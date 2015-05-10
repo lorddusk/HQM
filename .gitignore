@@ -1,0 +1,12 @@
+build
+.gradle
+eclipse
+new_old
+old
+out
+libs
+*.txt
+*.iml
+*.ipr
+*.iws
+/bin/

@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "The Journey (4.2.3 - DEBUG)"
+group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "HQM"
+
+minecraft {
+    version = "1.7.10-10.13.2.1284"
+    runDir = "eclipse/assets"
+
+	//replacing stuff in code.
+	replace "@VERSION@", project.version
+	replaceIn "ModInformation.java"
+}
+
+def root = project.projectDir.parentFile
+sourceSets {
+    main {
+        java {
+            srcDir new File(root, "src")
+        }
+        resources {
+            srcDir new File(root, "resources")
+        }
+    }
+}
+
+processResources
+{
+	inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in text files, not binary ones.
+    from(sourceSets.main.resources.srcDirs) {
+        include '**/*.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    // copy everything else, thats not text
+    from(sourceSets.main.resources.srcDirs) {
+		exclude '**/*.info'
+	}
+}
+
+jar {
+    exclude "**/*.psd"
+}
+
+repositories {
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven { // the repo from which to get NEI and stuff
+        name 'CB Repo'
+        url "http://chickenbones.net/maven/"
+    }
+}
+
+dependencies {
+    compile "mcp.mobius.waila:Waila:1.5.3_1.7.10"
+}
+
+task copyChicken(type: Copy, dependsOn: "extractUserDev") {
+    from { configurations.compile }
+    include "**/*Chicken*.jar", "**/*NotEnoughItems*.jar"
+    exclude "**/CodeChickenLib*" // because CCC downloads it anyways.. -_-
+    into file("/eclipse/assets/mods") // paralell to the assets dir
+
+    mustRunAfter "deobfBinJar"
+    mustRunAfter "repackMinecraft"
+}
+tasks.setupDevWorkspace.dependsOn copyChicken
+tasks.setupDecompWorkspace.dependsOn copyChicken
