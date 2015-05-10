@@ -204,7 +204,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
                 if (Quest.isEditing) {
                     if (item == null) {
-                        FMLLog.log("HQM-EDIT", Level.INFO, "Changed %s to bedrock.", Item.itemRegistry.getNameForObject(item));
+                        FMLLog.log("HQM-EDIT", Level.INFO, "Changed invalid item to bedrock.");
                         item = Item.getItemFromBlock(Blocks.bedrock);
                     }
                 }
