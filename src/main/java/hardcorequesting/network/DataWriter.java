@@ -219,16 +219,12 @@ public class DataWriter {
     }
 
     public void writeItemStack(ItemStack itemStack, boolean useSize) {
-        try {
         writeItem(itemStack.getItem());
         if (useSize) {
             writeData(itemStack.stackSize, DataBitHelper.SHORT);
         }
         writeData(itemStack.getItemDamage(), DataBitHelper.SHORT);
         writeNBT(itemStack.getTagCompound());
-        }catch(Exception e){
-            System.out.println("Check the name of the Quest before this error. There is something in that quest that shouldn't be there.");
-        }
     }
 
     public void writeItem(Item item) {

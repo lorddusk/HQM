@@ -1,6 +1,7 @@
 package hardcorequesting.quests;
 
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
@@ -11,12 +12,15 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
@@ -64,9 +68,9 @@ public abstract class QuestTaskItems extends QuestTask {
         public String getDisplayName() {
             if (hasItem && item == null) {
                 return "Nothing";
-            }else if (item != null) {
+            } else if (item != null) {
                 return item.getItem() != null ? item.getDisplayName() : "Unknown";
-            }else{
+            } else {
                 return fluid.getLocalizedName();
             }
         }
@@ -78,20 +82,20 @@ public abstract class QuestTaskItems extends QuestTask {
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);
             SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CREATE);
-        }else{
+        } else {
             SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CHANGE);
         }
 
         if (id < items.length) {
             if (element instanceof GuiEditMenuItem.ElementItem) {
-                GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem)element;
+                GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem) element;
                 items[id].hasItem = true;
                 items[id].fluid = null;
                 ItemStack itemStack = item.getItem().copy();
                 itemStack.stackSize = 1;
                 items[id].item = itemStack;
-            }else{
-                GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid)element;
+            } else {
+                GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
                 items[id].hasItem = false;
                 items[id].fluid = fluid.getItem();
                 items[id].item = null;
@@ -106,7 +110,7 @@ public abstract class QuestTaskItems extends QuestTask {
             return 0;
         }
 
-        QuestDataTaskItems data = ((QuestDataTaskItems)getData(player));
+        QuestDataTaskItems data = ((QuestDataTaskItems) getData(player));
         if (id >= data.progress.length) {
             data.progress = Arrays.copyOf(data.progress, data.progress.length + 1);
         }
@@ -115,7 +119,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     private void setProgress(EntityPlayer player, int id, int progress) {
-        ((QuestDataTaskItems)getData(player)).progress[id] = progress;
+        ((QuestDataTaskItems) getData(player)).progress[id] = progress;
     }
 
 
@@ -143,14 +147,14 @@ public abstract class QuestTaskItems extends QuestTask {
         super.read(dr, task, version, light);
         if (light) {
             for (int i = 0; i < items.length; i++) {
-                ((QuestDataTaskItems)task).progress[i] = dr.readData(DataBitHelper.ITEM_PROGRESS);
+                ((QuestDataTaskItems) task).progress[i] = dr.readData(DataBitHelper.ITEM_PROGRESS);
             }
-        }else{
+        } else {
             int count = dr.readData(DataBitHelper.TASK_ITEM_COUNT);
             for (int i = 0; i < count; i++) {
                 int progress = dr.readData(DataBitHelper.ITEM_PROGRESS);
-                if (i < ((QuestDataTaskItems)task).progress.length) {
-                    ((QuestDataTaskItems)task).progress[i] = Math.min(items[i].required, Math.max(0, progress));
+                if (i < ((QuestDataTaskItems) task).progress.length) {
+                    ((QuestDataTaskItems) task).progress[i] = Math.min(items[i].required, Math.max(0, progress));
                 }
             }
         }
@@ -164,7 +168,7 @@ public abstract class QuestTaskItems extends QuestTask {
             dw.writeData(items.length, DataBitHelper.TASK_ITEM_COUNT);
         }
         for (int i = 0; i < items.length; i++) {
-            dw.writeData(((QuestDataTaskItems)task).progress[i], DataBitHelper.ITEM_PROGRESS);
+            dw.writeData(((QuestDataTaskItems) task).progress[i], DataBitHelper.ITEM_PROGRESS);
         }
 
     }
@@ -180,7 +184,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 dw.writeNBT(item.item.getTagCompound());
                 dw.writeData(item.required, DataBitHelper.TASK_REQUIREMENT);
                 dw.writeData(item.precision.ordinal(), DataBitHelper.ITEM_PRECISION);
-            }else{
+            } else {
                 FluidStack fluidStack = new FluidStack(item.fluid, item.required);
                 NBTTagCompound compound = new NBTTagCompound();
                 fluidStack.writeToNBT(compound);
@@ -193,18 +197,25 @@ public abstract class QuestTaskItems extends QuestTask {
     public void load(DataReader dr, FileVersion version) {
         int count = dr.readData(DataBitHelper.TASK_ITEM_COUNT);
         ItemRequirement[] items = new ItemRequirement[count];
-
         for (int i = 0; i < items.length; i++) {
             boolean isItem = dr.readBoolean();
             if (isItem) {
                 Item item = dr.readItem();
+
+                if (Quest.isEditing) {
+                    if (item == null) {
+                        FMLLog.log("HQM-EDIT", Level.INFO, "Changed %s to bedrock.", Item.itemRegistry.getNameForObject(item));
+                        item = Item.getItemFromBlock(Blocks.bedrock);
+                    }
+                }
+
                 int dmg = dr.readData(DataBitHelper.SHORT);
                 NBTTagCompound compound = dr.readNBT();
                 ItemStack itemStack = new ItemStack(item, 1, dmg);
                 itemStack.setTagCompound(compound);
                 items[i] = new ItemRequirement(itemStack, dr.readData(DataBitHelper.TASK_REQUIREMENT));
                 items[i].precision = ItemPrecision.values()[dr.readData(DataBitHelper.ITEM_PRECISION)];
-            }else{
+            } else {
                 NBTTagCompound compound = dr.readNBT();
                 FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(compound);
                 if (fluidStack != null) {
@@ -230,7 +241,7 @@ public abstract class QuestTaskItems extends QuestTask {
             ItemRequirement item = items[i];
             if (item.hasItem) {
                 gui.drawItem(item.item, item.x, item.y, mX, mY, false);
-            }else{
+            } else {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
 
@@ -260,13 +271,13 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     private ItemRequirement[] getEditFriendlyItems(ItemRequirement[] items) {
-        if(Quest.isEditing && items.length < DataBitHelper.TASK_ITEM_COUNT.getMaximum()){
+        if (Quest.isEditing && items.length < DataBitHelper.TASK_ITEM_COUNT.getMaximum()) {
             items = Arrays.copyOf(items, items.length + 1);
-        }else{
+        } else {
             return items;
         }
 
-        items[items.length - 1] = new ItemRequirement((ItemStack)null, 1);
+        items[items.length - 1] = new ItemRequirement((ItemStack) null, 1);
         setPositions(items);
         return items;
     }
@@ -283,7 +294,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                     if (gui.getCurrentMode() == GuiQuestBook.EditMode.ITEM) {
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.item != null ? item.item.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE && (item.item != null || item.fluid != null))  {
+                    } else if (gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE && (item.item != null || item.fluid != null)) {
                         ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                         int id = 0;
                         for (int j = 0; j < this.items.length; j++) {
@@ -306,10 +317,8 @@ public abstract class QuestTaskItems extends QuestTask {
     protected abstract GuiEditMenuItem.Type getMenuTypeId();
 
 
-
     public boolean increaseItems(ItemStack[] itemsToConsume, QuestDataTaskItems data, String playerName) {
         if (!parent.isAvailable(playerName)) return false;
-
 
 
         boolean updated = false;
@@ -367,7 +376,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
     @Override
     public float getCompletedRatio(String playerName) {
-        QuestDataTaskItems data = (QuestDataTaskItems)getData(playerName);
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerName);
         int done = 0;
         int total = 0;
         for (int count : data.progress) {
@@ -382,8 +391,8 @@ public abstract class QuestTaskItems extends QuestTask {
 
     @Override
     public void mergeProgress(String playerName, QuestDataTask own, QuestDataTask other) {
-        int[] ownProgress = ((QuestDataTaskItems)own).progress;
-        int[] otherProgress = ((QuestDataTaskItems)other).progress;
+        int[] ownProgress = ((QuestDataTaskItems) own).progress;
+        int[] otherProgress = ((QuestDataTaskItems) other).progress;
 
         boolean completed = true;
         for (int i = 0; i < ownProgress.length; i++) {
@@ -402,8 +411,8 @@ public abstract class QuestTaskItems extends QuestTask {
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
 
-        int[] ownProgress = ((QuestDataTaskItems)own).progress;
-        int[] otherProgress = ((QuestDataTaskItems)other).progress;
+        int[] ownProgress = ((QuestDataTaskItems) own).progress;
+        int[] otherProgress = ((QuestDataTaskItems) other).progress;
 
 
         System.arraycopy(otherProgress, 0, ownProgress, 0, ownProgress.length);
@@ -411,7 +420,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
     @Override
     public void autoComplete(String playerName) {
-        QuestDataTaskItems data = (QuestDataTaskItems)getData(playerName);
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerName);
         for (int i = 0; i < items.length; i++) {
             data.progress[i] = items[i].required;
         }
