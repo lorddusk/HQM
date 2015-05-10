@@ -1748,7 +1748,7 @@ public class Quest {
 
                 dw.writeData(quest.set.getId(), DataBitHelper.QUEST_SETS);
 
-                if (quest.getIcon() != null) {
+                if (quest.getIcon() != null && quest.getIcon().getItem() != null) {
                     dw.writeBoolean(true);
                     dw.writeItemStack(quest.getIcon(), false);
                 } else {

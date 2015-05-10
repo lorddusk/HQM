@@ -158,6 +158,10 @@ public class DataReader {
     public Item readItem() {
         if (version.contains(FileVersion.NO_ITEM_IDS)) {
             String readString = readString(DataBitHelper.SHORT);
+            if (readString == null) {
+                FMLLog.log("HQM", Level.ERROR,  "Attempted to read an item that doesn't exist %s", readString);
+                return null;
+            }
             Object obj = Item.itemRegistry.getObject(readString);
             if (obj == null) {
                 FMLLog.log("HQM", Level.ERROR, "Attempted to read an item that doesn't exist %s", readString);
