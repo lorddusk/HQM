@@ -1,5 +1,6 @@
 package hardcorequesting.quests;
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
@@ -18,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -1800,8 +1802,8 @@ public class Quest {
 
                 System.out.println("Quest title :" + quest.getName());
 
-                writeRewardData(dw, quest.reward);
-                writeRewardData(dw, quest.rewardChoice);
+                writeRewardData(dw, quest.reward, quest);
+                writeRewardData(dw, quest.rewardChoice, quest);
 
                 int count = quest.reputationRewards != null ? quest.reputationRewards.size() : 0;
                 dw.writeData(count, DataBitHelper.REPUTATION_REWARD);
@@ -1819,7 +1821,7 @@ public class Quest {
         Group.saveAll(dw);
     }
 
-    private static void writeRewardData(DataWriter dw, ItemStack[] reward) {
+    private static void writeRewardData(DataWriter dw, ItemStack[] reward, Quest quest) {
         dw.writeBoolean(reward != null);
         if (reward != null) {
             int count = 0;
@@ -1830,8 +1832,10 @@ public class Quest {
             }
             dw.writeData(count, DataBitHelper.REWARDS);
             for (ItemStack itemStack : reward) {
-                if (itemStack != null) {
+                if (itemStack != null && itemStack.getItem()!=null) {
                     dw.writeItemStack(itemStack, true);
+                } else {
+                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards. This shouldn't happen", quest.getName());
                 }
             }
         }
