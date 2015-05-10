@@ -6,6 +6,10 @@ import hardcorequesting.QuestingData;
 
 import java.io.*;
 
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLLog;
+
 public abstract class FileHelper {
 
     public enum SaveResult {
@@ -71,6 +75,7 @@ public abstract class FileHelper {
             return SaveResult.SUCCESS;
         }catch(Exception e) {
             e.printStackTrace();
+            FMLLog.log("HQM", Level.ERROR, e, "An error occurred during quest book writing");
             boolean success = false;
             if (moveUpFileIndices(file.getAbsolutePath() + PRE_CRASH_SUFFIX, 0)) {
                 if (backup(new File(file.getAbsolutePath() + BACKUP_SUFFIX), new File(file.getAbsolutePath() + PRE_CRASH_SUFFIX + 0))) {
