@@ -13,6 +13,7 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
+import hardcorequesting.items.ModItems;
 import hardcorequesting.network.*;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.client.Minecraft;
@@ -1833,7 +1834,8 @@ public class Quest {
                 if (itemStack != null && itemStack.getItem()!=null) {
                     dw.writeItemStack(itemStack, true);
                 } else {
-                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards. This shouldn't happen", quest.getName());
+                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards - substituting an HQM book", quest.getName());
+                    dw.writeItemStack(new ItemStack(ModItems.book,1), false);
                 }
             }
         }
@@ -2044,7 +2046,13 @@ public class Quest {
             int count = dr.readData(DataBitHelper.REWARDS);
             ItemStack[] reward = new ItemStack[count];
             for (int i = 0; i < reward.length; i++) {
-                reward[i] = dr.readAndFixItemStack(true);
+                ItemStack rewardItemStack = dr.readAndFixItemStack(true);
+                if (rewardItemStack != null && rewardItemStack.getItem() != null) {
+                    reward[i] = rewardItemStack;
+                } else {
+                    FMLLog.log("HQM", Level.ERROR, "Invalid reward item. Substituting an HQM book.");
+                    reward[i] = new ItemStack(ModItems.book,1);
+                }
             }
             return reward;
         } else {
