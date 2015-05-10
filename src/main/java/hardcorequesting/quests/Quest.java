@@ -1800,8 +1800,6 @@ public class Quest {
                     task.save(dw);
                 }
 
-                System.out.println("Quest title :" + quest.getName());
-
                 writeRewardData(dw, quest.reward, quest);
                 writeRewardData(dw, quest.rewardChoice, quest);
 
@@ -1842,6 +1840,7 @@ public class Quest {
     }
 
     public static void loadAll(DataReader dr, FileVersion version) {
+        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quests");
         if (dr != null) {
             EventHandler.instance().clear();
             try {
@@ -1866,6 +1865,7 @@ public class Quest {
 
 
                 int count = dr.readData(DataBitHelper.QUESTS);
+                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "%d quests found", count);
                 for (int id = 0; id < count; id++) {
                     if (dr.readBoolean()) {
                         String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
@@ -1875,6 +1875,7 @@ public class Quest {
                         boolean big = dr.readBoolean();
 
                         Quest quest = new Quest(id, name, description, x, y, big);
+                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest %s", name);
 
                         if (version.lacks(FileVersion.SETS)) {
                             quest.setQuestSet(QuestLine.getActiveQuestLine().questSets.get(0));
@@ -1942,7 +1943,9 @@ public class Quest {
                             }
                         }
 
+                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest rewards", name);
                         quest.reward = readRewardData(dr);
+                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest reward choices", name);
                         quest.rewardChoice = readRewardData(dr);
 
                         if (version.contains(FileVersion.REPUTATION)) {
@@ -1977,12 +1980,15 @@ public class Quest {
                 }
 
 
+                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading bags");
                 if (version.contains(FileVersion.BAGS)) {
                     GroupTier.readAll(dr, version);
                     Group.readAll(dr, version);
                 }
+                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading complete");
             } catch (Exception ex) {
                 ex.printStackTrace();
+                FMLLog.log("HQM", Level.ERROR, ex, "Error occurred during quest loading");
             }
 
             /*PrintWriter writer = null;
