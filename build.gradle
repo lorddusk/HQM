@@ -82,7 +82,7 @@ task copyChicken(type: Copy, dependsOn: "extractUserDev") {
     from { configurations.compile }
     include "**/*Chicken*.jar", "**/*NotEnoughItems*.jar"
     exclude "**/CodeChickenLib*" // because CCC downloads it anyways.. -_-
-    into file("/eclipse/assets/mods") // paralell to the assets dir
+    into file("eclipse/assets/mods") // paralell to the assets dir
 
     mustRunAfter "deobfBinJar"
     mustRunAfter "repackMinecraft"
