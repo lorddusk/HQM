@@ -11,15 +11,18 @@ public class ModItems {
 	public static Item book;
     public static Item hearts;
     public static Item bags;
+    public static Item invalidItem;
 
     public static void init() {
         book = new ItemQuestBook().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
         hearts = new ItemHeart();
         bags = new ItemBag();
+        invalidItem = new ItemInvalid();
 
         GameRegistry.registerItem(book, ItemInfo.BOOK_UNLOCALIZED_NAME);
         GameRegistry.registerItem(hearts, ItemInfo.HEART_UNLOCALIZED_NAME);
         GameRegistry.registerItem(bags, ItemInfo.BAG_UNLOCALIZED_NAME);
+        GameRegistry.registerItem(invalidItem,ItemInfo.INVALID_UNLOCALIZED_NAME);
 	}
 	
 

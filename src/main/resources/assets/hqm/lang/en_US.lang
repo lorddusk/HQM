@@ -20,3 +20,4 @@ item.hqm:hearts_threequarts.name=Three quarters of a heart
 item.hqm:hearts_heart.name=Full heart
 item.hqm:hearts_rottenheart.name=Rotten heart
 item.hqm:bags.name=Reward Bag
+item.hqm:hqmInvalidItem.name=Invalid Item

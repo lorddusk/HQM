@@ -1834,8 +1834,8 @@ public class Quest {
                 if (itemStack != null && itemStack.getItem()!=null) {
                     dw.writeItemStack(itemStack, true);
                 } else {
-                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards - substituting an HQM book", quest.getName());
-                    dw.writeItemStack(new ItemStack(ModItems.book,1), false);
+                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards - substituting with HQM invalid item", quest.getName());
+                    dw.writeItemStack(new ItemStack(ModItems.invalidItem,1), false);
                 }
             }
         }
@@ -2050,8 +2050,8 @@ public class Quest {
                 if (rewardItemStack != null && rewardItemStack.getItem() != null) {
                     reward[i] = rewardItemStack;
                 } else {
-                    FMLLog.log("HQM", Level.ERROR, "Invalid reward item. Substituting an HQM book.");
-                    reward[i] = new ItemStack(ModItems.book,1);
+                    FMLLog.log("HQM", Level.ERROR, "Invalid reward item. Substituting with HQM invalid item.");
+                    reward[i] = new ItemStack(ModItems.invalidItem,1);
                 }
             }
             return reward;
