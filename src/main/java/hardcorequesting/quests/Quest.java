@@ -1885,7 +1885,12 @@ public class Quest {
                         }
 
                         if (version.contains(FileVersion.SETS) && dr.readBoolean()) {
-                            quest.setIcon(dr.readItemStack(false));
+                            ItemStack readItemStack = dr.readItemStack(false);
+                            if (readItemStack.getItem() == null) {
+                                FMLLog.log("HQM", Level.ERROR, "Attempted to read invalid icon for quest");
+                                readItemStack = null;
+                            }
+                            quest.setIcon(readItemStack);
                         } else {
                             quest.setIcon(null);
                         }
