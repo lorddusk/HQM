@@ -13,6 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLLog;
+
 public class DataReader {
 
     private InputStream stream;
@@ -153,7 +157,12 @@ public class DataReader {
 
     public Item readItem() {
         if (version.contains(FileVersion.NO_ITEM_IDS)) {
-            Object obj = Item.itemRegistry.getObject(readString(DataBitHelper.SHORT));
+            String readString = readString(DataBitHelper.SHORT);
+            Object obj = Item.itemRegistry.getObject(readString);
+            if (obj == null) {
+                FMLLog.log("HQM", Level.ERROR, "Attempted to read an item that doesn't exist %s", readString);
+                return null;
+            }
             if (obj instanceof Item) {
                 return (Item)obj;
             }
