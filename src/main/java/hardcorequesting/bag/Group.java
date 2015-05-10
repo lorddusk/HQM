@@ -17,6 +17,10 @@ import net.minecraft.world.storage.SaveHandler;
 
 import java.util.*;
 
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLLog;
+
 public class Group {
 
 
@@ -100,7 +104,7 @@ public class Group {
                 EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
                 player.worldObj.spawnEntityInWorld(entityItem);
             }
-        }   
+        }
     }
 
     public void setName(String name) {
@@ -158,11 +162,16 @@ public class Group {
 
             GroupTier tier = GroupTier.getTiers().get(dr.readData(DataBitHelper.TIER_COUNT));
             List<ItemStack> items = new ArrayList<ItemStack>();
+            if (Quest.isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest group %s", name);
             int itemCount = dr.readData(DataBitHelper.GROUP_ITEMS);
             for (int j = 0; j < itemCount; j++) {
                 ItemStack itemStack = dr.readItemStack(true);
                 if (itemStack != null) {
-                    items.add(itemStack);
+                    if (itemStack.getItem() != null) {
+                        items.add(itemStack);
+                    } else {
+                        FMLLog.log("HQM", Level.ERROR, "The bag item is invalid, skipping");
+                    }
                 }
             }
 
