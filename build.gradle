@@ -92,3 +92,13 @@ task copyChicken(type: Copy, dependsOn: "extractUserDev") {
 }
 tasks.setupDevWorkspace.dependsOn copyChicken
 tasks.setupDecompWorkspace.dependsOn copyChicken
+
+def libDir = './build/libs'
+
+task deobfJar(type: Jar) {
+    description = 'Creates a jar file containing the non-obfuscated class files'
+    classifier = 'deobf'
+    destinationDir = file(libDir)
+    from sourceSets.main.output.classesDir
+}
+tasks.build.dependsOn deobfJar
