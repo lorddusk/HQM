@@ -1613,7 +1613,8 @@ public class Quest {
         if (other.completed) {
             own.completed = true;
 
-            if (other.available) {
+            //If a quest is marked both claimed & available, then repeatable quests will never reset.
+            if (other.available && !own.claimed) {
                 own.available = true;
             }
         }
