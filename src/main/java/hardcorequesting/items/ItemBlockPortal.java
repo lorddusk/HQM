@@ -19,6 +19,8 @@ import java.util.List;
 public class ItemBlockPortal extends ItemBlock {
     public ItemBlockPortal(Block block) {
         super(block);
+        block.setBlockUnbreakable();
+        block.setResistance(6000000.0F);
     }
 
     @Override

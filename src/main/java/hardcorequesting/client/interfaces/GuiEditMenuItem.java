@@ -212,8 +212,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
             for (int i = 0; i < end; i++) {
                 Element item = playerItems.get(i);
                 FluidStack fluidStack = FluidContainerRegistry.getFluidForFilledItem((ItemStack) item.getItem());
-                if (fluidStack != null && !fluids.contains(fluidStack.fluidID)) {
-                    fluids.add(fluidStack.fluidID);
+                if (fluidStack != null && !fluids.contains(fluidStack.getFluidID())) {
+                    fluids.add(fluidStack.getFluidID());
                     playerItems.add(new ElementFluid(fluidStack.getFluid()));
                     if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
                         break;

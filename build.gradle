@@ -17,12 +17,15 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "The Journey (4.2.4)"
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+version = "The Journey (4.3.0)"
 group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "HQM"
 
 minecraft {
-    version = "1.7.10-10.13.2.1284"
+    version = "10.13.4.1448-1.7.10"
     runDir = "eclipse/assets"
 
 	//replacing stuff in code.

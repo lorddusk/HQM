@@ -9,7 +9,9 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.relauncher.Side;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
@@ -20,9 +22,11 @@ import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
+import java.util.Map;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION/*, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory"*/)
 public class HardcoreQuesting {
@@ -37,9 +41,13 @@ public class HardcoreQuesting {
 
     public static String path;
 
+    public static File configDir;
+
     public static Configuration config;
 
     public static FMLEventChannel packetHandler;
+
+    private static EntityPlayer commandUser;
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -59,6 +67,7 @@ public class HardcoreQuesting {
         ModBlocks.registerBlocks();
         ModBlocks.registerTileEntities();
 
+        configDir = new File(path);
         config = new Configuration(new File(path+ "editmode.cfg"));
         syncEdit();
 
@@ -121,11 +130,28 @@ public class HardcoreQuesting {
             syncEdit();
     }
 
+    @NetworkCheckHandler
+    public boolean networkCheck(Map<String, String> map, Side side)
+    {
+        return true;
+    }
+
+
     public static void syncEdit(){
         Quest.isEditing = config.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
         if(config.hasChanged()) {
             config.save();
         }
+    }
+
+    public static EntityPlayer getPlayer()
+    {
+        return commandUser;
+    }
+
+    public static void setPlayer(EntityPlayer player)
+    {
+        commandUser = player;
     }
 
 
