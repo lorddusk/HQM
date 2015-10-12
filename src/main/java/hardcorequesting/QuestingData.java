@@ -516,6 +516,29 @@ public class QuestingData {
 			data.put(name, this);
 		}
         team.postRead(this, version);
+
+        //When filling in data for a player on a team, we sometimes follow a codepath that causes us to attempt to
+        //access its teammates.  If those teammates haven't been loaded yet, we'll generate dummy versions of the
+        //players and put them into the questing data db (for some reason??) then
+        //we won't load the player's data when it comes time to acutally load them from the file because the player is
+        //already in the database (why???) and so that player will have their progress wiped.  If that player is
+        //the team leader, then the team's progress gets nuked.
+
+        //This can be avoided by checking the database after loading a player & removing dummy teammates.  It should
+        //probably be avoided by dropping a nuke on the code responsible, but you gotta do what ya gotta do.
+        for (Object teammateObj : team.getPlayers()) {
+            Team.PlayerEntry teammate = (Team.PlayerEntry)teammateObj;
+
+            if (!teammate.isInTeam())
+                continue;
+
+            String name = teammate.getName();
+            if (QuestingData.data.containsKey(name)) {
+                QuestingData teammatePlayer = (QuestingData)QuestingData.data.get(name);
+                if (teammatePlayer.getTeam().getId() != team.getId())
+                    QuestingData.data.remove(name);
+            }
+        }
 	}
 
 
