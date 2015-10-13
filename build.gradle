@@ -20,9 +20,9 @@ apply plugin: 'forge'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-version = "The Journey (4.3.0)"
+version = "4.3.0"
 group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "HQM"
+archivesBaseName = "HQM-The Journey"
 
 minecraft {
     version = "10.13.4.1448-1.7.10"
