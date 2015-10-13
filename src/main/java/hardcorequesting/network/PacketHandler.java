@@ -7,6 +7,7 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.*;
+import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.GuiReward;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -169,6 +170,7 @@ public class PacketHandler {
                     break;
                 case QUEST_SYNC:
                     QuestLine.receiveServerSync(dr);
+                    GuiEditMenuItem.Search.initItems();
                     break;
                 case BAG_INTERFACE:
                     GuiReward.open(player, dr);
