@@ -63,7 +63,12 @@ public class Group {
 
 
     public String getName() {
-        return name == null || name.equals("") ? tier.getName() + " Group" : name;
+        return hasName() ? name : tier.getName() + " Group";
+    }
+
+    public boolean hasName()
+    {
+        return name != null && !name.isEmpty();
     }
 
     public List<ItemStack> getItems() {

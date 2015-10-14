@@ -1,14 +1,10 @@
 package hardcorequesting.quests;
 
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
-import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
@@ -18,12 +14,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.StringUtils;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 
 public class QuestTaskLocation extends QuestTask {
 
@@ -83,7 +76,8 @@ public class QuestTaskLocation extends QuestTask {
         }
 
 
-    public class Location {
+    public static class Location {
+
         private ItemStack icon;
         private String name = "New";
         private int x;
@@ -107,8 +101,20 @@ public class QuestTaskLocation extends QuestTask {
             return location;
         }
 
+        public ItemStack getIcon() {
+            return icon;
+        }
+
+        public void setIcon(ItemStack icon) {
+            this.icon = icon;
+        }
+
         public String getName() {
             return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
 
         public int getX() {
@@ -231,7 +237,7 @@ public class QuestTaskLocation extends QuestTask {
         }
     }
 
-    Location[] locations = new Location[0];
+    public Location[] locations = new Location[0];
 
     private Location[] getEditFriendlyLocations(Location[] locations) {
         if(Quest.isEditing && locations.length < DataBitHelper.TASK_LOCATION_COUNT.getMaximum()){

@@ -1,4 +1,4 @@
-package hardcorequesting.quests;
+package hardcorequesting.parsing;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -7,6 +7,7 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.parsing.MinecraftAdapter;
+import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.item.ItemStack;
@@ -20,9 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by lang2 on 10/12/2015.
- */
 public class QuestAdapter {
     public static Quest QUEST;
     public static QuestTask TASK;
@@ -41,16 +39,6 @@ public class QuestAdapter {
         DEATH(QuestTaskDeath.class, "Death task", "A task where the player has to die a certain amount of times."),
         REPUTATION(QuestTaskReputationTarget.class, "Reputation task", "A task where the player has to reach a certain reputation."),
         REPUTATION_KILL(QuestTaskReputationKill.class, "Rep kill task", "A task where the player has to kill other players with certain reputations.");
-
-        private static Method addTaskData;
-
-        static {
-            try {
-                addTaskData = Quest.class.getDeclaredMethod("addTaskData", QuestData.class);
-                addTaskData.setAccessible(true);
-            } catch (NoSuchMethodException ignored) {
-            }
-        }
 
         private final Class<? extends QuestTask> clazz;
         private final String name;
@@ -82,9 +70,9 @@ public class QuestAdapter {
         public void addTaskData(Quest quest) {
             try {
                 if(HardcoreQuesting.getPlayer() != null) {
-                    addTaskData.invoke(quest, quest.getQuestData(HardcoreQuesting.getPlayer()));
+                    quest.addTaskData(quest.getQuestData(HardcoreQuesting.getPlayer()));
                 }else{
-                    addTaskData.invoke(quest, quest.getQuestData("lorddusk"));
+                    quest.addTaskData(quest.getQuestData("lorddusk"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -178,7 +166,7 @@ public class QuestAdapter {
         public void write(JsonWriter out, QuestTaskLocation.Location value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
-            ItemStack stack = ReflectionHelper.getPrivateValue(QuestTaskLocation.Location.class, value, ICON);
+            ItemStack stack = value.getIcon();
             if (stack != null) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
             }
@@ -195,11 +183,11 @@ public class QuestAdapter {
         @Override
         public QuestTaskLocation.Location read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskLocation.Location result = ((QuestTaskLocation) TASK).new Location();
+            QuestTaskLocation.Location result =  new QuestTaskLocation.Location();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
-                    ReflectionHelper.setPrivateValue(QuestTaskLocation.Location.class, result, in.nextString(), NAME);
+                    result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(X)) {
                     result.setX(in.nextInt());
                 } else if (name.equalsIgnoreCase(Y)) {
@@ -211,7 +199,7 @@ public class QuestAdapter {
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    ReflectionHelper.setPrivateValue(QuestTaskLocation.Location.class, result, MinecraftAdapter.ITEM_STACK.read(in), ICON);
+                    result.setIcon(MinecraftAdapter.ITEM_STACK.read(in));
                 } else if (name.equalsIgnoreCase(VISIBLE)) {
                     result.setVisible(QuestTaskLocation.Visibility.valueOf(in.nextString()));
                 }
@@ -455,7 +443,7 @@ public class QuestAdapter {
             int days = 0, hours = 0;
             in.beginObject();
             while (in.hasNext()) {
-                switch (in.nextName()) {
+                switch (in.nextName().toLowerCase()) {
                     case TYPE:
                         type = RepeatType.valueOf(in.nextString());
                         break;
@@ -488,7 +476,7 @@ public class QuestAdapter {
             in.beginObject();
             int rep = 0, val = 0;
             while (in.hasNext()) {
-                switch (in.nextName()) {
+                switch (in.nextName().toLowerCase()) {
                     case REPUTATION:
                         rep = in.nextInt();
                         break;
@@ -599,7 +587,7 @@ public class QuestAdapter {
             List<Integer> requirement = new ArrayList<>(), options = new ArrayList<>();
             in.beginObject();
             while (in.hasNext()) {
-                switch (in.nextName()) {
+                switch (in.nextName().toLowerCase()) {
                     case NAME:
                         QUEST.setName(in.nextString());
                         break;
@@ -607,10 +595,10 @@ public class QuestAdapter {
                         QUEST.setDescription(in.nextString());
                         break;
                     case X:
-                        ReflectionHelper.setPrivateValue(Quest.class, QUEST, in.nextInt(), X);
+                        QUEST.setX(in.nextInt());
                         break;
                     case Y:
-                        ReflectionHelper.setPrivateValue(Quest.class, QUEST, in.nextInt(), Y);
+                        QUEST.setY(in.nextInt());
                         break;
                     case TRIGGER_TASKS:
                         QUEST.setTriggerTasks(in.nextInt());

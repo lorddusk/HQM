@@ -80,7 +80,6 @@ public class Quest {
     private boolean useModifiedParentRequirement;
     private int parentRequirementCount;
 
-
     private int x;
     private int y;
     private boolean isBig;
@@ -366,6 +365,13 @@ public class Quest {
         }
     }
 
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
 
     public RepeatInfo getRepeatInfo() {
         return repeatInfo;
@@ -1192,7 +1198,7 @@ public class Quest {
         return data;
     }
 
-    private boolean addTaskData(QuestData data) {
+    public boolean addTaskData(QuestData data) {
         data.tasks = new QuestDataTask[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
             try {
