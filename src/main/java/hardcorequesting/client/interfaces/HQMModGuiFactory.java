@@ -6,27 +6,29 @@ import net.minecraft.client.gui.GuiScreen;
 
 import java.util.Set;
 
-/**
- * Created by Tim on 6/26/2014.
- */
-public class HQMModGuiFactory implements IModGuiFactory {
+public class HQMModGuiFactory implements IModGuiFactory
+{
     @Override
-    public void initialize(Minecraft minecraftInstance) {
+    public void initialize(Minecraft minecraftInstance)
+    {
 
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
+    public Class<? extends GuiScreen> mainConfigGuiClass()
+    {
         return HQMConfigGui.class;
     }
 
     @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories()
+    {
         return null;
     }
 
     @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
+    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element)
+    {
         return null;
     }
 }
