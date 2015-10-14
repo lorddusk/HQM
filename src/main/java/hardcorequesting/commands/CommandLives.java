@@ -1,6 +1,7 @@
 package hardcorequesting.commands;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import hardcorequesting.Lang;
 import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
 import net.minecraft.command.CommandException;
@@ -19,6 +20,7 @@ public class CommandLives extends CommandBase
     public CommandLives()
     {
         super("lives", ADD, REMOVE);
+        permissionLevel = 0;
     }
 
     @Override
@@ -50,23 +52,27 @@ public class CommandLives extends CommandBase
                 currentLives((EntityPlayer) sender);
             }
         }
-        else if (arguments.length == 1) {
-            if (arguments[0].matches(REMOVE) && isPlayerOp(sender)) {
+        if (!isPlayerOp(sender))
+        {
+            throw new CommandException(Lang.NO_PERMISSION);
+        }
+        if (arguments.length == 1) {
+            if (arguments[0].matches(REMOVE)) {
                 if (sender instanceof EntityPlayer) {
                     removeLive((EntityPlayer) sender);
                 }
-            } else if (arguments[0].matches(ADD) && isPlayerOp(sender)) {
+            } else if (arguments[0].matches(ADD)) {
                 if (sender instanceof EntityPlayer) {
                     addLive((EntityPlayer) sender);
                 }
-            } else if (isPlayerOp(sender))
+            } else
             {
                 getPlayerLives(sender, arguments[0]);
             }
         }
         else if (arguments.length == 2) {
             //remove amount own.
-            if (arguments[0].matches(REMOVE) && isPlayerOp(sender)) {
+            if (arguments[0].matches(REMOVE)) {
                 try {
                     amount = Integer.parseInt(arguments[1]);
                     if (sender instanceof EntityPlayer) {
@@ -77,7 +83,7 @@ public class CommandLives extends CommandBase
                 }
             }
             // remove playername
-            else if (arguments[1].matches(REMOVE) && isPlayerOp(sender)) {
+            else if (arguments[1].matches(REMOVE)) {
                 try {
                     amount = 1;
                     removeLivesFrom(sender, arguments[1], amount);
@@ -86,7 +92,7 @@ public class CommandLives extends CommandBase
                 }
             }
             //add amount own
-            else if (arguments[0].matches(ADD) && isPlayerOp(sender)) {
+            else if (arguments[0].matches(ADD)) {
                 try {
                     amount = Integer.parseInt(arguments[1]);
                     if (sender instanceof EntityPlayer) {
@@ -97,7 +103,7 @@ public class CommandLives extends CommandBase
                 }
             }
             //add amount playername
-            else if (arguments[0].matches(ADD) && isPlayerOp(sender)) {
+            else if (arguments[0].matches(ADD)) {
                 try {
                     amount = 1;
                     addLivesTo(sender, arguments[1], amount);
@@ -108,7 +114,7 @@ public class CommandLives extends CommandBase
         }
         else if (arguments.length == 3) {
             // /hqm lives remove playername amount
-            if (arguments[0].matches(REMOVE) && isPlayerOp(sender)) {
+            if (arguments[0].matches(REMOVE)) {
                 try {
                     amount = Integer.parseInt(arguments[2]);
                     removeLivesFrom(sender, arguments[1], amount);
@@ -117,7 +123,7 @@ public class CommandLives extends CommandBase
                 }
             }
             // /hqm lives add playername amount
-            else if (arguments[0].matches(ADD) && isPlayerOp(sender)) {
+            else if (arguments[0].matches(ADD)) {
                 try {
                     amount = Integer.parseInt(arguments[2]);
                     addLivesTo(sender, arguments[1], amount);

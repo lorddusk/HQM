@@ -8,6 +8,7 @@ public class CommandVersion extends CommandBase
     public CommandVersion()
     {
         super("version");
+        permissionLevel = 0;
     }
 
     @Override

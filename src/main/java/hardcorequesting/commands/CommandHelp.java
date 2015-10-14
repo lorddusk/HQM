@@ -21,6 +21,7 @@ public class CommandHelp extends CommandBase
     public CommandHelp()
     {
         super("help");
+        permissionLevel = -1;
     }
 
     @Override

@@ -30,6 +30,7 @@ public abstract class CommandBase implements ISubCommand
 
     private String name;
     private List<String> subCommands = new ArrayList<>();
+    protected int permissionLevel = 3;
 
     public CommandBase(String name, String... subCommands)
     {
@@ -46,7 +47,7 @@ public abstract class CommandBase implements ISubCommand
     @Override
     public int getPermissionLevel()
     {
-        return 3;
+        return permissionLevel;
     }
 
     @Override
@@ -70,7 +71,7 @@ public abstract class CommandBase implements ISubCommand
     @Override
     public boolean isVisible(ICommandSender sender)
     {
-        return isPlayerOp(sender);
+        return getPermissionLevel() <= 0 || isPlayerOp(sender);
     }
 
     @Override

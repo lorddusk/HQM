@@ -2,6 +2,7 @@ package hardcorequesting.commands;
 
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Lang;
+import hardcorequesting.bag.GroupTier;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
 import net.minecraft.command.CommandException;
@@ -21,7 +22,7 @@ public class CommandSave extends CommandBase
 
     public CommandSave()
     {
-        super("save", "all");
+        super("save", "all", "bags");
     }
 
     @Override
@@ -38,7 +39,11 @@ public class CommandSave extends CommandBase
                 {
                 }
             }
-        } else if (arguments.length > 0)
+        }
+        else if (arguments.length == 1 && arguments[0].equals("bags"))
+        {
+            save(sender, GroupTier.getTiers(), "bags");
+        }else if (arguments.length > 0)
         {
             for (QuestSet set : Quest.getQuestSets())
             {
@@ -92,14 +97,14 @@ public class CommandSave extends CommandBase
         return true;
     }
 
-    private static void save(ICommandSender sender, QuestSet set, String name)
+    private static void save(ICommandSender sender, Object save, String name)
     {
         try
         {
             File file = getFile(name);
             if (!file.exists()) file.createNewFile();
             FileWriter fileWriter = new FileWriter(file);
-            GSON.toJson(set, fileWriter);
+            GSON.toJson(save, fileWriter);
             fileWriter.close();
             sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
         } catch (IOException e)
@@ -111,6 +116,6 @@ public class CommandSave extends CommandBase
     @Override
     public int[] getSyntaxOptions(ICommandSender sender)
     {
-        return new int[]{0, 1};
+        return new int[]{0, 1, 2};
     }
 }

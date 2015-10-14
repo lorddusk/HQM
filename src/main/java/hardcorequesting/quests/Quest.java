@@ -79,7 +79,6 @@ public class Quest {
     private int triggerTasks = 1;
     private boolean useModifiedParentRequirement;
     private int parentRequirementCount;
-
     private int x;
     private int y;
     private boolean isBig;
@@ -371,6 +370,26 @@ public class Quest {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public ItemStack[] getReward()
+    {
+        return reward;
+    }
+
+    public void setReward(ItemStack[] reward)
+    {
+        this.reward = reward;
+    }
+
+    public ItemStack[] getRewardChoice()
+    {
+        return rewardChoice;
+    }
+
+    public void setRewardChoice(ItemStack[] rewardChoice)
+    {
+        this.rewardChoice = rewardChoice;
     }
 
     public RepeatInfo getRepeatInfo() {

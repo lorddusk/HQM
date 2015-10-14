@@ -154,6 +154,8 @@ public class BagAdapter
             group.setName(name);
             group.setLimit(limit);
             group.getItems().addAll(items);
+            if (!Group.getGroups().contains(group))
+                Group.add(group);
             return group;
         }
     };

@@ -221,4 +221,30 @@ public class Group {
     public boolean isValid(EntityPlayer player) {
         return limit == 0 || getRetrievalCount(player) < limit;
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj instanceof Group)
+        {
+            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size())
+            {
+                for (ItemStack stack : items)
+                {
+                    if (!listContains(stack, ((Group) obj).items)) return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean listContains(ItemStack stack, List<ItemStack> stacks)
+    {
+        for (ItemStack stack2 : stacks)
+        {
+            if (ItemStack.areItemStacksEqual(stack, stack2)) return true;
+        }
+        return false;
+    }
 }
