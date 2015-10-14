@@ -1,17 +1,23 @@
 package hardcorequesting.config;
 
+import cpw.mods.fml.client.config.IConfigElement;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import hardcorequesting.ModInformation;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Team;
 import hardcorequesting.items.ItemBag;
 import hardcorequesting.quests.QuestLine;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
-public class ModConfig {
-
-
+public class ModConfig
+{
     private static final String CATEGORY_GENERAL = "General";
 
     private static final String LIVES_KEY = "Default lives";
@@ -66,12 +72,26 @@ public class ModConfig {
     public static int OVERLAY_XPOSDEFAULT = 2;
     public static int OVERLAY_YPOSDEFAULT = 2;
 
-    public static void init(File file) {
-        Configuration config = new Configuration(file);
+    public static Configuration config;
 
-        config.load();
+    public static void init(File file)
+    {
+        if (config == null)
+        {
+            config = new Configuration(file);
+            loadConfig();
+        }
+    }
 
+    @SubscribeEvent
+    public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
+    {
+        if (event.modID.equalsIgnoreCase(ModInformation.ID))
+            loadConfig();
+    }
 
+    private static void loadConfig()
+    {
         int lives = config.get(CATEGORY_GENERAL, LIVES_KEY, LIVES_DEFAULT, LIVES_COMMENT).getInt(LIVES_DEFAULT);
         MAXLIVES = config.get(CATEGORY_GENERAL, MAXLIVES_KEY, MAXLIVES_DEFAULT, MAXLIVES_COMMENT).getInt(MAXLIVES_DEFAULT);
 
@@ -91,7 +111,6 @@ public class ModConfig {
             MAXROT = 1;
         }
 
-
         QuestingData.defaultLives = lives;
 
         QuestingData.autoHardcoreActivate = config.get(CATEGORY_GENERAL, AUTO_KEY, AUTO_DEFAULT, AUTO_COMMENT).getBoolean(AUTO_DEFAULT);
@@ -109,7 +128,16 @@ public class ModConfig {
         ROTTIMER = config.get(CATEGORY_GENERAL, FRESHNESS_KEY, FRESHNESS_DEFAULT, FRESHNESS_COMMENT).getBoolean(FRESHNESS_DEFAULT);
         MAXROT = config.get(CATEGORY_GENERAL, ROT_KEY, ROT_DEFAULT, ROT_COMMENT).getInt(ROT_DEFAULT);
 
-        config.save();
+        if (config.hasChanged())
+            config.save();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<IConfigElement> getConfigElements()
+    {
+        List<IConfigElement> list = new ArrayList<IConfigElement>();
+        list.addAll(new ConfigElement(config.getCategory(Configuration.CATEGORY_GENERAL)).getChildElements());
+        return list;
     }
 
 }
