@@ -118,13 +118,6 @@ public class HardcoreQuesting
 
     }
 
-    @NetworkCheckHandler
-    public boolean networkCheck(Map<String, String> map, Side side)
-    {
-        return true;
-    }
-
-
     public static EntityPlayer getPlayer()
     {
         return commandUser;
