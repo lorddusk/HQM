@@ -99,12 +99,12 @@ public class HardcoreQuesting
 
 
     }
-
-    @EventHandler
-    public void serverStarting(FMLServerStartingEvent event)
-    {
-        event.registerServerCommand(new CommandHandler());
-    }
+	
+	@EventHandler
+	public void serverStarting(FMLServerStartingEvent event)
+	{
+        event.registerServerCommand(CommandHandler.instance);
+	}
 
     @EventHandler
     public void serverAboutToStart(FMLServerAboutToStartEvent event)

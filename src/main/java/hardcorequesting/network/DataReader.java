@@ -52,7 +52,7 @@ public class DataReader {
         while (true) {
             int bitsLeft = bitCount - readBits;
             if (bitCountBuffer >= bitsLeft) {
-                data |= (byteBuffer & ((int)Math.pow(2, bitsLeft) - 1)) << readBits;
+                data |= (byteBuffer & ((1 << bitsLeft) - 1)) << readBits;
                 byteBuffer >>>= bitsLeft;
                 bitCountBuffer -= bitsLeft;
                 readBits += bitsLeft;
@@ -66,6 +66,7 @@ public class DataReader {
                 }catch (IOException ignored) {
                     byteBuffer = 0;
                 }
+
                 bitCountBuffer = 8;
             }
         }
@@ -177,6 +178,8 @@ public class DataReader {
         return null;
     }
 
+    private static final double LOG_2 = Math.log10(2);
+
     public <T extends Enum> T readEnum(Class<T> clazz) {
         try {
             Object[] values = (Object[] )clazz.getMethod("values").invoke(null);
@@ -184,7 +187,7 @@ public class DataReader {
             if (length == 0) {
                 return null;
             }
-            int bitCount = (int)(Math.log10(length) / Math.log10(2)) + 1;
+            int bitCount = (int)(Math.log10(length) / LOG_2) + 1;
 
             int val = readData(bitCount);
             return (T)values[val];

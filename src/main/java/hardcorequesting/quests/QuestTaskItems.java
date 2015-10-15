@@ -44,11 +44,11 @@ public abstract class QuestTaskItems extends QuestTask {
 
 
     public static class ItemRequirement {
-        protected ItemStack item;
-        protected Fluid fluid;
-        protected int required;
-        protected boolean hasItem;
-        protected ItemPrecision precision = ItemPrecision.PRECISE;
+        public ItemStack item;
+        public Fluid fluid;
+        public int required;
+        public boolean hasItem;
+        public ItemPrecision precision = ItemPrecision.PRECISE;
 
         public ItemRequirement(ItemStack item, int required) {
             this.item = item;
@@ -71,7 +71,7 @@ public abstract class QuestTaskItems extends QuestTask {
             } else if (item != null) {
                 return item.getItem() != null ? item.getDisplayName() : "Unknown";
             } else {
-                return fluid.getLocalizedName();
+                return fluid.getLocalizedName(null);
             }
         }
     }

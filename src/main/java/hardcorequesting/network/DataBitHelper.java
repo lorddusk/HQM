@@ -115,7 +115,7 @@ public enum DataBitHelper {
     public int getMaximum() {
         if (!hasMaximum) {
             hasMaximum = true;
-            cachedMaximum = (int)Math.pow(2, bitCount) - 1;
+            cachedMaximum = (1 << bitCount) - 1;
         }
 
         return cachedMaximum;

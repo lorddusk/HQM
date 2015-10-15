@@ -21,3 +21,51 @@ item.hqm:hearts_heart.name=Full heart
 item.hqm:hearts_rottenheart.name=Rotten heart
 item.hqm:bags.name=Reward Bag
 item.hqm:hqmInvalidItem.name=Invalid Item
+
+
+# ======================================
+#				COMMAND
+# ======================================
+
+hqm.command.notFound=Command not found
+hqm.command.noPermission=You not have permission to use this command
+hqm.command.loadFailed=Loading failed
+hqm.command.loadSuccess=Loaded: %s
+hqm.command.fileNotFound=File not found
+hqm.command.saveFailed=Saving %s failed
+hqm.command.savedTo=Quests saved to: %s
+hqm.command.questNotFound=Quest page %s not found
+
+hqm.command.info.help.start=Available commands are:
+hqm.command.help.syntax0=/hqm help <command>
+hqm.command.help.info0=For help with all available commands.
+hqm.command.version.syntax0=/hqm version
+hqm.command.version.info0=Get mod version.
+hqm.command.hardcore.syntax0=/hqm hardcore
+hqm.command.hardcore.info0=Enable Hardcore mode.
+hqm.command.quest.syntax0=/hqm quest
+hqm.command.quest.info0=Enable Questing mode.
+hqm.command.enable.syntax0=/hqm enable
+hqm.command.enable.info0=Enable Hardcore mode and Questing mode.
+hqm.command.edit.syntax0=/hqm edit <player>
+hqm.command.edit.info0=Give yourself a book in edit mode, defaults: user.
+hqm.command.lives.syntax0=/hqm lives
+hqm.command.lives.info0=Check your current lives remaining.
+hqm.command.lives.syntax1=/hqm lives [player]
+hqm.command.lives.info1=Check a player's current lives remaining.
+hqm.command.lives.syntax2=/hqm lives add <player> <amount>
+hqm.command.lives.info2=Add lives to a player, defaults: user, 1
+hqm.command.lives.syntax3=/hqm lives remove <player> <amount>
+hqm.command.lives.info3=Remove lives from a player, defaults: user, 1
+hqm.command.load.syntax0=/hqm load [filename]
+hqm.command.load.info0=Load the given quest line into HQM.
+hqm.command.load.syntax1=/hqm load all
+hqm.command.load.info1=Load all quest pages into HQM.
+hqm.command.save.syntax2=/hqm load bags
+hqm.command.save.info2=Loads quest bags and tiers from JSON - already existing reward groups will not be loaded.
+hqm.command.save.syntax0=/hqm save [Quest Page] <filename>
+hqm.command.save.info0=Saves the given quest page to a JSON file, defaults: page name
+hqm.command.save.syntax1=/hqm save all
+hqm.command.save.info1=Saves all quest pages by their name
+hqm.command.save.syntax2=/hqm save bags
+hqm.command.save.info2=Saves all quest bag rewards to a JSON.

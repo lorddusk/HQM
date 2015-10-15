@@ -238,7 +238,12 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                Quest.getQuestSets().add(new QuestSet("Unnamed set", "No description"));
+                int i = 0;
+                for (QuestSet set : Quest.getQuestSets())
+                {
+                    if (set.getName().startsWith("Unnamed set")) i++;
+                }
+                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
                 SaveHelper.add(SaveHelper.EditType.SET_CREATE);
             }
         });
@@ -1412,7 +1417,12 @@ public class GuiQuestBook extends GuiBase {
                         isSetOpened = false;
                     }else if (Quest.isEditing && currentMode == EditMode.CREATE) {
                         if (x > 0 && Quest.size() < DataBitHelper.QUESTS.getMaximum()) {
-                            Quest newQuest = new Quest(Quest.size(), "Unnamed", "Unnamed quest", 0, 0, false);
+                            int i = 0;
+                            for (Quest quest : selectedSet.getQuests())
+                            {
+                                if (quest.getName().startsWith("Unnamed")) i++;
+                            }
+                            Quest newQuest = new Quest(Quest.size(), "Unnamed" + (i == 0 ? "" : i), "Unnamed quest", 0, 0, false);
                             newQuest.setGuiCenterX(x);
                             newQuest.setGuiCenterY(y);
                             newQuest.setQuestSet(selectedSet);
