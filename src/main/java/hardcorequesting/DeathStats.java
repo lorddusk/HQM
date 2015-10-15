@@ -103,7 +103,7 @@ public class DeathStats {
 
     public static void save(QuestingData questingData, DataWriter dw, boolean light) {
         if (light) {
-            dw.writeData(QuestingData.getData().values().size(), DataBitHelper.PLAYERS);
+            dw.writeData(QuestingData.getData().size(), DataBitHelper.PLAYERS);
             for (QuestingData q : QuestingData.getData().values()) {
                 dw.writeString(q.getName(), DataBitHelper.NAME_LENGTH);
                 q.getDeathStat().save(dw);

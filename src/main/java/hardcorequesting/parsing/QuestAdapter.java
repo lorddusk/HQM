@@ -69,18 +69,6 @@ public class QuestAdapter {
             return null;
         }
 
-        public void addTaskData(Quest quest) {
-            try {
-                if(HardcoreQuesting.getPlayer() != null) {
-                    quest.addTaskData(quest.getQuestData(HardcoreQuesting.getPlayer()));
-                }else{
-                    quest.addTaskData(quest.getQuestData("lorddusk"));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         public static TaskType getType(Class<? extends QuestTask> clazz) {
             for (TaskType type : values()) {
                 if (type.clazz == clazz) return type;
@@ -418,7 +406,6 @@ public class QuestAdapter {
                 }
             }
             in.endObject();
-            type.addTaskData(QUEST);
             return null;
         }
     };
@@ -679,14 +666,31 @@ public class QuestAdapter {
             }
             in.endObject();
             if (!QUEST.getName().isEmpty()) {
-                requirementMapping.put(QUEST, requirement);
-                optionMapping.put(QUEST, options);
-                prerequisiteMapping.put(QUEST, prerequisites);
-                optionLinkMapping.put(QUEST, optionLinks);
+                optionalAdd(requirementMapping, requirement);
+                optionalAdd(optionMapping, options);
+                optionalAdd(prerequisiteMapping, prerequisites);
+                optionalAdd(optionLinkMapping, optionLinks);
+                try {
+                    if(HardcoreQuesting.getPlayer() != null) {
+                        QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
+                    }else{
+                        QUEST.addTaskData(QUEST.getQuestData("lorddusk"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return QUEST;
             }
             QuestLine.getActiveQuestLine().quests.remove(QUEST.getId());
             return null;
+        }
+
+        private void optionalAdd(Map map, List list)
+        {
+            if (!list.isEmpty())
+            {
+                map.put(QUEST, list);
+            }
         }
 
         private void readIntArray(List<Integer> list, JsonReader in) throws IOException

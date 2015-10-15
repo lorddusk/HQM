@@ -58,13 +58,13 @@ public class DataWriter {
         }
         bits += bitCount;
 
-        long mask = (long) Math.pow(2, bitCount) - 1;
+        int mask = (1 << bitCount) - 1;
         data &= mask;
 
         while (true) {
             if (bitCountBuffer + bitCount >= 8) {
                 int bitsToAdd = 8 - bitCountBuffer;
-                int addMask = (int) Math.pow(2, bitsToAdd) - 1;
+                int addMask = (1 << bitsToAdd) - 1;
                 int addData = data & addMask;
                 data >>>= bitsToAdd;
                 addData <<= bitCountBuffer;
@@ -231,14 +231,16 @@ public class DataWriter {
         writeString(Item.itemRegistry.getNameForObject(item), DataBitHelper.SHORT);
     }
 
+    private static final double LOG_2 = Math.log10(2);
+
     public void writeEnum(Enum data) {
         try {
-            Class<? extends Enum> clazz = data.getDeclaringClass();
+            Class<? extends Enum> clazz = data.getClass();
             int length = ((Object[]) clazz.getMethod("values").invoke(null)).length;
             if (length == 0) {
                 return;
             }
-            int bitCount = (int) (Math.log10(length) / Math.log10(2)) + 1;
+            int bitCount = (int) (Math.log10(length) / LOG_2) + 1;
 
             writeData(data.ordinal(), bitCount);
         } catch (Exception ex) {

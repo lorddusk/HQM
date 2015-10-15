@@ -24,12 +24,13 @@ import java.util.regex.Pattern;
 public class CommandLoad extends CommandBase
 {
     private static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern NO_BAGS = Pattern.compile(".*bags\\.json$", Pattern.CASE_INSENSITIVE);
     private static final FileFilter JSON_FILTER = new FileFilter()
     {
         @Override
         public boolean accept(File pathname)
         {
-            return JSON.matcher(pathname.getName()).find();
+            return !NO_BAGS.matcher(pathname.getName()).find() && JSON.matcher(pathname.getName()).find();
         }
     };
 
