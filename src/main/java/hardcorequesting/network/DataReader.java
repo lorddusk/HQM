@@ -52,7 +52,7 @@ public class DataReader {
         while (true) {
             int bitsLeft = bitCount - readBits;
             if (bitCountBuffer >= bitsLeft) {
-                data |= (byteBuffer & ((1 << bitsLeft) - 1)) << readBits;
+                data |= (byteBuffer & PacketHandler.BIT_MASK[bitsLeft]) << readBits;
                 byteBuffer >>>= bitsLeft;
                 bitCountBuffer -= bitsLeft;
                 readBits += bitsLeft;
