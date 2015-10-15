@@ -1,13 +1,11 @@
 package hardcorequesting;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -21,66 +19,64 @@ import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.Quest;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 import java.util.Map;
 
-@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION/*, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory"*/)
-public class HardcoreQuesting {
+@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
+public class HardcoreQuesting
+{
 
 
-	@Instance(ModInformation.ID)
-	public static HardcoreQuesting instance;
+    @Instance(ModInformation.ID)
+    public static HardcoreQuesting instance;
 
-	@SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
-	public static CommonProxy proxy;
-	public static CreativeTabs HQMTab = new HQMTab(CreativeTabs.getNextID(), "Hardcore Questing Mode");
+    @SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
+    public static CommonProxy proxy;
+    public static CreativeTabs HQMTab = new HQMTab(CreativeTabs.getNextID(), "Hardcore Questing Mode");
 
     public static String path;
 
     public static File configDir;
 
-    public static Configuration config;
-
     public static FMLEventChannel packetHandler;
 
     private static EntityPlayer commandUser;
-	
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
+
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event)
+    {
         new hardcorequesting.EventHandler();
         packetHandler = NetworkRegistry.INSTANCE.newEventDrivenChannel(ModInformation.CHANNEL);
 
         path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + ModInformation.CONFIG_LOC_NAME.toLowerCase() + File.separator;
-        ConfigHandler.init(path);
+        configDir = new File(path);
+        ConfigHandler.initModConfig(path);
+        ConfigHandler.initEditConfig(path);
 
         proxy.init();
-		proxy.initRenderers();
+        proxy.initRenderers();
         proxy.initSounds(path);
 
-		ModItems.init();
+        ModItems.init();
 
         ModBlocks.init();
         ModBlocks.registerBlocks();
         ModBlocks.registerTileEntities();
 
-        configDir = new File(path);
-        config = new Configuration(new File(path+ "editmode.cfg"));
-        syncEdit();
-
         //Quest.init(this.path);
     }
-	
-	@EventHandler
-	public void load(FMLInitializationEvent event) {
+
+    @EventHandler
+    public void load(FMLInitializationEvent event)
+    {
 
         FMLCommonHandler.instance().bus().register(instance);
 
         packetHandler.register(new PacketHandler());
-		new WorldEventListener();
-		new PlayerDeathEventListener();	
-		new PlayerTracker();
+        new WorldEventListener();
+        new PlayerDeathEventListener();
+        new PlayerTracker();
 
 
         ModItems.registerRecipes();
@@ -97,12 +93,12 @@ public class HardcoreQuesting {
     }
 
 
-
     @EventHandler
-	public void modsLoaded(FMLPostInitializationEvent event) {
-		
-	
-	}
+    public void modsLoaded(FMLPostInitializationEvent event)
+    {
+
+
+    }
 	
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event)
@@ -115,17 +111,11 @@ public class HardcoreQuesting {
     {
 
     }
+
     @EventHandler
     public void serverAboutToStart(FMLServerStoppingEvent event)
     {
 
-    }
-
-    @SubscribeEvent
-    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
-    {
-        if(event.modID.equals(ModInformation.ID))
-            syncEdit();
     }
 
     @NetworkCheckHandler
@@ -134,13 +124,6 @@ public class HardcoreQuesting {
         return true;
     }
 
-
-    public static void syncEdit(){
-        Quest.isEditing = config.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
-        if(config.hasChanged()) {
-            config.save();
-        }
-    }
 
     public static EntityPlayer getPlayer()
     {
@@ -151,9 +134,4 @@ public class HardcoreQuesting {
     {
         commandUser = player;
     }
-
-
-    private static final String EDITOR_KEY = "UseEditor";
-    private static final boolean EDITOR_DEFAULT = false;
-    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
 }
