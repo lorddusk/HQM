@@ -3,12 +3,9 @@ package hardcorequesting.network;
 
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import hardcorequesting.ModInformation;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -29,6 +26,7 @@ public class DataWriter {
     private int byteBuffer;
     private int bitCountBuffer;
     private int bits;
+
 
     DataWriter() {
         stream = new ByteArrayOutputStream();
@@ -58,13 +56,13 @@ public class DataWriter {
         }
         bits += bitCount;
 
-        int mask = (1 << bitCount) - 1;
+        int mask = PacketHandler.BIT_MASK[bitCount];
         data &= mask;
 
         while (true) {
             if (bitCountBuffer + bitCount >= 8) {
                 int bitsToAdd = 8 - bitCountBuffer;
-                int addMask = (1 << bitsToAdd) - 1;
+                int addMask = PacketHandler.BIT_MASK[bitsToAdd];
                 int addData = data & addMask;
                 data >>>= bitsToAdd;
                 addData <<= bitCountBuffer;
