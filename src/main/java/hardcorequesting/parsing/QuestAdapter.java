@@ -30,53 +30,6 @@ public class QuestAdapter {
     private static Map<Quest, List<Integer>> optionMapping = new HashMap<>();
     private static Map<Quest, List<String>> optionLinkMapping = new HashMap<>();
 
-
-    public enum TaskType {
-        CONSUME(QuestTaskItemsConsume.class, "Consume task", "A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids."),
-        CRAFT(QuestTaskItemsCrafting.class, "Crafting task", "A task where the player has to craft specific items."),
-        LOCATION(QuestTaskLocation.class, "Location task", "A task where the player has to reach one or more locations."),
-        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "QDS task", "A task where the player can hand in items or fluids. This is a normal consume task where manual submit has been disabled to teach the player about the QDS"),
-        DETECT(QuestTaskItemsDetect.class, "Detection task", "A task where the player needs specific items. These do not have to be handed in, having them in one\'s inventory is enough."),
-        KILL(QuestTaskMob.class, "Killing task", "A task where the player has to kill certain monsters."),
-        DEATH(QuestTaskDeath.class, "Death task", "A task where the player has to die a certain amount of times."),
-        REPUTATION(QuestTaskReputationTarget.class, "Reputation task", "A task where the player has to reach a certain reputation."),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "Rep kill task", "A task where the player has to kill other players with certain reputations.");
-
-        private final Class<? extends QuestTask> clazz;
-        private final String name;
-        public final String description;
-
-        TaskType(Class<? extends QuestTask> clazz, String name, String description) {
-            this.clazz = clazz;
-            this.name = name;
-            this.description = description;
-        }
-
-        public QuestTask addTask(Quest quest) {
-            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
-            try {
-                Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
-                QuestTask task = (QuestTask) ex.newInstance(quest, name, description);
-                if (prev != null) {
-                    task.addRequirement(prev);
-                }
-                quest.getTasks().add(task);
-                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
-                return task;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        public static TaskType getType(Class<? extends QuestTask> clazz) {
-            for (TaskType type : values()) {
-                if (type.clazz == clazz) return type;
-            }
-            return CONSUME;
-        }
-    }
-
     private static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
         private final String ITEM = "item";
         private final String FLUID = "fluid";
@@ -306,11 +259,11 @@ public class QuestAdapter {
         @Override
         public void write(JsonWriter out, QuestTask value) throws IOException {
             out.beginObject();
-            TaskType type = TaskType.getType(value.getClass());
+            Quest.TaskType type = Quest.TaskType.getType(value.getClass());
             out.name(TYPE).value(type.name());
-            if (!value.getDescription().equals(type.name))
+            if (!value.getDescription().equals(type.getName()))
                 out.name(DESCRIPTION).value(value.getDescription());
-            if (!value.getLongDescription().equals(type.description))
+            if (!value.getLongDescription().equals(type.getDescription()))
                 out.name(LONG_DESCRIPTION).value(value.getLongDescription());
             if (value instanceof QuestTaskItems) {
                 out.name(ITEMS).beginArray();
@@ -352,7 +305,7 @@ public class QuestAdapter {
                 throw new IOException("Tasks *MUST* start with the type");
             }
             String task = in.nextString();
-            TaskType type = TaskType.valueOf(task);
+            Quest.TaskType type = Quest.TaskType.valueOf(task);
             if (type == null) {
                 throw new IOException("Invalid Task Type: " + task);
             }

@@ -691,11 +691,12 @@ public class GuiQuestBook extends GuiBase {
                     int completedCount = enabled ? questSet.getCompletedCount(player) : 0; //no need to check for the completed count if it's not enabled
 
                     boolean completed = true;
+                    int unclaimed = 0;
                     for (Quest quest : questSet.getQuests()) {
-                        if (!quest.isCompleted(player) && quest.isLinkFree(player)) {
+                        if (completed && !quest.isCompleted(player) && quest.isLinkFree(player)) {
                             completed = false;
-                            break;
                         }
+                        if (quest.isCompleted(player) && quest.hasReward(player)) unclaimed++;
                     }
                     boolean selected = questSet == selectedSet;
                     boolean inBounds = inBounds(LIST_X, setY, getStringWidth(questSet.getName(i)), TEXT_HEIGHT, x, y);
@@ -704,6 +705,11 @@ public class GuiQuestBook extends GuiBase {
 
                     String info = enabled ? completed ? "All Quests Completed" : ((completedCount * 100) / total) + "% Completed" : "Locked";
                     drawString(info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
+                    if (enabled && unclaimed != 0)
+                    {
+                        String toClaim = GuiColor.PURPLE.toString() + unclaimed + (unclaimed == 1 ? " quest" : " quests") + " with unclaimed rewards";
+                        drawString(toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
+                    }
                 }
 
                 if ((Quest.isEditing && currentMode == EditMode.CREATE)) {
