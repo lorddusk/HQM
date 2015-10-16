@@ -210,9 +210,8 @@ public class Quest {
         });
 
         int itemIds = 0;
-        for (int i = 0; i < taskTypes.length; i++) {
-            final TaskType taskType = taskTypes[i];
-            buttons.add(new LargeButton(taskType.name, taskType.description, 185 + (i % 2) * 65, 50 + (i / 2) * 35) {
+        for (final TaskType taskType : TaskType.values()) {
+            buttons.add(new LargeButton(taskType.name, taskType.description, 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 35) {
                 @Override
                 public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                     return tasks.size() < DataBitHelper.TASKS.getMaximum();
@@ -225,22 +224,7 @@ public class Quest {
 
                 @Override
                 public void onClick(GuiBase gui, EntityPlayer player) {
-                    QuestTask prev = tasks.size() > 0 ? tasks.get(tasks.size() - 1) : null;
-                    Class<? extends QuestTask> clazz = taskType.clazz;
-                    try {
-                        Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                        QuestTask task = constructor.newInstance(self, taskType.name, taskType.description);
-
-                        if (prev != null) {
-                            task.addRequirement(prev);
-                        }
-                        tasks.add(task);
-
-                        addTaskData(getQuestData(player));
-                        SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    taskType.addTask(Quest.this);
                 }
             });
 
@@ -258,14 +242,7 @@ public class Quest {
 
                     @Override
                     public void onClick(GuiBase gui, EntityPlayer player) {
-                        TaskType oldTaskType = null;
-                        for (TaskType type : taskTypes) {
-                            if (type.clazz.equals(selectedTask.getClass())) {
-                                oldTaskType = type;
-                                break;
-                            }
-                        }
-
+                        TaskType oldTaskType = TaskType.getType(selectedTask.getClass());
                         if (oldTaskType == null) return;
 
                         nextTaskId--;
@@ -1221,7 +1198,7 @@ public class Quest {
         data.tasks = new QuestDataTask[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
             try {
-                Constructor<? extends QuestDataTask> constructor = tasks.get(i).getDataType().getConstructor(new Class[]{QuestTask.class});
+                Constructor constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
                 Object obj = constructor.newInstance(tasks.get(i));
                 data.tasks[i] = (QuestDataTask) obj;
             } catch (Exception ex) {
@@ -1254,13 +1231,7 @@ public class Quest {
         } else {
             dw.writeData(tasks.size(), DataBitHelper.TASKS);
             for (int i = 0; i < tasks.size(); i++) {
-                for (int j = 0; j < taskTypes.length; j++) {
-                    TaskType taskType = taskTypes[j];
-                    if (taskType.clazz == tasks.get(i).getClass()) {
-                        dw.writeData(j, DataBitHelper.TASK_TYPE);
-                        break;
-                    }
-                }
+                dw.writeData(TaskType.getType(tasks.get(i).getClass()).ordinal(), DataBitHelper.TASK_TYPE);
                 QuestTask task = tasks.get(i);
                 questData.tasks[i] = task.validateData(questData.tasks[i]);
                 task.write(dw, questData.tasks[i], false);
@@ -1308,7 +1279,7 @@ public class Quest {
                 int type = dr.readData(DataBitHelper.TASK_TYPE);
                 if (i >= tasks.size()) {
                     try {
-                        Class<? extends QuestTask> clazz = taskTypes[type].clazz;
+                        Class<? extends QuestTask> clazz = TaskType.values()[type].clazz;
                         Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
                         Object obj = constructor.newInstance(this, "Fake", "Fake");
                         QuestTask task = (QuestTask) obj;
@@ -1583,18 +1554,61 @@ public class Quest {
         }
     }
 
-    //two task types can't have the same class
-    private static final TaskType[] taskTypes = new TaskType[]{
-            new TaskType(QuestTaskItemsConsume.class, "Consume task", "A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids."),
-            new TaskType(QuestTaskItemsCrafting.class, "Crafting task", "A task where the player has to craft specific items."),
-            new TaskType(QuestTaskLocation.class, "Location task", "A task where the player has to reach one or more locations."),
-            new TaskType(QuestTaskItemsConsumeQDS.class, "QDS task", "A task where the player can hand in items or fluids. This is a normal consume task where manual submit has been disabled to teach the player about the QDS"),
-            new TaskType(QuestTaskItemsDetect.class, "Detection task", "A task where the player needs specific items. These do not have to be handed in, having them in one's inventory is enough."),
-            new TaskType(QuestTaskMob.class, "Killing task", "A task where the player has to kill certain monsters."),
-            new TaskType(QuestTaskDeath.class, "Death task", "A task where the player has to die a certain amount of times."),
-            new TaskType(QuestTaskReputationTarget.class, "Reputation task", "A task where the player has to reach a certain reputation."),
-            new TaskType(QuestTaskReputationKill.class, "Rep kill task", "A task where the player has to kill other players with certain reputations.")
-    };
+    public enum TaskType {
+        CONSUME(QuestTaskItemsConsume.class, "Consume task", "A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids."),
+        CRAFT(QuestTaskItemsCrafting.class, "Crafting task", "A task where the player has to craft specific items."),
+        LOCATION(QuestTaskLocation.class, "Location task", "A task where the player has to reach one or more locations."),
+        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "QDS task", "A task where the player can hand in items or fluids. This is a normal consume task where manual submit has been disabled to teach the player about the QDS"),
+        DETECT(QuestTaskItemsDetect.class, "Detection task", "A task where the player needs specific items. These do not have to be handed in, having them in one\'s inventory is enough."),
+        KILL(QuestTaskMob.class, "Killing task", "A task where the player has to kill certain monsters."),
+        DEATH(QuestTaskDeath.class, "Death task", "A task where the player has to die a certain amount of times."),
+        REPUTATION(QuestTaskReputationTarget.class, "Reputation task", "A task where the player has to reach a certain reputation."),
+        REPUTATION_KILL(QuestTaskReputationKill.class, "Rep kill task", "A task where the player has to kill other players with certain reputations.");
+
+        private final Class<? extends QuestTask> clazz;
+        private final String name;
+        private final String description;
+
+        TaskType(Class<? extends QuestTask> clazz, String name, String description) {
+            this.clazz = clazz;
+            this.name = name;
+            this.description = description;
+        }
+
+        public QuestTask addTask(Quest quest) {
+            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
+            try {
+                Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
+                QuestTask task = (QuestTask) ex.newInstance(quest, name, description);
+                if (prev != null) {
+                    task.addRequirement(prev);
+                }
+                quest.getTasks().add(task);
+                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
+                return task;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public static TaskType getType(Class<? extends QuestTask> clazz) {
+            for (TaskType type : values()) {
+                if (type.clazz == clazz) return type;
+            }
+            return CONSUME;
+        }
+
+        public String getDescription()
+        {
+            return description;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+    }
 
     public void setIcon(ItemStack icon) {
         this.icon = icon;
@@ -1734,20 +1748,6 @@ public class Quest {
         return parentRequirementCount;
     }
 
-
-    private static class TaskType {
-        private final Class<? extends QuestTask> clazz;
-        private final String name;
-        public final String description;
-
-        private TaskType(Class<? extends QuestTask> clazz, String name, String description) {
-            this.clazz = clazz;
-            this.name = name;
-            this.description = description;
-        }
-    }
-
-
     public static FileHelper FILE_HELPER;
 
     public static void saveAll(DataWriter dw) {
@@ -1814,13 +1814,7 @@ public class Quest {
                 dw.writeData(quest.tasks.size(), DataBitHelper.TASKS);
                 for (int i = 0; i < quest.tasks.size(); i++) {
                     QuestTask task = quest.tasks.get(i);
-                    int type = -1;
-                    for (int j = 0; j < taskTypes.length; j++) {
-                        if (taskTypes[j].clazz == task.getClass()) {
-                            type = j;
-                            break;
-                        }
-                    }
+                    int type = TaskType.getType(task.getClass()).ordinal();
                     dw.writeData(type, DataBitHelper.TASK_TYPE);
                     dw.writeString(task.getDescription(), DataBitHelper.QUEST_NAME_LENGTH);
                     dw.writeString(task.getLongDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
@@ -1962,7 +1956,7 @@ public class Quest {
                             String taskDescription = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
 
                             try {
-                                Class<? extends QuestTask> clazz = taskTypes[type].clazz;
+                                Class<? extends QuestTask> clazz = TaskType.values()[type].clazz;
                                 Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
                                 Object obj = constructor.newInstance(quest, taskName, taskDescription);
                                 QuestTask task = (QuestTask) obj;
