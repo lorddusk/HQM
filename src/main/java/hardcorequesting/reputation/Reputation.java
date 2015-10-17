@@ -74,6 +74,10 @@ public class Reputation {
         count = Math.max(id + 1, count);
     }
 
+    public String getNeutralName()
+    {
+        return neutral.getName();
+    }
 
 
     public void sort() {
@@ -587,6 +591,11 @@ public class Reputation {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void clearMarkers() {
+        markers.clear();
+        sort();
     }
 
     public void add(ReputationMarker marker) {
