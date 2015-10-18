@@ -20,6 +20,7 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -95,22 +96,32 @@ public abstract class QuestTask {
 
     public QuestDataTask getData(String playerName) {
         QuestData questData = QuestingData.getQuestingData(playerName).getQuestData(parent.getId());
-
+        if (id >= questData.tasks.length)
+        {
+            questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
+            questData.tasks[id] = newQuestData();
+        }
         return questData.tasks[id] = validateData(questData.tasks[id]);
     }
 
     public QuestDataTask validateData(QuestDataTask data) {
         if (data.getClass() != getDataType()) {
-            try {
-                Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[] {QuestTask.class});
-                Object obj = constructor.newInstance(this);
-                data = (QuestDataTask)obj;
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            return newQuestData();
         }
 
         return data;
+    }
+
+    private QuestDataTask newQuestData()
+    {
+        try {
+            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[] {QuestTask.class});
+            Object obj = constructor.newInstance(this);
+            return (QuestDataTask)obj;
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public String getDescription() {
