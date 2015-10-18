@@ -75,7 +75,7 @@ public class QuestAdapter {
                 } else if (next.equalsIgnoreCase(FLUID)) {
                     fluid = MinecraftAdapter.FLUID.read(in);
                 } else if (next.equalsIgnoreCase(REQUIRED)) {
-                    required = in.nextInt();
+                    required = Math.max(in.nextInt(), required);
                 } else if (next.equalsIgnoreCase(PRECISION)) {
                     ItemPrecision itemPrecision = ItemPrecision.valueOf(in.nextString());
                     if (itemPrecision != null) {
@@ -840,6 +840,8 @@ public class QuestAdapter {
             for (Quest quest : value.getQuests()) {
                 QUEST_ADAPTER.write(out, quest);
             }
+            out.endArray();
+            out.name(REPUTATION).beginArray();
             for (Reputation reputation : reputationList) {
                 REPUTATION_ADAPTER.write(out, reputation);
             }
@@ -883,15 +885,20 @@ public class QuestAdapter {
                 }
             }
             in.endObject();
-            for (QuestSet set : Quest.getQuestSets()) {
-                if (set.getName().equals(name)) {
-                    return removeQuests(quests);
+            QuestSet set = null;
+            for (QuestSet existing : Quest.getQuestSets()) {
+                if (existing.getName().equals(name)) {
+                    set = existing;
+                    questReplace(set.getQuests(), quests);
+                    break;
                 }
             }
-            if (name != null && description != null) {
-                QuestSet set = new QuestSet(name, description);
+            if (name != null && description != null && set == null) {
+                set = new QuestSet(name, description);
                 Quest.getQuestSets().add(set);
                 SaveHelper.add(SaveHelper.EditType.SET_CREATE);
+            }
+            if (set != null) {
                 for (Quest quest : quests) {
                     quest.setQuestSet(set);
                 }
@@ -905,12 +912,60 @@ public class QuestAdapter {
                 }
                 return set;
             }
-            return removeQuests(quests);
+            return removeQuestsRaw(quests);
         }
 
-        private QuestSet removeQuests(List<Quest> quests) {
+        private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
                 QuestLine.getActiveQuestLine().quests.remove(quest.getId());
+            }
+            return null;
+        }
+
+        private void questReplace(List<Quest> existing, List<Quest> replacements) {
+            for (Quest current : new ArrayList<>(existing))
+            {
+                Quest replacement = getReplacement(current, replacements);
+
+                for (Quest requirement : current.getRequirement())
+                {
+                    neatSwap(current, replacement, requirement.getReversedRequirement());
+                }
+                for (Quest dependent : current.getReversedRequirement())
+                {
+                    neatSwap(current, replacement, dependent.getRequirement());
+                }
+                for (Quest optionLink : current.getOptionLinks())
+                {
+                    neatSwap(current, replacement, optionLink.getReversedOptionLinks());
+                }
+                for (Quest optionLink : current.getReversedOptionLinks())
+                {
+                    neatSwap(current, replacement, optionLink.getOptionLinks());
+                }
+
+                for (QuestTask task : current.getTasks())
+                {
+                    task.onDelete();
+                }
+                current.setQuestSet(null);
+                QuestLine.getActiveQuestLine().quests.remove(current.getId());
+            }
+        }
+
+        private void neatSwap(Quest current, Quest replacement, List<Quest> replaceIn)
+        {
+            replaceIn.remove(current);
+            if (replacement != null) replaceIn.add(replacement);
+        }
+
+        private Quest getReplacement(Quest quest, List<Quest> replacements) {
+            for (Quest replacement : replacements)
+            {
+                if (quest.getName().equalsIgnoreCase(replacement.getName()))
+                {
+                    return replacement;
+                }
             }
             return null;
         }
@@ -918,7 +973,7 @@ public class QuestAdapter {
 
     private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
 
-    public static void postLoad()
+    public static void postLoad() throws IOException
     {
         for (Map.Entry<Quest, List<String>> entry : prerequisiteMapping.entrySet())
         {
@@ -943,7 +998,15 @@ public class QuestAdapter {
             int rep = entry.getValue();
             if (rep > 0 && rep < reputationList.size())
             {
-                entry.getKey().setReputation(reputationList.get(rep));
+                Reputation reputation = reputationList.get(rep);
+                if (reputation == null)
+                {
+                    throw new IOException("Failed to load reputation value " + rep);
+                }
+                entry.getKey().setReputation(reputation);
+            } else
+            {
+                throw new IOException("Missing reputation value " + rep);
             }
         }
         for (Map.Entry<QuestTaskReputation, List<ReputationSettingConstructor>> entry : taskReputationListMap.entrySet())

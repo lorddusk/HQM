@@ -18,6 +18,7 @@ import net.minecraft.util.StatCollector;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,23 +43,29 @@ public class CommandLoad extends CommandBase
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments)
     {
-        if (arguments.length == 1 && arguments[0].equals("all"))
+        try
         {
-            for (File file : getPossibleFiles())
+            if (arguments.length == 1 && arguments[0].equals("all"))
             {
-                loadSet(sender, file);
+                for (File file : getPossibleFiles())
+                {
+                    loadSet(sender, file);
+                }
+                QuestAdapter.postLoad();
+            } else if (arguments.length == 1 && arguments[0].equals("bags"))
+            {
+                loadBags(sender, getFile("bags"));
+            } else if (arguments.length > 0)
+            {
+                String file = getCombinedArgs(arguments);
+                loadSet(sender, getFile(file));
+                QuestAdapter.postLoad();
             }
-            QuestAdapter.postLoad();
-        }else if (arguments.length == 1 && arguments[0].equals("bags"))
+            Quest.FILE_HELPER.saveData(null);
+        } catch (IOException e)
         {
-            loadBags(sender, getFile("bags"));
-        }else if (arguments.length > 0)
-        {
-            String file = getCombinedArgs(arguments);
-            loadSet(sender, getFile(file));
-            QuestAdapter.postLoad();
+            throw new CommandException(e.getMessage());
         }
-        Quest.FILE_HELPER.saveData(null);
     }
 
     private File[] getPossibleFiles()
