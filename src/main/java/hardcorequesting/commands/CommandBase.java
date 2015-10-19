@@ -12,10 +12,10 @@ import hardcorequesting.quests.QuestSet;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
-import scala.actors.threadpool.Arrays;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class CommandBase implements ISubCommand
