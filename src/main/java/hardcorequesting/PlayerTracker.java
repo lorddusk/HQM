@@ -3,6 +3,7 @@ package hardcorequesting;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.command.ICommandSender;
@@ -34,7 +35,7 @@ public class PlayerTracker {
 
 		if(QuestingData.isHardcoreActive())
 			sendLoginMessage(player);
-		else
+		else if (ModConfig.NO_HARDCORE_MESSAGE)
 			player.addChatMessage(new ChatComponentText("This server doesn\'t have Hardcore Questing Mode enabled."));
 
         NBTTagCompound tags = player.getEntityData();
