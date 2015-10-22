@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
+import hardcorequesting.OreDictionaryHelper;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
@@ -20,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
@@ -48,7 +50,7 @@ public abstract class QuestTaskItems extends QuestTask {
         public Fluid fluid;
         public int required;
         public boolean hasItem;
-        public ItemPrecision precision = ItemPrecision.PRECISE;
+        private ItemPrecision precision = ItemPrecision.PRECISE;
 
         public ItemRequirement(ItemStack item, int required) {
             this.item = item;
@@ -60,6 +62,49 @@ public abstract class QuestTaskItems extends QuestTask {
             this.fluid = fluid;
             this.required = required;
             this.hasItem = false;
+        }
+
+        public ItemPrecision getPrecision()
+        {
+            return precision;
+        }
+
+        public void setPrecision(ItemPrecision precision)
+        {
+            this.precision = precision;
+            permutations = null;
+            if (this.precision == ItemPrecision.ORE_DICTIONARY)
+                setPermutations();
+        }
+
+        private ItemStack[] permutations;
+        private int cycleAt = -1;
+        private int current = 0;
+        private int last;
+        private static int CYCLE_TIME = 2;//2 second cycle
+
+        private void setPermutations()
+        {
+            if (item == null) return;
+            permutations = OreDictionaryHelper.getPermutations(item);
+            last = permutations.length-1;
+        }
+
+        public ItemStack getItem()
+        {
+            if (permutations == null && precision == ItemPrecision.ORE_DICTIONARY)
+                setPermutations();
+            if (permutations == null || permutations.length < 2)
+                return item;
+            int ticks = (int)(System.currentTimeMillis()/1000);
+            if (cycleAt == -1)
+                cycleAt = ticks + CYCLE_TIME;
+            if (ticks >= cycleAt)
+            {
+                if (++current > last) current = 0;
+                cycleAt += CYCLE_TIME;
+            }
+            return permutations[current];
         }
 
         private int x;
@@ -240,7 +285,7 @@ public abstract class QuestTaskItems extends QuestTask {
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
             if (item.hasItem) {
-                gui.drawItem(item.item, item.x, item.y, mX, mY, false);
+                gui.drawItem(item.getItem(), item.x, item.y, mX, mY, false);
             } else {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
