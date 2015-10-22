@@ -8,14 +8,31 @@ import hardcorequesting.quests.QuestData;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Team {
+public class Team implements Serializable {
+	
+	private static final long serialVersionUID = 4L;
 
+    public Team(RewardSetting rewardSetting, LifeSetting lifeSetting, int clientTeamLives, int id,
+			List<PlayerEntry> players, List<Team> invites, String name, List<Integer> reputation,
+			List<QuestData> questData) {
+		super();
+		this.rewardSetting = rewardSetting;
+		this.lifeSetting = lifeSetting;
+		this.clientTeamLives = clientTeamLives;
+		this.id = id;
+		this.players = players;
+		this.invites = invites;
+		this.name = name;
+		this.reputation = reputation;
+		this.questData = questData;
+	}
 
-    public void resetProgress(Quest quest) {
+	public void resetProgress(Quest quest) {
         questData.set(quest.getId(),  Quest.getQuest(quest.getId()).createData(getPlayerCount()));
     }
 
@@ -70,11 +87,25 @@ public class Team {
     }
 
 
-    public enum LifeSetting {
+    public enum LifeSetting implements Serializable {
         SHARE("Shared lives", "Everyone puts their lives into a shared pool. If anyone dies a life is removed from there. Everyone needs at least one life to be kept in the game, so if your death results in the party getting too few lives, you get banned. The others can keep playing."),
         INDIVIDUAL("Individual lives", "Everyone keeps their lives separated. If you run out of lives, you're out of the game. The other players in the party can continue playing with their lives.");
 
-        private String title;
+        /**
+		 * @param title the title to set
+		 */
+		public void setTitle(String title) {
+			this.title = title;
+		}
+
+		/**
+		 * @param description the description to set
+		 */
+		public void setDescription(String description) {
+			this.description = description;
+		}
+
+		private String title;
         private String description;
 
         LifeSetting(String title, String description) {
@@ -91,11 +122,11 @@ public class Team {
         }
     }
 
-    public enum RewardSetting {
+    public enum RewardSetting implements Serializable {
         ALL("Multiple rewards", "Everyone in the party can claim their rewards from a quest. This option gives more rewards than the others but can be disabled in the config."),
         ANY("Shared rewards", "The party receives one set of rewards when completing a quest. Anyone can claim the reward but as soon as it is claimed no body else can claim it."),
         RANDOM("Random rewards", "Each time the party completes a quest that set of rewards is assigned to a player. This player is the only one that can claim the rewards.");
-
+    	
         private static RewardSetting getDefault() {
             return isAllModeEnabled ? ALL : ANY;
         }
@@ -117,6 +148,34 @@ public class Team {
         }
 
         public static boolean isAllModeEnabled;
+
+		/**
+		 * @return the isAllModeEnabled
+		 */
+		public static boolean isAllModeEnabled() {
+			return isAllModeEnabled;
+		}
+
+		/**
+		 * @param isAllModeEnabled the isAllModeEnabled to set
+		 */
+		public static void setAllModeEnabled(boolean isAllModeEnabled) {
+			RewardSetting.isAllModeEnabled = isAllModeEnabled;
+		}
+
+		/**
+		 * @param title the title to set
+		 */
+		public void setTitle(String title) {
+			this.title = title;
+		}
+
+		/**
+		 * @param description the description to set
+		 */
+		public void setDescription(String description) {
+			this.description = description;
+		}
     }
 
     private RewardSetting rewardSetting = RewardSetting.getDefault();
@@ -671,8 +730,17 @@ public class Team {
         }
     }
 
-    public static class PlayerEntry {
-        private String name;
+    public static class PlayerEntry implements Serializable {
+    	
+        public PlayerEntry(String name, boolean inTeam, boolean owner, boolean bookOpen) {
+			super();
+			this.name = name;
+			this.inTeam = inTeam;
+			this.owner = owner;
+			this.bookOpen = bookOpen;
+		}
+
+		private String name;
         private boolean inTeam;
         private boolean owner;
         private boolean bookOpen;
@@ -722,6 +790,27 @@ public class Team {
         public void setBookOpen(boolean bookOpen) {
             this.bookOpen = bookOpen;
         }
+
+		/**
+		 * @param name the name to set
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * @param inTeam the inTeam to set
+		 */
+		public void setInTeam(boolean inTeam) {
+			this.inTeam = inTeam;
+		}
+
+		/**
+		 * @param owner the owner to set
+		 */
+		public void setOwner(boolean owner) {
+			this.owner = owner;
+		}
     }
 
     private int id = -1;
@@ -1045,4 +1134,109 @@ public class Team {
     public String getName() {
         return name;
     }
+
+	/**
+	 * @return the clientTeamLives
+	 */
+	public int getClientTeamLives() {
+		return clientTeamLives;
+	}
+
+	/**
+	 * @param clientTeamLives the clientTeamLives to set
+	 */
+	public void setClientTeamLives(int clientTeamLives) {
+		this.clientTeamLives = clientTeamLives;
+	}
+
+	/**
+	 * @return the latestError
+	 */
+	public static ErrorMessage getLatestError() {
+		return latestError;
+	}
+
+	/**
+	 * @param latestError the latestError to set
+	 */
+	public static void setLatestError(ErrorMessage latestError) {
+		Team.latestError = latestError;
+	}
+
+	/**
+	 * @return the reputation
+	 */
+	public List<Integer> getReputation() {
+		return reputation;
+	}
+
+	/**
+	 * @param reputation the reputation to set
+	 */
+	public void setReputation(List<Integer> reputation) {
+		this.reputation = reputation;
+	}
+
+	/**
+	 * @return the questData
+	 */
+	public List<QuestData> getQuestData() {
+		return questData;
+	}
+
+	/**
+	 * @param questData the questData to set
+	 */
+	public void setQuestData(List<QuestData> questData) {
+		this.questData = questData;
+	}
+
+	/**
+	 * @return the reloadedInvites
+	 */
+	public static boolean isReloadedInvites() {
+		return reloadedInvites;
+	}
+
+	/**
+	 * @param reloadedInvites the reloadedInvites to set
+	 */
+	public static void setReloadedInvites(boolean reloadedInvites) {
+		Team.reloadedInvites = reloadedInvites;
+	}
+
+	/**
+	 * @param rewardSetting the rewardSetting to set
+	 */
+	public void setRewardSetting(RewardSetting rewardSetting) {
+		this.rewardSetting = rewardSetting;
+	}
+
+	/**
+	 * @param lifeSetting the lifeSetting to set
+	 */
+	public void setLifeSetting(LifeSetting lifeSetting) {
+		this.lifeSetting = lifeSetting;
+	}
+
+	/**
+	 * @param players the players to set
+	 */
+	public void setPlayers(List<PlayerEntry> players) {
+		this.players = players;
+	}
+
+	/**
+	 * @param invites the invites to set
+	 */
+	public void setInvites(List<Team> invites) {
+		this.invites = invites;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 }

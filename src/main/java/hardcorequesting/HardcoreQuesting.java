@@ -21,12 +21,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
 public class HardcoreQuesting
 {
-
+	
 
     @Instance(ModInformation.ID)
     public static HardcoreQuesting instance;
@@ -36,6 +37,9 @@ public class HardcoreQuesting
     public static CreativeTabs HQMTab = new HQMTab(CreativeTabs.getNextID(), "Hardcore Questing Mode");
 
     public static String path;
+    public static File savedWorldPath = null;
+    
+    public static HashMap<String, Boolean> loaded = new HashMap<String, Boolean>();
 
     public static File configDir;
 

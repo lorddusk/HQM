@@ -28,6 +28,7 @@ public class PlayerTracker {
         EntityPlayer player = event.player;
         if (!QuestingData.hasData(player)) {
             QuestingData.getQuestingData(player).getDeathStat().refreshSync();
+            //TODO Load Player here.
         }
 
         QuestLine.sendServerSync(player);
@@ -67,6 +68,7 @@ public class PlayerTracker {
         if (!player.worldObj.isRemote) {
             PacketHandler.remove(player);
         }
+        QuestingData.savePlayerData(player.getDisplayName());
     }
 
 

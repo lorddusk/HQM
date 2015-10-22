@@ -20,6 +20,7 @@ public class WorldEventListener {
             QuestLine.reset();
 			WorldServer world = (WorldServer)event.world;
             QuestLine.loadWorldData(getWorldPath(world));
+            HardcoreQuesting.savedWorldPath = getWorldPath(world);
 			QuestingData.load(getWorldPath(world), world);
 		} 
 	}

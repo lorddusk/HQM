@@ -1,5 +1,33 @@
 package hardcorequesting.bag;
 
-public class GroupData {
-    public int retrieved;
+import java.io.Serializable;
+
+public class GroupData implements Serializable{
+	public int retrieved;
+	private static final long serialVersionUID = 1L;
+	
+	public GroupData(){
+		
+	}
+	
+    public GroupData(int retrieved) {
+		super();
+		this.retrieved = retrieved;
+	}
+
+	/**
+	 * @return the retrieved
+	 */
+	public int getRetrieved() {
+		return retrieved;
+	}
+
+	/**
+	 * @param retrieved the retrieved to set
+	 */
+	public void setRetrieved(int retrieved) {
+		this.retrieved = retrieved;
+	}
+
+	
 }
