@@ -13,7 +13,6 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -21,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.oredict.OreDictionary;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
@@ -46,7 +44,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
 
     public static class ItemRequirement {
-        public ItemStack item;
+        private ItemStack item;
         public Fluid fluid;
         public int required;
         public boolean hasItem;
@@ -73,8 +71,17 @@ public abstract class QuestTaskItems extends QuestTask {
         {
             this.precision = precision;
             permutations = null;
-            if (this.precision == ItemPrecision.ORE_DICTIONARY)
-                setPermutations();
+        }
+
+        public ItemStack getItem()
+        {
+            return item;
+        }
+
+        public void setItem(ItemStack item)
+        {
+            this.item = item;
+            this.permutations = null;
         }
 
         private ItemStack[] permutations;
@@ -88,9 +95,10 @@ public abstract class QuestTaskItems extends QuestTask {
             if (item == null) return;
             permutations = OreDictionaryHelper.getPermutations(item);
             last = permutations.length-1;
+            cycleAt = -1;
         }
 
-        public ItemStack getItem()
+        public ItemStack getPermutatedItem()
         {
             if (permutations == null && precision == ItemPrecision.ORE_DICTIONARY)
                 setPermutations();
@@ -110,7 +118,9 @@ public abstract class QuestTaskItems extends QuestTask {
         private int x;
         private int y;
 
-        public String getDisplayName() {
+        public String getDisplayName()
+        {
+            ItemStack item = getPermutatedItem();
             if (hasItem && item == null) {
                 return "Nothing";
             } else if (item != null) {
@@ -147,6 +157,7 @@ public abstract class QuestTaskItems extends QuestTask {
             }
             items[id].required = Math.min(DataBitHelper.ITEM_PROGRESS.getMaximum(), element.getAmount());
             items[id].precision = precision;
+            items[id].permutations = null;
         }
     }
 
@@ -285,7 +296,7 @@ public abstract class QuestTaskItems extends QuestTask {
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
             if (item.hasItem) {
-                gui.drawItem(item.getItem(), item.x, item.y, mX, mY, false);
+                gui.drawItem(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
             } else {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
