@@ -99,7 +99,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
             }
 
             for (ItemStack itemStack : itemsToCount) {
-                if (item.precision.areItemsSame(itemStack, item.item)) {
+                if (item.getPrecision().areItemsSame(itemStack, item.getItem())) {
                     int amount = Math.min(itemStack.stackSize, item.required - data.progress[i]);
                     data.progress[i] += amount;
                     updated = true;

@@ -40,10 +40,10 @@ public class QuestAdapter {
 
         @Override
         public void write(JsonWriter out, QuestTaskItems.ItemRequirement value) throws IOException {
-            ItemStack item = value.item;
+            ItemStack item = value.getItem();
             Fluid fluid = value.fluid;
             int required = value.required;
-            ItemPrecision precision = value.precision;
+            ItemPrecision precision = value.getPrecision();
             out.beginObject();
             if (item != null) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), item);
@@ -92,7 +92,7 @@ public class QuestAdapter {
             } else {
                 return null;
             }
-            result.precision = precision;
+            result.setPrecision(precision);
             return result;
         }
     };

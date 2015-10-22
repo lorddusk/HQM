@@ -1185,10 +1185,6 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
-
-
-
-
     @Override
 	protected void mouseClicked(int x0, int y0, int button) {
 		super.mouseClicked(x0, y0, button);

@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
+import hardcorequesting.OreDictionaryHelper;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
@@ -12,7 +13,6 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -44,11 +44,11 @@ public abstract class QuestTaskItems extends QuestTask {
 
 
     public static class ItemRequirement {
-        public ItemStack item;
+        private ItemStack item;
         public Fluid fluid;
         public int required;
         public boolean hasItem;
-        public ItemPrecision precision = ItemPrecision.PRECISE;
+        private ItemPrecision precision = ItemPrecision.PRECISE;
 
         public ItemRequirement(ItemStack item, int required) {
             this.item = item;
@@ -62,10 +62,65 @@ public abstract class QuestTaskItems extends QuestTask {
             this.hasItem = false;
         }
 
+        public ItemPrecision getPrecision()
+        {
+            return precision;
+        }
+
+        public void setPrecision(ItemPrecision precision)
+        {
+            this.precision = precision;
+            permutations = null;
+        }
+
+        public ItemStack getItem()
+        {
+            return item;
+        }
+
+        public void setItem(ItemStack item)
+        {
+            this.item = item;
+            this.permutations = null;
+        }
+
+        private ItemStack[] permutations;
+        private int cycleAt = -1;
+        private int current = 0;
+        private int last;
+        private static int CYCLE_TIME = 2;//2 second cycle
+
+        private void setPermutations()
+        {
+            if (item == null) return;
+            permutations = OreDictionaryHelper.getPermutations(item);
+            last = permutations.length-1;
+            cycleAt = -1;
+        }
+
+        public ItemStack getPermutatedItem()
+        {
+            if (permutations == null && precision == ItemPrecision.ORE_DICTIONARY)
+                setPermutations();
+            if (permutations == null || permutations.length < 2)
+                return item;
+            int ticks = (int)(System.currentTimeMillis()/1000);
+            if (cycleAt == -1)
+                cycleAt = ticks + CYCLE_TIME;
+            if (ticks >= cycleAt)
+            {
+                if (++current > last) current = 0;
+                cycleAt += CYCLE_TIME;
+            }
+            return permutations[current];
+        }
+
         private int x;
         private int y;
 
-        public String getDisplayName() {
+        public String getDisplayName()
+        {
+            ItemStack item = getPermutatedItem();
             if (hasItem && item == null) {
                 return "Nothing";
             } else if (item != null) {
@@ -102,6 +157,7 @@ public abstract class QuestTaskItems extends QuestTask {
             }
             items[id].required = Math.min(DataBitHelper.ITEM_PROGRESS.getMaximum(), element.getAmount());
             items[id].precision = precision;
+            items[id].permutations = null;
         }
     }
 
@@ -240,7 +296,7 @@ public abstract class QuestTaskItems extends QuestTask {
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
             if (item.hasItem) {
-                gui.drawItem(item.item, item.x, item.y, mX, mY, false);
+                gui.drawItem(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
             } else {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
