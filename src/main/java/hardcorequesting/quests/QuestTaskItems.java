@@ -23,7 +23,9 @@ import net.minecraftforge.fluids.FluidStack;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public abstract class QuestTaskItems extends QuestTask {
@@ -93,14 +95,23 @@ public abstract class QuestTaskItems extends QuestTask {
         private void setPermutations()
         {
             if (item == null) return;
-            permutations = OreDictionaryHelper.getPermutations(item);
+            switch (precision)
+            {
+                case ORE_DICTIONARY:
+                    permutations = OreDictionaryHelper.getPermutations(item);
+                    break;
+                case FUZZY:
+                    List<ItemStack> items = new ArrayList<>();
+                    item.getItem().getSubItems(item.getItem(), null, items);
+                    permutations = items.toArray(new ItemStack[items.size()]);
+            }
             last = permutations.length-1;
             cycleAt = -1;
         }
 
         public ItemStack getPermutatedItem()
         {
-            if (permutations == null && precision == ItemPrecision.ORE_DICTIONARY)
+            if (permutations == null && (precision == ItemPrecision.ORE_DICTIONARY || precision == ItemPrecision.FUZZY))
                 setPermutations();
             if (permutations == null || permutations.length < 2)
                 return item;
