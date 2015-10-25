@@ -121,7 +121,8 @@ public abstract class QuestTaskItems extends QuestTask {
             if (ticks >= cycleAt)
             {
                 if (++current > last) current = 0;
-                cycleAt += CYCLE_TIME;
+                while (ticks >= cycleAt)
+                    cycleAt += CYCLE_TIME;
             }
             return permutations[current];
         }

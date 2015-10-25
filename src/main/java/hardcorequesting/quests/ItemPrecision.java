@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
+import hardcorequesting.OreDictionaryHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 public enum ItemPrecision {
     PRECISE("Precise detection") {
@@ -24,14 +24,9 @@ public enum ItemPrecision {
     },
     ORE_DICTIONARY("Ore dictionary detection") {
         @Override
-        protected boolean same(ItemStack item1, ItemStack item2) {
-            int id1 = OreDictionary.getOreID(item1);
-            if (id1 != -1) {
-                int id2 = OreDictionary.getOreID(item2);
-                return id1 == id2;
-            }else{
-                return PRECISE.same(item1, item2);
-            }
+        protected boolean same(ItemStack item1, ItemStack item2)
+        {
+            return OreDictionaryHelper.match(item1, item2) || PRECISE.same(item1, item2);
         }
     };
 
