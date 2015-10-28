@@ -2,12 +2,9 @@ package hardcorequesting.client.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.config.ModConfig;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -23,7 +20,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -127,10 +123,7 @@ public class GuiBase extends GuiScreen {
     }
     public void drawMouseOver(String str, int x, int y) {
         List<String> lst = new ArrayList<String>();
-        String[] split = str.split("\n");
-        for (String s : split) {
-            lst.add(s);
-        }
+        Collections.addAll(lst, str.split("\n"));
         drawMouseOver(lst, x, y);
     }
     

@@ -333,6 +333,8 @@ public abstract class QuestTaskItems extends QuestTask {
                     str += GuiColor.GREEN;
                 }
                 str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
+                if (Quest.isEditing)
+                    str += "\n" + GuiColor.GRAY + item.getPrecision().toString();
                 gui.drawMouseOver(str, mX + gui.getLeft(), mY + gui.getTop());
             }
         }
