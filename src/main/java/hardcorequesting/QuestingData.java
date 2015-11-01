@@ -2,6 +2,8 @@ package hardcorequesting;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import hardcorequesting.Team.PlayerEntry;
+import hardcorequesting.Team.UpdateType;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -11,6 +13,7 @@ import hardcorequesting.items.ModItems;
 import hardcorequesting.network.*;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
+import hardcorequesting.reputation.Reputation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityItem;
@@ -395,7 +398,12 @@ public class QuestingData implements Serializable {
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				QuestingData result = (QuestingData) ois.readObject();
+				ois.close();
+				if(!result.team.isSingle()){
+					result.setTeam(result.voidTeamData(name));	
+				}
 				data.put(name, result);
+
 				HardcoreQuesting.loaded.put(name, true);
 				ois.close();
 			} catch (FileNotFoundException e) {
@@ -515,11 +523,65 @@ public class QuestingData implements Serializable {
 			FileOutputStream fos = new FileOutputStream(file);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			QuestingData d = data.get(name);
+			if(!d.getTeam().isSingle()){
+				d.setTeam(d.voidTeamData(name));
+			}
 			oos.writeObject(d);
 			oos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private Team voidTeamData(String playerName) {
+		List<QuestData> oldQuestData = team.getQuestData();
+		int id = 0;
+		for (PlayerEntry player : team.getPlayers()) {
+			if (player.isInTeam()) {
+				if (player.getName().equals(playerName)) {
+					Team leaveTeam = new Team(playerName);
+					// leaveTeam.getPlayers().get(0).setBookOpen(player.bookOpen);
+					for (int i = 0; i < oldQuestData.size(); i++) {
+						QuestData leaveData = leaveTeam.getQuestData().get(i);
+						QuestData data = oldQuestData.get(i);
+						if (data != null) {
+							boolean[] old = data.reward;
+							data.reward = new boolean[old.length - 1];
+							for (int j = 0; j < data.reward.length; j++) {
+								if (j < id) {
+									data.reward[j] = old[j];
+								} else {
+									data.reward[j] = old[j + 1];
+								}
+							}
+
+							leaveData.reward[0] = old[id];
+						}
+					}
+
+					team.getPlayers().remove(id);
+
+					for (int i = 0; i < oldQuestData.size(); i++) {
+						QuestData leaveData = leaveTeam.getQuestData().get(i);
+						QuestData data = oldQuestData.get(i);
+						if (data != null && Quest.getQuest(i) != null) {
+							Quest.getQuest(i).copyProgress(leaveData, data);
+						}
+					}
+
+					for (int i = 0; i < Reputation.size(); i++) {
+						Reputation reputation = Reputation.getReputation(i);
+						if (reputation != null) {
+							leaveTeam.setReputation(reputation, team.getReputation(reputation));
+						}
+					}
+
+					return leaveTeam;
+				}
+				id++;
+			}
+		}
+		return team;
 	}
 
 	public static void saveAllData(DataWriter dw) {
@@ -546,7 +608,11 @@ public class QuestingData implements Serializable {
 				File file = new File(HardcoreQuesting.savedWorldPath, playerPath + onlinep + ".qd");
 				FileOutputStream fos = new FileOutputStream(file);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
-				oos.writeObject(data.get(onlinep));
+				QuestingData saveObject = data.get(onlinep);
+				if(!saveObject.getTeam().isSingle()){
+					saveObject.setTeam(saveObject.voidTeamData(onlinep));
+				}
+				oos.writeObject(saveObject);
 				oos.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -619,7 +685,6 @@ public class QuestingData implements Serializable {
 		// already in the database (why???) and so that player will have their
 		// progress wiped. If that player is
 		// the team leader, then the team's progress gets nuked.
-
 		// This can be avoided by checking the database after loading a player &
 		// removing dummy teammates. It should
 		// probably be avoided by dropping a nuke on the code responsible, but
@@ -819,6 +884,13 @@ public class QuestingData implements Serializable {
 		if (!team.isSingle() && !getTeams().isEmpty()) {
 			team = getTeams().get(team.getId());
 		}
+		return team;
+	}
+	
+	public Team getTeam2() {
+//		if (!team.isSingle() && !getTeams().isEmpty()) {
+//			team = getTeams().get(team.getId());
+//		}
 		return team;
 	}
 

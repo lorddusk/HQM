@@ -117,7 +117,8 @@ public abstract class FileHelper {
     }
 
     public boolean backup(File fileToBackUp) {
-        return backup(fileToBackUp, new File(fileToBackUp.getAbsolutePath() + BACKUP_SUFFIX));
+    	return true;
+    	//return backup(fileToBackUp, new File(fileToBackUp.getAbsolutePath() + BACKUP_SUFFIX));
     }
 
     public boolean backup(File fileToBackUp, File backup) {

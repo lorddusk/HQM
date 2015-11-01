@@ -702,7 +702,7 @@ public class Team implements Serializable {
 
     }
 
-    private boolean isOwner(String playerName) {
+    boolean isOwner(String playerName) {
         PlayerEntry entry = getEntry(playerName);
         return entry != null && entry.isOwner();
     }
