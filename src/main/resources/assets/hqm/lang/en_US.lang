@@ -22,6 +22,25 @@ item.hqm:hearts_rottenheart.name=Rotten heart
 item.hqm:bags.name=Reward Bag
 item.hqm:hqmInvalidItem.name=Invalid Item
 
+# ======================================
+#			TEAM SETTINGS
+# ======================================
+hqm.team.sharedLives.title=Shared lives
+hqm.team.sharedLives.desc=Everyone puts their lives into a shared pool. If anyone dies a life is removed from there. Everyone needs at least one life to be kept in the game, so if your death results in the party getting too few lives, you get banned. The others can keep playing.
+hqm.team.individualLives.title=Individual lives
+hqm.team.individualLives.desc=Everyone keeps their lives separated. If you run out of lives, you're out of the game. The other players in the party can continue playing with their lives.
+hqm.team.allReward.title=Multiple rewards
+hqm.team.allReward.desc=Everyone in the party can claim their rewards from a quest. This option gives more rewards than the others but can be disabled in the config.
+hqm.team.anyReward.title=Shared rewards
+hqm.team.anyReward.desc=The party receives one set of rewards when completing a quest. Anyone can claim the reward but as soon as it is claimed no body else can claim it.
+hqm.team.randomReward.title=Random rewards
+hqm.team.randomReward.desc=Each time the party completes a quest that set of rewards is assigned to a player. This player is the only one that can claim the rewards.
+hqm.team.invalidPlayer.title=Invite Error
+hqm.team.invalidPlayer.desc=The username does not match a player on this server. The players you invite must have logged on at least once before.
+hqm.team.playerInParty.title=Invite Error
+hqm.team.playerInParty.desc=That player is already in a party, you can't invite players from other parties.
+hqm.team.usedTeamName.title=Team Error
+hqm.team.usedTeamName.desc=That party name is already used by someone else.
 
 # ======================================
 #				COMMAND
