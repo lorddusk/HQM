@@ -126,7 +126,7 @@ public enum  DeathType {
 
     public String getName()
     {
-        return Translator.translate(name);
+        return Translator.translate("hqm.deathType." + name);
     }
 
     /*Fire: inFire, onFire, fireball
