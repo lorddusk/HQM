@@ -393,13 +393,15 @@ public class QuestingData implements Serializable {
 
 	public static QuestingData getQuestingData(String name) {
 		File file = new File(HardcoreQuesting.savedWorldPath, playerPath + name + ".qd");
-		if (!HardcoreQuesting.loaded.containsKey(name) && file.exists()) {
+		if (!HardcoreQuesting.loaded.containsKey(name) && file.exists() && !data.containsKey(name)) {
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				QuestingData result = (QuestingData) ois.readObject();
 				ois.close();
+				System.out.println("HQM DEBUG: loading playerfile from: "+name  );
 				if(!result.team.isSingle()){
+					System.out.println("HQM DEBUG: and voiding");
 					result.setTeam(result.voidTeamData(name));	
 				}
 				data.put(name, result);
@@ -523,9 +525,6 @@ public class QuestingData implements Serializable {
 			FileOutputStream fos = new FileOutputStream(file);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			QuestingData d = data.get(name);
-			if(!d.getTeam().isSingle()){
-				d.setTeam(d.voidTeamData(name));
-			}
 			oos.writeObject(d);
 			oos.close();
 		} catch (IOException e) {
@@ -609,9 +608,6 @@ public class QuestingData implements Serializable {
 				FileOutputStream fos = new FileOutputStream(file);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				QuestingData saveObject = data.get(onlinep);
-				if(!saveObject.getTeam().isSingle()){
-					saveObject.setTeam(saveObject.voidTeamData(onlinep));
-				}
 				oos.writeObject(saveObject);
 				oos.close();
 			} catch (IOException e) {
