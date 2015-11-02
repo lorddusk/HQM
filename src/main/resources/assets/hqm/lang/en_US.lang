@@ -1,4 +1,9 @@
 # ======================================
+#				GENERAL
+# ======================================
+itemGroup.hqm=Hardcore Questing Mode
+
+# ======================================
 #				BLOCKS
 # ======================================
 tile.hqm:item_barrel.name=Quest Delivery System
@@ -6,8 +11,6 @@ tile.hqm:quest_tracker.name=Quest Tracking System
 tile.hqm:quest_portal_0.name=Quest Gate System
 tile.hqm:quest_portal_1.name=Solid Wall
 tile.hqm:quest_portal_2.name=Magical Border
-
-
 
 # ======================================
 #				ITEMS
