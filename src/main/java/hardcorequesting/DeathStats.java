@@ -27,8 +27,9 @@ public class DeathStats {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    public String getName()
+    {
+        return Translator.translate(name);
     }
 
     public String getDescription(int id) {
@@ -168,15 +169,16 @@ public class DeathStats {
     }
 
     private static class DeathStatsBest extends DeathStats {
-        private static final String[] prefixes = {GuiColor.YELLOW + "1st", GuiColor.LIGHT_GRAY + "2nd", GuiColor.ORANGE + "3rd"};
+        private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
+        private static final String[] placePrefixes = {"first", "second", "third"};
         private String[] messages = new String[DeathType.values().length];
         private DeathStatsBest() {
-            super("Worst players");
+            super("hqm.deathStat.worstPlayers");
             for (int i = 0; i < messages.length; i++) {
                 Arrays.sort(clientDeathList, deathTypeComparator[i]);
                 deaths[i] = clientDeathList[0].getDeaths(i);
                 if (clientDeathList[0].getDeaths(i) == 0) {
-                    messages[i] = GuiColor.RED + "No one has died this way, yet.";
+                    messages[i] = GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied");
                 }else{
                     messages[i] = "";
                     int currentValue = 0;
@@ -193,7 +195,8 @@ public class DeathStats {
                         if (j != 0) {
                             messages[i] += "\n";
                         }
-                        messages[i] += prefixes[standing] + GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
+                        messages[i] += colourPrefixes[standing] + Translator.translate("hqm.deathStat." + placePrefixes[standing]);
+                        messages[i] += GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
                     }
 
                 }
@@ -209,7 +212,7 @@ public class DeathStats {
     private static class DeathStatsTotal extends DeathStats {
         private int[] count = new int[DeathType.values().length];
         private DeathStatsTotal() {
-            super("Everyone");
+            super("hqm.deathStat.everyone");
             for (int i = 0; i < count.length; i++) {
                 for (DeathStats deathStats : clientDeathList) {
                     deaths[i] += deathStats.getDeaths(i);
@@ -223,7 +226,10 @@ public class DeathStats {
 
         @Override
         public String getDescription(int id) {
-            return super.getDescription(id) + "\n\n" + (count[id] == 0 ? GuiColor.RED + "No one has died this way, yet." : String.valueOf(GuiColor.GREEN) + count[id] + " " + (count[id] == 1 ? "player" : "players") + " have died this way.");
+            return super.getDescription(id) + "\n\n" +
+                    (count[id] == 0 ?
+                            GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied") :
+                            GuiColor.GREEN.toString() + count[id] + " " + Translator.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + Translator.translate("hqm.deathStat.diedThisWay"));
         }
     }
 }

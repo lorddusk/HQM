@@ -61,6 +61,18 @@ hqm.deathType.magic=Magic
 hqm.deathType.rottenHearts=Rotten Hearts
 hqm.deathType.other=Other / Unknown
 
+# ======================================
+#			DEATH STATS
+# ======================================
+hqm.deathStat.first=1st
+hqm.deathStat.second=2nd
+hqm.deathStat.third=3rd
+hqm.deathStat.worstPlayers=Worst Players
+hqm.deathStat.everyone=Everyone
+hqm.deathStat.noOneDied=No one has died this way, yet.
+hqm.deathStat.payer=player
+hqm.deathStat.payers=players
+hqm.deathStat.diedThisWay=have died this way.
 
 # ======================================
 #				COMMAND
