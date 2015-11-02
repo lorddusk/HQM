@@ -6,91 +6,91 @@ import net.minecraft.util.DamageSource;
 
 
 public enum  DeathType {
-    LAVA("Lava") {
+    LAVA("lava") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("lava");
         }
     },
-    FIRE("Fire") {
+    FIRE("fire") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.isFireDamage();
         }
     },
-    SUFFOCATION("Suffocation") {
+    SUFFOCATION("suffocation") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("inWall");
         }
     },
-    THORNS("Thorns") {
+    THORNS("thorns") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("thorns") || source.getDamageType().equals("cactus");
         }
     },
-    DROWNING("Drowning") {
+    DROWNING("drowning") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("drown");
         }
     },
-    STARVATION("Starvation") {
+    STARVATION("starvation") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("starve");
         }
     },
-    FALL("Fall") {
+    FALL("fall") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("fall");
         }
     },
-    VOID("Void") {
+    VOID("void") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("outOfWorld");
         }
     },
-    CRUSHED("Crushed") {
+    CRUSHED("crushed") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("anvil") || source.getDamageType().equals("fallingBlock");
         }
     },
-    EXPLOSION("Explosions") {
+    EXPLOSION("explosions") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.isExplosion();
         }
     },
-    MONSTER("Monsters") {
+    MONSTER("monsters") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("mob") || source.getEntity() instanceof EntityLiving;
         }
     },
-    PLAYER("Other players") {
+    PLAYER("otherPlayers") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.getDamageType().equals("player") || source.getEntity() instanceof EntityPlayer;
         }
     },
-    MAGIC("Magic") {
+    MAGIC("magic") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return source.isMagicDamage();
         }
     },
-    HQM("Rotten Hearts") {
+    HQM("rottenHearts") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return false; //handled elsewhere
         }
     },
-    OTHER("Other / Unknown") {
+    OTHER("other") {
         @Override
         boolean isSourceValid(DamageSource source) {
             return true; //fallback
@@ -124,8 +124,9 @@ public enum  DeathType {
     //is only accurate if called in the values() order
     abstract boolean isSourceValid(DamageSource source);
 
-    public String getName() {
-        return name;
+    public String getName()
+    {
+        return Translator.translate(name);
     }
 
     /*Fire: inFire, onFire, fireball

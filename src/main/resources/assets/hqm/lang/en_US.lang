@@ -43,6 +43,26 @@ hqm.team.usedTeamName.title=Team Error
 hqm.team.usedTeamName.desc=That party name is already used by someone else.
 
 # ======================================
+#			DEATH TYPES
+# ======================================
+hqm.deathType.lava=Lava
+hqm.deathType.fire=Fire
+hqm.deathType.suffocation=Suffocation
+hqm.deathType.thorns=Thorns
+hqm.deathType.drowning=Drowning
+hqm.deathType.starvation=Starvation
+hqm.deathType.fall=Fall
+hqm.deathType.void=Void
+hqm.deathType.crushed=Crushed
+hqm.deathType.explosions=Explosions
+hqm.deathType.monsters=Monsters
+hqm.deathType.otherPlayers=Other Players
+hqm.deathType.magic=Magic
+hqm.deathType.rottenHearts=Rotten Hearts
+hqm.deathType.other=Other / Unknown
+
+
+# ======================================
 #				COMMAND
 # ======================================
 
