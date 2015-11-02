@@ -1,12 +1,12 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.Lang;
+import hardcorequesting.Translator;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class CommandHelp extends CommandBase
         switch (arguments.length)
         {
             case 0:
-                StringBuilder output = new StringBuilder(StatCollector.translateToLocal(Lang.HELP_START) + " ");
+                StringBuilder output = new StringBuilder(Translator.translate(Lang.HELP_START) + " ");
                 List<String> commands = new ArrayList<>();
                 for (ISubCommand command : CommandHandler.commands.values())
                 {
@@ -62,8 +62,8 @@ public class CommandHelp extends CommandBase
                 if (command.isVisible(sender))
                 {
                     for (int i : command.getSyntaxOptions(sender))
-                        sender.addChatMessage(new ChatComponentText(YELLOW + StatCollector.translateToLocal(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
-                                + WHITE + " - " + StatCollector.translateToLocal(Lang.COMMAND_PREFIX + commandName + Lang.INFO_SUFFIX + i)));
+                        sender.addChatMessage(new ChatComponentText(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
+                                + WHITE + " - " + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.INFO_SUFFIX + i)));
                 } else
                 {
                     throw new CommandException(Lang.NO_PERMISSION);
