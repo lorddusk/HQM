@@ -29,7 +29,7 @@ public class HardcoreQuesting
 
     @SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
     public static CommonProxy proxy;
-    public static CreativeTabs HQMTab = new HQMTab(CreativeTabs.getNextID(), "Hardcore Questing Mode");
+    public static CreativeTabs HQMTab = new HQMTab();
 
     public static String path;
 

@@ -22,6 +22,7 @@ import net.minecraft.server.management.UserListBans;
 import net.minecraft.server.management.UserListBansEntry;
 import net.minecraft.server.management.UserListEntry;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
@@ -139,14 +140,15 @@ public class QuestingData {
     public void removeLifeAndSendMessage(EntityPlayer player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.addChatMessage(new ChatComponentText("You just lost a life. You have " + getLives() + " live(s) left"));
+            player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.lostLife", getLives())));
         }
         if (getTeam().isSharingLives()) {
             for (Team.PlayerEntry entry : getTeam().getPlayers()) {
                 if (entry.isInTeam() && !entry.getName().equals(getUserName(player))) {
                     EntityPlayer other = getPlayer(entry.getName());
                     if (other != null) {
-                        other.addChatMessage(new ChatComponentText(getUserName(player) + " just lost a life" + (isDead ? " and got banned" : "") + ". You have " + getLives() + " live(s) left"));
+                        other.addChatMessage(new ChatComponentText(
+                                Translator.translate("hqm.message.lostTeamLife", getUserName(player), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
                     }
                 }
             }
@@ -232,7 +234,7 @@ public class QuestingData {
 		MinecraftServer mcServer = MinecraftServer.getServer();
 
 		if (mcServer.isSinglePlayer() && playerEntity.getCommandSenderName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer("You\'re out of lives. Game over, man, it\'s game over!");
+            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
             mcServer.getActiveAnvilConverter().flushCache();
@@ -249,7 +251,7 @@ public class QuestingData {
             mcServer.getConfigurationManager().func_152608_h().func_152687_a(userlistbansentry);
 
 			//mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer("You\'re out of lives. Game over, man, it\'s game over!");
+            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
 		}
 
@@ -689,7 +691,7 @@ public class QuestingData {
 
     public static void disableHardcore(ICommandSender sender) {
         if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            sender.addChatMessage(new ChatComponentText("Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it..."));
+            sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcore"));
             try {
                 ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
             }catch (Throwable ex) {
@@ -697,7 +699,7 @@ public class QuestingData {
             }
 
             if (!MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-                sender.addChatMessage(new ChatComponentText("Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect."));
+                sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcoreOverride"));
             }
         }
     }

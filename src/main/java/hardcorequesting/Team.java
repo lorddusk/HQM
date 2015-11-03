@@ -71,8 +71,8 @@ public class Team {
 
 
     public enum LifeSetting {
-        SHARE("Shared lives", "Everyone puts their lives into a shared pool. If anyone dies a life is removed from there. Everyone needs at least one life to be kept in the game, so if your death results in the party getting too few lives, you get banned. The others can keep playing."),
-        INDIVIDUAL("Individual lives", "Everyone keeps their lives separated. If you run out of lives, you're out of the game. The other players in the party can continue playing with their lives.");
+        SHARE("hqm.team.sharedLives.title", "hqm.team.sharedLives.desc"),
+        INDIVIDUAL("hqm.team.individualLives.title", "hqm.team.individualLives.desc");
 
         private String title;
         private String description;
@@ -82,19 +82,21 @@ public class Team {
             this.description = description;
         }
 
-        public String getTitle() {
-            return title;
+        public String getTitle()
+        {
+            return Translator.translate(title);
         }
 
-        public String getDescription() {
-            return description;
+        public String getDescription()
+        {
+            return Translator.translate(description);
         }
     }
 
     public enum RewardSetting {
-        ALL("Multiple rewards", "Everyone in the party can claim their rewards from a quest. This option gives more rewards than the others but can be disabled in the config."),
-        ANY("Shared rewards", "The party receives one set of rewards when completing a quest. Anyone can claim the reward but as soon as it is claimed no body else can claim it."),
-        RANDOM("Random rewards", "Each time the party completes a quest that set of rewards is assigned to a player. This player is the only one that can claim the rewards.");
+        ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
+        ANY("hqm.team.anyReward.title", "hqm.team.anyReward.desc"),
+        RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");
 
         private static RewardSetting getDefault() {
             return isAllModeEnabled ? ALL : ANY;
@@ -108,12 +110,14 @@ public class Team {
             this.description = description;
         }
 
-        public String getTitle() {
-            return title;
+        public String getTitle()
+        {
+            return Translator.translate(title);
         }
 
-        public String getDescription() {
-            return description;
+        public String getDescription()
+        {
+            return Translator.translate(description);
         }
 
         public static boolean isAllModeEnabled;
@@ -425,9 +429,9 @@ public class Team {
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static ErrorMessage latestError;
     public enum ErrorMessage {
-        INVALID_PLAYER("Invite Error", "The username does not match a player on this server. The players you invite must have logged on at least once before."),
-        IN_PARTY("Invite Error", "That player is already in a party, you can't invite players from other parties."),
-        USED_NAME("Team Error", "That party name is already used by someone else.");
+        INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
+        IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
+        USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
 
         private String header;
         private String message;
@@ -437,12 +441,14 @@ public class Team {
             this.header = header;
         }
 
-        public String getMessage() {
-            return message;
+        public String getMessage()
+        {
+            return Translator.translate(message);
         }
 
-        public String getHeader() {
-            return header;
+        public String getHeader()
+        {
+            return Translator.translate(header);
         }
 
         public void sendToClient(EntityPlayer player) {

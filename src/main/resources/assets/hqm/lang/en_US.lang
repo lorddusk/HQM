@@ -1,4 +1,25 @@
 # ======================================
+#		 TRANSLATE GUIDELINES
+# ======================================
+# %s is where something will be filled in at runtime.
+# Don't remove it since it will make things weird.
+# Just put it on the correct place in the sentence.
+
+# ======================================
+#				GENERAL
+# ======================================
+itemGroup.hqm=Hardcore Questing Mode
+hqm.message.noHardcore=This server doesn't have Hardcore Questing Mode enabled.
+hqm.message.hardcore=This server currently has Hardcore Questing Mode enabled!
+hqm.message.livesLeft=You currently have %s live(s) left.
+hqm.message.lostLife=You just lost a life. You have %s live(s) left
+hqm.message.lostTeamLife=%s just lost a life %s. You have %s live(s) left
+hqm.message.andBanned=and got banned
+hqm.message.gameOver=You're out of lives. Game over, man, it's game over!
+hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
+hqm.message.vanillaHardcoreOverride=Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect.
+
+# ======================================
 #				BLOCKS
 # ======================================
 tile.hqm:item_barrel.name=Quest Delivery System
@@ -6,8 +27,6 @@ tile.hqm:quest_tracker.name=Quest Tracking System
 tile.hqm:quest_portal_0.name=Quest Gate System
 tile.hqm:quest_portal_1.name=Solid Wall
 tile.hqm:quest_portal_2.name=Magical Border
-
-
 
 # ======================================
 #				ITEMS
@@ -21,6 +40,80 @@ item.hqm:hearts_heart.name=Full heart
 item.hqm:hearts_rottenheart.name=Rotten heart
 item.hqm:bags.name=Reward Bag
 item.hqm:hqmInvalidItem.name=Invalid Item
+
+# ======================================
+#			TEAM SETTINGS
+# ======================================
+hqm.team.sharedLives.title=Shared lives
+hqm.team.sharedLives.desc=Everyone puts their lives into a shared pool. If anyone dies a life is removed from there. Everyone needs at least one life to be kept in the game, so if your death results in the party getting too few lives, you get banned. The others can keep playing.
+hqm.team.individualLives.title=Individual lives
+hqm.team.individualLives.desc=Everyone keeps their lives separated. If you run out of lives, you're out of the game. The other players in the party can continue playing with their lives.
+hqm.team.allReward.title=Multiple rewards
+hqm.team.allReward.desc=Everyone in the party can claim their rewards from a quest. This option gives more rewards than the others but can be disabled in the config.
+hqm.team.anyReward.title=Shared rewards
+hqm.team.anyReward.desc=The party receives one set of rewards when completing a quest. Anyone can claim the reward but as soon as it is claimed no body else can claim it.
+hqm.team.randomReward.title=Random rewards
+hqm.team.randomReward.desc=Each time the party completes a quest that set of rewards is assigned to a player. This player is the only one that can claim the rewards.
+hqm.team.invalidPlayer.title=Invite Error
+hqm.team.invalidPlayer.desc=The username does not match a player on this server. The players you invite must have logged on at least once before.
+hqm.team.playerInParty.title=Invite Error
+hqm.team.playerInParty.desc=That player is already in a party, you can't invite players from other parties.
+hqm.team.usedTeamName.title=Team Error
+hqm.team.usedTeamName.desc=That party name is already used by someone else.
+
+# ======================================
+#			DEATH TYPES
+# ======================================
+hqm.deathType.lava=Lava
+hqm.deathType.fire=Fire
+hqm.deathType.suffocation=Suffocation
+hqm.deathType.thorns=Thorns
+hqm.deathType.drowning=Drowning
+hqm.deathType.starvation=Starvation
+hqm.deathType.fall=Fall
+hqm.deathType.void=Void
+hqm.deathType.crushed=Crushed
+hqm.deathType.explosions=Explosions
+hqm.deathType.monsters=Monsters
+hqm.deathType.otherPlayers=Other Players
+hqm.deathType.magic=Magic
+hqm.deathType.rottenHearts=Rotten Hearts
+hqm.deathType.other=Other / Unknown
+
+# ======================================
+#			DEATH STATS
+# ======================================
+hqm.deathStat.first=1st
+hqm.deathStat.second=2nd
+hqm.deathStat.third=3rd
+hqm.deathStat.worstPlayers=Worst Players
+hqm.deathStat.everyone=Everyone
+hqm.deathStat.noOneDied=No one has died this way, yet.
+hqm.deathStat.payer=player
+hqm.deathStat.payers=players
+hqm.deathStat.diedThisWay=have died this way.
+
+# ======================================
+#			TRACKER TYPES
+# ======================================
+hqm.tracker.team.title=Team Tracker
+hqm.tracker.team.desc=Emits a redstone signal depending on how many teams that have completed the selected quest. Players without teams count as separate one person teams.
+hqm.tracker.player.title=Player Tracker
+hqm.tracker.player.desc=Emits a redstone signal depending on how many players that have completed this quest.
+hqm.tracker.progressMax.title=Progress Tracker (Max)
+hqm.tracker.progressMax.desc=Emits a redstone signal depending on the progress of this quest for the player/team that has the highest progress. This will only emit at full strength if someone has completed the quest.
+hqm.tracker.progressClose.title=Progress Tracker (Close)
+hqm.tracker.progressClose.desc=Emits a redstone signal depending on the progress of the nearest player. This will only emit at full strength if that player has completed the quest. This mode requires the players to be online, no matter the radius setting.
+
+# ======================================
+#			PORTAL TYPES
+# ======================================
+hqm.portal.tech.title=Tech Theme
+hqm.portal.tech.desc=This set works perfectly for your technical themed map.
+hqm.portal.magic.title=Magic Theme
+hqm.portal.magic.desc=This set works perfectly for your magical themed map.
+hqm.portal.custom.title=Custom Theme
+hqm.portal.custom.desc=Customize the theme by specify what block this block should look like.
 
 
 # ======================================
