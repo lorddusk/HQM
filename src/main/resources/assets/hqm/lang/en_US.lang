@@ -105,6 +105,15 @@ hqm.tracker.progressMax.desc=Emits a redstone signal depending on the progress o
 hqm.tracker.progressClose.title=Progress Tracker (Close)
 hqm.tracker.progressClose.desc=Emits a redstone signal depending on the progress of the nearest player. This will only emit at full strength if that player has completed the quest. This mode requires the players to be online, no matter the radius setting.
 
+# ======================================
+#			PORTAL TYPES
+# ======================================
+hqm.portal.tech.title=Tech Theme
+hqm.portal.tech.desc=This set works perfectly for your technical themed map.
+hqm.portal.magic.title=Magic Theme
+hqm.portal.magic.desc=This set works perfectly for your magical themed map.
+hqm.portal.custom.title=Custom Theme
+hqm.portal.custom.desc=Customize the theme by specify what block this block should look like.
 
 
 # ======================================
