@@ -10,6 +10,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 
 public class PlayerTracker {
 
@@ -36,7 +37,7 @@ public class PlayerTracker {
 		if(QuestingData.isHardcoreActive())
 			sendLoginMessage(player);
 		else if (ModConfig.NO_HARDCORE_MESSAGE)
-			player.addChatMessage(new ChatComponentText("This server doesn\'t have Hardcore Questing Mode enabled."));
+			player.addChatMessage(new ChatComponentTranslation("hqm.message.noHardcore"));
 
         NBTTagCompound tags = player.getEntityData();
         if(tags.hasKey("HardcoreQuesting")) {
@@ -57,8 +58,7 @@ public class PlayerTracker {
 
 
     private void sendLoginMessage(EntityPlayer player) {
-		player.addChatMessage(new ChatComponentText("This server currently has"
-                + " Hardcore Questing Mode enabled! You currently have " + getRemainingLives(player) + " live(s) left."));
+		player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore")+ " " + Translator.translate("hqm.message.livesLeft", getRemainingLives(player))));
 		
 	}
 
