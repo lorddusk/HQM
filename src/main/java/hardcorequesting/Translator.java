@@ -8,4 +8,9 @@ public class Translator
     {
         return StatCollector.translateToLocal(id);
     }
+
+    public static String translate(String id, Object... args)
+    {
+        return StatCollector.translateToLocalFormatted(id, args);
+    }
 }
