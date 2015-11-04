@@ -18,7 +18,7 @@ public class CommandEdit extends CommandBase
         if (sender instanceof EntityPlayer && isPlayerOp(sender)) {
             EntityPlayer player = (EntityPlayer) sender;
 
-            String name = arguments.length == 2 ? arguments[1] : QuestingData.getUserName(player);
+            String name = arguments.length == 1 ? arguments[0] : QuestingData.getUserName(player);
             if (QuestingData.hasData(name)) {
                 player.inventory.addItemStackToInventory(ItemQuestBook.getOPBook(name));
             } else {
