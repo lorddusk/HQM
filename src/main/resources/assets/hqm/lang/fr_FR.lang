@@ -1,0 +1,164 @@
+# ======================================
+#		 TRANSLATE GUIDELINES
+# ======================================
+# %s is where something will be filled in at runtime.
+# Don't remove it since it will make things weird.
+# Just put it on the correct place in the sentence.
+
+# ======================================
+#				GENERAL
+# ======================================
+itemGroup.hqm=Hardcore Questing Mode
+hqm.message.noHardcore=Ce serveur n'a pas Hardcore Questing Mode d'activé.
+hqm.message.hardcore=Ce serveur permet actuellement Hardcore Questing Mode !
+hqm.message.livesLeft=Il vous reste actuellement %s vie(s).
+hqm.message.lostLife=Vous venez de perdre une vie. Il vous reste %s vie(s) 
+hqm.message.lostTeamLife=%s vient de perdre une vie %s. Il vous reste %s vie(s) 
+hqm.message.andBanned=et a été banni
+hqm.message.gameOver=Vous n'avez plus de vies. Game over, man, it's game over!
+hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
+hqm.message.vanillaHardcoreOverride=Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect.
+
+# ======================================
+#				BLOCKS
+# ======================================
+tile.hqm:item_barrel.name=Système d'administration des quêtes
+tile.hqm:quest_tracker.name=Système de suivi de quêtes
+tile.hqm:quest_portal_0.name=Portail des quêtes
+tile.hqm:quest_portal_1.name=Mur solide
+tile.hqm:quest_portal_2.name=Bords magiques
+
+# ======================================
+#				ITEMS
+# ======================================
+item.hqm:quest_book_0.name=Livre de quêtes
+item.hqm:quest_book_1.name=Livre de quêtes - Version OP
+item.hqm:hearts_quarterheart.name=Quart de coeur
+item.hqm:hearts_halfheart.name=Demi coeur
+item.hqm:hearts_threequarts.name=Trois quart de coeur
+item.hqm:hearts_heart.name=Coeur entier
+item.hqm:hearts_rottenheart.name=Coeur pourri
+item.hqm:bags.name=Sac de récompense
+item.hqm:hqmInvalidItem.name=Élément non valide
+
+# ======================================
+#			TEAM SETTINGS
+# ======================================
+hqm.team.sharedLives.title=Vies partagées
+hqm.team.sharedLives.desc=Tout le monde met sa vie dans pot commun. Si quelqu'un meurt une vie est enlevée du pot. Tout le monde a besoin d'au moins une vie à être gardé dans le jeu, donc si votre mort aboutit à vider le pot commun de vies, vous êtes banni. Les autres peuvent continuer à jouer.
+hqm.team.individualLives.title=Vies individuelles
+hqm.team.individualLives.desc=Tout le monde conserve sa propre vie. Si vous êtes à court de vies, vous êtes hors du jeu. Les autres joueurs dans le parti peuvent continuer à jouer avec leurs vies.
+hqm.team.allReward.title=Récompenses multiples
+hqm.team.allReward.desc=Tout le monde dans la partie peut revendiquer leurs récompenses d'une quête. Cette option donne plus de récompenses que les autres mais peut être mis hors de service dans la config.
+hqm.team.anyReward.title=Récompenses partégées
+hqm.team.anyReward.desc=La parti reçoit un ensemble de récompenses en achevant une quête. N'importe qui peut revendiquer la récompense mais aussitôt qu'elle est revendiqué plus personne ne peut le faire.
+hqm.team.randomReward.title=Récompenses aléatoires
+hqm.team.randomReward.desc=Chaque fois que la partie complète uen quête cette ensemble de récompenses est assigné à un joueur. Ce joueur est le seul qui puisse revendiquer les récompenses.
+hqm.team.invalidPlayer.title=Erreur d'invite
+hqm.team.invalidPlayer.desc=The username does not match a player on this server. The players you invite must have logged on at least once before.
+hqm.team.playerInParty.title=Erreur d'invite
+hqm.team.playerInParty.desc=Ce joueur est déjà dans une partie, vous ne pouvez pas inviter de joueurs d'autres parties.
+hqm.team.usedTeamName.title=Erreur de groupe
+hqm.team.usedTeamName.desc=Ce nom de partie est déjà utilisé par quelqu'un d'autre.
+
+# ======================================
+#			DEATH TYPES
+# ======================================
+hqm.deathType.lava=Lave
+hqm.deathType.fire=Feu
+hqm.deathType.suffocation=Suffocation
+hqm.deathType.thorns=Épines
+hqm.deathType.drowning=Noyade
+hqm.deathType.starvation=Famine
+hqm.deathType.fall=Chute
+hqm.deathType.void=Néant
+hqm.deathType.crushed=Broyé
+hqm.deathType.explosions=Explosions
+hqm.deathType.monsters=Monstres
+hqm.deathType.otherPlayers=Autres joueurs
+hqm.deathType.magic=Magique
+hqm.deathType.rottenHearts=Coeur pourri
+hqm.deathType.other=Autre / Inconnue
+
+# ======================================
+#			DEATH STATS
+# ======================================
+hqm.deathStat.first=1er
+hqm.deathStat.second=2ème
+hqm.deathStat.third=3ème
+hqm.deathStat.worstPlayers=Les pires joueurs
+hqm.deathStat.everyone=Tout le monde
+hqm.deathStat.noOneDied=Personne n'est mort ainsi, pourtant.
+hqm.deathStat.payer=joueur
+hqm.deathStat.payers=joueurs
+hqm.deathStat.diedThisWay=sont mort ainsi.
+
+# ======================================
+#			TRACKER TYPES
+# ======================================
+hqm.tracker.team.title=Team Tracker
+hqm.tracker.team.desc=Emits a redstone signal depending on how many teams that have completed the selected quest. Players without teams count as separate one person teams.
+hqm.tracker.player.title=Player Tracker
+hqm.tracker.player.desc=Emits a redstone signal depending on how many players that have completed this quest.
+hqm.tracker.progressMax.title=Progress Tracker (Max)
+hqm.tracker.progressMax.desc=Emits a redstone signal depending on the progress of this quest for the player/team that has the highest progress. This will only emit at full strength if someone has completed the quest.
+hqm.tracker.progressClose.title=Progress Tracker (Close)
+hqm.tracker.progressClose.desc=Emits a redstone signal depending on the progress of the nearest player. This will only emit at full strength if that player has completed the quest. This mode requires the players to be online, no matter the radius setting.
+
+# ======================================
+#			PORTAL TYPES
+# ======================================
+hqm.portal.tech.title=Thème technique
+hqm.portal.tech.desc=Cet ensemble fonctionera parfaitement pour votre carte à thème technique.
+hqm.portal.magic.title=Thème magique
+hqm.portal.magic.desc=Cet ensemble fonctionera parfaitement pour votre carte à thème magique.
+hqm.portal.custom.title=Thème personalisé
+hqm.portal.custom.desc=Personalisez le thème en spécifiant, à quel bloc, ce bloc devrat-il ressembler.
+
+
+# ======================================
+#				COMMAND
+# ======================================
+
+hqm.command.notFound=Commande introuvable
+hqm.command.noPermission=Vous n'avez pas la permission d'utiliser cette commande
+hqm.command.loadFailed=Échec de chargement
+hqm.command.loadSuccess=Chargé : %s
+hqm.command.fileNotFound=Fichier introuvable
+hqm.command.saveFailed=Échec d'enregistrement de %s
+hqm.command.savedTo=Quêtes enregistrées dans : %s
+hqm.command.questNotFound=La page de quête %s est introuvable
+
+hqm.command.info.help.start=Les commandes disponibles sont :
+hqm.command.help.syntax0=/hqm help <commande>
+hqm.command.help.info0=Pour de l'aide sur toutes les commandes disponibles.
+hqm.command.version.syntax0=/hqm version
+hqm.command.version.info0=Donne la version du mod.
+hqm.command.hardcore.syntax0=/hqm hardcore
+hqm.command.hardcore.info0=Active le mode difficile.
+hqm.command.quest.syntax0=/hqm quest
+hqm.command.quest.info0=Active le mode de quêtes.
+hqm.command.enable.syntax0=/hqm enable
+hqm.command.enable.info0=Active les modes difficile et de quêtes.
+hqm.command.edit.syntax0=/hqm edit <joueur>
+hqm.command.edit.info0=Vous donne un livre en mode édition, par défaut à : user.
+hqm.command.lives.syntax0=/hqm lives
+hqm.command.lives.info0=Verifie vos vies restantes.
+hqm.command.lives.syntax1=/hqm lives [joueur]
+hqm.command.lives.info1=Vérifie les vies restantes d'un joueur.
+hqm.command.lives.syntax2=/hqm lives add <joueur> <quantité>
+hqm.command.lives.info2=Ajoute des vies à un joueur, par défaut à : user et 1
+hqm.command.lives.syntax3=/hqm lives remove <joueur> <quantité>
+hqm.command.lives.info3=Retire des vies à un joueur, par défaut à : user et 1
+hqm.command.load.syntax0=/hqm load [non de fichier]
+hqm.command.load.info0=Charge les pages de quêtes données dans HQM.
+hqm.command.load.syntax1=/hqm load all
+hqm.command.load.info1=Charge toutes les pages de quêtes dans le HQM.
+hqm.command.save.syntax2=/hqm load bags
+hqm.command.save.info2=Charge les sacs de quête et les niveaux d'un JSON - les groupes de récompenses déjà existants ne seront pas chargés.
+hqm.command.save.syntax0=/hqm save [page de quête] <non de fichier>
+hqm.command.save.info0=Enregistre la page de quête donnée dans un fichier JSON, par défaut à : page name
+hqm.command.save.syntax1=/hqm save all
+hqm.command.save.info1=Enregistre toutes les pages de quêtes par leurs noms
+hqm.command.save.syntax2=/hqm save bags
+hqm.command.save.info2=Enregistre toutes les récompenses de sac de quête dans un JSON.
