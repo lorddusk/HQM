@@ -393,7 +393,8 @@ public class QuestingData implements Serializable {
 
 	public static QuestingData getQuestingData(String name) {
 		File file = new File(HardcoreQuesting.savedWorldPath, playerPath + name + ".qd");
-		if (!HardcoreQuesting.loaded.containsKey(name) && file.exists() && !data.containsKey(name)) {
+		boolean containskey = data.containsKey(name);
+		if (!containskey && !HardcoreQuesting.loaded.containsKey(name) && file.exists()) {
 			try {
 				FileInputStream fis = new FileInputStream(file);
 				ObjectInputStream ois = new ObjectInputStream(fis);
@@ -416,7 +417,7 @@ public class QuestingData implements Serializable {
 				e.printStackTrace();
 			}
 		}
-		if (!data.containsKey(name)) {
+		if (!containskey) {
 			new QuestingData(name);
 		}
 		return data.get(name);
