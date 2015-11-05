@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
+import hardcorequesting.Translator;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.parsing.BagAdapter;
 import hardcorequesting.parsing.QuestAdapter;
@@ -12,6 +13,7 @@ import hardcorequesting.quests.QuestSet;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -95,8 +97,8 @@ public abstract class CommandBase implements ISubCommand
         return text.substring(0, text.length()-1);
     }
 
-    protected void sendChat(ICommandSender sender, String string) {
-        sender.addChatMessage(new ChatComponentText(string));
+    protected void sendChat(ICommandSender sender, String key, Object... args) {
+        sender.addChatMessage(new ChatComponentText(Translator.translate(key, args)));
     }
 
     protected boolean isPlayerOp(ICommandSender sender)

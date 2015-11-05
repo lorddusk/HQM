@@ -15,20 +15,13 @@ public class CommandHardcore extends CommandBase
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments)
     {
-        QuestingData.disableHardcore(sender);
-        if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            sendChat(sender, "Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.");
-        } else if (!QuestingData.isHardcoreActive()) {
-            sendChat(sender, "Hardcore Mode has been activated. Enjoy!");
-            QuestingData.activateHardcore();
-            if (sender instanceof EntityPlayer) {
-                currentLives((EntityPlayer) sender);
-            }
-        } else {
-            sendChat(sender, "Hardcore Mode is already activated.");
-            if (sender instanceof EntityPlayer) {
-                currentLives((EntityPlayer) sender);
-            }
-        }
+        QuestingData.disableVanillaHardcore(sender);
+        if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
+            sendChat(sender, "hqm.message.vanillaHardcoreOn");
+        else
+            sendChat(sender, QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore");
+        QuestingData.activateHardcore();
+        if (sender instanceof EntityPlayer)
+            currentLives((EntityPlayer) sender);
     }
 }

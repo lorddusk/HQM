@@ -15,46 +15,15 @@ public class CommandEnable extends CommandBase
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments)
     {
-        System.out.println("ENABLE");
-            QuestingData.disableHardcore(sender);
-
-            if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled() && !QuestingData.isQuestActive()) {
-                sendChat(sender, "Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.");
-                sendChat(sender, "Questing mode has been activated. Enjoy!");
-                QuestingData.activateQuest();
-            } else if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled() && QuestingData.isQuestActive()) {
-                sendChat(sender, "Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.");
-                sendChat(sender, "Questing mode is already activated.");
-            } else if (!QuestingData.isHardcoreActive() && !QuestingData.isQuestActive()) {
-                sendChat(sender, "Hardcore Mode has been activated. Enjoy!");
-                sendChat(sender, "Questing mode has been activated. Enjoy!");
-                QuestingData.activateHardcore();
-                QuestingData.activateQuest();
-                if (sender instanceof EntityPlayer) {
-                    currentLives((EntityPlayer) sender);
-                }
-            } else if (!QuestingData.isHardcoreActive() && QuestingData.isQuestActive()) {
-                sendChat(sender, "Hardcore Mode has been activated. Enjoy!");
-                QuestingData.activateHardcore();
-                if (sender instanceof EntityPlayer) {
-                    currentLives((EntityPlayer) sender);
-                }
-                sendChat(sender, "Questing mode is already activated.");
-            } else if (QuestingData.isHardcoreActive() && !QuestingData.isQuestActive()) {
-                sendChat(sender, "Questing mode has been activated. Enjoy!");
-                QuestingData.activateQuest();
-                sendChat(sender, "Hardcore Mode is already activated.");
-                if (sender instanceof EntityPlayer) {
-                    currentLives((EntityPlayer) sender);
-                }
-            } else
-            {
-                sendChat(sender, "Hardcore Mode is already activated.");
-                if (sender instanceof EntityPlayer)
-                {
-                    currentLives((EntityPlayer) sender);
-                }
-                sendChat(sender, "Questing mode is already activated.");
-            }
+        QuestingData.disableVanillaHardcore(sender);
+        if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
+            sendChat(sender, "hqm.message.vanillaHardcoreOn");
+        else
+            sendChat(sender, QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore");
+        sendChat(sender, QuestingData.isQuestActive() ? "hqm.message.questAlreadyActivated" : "hqm.message.questActivated");
+        QuestingData.activateHardcore();
+        QuestingData.activateQuest();
+        if (sender instanceof EntityPlayer)
+            currentLives((EntityPlayer) sender);
     }
 }
