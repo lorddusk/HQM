@@ -24,6 +24,7 @@ hqm.message.questActivated=Questing mode has been activated. Enjoy!
 hqm.message.questHardcore=Hardcore Mode has been activated. Enjoy!
 hqm.message.questAlreadyActivated=Questing mode is already activated.
 hqm.message.hardcoreAlreadyActivated=Hardcore Mode is already activated
+hqm.message.noQuestYet=Questing Mode isn't enabled yet. use '/hqm quest' to enable it.
 hqm.message.noHardcoreYet=Hardcore Mode isn't enabled yet. use '/hqm hardcore' to enable it.
 hqm.message.positiveNumbers=Please use only positive numbers.
 hqm.message.posNumberAndPlayer=Please use only positive numbers and / or a correct Playername.
@@ -36,17 +37,30 @@ hqm.message.addLives=You have added %s live(s) to your lifepool.
 hqm.message.addLivesTo=You have added %s  live(s) to %s.
 hqm.message.addLivesBy=You had %s live(s) added by %s
 hqm.message.cantGiveMoreLives=You can't give %s more than %s lives.
+hqm.message.haveMaxLives=You already have maximum lives.
 hqm.massage.setLivesInstead=Setting %s to %s lives instead.
 hqm.massage.setLivesBy=You have got your lives set to %s by %s
+hqm.message.haveRemaining=You have %s remaining
 hqm.message.hasLivesRemaining=%s has %s live(s) remaining
 hqm.message.version=Hardcore Questing Mode - Version : %s
+hqm.message.addOne=You have added 1 to your total life.
+hqm.message.eatRottenHearth=Why did you eat a rotten heart?
+hqm.message.hearthDecay=One or more of your hearts has just decade into a Rotten Heart.
+hqm.message.alreadyEditing=Another OP is already accessing this player's quests.
+hqm.message.bookNoPermission=You don't have permission to use this book.
 
 # ======================================
 #				BLOCKS
 # ======================================
 tile.hqm:item_barrel.name=Quest Delivery System
+tile.hqm:item_barrel.nonBound=You currently have not bound a quest to the QDS
+tile.hqm:item_barrel.boundTo=The QDS is currently bound to '%s'
+tile.hqm:item_barrel.bindTo=You bound '%s' to the QDS
+tile.hqm:item_barrel.noTask=You currently have not selected any tasks
 tile.hqm:quest_tracker.name=Quest Tracking System
 tile.hqm:quest_portal_0.name=Quest Gate System
+tile.hqm:quest_portal_0.bindTo=You bound '%s' to the QGS
+tile.hqm:quest_portal_0.noTask=You currently have not selected any quest
 tile.hqm:quest_portal_1.name=Solid Wall
 tile.hqm:quest_portal_2.name=Magical Border
 
@@ -55,11 +69,16 @@ tile.hqm:quest_portal_2.name=Magical Border
 # ======================================
 item.hqm:quest_book_0.name=Quest Book
 item.hqm:quest_book_1.name=Quest Book - OP Edition
+item.hqm:quest_book_1.useAs=Use book as: %s
+item.hqm:quest_book_1.invalid=Invalid book!
 item.hqm:hearts_quarterheart.name=Quarter of a heart
 item.hqm:hearts_halfheart.name=Half a heart
 item.hqm:hearts_threequarts.name=Three quarters of a heart
 item.hqm:hearts_heart.name=Full heart
+item.hqm:hearts_heart.tooltip=Consume to get an extra life
+item.hqm:hearts_heart.freshness=Current freshness : %s %
 item.hqm:hearts_rottenheart.name=Rotten heart
+item.hqm:hearts_rottenheart.tooltip=Rotten Heart. Do Not Eat
 item.hqm:bags.name=Reward Bag
 item.hqm:hqmInvalidItem.name=Invalid Item
 
