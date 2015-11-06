@@ -13,11 +13,7 @@ public class CommandQuest extends CommandBase
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments)
     {
-        if (!QuestingData.isQuestActive()) {
-                sendChat(sender, "Questing mode has been activated. Enjoy!");
-                QuestingData.activateQuest();
-            } else {
-                sendChat(sender, "Questing mode is already activated.");
-            }
+        sendChat(sender, QuestingData.isQuestActive() ? "hqm.message.questAlreadyActivated" : "hqm.message.questActivated");
+        QuestingData.activateQuest();
     }
 }

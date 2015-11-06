@@ -17,7 +17,29 @@ hqm.message.lostTeamLife=%s just lost a life %s. You have %s live(s) left
 hqm.message.andBanned=and got banned
 hqm.message.gameOver=You're out of lives. Game over, man, it's game over!
 hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
+hqm.message.vanillaHardcoreOn=Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.
 hqm.message.vanillaHardcoreOverride=Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect.
+hqm.message.noPlayer=That player does not exist.
+hqm.message.questActivated=Questing mode has been activated. Enjoy!
+hqm.message.questHardcore=Hardcore Mode has been activated. Enjoy!
+hqm.message.questAlreadyActivated=Questing mode is already activated.
+hqm.message.hardcoreAlreadyActivated=Hardcore Mode is already activated
+hqm.message.noHardcoreYet=Hardcore Mode isn't enabled yet. use '/hqm hardcore' to enable it.
+hqm.message.positiveNumbers=Please use only positive numbers.
+hqm.message.posNumberAndPlayer=Please use only positive numbers and / or a correct Playername.
+hqm.message.cantRemoveLives=You currently have %s live(s) remaining, you can't remove that much lives.
+hqm.message.removeLives=You have removed %s live(s) from your lifepool.
+hqm.message.removeLivesFrom=You have removed %s  live(s) from %s.
+hqm.message.removeLivesBy=You had %s live(s) removed by %s
+hqm.message.cantAddLives=You can't have more than %s lives.
+hqm.message.addLives=You have added %s live(s) to your lifepool.
+hqm.message.addLivesTo=You have added %s  live(s) to %s.
+hqm.message.addLivesBy=You had %s live(s) added by %s
+hqm.message.cantGiveMoreLives=You can't give %s more than %s lives.
+hqm.massage.setLivesInstead=Setting %s to %s lives instead.
+hqm.massage.setLivesBy=You have got your lives set to %s by %s
+hqm.message.hasLivesRemaining=%s has %s live(s) remaining
+hqm.message.version=Hardcore Questing Mode - Version : %s
 
 # ======================================
 #				BLOCKS

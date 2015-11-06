@@ -689,7 +689,7 @@ public class QuestingData {
 	}
 
 
-    public static void disableHardcore(ICommandSender sender) {
+    public static void disableVanillaHardcore(ICommandSender sender) {
         if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
             sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcore"));
             try {

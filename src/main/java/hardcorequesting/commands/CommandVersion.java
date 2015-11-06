@@ -1,6 +1,7 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.ModInformation;
+import hardcorequesting.Translator;
 import net.minecraft.command.ICommandSender;
 
 public class CommandVersion extends CommandBase
@@ -14,7 +15,6 @@ public class CommandVersion extends CommandBase
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments)
     {
-        String colour = "\u00A7a";
-        sendChat(sender, String.format(colour + "Hardcore Questing Mode - Version : %s", ModInformation.VERSION));
+        sendChat(sender, "\u00A7a" + Translator.translate("hqm.message.version", ModInformation.VERSION));
     }
 }

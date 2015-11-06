@@ -22,7 +22,7 @@ public class CommandEdit extends CommandBase
             if (QuestingData.hasData(name)) {
                 player.inventory.addItemStackToInventory(ItemQuestBook.getOPBook(name));
             } else {
-                sendChat(player, "That player does no exist.");
+                sendChat(player, "hqm.message.noPlayer");
             }
         }
     }
