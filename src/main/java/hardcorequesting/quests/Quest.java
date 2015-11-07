@@ -977,6 +977,7 @@ public class Quest {
             for (int i = 0; i < rewards.length; i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (rewards[i] != null) {
+                        GuiQuestBook.setSelected(rewards[i]);
                         List<String> str = new ArrayList<String>();
                         try {
                             if (isEditing && !GuiQuestBook.isCtrlKeyDown()) {

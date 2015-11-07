@@ -324,10 +324,10 @@ public abstract class QuestTaskItems extends QuestTask {
             //gui.setZLevel(z);
         }
 
-
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
+                GuiQuestBook.setSelected(item.getItem());
                 String str = "";
                 if (getProgress(player, i) == item.required) {
                     str += GuiColor.GREEN;
@@ -336,6 +336,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (Quest.isEditing)
                     str += "\n" + GuiColor.GRAY + item.getPrecision().toString();
                 gui.drawMouseOver(str, mX + gui.getLeft(), mY + gui.getTop());
+                break;
             }
         }
     }

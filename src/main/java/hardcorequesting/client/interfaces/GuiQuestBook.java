@@ -1,5 +1,10 @@
 package hardcorequesting.client.interfaces;
 
+import codechicken.nei.NEIClientConfig;
+import codechicken.nei.NEIClientUtils;
+import codechicken.nei.recipe.GuiCraftingRecipe;
+import codechicken.nei.recipe.GuiUsageRecipe;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.DeathStats;
@@ -61,6 +66,8 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isReputationPage;
     private static Group selectedGroup;
     public static Reputation selectedReputation;
+    private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
+    private static ItemStack selected;
 
 	private final EntityPlayer player;
     private final boolean isOpBook;
@@ -440,6 +447,7 @@ public class GuiQuestBook extends GuiBase {
 
 	@Override
     public void drawScreen(int x0, int y0, float f) {
+        selected = null;
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
         
@@ -1182,6 +1190,36 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onKeyTyped(this, c, k);
         }else if(isBagPage && selectedGroup != null) {
             textBoxes.onKeyStroke(this, c, k);
+        }else if (isNEIActive())
+        {
+            handleNEI(k);
+        }
+    }
+
+    private boolean isNEIActive()
+    {
+        return isNEIActive;
+    }
+
+    public static void setSelected(ItemStack stack)
+    {
+        selected = stack;
+    }
+
+    private void handleNEI(int k)
+    {
+        ItemStack stackover = selected;
+        if(stackover != null)
+        {
+            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey()))
+            {
+                GuiUsageRecipe.openRecipeGui("item", stackover.copy());
+            }
+
+            if (k == NEIClientConfig.getKeyBinding("gui.recipe"))
+            {
+                GuiCraftingRecipe.openRecipeGui("item", stackover.copy());
+            }
         }
     }
 
