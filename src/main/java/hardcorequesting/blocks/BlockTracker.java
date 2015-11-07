@@ -3,6 +3,7 @@ package hardcorequesting.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.Translator;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
@@ -62,13 +63,13 @@ public class BlockTracker extends BlockContainer {
                     TileEntity te = world.getTileEntity(x, y, z);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(new ChatComponentText("You're not in edit mode. This block is off limit."));
+                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));;
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {
-                                player.addChatMessage(new ChatComponentText("You bound '" + ((TileEntityTracker) te).getCurrentQuest().getName() + "' to the QTS"));
+                                player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) te).getCurrentQuest().getName()));
                             } else {
-                                player.addChatMessage(new ChatComponentText("You currently have not selected any quest"));
+                                player.addChatMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                             }
                         }
 
@@ -80,7 +81,7 @@ public class BlockTracker extends BlockContainer {
                     TileEntity te = world.getTileEntity(x, y, z);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(new ChatComponentText("You're not in edit mode. This block is off limit."));
+                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) te).openInterface(player);
                         }

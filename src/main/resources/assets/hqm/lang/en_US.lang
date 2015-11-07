@@ -48,6 +48,7 @@ hqm.message.eatRottenHearth=Why did you eat a rotten heart?
 hqm.message.hearthDecay=One or more of your hearts has just decade into a Rotten Heart.
 hqm.message.alreadyEditing=Another OP is already accessing this player's quests.
 hqm.message.bookNoPermission=You don't have permission to use this book.
+hqm.message.noTaskSelected=You currently have not selected any tasks
 
 # ======================================
 #				BLOCKS
@@ -56,11 +57,10 @@ tile.hqm:item_barrel.name=Quest Delivery System
 tile.hqm:item_barrel.nonBound=You currently have not bound a quest to the QDS
 tile.hqm:item_barrel.boundTo=The QDS is currently bound to '%s'
 tile.hqm:item_barrel.bindTo=You bound '%s' to the QDS
-tile.hqm:item_barrel.noTask=You currently have not selected any tasks
 tile.hqm:quest_tracker.name=Quest Tracking System
+tile.hqm:quest_tracker.offLimit=You're not in edit mode. This block is off limit.
 tile.hqm:quest_portal_0.name=Quest Gate System
 tile.hqm:quest_portal_0.bindTo=You bound '%s' to the QGS
-tile.hqm:quest_portal_0.noTask=You currently have not selected any quest
 tile.hqm:quest_portal_1.name=Solid Wall
 tile.hqm:quest_portal_2.name=Magical Border
 

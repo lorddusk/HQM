@@ -103,7 +103,7 @@ public class BlockDelivery extends BlockContainer
                         if (((TileEntityBarrel) te).getCurrentTask() != null)
                             player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.noTask"));
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;

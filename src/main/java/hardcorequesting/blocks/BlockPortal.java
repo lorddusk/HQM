@@ -88,7 +88,7 @@ public class BlockPortal extends BlockContainer
                         if (((TileEntityPortal) te).getCurrentQuest() != null)
                             player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_portal_0.bindTo", ((TileEntityPortal) te).getCurrentQuest().getName()));
                         else
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_portal_0.noTask"));
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;
