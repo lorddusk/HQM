@@ -83,6 +83,17 @@ item.hqm:bags.name=Reward Bag
 item.hqm:hqmInvalidItem.name=Invalid Item
 
 # ======================================
+#				BAGS
+# ======================================
+hqm.bag.basic=Basic
+hqm.bag.good=Good
+hqm.bag.greater=Greater
+hqm.bag.epic=Epic
+hqm.bag.legendary=Legendary
+hqm.bag.group=%s Group
+hqm.bag.unknown=Unknown
+
+# ======================================
 #			TEAM SETTINGS
 # ======================================
 hqm.team.sharedLives.title=Shared lives

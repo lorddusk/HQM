@@ -2,13 +2,13 @@ package hardcorequesting.bag;
 
 
 import hardcorequesting.FileVersion;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.QuestLine;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class GroupTier {
     }
 
     public String getName() {
-        return name == null || name.equals("") ? "Unknown" : name;
+        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
     }
 
     public GuiColor getColor() {

@@ -43,21 +43,23 @@ public class ItemBag extends Item {
             itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack itemstack, EntityPlayer player, List lst, boolean extraInfo) {
-        super.addInformation(itemstack, player, lst, extraInfo);
+    public void addInformation(ItemStack itemstack, EntityPlayer player, List tooltip, boolean extraInfo) {
+        super.addInformation(itemstack, player, tooltip, extraInfo);
 
         int dmg = itemstack.getItemDamage();
         if (dmg >= 0 && dmg < BagTier.values().length) {
             BagTier tier = BagTier.values()[dmg];
-            lst.add(tier.getColor() + tier.toString());
+            tooltip.add(tier.getColor() + tier.getName());
         }
     }
 
+    @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, List lst) {
+    public void getSubItems(Item item, CreativeTabs tabs, List stackList) {
         for (int i = 0; i < BagTier.values().length; i++) {
-            lst.add(new ItemStack(this, 1, i));
+            stackList.add(new ItemStack(this, 1, i));
         }
     }
 

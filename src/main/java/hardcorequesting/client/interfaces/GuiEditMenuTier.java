@@ -78,7 +78,7 @@ public class GuiEditMenuTier  extends GuiEditMenu {
             BagTier bagTier = values[i];
 
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(bagTier.getColor().toString() + bagTier.toString(), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
 
         GL11.glColor3f(1F, 1F, 1F);
