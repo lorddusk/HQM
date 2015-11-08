@@ -1,9 +1,8 @@
 package hardcorequesting.client.interfaces;
 
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
-
 
 public abstract class GuiEditMenuExtended extends GuiEditMenu {
 
@@ -75,7 +74,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         protected void draw(GuiBase gui, boolean selected) {
             super.draw(gui, selected);
 
-            gui.drawString(title, BOX_X, BOX_Y + BOX_OFFSET * id + TEXT_OFFSET, 0x404040);
+            gui.drawString(Translator.translate(title), BOX_X, BOX_Y + BOX_OFFSET * id + TEXT_OFFSET, 0x404040);
         }
 
         protected abstract int getValue();

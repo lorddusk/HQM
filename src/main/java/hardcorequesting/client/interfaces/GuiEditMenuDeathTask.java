@@ -15,7 +15,7 @@ public class GuiEditMenuDeathTask extends GuiEditMenuExtended {
         deaths = task.getDeaths();
         this.task = task;
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Required death count") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.deathTask.reqDeathCount") {
             @Override
             protected void setValue(int number) {
                 deaths = number;

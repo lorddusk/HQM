@@ -285,7 +285,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);
-            gui.drawCenteredString(precision.toString(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(precision.getName(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         }
 
     }

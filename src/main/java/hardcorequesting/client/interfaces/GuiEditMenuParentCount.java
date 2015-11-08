@@ -1,7 +1,7 @@
 package hardcorequesting.client.interfaces;
 
-
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.quests.Quest;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -21,7 +21,7 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
         }
 
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Parent count") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.parentCount.count") {
             @Override
             protected void setValue(int number) {
                 parentRequirementCount = number;
@@ -46,12 +46,12 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     @Override
     protected String getArrowText() {
-        return useModifiedParentRequirement ? "Requires specified amount" : "Requires all";
+        return Translator.translate("hqm.parentCount.req" + (useModifiedParentRequirement ? "Count" : "All") + ".title");
     }
 
     @Override
     protected String getArrowDescription() {
-        return useModifiedParentRequirement ? "For this quest to unlock the player will have to complete a certain amount of parent quests. The required amount can be specified below." : "All parent quests have to be completed before this quest unlocks.";
+        return Translator.translate("hqm.parentCount.req" + (useModifiedParentRequirement ? "Count" : "All") + ".desc");
     }
 
     @Override

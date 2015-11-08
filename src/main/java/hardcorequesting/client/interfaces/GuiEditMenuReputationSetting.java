@@ -1,6 +1,6 @@
 package hardcorequesting.client.interfaces;
 
-
+import hardcorequesting.Translator;
 import hardcorequesting.quests.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
@@ -50,7 +50,7 @@ public class GuiEditMenuReputationSetting extends  GuiEditMenuExtended {
             }
         }
 
-        checkboxes.add(new CheckBox("Inverted range?", 21, 124) {
+        checkboxes.add(new CheckBox("hqm.repSetting.invRang", 21, 124) {
             @Override
             public boolean getValue() {
                 return inverted;
@@ -82,17 +82,17 @@ public class GuiEditMenuReputationSetting extends  GuiEditMenuExtended {
 
             String info = null;
 
-            gui.drawString("Lower bounds", BARS_X, LOWER_Y, 0x404040);
+            gui.drawString(Translator.translate("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.draw((GuiQuestBook)gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
 
-            gui.drawString("Upper bounds", BARS_X, UPPER_Y, 0x404040);
+            gui.drawString(Translator.translate("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.draw((GuiQuestBook)gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
 
-            gui.drawString("Preview", BARS_X, RESULT_Y, 0x404040);
+            gui.drawString(Translator.translate("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.draw((GuiQuestBook)gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
@@ -147,7 +147,7 @@ public class GuiEditMenuReputationSetting extends  GuiEditMenuExtended {
     @Override
     protected String getArrowText() {
         if (Reputation.getReputationList().isEmpty()) {
-            return "Invalid";
+            return Translator.translate("hqm.repSetting.invalid");
         }else{
             return reputation.getName();
         }
@@ -156,7 +156,7 @@ public class GuiEditMenuReputationSetting extends  GuiEditMenuExtended {
     @Override
     protected String getArrowDescription() {
         if (Reputation.getReputationList().isEmpty()) {
-            return "There are no valid reputations to choose from. Please go to the reputation menu (click on the reputation button on the left hand side of the book when browsing the main menu) and create at least one first.";
+            return Translator.translate("hqm.repReward.noValidReps");
         }else{
             return null;
         }

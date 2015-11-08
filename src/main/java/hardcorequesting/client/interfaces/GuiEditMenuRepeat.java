@@ -1,11 +1,11 @@
 package hardcorequesting.client.interfaces;
 
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.RepeatInfo;
 import hardcorequesting.quests.RepeatType;
 import net.minecraft.entity.player.EntityPlayer;
-
 
 public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     private Quest quest;
@@ -20,8 +20,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         days = quest.getRepeatInfo().getDays();
         hours = quest.getRepeatInfo().getHours();
 
-
-        textBoxes.add(new TextBoxHidden(gui, 0, "Days") {
+        textBoxes.add(new TextBoxHidden(gui, 0, "hqm.repeatMenu.days") {
             @Override
             protected int getValue() {
                 return days;
@@ -33,7 +32,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
             }
         });
 
-        textBoxes.add(new TextBoxHidden(gui, 1, "Hours") {
+        textBoxes.add(new TextBoxHidden(gui, 1, "hqm.repeatMenu.hours") {
             @Override
             protected int getValue() {
                 return hours;
@@ -48,10 +47,9 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
             protected void draw(GuiBase gui, boolean selected) {
                 super.draw(gui, selected);
 
-                gui.drawString(gui.getLinesFromText("These are minecraft days and hours.", 0.7F, 150), BOX_X, BOX_Y + BOX_OFFSET * 2 + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), BOX_X, BOX_Y + BOX_OFFSET * 2 + TEXT_OFFSET, 0.7F, 0x404040);
             }
         });
-
     }
 
 

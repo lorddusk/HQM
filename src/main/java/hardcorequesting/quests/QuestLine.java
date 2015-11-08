@@ -1,10 +1,7 @@
 package hardcorequesting.quests;
 
-
-import com.sun.org.apache.xpath.internal.SourceTree;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;

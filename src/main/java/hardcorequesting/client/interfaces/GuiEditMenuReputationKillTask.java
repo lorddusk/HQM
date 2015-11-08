@@ -1,10 +1,8 @@
 package hardcorequesting.client.interfaces;
 
 import hardcorequesting.SaveHelper;
-import hardcorequesting.quests.QuestTaskDeath;
 import hardcorequesting.quests.QuestTaskReputationKill;
 import net.minecraft.entity.player.EntityPlayer;
-
 
 public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
     private int kills;
@@ -16,7 +14,7 @@ public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
         kills = task.getKills();
         this.task = task;
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Required kill count") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
             protected void setValue(int number) {
                 kills = number;
