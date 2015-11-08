@@ -1,6 +1,7 @@
 package hardcorequesting.bag;
 
 
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 
 public enum BagTier {
@@ -21,8 +22,12 @@ public enum BagTier {
         return color;
     }
 
+    public String getName() {
+        return Translator.translate("hqm.bag." + this.name().toLowerCase());
+    }
+
     @Override
     public String toString() {
-        return super.toString().charAt(0) + super.toString().substring(1).toLowerCase();
+        return this.name().charAt(0) + this.name().substring(1).toLowerCase();
     }
 }

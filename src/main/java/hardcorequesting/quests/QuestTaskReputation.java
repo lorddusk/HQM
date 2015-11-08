@@ -1,8 +1,7 @@
 package hardcorequesting.quests;
 
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.EventHandler;
+import cpw.mods.fml.relauncher.SideOnly;;
 import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
@@ -18,10 +17,8 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.Arrays;
 
-
 public abstract class QuestTaskReputation extends QuestTask {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
-
 
     private ReputationSetting[] settings = new ReputationSetting[0];
 

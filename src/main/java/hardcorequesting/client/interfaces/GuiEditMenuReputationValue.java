@@ -4,10 +4,7 @@ import hardcorequesting.SaveHelper;
 import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.entity.player.EntityPlayer;
 
-
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
-
-
     private ReputationMarker marker;
     private int value;
 
@@ -17,7 +14,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
         this.marker = marker;
         this.value = marker.getValue();
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Tier value") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repValue.tierValue") {
             @Override
             protected void setValue(int number) {
                 value = number;

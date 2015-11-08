@@ -1,6 +1,5 @@
 package hardcorequesting.tileentity;
 
-
 import hardcorequesting.Translator;
 
 public enum PortalType {

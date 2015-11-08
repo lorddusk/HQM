@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
@@ -203,14 +204,13 @@ public class QuestTaskLocation extends QuestTask {
     }
 
     public enum Visibility {
-        FULL("Show All", "Will display the location of the target to the player and therefore the distance to it as well. The maximum distance the player can be from the target (the radius) is also displayed.", true, true),
-        LOCATION("Show Location", "The radius required to trigger the location is hidden from the user. The location is however still visible, and therefore even the distance to it.", true, false),
-        NONE("Hide info", "The location, distance and radius will be hidden from the user. It's up to you to guide them through the map or through text." ,false, false);
+        FULL("Full", true, true),
+        LOCATION("Location", true, false),
+        NONE("None" ,false, false);
 
         private boolean showCoordinate;
         private boolean showRadius;
-        private String name;
-        private String description;
+        private String id;
 
         public boolean doShowCoordinate() {
             return showCoordinate;
@@ -220,20 +220,18 @@ public class QuestTaskLocation extends QuestTask {
             return showRadius;
         }
 
-        Visibility(String name, String description, boolean showCoordinate, boolean showRadius) {
-            this.name = name;
-            this.description = description;
+        Visibility(String id, boolean showCoordinate, boolean showRadius) {
+            this.id = id;
             this.showCoordinate = showCoordinate;
             this.showRadius = showRadius;
         }
 
-        @Override
-        public String toString() {
-            return name;
+        public String getName() {
+            return Translator.translate("hqm.locationMenu.vis" + id + ".title");
         }
 
         public String getDescription() {
-            return description;
+            return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
         }
     }
 
@@ -359,7 +357,7 @@ public class QuestTaskLocation extends QuestTask {
             gui.drawString(location.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
 
             if (visited(i, player)) {
-                gui.drawString(GuiColor.GREEN  + "Visited", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.locationMenu.visited="), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }else if (location.visible.doShowCoordinate()) {
                 if (location.radius >= 0) {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
@@ -369,15 +367,15 @@ public class QuestTaskLocation extends QuestTask {
                     if (location.radius >= 0) {
                         String str;
                         int distance = (int)player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);
-                        str = distance + "m away";
+                        str = Translator.translate("hqm.locationMenu.mAway", distance);
                         if(location.visible.doShowRadius()) {
-                            str += " [" + location.radius + "m radius]";
+                            str += " [" + Translator.translate("hqm.locationMenu.mRadius", location.radius) + "]";
                         }
                         gui.drawString(str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
                     }
 
                 }else{
-                    gui.drawString("Wrong dimension", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
+                    gui.drawString(Translator.translate("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
                 }
 
             }

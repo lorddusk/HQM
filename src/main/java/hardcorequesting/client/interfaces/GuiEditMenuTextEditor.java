@@ -3,6 +3,7 @@ package hardcorequesting.client.interfaces;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.network.DataBitHelper;
@@ -23,7 +24,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.text = new TextBoxLogic(gui, txt, 140, true);
         this.text.setMaxLength(isName ? DataBitHelper.QUEST_NAME_LENGTH.getMaximum() : DataBitHelper.QUEST_DESCRIPTION_LENGTH.getMaximum());
         this.isName = isName;
-        buttons.add(new LargeButton("Copy all", 185, 20) {
+        buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -40,7 +41,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
             }
         });
 
-        buttons.add(new LargeButton("Paste", 245, 20) {
+        buttons.add(new LargeButton("hqm.textEditor.paste", 245, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -57,7 +58,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
             }
         });
 
-        buttons.add(new LargeButton("Clear", 185, 40) {
+        buttons.add(new LargeButton("hqm.textEditor.clear", 185, 40) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -74,7 +75,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
             }
         });
 
-        buttons.add(new LargeButton("Clear & Paste", 245, 40) {
+        buttons.add(new LargeButton("hqm.textEditor.clearPaste", 245, 40) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -178,7 +179,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     protected void save(GuiBase gui) {
         String str = text.getText();
         if (str == null || str.isEmpty()) {
-            str = "Unnamed";
+            str = Translator.translate("hqm.textEditor.unnamed");
         }
 
         if (quest != null) {

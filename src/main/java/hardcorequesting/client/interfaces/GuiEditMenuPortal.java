@@ -1,16 +1,10 @@
 package hardcorequesting.client.interfaces;
 
-
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.Translator;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityPortal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class GuiEditMenuPortal extends GuiEditMenuExtended {
     private TileEntityPortal portal;
@@ -27,7 +21,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
 
         this.portal = portal.copy();
 
-        buttons.add(new LargeButton("Edit item", 40, 80) {
+        buttons.add(new LargeButton("hqm.portalMenu.edit", 40, 80) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -45,7 +39,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
         });
 
 
-        checkboxes.add(new CheckBox("Use collision when completed", CHECK_BOX_X, CHECK_BOX_Y) {
+        checkboxes.add(new CheckBox("hqm.portalMenu.collisionOnComplete", CHECK_BOX_X, CHECK_BOX_Y) {
             @Override
             public boolean getValue() {
                 return self.portal.isCompletedCollision();
@@ -57,7 +51,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
             }
         });
 
-        checkboxes.add(new CheckBox("Use textures when completed", CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_OFFSET) {
+        checkboxes.add(new CheckBox("hqm.portalMenu.texOnComplete", CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_OFFSET) {
             @Override
             public boolean getValue() {
                 return self.portal.isCompletedTexture();
@@ -69,7 +63,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
             }
         });
 
-        checkboxes.add(new CheckBox("Use collision when not completed", CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_OFFSET * 2) {
+        checkboxes.add(new CheckBox("hqm.portalMenu.collisionNonComplete", CHECK_BOX_X, CHECK_BOX_Y + CHECK_BOX_OFFSET * 2) {
             @Override
             public boolean getValue() {
                 return self.portal.isUncompletedCollision();
@@ -98,7 +92,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
 
-        gui.drawCenteredString(portal.getCurrentQuest() != null ? portal.getCurrentQuest().getName() : "No quest selected", 0, 5, 1F, 170, 20, 0x404040);
+        gui.drawCenteredString(portal.getCurrentQuest() != null ? portal.getCurrentQuest().getName() : Translator.translate("hqm.portalMenu.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
         if (!portal.getType().isPreset()) {
             gui.drawItem(portal.getItem(), 20, 80, mX, mY, false);
         }

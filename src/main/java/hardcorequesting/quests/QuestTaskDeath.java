@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
@@ -74,7 +75,7 @@ public class QuestTaskDeath extends QuestTask {
     @Override
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         int died = ((QuestDataTaskDeath)getData(player)).deaths;
-        gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + "You've died " + deaths + " " + (deaths > 1 ? "times" : "time") + "." : "You've died " + died + " of " + deaths + " " + (deaths > 1 ? "times" : "time"), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + Translator.translate("hqm.deathMenu.deaths", deaths) : Translator.translate("hqm.deathMenu.deathsOutOf", died, deaths), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
 
     @SideOnly(Side.CLIENT)

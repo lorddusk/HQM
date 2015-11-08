@@ -1,6 +1,7 @@
 package hardcorequesting.client.interfaces;
 
 
+import hardcorequesting.Translator;
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ItemBag;
@@ -68,7 +69,7 @@ public class GuiReward extends GuiBase {
         int myWeight = group.getTier().getWeights()[bagTier];
         float chance = ((float)myWeight / totalWeight);
 
-        statisticsText = (((int)(chance * 10000)) / 100F) + "% chance to get this reward";
+        statisticsText = Translator.translate("hqm.rewardGui.chance", ((int)(chance * 10000)) / 100F);
 
 
         lines = (int)Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
@@ -106,9 +107,9 @@ public class GuiReward extends GuiBase {
         int mX = mX0 - left;
         int mY = mY0 - top;
 
-        drawCenteredString(group.getTier().getColor() + group.getTier().getName() + " Reward", 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
+        drawCenteredString(group.getTier().getColor() + Translator.translate("hqm.rewardGui.tierReward", group.getTier().getName()), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
         drawCenteredString(statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
-        drawCenteredString("Click to close", 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
+        drawCenteredString(Translator.translate("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
 
         for (Reward reward : rewards) {
             try {
@@ -129,7 +130,7 @@ public class GuiReward extends GuiBase {
                             if (info.size() > 0) {
                                 str.add((String)info.get(0));
                                 if (info.size() > 1) {
-                                    str.add(GuiColor.GRAY + "Hold shift for more info");
+                                    str.add(GuiColor.GRAY + Translator.translate("hqm.rewardGui.shiftInfo"));
                                 }
                             }
                             drawMouseOver(str, mX0, mY0);

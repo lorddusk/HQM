@@ -1,11 +1,10 @@
 package hardcorequesting.quests;
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
-import hardcorequesting.QuestingData;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
@@ -22,7 +21,6 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
 
     private int kills;
-
 
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
@@ -80,9 +78,9 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
         super.draw(gui, player, mX, mY);
         int killCount = ((QuestDataTaskReputationKill)getData(player)).kills;
         if (Quest.isEditing) {
-            gui.drawString(gui.getLinesFromText("Kills: " + killCount + "/" + kills, 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }else{
-            gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + "You've killed " + kills + " " + (kills > 1 ? "players" : "player") + "." : "You've killed " + killCount + " of " + kills + " " + (kills > 1 ? "players" : "player"), 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate("hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }
     }
 

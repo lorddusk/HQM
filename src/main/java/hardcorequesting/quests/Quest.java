@@ -3,11 +3,7 @@ package hardcorequesting.quests;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.EventHandler;
-import hardcorequesting.FileVersion;
-import hardcorequesting.QuestingData;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Team;
+import hardcorequesting.*;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
@@ -88,7 +84,7 @@ public class Quest {
     private final List<LargeButton> buttons = new ArrayList<LargeButton>();
 
     {
-        buttons.add(new LargeButton("Claim reward", 100, 190) {
+        buttons.add(new LargeButton("hqm.quest.claim", 100, 190) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return canPlayerClaimReward(player);
@@ -110,7 +106,7 @@ public class Quest {
             }
         });
 
-        buttons.add(new LargeButton("Manual submit", 185, 200) {
+        buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return ((QuestTaskItemsConsume) selectedTask).allowManual();
@@ -130,7 +126,7 @@ public class Quest {
             }
         });
 
-        buttons.add(new LargeButton("Manual detect", 185, 200) {
+        buttons.add(new LargeButton("hqm.quest.manualDetect", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -147,7 +143,7 @@ public class Quest {
             }
         });
 
-        buttons.add(new LargeButton("Requirement", 185, 200) {
+        buttons.add(new LargeButton("hqm.quest.requirement", 185, 200) {
             @Override
             @SideOnly(Side.CLIENT)
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
@@ -167,7 +163,7 @@ public class Quest {
             }
         });
 
-        buttons.add(new LargeButton("Requirement", 250, 95) {
+        buttons.add(new LargeButton("hqm.quest.requirement", 250, 95) {
             @Override
             @SideOnly(Side.CLIENT)
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
@@ -188,7 +184,7 @@ public class Quest {
         });
 
 
-        buttons.add(new LargeButton("Select task", 250, 200) {
+        buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return QuestingData.getQuestingData(player).selectedQuest != getId() || QuestingData.getQuestingData(player).selectedTask != selectedTask.getId();
@@ -211,7 +207,7 @@ public class Quest {
 
         int itemIds = 0;
         for (final TaskType taskType : TaskType.values()) {
-            buttons.add(new LargeButton(taskType.name, taskType.description, 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 35) {
+            buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 35) {
                 @Override
                 public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                     return tasks.size() < DataBitHelper.TASKS.getMaximum();
@@ -229,7 +225,7 @@ public class Quest {
             });
 
             if (QuestTaskItems.class.isAssignableFrom(taskType.clazz)) {
-                buttons.add(new LargeButton(taskType.name, taskType.description, 185 + (itemIds % 2) * 65, 50 + (itemIds / 2) * 35) {
+                buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (itemIds % 2) * 65, 50 + (itemIds / 2) * 35) {
                     @Override
                     public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                         return selectedTask instanceof QuestTaskItems;
@@ -249,7 +245,7 @@ public class Quest {
                         Class<? extends QuestTask> clazz = taskType.clazz;
                         try {
                             Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                            QuestTask task = constructor.newInstance(self, taskType.name, taskType.description);
+                            QuestTask task = constructor.newInstance(self, taskType.getLangKeyName(), taskType.getLangKeyDescription());
 
                             for (QuestTask questTask : selectedTask.getRequirements()) {
                                 task.addRequirement(questTask);
@@ -269,11 +265,11 @@ public class Quest {
                                 }
                             }
 
-                            if (!selectedTask.getDescription().equals(oldTaskType.name)) {
-                                task.setDescription(selectedTask.getDescription());
+                            if (!selectedTask.getLangKeyDescription().equals(oldTaskType.getLangKeyName())) {
+                                task.setDescription(selectedTask.getLangKeyDescription());
                             }
-                            if (!selectedTask.getLongDescription().equals(oldTaskType.description)) {
-                                task.setLongDescription(selectedTask.getLongDescription());
+                            if (!selectedTask.getLangKeyLongDescription().equals(oldTaskType.getLangKeyDescription())) {
+                                task.setLongDescription(selectedTask.getLangKeyLongDescription());
                             }
                             ((QuestTaskItems) task).setItems(((QuestTaskItems) selectedTask).getItems());
                             task.setId(selectedTask.getId());
@@ -820,14 +816,14 @@ public class Quest {
             selectedReward = -1;
         }
         if (reward != null || isEditing) {
-            gui.drawString("Rewards", START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(Translator.translate("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, reward, REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
             if (rewardChoice != null || isEditing) {
-                gui.drawString("Pick one", START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
+                gui.drawString(Translator.translate("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
                 drawRewards(gui, rewardChoice, REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
         } else if (rewardChoice != null) {
-            gui.drawString("Pick one reward", START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(Translator.translate("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewardChoice, REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
 
@@ -883,9 +879,9 @@ public class Quest {
         if (selectedTask != null) {
             if (isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.CHANGE_TASK) {
                 if (selectedTask instanceof QuestTaskItems) {
-                    gui.drawString(gui.getLinesFromText("Click on the item task type you want to change to.", 0.7F, 130), 180, 20, 0.7F, 0x404040);
+                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskChangeTo"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 } else {
-                    gui.drawString(gui.getLinesFromText("You can only change the type of item tasks.", 0.7F, 130), 180, 20, 0.7F, 0x404040);
+                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 }
             } else {
                 List<String> description = selectedTask.getCachedLongDescription(gui);
@@ -895,9 +891,9 @@ public class Quest {
                 selectedTask.draw(gui, player, mX, mY);
             }
         } else if (isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.TASK) {
-            gui.drawString(gui.getLinesFromText("Create tasks of different types by using the buttons below", 0.7F, 130), 180, 20, 0.7F, 0x404040);
+            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         } else if (isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.CHANGE_TASK) {
-            gui.drawString(gui.getLinesFromText("Select an item task you want to change the type of.", 0.7F, 130), 180, 20, 0.7F, 0x404040);
+            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
 
         if (reward != null || isEditing) {
@@ -921,13 +917,7 @@ public class Quest {
 
             }
 
-            String comment;
-            if (!claimed) {
-                comment = "The party will receive this reputation when the first member claims their reward.";
-            }else{
-                comment = "The party has already received this reputation.";
-            }
-            List<String> commentLines = gui.getLinesFromText(comment, 1, 200);
+            List<String> commentLines = gui.getLinesFromText(Translator.translate("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
                 str.add("");
                 for (String commentLine : commentLines) {
@@ -971,6 +961,7 @@ public class Quest {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     private void drawRewardMouseOver(GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
         if (rewards != null) {
@@ -983,7 +974,7 @@ public class Quest {
                             if (isEditing && !GuiQuestBook.isCtrlKeyDown()) {
                                 str = rewards[i].getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                                 str.add("");
-                                str.add(GuiColor.GRAY + "Hold Ctrl to see this as a non-editor.");
+                                str.add(GuiColor.GRAY + Translator.translate("hqm.quest.crtlNonEditor"));
                             } else {
                                 str.add(rewards[i].getDisplayName());
                             }
@@ -992,7 +983,7 @@ public class Quest {
                         }
 
                         if (selected == i) {
-                            str.add(GuiColor.GREEN + "Selected");
+                            str.add(GuiColor.GREEN + Translator.translate("hqm.quest.selected"));
                         }
                         gui.drawMouseOver(str, gui.getLeft() + mX, gui.getTop() + mY);
                     }
@@ -1556,31 +1547,29 @@ public class Quest {
     }
 
     public enum TaskType {
-        CONSUME(QuestTaskItemsConsume.class, "Consume task", "A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids."),
-        CRAFT(QuestTaskItemsCrafting.class, "Crafting task", "A task where the player has to craft specific items."),
-        LOCATION(QuestTaskLocation.class, "Location task", "A task where the player has to reach one or more locations."),
-        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "QDS task", "A task where the player can hand in items or fluids. This is a normal consume task where manual submit has been disabled to teach the player about the QDS"),
-        DETECT(QuestTaskItemsDetect.class, "Detection task", "A task where the player needs specific items. These do not have to be handed in, having them in one\'s inventory is enough."),
-        KILL(QuestTaskMob.class, "Killing task", "A task where the player has to kill certain monsters."),
-        DEATH(QuestTaskDeath.class, "Death task", "A task where the player has to die a certain amount of times."),
-        REPUTATION(QuestTaskReputationTarget.class, "Reputation task", "A task where the player has to reach a certain reputation."),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "Rep kill task", "A task where the player has to kill other players with certain reputations.");
+        CONSUME(QuestTaskItemsConsume.class, "consume"),
+        CRAFT(QuestTaskItemsCrafting.class, "craft"),
+        LOCATION(QuestTaskLocation.class, "location"),
+        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
+        DETECT(QuestTaskItemsDetect.class, "detect"),
+        KILL(QuestTaskMob.class, "kill"),
+        DEATH(QuestTaskDeath.class, "death"),
+        REPUTATION(QuestTaskReputationTarget.class, "reputation"),
+        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill");
 
         private final Class<? extends QuestTask> clazz;
-        private final String name;
-        private final String description;
+        private final String id;
 
-        TaskType(Class<? extends QuestTask> clazz, String name, String description) {
+        TaskType(Class<? extends QuestTask> clazz, String id) {
             this.clazz = clazz;
-            this.name = name;
-            this.description = description;
+            this.id = id;
         }
 
         public QuestTask addTask(Quest quest) {
             QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
             try {
                 Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
-                QuestTask task = (QuestTask) ex.newInstance(quest, name, description);
+                QuestTask task = (QuestTask) ex.newInstance(quest, getName(), getDescription());
                 if (prev != null) {
                     task.addRequirement(prev);
                 }
@@ -1600,14 +1589,25 @@ public class Quest {
             return CONSUME;
         }
 
+        public String getLangKeyDescription()
+        {
+            return "hqm.taskType." + id + ".desc";
+        }
+
+        public String getLangKeyName()
+        {
+            return "hqm.taskType." + id + ".title";
+        }
+
+
         public String getDescription()
         {
-            return description;
+            return Translator.translate(getLangKeyDescription());
         }
 
         public String getName()
         {
-            return name;
+            return Translator.translate(getLangKeyName());
         }
     }
 

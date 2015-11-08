@@ -1,7 +1,7 @@
 package hardcorequesting.client.interfaces;
 
-
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.config.ModConfig;
@@ -71,14 +71,14 @@ public class GuiEditMenuTier  extends GuiEditMenu {
 
         gui.drawString(tier.getName(), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
 
-        gui.drawString("Weights", TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
+        gui.drawString(Translator.translate("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
 
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             BagTier bagTier = values[i];
 
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(bagTier.getColor().toString() + bagTier.toString(), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
 
         GL11.glColor3f(1F, 1F, 1F);

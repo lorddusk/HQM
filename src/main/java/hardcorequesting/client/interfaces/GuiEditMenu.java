@@ -1,8 +1,8 @@
 package hardcorequesting.client.interfaces;
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import hardcorequesting.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public abstract class GuiEditMenu {
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
 
-        buttons.add(new LargeButton("Ok", xOffset + 40, 200) {
+        buttons.add(new LargeButton("hqm.edit.ok", xOffset + 40, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -44,7 +44,7 @@ public abstract class GuiEditMenu {
             }
         });
 
-        buttons.add(new LargeButton("Cancel", xOffset + 100, 200) {
+        buttons.add(new LargeButton("hqm.edit.cancel", xOffset + 100, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -157,7 +157,7 @@ public abstract class GuiEditMenu {
             }
 
             if (cached == null) {
-                cached = gui.getLinesFromText(name, 0.7F, width);
+                cached = gui.getLinesFromText(Translator.translate(name), 0.7F, width);
             }
 
             boolean selected = getValue();

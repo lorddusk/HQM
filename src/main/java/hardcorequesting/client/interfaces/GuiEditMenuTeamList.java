@@ -1,11 +1,10 @@
 package hardcorequesting.client.interfaces;
 
 import hardcorequesting.TeamStats;
+import hardcorequesting.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
-
 public class GuiEditMenuTeamList extends GuiEditMenu {
-
     private GuiEditMenuTeam parent;
     protected GuiEditMenuTeamList(GuiQuestBook gui, EntityPlayer player, GuiEditMenuTeam parent) {
         super(gui, player);
@@ -40,14 +39,14 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
             gui.drawString(teamStat.getName(), x, y, 0x404040);
-            gui.drawString(teamStat.getProgress() + "% done", x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
-            gui.drawString("Players: " + teamStat.getPlayers(), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
-            gui.drawString("Lives: " + teamStat.getLives(), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
+            gui.drawString(Translator.translate("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
+            gui.drawString(Translator.translate("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
+            gui.drawString(Translator.translate("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
         }
 
-        gui.drawCenteredString("Page " + ((pagePair * 2) + 1), 0, 202, 0.7F, 170, 30, 0x707070);
+        gui.drawCenteredString(Translator.translate("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
         if (end - start > TEAMS_PER_PAGE) {
-            gui.drawCenteredString("Page " + ((pagePair * 2) + 2), 170, 202, 0.7F, 170, 30, 0x707070);
+            gui.drawCenteredString(Translator.translate("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
         }
     }
 

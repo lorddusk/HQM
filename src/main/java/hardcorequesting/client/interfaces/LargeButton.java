@@ -2,12 +2,11 @@ package hardcorequesting.client.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
-
 
 public abstract class LargeButton {
     private static final int BUTTON_SRC_X = 54;
@@ -63,7 +62,7 @@ public abstract class LargeButton {
     public void drawMouseOver(GuiBase gui, EntityPlayer player, int mX, int mY) {
         if (isVisible(gui, player) && description != null && inButtonBounds(gui, mX, mY)) {
             if (lines == null) {
-                lines = gui.getLinesFromText(description, 1, 200);
+                lines = gui.getLinesFromText(getDescription(), 1, 200);
             }
 
             gui.drawMouseOver(lines, mX + gui.left, mY + gui.top);
@@ -71,7 +70,12 @@ public abstract class LargeButton {
     }
 
     protected String getName() {
-        return name;
+        return Translator.translate(name);
+    }
+
+    protected String getDescription()
+    {
+        return Translator.translate(description);
     }
 
 }

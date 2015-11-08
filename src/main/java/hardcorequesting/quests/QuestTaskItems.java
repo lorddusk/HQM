@@ -334,7 +334,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 }
                 str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
                 if (Quest.isEditing)
-                    str += "\n" + GuiColor.GRAY + item.getPrecision().toString();
+                    str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
                 gui.drawMouseOver(str, mX + gui.getLeft(), mY + gui.getTop());
                 break;
             }

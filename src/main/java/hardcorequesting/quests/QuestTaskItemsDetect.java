@@ -1,9 +1,6 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.gameevent.PlayerEvent;;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
@@ -13,9 +10,7 @@ import hardcorequesting.network.DataReader;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
     public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {
@@ -24,14 +19,11 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         register(EventHandler.Type.CRAFTING, EventHandler.Type.PICK_UP, EventHandler.Type.OPEN_BOOK);
     }
 
-
-
     @SideOnly(Side.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
         return GuiEditMenuItem.Type.CRAFTING_TASK;
     }
-
 
     @Override
     public void onOpenBook(EventHandler.BookOpeningEvent event) {

@@ -4,6 +4,7 @@ package hardcorequesting.bag;
 import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
@@ -12,8 +13,6 @@ import hardcorequesting.quests.QuestLine;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.storage.SaveHandler;
 
 import java.util.*;
 
@@ -63,7 +62,7 @@ public class Group {
 
 
     public String getName() {
-        return hasName() ? name : tier.getName() + " Group";
+        return hasName() ? name : Translator.translate("hqm.bag.group", tier.getName());
     }
 
     public boolean hasName()

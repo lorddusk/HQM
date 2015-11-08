@@ -1,6 +1,5 @@
 package hardcorequesting.tileentity;
 
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Team;
