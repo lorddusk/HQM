@@ -4,6 +4,7 @@
 # %s is where something will be filled in at runtime.
 # Don't remove it since it will make things weird.
 # Just put it on the correct place in the sentence.
+# To use the % use %% to escape the formatter.
 
 # ======================================
 #				GENERAL
@@ -343,7 +344,7 @@ hqm.command.save.info2=Saves all quest bag rewards to a JSON.
 # ======================================
 #				REWARD GUI
 # ======================================
-hqm.rewardGui.chance=%s% chance to get this reward
+hqm.rewardGui.chance=%s%% chance to get this reward
 hqm.rewardGui.tierReward=%s Reward
 hqm.rewardGui.close=Click to close
 hqm.rewardGui.shiftInfo=Hold shift for more info
@@ -381,7 +382,7 @@ hqm.mobTask.typeMatch.title=Type Match
 hqm.mobTask.exactMatch.desc=Only matching monsters with the selected type, subtypes are not counted towards the killing count.
 hqm.mobTask.typeMatch.desc=Matching every monster that has the selected type or a subtype to the selected type.
 hqm.mobTask.allKilled=All killed
-hqm.mobTask.partKills=%s[%s%] killed
+hqm.mobTask.partKills=%s[%s%%] killed
 hqm.mobTask.totalKills=Kill a total of %s
 
 # ======================================
@@ -479,7 +480,7 @@ hqm.questBook.maxRetrieval=Maximum retrieval count
 hqm.questBook.noRestriction=Leave at 0 for no restriction
 hqm.questBook.items=%s items
 hqm.questBook.allQuests=All Quests Completed
-hqm.questBook.percentageQuests=%s% Completed
+hqm.questBook.percentageQuests=%s%% Completed
 hqm.questBook.locked=Locked
 hqm.questBook.lockedQuest=Locked Quest
 hqm.questBook.unclaimedRewards=%s quest(s) with unclaimed rewards
@@ -521,7 +522,7 @@ hqm.questBook.inclInvisiQuests=%s quests(s) including invisible ones
 # ======================================
 #			    TEAM LIST
 # ======================================
-hqm.teamList.done=%s% done
+hqm.teamList.done=%s%% done
 hqm.teamList.players=Players: %s
 hqm.teamList.lives=Lives: %s
 hqm.teamList.page=Page %s
