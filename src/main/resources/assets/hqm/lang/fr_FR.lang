@@ -4,6 +4,7 @@
 # %s is where something will be filled in at runtime.
 # Don't remove it since it will make things weird.
 # Just put it on the correct place in the sentence.
+# To use the % use %% to escape the formatter.
 
 # ======================================
 #				GENERAL
@@ -15,16 +16,52 @@ hqm.message.livesLeft=Il vous reste actuellement %s vie(s).
 hqm.message.lostLife=Vous venez de perdre une vie. Il vous reste %s vie(s) 
 hqm.message.lostTeamLife=%s vient de perdre une vie %s. Il vous reste %s vie(s) 
 hqm.message.andBanned=et a été banni
-hqm.message.gameOver=Vous n'avez plus de vies. Game over, man, it's game over!
+hqm.message.gameOver=Vous n'avez plus de vies. Game over, man, ce jeu est terminé !
 hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
+hqm.message.vanillaHardcoreOn=Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.
 hqm.message.vanillaHardcoreOverride=Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect.
+hqm.message.noPlayer=That player does not exist.
+hqm.message.questActivated=Questing mode has been activated. Enjoy!
+hqm.message.questHardcore=Hardcore Mode has been activated. Enjoy!
+hqm.message.questAlreadyActivated=Questing mode is already activated.
+hqm.message.hardcoreAlreadyActivated=Hardcore Mode is already activated
+hqm.message.noQuestYet=Questing Mode isn't enabled yet. use '/hqm quest' to enable it.
+hqm.message.noHardcoreYet=Hardcore Mode isn't enabled yet. use '/hqm hardcore' to enable it.
+hqm.message.positiveNumbers=Please use only positive numbers.
+hqm.message.posNumberAndPlayer=Please use only positive numbers and / or a correct Playername.
+hqm.message.cantRemoveLives=You currently have %s live(s) remaining, you can't remove that much lives.
+hqm.message.removeLives=You have removed %s live(s) from your lifepool.
+hqm.message.removeLivesFrom=You have removed %s  live(s) from %s.
+hqm.message.removeLivesBy=You had %s live(s) removed by %s
+hqm.message.cantAddLives=You can't have more than %s lives.
+hqm.message.addLives=You have added %s live(s) to your lifepool.
+hqm.message.addLivesTo=You have added %s  live(s) to %s.
+hqm.message.addLivesBy=You had %s live(s) added by %s
+hqm.message.cantGiveMoreLives=You can't give %s more than %s lives.
+hqm.message.haveMaxLives=You already have maximum lives.
+hqm.massage.setLivesInstead=Setting %s to %s lives instead.
+hqm.massage.setLivesBy=You have got your lives set to %s by %s
+hqm.message.haveRemaining=Vous avez %s restant
+hqm.message.hasLivesRemaining=%s a %s vie(s) restantes
+hqm.message.version=Hardcore Questing Mode - Version : %s
+hqm.message.addOne=Vous avez ajouté 1 à votre total de vie.
+hqm.message.eatRottenHearth=Pourquoi avez-vous mangé un coeur pourri ?
+hqm.message.hearthDecay=One or more of your hearts has just decade into a Rotten Heart.
+hqm.message.alreadyEditing=Un autre OP accède déjà aux quêtes de ce joueur.
+hqm.message.bookNoPermission=Vous n'avez pas la permission de toucher à ce livre.
+hqm.message.noTaskSelected=Vous n'avez pas encore sélectionné de tache.
 
 # ======================================
 #				BLOCKS
 # ======================================
 tile.hqm:item_barrel.name=Système d'administration des quêtes
+tile.hqm:item_barrel.nonBound=Vous n'avez pas lié de quêtes au SAQ actuellement
+tile.hqm:item_barrel.boundTo=Le SAQ est actuellement lié à '%s'
+tile.hqm:item_barrel.bindTo=Vous avez lié '%s' au SAQ
 tile.hqm:quest_tracker.name=Système de suivi de quêtes
-tile.hqm:quest_portal_0.name=Portail des quêtes
+tile.hqm:quest_tracker.offLimit=Vous n'êtes pas en mode édition. Ce bloc est hors limites.
+tile.hqm:quest_portal_0.name=Système portail des quêtes
+tile.hqm:quest_portal_0.bindTo=Vous avez lié '%s' au SPQ
 tile.hqm:quest_portal_1.name=Mur solide
 tile.hqm:quest_portal_2.name=Bords magiques
 
@@ -33,13 +70,49 @@ tile.hqm:quest_portal_2.name=Bords magiques
 # ======================================
 item.hqm:quest_book_0.name=Livre de quêtes
 item.hqm:quest_book_1.name=Livre de quêtes - Version OP
+item.hqm:quest_book_1.useAs=Utilisez le livre comme : %s
+item.hqm:quest_book_1.invalid=Livre invalide !
 item.hqm:hearts_quarterheart.name=Quart de coeur
 item.hqm:hearts_halfheart.name=Demi coeur
 item.hqm:hearts_threequarts.name=Trois quart de coeur
 item.hqm:hearts_heart.name=Coeur entier
+item.hqm:hearts_heart.tooltip=Consommez-le pour recevoir une vie supplémentaire
+item.hqm:hearts_heart.freshness=Fraicheur actuelle : %s %%
 item.hqm:hearts_rottenheart.name=Coeur pourri
+item.hqm:hearts_rottenheart.tooltip=Coeur pourri. Ne pas avaler
 item.hqm:bags.name=Sac de récompense
 item.hqm:hqmInvalidItem.name=Élément non valide
+
+# ======================================
+#			    QUESTS
+# ======================================
+hqm.quest.claim=Réclamer la récompense
+hqm.quest.manualSubmit=Envoi manuel
+hqm.quest.manualDetect=Détection manuelle
+hqm.quest.requirement=Prérequis
+hqm.quest.selectTask=Choisir une tache
+hqm.quest.rewards=Récompenses
+hqm.quest.pickOne=Piochez un
+hqm.quest.pickOneReward=Piochez une récompense
+hqm.quest.itemTaskChangeTo=Click on the item task type you want to change to.
+hqm.quest.itemTaskTypeOnly=You can only change the type of item tasks.
+hqm.quest.itemTaskTypeChange=Select an item task you want to change the type of.
+hqm.quest.createTasks=Create tasks of different types by using the buttons below
+hqm.quest.partyRepReward=The party will receive this reputation when the first member claims their reward.
+hqm.quest.partyRepRewardClaimed=The party has already received this reputation.
+hqm.quest.crtlNonEditor=Hold Ctrl to see this as a non-editor.
+hqm.quest.selected=Sélectionné
+
+# ======================================
+#				BAGS
+# ======================================
+hqm.bag.basic=De base
+hqm.bag.good=Bon
+hqm.bag.greater=Meilleur
+hqm.bag.epic=Epique
+hqm.bag.legendary=Légendaire
+hqm.bag.group=%s Group
+hqm.bag.unknown=Inconnu
 
 # ======================================
 #			TEAM SETTINGS
@@ -60,6 +133,28 @@ hqm.team.playerInParty.title=Erreur d'invite
 hqm.team.playerInParty.desc=Ce joueur est déjà dans une partie, vous ne pouvez pas inviter de joueurs d'autres parties.
 hqm.team.usedTeamName.title=Erreur de groupe
 hqm.team.usedTeamName.desc=Ce nom de partie est déjà utilisé par quelqu'un d'autre.
+
+# ======================================
+#			TASK TYPES
+# ======================================
+hqm.taskType.consume.title=Consume task
+hqm.taskType.consume.desc=A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids.
+hqm.taskType.craft.title=Crafting task
+hqm.taskType.craft.desc=A task where the player has to craft specific items.
+hqm.taskType.location.title=Location task
+hqm.taskType.location.desc=A task where the player has to reach one or more locations.
+hqm.taskType.consumeQDS.title=QDS task
+hqm.taskType.consumeQDS.desc=A task where the player can hand in items or fluids. This is a normal consume task where manual submit has been disabled to teach the player about the QDS
+hqm.taskType.detect.title=Detection task
+hqm.taskType.detect.desc=A task where the player needs specific items. These do not have to be handed in, having them in one's inventory is enough.
+hqm.taskType.kill.title=Killing task
+hqm.taskType.kill.desc=A task where the player has to kill certain monsters.
+hqm.taskType.death.title=Death task
+hqm.taskType.death.desc=A task where the player has to die a certain amount of times.
+hqm.taskType.reputation.title=Reputation task
+hqm.taskType.reputation.desc=A task where the player has to reach a certain reputation.
+hqm.taskType.reputationKill.title=Rep kill task
+hqm.taskType.reputationKill.desc=A task where the player has to kill other players with certain reputations.
 
 # ======================================
 #			DEATH TYPES
@@ -115,11 +210,94 @@ hqm.portal.magic.desc=Cet ensemble fonctionera parfaitement pour votre carte à 
 hqm.portal.custom.title=Thème personalisé
 hqm.portal.custom.desc=Personalisez le thème en spécifiant, à quel bloc, ce bloc devrat-il ressembler.
 
+# ======================================
+#				ITEM PRECISION
+# ======================================
+hqm.precision.precise=Precise detection
+hqm.precision.nbtFuzzy=NBT independent detection
+hqm.precision.fuzzy=Fuzzy detection
+hqm.precision.oreDict=Ore dictionary detection
+
+# ======================================
+#			REPEAT TYPES
+# ======================================
+hqm.repeat.none.title=Non répétable
+hqm.repeat.none.desc=Cette quête est non répétable and can therefore only be completed once.
+hqm.repeat.instant.title=Instant repeat
+hqm.repeat.instant.desc=As soon as this quest is completed it can be completed again for another set of rewards
+hqm.repeat.instant.message=Instant Cooldown
+hqm.repeat.interval.title=Interval repeat
+hqm.repeat.interval.desc=At a specific interval this quest will be reset and available for completion again. The quest is only reset if it has already been completed.
+hqm.repeat.interval.message=Refreshes on interval
+hqm.repeat.time.title=Cooldown repeat
+hqm.repeat.time.desc=After completing this quest it goes on a cooldown, when this cooldown ends you can complete the quest again.
+hqm.repeat.time.message=Cooldown on completion
+hqm.repeat.invalid=Temps non valide
+hqm.repeat.resetIn=Mis à zéro dans %s
+hqm.repeat.day=jour
+hqm.repeat.days=jours
+hqm.repeat.and=et
+hqm.repeat.hour=heure
+hqm.repeat.hours=heures
+hqm.repeat.repeatable=Quête répétable
+
+# ======================================
+#			EDIT MODES
+# ======================================
+hqm.editMode.normal.title=Curseur
+hqm.editMode.normal.desc=Utilisez le livre comme si vous étiez en mode jeu.
+hqm.editMode.move.title=Déplacer
+hqm.editMode.move.desc=Cliquez et glissez-déposez les quêtes
+hqm.editMode.create.title=Créer
+hqm.editMode.create.desc=Cliquez pour créer une quête, un groupe de quêtes, un groupe de récompense, et plein d'autres choses.
+hqm.editMode.req.title=Quest Requirements
+hqm.editMode.req.desc=Click on a quest to select it and then click on the quests you want as requirements for the selected quest.\n\nHold shift and click on the selected quest to remove its requirements.
+hqm.editMode.size.title=Change Size
+hqm.editMode.size.desc=Click on a quest to change its size, this is purely visual and has no impact on how the quest works.
+hqm.editMode.rename.title=Edit Text
+hqm.editMode.rename.desc=Click on the text you want to edit. Works with names and descriptions for quest sets, quests, tasks, main lore, reward groups and reward tiers.
+hqm.editMode.item.title=Change Item
+hqm.editMode.item.desc=Click on an item or item slot to open the item selector. This works for quest rewards and task items to give some examples.
+hqm.editMode.task.title=Create Task
+hqm.editMode.task.desc=Opens up the task creation menu.
+hqm.editMode.delete.title=Delete
+hqm.editMode.delete.desc=Be careful with this one, things you click on will be deleted. Works with quest sets, quests, tasks, rewards, task items and just about everything.
+hqm.editMode.swap.title=Change Set
+hqm.editMode.swap.desc=Click on a quest to move it to another set. Before using this you will have to use the "Target Set" command to select a target set.
+hqm.editMode.swapSelect.title=Target Set
+hqm.editMode.swapSelect.desc=Mark a set as the target for quest movement. The "Change Set" command can then be used to move quests to this set
+hqm.editMode.tier.title=Set group tier
+hqm.editMode.tier.desc=Selected a group and then click on a tier to set the group's tier.
+hqm.editMode.bag.title=Reward Bags
+hqm.editMode.bag.desc=Open up the reward bag menu. Here you will be able to modify the group tiers and add groups of items for the reward bags.
+hqm.editMode.location.title=Edit Location
+hqm.editMode.location.desc=Edit the target location for location tasks.
+hqm.editMode.repeatable.title=Set Repeatability
+hqm.editMode.repeatable.desc=Change if a quest should be repeatable or not, and if so, the properties of the repeatability.
+hqm.editMode.trigger.title=Trigger Quests
+hqm.editMode.trigger.desc=Specify any properties for trigger quests.
+hqm.editMode.mob.title=Edit Monster
+hqm.editMode.mob.desc=Edit the monster target for killing tasks.
+hqm.editMode.questSelection.title=Select Quest
+hqm.editMode.questSelection.desc=Mark a quest as the selected quest. When a quest is selected you can bind it to a Quest Tracker System or a Quest Gate System by right clicking it with a book.
+hqm.editMode.questOption.title=Quest Option
+hqm.editMode.questOption.desc=Click on a quest to select it and then click on the quests you want to link it to. If an option linked quest is completed all quests it's linked to becomes invisible and uncompletable.\n\n Hold shift and click on the selected quest to remove all its links.
+hqm.editMode.changeTask.title=Change Task
+hqm.editMode.changeTask.desc=Change the task type of item tasks.
+hqm.editMode.reqParents.title=Required parents
+hqm.editMode.reqParents.desc=Change how many of the parent quests that have to be completed before this one unlocks.
+hqm.editMode.rep.title=Reputation
+hqm.editMode.rep.desc=Open the reputation menu where you can create reputations and their tiers.
+hqm.editMode.repValue.title=Change value
+hqm.editMode.repValue.desc=Change the value of the different reputation tiers
+hqm.editMode.repTask.title=Edit reputation target
+hqm.editMode.repTask.desc=Change the configurations for a reputation target for the selected reputation task
+hqm.editMode.repReward.title=Edit reputation reward
+hqm.editMode.repReward.desc=Click on the reputation reward icon to bring up the reputation reward menu.
 
 # ======================================
 #				COMMAND
 # ======================================
-
 hqm.command.notFound=Commande introuvable
 hqm.command.noPermission=Vous n'avez pas la permission d'utiliser cette commande
 hqm.command.loadFailed=Échec de chargement
@@ -162,3 +340,272 @@ hqm.command.save.syntax1=/hqm save all
 hqm.command.save.info1=Enregistre toutes les pages de quêtes par leurs noms
 hqm.command.save.syntax2=/hqm save bags
 hqm.command.save.info2=Enregistre toutes les récompenses de sac de quête dans un JSON.
+
+# ======================================
+#				REWARD GUI
+# ======================================
+hqm.rewardGui.chance=%s%% chance to get this reward
+hqm.rewardGui.tierReward=%s Reward
+hqm.rewardGui.close=Click to close
+hqm.rewardGui.shiftInfo=Hold shift for more info
+
+# ======================================
+#			EDIT MENU
+# ======================================
+hqm.edit.ok=Ok
+hqm.edit.cancel=Annuler
+
+# ======================================
+#			DEATH MENU
+# ======================================
+hqm.deathMenu.showWorst=Show Worst
+hqm.deathMenu.showTotal=Show Total
+hqm.deathMenu.total=Total Deaths: %s
+hqm.deathMenu.lots=lots
+hqm.deathMenu.deaths=You've died %s time(s).
+hqm.deathMenu.deathsOutOf=You've died %s of %s time(s).
+
+# ======================================
+#			DEATH TASK
+# ======================================
+hqm.deathTask.reqDeathCount=Required death count
+
+# ======================================
+#			MOB TASK
+# ======================================
+hqm.mobTask.reqKills=Required kill count
+hqm.mobTask.search=Search
+hqm.mobTask.nothingSelected=Nothing Selected
+hqm.mobTask.currentlySelected=Currently Selected
+hqm.mobTask.exactMatch.title=Exact Match
+hqm.mobTask.typeMatch.title=Type Match
+hqm.mobTask.exactMatch.desc=Only matching monsters with the selected type, subtypes are not counted towards the killing count.
+hqm.mobTask.typeMatch.desc=Matching every monster that has the selected type or a subtype to the selected type.
+hqm.mobTask.allKilled=All killed
+hqm.mobTask.partKills=%s[%s%%] killed
+hqm.mobTask.totalKills=Kill a total of %s
+
+# ======================================
+#			REPUTATION REWARD
+# ======================================
+hqm.repReward.value=Reward value
+hqm.repReward.create=Create new
+hqm.repReward.delete=Delete
+hqm.repReward.noValidReps=There are no valid reputations to choose from. Please go to the reputation menu (click on the reputation button on the left hand side of the book when browsing the main menu) and create at least one first.
+
+# ======================================
+#			REPUTATION SETTING
+# ======================================
+hqm.repSetting.invRange=Inverted range?
+hqm.repSetting.lower=Lower bounds
+hqm.repSetting.upper=Upper bounds
+hqm.repSetting.preview=Preview
+hqm.repSetting.invalid=Invalid
+
+# ======================================
+#			  REPUTATION
+# ======================================
+hqm.rep.noValueOf=No value of
+hqm.rep.anyValueOf=Any value of
+hqm.rep.not=Not
+hqm.rep.atLeastTwo=You need at least two tiers
+hqm.rep.notZero=A tier can't have value 0
+hqm.rep.unique=Tiers must have unique values
+hqm.rep.neutral=Neutral: %s
+
+# ======================================
+#			REPUTATION KILL
+# ======================================
+hqm.repKil.kills=Kills: %s/%s
+hqm.repKil.killCount=You've killed %s player(s).
+hqm.repKil.killCountOutOf=You've killed %s of %s player(s).
+
+# ======================================
+#			REPUTATION VALUE
+# ======================================
+hqm.repValue.tierValue=Tier value
+
+# ======================================
+#			    MENU TIER
+# ======================================
+hqm.menuTier.weights=Weights
+
+# ======================================
+#			    MENU TRACKER
+# ======================================
+hqm.menuTracker.radius.title=Player Radius
+hqm.menuTracker.radius.desc=Only includes players within the given distance. Leaving this at zero makes it detect any player, even offline ones.
+hqm.menuTracker.noQuest=No quest selected
+
+# ======================================
+#			    MENU TRIGGER
+# ======================================
+hqm.menuTrigger.taskCount=Trigger tasks count
+hqm.trigger.none.title=Normal Quest
+hqm.trigger.none.desc=Just a normal quest.
+hqm.trigger.quest.title=Trigger Quest
+hqm.trigger.quest.desc=A trigger quest is an invisible quest. The quest can still be completed as usual but you can't claim any rewards for it or see it in any lists. It can be used to trigger other quests, hence its name.
+hqm.trigger.task.title=Trigger Tasks
+hqm.trigger.task.desc=Trigger tasks are the first few tasks of a quest that have to be completed before the quest shows up. The quest will be invisible until the correct amount of tasks have been completed. When the quest becomes visible the player can see the tasks that have already been completed.
+hqm.trigger.anti.title=Reversed Trigger
+hqm.trigger.anti.desc=This quest will be invisible until it is enabled (all its parent quests are completed). This way you can make a secret quest line appear all of a sudden when a known quest is completed.
+
+# ======================================
+#			    QUEST BOOK
+# ======================================
+hqm.questBook.saveAll=Save all
+hqm.questBook.open=Open
+hqm.questBook.createSet=Create Set
+hqm.questBook.createGroup=Create Group
+hqm.questBook.createTier=Create Tier
+hqm.questBook.reset=Reset
+hqm.questBook.create=Create New
+hqm.questBook.start=Click here to start
+hqm.questBook.playAgain=Click to play again
+hqm.questBook.lives=Lives
+hqm.questBook.party=Party
+hqm.questBook.quests=Quests
+hqm.questBook.reputation=Reputation
+hqm.questBook.showQuests=Click here to show quests
+hqm.questBook.deadOut=If you die, you're out.
+hqm.questBook.infiniteLives=Hardcore mode is not active, you have an infinite amount of lives.
+hqm.questBook.deaths=You've currently died %s time(s)
+hqm.questBook.invites=You have %s party invite(s)
+hqm.questBook.notInParty=You're currently not in a party.
+hqm.questBook.inParty=You're in a party with %s player(s)
+hqm.questBook.openParty=Click here to open party window
+hqm.questBook.resetParty=Reset the quest progress for the entire party.
+hqm.questBook.shiftCtrlConfirm=Hold shift+ctrl while clicking to confirm.
+hqm.questBook.maxRetrieval=Maximum retrieval count
+hqm.questBook.noRestriction=Leave at 0 for no restriction
+hqm.questBook.items=%s items
+hqm.questBook.allQuests=All Quests Completed
+hqm.questBook.percentageQuests=%s%% Completed
+hqm.questBook.locked=Locked
+hqm.questBook.lockedQuest=Locked Quest
+hqm.questBook.unclaimedRewards=%s quest(s) with unclaimed rewards
+hqm.questBook.createNewSet=Click the button below to create a new empty quest set.
+hqm.questBook.shiftSetReset=Hold shift and click on quests to automatically complete them or reset their progress.
+hqm.questBook.parentCount=Requires %s/%s quest(s) to be completed.
+hqm.questBook.parentCountElsewhere=Requires %s/%s quest(s) to be completed elsewhere.
+hqm.questBook.and=and
+hqm.questBook.hold=Hold %s
+hqm.questBook.holding=Holding %s
+hqm.questBook.completed=Completed
+hqm.questBook.unclaimedReward=Unclaimed reward
+hqm.questBook.reqOnly=Only requires %s quest(s) to be completed.
+hqm.questBook.reqMore=Requires %s quest(s) to be completed. This is more than there are, weird.
+hqm.questBook.reqAll=Requires all %s quest(s) to be completed.
+hqm.questBook.noTasks=This quest has no tasks!
+hqm.questBook.completedTasks=%s/%s completed tasks.
+hqm.questBook.invisLocked=Invisible while locked
+hqm.questBook.invisPerm=Permanently invisible
+hqm.questBook.invisCount=Invisible until %s task(s) have been completed.
+hqm.questBook.invisInherit=Inherited invisibility
+hqm.questBook.invisOption=Invisible through quest option.
+hqm.questBook.optionLinks=Connected to %s quest(s) through option links.
+hqm.questBook.childUnlocks=Unlocks %s quest(s) elsewhere.
+hqm.questBook.ctrlNonEditor=Hold Ctrl to see this as a non-editor.
+hqm.questBook.resetQuest=Click to reset quest
+hqm.questBook.completeQuest=Click to complete quest
+hqm.questBook.warning=WARNING!
+hqm.questBook.deleteOnClick=You're now deleting everything you click on!
+hqm.questBook.goBack=Go back
+hqm.questBook.rightClick=You can also right click anywhere
+hqm.questBook.totalQuests=%s quest(s) in total
+hqm.questBook.unlockedQuests=%s unlocked quests(s)
+hqm.questBook.completedQuests=%s completed quests(s)
+hqm.questBook.availableQuests=%s quests(s) available for completion
+hqm.questBook.unclaimedQuests=%s quests(s) with unclaimed rewards
+hqm.questBook.inclInvisiQuests=%s quests(s) including invisible ones
+
+# ======================================
+#			    TEAM LIST
+# ======================================
+hqm.teamList.done=%s%% done
+hqm.teamList.players=Players: %s
+hqm.teamList.lives=Lives: %s
+hqm.teamList.page=Page %s
+
+# ======================================
+#			LOCATION MENU
+# ======================================
+hqm.locationMenu.xTarget=X ciblé
+hqm.locationMenu.yTarget=Y ciblé
+hqm.locationMenu.zTarget=Z ciblé
+hqm.locationMenu.dim=Dimension
+hqm.locationMenu.radius=Rayon
+hqm.locationMenu.negRadius=Un rayon négatif ignores la position du joueur
+hqm.locationMenu.location=Votre position
+hqm.locationMenu.visFull.title=Tout montrer
+hqm.locationMenu.visFull.desc=Will display the location of the target to the player and therefore the distance to it as well. The maximum distance the player can be from the target (the radius) is also displayed.
+hqm.locationMenu.visLocation.title=Montrer la position
+hqm.locationMenu.visLocation.desc=The radius required to trigger the location is hidden from the user. The location is however still visible, and therefore even the distance to it.
+hqm.locationMenu.visNone.title=Cacher l'info
+hqm.locationMenu.visNone.desc=The location, distance and radius will be hidden from the user. It's up to you to guide them through the map or through text.
+hqm.locationMenu.visited=Visité
+hqm.locationMenu.mAway=%sm de distance
+hqm.locationMenu.mRadius=%sm de rayon
+hqm.locationMenu.wrongDim=Mauvaise dimension
+
+# ======================================
+#		    REPEAT MENU
+# ======================================
+hqm.repeatMenu.days=Jours
+hqm.repeatMenu.hours=Heures
+hqm.repeatMenu.mcDaysHours=Ce sont les jours et les heures de minecraft.
+
+# ======================================
+#		    PORTAL MENU
+# ======================================
+hqm.portalMenu.edit=Editer un élément
+hqm.portalMenu.collisionOnComplete=Use collision when completed
+hqm.portalMenu.texOnComplete=Use textures when completed
+hqm.portalMenu.collisionNonComplete=Use collision when not completed
+hqm.portalMenu.texNonComplete=Use textures when not completed
+hqm.portalMenu.noQuest=Pas de quête sélectionnée
+
+# ======================================
+#		PARENT COUNT MENU
+# ======================================
+hqm.parentCount.count=Parent count
+hqm.parentCount.reqAll.title=Requires all
+hqm.parentCount.reqCount.title=Requires specified amount
+hqm.parentCount.reqAll.desc=All parent quests have to be completed before this quest unlocks.
+hqm.parentCount.reqCount.desc=For this quest to unlock the player will have to complete a certain amount of parent quests. The required amount can be specified below.
+
+# ======================================
+#			TEXT EDITOR
+# ======================================
+hqm.textEditor.copyAll=Tout copier
+hqm.textEditor.paste=Coller
+hqm.textEditor.clear=Effacer
+hqm.textEditor.clearPaste=Effacer et coller
+hqm.textEditor.unnamed=Sans-nom
+
+# ======================================
+#			PARTY MENU
+# ======================================
+hqm.party.create=Créer une aventure
+hqm.party.invitePlayer=Inviter un joueur
+hqm.party.accept=Acceptez
+hqm.party.decline=Déclinez
+hqm.party.decideLater=Décidez plus tard
+hqm.party.kickPlayer=Sortir un joueur
+hqm.party.removeInvite=Retirer l'invitation
+hqm.party.leave=Quitter l'aventure
+hqm.party.disband=Disband Party
+hqm.party.list=Liste d'aventure
+hqm.party.invites=Vos invitations
+hqm.party.noInvites=Pas d'invitations d'aventure
+hqm.party.name=Nom de l'aventure
+hqm.party.owner=Propriétaire
+hqm.party.invite=Invité
+hqm.party.playerName=Nom du joueur
+hqm.party.shiftConfirm=Hold shift while clicking to confirm.
+hqm.party.shiftCtrlConfirm=Hold shift+ctrl while clicking to confirm.
+hqm.party.currentSelection=You have currently selected: %s
+hqm.party.stats=Stats à propos de toutes les aventures existantes.
+hqm.party.lifeSetting=Option vie : %s
+hqm.party.rewardSetting=Option récompenses: %s
+hqm.party.change=Cliquez ici pour changer
