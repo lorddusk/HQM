@@ -34,7 +34,6 @@ public class Reputation {
     private static List<Reputation> reputationList = new ArrayList<Reputation>();
     private static Map<Integer, Reputation> reputationMap = new HashMap<Integer, Reputation>();
 
-
     public static List<Reputation> getReputationList() {
         return reputationList;
     }
@@ -42,8 +41,6 @@ public class Reputation {
     public static Reputation getReputation(int id) {
         return reputationMap.get(id);
     }
-
-
 
     public int getId() {
         return id;
@@ -324,10 +321,6 @@ public class Reputation {
 
         gui.drawString(str, x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
 
-
-
-
-
         return info;
     }
 
@@ -344,7 +337,7 @@ public class Reputation {
                 }else{
                     for (ReputationMarker marker2 : markers) {
                         if (!marker.equals(marker2) && marker.getValue() == marker2.getValue()) {
-                            error = "hqm.rep.unique";
+                            error = "unique";
                             break;
                         }
                     }
@@ -356,7 +349,7 @@ public class Reputation {
             }
         }
 
-        return Translator.translate("hqm.rep." + error);
+        return error == null ? null : Translator.translate("hqm.rep." + error);
     }
 
     public ReputationMarker getCurrentMarker(int value) {
