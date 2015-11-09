@@ -585,14 +585,14 @@ public class QuestAdapter {
         private final String X = "x";
         private final String Y = "y";
         private final String ICON = "icon";
-        private final String BIG_ICON = "bigIcon";
+        private final String BIG_ICON = "bigicon";
         private final String REQUIREMENTS = "requirements";
         private final String PREREQUISITES = "prerequisites";
         private final String OPTIONS = "options";
         private final String OPTIONLINKS = "optionlinks";
         private final String REPEAT = "repeat";
         private final String TRIGGER = "trigger";
-        private final String TRIGGER_TASKS = "triggerTasks";
+        private final String TRIGGER_TASKS = "triggertasks";
         private final String PARENT_REQUIREMENT = "parentrequirement";
         private final String TASKS = "tasks";
         private final String REWARDS = "reward";
