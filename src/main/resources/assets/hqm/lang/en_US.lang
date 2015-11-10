@@ -518,6 +518,7 @@ hqm.questBook.completedQuests=%s completed quests(s)
 hqm.questBook.availableQuests=%s quests(s) available for completion
 hqm.questBook.unclaimedQuests=%s quests(s) with unclaimed rewards
 hqm.questBook.inclInvisiQuests=%s quests(s) including invisible ones
+hqm.questBook.moreInfo=Click here for more info
 
 # ======================================
 #			    TEAM LIST

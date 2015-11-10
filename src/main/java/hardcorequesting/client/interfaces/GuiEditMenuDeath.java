@@ -83,8 +83,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             gui.drawString(deaths, DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
 
-        gui.drawString(BEST_LABEL, BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
-        gui.drawString(TOTAL_LABEL, TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
+        gui.drawString(Translator.translate(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
+        gui.drawString(Translator.translate(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
 
         DeathStats stats = getStats();
 
@@ -164,11 +164,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
         scrollBar.onClick(gui, mX, mY);
 
-        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)) {
+        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translate(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
             selectedName = null;
-        }else if(gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)) {
+        }else if(gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
             selectedName = null;
