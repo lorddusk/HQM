@@ -1651,7 +1651,7 @@ public class GuiQuestBook extends GuiBase {
         MOB("mob"),
         QUEST_SELECTION("questSelection"),
         QUEST_OPTION("questOption"),
-        CHANGE_TASK("changeTasl"),
+        CHANGE_TASK("changeTask"),
         REQUIRED_PARENTS("reqParents"),
         REPUTATION("rep"),
         REPUTATION_VALUE("repValue"),
