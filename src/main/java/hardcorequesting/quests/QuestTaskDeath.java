@@ -75,7 +75,7 @@ public class QuestTaskDeath extends QuestTask {
     @Override
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         int died = ((QuestDataTaskDeath)getData(player)).deaths;
-        gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + Translator.translate("hqm.deathMenu.deaths", deaths) : Translator.translate("hqm.deathMenu.deathsOutOf", died, deaths), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + Translator.translate(deaths != 0, "hqm.deathMenu.deaths", deaths) : Translator.translate(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
 
     @SideOnly(Side.CLIENT)

@@ -5,6 +5,7 @@
 # Don't remove it since it will make things weird.
 # Just put it on the correct place in the sentence.
 # To use the % use %% to escape the formatter.
+# Use [[singular||plural]] to support singular and plural
 
 # ======================================
 #				GENERAL
@@ -12,9 +13,9 @@
 itemGroup.hqm=Hardcore Questing Mode
 hqm.message.noHardcore=This server doesn't have Hardcore Questing Mode enabled.
 hqm.message.hardcore=This server currently has Hardcore Questing Mode enabled!
-hqm.message.livesLeft=You currently have %s live(s) left.
-hqm.message.lostLife=You just lost a life. You have %s live(s) left
-hqm.message.lostTeamLife=%s just lost a life %s. You have %s live(s) left
+hqm.message.livesLeft=You currently have %s [[live||lives]] left.
+hqm.message.lostLife=You just lost a life. You have %s [[live||lives]] left
+hqm.message.lostTeamLife=%s just lost a life %s. You have %s [[live||lives]] left
 hqm.message.andBanned=and got banned
 hqm.message.gameOver=You're out of lives. Game over, man, it's game over!
 hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
@@ -29,20 +30,20 @@ hqm.message.noQuestYet=Questing Mode isn't enabled yet. use '/hqm quest' to enab
 hqm.message.noHardcoreYet=Hardcore Mode isn't enabled yet. use '/hqm hardcore' to enable it.
 hqm.message.positiveNumbers=Please use only positive numbers.
 hqm.message.posNumberAndPlayer=Please use only positive numbers and / or a correct Playername.
-hqm.message.cantRemoveLives=You currently have %s live(s) remaining, you can't remove that much lives.
-hqm.message.removeLives=You have removed %s live(s) from your lifepool.
-hqm.message.removeLivesFrom=You have removed %s  live(s) from %s.
-hqm.message.removeLivesBy=You had %s live(s) removed by %s
-hqm.message.cantAddLives=You can't have more than %s lives.
-hqm.message.addLives=You have added %s live(s) to your lifepool.
-hqm.message.addLivesTo=You have added %s  live(s) to %s.
-hqm.message.addLivesBy=You had %s live(s) added by %s
+hqm.message.cantRemoveLives=You currently have %s [[live||lives]] remaining, you can't remove that much lives.
+hqm.message.removeLives=You have removed %s [[live||lives]] from your lifepool.
+hqm.message.removeLivesFrom=You have removed %s  [[live||lives]] from %s.
+hqm.message.removeLivesBy=You had %s [[live||lives]] removed by %s
+hqm.message.cantAddLives=You can't have more than %s [[live||lives]].
+hqm.message.addLives=You have added %s [[live||lives]] to your lifepool.
+hqm.message.addLivesTo=You have added %s  [[live||lives]] to %s.
+hqm.message.addLivesBy=You had %s [[live||lives]] added by %s
 hqm.message.cantGiveMoreLives=You can't give %s more than %s lives.
 hqm.message.haveMaxLives=You already have maximum lives.
 hqm.massage.setLivesInstead=Setting %s to %s lives instead.
 hqm.massage.setLivesBy=You have got your lives set to %s by %s
 hqm.message.haveRemaining=You have %s remaining
-hqm.message.hasLivesRemaining=%s has %s live(s) remaining
+hqm.message.hasLivesRemaining=%s has %s [[live||lives]] remaining
 hqm.message.version=Hardcore Questing Mode - Version : %s
 hqm.message.addOne=You have added 1 to your total life.
 hqm.message.eatRottenHearth=Why did you eat a rotten heart?
@@ -362,8 +363,8 @@ hqm.deathMenu.showWorst=Show Worst
 hqm.deathMenu.showTotal=Show Total
 hqm.deathMenu.total=Total Deaths: %s
 hqm.deathMenu.lots=lots
-hqm.deathMenu.deaths=You've died %s time(s).
-hqm.deathMenu.deathsOutOf=You've died %s of %s time(s).
+hqm.deathMenu.deaths=You've died %s [[time||times]].
+hqm.deathMenu.deathsOutOf=You've died %s of %s [[time||times]].
 
 # ======================================
 #			DEATH TASK
@@ -417,8 +418,8 @@ hqm.rep.neutral=Neutral: %s
 #			REPUTATION KILL
 # ======================================
 hqm.repKil.kills=Kills: %s/%s
-hqm.repKil.killCount=You've killed %s player(s).
-hqm.repKil.killCountOutOf=You've killed %s of %s player(s).
+hqm.repKil.killCount=You've killed %s [[player||players]].
+hqm.repKil.killCountOutOf=You've killed %s of %s [[player||players]].
 
 # ======================================
 #			REPUTATION VALUE
@@ -469,10 +470,10 @@ hqm.questBook.reputation=Reputation
 hqm.questBook.showQuests=Click here to show quests
 hqm.questBook.deadOut=If you die, you're out.
 hqm.questBook.infiniteLives=Hardcore mode is not active, you have an infinite amount of lives.
-hqm.questBook.deaths=You've currently died %s time(s)
-hqm.questBook.invites=You have %s party invite(s)
+hqm.questBook.deaths=You've currently died %s [[time||times]]
+hqm.questBook.invites=You have %s party [[invite||invites]]
 hqm.questBook.notInParty=You're currently not in a party.
-hqm.questBook.inParty=You're in a party with %s player(s)
+hqm.questBook.inParty=You're in a party with %s [[player||players]]
 hqm.questBook.openParty=Click here to open party window
 hqm.questBook.resetParty=Reset the quest progress for the entire party.
 hqm.questBook.shiftCtrlConfirm=Hold shift+ctrl while clicking to confirm.
@@ -483,28 +484,28 @@ hqm.questBook.allQuests=All Quests Completed
 hqm.questBook.percentageQuests=%s%% Completed
 hqm.questBook.locked=Locked
 hqm.questBook.lockedQuest=Locked Quest
-hqm.questBook.unclaimedRewards=%s quest(s) with unclaimed rewards
+hqm.questBook.unclaimedRewards=%s [[quest||quests]] with unclaimed rewards
 hqm.questBook.createNewSet=Click the button below to create a new empty quest set.
 hqm.questBook.shiftSetReset=Hold shift and click on quests to automatically complete them or reset their progress.
-hqm.questBook.parentCount=Requires %s/%s quest(s) to be completed.
-hqm.questBook.parentCountElsewhere=Requires %s/%s quest(s) to be completed elsewhere.
+hqm.questBook.parentCount=Requires %s/%s [[quest||quests]] to be completed.
+hqm.questBook.parentCountElsewhere=Requires %s/%s [[quest||quests]] to be completed elsewhere.
 hqm.questBook.and=and
 hqm.questBook.hold=Hold %s
 hqm.questBook.holding=Holding %s
 hqm.questBook.completed=Completed
 hqm.questBook.unclaimedReward=Unclaimed reward
-hqm.questBook.reqOnly=Only requires %s quest(s) to be completed.
-hqm.questBook.reqMore=Requires %s quest(s) to be completed. This is more than there are, weird.
-hqm.questBook.reqAll=Requires all %s quest(s) to be completed.
+hqm.questBook.reqOnly=Only requires %s [[quest||quests]] to be completed.
+hqm.questBook.reqMore=Requires %s [[quest||quests]] to be completed. This is more than there are, weird.
+hqm.questBook.reqAll=Requires all %s [[quest||quests]] to be completed.
 hqm.questBook.noTasks=This quest has no tasks!
 hqm.questBook.completedTasks=%s/%s completed tasks.
 hqm.questBook.invisLocked=Invisible while locked
 hqm.questBook.invisPerm=Permanently invisible
-hqm.questBook.invisCount=Invisible until %s task(s) have been completed.
+hqm.questBook.invisCount=Invisible until %s [[task has||tasks have]] been completed.
 hqm.questBook.invisInherit=Inherited invisibility
 hqm.questBook.invisOption=Invisible through quest option.
-hqm.questBook.optionLinks=Connected to %s quest(s) through option links.
-hqm.questBook.childUnlocks=Unlocks %s quest(s) elsewhere.
+hqm.questBook.optionLinks=Connected to %s [[quest||quests]] through option links.
+hqm.questBook.childUnlocks=Unlocks %s [[quest||quests]] elsewhere.
 hqm.questBook.ctrlNonEditor=Hold Ctrl to see this as a non-editor.
 hqm.questBook.resetQuest=Click to reset quest
 hqm.questBook.completeQuest=Click to complete quest
@@ -512,12 +513,12 @@ hqm.questBook.warning=WARNING!
 hqm.questBook.deleteOnClick=You're now deleting everything you click on!
 hqm.questBook.goBack=Go back
 hqm.questBook.rightClick=You can also right click anywhere
-hqm.questBook.totalQuests=%s quest(s) in total
-hqm.questBook.unlockedQuests=%s unlocked quests(s)
-hqm.questBook.completedQuests=%s completed quests(s)
-hqm.questBook.availableQuests=%s quests(s) available for completion
-hqm.questBook.unclaimedQuests=%s quests(s) with unclaimed rewards
-hqm.questBook.inclInvisiQuests=%s quests(s) including invisible ones
+hqm.questBook.totalQuests=%s [[quest||quests]] in total
+hqm.questBook.unlockedQuests=%s unlocked [[quest||quests]]
+hqm.questBook.completedQuests=%s completed [[quest||quests]]
+hqm.questBook.availableQuests=%s [[quest||quests]] available for completion
+hqm.questBook.unclaimedQuests=%s [[quest||quests]] with unclaimed rewards
+hqm.questBook.inclInvisiQuests=%s [[quest||quests]] including invisible ones
 hqm.questBook.moreInfo=Click here for more info
 
 # ======================================

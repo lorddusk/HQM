@@ -58,7 +58,7 @@ public class PlayerTracker {
 
 
     private void sendLoginMessage(EntityPlayer player) {
-		player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore")+ " " + Translator.translate("hqm.message.livesLeft", getRemainingLives(player))));
+		player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore")+ " " + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))));
 		
 	}
 
