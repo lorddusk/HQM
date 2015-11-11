@@ -3,8 +3,7 @@ package hardcorequesting.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Util;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -13,14 +12,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class BlockDelivery extends BlockContainer {
+public class BlockDelivery extends BlockContainer
+{
 
-    public BlockDelivery() {
+    public BlockDelivery()
+    {
         super(Material.wood);
         setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
@@ -32,73 +32,78 @@ public class BlockDelivery extends BlockContainer {
     @SideOnly(Side.CLIENT)
     private IIcon emptyIcon;
 
-    private String line;
-
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister icon) {
+    public void registerBlockIcons(IIconRegister icon)
+    {
         pickIcons(icon);
     }
 
-    public void pickIcons(IIconRegister icon){
-            activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON);
-            emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON_EMPTY);
+    public void pickIcons(IIconRegister icon)
+    {
+        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON);
+        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON_EMPTY);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int side, int meta) {
+    public IIcon getIcon(int side, int meta)
+    {
         return getIconFromSideAndMeta(side, 1); //pretend we have meta data 1 (it being active)
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
+    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
+    {
         return getIconFromSideAndMeta(side, world.getBlockMetadata(x, y, z));
     }
 
     @SideOnly(Side.CLIENT)
-    private IIcon getIconFromSideAndMeta(int side, int meta) {
+    private IIcon getIconFromSideAndMeta(int side, int meta)
+    {
         return side == 0 || side == 1 || meta == 0 ? emptyIcon : activeIcon;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int i) {
+    public TileEntity createNewTileEntity(World world, int i)
+    {
         return new TileEntityBarrel();
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
+    {
 
-        if (player != null) {
-            if (player.inventory.getCurrentItem() == null) {
-                if (!world.isRemote) {
+        if (player != null)
+        {
+            if (player.inventory.getCurrentItem() == null)
+            {
+                if (!world.isRemote)
+                {
                     TileEntity te = world.getTileEntity(x, y, z);
-                    if (te != null && te instanceof TileEntityBarrel) {
-                        if (((TileEntityBarrel) te).getCurrentTask() != null && te.getBlockMetadata() == 1) {
-                            line = "The QDS is currently bound to '" + Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName() + "'";
-                            player.addChatComponentMessage(Util.getChatComponent(line, EnumChatFormatting.WHITE));
-                        } else {
-                            line = "You currently have not bound a quest to the QDS";
-                            player.addChatComponentMessage(Util.getChatComponent(line, EnumChatFormatting.WHITE));
-                        }
+                    if (te != null && te instanceof TileEntityBarrel)
+                    {
+                        if (((TileEntityBarrel) te).getCurrentTask() != null && te.getBlockMetadata() == 1)
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.boundTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
+                        else
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.nonBound"));
                     }
                 }
                 return true;
-            } else if (player.inventory.getCurrentItem().getItem() == ModItems.book) {
-                if (!world.isRemote) {
+            } else if (player.inventory.getCurrentItem().getItem() == ModItems.book)
+            {
+                if (!world.isRemote)
+                {
                     TileEntity te = world.getTileEntity(x, y, z);
-                    if (te != null && te instanceof TileEntityBarrel) {
+                    if (te != null && te instanceof TileEntityBarrel)
+                    {
                         ((TileEntityBarrel) te).storeSettings(player);
 
-                        if (((TileEntityBarrel) te).getCurrentTask() != null) {
-                            line = "You bound '" + Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName() + "' to the QDS";
-                            player.addChatComponentMessage(Util.getChatComponent(line, EnumChatFormatting.WHITE));
-                        } else {
-                            line = "You currently have not selected any tasks";
-                            player.addChatComponentMessage(Util.getChatComponent(line, EnumChatFormatting.WHITE));
-                        }
-
+                        if (((TileEntityBarrel) te).getCurrentTask() != null)
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
+                        else
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;
@@ -109,12 +114,14 @@ public class BlockDelivery extends BlockContainer {
     }
 
 
-    public boolean hasComparatorInputOverride() {
+    public boolean hasComparatorInputOverride()
+    {
         return true;
     }
 
 
-    public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
+    public int getComparatorInputOverride(World world, int x, int y, int z, int side)
+    {
         return world.getBlockMetadata(x, y, z) == 1 ? 15 : 0;
     }
 }

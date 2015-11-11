@@ -1,9 +1,9 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.Translator;
 import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.tileentity.TrackerType;
 import net.minecraft.entity.player.EntityPlayer;
-
 
 public class GuiEditMenuTracker extends GuiEditMenuExtended {
     private TileEntityTracker tracker;
@@ -13,7 +13,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
 
         this.tracker = tracker;
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Player Radius") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTracker.radius.title") {
             @Override
             protected void setValue(int number) {
                 tracker.setRadius(number);
@@ -28,7 +28,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
             protected void draw(GuiBase gui, boolean selected) {
                 super.draw(gui, selected);
 
-                gui.drawString(gui.getLinesFromText("Only includes players within the given distance. Leaving this at zero makes it detect any player, even offline ones.", 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
         });
     }
@@ -37,7 +37,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
 
-        gui.drawCenteredString(tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : "No quest selected", 0, 5, 1F, 170, 20, 0x404040);
+        gui.drawCenteredString(tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translate("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     }
 
     @Override

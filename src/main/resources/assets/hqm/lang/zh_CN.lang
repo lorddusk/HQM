@@ -1,0 +1,164 @@
+# ======================================
+#		 TRANSLATE GUIDELINES
+# ======================================
+# %s is where something will be filled in at runtime.|致翻译者: %s会在实际游戏中替换为有意义的文本,
+# Don't remove it since it will make things weird.|请不要随意删除%s,否则会导致实际文本各种闹鬼
+# Just put it on the correct place in the sentence.|只需把%s放在正确的位置即可(也就是说,保证%s所在位置合乎汉语语法)
+
+# ======================================
+#				GENERAL
+# ======================================
+itemGroup.hqm=极限任务模式
+hqm.message.noHardcore=本服务器当前未启用极限任务模式.
+hqm.message.hardcore=本服务器当前已启用极限任务模式!
+hqm.message.livesLeft=你现在还剩下%s次生命.
+hqm.message.lostLife=你刚刚失去了一次生命.你现在还剩下%s次生命.
+hqm.message.lostTeamLife=%s刚刚失去了一次生命%s.你们现在还剩下%s次生命.
+hqm.message.andBanned=并被封禁.
+hqm.message.gameOver=你失去了全部的生命.游戏已经结束了,没错,一切都已经结束了!
+hqm.message.vanillaHardcore=极限任务模式不能和原版极限模式同时工作.尝试关闭中...
+hqm.message.vanillaHardcoreOverride=原版极限模式已禁用.请重新打开存档以完成禁用流程.
+
+# ======================================
+#				BLOCKS
+# ======================================
+tile.hqm:item_barrel.name=任务提交系统
+tile.hqm:quest_tracker.name=任务追踪系统
+tile.hqm:quest_portal_0.name=任务门系统
+tile.hqm:quest_portal_1.name=坚实之墙
+tile.hqm:quest_portal_2.name=魔法壁垒
+
+# ======================================
+#				ITEMS
+# ======================================
+item.hqm:quest_book_0.name=任务手册
+item.hqm:quest_book_1.name=任务手册---管理员版
+item.hqm:hearts_quarterheart.name=四分之一红心
+item.hqm:hearts_halfheart.name=半个红心
+item.hqm:hearts_threequarts.name=四分之三红心
+item.hqm:hearts_heart.name=完整红心
+item.hqm:hearts_rottenheart.name=腐烂红心
+item.hqm:bags.name=奖励袋子
+item.hqm:hqmInvalidItem.name=无效物品
+
+# ======================================
+#			TEAM SETTINGS
+# ======================================
+hqm.team.sharedLives.title=共享生命
+hqm.team.sharedLives.desc=所有人的生命都将汇总入共享生命池中,任何一个人的死亡都会导致生命从共享生命池中直接扣除.每个人都需要至少一次生命来确保游戏进行下去,所以如果你的死亡导致了生命数不足,你将会立刻被封禁,而其他玩家则可以继续游戏.
+hqm.team.individualLives.title=独享生命
+hqm.team.individualLives.desc=所有人的生命都将单独统计.若你失去了所有生命,你将会出局,而你的团队成员将会继续用他们的生命进行游戏.
+hqm.team.allReward.title=多重奖励
+hqm.team.allReward.desc=所有团队成员均可在任务完成后申领奖励.该选项可以带来最多的奖励,同时你可以在配置文件中禁用此选项.
+hqm.team.anyReward.title=共享奖励
+hqm.team.anyReward.desc=团队每完成一个任务,将只能领取一份奖励.玩家们必须赶在别人没有申领之前申领奖励.
+hqm.team.randomReward.title=随机奖励
+hqm.team.randomReward.desc=每当有任务完成,奖励将会随机选取并自动分发到玩家手中.只有完成任务的那个玩家有权申领奖励.
+hqm.team.invalidPlayer.title=邀请错误
+hqm.team.invalidPlayer.desc=无法找到该玩家.被邀请的玩家需要至少登录过一次本服务器.
+hqm.team.playerInParty.title=邀请错误
+hqm.team.playerInParty.desc=你不能邀请已属于某团队的玩家加入.
+hqm.team.usedTeamName.title=团队错误
+hqm.team.usedTeamName.desc=该团队名已被使用.
+
+# ======================================
+#			DEATH TYPES
+# ======================================
+hqm.deathType.lava=熔岩
+hqm.deathType.fire=火焰
+hqm.deathType.suffocation=窒息
+hqm.deathType.thorns=荆棘
+hqm.deathType.drowning=溺水
+hqm.deathType.starvation=饥饿
+hqm.deathType.fall=摔落
+hqm.deathType.void=虚空
+hqm.deathType.crushed=粉碎
+hqm.deathType.explosions=爆炸
+hqm.deathType.monsters=怪物击杀
+hqm.deathType.otherPlayers=玩家击杀
+hqm.deathType.magic=魔法
+hqm.deathType.rottenHearts=腐烂红心
+hqm.deathType.other=其他/未知
+
+# ======================================
+#			DEATH STATS
+# ======================================
+hqm.deathStat.first=第一
+hqm.deathStat.second=第二
+hqm.deathStat.third=第三
+hqm.deathStat.worstPlayers=最悲惨的玩家
+hqm.deathStat.everyone=所有人
+hqm.deathStat.noOneDied=还没有人以这种方式死去.
+hqm.deathStat.payer=玩家
+hqm.deathStat.payers=玩家
+hqm.deathStat.diedThisWay=以这种方式死亡.
+
+# ======================================
+#			TRACKER TYPES
+# ======================================
+hqm.tracker.team.title=团队追踪器
+hqm.tracker.team.desc=根据当前完成被选中的任务的团队总数,发射对应强度的红石信号.无团队的玩家将按照单人团队计算(也就是一人一团队).
+hqm.tracker.player.title=玩家追踪器
+hqm.tracker.player.desc=根据当前完成此任务的玩家总数,发射对应强度的红石信号.
+hqm.tracker.progressMax.title=进度追踪器(进度优先)
+hqm.tracker.progressMax.desc=根据当前进度最快的玩家(或团队)的任务完成进度,发射对应强度的红石信号.该追踪器只会在有人完成所有任务时发出最强信号.
+hqm.tracker.progressClose.title=进度追踪器(距离优先)
+hqm.tracker.progressClose.desc=根据当前距离追踪器最近的玩家的任务完成进度,发射对应强度的红石信号.该追踪器只会在有人完成所有任务时发出最强信号.不论检测半径设定为多大,该追踪器需要玩家保持在线.
+
+# ======================================
+#			PORTAL TYPES
+# ======================================
+hqm.portal.tech.title=科技主题
+hqm.portal.tech.desc=这一套主题适合科技主题地图.
+hqm.portal.magic.title=魔法主题
+hqm.portal.magic.desc=这一套主题适合魔法主题地图.
+hqm.portal.custom.title=自定义主题
+hqm.portal.custom.desc=自定义此方块的外貌.
+
+
+# ======================================
+#				COMMAND
+# ======================================
+
+hqm.command.notFound=没有找到命令
+hqm.command.noPermission=你没有权限使用这个命令
+hqm.command.loadFailed=加载失败
+hqm.command.loadSuccess=已加载: %s
+hqm.command.fileNotFound=文件未找到
+hqm.command.saveFailed=保存%s时失败
+hqm.command.savedTo=任务已保存至: %s
+hqm.command.questNotFound=任务页%s未找到
+
+hqm.command.info.help.start=可用指令有:
+hqm.command.help.syntax0=/hqm help <command>
+hqm.command.help.info0=显示对应指令的用法.
+hqm.command.version.syntax0=/hqm version
+hqm.command.version.info0=获取模组版本.
+hqm.command.hardcore.syntax0=/hqm hardcore
+hqm.command.hardcore.info0=启用极限模式.
+hqm.command.quest.syntax0=/hqm quest
+hqm.command.quest.info0=启用任务模式.
+hqm.command.enable.syntax0=/hqm enable
+hqm.command.enable.info0=同时启用极限模式和任务模式.
+hqm.command.edit.syntax0=/hqm edit <player>
+hqm.command.edit.info0=给予玩家一本处于编辑模式的任务书,默认为给予当前玩家.
+hqm.command.lives.syntax0=/hqm lives
+hqm.command.lives.info0=获取当前剩余生命数.
+hqm.command.lives.syntax1=/hqm lives [player]
+hqm.command.lives.info1=获取指定玩家的剩余生命数.
+hqm.command.lives.syntax2=/hqm lives add <player> <amount>
+hqm.command.lives.info2=增加指定玩家生命数,默认为增加当前玩家1次生命.
+hqm.command.lives.syntax3=/hqm lives remove <player> <amount>
+hqm.command.lives.info3=减少指定玩家生命数,默认为减少当前玩家1次生命.
+hqm.command.load.syntax0=/hqm load [filename]
+hqm.command.load.info0=载入指定的任务到HQM.
+hqm.command.load.syntax1=/hqm load all
+hqm.command.load.info1=载入全部任务至HQM.
+hqm.command.save.syntax2=/hqm load bags
+hqm.command.save.info2=从JSON文件中载入全部奖励袋等级和内容信息(已有设定不会被加载).
+hqm.command.save.syntax0=/hqm save [Quest Page] <filename>
+hqm.command.save.info0=保存指定任务页信息为JSON格式文件.
+hqm.command.save.syntax1=/hqm save all
+hqm.command.save.info1=保存全部任务页并以对应名字命名.
+hqm.command.save.syntax2=/hqm save bags
+hqm.command.save.info2=保存全部奖励袋等级信息为JSON文件.

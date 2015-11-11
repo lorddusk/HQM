@@ -1,12 +1,11 @@
 package hardcorequesting.quests;
 
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
@@ -16,12 +15,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.StringUtils;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 import java.util.Arrays;
-
 
 public class QuestTaskMob extends QuestTask {
 
@@ -237,11 +233,11 @@ public class QuestTaskMob extends QuestTask {
 
             int killed = killed(i, player);
             if (killed == mob.count) {
-                gui.drawString(GuiColor.GREEN  + "All killed", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.mobTask.allKilled"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }else {
-                gui.drawString(killed + "[" + (100 * killed / mob.count) + "%] killed", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(Translator.translate("hqm.mobTask.partKills", killed, (100 * killed / mob.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
-            gui.drawString("Kill a total of " + mob.count, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
+            gui.drawString(Translator.translate("hqm.mobTask.totalKills", mob.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
         }
     }
 

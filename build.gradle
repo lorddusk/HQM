@@ -20,9 +20,9 @@ apply plugin: 'forge'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-version = "4.3.0"
+version = "4.3.2"
 group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "HQM-The Journey"
+archivesBaseName = "HQM - The Journey"
 
 minecraft {
     version = "10.13.4.1448-1.7.10"
@@ -78,7 +78,7 @@ repositories {
 }
 
 dependencies {
-    compile "mcp.mobius.waila:Waila:1.5.3_1.7.10"
+    compile "mcp.mobius.waila:Waila:1.5.10_1.7.10"
 }
 
 task copyChicken(type: Copy, dependsOn: "extractUserDev") {

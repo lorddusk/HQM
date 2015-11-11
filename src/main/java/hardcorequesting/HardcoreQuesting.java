@@ -7,9 +7,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
 import cpw.mods.fml.common.network.FMLEventChannel;
-import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.relauncher.Side;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
@@ -22,30 +20,28 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
 public class HardcoreQuesting
 {
-	
 
     @Instance(ModInformation.ID)
     public static HardcoreQuesting instance;
 
     @SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
     public static CommonProxy proxy;
-    public static CreativeTabs HQMTab = new HQMTab(CreativeTabs.getNextID(), "Hardcore Questing Mode");
+    public static CreativeTabs HQMTab = new HQMTab();
 
     public static String path;
-    public static File savedWorldPath = null;
-    
-    public static HashMap<String, Boolean> loaded = new HashMap<String, Boolean>();
 
     public static File configDir;
 
     public static FMLEventChannel packetHandler;
 
     private static EntityPlayer commandUser;
+    public static File savedWorldPath = null;
+    
+    public static HashMap<String, Boolean> loaded = new HashMap<String, Boolean>();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -86,14 +82,13 @@ public class HardcoreQuesting
         ModItems.registerRecipes();
         ModBlocks.registerRecipes();
 
-        //FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
+        FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
         Quest.init(path);
-
     }
 
 

@@ -5,12 +5,7 @@ import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.EventHandler;
-import hardcorequesting.FileVersion;
-import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Team;
-import hardcorequesting.TeamStats;
+import hardcorequesting.*;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.*;
@@ -124,18 +119,26 @@ public abstract class QuestTask {
         return null;
     }
 
-    public String getDescription() {
+    public String getLangKeyDescription() {
         return description;
     }
 
-    public String getLongDescription() {
+    public String getDescription() {
+        return Translator.translate(description);
+    }
+
+    public String getLangKeyLongDescription() {
         return longDescription;
+    }
+
+    public String getLongDescription() {
+        return Translator.translate(longDescription);
     }
 
     @SideOnly(Side.CLIENT)
     public List<String> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(longDescription, 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(Translator.translate(longDescription), 0.7F, 130);
         }
 
         return cachedDescription;

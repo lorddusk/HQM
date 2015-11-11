@@ -1,10 +1,10 @@
 package hardcorequesting.quests;
 
-
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 
 public enum TriggerType {
-    NONE("Normal Quest", "Just a normal quest.", false, false) {
+    NONE("none", false, false) {
         @Override
         public boolean isQuestVisible(Quest quest, String playerName) {
             return true;
@@ -15,14 +15,14 @@ public enum TriggerType {
             return null;
         }
     },
-    QUEST_TRIGGER("Trigger Quest", "A trigger quest is an invisible quest. The quest can still be completed as usual but you can't claim any rewards for it or see it in any lists. It can be used to trigger other quests, hence its name.", false, true) {
+    QUEST_TRIGGER("quest", false, true) {
         @Override
         public boolean isQuestVisible(Quest quest, String playerName) {
             return false;
         }
 
     },
-    TASK_TRIGGER("Trigger Tasks", "Trigger tasks are the first few tasks of a quest that have to be completed before the quest shows up. The quest will be invisible until the correct amount of tasks have been completed. When the quest becomes visible the player can see the tasks that have already been completed.", true, true) {
+    TASK_TRIGGER("task", true, true) {
         @Override
         public boolean isQuestVisible(Quest quest, String playerName) {
             if (quest.getTriggerTasks() >= quest.getTasks().size()) {
@@ -37,31 +37,29 @@ public enum TriggerType {
             return super.getMessage(quest) + " (" + quest.getTriggerTasks() + ")";
         }
     },
-    ANTI_TRIGGER("Reversed Trigger", "This quest will be invisible until it is enabled (all its parent quests are completed). This way you can make a secret quest line appear all of a sudden when a known quest is completed.", false, false) {
+    ANTI_TRIGGER("anti", false, false) {
         @Override
         public boolean isQuestVisible(Quest quest, String playerName) {
             return quest.isEnabled(playerName, false);
         }
     };
 
-    private String name;
-    private String description;
+    private String id;
     private boolean useTaskCount;
     private boolean workAsInvisible;
 
-    TriggerType(String name, String description, boolean useTaskCount, boolean workAsInvisible) {
-        this.name = name;
-        this.description = description;
+    TriggerType(String id, boolean useTaskCount, boolean workAsInvisible) {
+        this.id = id;
         this.useTaskCount = useTaskCount;
         this.workAsInvisible = workAsInvisible;
     }
 
     public String getName() {
-        return name;
+        return Translator.translate("hqm.trigger." + id + ".title");
     }
 
     public String getDescription() {
-        return description;
+        return Translator.translate("hqm.trigger." + id + ".desc");
     }
 
     public boolean isUseTaskCount() {

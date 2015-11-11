@@ -4,7 +4,6 @@ import hardcorequesting.quests.ItemPrecision;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
-
 public class GuiEditMenuItemPortal extends GuiEditMenuItem {
     private GuiEditMenuPortal parent;
     public GuiEditMenuItemPortal(GuiBase gui, GuiEditMenuPortal parent, EntityPlayer player, ItemStack item) {
@@ -15,7 +14,7 @@ public class GuiEditMenuItemPortal extends GuiEditMenuItem {
 
     @Override
     protected void save(GuiBase gui) {
-        if (selected instanceof ElementItem && (ItemStack)selected.getItem() != null) {
+        if (selected instanceof ElementItem && selected.getItem() != null) {
             parent.setItem((ItemStack)selected.getItem());
         }
     }

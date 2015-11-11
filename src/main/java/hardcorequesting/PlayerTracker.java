@@ -3,76 +3,66 @@ package hardcorequesting;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
+import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 
 public class PlayerTracker {
 
-
-    public PlayerTracker() {
-        FMLCommonHandler.instance().bus().register(this);
-    }
-
+	public PlayerTracker() {
+		FMLCommonHandler.instance().bus().register(this);
+	}
 
 	public int getRemainingLives(ICommandSender sender) {
-		return  QuestingData.getQuestingData((EntityPlayer) sender).getLives();
+		return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
 	}
 
-		
-    @SubscribeEvent
+	@SubscribeEvent
 	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        EntityPlayer player = event.player;
-        if (!QuestingData.hasData(player)) {
-            QuestingData.getQuestingData(player).getDeathStat().refreshSync();
-            //TODO Load Player here.
-        }
+		EntityPlayer player = event.player;
+		if (!QuestingData.hasData(player)) {
+			QuestingData.getQuestingData(player).getDeathStat().refreshSync();
+		}
 
-        QuestLine.sendServerSync(player);
+		QuestLine.sendServerSync(player);
 
-		if(QuestingData.isHardcoreActive())
+		if (QuestingData.isHardcoreActive())
 			sendLoginMessage(player);
-		else
-			player.addChatMessage(new ChatComponentText("This server doesn\'t have Hardcore Questing Mode enabled."));
+		else if (ModConfig.NO_HARDCORE_MESSAGE)
+			player.addChatMessage(new ChatComponentTranslation("hqm.message.noHardcore"));
 
-        NBTTagCompound tags = player.getEntityData();
-        if(tags.hasKey("HardcoreQuesting")) {
-            if (tags.getCompoundTag("HardcoreQuesting").getBoolean("questBook")) {
-                QuestingData.getQuestingData(player).receivedBook = true;
-            }
-            if (QuestingData.isQuestActive()) {
-                tags.removeTag("HardcoreQuesting");
-            }
-        }
+		NBTTagCompound tags = player.getEntityData();
+		if (tags.hasKey("HardcoreQuesting")) {
+			if (tags.getCompoundTag("HardcoreQuesting").getBoolean("questBook")) {
+				QuestingData.getQuestingData(player).receivedBook = true;
+			}
+			if (QuestingData.isQuestActive()) {
+				tags.removeTag("HardcoreQuesting");
+			}
+		}
 
-
-
-        QuestingData.spawnBook(player);
+		QuestingData.spawnBook(player);
 
 	}
 
+	private void sendLoginMessage(EntityPlayer player) {
+		player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore") + " "
+				+ Translator.translate("hqm.message.livesLeft", getRemainingLives(player))));
 
-
-    private void sendLoginMessage(EntityPlayer player) {
-		player.addChatMessage(new ChatComponentText("This server currently has"
-                + " Hardcore Questing Mode enabled! You currently have " + getRemainingLives(player) + " live(s) left."));
-		
 	}
 
-    @SubscribeEvent
+	@SubscribeEvent
 	public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        EntityPlayer player = event.player;
-        if (!player.worldObj.isRemote) {
-            PacketHandler.remove(player);
-        }
-        QuestingData.savePlayerData(player.getDisplayName());
-    }
-
-
-
-	
+		EntityPlayer player = event.player;
+		if (!player.worldObj.isRemote) {
+			PacketHandler.remove(player);
+			QuestingData.savePlayerData(player.getDisplayName());
+		}
+	}
 
 }

@@ -1,47 +1,47 @@
 package hardcorequesting.quests;
 
-
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import net.minecraft.entity.player.EntityPlayer;
 
 public enum  RepeatType {
-    NONE("Not repeatable", "This quest is not repeatable and can therefore only be completed once.", false) {
+    NONE("none", false) {
         @Override
         public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
             return null;
         }
     },
-    INSTANT("Instant repeat", "As soon as this quest is completed it can be completed again for another set of rewards", false) {
+    INSTANT("instant", false) {
         @Override
         public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + "Instant Cooldown";
+            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + Translator.translate("hqm.repeat.instant.message");
         }
 
         @Override
         public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + "Instant Cooldown";
+            return GuiColor.YELLOW + Translator.translate("hqm.repeat.instant.message");
         }
     },
-    INTERVAL("Interval repeat", "At a specific interval this quest will be reset and available for completion again. The quest is only reset if it has already been completed.", true) {
+    INTERVAL("interval", true) {
         @Override
         public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + "Refreshes on interval\n" + formatTime(days, hours) + "\n" + formatResetTime(quest, player, days, hours);
+            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + Translator.translate("hqm.repeat.interval.message") + "\n" + formatTime(days, hours) + "\n" + formatResetTime(quest, player, days, hours);
         }
 
         @Override
         public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + "Refreshes on interval (" + days + ":" + hours + ")";
+            return GuiColor.YELLOW +  Translator.translate("hqm.repeat.interval.message") + " (" + days + ":" + hours + ")";
         }
     },
-    TIME("Cooldown repeat", "After completing this quest it goes on a cooldown, when this cooldown ends you can complete the quest again.", true) {
+    TIME("time", true) {
         @Override
         public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + "Cooldown on completion\n" + formatTime(days, hours) + formatRemainingTime(quest, player, days, hours);
+            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + Translator.translate("hqm.repeat.time.message") + "\n" + formatTime(days, hours) + formatRemainingTime(quest, player, days, hours);
         }
 
         @Override
         public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + "Cooldown on completion (" + days + ":" + hours + ")";
+            return GuiColor.YELLOW + Translator.translate("hqm.repeat.time.message") + " (" + days + ":" + hours + ")";
         }
     };
 
@@ -61,7 +61,7 @@ public enum  RepeatType {
 
     private static String formatResetTime(Quest quest, EntityPlayer player, int days, int hours) {
         if (days == 0 && hours == 0) {
-            return GuiColor.RED + "Invalid time";
+            return GuiColor.RED + Translator.translate("hqm.repeat.invalid");
         }
 
         int total = days * 24 + hours;
@@ -71,9 +71,9 @@ public enum  RepeatType {
         int resetHours = resetHoursTotal % 24;
 
         if (!quest.isAvailable(player)) {
-            return GuiColor.YELLOW + "Resets in " + formatTime(resetDays, resetHours);
+            return GuiColor.YELLOW + Translator.translate("hqm.repeat.resetIn", formatTime(resetDays, resetHours));
         }else{
-            return GuiColor.GRAY + "Next reset: " + formatTime(resetDays, resetHours);
+            return GuiColor.GRAY + Translator.translate("hqm.repeat.nextReset", formatTime(resetDays, resetHours));
         }
     }
 
@@ -84,11 +84,11 @@ public enum  RepeatType {
         }
         str += days;
         str += " ";
-        str += days == 1 ? "day" : "days";
+        str += Translator.translate("hqm.repeat." + (days == 1 ? "day" : "days"));
 
         str += GuiColor.GRAY;
 
-        str += " and ";
+        str += " " + Translator.translate("hqm.repeat.and") + " ";
 
         if (hours > 0) {
             str += GuiColor.LIGHT_GRAY;
@@ -96,36 +96,34 @@ public enum  RepeatType {
 
         str += hours;
         str += " ";
-        str += hours == 1 ? "hour" : "hours";
+        str += Translator.translate("hqm.repeat." + (hours == 1 ? "hour" : "hours"));
 
         return str;
     }
 
-    RepeatType(String name, String description, boolean useTime) {
-        this.name = name;
-        this.description = description;
+    RepeatType(String id, boolean useTime) {
+        this.id = id;
         this.useTime = useTime;
     }
 
     public String getName() {
-        return name;
+        return Translator.translate("hqm.repeat." + id + ".title");
     }
 
     public String getDescription() {
-        return description;
+        return  Translator.translate("hqm.repeat." + id + ".desc");
     }
 
     public boolean isUseTime() {
         return useTime;
     }
 
-    private String name;
-    private String description;
+    private String id;
     private boolean useTime;
 
 
     public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
-        return GuiColor.YELLOW + "Repeatable Quest\n";
+        return GuiColor.YELLOW + Translator.translate("hqm.repeat.repeatable") + "\n";
     }
 
     public String getShortMessage(int days, int hours) {

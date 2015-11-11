@@ -1,10 +1,6 @@
 package hardcorequesting.quests;
 
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
@@ -12,18 +8,13 @@ import hardcorequesting.QuestingData;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.network.DataReader;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StringUtils;
 
 public class QuestTaskItemsCrafting extends QuestTaskItems {
     public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventHandler.Type.CRAFTING);
     }
-
-
-
 
     @Override
     public void onUpdate(EntityPlayer player, DataReader dr) {

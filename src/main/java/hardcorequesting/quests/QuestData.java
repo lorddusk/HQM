@@ -1,6 +1,5 @@
 package hardcorequesting.quests;
 
-
 import java.io.Serializable;
 
 import hardcorequesting.QuestingData;
@@ -8,8 +7,14 @@ import hardcorequesting.Team;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class QuestData implements Serializable {
-	
-    public QuestData(boolean[] reward, boolean completed, boolean claimed, QuestDataTask[] tasks, boolean available,
+	public boolean[] reward;
+	public boolean completed;
+	public boolean claimed;
+	public QuestDataTask[] tasks;
+	public boolean available = true;
+	public int time;
+
+	public QuestData(boolean[] reward, boolean completed, boolean claimed, QuestDataTask[] tasks, boolean available,
 			int time) {
 		super();
 		this.reward = reward;
@@ -20,55 +25,49 @@ public class QuestData implements Serializable {
 		this.time = time;
 	}
 
+	public QuestData(int players) {
+		reward = new boolean[players];
+	}
+	
+	@Override
+	public String toString(){
+		return "Completed: "+ completed +"  claimed: "+claimed;
+	}
 
-	public boolean[] reward;
-    public boolean completed;
-    public boolean claimed;
-    public QuestDataTask[] tasks;
-    public boolean available = true;
-    public int time;
+	public boolean getReward(EntityPlayer player) {
+		int id = getId(player);
+		if (id >= 0 && id < reward.length) {
+			return reward[id];
+		} else {
+			return true;
+		}
+	}
 
-    public QuestData(int players) {
-        reward = new boolean[players];
-    }
+	public void claimReward(EntityPlayer player) {
+		int id = getId(player);
+		if (id >= 0 && id < reward.length) {
+			reward[id] = false;
+		}
+	}
 
+	private int getId(EntityPlayer player) {
+		Team team = QuestingData.getQuestingData(player).getTeam();
+		int id = 0;
+		for (Team.PlayerEntry entry : team.getPlayers()) {
+			if (entry.isInTeam()) {
+				if (entry.getName().equals(QuestingData.getUserName(player))) {
+					return id;
+				}
+				id++;
+			}
+		}
 
-    public boolean getReward(EntityPlayer player) {
-        int id = getId(player);
-        if (id >= 0 && id < reward.length) {
-            return reward[id];
-        }else{
-            return true;
-        }
-    }
+		return -1;
+	}
 
-    public void claimReward(EntityPlayer player) {
-        int id = getId(player);
-        if (id >= 0 && id < reward.length) {
-            reward[id] = false;
-        }
-    }
-
-    private int getId(EntityPlayer player) {
-        Team team = QuestingData.getQuestingData(player).getTeam();
-        int id = 0;
-        for (Team.PlayerEntry entry : team.getPlayers()) {
-            if (entry.isInTeam()) {
-                if (entry.getName().equals(QuestingData.getUserName(player))) {
-                    return id;
-                }
-                id++;
-            }
-        }
-
-        return -1;
-    }
-
-
-    public boolean canClaim() {
-        return completed && !claimed;
-    }
-
+	public boolean canClaim() {
+		return completed && !claimed;
+	}
 
 	/**
 	 * @return the reward
@@ -77,14 +76,13 @@ public class QuestData implements Serializable {
 		return reward;
 	}
 
-
 	/**
-	 * @param reward the reward to set
+	 * @param reward
+	 *            the reward to set
 	 */
 	public void setReward(boolean[] reward) {
 		this.reward = reward;
 	}
-
 
 	/**
 	 * @return the completed
@@ -93,14 +91,13 @@ public class QuestData implements Serializable {
 		return completed;
 	}
 
-
 	/**
-	 * @param completed the completed to set
+	 * @param completed
+	 *            the completed to set
 	 */
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
-
 
 	/**
 	 * @return the claimed
@@ -109,14 +106,13 @@ public class QuestData implements Serializable {
 		return claimed;
 	}
 
-
 	/**
-	 * @param claimed the claimed to set
+	 * @param claimed
+	 *            the claimed to set
 	 */
 	public void setClaimed(boolean claimed) {
 		this.claimed = claimed;
 	}
-
 
 	/**
 	 * @return the tasks
@@ -125,14 +121,13 @@ public class QuestData implements Serializable {
 		return tasks;
 	}
 
-
 	/**
-	 * @param tasks the tasks to set
+	 * @param tasks
+	 *            the tasks to set
 	 */
 	public void setTasks(QuestDataTask[] tasks) {
 		this.tasks = tasks;
 	}
-
 
 	/**
 	 * @return the available
@@ -141,14 +136,13 @@ public class QuestData implements Serializable {
 		return available;
 	}
 
-
 	/**
-	 * @param available the available to set
+	 * @param available
+	 *            the available to set
 	 */
 	public void setAvailable(boolean available) {
 		this.available = available;
 	}
-
 
 	/**
 	 * @return the time
@@ -157,9 +151,9 @@ public class QuestData implements Serializable {
 		return time;
 	}
 
-
 	/**
-	 * @param time the time to set
+	 * @param time
+	 *            the time to set
 	 */
 	public void setTime(int time) {
 		this.time = time;

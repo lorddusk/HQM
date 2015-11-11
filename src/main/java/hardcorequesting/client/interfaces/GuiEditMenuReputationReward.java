@@ -1,7 +1,7 @@
 package hardcorequesting.client.interfaces;
 
-
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.reputation.Reputation;
@@ -25,7 +25,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         }
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Reward value") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repReward.value") {
             @Override
             protected int getValue() {
                 return selectedReward.getValue();
@@ -47,7 +47,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         });
 
-        buttons.add(new LargeButton("Create new", 20, 20) {
+        buttons.add(new LargeButton("hqm.repReward.create", 20, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return GuiEditMenuReputationReward.this.rewards.size() < DataBitHelper.REPUTATION_REWARD.getMaximum();
@@ -64,7 +64,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         });
 
-        buttons.add(new LargeButton("Delete", 80, 20) {
+        buttons.add(new LargeButton("hqm.repReward.delete", 80, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -103,7 +103,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         }else{
             if (error == null) {
-                error = gui.getLinesFromText("There are no valid reputations to choose from. Please go to the reputation menu (click on the reputation button on the left hand side of the book when browsing the main menu) and create at least one first.", 0.7F, 140);
+                error = gui.getLinesFromText(Translator.translate("hqm.repReward.noValidReps"), 0.7F, 140);
             }
 
             gui.drawString(error, START_X, ERROR_Y, 0.7F, 0x404040);

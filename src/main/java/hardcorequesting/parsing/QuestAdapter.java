@@ -40,10 +40,10 @@ public class QuestAdapter {
 
         @Override
         public void write(JsonWriter out, QuestTaskItems.ItemRequirement value) throws IOException {
-            ItemStack item = value.item;
+            ItemStack item = value.getItem();
             Fluid fluid = value.fluid;
             int required = value.required;
-            ItemPrecision precision = value.precision;
+            ItemPrecision precision = value.getPrecision();
             out.beginObject();
             if (item != null) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), item);
@@ -92,7 +92,7 @@ public class QuestAdapter {
             } else {
                 return null;
             }
-            result.precision = precision;
+            result.setPrecision(precision);
             return result;
         }
     };
@@ -585,14 +585,14 @@ public class QuestAdapter {
         private final String X = "x";
         private final String Y = "y";
         private final String ICON = "icon";
-        private final String BIG_ICON = "bigIcon";
+        private final String BIG_ICON = "bigicon";
         private final String REQUIREMENTS = "requirements";
         private final String PREREQUISITES = "prerequisites";
         private final String OPTIONS = "options";
         private final String OPTIONLINKS = "optionlinks";
         private final String REPEAT = "repeat";
         private final String TRIGGER = "trigger";
-        private final String TRIGGER_TASKS = "triggerTasks";
+        private final String TRIGGER_TASKS = "triggertasks";
         private final String PARENT_REQUIREMENT = "parentrequirement";
         private final String TASKS = "tasks";
         private final String REWARDS = "reward";

@@ -3,7 +3,6 @@ package hardcorequesting;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import hardcorequesting.Team.PlayerEntry;
-import hardcorequesting.Team.UpdateType;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -14,7 +13,6 @@ import hardcorequesting.network.*;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.reputation.Reputation;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +24,7 @@ import net.minecraft.server.management.UserListBans;
 import net.minecraft.server.management.UserListBansEntry;
 import net.minecraft.server.management.UserListEntry;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.StringUtils;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
@@ -162,16 +161,16 @@ public class QuestingData implements Serializable {
 	public void removeLifeAndSendMessage(EntityPlayer player) {
 		boolean isDead = !removeLives(player, 1);
 		if (!isDead) {
-			player.addChatMessage(
-					new ChatComponentText("You just lost a life. You have " + getLives() + " live(s) left"));
+			player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.lostLife", getLives())));
 		}
 		if (getTeam().isSharingLives()) {
 			for (Team.PlayerEntry entry : getTeam().getPlayers()) {
 				if (entry.isInTeam() && !entry.getName().equals(getUserName(player))) {
 					EntityPlayer other = getPlayer(entry.getName());
 					if (other != null) {
-						other.addChatMessage(new ChatComponentText(getUserName(player) + " just lost a life"
-								+ (isDead ? " and got banned" : "") + ". You have " + getLives() + " live(s) left"));
+						other.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.lostTeamLife",
+								getUserName(player),
+								(isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
 					}
 				}
 			}
@@ -266,7 +265,7 @@ public class QuestingData implements Serializable {
 
 		if (mcServer.isSinglePlayer() && playerEntity.getCommandSenderName().equals(mcServer.getServerOwner())) {
 			((EntityPlayerMP) playerEntity).playerNetServerHandler
-					.kickPlayerFromServer("You\'re out of lives. Game over, man, it\'s game over!");
+					.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 
 			/*
 			 * ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer,
@@ -288,7 +287,7 @@ public class QuestingData implements Serializable {
 
 			// mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
 			((EntityPlayerMP) playerEntity).playerNetServerHandler
-					.kickPlayerFromServer("You\'re out of lives. Game over, man, it\'s game over!");
+					.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 			SoundHandler.playToAll(Sounds.DEATH);
 		}
 
@@ -400,14 +399,21 @@ public class QuestingData implements Serializable {
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				QuestingData result = (QuestingData) ois.readObject();
 				ois.close();
-				System.out.println("HQM DEBUG: loading playerfile from: "+name  );
-				if(!result.team.isSingle()){
+
+				System.out.println("HQM DEBUG: loading playerfile from: " + name);
+//				System.out.println("LOADED QUESTDATA BEFORE VOID:");
+//				System.out.println(result.getTeam().getQuestData());
+				if (!result.team.isSingle()) {
 					System.out.println("HQM DEBUG: and voiding");
-					result.setTeam(result.voidTeamData(name));	
+//					result.setTeam(result.voidTeamData(name));
+//					System.out.println("LOADED QUESTDATA AFTER VOID:");
+//					System.out.println(result.getTeam().getQuestData());
 				}
+
 				data.put(name, result);
 
 				HardcoreQuesting.loaded.put(name, true);
+				containskey = true;
 				ois.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -417,9 +423,10 @@ public class QuestingData implements Serializable {
 				e.printStackTrace();
 			}
 		}
-		if (!containskey) {
+		if (!data.containsKey(name)) {
 			new QuestingData(name);
 		}
+		HardcoreQuesting.loaded.put(name, true);
 		return data.get(name);
 	}
 
@@ -581,6 +588,7 @@ public class QuestingData implements Serializable {
 				id++;
 			}
 		}
+		System.out.println("HQM DEBUG: IF THIS MESSAGE IS SHOWN, SOMETHING WENT WRONG!!");
 		return team;
 	}
 
@@ -609,6 +617,9 @@ public class QuestingData implements Serializable {
 				FileOutputStream fos = new FileOutputStream(file);
 				ObjectOutputStream oos = new ObjectOutputStream(fos);
 				QuestingData saveObject = data.get(onlinep);
+				System.out.println("HQM DEBUG: SAVING PLAYERFILE: " + onlinep);
+//				System.out.println("SAVEING QUESTDATA:");
+//				System.out.println(saveObject.getTeam().getQuestData());
 				oos.writeObject(saveObject);
 				oos.close();
 			} catch (IOException e) {
@@ -682,6 +693,7 @@ public class QuestingData implements Serializable {
 		// already in the database (why???) and so that player will have their
 		// progress wiped. If that player is
 		// the team leader, then the team's progress gets nuked.
+
 		// This can be avoided by checking the database after loading a player &
 		// removing dummy teammates. It should
 		// probably be avoided by dropping a nuke on the code responsible, but
@@ -841,10 +853,9 @@ public class QuestingData implements Serializable {
 		loadData(FILE_VERSION, dr, true);
 	}
 
-	public static void disableHardcore(ICommandSender sender) {
+	public static void disableVanillaHardcore(ICommandSender sender) {
 		if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-			sender.addChatMessage(new ChatComponentText(
-					"Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it..."));
+			sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcore"));
 			try {
 				ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
 			} catch (Throwable ex) {
@@ -852,8 +863,7 @@ public class QuestingData implements Serializable {
 			}
 
 			if (!MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-				sender.addChatMessage(new ChatComponentText(
-						"Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect."));
+				sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcoreOverride"));
 			}
 		}
 	}
@@ -883,11 +893,11 @@ public class QuestingData implements Serializable {
 		}
 		return team;
 	}
-	
+
 	public Team getTeam2() {
-//		if (!team.isSingle() && !getTeams().isEmpty()) {
-//			team = getTeams().get(team.getId());
-//		}
+		// if (!team.isSingle() && !getTeams().isEmpty()) {
+		// team = getTeams().get(team.getId());
+		// }
 		return team;
 	}
 

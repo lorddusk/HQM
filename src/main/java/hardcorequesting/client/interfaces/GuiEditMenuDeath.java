@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.DeathStats;
 import hardcorequesting.DeathType;
 import hardcorequesting.QuestingData;
+import hardcorequesting.Translator;
 import hardcorequesting.config.ModConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
@@ -52,8 +53,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private static final int PLAYERS_SPACING = 20;
     private static final int DEATHS_RIGHT = 140;
 
-    private static final String BEST_LABEL = "Show worst";
-    private static final String TOTAL_LABEL = "Show total";
+    private static final String BEST_LABEL = "hqm.deathMenu.showWorst";
+    private static final String TOTAL_LABEL = "hqm.deathMenu.showTotal";
     private static final int BEST_X = 185;
     private static final int TOTAL_X = 255;
     private static final int LABEL_Y = 210;
@@ -82,8 +83,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             gui.drawString(deaths, DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
 
-        gui.drawString(BEST_LABEL, BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
-        gui.drawString(TOTAL_LABEL, TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
+        gui.drawString(Translator.translate(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
+        gui.drawString(Translator.translate(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
 
         DeathStats stats = getStats();
 
@@ -101,7 +102,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             }
 
             gui.drawString(stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
-            gui.drawString("Total Deaths: " + stats.getTotalDeaths(), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
+            gui.drawString(Translator.translate("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
 
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
@@ -109,7 +110,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
                 String str = String.valueOf(stats.getDeaths(i));
                 if (str.length() > 5) {
-                    str = "lots";
+                    str = Translator.translate("hqm.deathMenu.lots");
                 }
                 float f = DIGIT_TEXT_SIZE[str.length() - 1];
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
@@ -163,11 +164,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
         scrollBar.onClick(gui, mX, mY);
 
-        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)) {
+        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translate(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
             selectedName = null;
-        }else if(gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)) {
+        }else if(gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
             selectedName = null;

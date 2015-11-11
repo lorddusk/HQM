@@ -1,11 +1,11 @@
 package hardcorequesting.reputation;
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuReputationValue;
 import hardcorequesting.client.interfaces.GuiEditMenuTextEditor;
@@ -34,7 +34,6 @@ public class Reputation {
     private static List<Reputation> reputationList = new ArrayList<Reputation>();
     private static Map<Integer, Reputation> reputationMap = new HashMap<Integer, Reputation>();
 
-
     public static List<Reputation> getReputationList() {
         return reputationList;
     }
@@ -42,8 +41,6 @@ public class Reputation {
     public static Reputation getReputation(int id) {
         return reputationMap.get(id);
     }
-
-
 
     public int getId() {
         return id;
@@ -291,7 +288,7 @@ public class Reputation {
             str = text;
         }else if(current == null) {
             if (lower == null && upper == null) {
-                str = GuiColor.RED + (inverted ? "No value of" : "Any value of") + " " + name;
+                str = GuiColor.RED + Translator.translate("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
 
             }else{
                 String lowerName = lower == null ? null : GuiScreen.isShiftKeyDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -306,7 +303,7 @@ public class Reputation {
                         }
                     }else{
                         if (inverted) {
-                            str = "Not (" + lowerName + " <= " + name + " <= " + upperName + ")";
+                            str = Translator.translate("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
                         }else{
                             str = lowerName + " <= " + name + " <= " + upperName;
                         }
@@ -324,10 +321,6 @@ public class Reputation {
 
         gui.drawString(str, x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
 
-
-
-
-
         return info;
     }
 
@@ -336,15 +329,15 @@ public class Reputation {
     private String getError() {
         String error = null;
         if (markers.size() < 2) {
-            error = "You need at least two tiers";
+            error = "atLeastTwo";
         }else{
             for (ReputationMarker marker : markers) {
                 if (marker.getValue() == 0) {
-                    error = "A tier can't have value 0";
+                    error = "notZero";
                 }else{
                     for (ReputationMarker marker2 : markers) {
                         if (!marker.equals(marker2) && marker.getValue() == marker2.getValue()) {
-                            error = "Tiers must have unique values";
+                            error = "unique";
                             break;
                         }
                     }
@@ -356,7 +349,7 @@ public class Reputation {
             }
         }
 
-        return error;
+        return error == null ? null : Translator.translate("hqm.rep." + error);
     }
 
     public ReputationMarker getCurrentMarker(int value) {
@@ -442,7 +435,7 @@ public class Reputation {
         }
 
         if (selectedReputation != null) {
-            String neutralName = "Neutral: " + selectedReputation.neutral.getName();
+            String neutralName = Translator.translate("hqm.rep.neutral", selectedReputation.neutral.getName());
             gui.drawString(neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
 
             int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.markers.size() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
@@ -537,7 +530,7 @@ public class Reputation {
         }
 
         if (selectedReputation != null) {
-            String neutralName = "Neutral: " + selectedReputation.neutral.getName();
+            String neutralName = Translator.translate("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));

@@ -67,6 +67,11 @@ public class ModConfig
     private static final String ROT_COMMENT = "Define in seconds how long the rot timer is.";
     public static int MAXROT;
 
+    public static boolean NO_HARDCORE_MESSAGE;
+    public static final boolean NO_HARDCORE_MESSAGE_DEFAULT = true;
+    public static final String NO_HARDCORE_MESSAGE_COMMENT = "Enable or disable sending a status message if Hardcore Questing mode is off";
+    public static final String NO_HARDCORE_MESSAGE_KEY = "NoHardcoreMessage";
+
     public static int OVERLAY_XPOS;
     public static int OVERLAY_YPOS;
     public static int OVERLAY_XPOSDEFAULT = 2;
@@ -127,6 +132,8 @@ public class ModConfig
 
         ROTTIMER = config.get(CATEGORY_GENERAL, FRESHNESS_KEY, FRESHNESS_DEFAULT, FRESHNESS_COMMENT).getBoolean(FRESHNESS_DEFAULT);
         MAXROT = config.get(CATEGORY_GENERAL, ROT_KEY, ROT_DEFAULT, ROT_COMMENT).getInt(ROT_DEFAULT);
+
+        NO_HARDCORE_MESSAGE = config.get(CATEGORY_GENERAL, NO_HARDCORE_MESSAGE_KEY, NO_HARDCORE_MESSAGE_DEFAULT, NO_HARDCORE_MESSAGE_COMMENT).getBoolean(NO_HARDCORE_MESSAGE_DEFAULT);
 
         if (config.hasChanged())
             config.save();

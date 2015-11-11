@@ -1,12 +1,13 @@
 package hardcorequesting.client.interfaces;
 
+import codechicken.nei.NEIClientConfig;
+import codechicken.nei.NEIClientUtils;
+import codechicken.nei.recipe.GuiCraftingRecipe;
+import codechicken.nei.recipe.GuiUsageRecipe;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.DeathStats;
-import hardcorequesting.OPBookHelper;
-import hardcorequesting.QuestingData;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Team;
+import hardcorequesting.*;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
@@ -61,6 +62,8 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isReputationPage;
     private static Group selectedGroup;
     public static Reputation selectedReputation;
+    private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
+    private static ItemStack selected;
 
 	private final EntityPlayer player;
     private final boolean isOpBook;
@@ -191,7 +194,7 @@ public class GuiQuestBook extends GuiBase {
     private LargeButton saveButton;
     private List<LargeButton> buttons = new ArrayList<LargeButton>();
     {
-        buttons.add(saveButton = new LargeButton("Save all", 360, 10) {
+        buttons.add(saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -208,7 +211,7 @@ public class GuiQuestBook extends GuiBase {
             }
         });
 
-        buttons.add(new LargeButton("Open", 245, 190) {
+        buttons.add(new LargeButton("hqm.questBook.open", 245, 190) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return true;
@@ -225,7 +228,7 @@ public class GuiQuestBook extends GuiBase {
             }
         });
 
-        buttons.add(new LargeButton("Create Set", 185, 50) {
+        buttons.add(new LargeButton("hqm.questBook.createSet", 185, 50) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return Quest.getQuestSets().size() < DataBitHelper.QUEST_SETS.getMaximum();
@@ -248,7 +251,7 @@ public class GuiQuestBook extends GuiBase {
             }
         });
 
-        buttons.add(new LargeButton("Create Group", 100, 175) {
+        buttons.add(new LargeButton("hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return GroupTier.getTiers().size() > 0 && Group.getGroups().size() < DataBitHelper.GROUP_COUNT.getMaximum();
@@ -266,7 +269,7 @@ public class GuiQuestBook extends GuiBase {
             }
         });
 
-        buttons.add(new LargeButton("Create Tier", 100, 200) {
+        buttons.add(new LargeButton("hqm.questBook.createTier", 100, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return GroupTier.getTiers().size() < DataBitHelper.TIER_COUNT.getMaximum();
@@ -319,7 +322,7 @@ public class GuiQuestBook extends GuiBase {
             }
         });
 
-        buttons.add(new LargeButton("Create Tier", 20, 20) {
+        buttons.add(new LargeButton("hqm.questBook.createTier", 20, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return selectedReputation.getMarkerCount() < DataBitHelper.REPUTATION_MARKER.getMaximum();
@@ -440,6 +443,7 @@ public class GuiQuestBook extends GuiBase {
 
 	@Override
     public void drawScreen(int x0, int y0, float f) {
+        selected = null;
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
         
@@ -493,9 +497,9 @@ public class GuiQuestBook extends GuiBase {
             if (isMainPageOpen) {
                 int startLine = mainDescriptionScroll.isVisible(this) ? Math.round((Quest.getMainDescription(this).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
                 drawString(Quest.getMainDescription(this), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
-                drawCenteredString("Click here to start", 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
+                drawCenteredString(Translator.translate("hqm.questBook.start"), 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
                 if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-                    drawCenteredString("Click to play again", PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
+                    drawCenteredString(Translator.translate("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
                 }
                 if (QuestLine.getActiveQuestLine().front == null && QuestLine.getActiveQuestLine().mainPath != null) {
                     File file = new File(QuestLine.getActiveQuestLine().mainPath + "front.png");
@@ -518,18 +522,18 @@ public class GuiQuestBook extends GuiBase {
                     drawRect(20, 20, 0, 0, 140, 180);
                 }
             }else if(isMenuPageOpen) {
-                drawString("Lives", INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
-                drawString("Party", INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
-                drawString("Quests", INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
-                drawString("Reputation", INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
+                drawString(Translator.translate("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
+                drawString(Translator.translate("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
+                drawString(Translator.translate("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
+                drawString(Translator.translate("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
 
                 drawQuestInfo(null, INFO_LEFT_X, INFO_QUESTS_Y + (int)(TEXT_HEIGHT * 1.5F));
-                drawString("Click here to show quests", INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
+                drawString(Translator.translate("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
 
                 if (QuestingData.isHardcoreActive()) {
                     boolean almostOut = QuestingData.getQuestingData(player).getLives() == QuestingData.getQuestingData(player).getLivesToStayAlive();
                     if (almostOut) {
-                        drawString(GuiColor.RED + "If you die, you're out.", INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
+                        drawString(GuiColor.RED + Translator.translate("hqm.questBook.deadOut"), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
                     }
 
                     GL11.glColor4f(1, 1, 1, 1);
@@ -550,13 +554,13 @@ public class GuiQuestBook extends GuiBase {
                         drawItem(new ItemStack(ModItems.hearts, 1, 3), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
                     }
                 }else{
-                    drawString(getLinesFromText("Hardcore mode is not active, you have an infinite amount of lives.", 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
+                    drawString(getLinesFromText(Translator.translate("hqm.questBook.infiniteLives"), 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
                 }
 
 
                 int deaths = DeathStats.getDeathStats(QuestingData.getUserName(player)).getTotalDeaths();
-                drawString("You've currently died " + deaths + " " + (deaths == 1 ? "time" : "times"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
-                drawString("Click here for more info", INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
+                drawString(Translator.translate("hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
+                drawString(Translator.translate("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
 
 
                 String str;
@@ -564,9 +568,9 @@ public class GuiQuestBook extends GuiBase {
                 if (team.isSingle()) {
                     int invites = team.getInvites() == null ? 0 : team.getInvites().size();
                     if (invites > 0) {
-                        str = "You have " + invites + " party " + (invites == 1 ? "invite" : "invites");
+                        str = Translator.translate("hqm.questBook.invites", invites);
                     }else{
-                        str = "You're currently not in a party.";
+                        str = Translator.translate("hqm.questBook.notInParty");
                     }
                 }else{
                     int players = 0;
@@ -575,15 +579,15 @@ public class GuiQuestBook extends GuiBase {
                             players++;
                         }
                     }
-                    str = "You're in a party with " + players + " " + (players == 1 ? "player" : "players");
+                    str = Translator.translate("hqm.questBook.inParty", players);
                 }
 
                 drawString(str, INFO_RIGHT_X, INFO_TEAM_Y + TEAM_TEXT_Y, 0.7F, 0x404040);
-                drawString("Click here to open party window", INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, 0x707070);
+                drawString(Translator.translate("hqm.questBook.openParty"), INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, 0x707070);
 
                 if (isOpBook) {
-                    drawString("Reset the quest progress for the entire party.", 22, 182, 0.6F, 0x404040);
-                    drawString(getLinesFromText("Hold shift+ctrl while clicking to confirm.", 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
+                    drawString(Translator.translate("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
+                    drawString(getLinesFromText(Translator.translate("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
                 }
 
 
@@ -617,8 +621,8 @@ public class GuiQuestBook extends GuiBase {
                         }
                     }
 
-                    drawString("Maximum retrieval count", 180, 20, 0x404040);
-                    drawString("Leave at 0 for no restriction", 180, 48, 0.7F, 0x404040);
+                    drawString(Translator.translate("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
+                    drawString(Translator.translate("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
                     textBoxes.draw(this);
                 }else{
                     List<GroupTier> tiers = GroupTier.getTiers();
@@ -672,7 +676,7 @@ public class GuiQuestBook extends GuiBase {
                             GL11.glDisable(GL11.GL_BLEND);
                         }
 
-                        drawString(group.getItems().size() + " items", GROUPS_X + GROUPS_SECOND_LINE_X, yPos + GROUPS_SECOND_LINE_Y, 0.7F, 0x404040);
+                        drawString(Translator.translate("hqm.questBook.items", group.getItems().size()), GROUPS_X + GROUPS_SECOND_LINE_X, yPos + GROUPS_SECOND_LINE_Y, 0.7F, 0x404040);
                     }
                 }
             }else if(isReputationPage) {
@@ -703,17 +707,25 @@ public class GuiQuestBook extends GuiBase {
                     int color = modifyingQuestSet == questSet ? 0x4040DD : enabled ? completed ? selected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : selected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : 0x404040 : 0xDDDDDD;
                     drawString(questSet.getName(i), LIST_X, setY, color);
 
-                    String info = enabled ? completed ? "All Quests Completed" : ((completedCount * 100) / total) + "% Completed" : "Locked";
+                    String info;
+                    if (enabled)
+                    {
+                        if (completed)
+                            info = Translator.translate("hqm.questBook.allQuests");
+                        else
+                            info = Translator.translate("hqm.questBook.percentageQuests", ((completedCount * 100) / total));
+                    } else
+                        info = Translator.translate("hqm.questBook.locked");
                     drawString(info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
                     if (enabled && unclaimed != 0)
                     {
-                        String toClaim = GuiColor.PURPLE.toString() + unclaimed + (unclaimed == 1 ? " quest" : " quests") + " with unclaimed rewards";
+                        String toClaim = GuiColor.PURPLE.toString() + Translator.translate("hqm.questBook.unclaimedRewards", unclaimed);
                         drawString(toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
                     }
                 }
 
                 if ((Quest.isEditing && currentMode == EditMode.CREATE)) {
-                    drawString(getLinesFromText("Click the button below to create a new empty quest set.", 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+                    drawString(getLinesFromText(Translator.translate("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
                 }else{
                     if (selectedSet != null){
                         int startLine = descriptionScroll.isVisible(this) ? Math.round((selectedSet.getDescription(this).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
@@ -727,7 +739,7 @@ public class GuiQuestBook extends GuiBase {
             }else{
                 if (selectedQuest == null)  {
                     if (isOpBook) {
-                        drawString(getLinesFromText("Hold shift and click on quests to automatically complete them or reset their progress.", 0.7F, 130), 184, 192, 0.7F, 0x707070);
+                        drawString(getLinesFromText(Translator.translate("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
                     }
 
                     for (Quest child : selectedSet.getQuests()) {
@@ -807,7 +819,7 @@ public class GuiQuestBook extends GuiBase {
                                 if (editing) {
                                     txt += "\n";
                                 }
-                                txt += GuiColor.GRAY + "Locked Quest";
+                                txt += GuiColor.GRAY + Translator.translate("hqm.questBook.lockedQuest");
                             }
 
                             if (!enabled || editing) {
@@ -833,36 +845,36 @@ public class GuiQuestBook extends GuiBase {
                                 }
 
                                 if (editing && totalParentCount > 0) {
-                                    txt += "\n" + GuiColor.GRAY + "Requires " + (totalParentCount - totalCompletedCount) + "/" + totalParentCount + " " + (totalParentCount == 1 ? "quest" : "quests") + " to be completed.";
+                                    txt += "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), totalParentCount);
 
                                     if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-                                        txt += " [Holding R]";
+                                        txt += " [" + Translator.translate("hqm.questBook.holding", "R") + "]";
                                         for (Quest parent : quest.getRequirement()) {
                                             txt += "\n" + GuiColor.GRAY + parent.getName();
                                             if (parent.isCompleted(player)) {
-                                                txt += " " + GuiColor.WHITE + " [Completed]";
+                                                txt += " " + GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
                                             }
                                         }
                                     }else{
-                                        txt += " [Hold R]";
+                                        txt += " [" + Translator.translate("hqm.questBook.hold", "R") + "]";
                                     }
                                 }
 
                                 int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirement().size() - quest.getParentRequirementCount()) : 0;
                                 if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
-                                    txt += "\n" + GuiColor.PINK + "Requires " + (parentCount - completed) + "/" + parentCount + " " + (parentCount == 1 ? "quest" : "quests") + " to be completed elsewhere.";
+                                    txt += "\n" + GuiColor.PINK + Translator.translate("hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), totalParentCount);
                                     shouldDrawText = true;
                                     if (editing) {
                                         if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-                                            txt += " [Holding E]";
+                                            txt += " [" + Translator.translate("hqm.questBook.holding", "E") + "]";
                                             for (Quest parent : externalQuests) {
                                                 txt += "\n" + GuiColor.PINK + parent.getName() + " (" + parent.getQuestSet().getName() + ")";
                                                 if (parent.isCompleted(player)) {
-                                                    txt += " " + GuiColor.WHITE + " [Completed]";
+                                                    txt += " " + GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
                                                 }
                                             }
                                         }else{
-                                            txt += " [Hold E]";
+                                            txt += " [" + Translator.translate("hqm.questBook.hold", "E") + "]";
                                         }
                                     }
                                 }
@@ -871,11 +883,11 @@ public class GuiQuestBook extends GuiBase {
                                     txt += "\n" + GuiColor.MAGENTA;
                                     int amount = quest.getParentRequirementCount();
                                     if (amount < quest.getRequirement().size()) {
-                                        txt += "Only requires " + amount + " " + (amount == 1 ? "quest" : "quests") + " to be completed";
+                                        txt += Translator.translate("hqm.questBook.reqOnly", amount);
                                     }else if(amount > quest.getRequirement().size()) {
-                                        txt += "Requires " + amount + " " + (amount == 1 ? "quest" : "quests") + " to be completed. This is more than there are, weird.";
+                                        txt += Translator.translate("hqm.questBook.reqMore", amount);
                                     }else{
-                                        txt += "Requires all " + amount + " " + (amount == 1 ? "quest" : "quests");
+                                        txt += Translator.translate("hqm.questBook.reqAll", amount);
                                     }
 
                                 }
@@ -883,10 +895,10 @@ public class GuiQuestBook extends GuiBase {
 
                             if (enabled || editing) {
                                 if (quest.isCompleted(player)) {
-                                    txt += "\n" + GuiColor.GREEN + "Completed";
+                                    txt += "\n" + GuiColor.GREEN + Translator.translate("hqm.questBook.completed");
                                 }
                                 if (quest.hasReward(player)) {
-                                    txt += "\n" + GuiColor.PURPLE + "Unclaimed reward";
+                                    txt += "\n" + GuiColor.PURPLE + Translator.translate("hqm.questBook.unclaimedReward");
                                 }
 
                                 String repeatMessage = enabled ? quest.getRepeatInfo().getMessage(quest, player) : quest.getRepeatInfo().getShortMessage();
@@ -905,20 +917,20 @@ public class GuiQuestBook extends GuiBase {
                                     }
 
                                     if (totalTasks == 0) {
-                                        txt += "\n" + GuiColor.RED + "This quest has no tasks!";
+                                        txt += "\n" + GuiColor.RED + Translator.translate("hqm.questBook.noTasks");
                                     }else{
-                                        txt += "\n" + GuiColor.CYAN + completedTasks + "/" + totalTasks + " completed tasks.";
+                                        txt += "\n" + GuiColor.CYAN + Translator.translate("hqm.questBook.completedTasks", completedTasks, totalTasks);
 
                                         if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
-                                            txt += " [Holding T]";
+                                            txt += " [" + Translator.translate("hqm.questBook.holding", "T") + "]";
                                             for (QuestTask task : quest.getTasks()) {
                                                 txt += "\n" + GuiColor.CYAN + task.getDescription();
                                                 if (task.isCompleted(player)) {
-                                                    txt += GuiColor.WHITE + " [Completed]";
+                                                    txt += GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") +"]";
                                                 }
                                             }
                                         }else{
-                                            txt += " [Hold T]";
+                                            txt += " [" + Translator.translate("hqm.questBook.holding", "T") + "]";
                                         }
                                     }
 
@@ -941,30 +953,30 @@ public class GuiQuestBook extends GuiBase {
 
                                             switch (quest.getTriggerType()) {
                                                 case ANTI_TRIGGER:
-                                                    invisibilityMessage = "Invisible while locked";
+                                                    invisibilityMessage = Translator.translate("hqm.questBook.invisLocked");
                                                     break;
                                                 case QUEST_TRIGGER:
-                                                    invisibilityMessage = "Permanently invisible";
+                                                    invisibilityMessage = Translator.translate("hqm.questBook.invisPerm");
                                                     parentInvisible = false;
                                                     break;
                                                 case TASK_TRIGGER:
-                                                    invisibilityMessage = "Invisible until " + quest.getTriggerTasks() + " " + (quest.getTriggerTasks() > 1 ? "tasks have" : "task has") + " been completed.";
+                                                    invisibilityMessage = Translator.translate("hqm.questBook.invisCount", quest.getTriggerTasks());
                                                     break;
                                                 default:
                                                     invisibilityMessage = null;
                                             }
 
                                             if (parentInvisible) {
-                                                String parentText = "Inherited invisibility";
+                                                String parentText = Translator.translate("hqm.questBook.invisInherit");
                                                 if (invisibilityMessage == null) {
                                                     invisibilityMessage = parentText;
                                                 }else{
-                                                    invisibilityMessage = parentText + " and " + invisibilityMessage;
+                                                    invisibilityMessage = parentText + " " + Translator.translate("hqm.questBook.and") + " " + invisibilityMessage;
                                                 }
                                             }
 
                                         }else{
-                                            invisibilityMessage = "Invisible through quest option.";
+                                            invisibilityMessage = Translator.translate("hqm.questBook.invisOption");
                                         }
 
                                         if (invisibilityMessage != null) {
@@ -985,10 +997,10 @@ public class GuiQuestBook extends GuiBase {
                                     }
                                     int optionLinks = ids.size();
                                     if (optionLinks > 0) {
-                                        txt += "\n" + GuiColor.BLUE + "Connected to " + optionLinks + " " + (optionLinks > 1 ? "quests" : "quest") + " through option links.";
+                                        txt += "\n" + GuiColor.BLUE + Translator.translate("hqm.questBook.optionLinks", optionLinks);
 
                                         if (Keyboard.isKeyDown(Keyboard.KEY_O)) {
-                                            txt += " [Holding O]";
+                                            txt += " [" + Translator.translate("hqm.questBook.holding", "O") + "]";
                                             for (int id : ids) {
                                                 Quest option = Quest.getQuest(id);
                                                 txt += "\n" + GuiColor.BLUE + option.getName();
@@ -997,7 +1009,7 @@ public class GuiQuestBook extends GuiBase {
                                                 }
                                             }
                                         }else{
-                                            txt += " [Hold O]";
+                                            txt += " [" + Translator.translate("hqm.questBook.hold", "O") + "]";
                                         }
                                     }
 
@@ -1014,15 +1026,15 @@ public class GuiQuestBook extends GuiBase {
                                 }
 
                                 if (childCount > 0) {
-                                    txt += "\n" + GuiColor.PINK + "Unlocks " + childCount + " " + (childCount == 1 ? "quest" : "quests") + " elsewhere.";
+                                    txt += "\n" + GuiColor.PINK + Translator.translate("hqm.questBook.childUnlock", childCount);
                                     if (editing) {
                                         if (Keyboard.isKeyDown(Keyboard.KEY_U)) {
-                                            txt += " [Holding U]";
+                                            txt += " [" + Translator.translate("hqm.questBook.holding", "U") + "]";
                                             for (Quest child : externalQuests) {
                                                 txt += "\n" + GuiColor.PINK + child.getName() + " (" + child.getQuestSet().getName() + ")";
                                             }
                                         }else{
-                                            txt += " [Hold U]";
+                                            txt += " [" + Translator.translate("hqm.questBook.hold", "U") + "]";
                                         }
                                     }
                                 }
@@ -1034,14 +1046,14 @@ public class GuiQuestBook extends GuiBase {
 
 
                             if (editing) {
-                                txt += "\n\n" + GuiColor.GRAY + "Hold Ctrl to see this as a non-editor.";
+                                txt += "\n\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.ctrlNonEditor");
                             }
 
                             if (isOpBook && GuiScreen.isShiftKeyDown()) {
                                 if (quest.isCompleted(player)) {
-                                    txt += "\n\n" + GuiColor.RED + "Click to reset quest";
+                                    txt += "\n\n" + GuiColor.RED + Translator.translate("hqm.questBook.resetQuest");
                                 }else{
-                                    txt += "\n\n" + GuiColor.ORANGE + "Click to complete quest";
+                                    txt += "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.questBook.completeQuest");
                                 }
                             }
 
@@ -1071,12 +1083,10 @@ public class GuiQuestBook extends GuiBase {
             if (currentMode == EditMode.DELETE) {
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0, 0, 200);
-                drawCenteredString("WARNING!", 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                drawCenteredString("You're now deleting everything you click on!", 0, fontRendererObj.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(Translator.translate("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(Translator.translate("hqm.questBook.deleteOnClick"), 0, fontRendererObj.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 applyColor(0xFFFFFFFF);
-
-                    ResourceHelper.bindResource(MAP_TEXTURE);
-
+                ResourceHelper.bindResource(MAP_TEXTURE);
                 GL11.glPopMatrix();
             }
 
@@ -1108,9 +1118,9 @@ public class GuiQuestBook extends GuiBase {
         }
 
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
-            drawMouseOver("Go back\n" + GuiColor.GRAY + "You can also right click anywhere", x + left, y + top);
+            drawMouseOver(Translator.translate("hqm.questBook.goBack") + "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.rightClick"), x + left, y + top);
         }else if(shouldDisplayAndIsInArrowBounds(true, x, y)) {
-            drawMouseOver("Back to menu", x + left, y + top);
+            drawMouseOver(Translator.translate("hqm.questBook.backToMenu"), x + left, y + top);
         }
      }
 
@@ -1139,17 +1149,16 @@ public class GuiQuestBook extends GuiBase {
             }
         }
 
-
         List<String> info = new ArrayList<String>();
-        info.add(GuiColor.GRAY.toString() + total + " " + (total == 1 ? "quest" : "quests") + " in total");
-        info.add(GuiColor.CYAN.toString() + enabled + " unlocked " + (enabled == 1 ? "quest" : "quests"));
-        info.add(GuiColor.GREEN.toString() + completed + " completed " + (completed == 1 ? "quest" : "quests"));
-        info.add(GuiColor.LIGHT_BLUE.toString() + (enabled - completed) + " " + (enabled - completed == 1 ? "quest" : "quests") + " available for completion");
+        info.add(GuiColor.GRAY.toString() + Translator.translate("hqm.questBook.totalQuests", total));
+        info.add(GuiColor.CYAN.toString() + Translator.translate("hqm.questBook.unlockedQuests", enabled));
+        info.add(GuiColor.GREEN.toString() + Translator.translate("hqm.questBook.completedQuests", completed));
+        info.add(GuiColor.LIGHT_BLUE.toString() + Translator.translate("hqm.questBook.totalQuests", enabled - completed));
         if (reward > 0) {
-            info.add(GuiColor.PURPLE.toString() + reward + " " + (reward == 1 ? "quest" : "quests") + " with unclaimed rewards");
+            info.add(GuiColor.PURPLE.toString() + Translator.translate("hqm.questBook.unclaimedQuests", reward));
         }
         if (Quest.isEditing && !isCtrlKeyDown()) {
-            info.add(GuiColor.LIGHT_GRAY.toString() + realTotal + " " + (realTotal == 1 ? "quest" : "quests") + " including invisible ones");
+            info.add(GuiColor.LIGHT_GRAY.toString() + Translator.translate("hqm.questBook.inclInvisiQuests", realTotal));
         }
         drawString(info, x, y, 0.7F, 0x404040);
     }
@@ -1182,12 +1191,38 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onKeyTyped(this, c, k);
         }else if(isBagPage && selectedGroup != null) {
             textBoxes.onKeyStroke(this, c, k);
+        }else if (isNEIActive())
+        {
+            handleNEI(k);
         }
     }
 
+    private boolean isNEIActive()
+    {
+        return isNEIActive;
+    }
 
+    public static void setSelected(ItemStack stack)
+    {
+        selected = stack;
+    }
 
+    private void handleNEI(int k)
+    {
+        ItemStack stackover = selected;
+        if(stackover != null)
+        {
+            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey()))
+            {
+                GuiUsageRecipe.openRecipeGui("item", stackover.copy());
+            }
 
+            if (k == NEIClientConfig.getKeyBinding("gui.recipe"))
+            {
+                GuiCraftingRecipe.openRecipeGui("item", stackover.copy());
+            }
+        }
+    }
 
     @Override
 	protected void mouseClicked(int x0, int y0, int button) {
@@ -1597,46 +1632,44 @@ public class GuiQuestBook extends GuiBase {
     }
 
     public enum EditMode {
-        NORMAL("Cursor", "Use the book as if you would be in play mode."),
-        MOVE("Move", "Click and drag to move quests"),
-        CREATE("Create", "Click to create quests, quest sets, and reward groups, among other things."),
-        REQUIREMENT("Quest Requirements", "Click on a quest to select it and then click on the quests you want as requirements for the selected quest.\n\nHold shift and click on the selected quest to remove its requirements."),
-        SIZE("Change Size", "Click on a quest to change its size, this is purely visual and has no impact on how the quest works."),
-        RENAME("Edit Text", "Click on the text you want to edit. Works with names and descriptions for quest sets, quests, tasks, main lore, reward groups and reward tiers."),
-        ITEM("Change Item", "Click on an item or item slot to open the item selector. This works for quest rewards and task items to give some examples."),
-        TASK("Create Task", "Opens up the task creation menu."),
-        DELETE("Delete", "Be careful with this one, things you click on will be deleted. Works with quest sets, quests, tasks, rewards, task items and just about everything."),
-        SWAP("Change Set", "Click on a quest to move it to another set. Before using this you will have to use the \"Target Set\" command to select a target set."),
-        SWAP_SELECT("Target Set", "Mark a set as the target for quest movement. The \"Change Set\" command can then be used to move quests to this set"),
-        TIER("Set group tier", "Selected a group and then click on a tier to set the group's tier."),
-        BAG("Reward Bags", "Open up the reward bag menu. Here you will be able to modify the group tiers and add groups of items for the reward bags."),
-        LOCATION("Edit Location", "Edit the target location for location tasks."),
-        REPEATABLE("Set Repeatability", "Change if a quest should be repeatable or not, and if so, the properties of the repeatability."),
-        TRIGGER("Trigger Quests", "Specify any properties for trigger quests."),
-        MOB("Edit Monster", "Edit the monster target for killing tasks."),
-        QUEST_SELECTION("Select Quest", "Mark a quest as the selected quest. When a quest is selected you can bind it to a Quest Tracker System or a Quest Gate System by right clicking it with a book."),
-        QUEST_OPTION("Quest Option", "Click on a quest to select it and then click on the quests you want to link it to. If an option linked quest is completed all quests it's linked to becomes invisible and uncompletable. \n\nHold shift and click on the selected quest to remove all its links."),
-        CHANGE_TASK("Change Task", "Change the task type of item tasks."),
-        REQUIRED_PARENTS("Required parents", "Change how many of the parent quests that have to be completed before this one unlocks."),
-        REPUTATION("Reputation", "Open the reputation menu where you can create reputations and their tiers."),
-        REPUTATION_VALUE("Change value", "Change the value of the different reputation tiers"),
-        REPUTATION_TASK("Edit reputation target", "Change the configurations for a reputation target for the selected reputation task"),
-        REPUTATION_REWARD("Edit reputation reward", "Click on the reputation reward icon to bring up the reputation reward menu.");
+        NORMAL("normal"),
+        MOVE("move"),
+        CREATE("create"),
+        REQUIREMENT("req"),
+        SIZE("size"),
+        RENAME("rename"),
+        ITEM("item"),
+        TASK("task"),
+        DELETE("delete"),
+        SWAP("swap"),
+        SWAP_SELECT("swapSelect"),
+        TIER("tier"),
+        BAG("bag"),
+        LOCATION("location"),
+        REPEATABLE("repeatable"),
+        TRIGGER("trigger"),
+        MOB("mob"),
+        QUEST_SELECTION("questSelection"),
+        QUEST_OPTION("questOption"),
+        CHANGE_TASK("changeTask"),
+        REQUIRED_PARENTS("reqParents"),
+        REPUTATION("rep"),
+        REPUTATION_VALUE("repValue"),
+        REPUTATION_TASK("repTask"),
+        REPUTATION_REWARD("repReward");
 
-        private String name;
-        private String description;
+        private String id;
 
-        EditMode(String name, String description) {
-            this.name = name;
-            this.description = description;
+        EditMode(String id) {
+            this.id = id;
         }
 
         public String getName() {
-            return name;
+            return Translator.translate("hqm.editMode." + id + ".title");
         }
 
         public String getDescription() {
-            return description;
+            return Translator.translate("hqm.editMode." + id + ".desc");
         }
     }
     private static final int BUTTON_SIZE = 16;

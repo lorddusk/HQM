@@ -1,27 +1,28 @@
 package hardcorequesting.tileentity;
 
+import hardcorequesting.Translator;
 
 public enum PortalType {
-    TECH("Tech Theme", "This set works perfectly for your technical themed map.", true),
-    MAGIC("Magic Theme", "This set works perfectly for your magical themed map.", true),
-    CUSTOM("Custom Theme", "Customize the theme by specify what block this block should look like.", false);
+    TECH("tech", true),
+    MAGIC("magic", true),
+    CUSTOM("custom", false);
 
-    private String name;
-    private String description;
+    private String id;
     private boolean isPreset;
 
-    PortalType(String name, String description, boolean isPreset) {
-        this.name = name;
-        this.description = description;
+    PortalType(String id, boolean isPreset) {
+        this.id = id;
         this.isPreset = isPreset;
     }
 
-    public String getName() {
-        return name;
+    public String getName()
+    {
+        return Translator.translate("hqm.portal." + this.id + ".title");
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescription()
+    {
+        return Translator.translate("hqm.portal." + this.id + ".desc");
     }
 
     public boolean isPreset() {

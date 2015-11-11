@@ -1,6 +1,7 @@
 package hardcorequesting.client.interfaces;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.quests.QuestTaskMob;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
 
@@ -41,7 +41,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         };
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Required kill count") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
             protected void setValue(int number) {
                 mob.setCount(number);
@@ -108,8 +108,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             gui.drawString(mobs.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected  ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
 
-        gui.drawString("Search", 180, 20, 0x404040);
-        gui.drawString(mob.getMob() == null ? "Nothing Selected" : "Currently Selected", 180, 40, 0x404040);
+        gui.drawString(Translator.translate("hqm.mobTask.search"), 180, 20, 0x404040);
+        gui.drawString(Translator.translate("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (mob.getMob() != null) {
             gui.drawString(mob.getMob(), 180, 50, 0.7F, 0x404040);
         }
@@ -131,7 +131,6 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
                 }else{
                     mob.setMob(mobs.get(i));
                 }
-
                 break;
             }
         }
@@ -151,25 +150,23 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
     @Override
     protected String getArrowText() {
-        return mob.isExact() ? "Exact Match" : "Type Match";
+        return Translator.translate("hqm.mobTask." + (mob.isExact() ? "exact" : "type") + "Match.title");
     }
 
     @Override
     protected String getArrowDescription() {
-        return mob.isExact() ? "Only matching monsters with the selected type, subtypes are not counted towards the killing count." : "Matching every monster that has the selected type or a subtype to the selected type.";
+        return Translator.translate("hqm.mobTask." + (mob.isExact() ? "exact" : "type") + "Match.desc");
     }
 
     @Override
     public void onDrag(GuiBase gui, int mX, int mY) {
         super.onDrag(gui, mX, mY);
-
         scrollBar.onDrag(gui, mX, mY);
     }
 
     @Override
     public void onScroll(GuiBase gui, int mX, int mY, int scroll) {
         super.onScroll(gui, mX, mY, scroll);
-
         scrollBar.onScroll(gui, mX, mY, scroll);
     }
 

@@ -6,7 +6,6 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.TriggerType;
 import net.minecraft.entity.player.EntityPlayer;
 
-
 public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     private TriggerType type;
     private int triggerTasks;
@@ -19,7 +18,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();
 
-        textBoxes.add(new TextBoxNumber(gui, 0, "Trigger tasks count") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTrigger.taskCount") {
             @Override
             protected void setValue(int number) {
                 triggerTasks = number;
