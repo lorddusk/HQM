@@ -5,11 +5,11 @@ Hardcore Questing Mode
 Updated Version to support Player Questfiles
 Here is how it works.
 
-1. On player login it will search the HQM folder for a playername.qd file.
-  1. If there isnt any it will search for existing playerquest data.
-  2. If there is player questdata it will use it.
-  3. If there isnt any it will create it.
-2. If there is a player quest file. It will load this file into the questdata. Overriding the existing one. For performance reasons it will only do this on the first questdata call.
+1. On player login it will search the HQM questdata instance for data for the player.
+  1. If there isnt any it will search for an existing player.questdata file.
+  2. If there is a player.questdata file it will use that questdata and restore it and put it in the hashmap.
+  3. If there isnt any it will create new questdata as before.
+2. If there is questdata for the player already, nothing will change.
 
 On Playerlogout and Worldsave it will save the playerdata from players currently online or leaving player into a player file for each player.
 
