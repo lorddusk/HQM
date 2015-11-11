@@ -98,7 +98,11 @@ public abstract class CommandBase implements ISubCommand
     }
 
     protected void sendChat(ICommandSender sender, String key, Object... args) {
-        sender.addChatMessage(new ChatComponentText(Translator.translate(key, args)));
+        sendChat(sender, false, key, args);
+    }
+
+    protected void sendChat(ICommandSender sender, boolean plural, String key, Object... args) {
+        sender.addChatMessage(new ChatComponentText(Translator.translate(plural, key, args)));
     }
 
     protected boolean isPlayerOp(ICommandSender sender)

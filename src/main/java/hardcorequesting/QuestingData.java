@@ -140,7 +140,7 @@ public class QuestingData {
     public void removeLifeAndSendMessage(EntityPlayer player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.lostLife", getLives())));
+            player.addChatMessage(new ChatComponentText(Translator.translate(getLives() != 1, "hqm.message.lostLife", getLives())));
         }
         if (getTeam().isSharingLives()) {
             for (Team.PlayerEntry entry : getTeam().getPlayers()) {
@@ -148,7 +148,7 @@ public class QuestingData {
                     EntityPlayer other = getPlayer(entry.getName());
                     if (other != null) {
                         other.addChatMessage(new ChatComponentText(
-                                Translator.translate("hqm.message.lostTeamLife", getUserName(player), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
+                                Translator.translate(getLives() != 1, "hqm.message.lostTeamLife", getUserName(player), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
                     }
                 }
             }

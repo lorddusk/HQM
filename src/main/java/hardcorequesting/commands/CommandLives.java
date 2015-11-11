@@ -165,11 +165,12 @@ public class CommandLives extends CommandBase
     {
         if (QuestingData.getQuestingData(player).getLives() - amount < QuestingData.getQuestingData(player).getLivesToStayAlive())
         {
-            sendChat(player, "hqm.message.cantRemoveLive", QuestingData.getQuestingData(player).getLives());
+            int lives = QuestingData.getQuestingData(player).getLives();
+            sendChat(player, lives != 1, "hqm.message.cantRemoveLives", lives);
         } else
         {
             QuestingData.getQuestingData(player).removeLives(player, amount);
-            sendChat(player, "hqm.message.removeLives", amount);
+            sendChat(player, amount != 1, "hqm.message.removeLives", amount);
             currentLives(player);
         }
     }
@@ -180,8 +181,8 @@ public class CommandLives extends CommandBase
 
         QuestingData.getQuestingData(player).removeLives((EntityPlayerMP) sender, amount);
 
-        sendChat(sender, "hqm.message.removeLivesFrom", amount, playerName);
-        sendChat(player, "hqm.message.removeLivesBy", amount, sender.getCommandSenderName());
+        sendChat(sender, amount != 1, "hqm.message.removeLivesFrom", amount, playerName);
+        sendChat(player, amount != 1, "hqm.message.removeLivesBy", amount, sender.getCommandSenderName());
         currentLives(player);
     }
 
@@ -190,12 +191,12 @@ public class CommandLives extends CommandBase
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES)
         {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(player, "hqm.message.addLives", amount);
+            sendChat(player, amount != 1, "hqm.message.addLives", amount);
             currentLives(player);
         } else
         {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(player, "hqm.message.cantAddLives", ModConfig.MAXLIVES);
+            sendChat(player, ModConfig.MAXLIVES != 1, "hqm.message.cantAddLives", ModConfig.MAXLIVES);
             currentLives(player);
         }
     }
@@ -207,8 +208,8 @@ public class CommandLives extends CommandBase
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES)
         {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(sender, "hqm.message.addLivesTo", amount, playerName);
-            sendChat(player, "hqm.message.addLivesBy", amount, sender.getCommandSenderName());
+            sendChat(sender, amount != 1, "hqm.message.addLivesTo", amount, playerName);
+            sendChat(player, amount != 1, "hqm.message.addLivesBy", amount, sender.getCommandSenderName());
             currentLives(player);
         } else
         {
@@ -226,7 +227,7 @@ public class CommandLives extends CommandBase
         if (player != null)
         {
             int lives = QuestingData.getQuestingData(player).getLives();
-            sendChat(sender, "hqm.message.hasLivesRemaining", playerName, lives);
+            sendChat(sender, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);
         } else
         {
             throw new CommandException("hqm.message.noPlayer");
