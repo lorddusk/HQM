@@ -4,7 +4,7 @@ package hardcorequesting.quests;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.reputation.ReputationBar;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -15,18 +15,24 @@ public class QuestSet {
     private String description;
     private List<String> cachedDescription;
     private List<Quest> quests;
+    private List<ReputationBar> reputationBars;
     private int id;
 
 
     public QuestSet(String name, String description) {
         this.name = name;
         this.description = description;
-        quests = new ArrayList<Quest>();
+        this.quests = new ArrayList<Quest>();
+        this.reputationBars = new ArrayList<>();
         this.id = Quest.getQuestSets().size();
     }
 
     public List<Quest> getQuests() {
         return quests;
+    }
+
+    public List<ReputationBar> getReputationBars() {
+        return reputationBars;
     }
 
     public String getName() {
@@ -76,6 +82,14 @@ public class QuestSet {
 
     public void addQuest(Quest quest) {
         quests.add(quest);
+    }
+
+    public void removeRepBar(ReputationBar repBar) {
+        reputationBars.remove(repBar);
+    }
+
+    public void addRepBar(ReputationBar repBar) {
+        reputationBars.add(repBar);
     }
 
     public int getCompletedCount(EntityPlayer player) {

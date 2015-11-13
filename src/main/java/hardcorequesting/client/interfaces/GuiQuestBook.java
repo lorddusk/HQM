@@ -18,6 +18,7 @@ import hardcorequesting.network.FileHelper;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -780,12 +781,8 @@ public class GuiQuestBook extends GuiBase {
                             GL11.glEnable(GL11.GL_BLEND);
                             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                             applyColor(quest == modifyingQuest ? 0xFFBBFFBB : quest.getColorFilter(player, tick));
-
-
-                                ResourceHelper.bindResource(MAP_TEXTURE);
-
+                            ResourceHelper.bindResource(MAP_TEXTURE);
                             drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
-
 
                             int iconX = quest.getGuiCenterX() - 8;
                             int iconY = quest.getGuiCenterY() - 8;
@@ -800,7 +797,6 @@ public class GuiQuestBook extends GuiBase {
                             //ResourceHelper.bindResource(QUEST_ICONS);
                             //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
                         }
-
                     }
 
 
@@ -1064,7 +1060,10 @@ public class GuiQuestBook extends GuiBase {
                         }
                     }
 
-
+                    for (ReputationBar bar : selectedSet.getReputationBars())
+                    {
+                        bar.draw(this, x, y, player);
+                    }
 
                 }else{
                     selectedQuest.drawMenu(this, player, x, y);
@@ -1228,7 +1227,6 @@ public class GuiQuestBook extends GuiBase {
 	protected void mouseClicked(int x0, int y0, int button) {
 		super.mouseClicked(x0, y0, button);
 
-       
         int x = x0 - left;
         int y = y0 - top;
 
@@ -1469,6 +1467,9 @@ public class GuiQuestBook extends GuiBase {
                             newQuest.setQuestSet(selectedSet);
                             SaveHelper.add(SaveHelper.EditType.QUEST_CREATE);
                         }
+                    }else if (Quest.isEditing && currentMode == EditMode.REP_BAR) {
+                        if (x > 0 && Reputation.getReputation(0) != null)
+                            selectedSet.addRepBar(new ReputationBar(0, x, y));
                     }else{
                         for (Quest quest : selectedSet.getQuests()) {
                             if ((Quest.isEditing ||quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
@@ -1533,6 +1534,24 @@ public class GuiQuestBook extends GuiBase {
                                 break;
                             }
                         }
+
+                        for (ReputationBar reputationBar : selectedSet.getReputationBars())
+                        {
+                            if (Quest.isEditing && reputationBar.inBounds(x, y))
+                            {
+                                switch (currentMode)
+                                {
+                                    case MOVE:
+                                        modifyingBar = reputationBar;
+                                        break;
+                                    case DELETE:
+                                        selectedSet.removeRepBar(reputationBar);
+                                    default:
+                                        break;
+                                }
+
+                            }
+                        }
                     }
 
 
@@ -1557,6 +1576,7 @@ public class GuiQuestBook extends GuiBase {
         updatePosition(x, y);
         if (currentMode == EditMode.MOVE) {
             modifyingQuest = null;
+            modifyingBar = null;
         }
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
@@ -1591,10 +1611,17 @@ public class GuiQuestBook extends GuiBase {
     private Group modifyingGroup;
     private QuestSet modifyingQuestSet;
     private Quest modifyingQuest;
+    private ReputationBar modifyingBar;
     private void updatePosition(int x, int y) {
-        if (modifyingQuest != null && currentMode == EditMode.MOVE && Quest.isEditing) {
-            modifyingQuest.setGuiCenterX(x);
-            modifyingQuest.setGuiCenterY(y);
+        if (Quest.isEditing && currentMode == EditMode.MOVE) {
+            if (modifyingQuest != null) {
+                modifyingQuest.setGuiCenterX(x);
+                modifyingQuest.setGuiCenterY(y);
+            }
+            if (modifyingBar != null)
+            {
+                modifyingBar.moveTo(x, y);
+            }
         }
     }
 
@@ -1606,9 +1633,6 @@ public class GuiQuestBook extends GuiBase {
     public void loadMap() {
         selectedQuest = null;
     }
-
-
-
 
 
     private EditMode currentMode = EditMode.NORMAL;
@@ -1656,7 +1680,8 @@ public class GuiQuestBook extends GuiBase {
         REPUTATION("rep"),
         REPUTATION_VALUE("repValue"),
         REPUTATION_TASK("repTask"),
-        REPUTATION_REWARD("repReward");
+        REPUTATION_REWARD("repReward"),
+        REP_BAR("repBar");
 
         private String id;
 
@@ -1689,7 +1714,7 @@ public class GuiQuestBook extends GuiBase {
     private EditButton[] mainButtons = createButtons(EditMode.NORMAL, EditMode.RENAME);
     private EditButton[] menuButtons = createButtons(EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
     private EditButton[] overviewButtons = createButtons(EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
-    private EditButton[] setButtons = createButtons(EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.DELETE);
+    private EditButton[] setButtons = createButtons(EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR, EditMode.DELETE);
     private EditButton[] questButtons = createButtons(EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, EditMode.CHANGE_TASK, EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.DELETE);
 
     private EditButton[] createButtons(EditMode... modes) {
