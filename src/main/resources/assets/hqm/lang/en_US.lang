@@ -295,6 +295,10 @@ hqm.editMode.repTask.title=Edit reputation target
 hqm.editMode.repTask.desc=Change the configurations for a reputation target for the selected reputation task
 hqm.editMode.repReward.title=Edit reputation reward
 hqm.editMode.repReward.desc=Click on the reputation reward icon to bring up the reputation reward menu.
+hqm.editMode.repBarCreate.title=Add Reputation Bar
+hqm.editMode.repBarCreate.desc=Click to add a new reputation bar to display on the set page.
+hqm.editMode.repBarChange.title=Edit Reputation Bar
+hqm.editMode.repBarChange.desc=Click on the reputation bar you want to edit.
 
 # ======================================
 #				COMMAND
@@ -413,6 +417,7 @@ hqm.rep.atLeastTwo=You need at least two tiers
 hqm.rep.notZero=A tier can't have value 0
 hqm.rep.unique=Tiers must have unique values
 hqm.rep.neutral=Neutral: %s
+hqm.rep.select=Select a reputation to display
 
 # ======================================
 #			REPUTATION KILL

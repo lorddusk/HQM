@@ -1761,7 +1761,7 @@ public class Quest {
             dw.writeString(questSet.getDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
             dw.writeData(questSet.getReputationBars().size(), DataBitHelper.BYTE);
             for (ReputationBar reputationBar : questSet.getReputationBars())
-                dw.writeData(reputationBar.writeDate(), DataBitHelper.INT);
+                dw.writeData(reputationBar.save(), DataBitHelper.INT);
         }
 
         Reputation.save(dw);

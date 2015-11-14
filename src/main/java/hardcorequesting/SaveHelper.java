@@ -66,6 +66,7 @@ public final class SaveHelper {
         REPUTATION_REWARD_CHANGE("Changed rep rewards", GuiColor.ORANGE),
         KILLS_CHANGE("Changed kills", GuiColor.ORANGE),
         REP_BAR_ADD("Created reputation bar", GuiColor.GREEN),
+        REP_BAR_MOVE("Moved reputation bar", GuiColor.ORANGE),
         REP_BAR_CHANGE("Changed reputation bar", GuiColor.ORANGE),
         REP_BAR_REMOVE("Removed reputation bar", GuiColor.RED);
 
