@@ -1,6 +1,5 @@
 package hardcorequesting.quests;
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;
@@ -32,7 +31,17 @@ public class QuestSet {
     }
 
     public List<ReputationBar> getReputationBars() {
+        validateBars();
         return reputationBars;
+    }
+
+    private void validateBars()
+    {
+        List<ReputationBar> toRemove = new ArrayList<>();
+        for (ReputationBar reputationBar : reputationBars)
+            if (!reputationBar.isValid())
+                toRemove.add(reputationBar);
+        reputationBars.removeAll(toRemove);
     }
 
     public String getName() {

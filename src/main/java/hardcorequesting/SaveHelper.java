@@ -1,6 +1,5 @@
 package hardcorequesting;
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiColor;
@@ -13,9 +12,7 @@ import java.util.List;
 
 public final class SaveHelper {
 
-
-
-    public static enum EditType {
+    public enum EditType {
         QUEST_CREATE("Created quests", GuiColor.GREEN),
         QUEST_REMOVE("Removed quests", GuiColor.RED),
         TASK_CREATE("Created tasks", GuiColor.GREEN),
@@ -67,7 +64,10 @@ public final class SaveHelper {
         REPUTATION_TASK_CHANGE("Changed rep targets", GuiColor.ORANGE),
         REPUTATION_TASK_REMOVE("Removed rep targets", GuiColor.RED),
         REPUTATION_REWARD_CHANGE("Changed rep rewards", GuiColor.ORANGE),
-        KILLS_CHANGE("Changed kills", GuiColor.ORANGE);
+        KILLS_CHANGE("Changed kills", GuiColor.ORANGE),
+        REP_BAR_ADD("Created reputation bar", GuiColor.GREEN),
+        REP_BAR_CHANGE("Changed reputation bar", GuiColor.ORANGE),
+        REP_BAR_REMOVE("Removed reputation bar", GuiColor.RED);
 
 
         private String label;

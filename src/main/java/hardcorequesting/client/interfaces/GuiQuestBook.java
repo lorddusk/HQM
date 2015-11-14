@@ -1468,8 +1468,10 @@ public class GuiQuestBook extends GuiBase {
                             SaveHelper.add(SaveHelper.EditType.QUEST_CREATE);
                         }
                     }else if (Quest.isEditing && currentMode == EditMode.REP_BAR) {
-                        if (x > 0 && Reputation.getReputation(0) != null)
-                            selectedSet.addRepBar(new ReputationBar(0, x, y));
+                        if (x > 0 && Reputation.getReputation(0) != null) {
+                            selectedSet.addRepBar(new ReputationBar(0, x, y, selectedSet.getId()));
+                            SaveHelper.add(SaveHelper.EditType.REP_BAR_ADD);
+                        }
                     }else{
                         for (Quest quest : selectedSet.getQuests()) {
                             if ((Quest.isEditing ||quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
@@ -1535,7 +1537,7 @@ public class GuiQuestBook extends GuiBase {
                             }
                         }
 
-                        for (ReputationBar reputationBar : selectedSet.getReputationBars())
+                        for (ReputationBar reputationBar : new ArrayList<ReputationBar>(selectedSet.getReputationBars()))
                         {
                             if (Quest.isEditing && reputationBar.inBounds(x, y))
                             {
@@ -1543,13 +1545,14 @@ public class GuiQuestBook extends GuiBase {
                                 {
                                     case MOVE:
                                         modifyingBar = reputationBar;
+                                        SaveHelper.add(SaveHelper.EditType.REP_BAR_CHANGE);
                                         break;
                                     case DELETE:
                                         selectedSet.removeRepBar(reputationBar);
+                                        SaveHelper.add(SaveHelper.EditType.REP_BAR_REMOVE);
                                     default:
                                         break;
                                 }
-
                             }
                         }
                     }
