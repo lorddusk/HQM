@@ -12,6 +12,7 @@ import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.*;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationBar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -1758,6 +1759,9 @@ public class Quest {
         for (QuestSet questSet : QuestLine.getActiveQuestLine().questSets) {
             dw.writeString(questSet.getName(), DataBitHelper.QUEST_NAME_LENGTH);
             dw.writeString(questSet.getDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
+            dw.writeData(questSet.getReputationBars().size(), DataBitHelper.BYTE);
+            for (ReputationBar reputationBar : questSet.getReputationBars())
+                dw.writeData(reputationBar.save(), DataBitHelper.INT);
         }
 
         Reputation.save(dw);
@@ -1880,7 +1884,16 @@ public class Quest {
                     for (int i = 0; i < setCount; i++) {
                         String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
                         String description = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                        QuestLine.getActiveQuestLine().questSets.add(new QuestSet(name, description));
+                        QuestSet questSet = new QuestSet(name, description);
+                        if (version.contains(FileVersion.REPUTATION_BARS)) {
+                            int barCount = dr.readData(DataBitHelper.BYTE);
+                            for (int ii = 0; ii < barCount ; ii++)
+                            {
+                                int data = dr.readData(DataBitHelper.INT);
+                                questSet.addRepBar(new ReputationBar(version, data));
+                            }
+                        }
+                        QuestLine.getActiveQuestLine().questSets.add(questSet);
                     }
                 }
 

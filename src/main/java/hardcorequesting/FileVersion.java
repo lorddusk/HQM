@@ -22,7 +22,8 @@ public enum FileVersion {
     NO_ITEM_IDS_FIX,
     PARENT_COUNT,
     REPUTATION,
-    REPUTATION_KILL;
+    REPUTATION_KILL,
+    REPUTATION_BARS;
 
     public boolean contains(FileVersion other) {
         return ordinal() >= other.ordinal();

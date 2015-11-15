@@ -411,11 +411,11 @@ public class Reputation {
 
     public static final int REPUTATION_LIST_X = 20;
     public static final int REPUTATION_MARKER_LIST_X = 180;
-    private static final int REPUTATION_LIST_Y = 20;
-    private static final int REPUTATION_MARKER_LIST_Y = 35;
-    private static final int REPUTATION_NEUTRAL_Y = 20;
-    private static final int REPUTATION_OFFSET = 20;
-    private static final int FONT_HEIGHT = 9;
+    public static final int REPUTATION_LIST_Y = 20;
+    public static final int REPUTATION_MARKER_LIST_Y = 35;
+    public static final int REPUTATION_NEUTRAL_Y = 20;
+    public static final int REPUTATION_OFFSET = 20;
+    public static final int FONT_HEIGHT = 9;
 
     @SideOnly(Side.CLIENT)
     public static void drawEditPage(GuiQuestBook gui, int mX, int mY) {
