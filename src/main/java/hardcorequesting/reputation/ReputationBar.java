@@ -66,7 +66,7 @@ public class ReputationBar
 
     public boolean isValid()
     {
-        return getQuestSet() != null && Reputation.getReputation(this.repId) != null;
+        return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && Reputation.getReputation(this.repId) != null;
     }
 
     @SideOnly(Side.CLIENT)
