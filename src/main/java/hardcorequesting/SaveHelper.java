@@ -13,70 +13,141 @@ import java.util.List;
 public final class SaveHelper {
 
     public enum EditType {
-        QUEST_CREATE("Created quests", GuiColor.GREEN),
-        QUEST_REMOVE("Removed quests", GuiColor.RED),
-        TASK_CREATE("Created tasks", GuiColor.GREEN),
-        TASK_REMOVE("Removed tasks", GuiColor.RED),
-        TASK_CHANGE_TYPE("Changed task type", GuiColor.ORANGE),
-        REQUIREMENT_CHANGE("Added requirements", GuiColor.GREEN),
-        REQUIREMENT_REMOVE("Removed requirements", GuiColor.RED),
-        REPEATABILITY_CHANGED("Changed repeatability", GuiColor.ORANGE),
-        VISIBILITY_CHANGED("Changed triggers", GuiColor.ORANGE),
-        PARENT_REQUIREMENT_CHANGED("Changed parent count", GuiColor.ORANGE),
-        OPTION_CHANGE("Added quest options", GuiColor.GREEN),
-        OPTION_REMOVE("Removed quest options", GuiColor.RED),
-        NAME_CHANGE("Changed names", GuiColor.ORANGE),
-        DESCRIPTION_CHANGE("Changed descriptions", GuiColor.ORANGE),
-        ICON_CHANGE("Changed quest icons", GuiColor.ORANGE),
-        QUEST_SIZE_CHANGE("Changed quest sizes", GuiColor.ORANGE),
-        QUEST_MOVE("Moved quests", GuiColor.ORANGE),
-        QUEST_CHANGE_SET("Moved between sets", GuiColor.ORANGE),
-        SET_CREATE("Created quest sets", GuiColor.GREEN),
-        SET_REMOVE("Removed quest sets", GuiColor.RED),
-        REWARD_CREATE("Created rewards", GuiColor.GREEN),
-        REWARD_CHANGE("Changed rewards", GuiColor.ORANGE),
-        REWARD_REMOVE("Removed rewards", GuiColor.RED),
-        MONSTER_CREATE("Created mobs", GuiColor.GREEN),
-        MONSTER_CHANGE("Changed mobs", GuiColor.ORANGE),
-        MONSTER_REMOVE("Removed mobs", GuiColor.RED),
-        LOCATION_CREATE("Created locations", GuiColor.GREEN),
-        LOCATION_CHANGE("Changed locations", GuiColor.ORANGE),
-        LOCATION_REMOVE("Removed locations", GuiColor.RED),
-        TIER_CREATE("Created tiers", GuiColor.GREEN),
-        TIER_CHANGE("Changed tiers", GuiColor.ORANGE),
-        TIER_REMOVE("Removed tiers", GuiColor.RED),
-        GROUP_CREATE("Created groups", GuiColor.GREEN),
-        GROUP_CHANGE("Changed groups", GuiColor.ORANGE),
-        GROUP_REMOVE("Removed groups", GuiColor.RED),
-        GROUP_ITEM_CREATE("Created group items", GuiColor.GREEN),
-        GROUP_ITEM_CHANGE("Changed group items", GuiColor.ORANGE),
-        GROUP_ITEM_REMOVE("Removed group items", GuiColor.RED),
-        DEATH_CHANGE("Changed deaths", GuiColor.ORANGE),
-        TASK_ITEM_CREATE("Created task items", GuiColor.GREEN),
-        TASK_ITEM_CHANGE("Changed task items", GuiColor.ORANGE),
-        TASK_ITEM_REMOVE("Removed task items", GuiColor.RED),
-        REPUTATION_ADD("Created reputations", GuiColor.GREEN),
-        REPUTATION_REMOVE("Removed reputations", GuiColor.RED),
-        REPUTATION_MARKER_CREATE("Created rep tiers", GuiColor.GREEN),
-        REPUTATION_MARKER_CHANGE("Changed rep tiers", GuiColor.ORANGE),
-        REPUTATION_MARKER_REMOVE("Removed rep tiers", GuiColor.RED),
-        REPUTATION_TASK_CREATE("Created rep targets", GuiColor.GREEN),
-        REPUTATION_TASK_CHANGE("Changed rep targets", GuiColor.ORANGE),
-        REPUTATION_TASK_REMOVE("Removed rep targets", GuiColor.RED),
-        REPUTATION_REWARD_CHANGE("Changed rep rewards", GuiColor.ORANGE),
-        KILLS_CHANGE("Changed kills", GuiColor.ORANGE),
-        REP_BAR_ADD("Created reputation bar", GuiColor.GREEN),
-        REP_BAR_MOVE("Moved reputation bar", GuiColor.ORANGE),
-        REP_BAR_CHANGE("Changed reputation bar", GuiColor.ORANGE),
-        REP_BAR_REMOVE("Removed reputation bar", GuiColor.RED);
+        QUEST_CREATE(BaseEditType.ADD, Type.QUEST),
+        QUEST_REMOVE(BaseEditType.REMOVE, Type.QUEST),
+        TASK_CREATE(BaseEditType.ADD, Type.TASK),
+        TASK_REMOVE(BaseEditType.REMOVE, Type.TASK),
+        TASK_CHANGE_TYPE(BaseEditType.ADD, Type.TASK_TYPE),
+        REQUIREMENT_CHANGE(BaseEditType.CHANGE, Type.REQUIREMENT),
+        REQUIREMENT_REMOVE(BaseEditType.REMOVE, Type.REQUIREMENT),
+        REPEATABILITY_CHANGED(BaseEditType.CHANGE, Type.REPEATABILITY),
+        VISIBILITY_CHANGED(BaseEditType.CHANGE, Type.VISIBILITY),
+        PARENT_REQUIREMENT_CHANGED(BaseEditType.CHANGE, Type.PARENT),
+        OPTION_CHANGE(BaseEditType.ADD, Type.OPTION),
+        OPTION_REMOVE(BaseEditType.REMOVE, Type.OPTION),
+        NAME_CHANGE(BaseEditType.CHANGE, Type.NAME),
+        DESCRIPTION_CHANGE(BaseEditType.CHANGE, Type.DESCRIPTION),
+        ICON_CHANGE(BaseEditType.CHANGE, Type.ICON),
+        QUEST_SIZE_CHANGE(BaseEditType.CHANGE, Type.QUEST_SIZE),
+        QUEST_MOVE(BaseEditType.MOVE, Type.QUEST),
+        QUEST_CHANGE_SET(BaseEditType.MOVE, Type.BETWEEN_SETS),
+        SET_CREATE(BaseEditType.ADD, Type.SET),
+        SET_REMOVE(BaseEditType.REMOVE, Type.SET),
+        REWARD_CREATE(BaseEditType.ADD, Type.REWARD),
+        REWARD_CHANGE(BaseEditType.CHANGE, Type.REWARD),
+        REWARD_REMOVE(BaseEditType.REMOVE, Type.REWARD),
+        MONSTER_CREATE(BaseEditType.ADD, Type.MONSTER),
+        MONSTER_CHANGE(BaseEditType.CHANGE, Type.MONSTER),
+        MONSTER_REMOVE(BaseEditType.REMOVE, Type.MONSTER),
+        LOCATION_CREATE(BaseEditType.ADD, Type.LOCATION),
+        LOCATION_CHANGE(BaseEditType.CHANGE, Type.LOCATION),
+        LOCATION_REMOVE(BaseEditType.REMOVE, Type.LOCATION),
+        TIER_CREATE(BaseEditType.ADD, Type.TIER),
+        TIER_CHANGE(BaseEditType.CHANGE, Type.TIER),
+        TIER_REMOVE(BaseEditType.REMOVE, Type.TIER),
+        GROUP_CREATE(BaseEditType.ADD, Type.GROUP),
+        GROUP_CHANGE(BaseEditType.CHANGE, Type.GROUP),
+        GROUP_REMOVE(BaseEditType.REMOVE, Type.GROUP),
+        GROUP_ITEM_CREATE(BaseEditType.ADD, Type.GROUP_ITEM),
+        GROUP_ITEM_CHANGE(BaseEditType.REMOVE, Type.GROUP_ITEM),
+        GROUP_ITEM_REMOVE(BaseEditType.REMOVE, Type.GROUP_ITEM),
+        DEATH_CHANGE(BaseEditType.CHANGE, Type.DEATH),
+        TASK_ITEM_CREATE(BaseEditType.ADD, Type.TASK_ITEM),
+        TASK_ITEM_CHANGE(BaseEditType.CHANGE, Type.TASK_ITEM),
+        TASK_ITEM_REMOVE(BaseEditType.REMOVE, Type.TASK_ITEM),
+        REPUTATION_ADD(BaseEditType.ADD, Type.REPUTATION),
+        REPUTATION_REMOVE(BaseEditType.REMOVE, Type.REPUTATION),
+        REPUTATION_MARKER_CREATE(BaseEditType.ADD, Type.REPUTATION_MARKER),
+        REPUTATION_MARKER_CHANGE(BaseEditType.CHANGE, Type.REPUTATION_MARKER),
+        REPUTATION_MARKER_REMOVE(BaseEditType.REMOVE, Type.REPUTATION_MARKER),
+        REPUTATION_TASK_CREATE(BaseEditType.ADD, Type.REPUTATION_TASK),
+        REPUTATION_TASK_CHANGE(BaseEditType.CHANGE, Type.REPUTATION_TASK),
+        REPUTATION_TASK_REMOVE(BaseEditType.REMOVE, Type.REPUTATION_TASK),
+        REPUTATION_REWARD_CHANGE(BaseEditType.CHANGE, Type.REPUTATION_REWARD),
+        KILLS_CHANGE(BaseEditType.CHANGE, Type.KILLS),
+        REPUTATION_BAR_ADD(BaseEditType.ADD, Type.REPUTATION_BAR),
+        REPUTATION_BAR_MOVE(BaseEditType.MOVE, Type.REPUTATION_BAR),
+        REPUTATION_BAR_CHANGE(BaseEditType.CHANGE, Type.REPUTATION_BAR),
+        REPUTATION_BAR_REMOVE(BaseEditType.REMOVE, Type.REPUTATION_BAR);
 
 
-        private String label;
-        private GuiColor color;
+        private BaseEditType basType;
+        private Type type;
 
-        EditType(String label, GuiColor color) {
-            this.label = label;
-            this.color = color;
+        EditType(BaseEditType basType, Type type) {
+            this.basType = basType;
+            this.type = type;
+        }
+
+        public String translate(int number)
+        {
+            return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
+        }
+
+        private enum BaseEditType
+        {
+            ADD("added", GuiColor.GREEN),
+            CHANGE("changed", GuiColor.ORANGE),
+            MOVE("moved", GuiColor.ORANGE),
+            REMOVE("removed", GuiColor.RED);
+
+            private String id;
+            private GuiColor colour;
+
+            BaseEditType(String id, GuiColor colour)
+            {
+                this.id = id;
+                this.colour = colour;
+            }
+
+            private String translate()
+            {
+                return Translator.translate("hqm.editType." + id);
+            }
+        }
+
+        private enum Type
+        {
+            QUEST("quest"),
+            TASK("task"),
+            TASK_TYPE("taskType"),
+            REQUIREMENT("req"),
+            REPEATABILITY("repeat"),
+            VISIBILITY("vis"),
+            PARENT("parent"),
+            OPTION("option"),
+            NAME("name"),
+            DESCRIPTION("desc"),
+            ICON("icon"),
+            QUEST_SIZE("questSize"),
+            SET("set"),
+            REWARD("reward"),
+            MONSTER("monster"),
+            LOCATION("location"),
+            TIER("tier"),
+            GROUP("group"),
+            GROUP_ITEM("groupItem"),
+            DEATH("death"),
+            TASK_ITEM("taskItem"),
+            REPUTATION("rep"),
+            REPUTATION_MARKER("repMark"),
+            REPUTATION_TASK("repTask"),
+            REPUTATION_REWARD("repReward"),
+            KILLS("kills"),
+            REPUTATION_BAR("repBar"),
+            BETWEEN_SETS("betweenSets");
+
+            private String id;
+
+            Type(String id)
+            {
+                this.id = id;
+            }
+
+            private String translate()
+            {
+                return Translator.translate("hqm.editType." + id);
+            }
         }
     }
 
@@ -179,15 +250,15 @@ public final class SaveHelper {
 
         if (isLarge) {
             if (total == 0) {
-                gui.drawString("Everything is saved!", X + START_X, Y + START_Y, 0.7F, 0x404040);
+                gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
             }else{
                 if (saveTime == 0) {
-                    gui.drawString("Never saved this session", X + START_X, Y + START_Y, 0.7F, 0x404040);
+                    gui.drawString(Translator.translate("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }else{
                     gui.drawString(formatTime((int)((Minecraft.getSystemTime() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
 
-                gui.drawString("Unsaved changes: " + total, X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
+                gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
                 int others = total;
                 for (int i = 0; i < LISTED_TYPES; i++) {
                     ListElement element = sortedList.get(i);
@@ -195,11 +266,11 @@ public final class SaveHelper {
                         //since it's sorted, the first 0 means the rest is empty
                         break;
                     }
-                    gui.drawString(element.type.label + ": " + element.type.color + element.count, X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(element.type.translate(element.count), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                     others -= element.count;
                 }
                 if (others > 0) {
-                    gui.drawString("Other changes: " + others, X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(Translator.translate("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                 }
             }
         }else{
@@ -229,16 +300,12 @@ public final class SaveHelper {
 
         if (hours == 0) {
             if (minutes == 0) {
-                return "Saved recently";
-            }else if (minutes == 1){
-                return "Saved 1 minute ago";
-            }else{
-                return "Saved " + minutes + " minutes ago";
+                return Translator.translate("hqm.editType.savedRecent");
+            }else {
+                return Translator.translate(minutes != 1, "hqm.editType.savedMinutes", minutes);
             }
-        }else if (hours == 1){
-            return "Saved 1 hour ago";
-        }else{
-            return "Saved " + hours + " hours ago";
+        }else {
+            return Translator.translate(hours != 1, "hqm.editType.savedMinutes", hours);
         }
     }
 

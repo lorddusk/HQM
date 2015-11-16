@@ -616,3 +616,48 @@ hqm.party.stats=Stats about all existing parties.
 hqm.party.lifeSetting=Life setting: %s
 hqm.party.rewardSetting=Reward setting: %s
 hqm.party.change=Click here to change
+
+# ======================================
+#			EDIT TYPES
+# ======================================
+hqm.editType.allSaved=Everything is saved!
+hqm.editType.neverSaved=Never saved this session
+hqm.editType.unsaved=Unsaved changes: %s
+hqm.editType.other=Other changes: %s
+hqm.editType.savedRecent=Saved recently
+hqm.editType.savedMinutes=Saved %s [[minute||minutes]] ago
+hqm.editType.savedHours=Saved %s [[hour||hours]] ago
+
+hqm.editType.added=Created
+hqm.editType.changed=Changed
+hqm.editType.moved=Moved
+hqm.editType.removed=Removed
+
+hqm.editType.quest=quests
+hqm.editType.task=tasks
+hqm.editType.taskType=task type
+hqm.editType.req=requirements
+hqm.editType.repeat=repeatability
+hqm.editType.vis=triggers
+hqm.editType.parent=parent count
+hqm.editType.option=quest options
+hqm.editType.name=names
+hqm.editType.desc=descriptions
+hqm.editType.icon=quest icons
+hqm.editType.questSize=quest sizes
+hqm.editType.set=quest sets
+hqm.editType.reward=rewards
+hqm.editType.monster=mobs
+hqm.editType.location=locations
+hqm.editType.tier=tiers
+hqm.editType.group=groups
+hqm.editType.groupItem=group items
+hqm.editType.death=deaths
+hqm.editType.taskItem=task items
+hqm.editType.rep=reputations
+hqm.editType.repMark=rep tiers
+hqm.editType.repTask=targets
+hqm.editType.repReward=rep rewards
+hqm.editType.kills=kills
+hqm.editType.repBar=rep bar
+hqm.editType.betweenSets=between sets

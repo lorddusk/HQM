@@ -1544,14 +1544,14 @@ public class GuiQuestBook extends GuiBase {
                                 {
                                     case MOVE:
                                         modifyingBar = reputationBar;
-                                        SaveHelper.add(SaveHelper.EditType.REP_BAR_MOVE);
+                                        SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
                                         break;
                                     case REP_BAR_CHANGE:
                                         editMenu = new ReputationBar.EditGui(this, player, reputationBar);
                                         break;
                                     case DELETE:
                                         selectedSet.removeRepBar(reputationBar);
-                                        SaveHelper.add(SaveHelper.EditType.REP_BAR_REMOVE);
+                                        SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_REMOVE);
                                     default:
                                         break;
                                 }
