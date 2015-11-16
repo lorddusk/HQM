@@ -131,6 +131,8 @@ public class QuestSet {
 
     public void decreaseId() {
         id--;
+        for (ReputationBar reputationBar : reputationBars)
+            reputationBar.setQuestSet(this.id);
     }
 
 

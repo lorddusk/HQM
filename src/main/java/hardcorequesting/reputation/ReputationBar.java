@@ -59,9 +59,9 @@ public class ReputationBar
         return Quest.getQuestSets().get(this.questSet);
     }
 
-    public int getQuestSetId()
+    public void setQuestSet(int id)
     {
-        return this.questSet;
+        this.questSet = id;
     }
 
     public boolean isValid()
@@ -156,9 +156,9 @@ public class ReputationBar
         protected void save(GuiBase gui) {
             if (isNew) {
                 Quest.getQuestSets().get(bar.questSet).addRepBar(bar);
-                SaveHelper.add(SaveHelper.EditType.REP_BAR_ADD);
+                SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_ADD);
             } else {
-                SaveHelper.add(SaveHelper.EditType.REP_BAR_CHANGE);
+                SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_CHANGE);
             }
         }
     }
