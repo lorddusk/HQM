@@ -88,7 +88,7 @@ public enum DataBitHelper {
 
     private int bitCount;
 
-    private DataBitHelper(int bitCount, int maximum) {
+    DataBitHelper(int bitCount, int maximum) {
         this(bitCount);
         int calculatedMax = getMaximum();
         if (maximum < calculatedMax) {
@@ -96,7 +96,7 @@ public enum DataBitHelper {
         }
     }
 
-    private DataBitHelper(int bitCount) {
+    DataBitHelper(int bitCount) {
         this.bitCount = bitCount;
     }
 
@@ -115,7 +115,7 @@ public enum DataBitHelper {
     public int getMaximum() {
         if (!hasMaximum) {
             hasMaximum = true;
-            cachedMaximum = (1 << bitCount) - 1;
+            cachedMaximum = bitCount == INT.bitCount ? Integer.MAX_VALUE : (1 << bitCount) - 1;
         }
 
         return cachedMaximum;
