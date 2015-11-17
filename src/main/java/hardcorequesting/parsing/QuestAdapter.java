@@ -889,6 +889,7 @@ public class QuestAdapter {
             for (QuestSet existing : Quest.getQuestSets()) {
                 if (existing.getName().equals(name)) {
                     set = existing;
+                    set.setDescription(description);
                     questReplace(set.getQuests(), quests);
                     break;
                 }
