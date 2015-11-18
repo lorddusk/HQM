@@ -18,3 +18,4 @@ HQM crashes every time :bomb:?  Have a suggestion?  Found a :bug:?  Create an is
 		* Detailed description of the bug and pictures if applicable
 		* Ways to reproduce the bug
 5. Click `Submit new issue`, and wait for feedback! :boom:
+6. (If not following this guidelines, I keep the privilege to close the issue without warning or explanation.)
