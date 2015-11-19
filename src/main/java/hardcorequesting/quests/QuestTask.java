@@ -153,7 +153,6 @@ public abstract class QuestTask {
 
     protected void completeTask(String playerName) {
         getData(playerName).completed = true;
-
         completeQuest(parent, playerName);
     }
 

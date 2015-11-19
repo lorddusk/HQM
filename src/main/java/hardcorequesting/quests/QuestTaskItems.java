@@ -4,15 +4,14 @@ package hardcorequesting.quests;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.FileVersion;
-import hardcorequesting.OreDictionaryHelper;
-import hardcorequesting.SaveHelper;
+import hardcorequesting.*;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -186,8 +185,17 @@ public abstract class QuestTaskItems extends QuestTask {
         return data.progress[id];
     }
 
-    private void setProgress(EntityPlayer player, int id, int progress) {
-        ((QuestDataTaskItems) getData(player)).progress[id] = progress;
+    protected void resetTask(String playerName, int id)
+    {
+        getData(playerName).completed = false;
+        ((QuestDataTaskItems) getData(playerName)).progress[id] = 0;
+    }
+
+    protected void completeTask(String playerName, int id, int count)
+    {
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerName);
+        data.progress[id] = count;
+        doCompletionCheck(data, playerName);
     }
 
 
@@ -335,6 +343,13 @@ public abstract class QuestTaskItems extends QuestTask {
                 str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
                 if (Quest.isEditing)
                     str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
+                if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
+                    if (isCompleted(player)) {
+                        str += "\n\n" + GuiColor.RED + Translator.translate("hqm.questBook.resetTask");
+                    }else{
+                        str += "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.questBook.completeTask");
+                    }
+                }
                 gui.drawMouseOver(str, mX + gui.getLeft(), mY + gui.getTop());
                 break;
             }
@@ -376,6 +391,12 @@ public abstract class QuestTaskItems extends QuestTask {
                         }
                         setItems(newItems);
                         SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
+                    } else if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
+                        if (isCompleted(player)) {
+                            resetTask(QuestingData.getUserName(player), i);
+                        }else{
+                            completeTask(QuestingData.getUserName(player), i, item.required);
+                        }
                     }
                     break;
                 }
