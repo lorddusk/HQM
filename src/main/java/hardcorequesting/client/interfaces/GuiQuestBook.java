@@ -67,7 +67,7 @@ public class GuiQuestBook extends GuiBase {
     private static ItemStack selected;
 
 	private final EntityPlayer player;
-    private final boolean isOpBook;
+    public final boolean isOpBook;
 
     private ScrollBar setScroll;
     private ScrollBar descriptionScroll;
