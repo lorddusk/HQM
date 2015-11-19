@@ -743,6 +743,11 @@ public class GuiQuestBook extends GuiBase {
                         drawString(getLinesFromText(Translator.translate("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
                     }
 
+                    for (ReputationBar bar : selectedSet.getReputationBars())
+                    {
+                        bar.draw(this, x, y, player);
+                    }
+
                     for (Quest child : selectedSet.getQuests()) {
                         if ((Quest.isEditing || child.isVisible(player))) {
                             for (Quest parent : child.getRequirement()) {
@@ -1058,11 +1063,6 @@ public class GuiQuestBook extends GuiBase {
                             }
                             break;
                         }
-                    }
-
-                    for (ReputationBar bar : selectedSet.getReputationBars())
-                    {
-                        bar.draw(this, x, y, player);
                     }
 
                 }else{
