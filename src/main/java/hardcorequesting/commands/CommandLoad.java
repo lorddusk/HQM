@@ -70,7 +70,7 @@ public class CommandLoad extends CommandBase
 
     private File[] getPossibleFiles()
     {
-        return HardcoreQuesting.configDir.listFiles(JSON_FILTER);
+        return new File(HardcoreQuesting.configDir + File.separator + "QuestSheets").listFiles(JSON_FILTER);
     }
 
     private void loadSet(ICommandSender sender, File file)
