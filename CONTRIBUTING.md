@@ -6,7 +6,10 @@ Don't file these issues, because they are NOT issues.
 
 1. Quest editing doesn't work on servers!
 	* I know, it's a design choice and a necesity to make sure editing won't corrupt while saving.
-
+2. After changing minecraft name via mojang site, I'm not part of my party anymore!
+ 	* Use `/hqm edit oldplayername` to get the questbook of your old player name, you use that to invite your new name to the party you used to be in.
+3. 1.8 support?!
+ 	* Is in the works, but not soon, don't ask for ETA's.
 
 ### Creating an Issue
 HQM crashes every time :bomb:?  Have a suggestion?  Found a :bug:?  Create an issue now!
