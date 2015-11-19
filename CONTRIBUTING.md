@@ -1,6 +1,12 @@
 ## Contributing
 First of all, thanks for contributing! :sparkles: :+1:
 
+### Common "Issues"
+Don't file these issues, because they are NOT issues.
+
+1. Quest editing doesn't work on servers!
+	* I know, it's a design choice and a necesity to make sure editing won't corrupt while saving.
+
 
 ### Creating an Issue
 HQM crashes every time :bomb:?  Have a suggestion?  Found a :bug:?  Create an issue now!
