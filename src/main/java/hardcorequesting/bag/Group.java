@@ -1,15 +1,20 @@
 package hardcorequesting.bag;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -19,6 +24,7 @@ import java.util.*;
 import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.common.FMLLog;
+import org.lwjgl.opengl.GL11;
 
 public class Group {
 
@@ -245,5 +251,103 @@ public class Group {
             if (ItemStack.areItemStacksEqual(stack, stack2)) return true;
         }
         return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void drawOverview(GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y)
+    {
+        List<GroupTier> tiers = GroupTier.getTiers();
+        int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
+            GroupTier groupTier = tiers.get(i);
+
+            String str = groupTier.getName();
+            int yPos = GuiQuestBook.TIERS_Y + GuiQuestBook.TIERS_SPACING * (i - start);
+            boolean inBounds = gui.inBounds(GuiQuestBook.TIERS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, x, y);
+            int color = groupTier.getColor().getHexColor();
+            if (inBounds) {
+                color &= 0xFFFFFF;
+                color |= 0xBB << 24;
+                GL11.glEnable(GL11.GL_BLEND);
+            }
+            gui.drawString(str, GuiQuestBook.TIERS_X, yPos, color);
+            if (inBounds) {
+                GL11.glDisable(GL11.GL_BLEND);
+            }
+
+            for (int j = 0; j < BagTier.values().length; j++) {
+                BagTier bagTier = BagTier.values()[j];
+                gui.drawCenteredString(bagTier.getColor().toString() + groupTier.getWeights()[j],
+                        GuiQuestBook.TIERS_X + GuiQuestBook.TIERS_SECOND_LINE_X + j * GuiQuestBook.WEIGHT_SPACING,
+                        yPos + GuiQuestBook.TIERS_SECOND_LINE_Y, 0.7F,
+                        GuiQuestBook.WEIGHT_SPACING, 0, 0x404040);
+            }
+        }
+
+        List<Group> groups = Group.getGroups();
+        start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
+            Group group = groups.get(i);
+
+            String str = group.getName();
+            int yPos = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
+            boolean inBounds = gui.inBounds(GuiQuestBook.GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, x, y);
+            int color = group.getTier().getColor().getHexColor();
+            boolean selected = group == gui.getModifyingGroup();
+            if (inBounds || selected) {
+                color &= 0xFFFFFF;
+                GL11.glEnable(GL11.GL_BLEND);
+
+                if (selected) {
+                    color |= 0x50 << 24;
+                } else {
+                    color |= 0xBB << 24;
+                }
+            }
+
+            gui.drawString(str, GuiQuestBook.GROUPS_X, yPos, color);
+            if (inBounds || selected) {
+                GL11.glDisable(GL11.GL_BLEND);
+            }
+
+            gui.drawString(Translator.translate("hqm.questBook.items", group.getItems().size()),
+                    GuiQuestBook.GROUPS_X + GuiQuestBook.GROUPS_SECOND_LINE_X,
+                    yPos + GuiQuestBook.GROUPS_SECOND_LINE_Y,
+                    0.7F, 0x404040);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void draw(GuiQuestBook gui, int x, int y)
+    {
+        gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
+        List<ItemStack> items = this.getItems();
+        for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
+            ItemStack itemStack = i < items.size() ? items.get(i) : null;
+
+            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
+            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+
+            gui.drawItem(itemStack, xPos, yPos, x, y, false);
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack itemStack = items.get(i);
+
+            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
+            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+
+            if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
+                if (itemStack != null && itemStack.getItem() != null) {
+                    try {
+                        gui.drawMouseOver(itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), x + gui.getLeft(), y + gui.getTop());
+                    }catch (Exception ignored) {}
+                }
+                break;
+            }
+        }
+
+        gui.drawString(Translator.translate("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
+        gui.drawString(Translator.translate("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
     }
 }
