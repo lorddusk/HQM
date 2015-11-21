@@ -293,7 +293,7 @@ public class Group {
             int yPos = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(GuiQuestBook.GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, x, y);
             int color = group.getTier().getColor().getHexColor();
-            boolean selected = group == gui.getModifyingGroup();
+            boolean selected = group == gui.modifyingGroup;
             if (inBounds || selected) {
                 color &= 0xFFFFFF;
                 GL11.glEnable(GL11.GL_BLEND);
@@ -389,7 +389,7 @@ public class Group {
             if (gui.inBounds(GuiQuestBook.GROUPS_X, posY, gui.getStringWidth(group.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
-                        gui.modifyingGroup = (group == gui.getModifyingGroup() ? null : group);
+                        gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
                         break;
                     case NORMAL:
                         GuiQuestBook.selectedGroup = group;

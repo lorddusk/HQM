@@ -169,9 +169,9 @@ public class QuestSet {
                 }
                 if (quest.isCompleted(player) && quest.hasReward(player)) unclaimed++;
             }
-            boolean selected = questSet == GuiQuestBook.getSelectedSet();
+            boolean selected = questSet == GuiQuestBook.selectedSet;
             boolean inBounds = gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y);
-            int color = gui.getModifyingQuestSet() == questSet ? 0x4040DD : enabled ? completed ? selected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : selected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : 0x404040 : 0xDDDDDD;
+            int color = gui.modifyingQuestSet == questSet ? 0x4040DD : enabled ? completed ? selected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : selected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : 0x404040 : 0xDDDDDD;
             gui.drawString(questSet.getName(i), GuiQuestBook.LIST_X, setY, color);
 
             String info;
@@ -194,12 +194,12 @@ public class QuestSet {
         if ((Quest.isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.CREATE)) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
         }else{
-            if (GuiQuestBook.getSelectedSet() != null){
-                int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.getSelectedSet().getDescription(gui).size() - GuiQuestBook.VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-                gui.drawString(GuiQuestBook.getSelectedSet().getDescription(gui), startLine, GuiQuestBook.VISIBLE_DESCRIPTION_LINES, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
+            if (GuiQuestBook.selectedSet != null){
+                int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - GuiQuestBook.VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
+                gui.drawString(GuiQuestBook.selectedSet.getDescription(gui), startLine, GuiQuestBook.VISIBLE_DESCRIPTION_LINES, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
             }
 
-            drawQuestInfo(gui, GuiQuestBook.getSelectedSet(), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.getSelectedSet() == null ? GuiQuestBook.DESCRIPTION_Y : INFO_Y);
+            drawQuestInfo(gui, GuiQuestBook.selectedSet, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.selectedSet == null ? GuiQuestBook.DESCRIPTION_Y : INFO_Y);
         }
 
     }
@@ -253,7 +253,7 @@ public class QuestSet {
                 GL11.glPushMatrix();
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                gui.applyColor(quest == gui.getModifyingQuest() ? 0xFFBBFFBB : quest.getColorFilter(player, gui.getTick()));
+                gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getColorFilter(player, gui.getTick()));
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
                 gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
 

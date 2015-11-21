@@ -173,13 +173,13 @@ public class BlockPortal extends BlockContainer
     }
 
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z)
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player)
     {
         TileEntity te = world.getTileEntity(x, y, z);
         if (te != null && te instanceof TileEntityPortal)
         {
             TileEntityPortal portal = (TileEntityPortal) te;
-            ItemStack itemStack = super.getPickBlock(target, world, x, y, z);
+            ItemStack itemStack = super.getPickBlock(target, world, x, y, z, player);
             if (itemStack != null)
             {
                 NBTTagCompound tagCompound = itemStack.getTagCompound();

@@ -380,6 +380,7 @@ public class GuiQuestBook extends GuiBase {
 		super.updateScreen();
 	}
 
+    //region pixel info for all the things
     public static final int VISIBLE_REPUTATION_TIERS = 9;
     public static final int VISIBLE_REPUTATIONS = 10;
     public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
@@ -446,7 +447,7 @@ public class GuiQuestBook extends GuiBase {
     private static final int MENU_ARROW_SRC_Y = 104;
     private static final int MENU_ARROW_WIDTH = 14;
     private static final int MENU_ARROW_HEIGHT = 9;
-
+    //endregion
 
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
 
@@ -947,30 +948,6 @@ public class GuiQuestBook extends GuiBase {
     private EditMode currentMode = EditMode.NORMAL;
     public EditMode getCurrentMode() {
         return currentMode;
-    }
-
-    public static Quest getSelectedQuest() {
-        return selectedQuest;
-    }
-
-    public static QuestSet getSelectedSet()
-    {
-        return selectedSet;
-    }
-
-    public Quest getModifyingQuest()
-    {
-        return modifyingQuest;
-    }
-
-    public QuestSet getModifyingQuestSet()
-    {
-        return modifyingQuestSet;
-    }
-
-    public Group getModifyingGroup()
-    {
-        return modifyingGroup;
     }
 
     public EntityPlayer getPlayer() {

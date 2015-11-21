@@ -96,7 +96,7 @@ public class GroupTier {
             if (gui.inBounds(GuiQuestBook.TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
-                        if (gui.getModifyingGroup() != null) {
+                        if (gui.modifyingGroup != null) {
                             gui.modifyingGroup.setTier(groupTier);
                             SaveHelper.add(SaveHelper.EditType.GROUP_CHANGE);
                         }
