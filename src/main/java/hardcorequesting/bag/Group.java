@@ -7,11 +7,11 @@ import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
-import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.client.interfaces.ScrollBar;
+import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
+import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.client.Minecraft;
@@ -349,5 +349,64 @@ public class Group {
 
         gui.drawString(Translator.translate("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
         gui.drawString(Translator.translate("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
+    }
+
+    public void mouseClicked(GuiQuestBook gui, int x, int y)
+    {
+        List<ItemStack> items = this.getItems();
+        for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
+            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
+            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+
+            if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
+                if (gui.getCurrentMode() == GuiQuestBook.EditMode.ITEM) {
+                    ItemStack itemStack = i < items.size() ? items.get(i) : null;
+                    int amount;
+                    if (itemStack != null) {
+                        itemStack = itemStack.copy();
+                        amount = itemStack.stackSize;
+                    }else{
+                        amount = 1;
+                    }
+
+                     gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), itemStack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE));
+                }else if (gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE) {
+                    this.removeItem(i);
+                    SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
+                }
+                break;
+            }
+        }
+    }
+
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar groupScroll, int x, int y) {
+        List<Group> groups = getGroups();
+        int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
+            Group group = groups.get(i);
+
+            int posY = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
+            if (gui.inBounds(GuiQuestBook.GROUPS_X, posY, gui.getStringWidth(group.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
+                switch (gui.getCurrentMode()) {
+                    case TIER:
+                        gui.modifyingGroup = (group == gui.getModifyingGroup() ? null : group);
+                        break;
+                    case NORMAL:
+                        GuiQuestBook.selectedGroup = group;
+                        gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
+                        break;
+                    case RENAME:
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), group));
+                        break;
+                    case DELETE:
+                        group.remove(i);
+                        SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+        }
     }
 }

@@ -2,8 +2,9 @@ package hardcorequesting.bag;
 
 
 import hardcorequesting.FileVersion;
+import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
-import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
@@ -81,6 +82,47 @@ public class GroupTier {
             }
 
             QuestLine.getActiveQuestLine().tiers.add(new GroupTier(name, color, weights));
+        }
+    }
+
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar tierScroll, int x, int y)
+    {
+        List<GroupTier> tiers = GroupTier.getTiers();
+        int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
+            GroupTier groupTier = tiers.get(i);
+
+            int posY = GuiQuestBook.TIERS_Y + GuiQuestBook.TIERS_SPACING * (i - start);
+            if (gui.inBounds(GuiQuestBook.TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
+                switch (gui.getCurrentMode()) {
+                    case TIER:
+                        if (gui.getModifyingGroup() != null) {
+                            gui.modifyingGroup.setTier(groupTier);
+                            SaveHelper.add(SaveHelper.EditType.GROUP_CHANGE);
+                        }
+                        break;
+                    case NORMAL:
+                        gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer(), groupTier));
+                        break;
+                    case RENAME:
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), groupTier));
+                        break;
+                    case DELETE:
+                        if (tiers.size() > 1 || Group.getGroups().size() == 0) {
+                            for (Group group : Group.getGroups()) {
+                                if (group.getTier() == groupTier) {
+                                    group.setTier(i == 0 ? tiers.get(1) : tiers.get(0));
+                                }
+                            }
+                            tiers.remove(i);
+                            SaveHelper.add(SaveHelper.EditType.TIER_REMOVE);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
         }
     }
 }

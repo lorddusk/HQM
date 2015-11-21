@@ -2,8 +2,11 @@ package hardcorequesting.quests;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import hardcorequesting.OPBookHelper;
+import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.*;
+import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.reputation.ReputationBar;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -569,5 +572,157 @@ public class QuestSet {
             info.add(GuiColor.LIGHT_GRAY.toString() + Translator.translate(realTotal != 1, "hqm.questBook.inclInvisiQuests", realTotal));
         }
         gui.drawString(info, x, y, 0.7F, 0x404040);
+    }
+
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar setScroll, int x, int y)
+    {
+        List<QuestSet> questSets = Quest.getQuestSets();
+        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
+            QuestSet questSet = questSets.get(i);
+
+            int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
+            if (gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y)) {
+                switch (gui.getCurrentMode())
+                {
+                    case DELETE:
+                        if (questSet.getQuests().isEmpty()) {
+                            for (int j = questSet.getId() + 1; j < Quest.getQuestSets().size(); j++) {
+                                Quest.getQuestSets().get(j).decreaseId();
+                            }
+                            Quest.getQuestSets().remove(questSet);
+                            SaveHelper.add(SaveHelper.EditType.SET_REMOVE);
+                        }
+                        break;
+                    case SWAP_SELECT:
+                            gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
+                        break;
+                    case RENAME:
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(),  questSet, true));
+                        break;
+                    default:
+                        if (!(!Quest.isEditing && questSet.isEnabled(gui.getPlayer())))
+                            break;
+                    case NORMAL:
+                        GuiQuestBook.selectedSet = (GuiQuestBook.selectedSet == questSet ? null : questSet);
+                        break;
+                }
+                break;
+            }
+        }
+
+
+        if (Quest.isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
+            if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int)(GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
+                gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
+            }
+        }
+    }
+
+    public void mouseClicked(GuiQuestBook gui, int x, int y)
+    {
+        EntityPlayer player = gui.getPlayer();
+        if (Quest.isEditing && (gui.getCurrentMode() == GuiQuestBook.EditMode.CREATE || gui.getCurrentMode() == GuiQuestBook.EditMode.REP_BAR_CREATE))
+        {
+            switch (gui.getCurrentMode())
+            {
+                case CREATE:
+                    if (x > 0 && Quest.size() < DataBitHelper.QUESTS.getMaximum()) {
+                        int i = 0;
+                        for (Quest quest : this.getQuests())
+                            if (quest.getName().startsWith("Unnamed")) i++;
+                        Quest newQuest = new Quest(Quest.size(), "Unnamed" + (i == 0 ? "" : i), "Unnamed quest", 0, 0, false);
+                        newQuest.setGuiCenterX(x);
+                        newQuest.setGuiCenterY(y);
+                        newQuest.setQuestSet(this);
+                        SaveHelper.add(SaveHelper.EditType.QUEST_CREATE);
+                    }
+                    break;
+                case REP_BAR_CREATE:
+                    gui.setEditMenu(new ReputationBar.EditGui(gui, player, x, y, this.getId()));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            for (Quest quest : this.getQuests()) {
+                if ((Quest.isEditing || quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
+                    if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
+                        switch (gui.getCurrentMode()) {
+                            case MOVE:
+                                gui.modifyingQuest = quest;
+                                SaveHelper.add(SaveHelper.EditType.QUEST_MOVE);
+                                break;
+                            case REQUIREMENT:
+                                if (gui.modifyingQuest == quest) {
+                                    if (GuiScreen.isShiftKeyDown())
+                                        gui.modifyingQuest.clearRequirements();
+                                    gui.modifyingQuest = null;
+                                } else if (gui.modifyingQuest == null) {
+                                    gui.modifyingQuest = quest;
+                                } else {
+                                    gui.modifyingQuest.addRequirement(quest.getId());
+                                }
+                                break;
+                            case SIZE:
+                                int cX = quest.getGuiCenterX();
+                                int cY = quest.getGuiCenterY();
+                                quest.setBigIcon(!quest.useBigIcon());
+                                quest.setGuiCenterX(cX);
+                                quest.setGuiCenterY(cY);
+                                SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
+                                break;
+                            case ITEM:
+                                gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIcon(), quest.getId(), GuiEditMenuItem.Type.QUEST_ICON, 1, ItemPrecision.PRECISE));
+                                break;
+                            case DELETE:
+                                Quest.removeQuest(quest);
+                                SaveHelper.add(SaveHelper.EditType.QUEST_REMOVE);
+                                break;
+                            case SWAP:
+                                if (gui.modifyingQuestSet != null && gui.modifyingQuestSet != this) {
+                                    quest.setQuestSet(gui.modifyingQuestSet);
+                                    SaveHelper.add(SaveHelper.EditType.QUEST_CHANGE_SET);
+                                }
+                                break;
+                            case REPEATABLE:
+                                gui.setEditMenu(new GuiEditMenuRepeat(gui, player, quest));
+                                break;
+                            case REQUIRED_PARENTS:
+                                gui.setEditMenu(new GuiEditMenuParentCount(gui, player, quest));
+                                break;
+                            case QUEST_SELECTION:
+                                Quest.selectedQuestId = quest.getId();
+                                break;
+                            case QUEST_OPTION:
+                                if (gui.modifyingQuest == quest) {
+                                    if (GuiScreen.isShiftKeyDown())
+                                        gui.modifyingQuest.clearOptionLinks();
+                                    gui.modifyingQuest = null;
+                                } else if (gui.modifyingQuest == null) {
+                                    gui.modifyingQuest = quest;
+                                } else {
+                                    gui.modifyingQuest.addOptionLink(quest.getId());
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
+                            OPBookHelper.reverseQuestCompletion(quest, player);
+                        } else {
+                            GuiQuestBook.selectedQuest = quest;
+                            quest.onOpen(gui, player);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (Quest.isEditing)
+            for (ReputationBar reputationBar : new ArrayList<ReputationBar>(this.getReputationBars()))
+                reputationBar.mouseClicked(gui, x, y);
     }
 }

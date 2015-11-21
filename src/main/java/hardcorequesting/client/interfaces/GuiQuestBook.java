@@ -8,7 +8,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.*;
-import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -54,14 +53,14 @@ public class GuiQuestBook extends GuiBase {
     }
 
     //these are static to keep the same page loaded when the book is reopened
-    private static QuestSet selectedSet;
+    public static QuestSet selectedSet;
     private static boolean isSetOpened;
-    private static Quest selectedQuest;
+    public static Quest selectedQuest;
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
     private static boolean isBagPage;
     private static boolean isReputationPage;
-    private static Group selectedGroup;
+    public static Group selectedGroup;
     public static Reputation selectedReputation;
     private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
     private static ItemStack selected;
@@ -138,6 +137,12 @@ public class GuiQuestBook extends GuiBase {
 
 
     private TextBoxGroup.TextBox textBoxGroupAmount;
+
+    public TextBoxGroup.TextBox getTextBoxGroupAmount()
+    {
+        return textBoxGroupAmount;
+    }
+
     private TextBoxGroup textBoxes; {
         textBoxes = new TextBoxGroup();
         textBoxes.add(textBoxGroupAmount = new TextBoxGroup.TextBox(this, "0", 180, 30, false) {
@@ -786,129 +791,16 @@ public class GuiQuestBook extends GuiBase {
             }
 
             if (isMainPageOpen) {
-                if (x > 0 && x < PAGE_WIDTH && y > 205) {
-                    isMainPageOpen = false;
-                    SoundHandler.stopLoreMusic();
-                }else if(x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
-                    if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-                        SoundHandler.playLoreMusic();
-                    }
-                }else{
-                    if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int)(VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                        editMenu = new GuiEditMenuTextEditor(this, player);
-                    }
-                }
+                mainPageMouseClicked(x, y);
             }else if(isMenuPageOpen) {
-                if(button == 1) {
-                    isMainPageOpen = true;
-                }else{
-                    if(inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
-                        editMenu = new GuiEditMenuTeam(this , player);
-                    }else if(inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
-                        editMenu = new GuiEditMenuDeath(this, player);
-                    }else if(inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
-                        isMenuPageOpen = false;
-                    }
-                }
+                menuPageMouseClicked(button, x, y);
             }else if (isBagPage) {
-                if (selectedGroup != null) {
-                    if (button == 1) {
-                        selectedGroup = null;
-                    }else{
-                        List<ItemStack> items = selectedGroup.getItems();
-                        for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
-                            int xPos = (i % ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_X;
-                            int yPos = (i / ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_Y;
-
-                            if (inBounds(xPos, yPos, ITEM_SIZE, ITEM_SIZE, x, y)) {
-                                if (currentMode == EditMode.ITEM) {
-                                    ItemStack itemStack = i < items.size() ? items.get(i) : null;
-                                    int amount;
-                                    if (itemStack != null) {
-                                        itemStack = itemStack.copy();
-                                        amount = itemStack.stackSize;
-                                    }else{
-                                        amount = 1;
-                                    }
-
-                                    editMenu = new GuiEditMenuItem(this, player, itemStack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE);
-                                }else if (currentMode == EditMode.DELETE) {
-                                    selectedGroup.removeItem(i);
-                                    SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
-                                }
-                                break;
-                            }
-                        }
-
-                        textBoxes.onClick(this, x, y);
-                    }
-                }else{
-                    if (button == 1) {
-                        isBagPage = false;
-                        isMenuPageOpen = true;
-                    }else{
-                        List<Group> groups = Group.getGroups();
-                        int start = groupScroll.isVisible(this) ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
-                        for (int i = start; i < Math.min(start + VISIBLE_GROUPS, groups.size()); i++) {
-                            Group group = groups.get(i);
-
-                            int posY = GROUPS_Y + GROUPS_SPACING * (i - start);
-                            if (inBounds(GROUPS_X, posY, getStringWidth(group.getName()), TEXT_HEIGHT, x, y)) {
-                                if (currentMode == EditMode.TIER) {
-                                    if (group == modifyingGroup) {
-                                        modifyingGroup = null;
-                                    }else{
-                                        modifyingGroup = group;
-                                    }
-                                }else if(currentMode == EditMode.NORMAL) {
-                                    selectedGroup = group;
-                                    textBoxGroupAmount.setTextAndCursor(this, String.valueOf(selectedGroup.getLimit()));
-                                }else if(currentMode == EditMode.RENAME) {
-                                    editMenu = new GuiEditMenuTextEditor(this, player, group);
-                                }else if(currentMode == EditMode.DELETE) {
-                                    group.remove(i);
-                                    SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
-                                }
-                                break;
-                            }
-                        }
-
-                        List<GroupTier> tiers = GroupTier.getTiers();
-                        start = tierScroll.isVisible(this) ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
-                        for (int i = start; i < Math.min(start + VISIBLE_TIERS, tiers.size()); i++) {
-                            GroupTier groupTier = tiers.get(i);
-
-                            int posY = TIERS_Y + TIERS_SPACING * (i - start);
-                            if (inBounds(TIERS_X, posY, getStringWidth(groupTier.getName()), TEXT_HEIGHT, x, y)) {
-                                if (currentMode == EditMode.NORMAL) {
-                                    editMenu = new GuiEditMenuTier(this, player, groupTier);
-                                }else if (currentMode == EditMode.TIER && modifyingGroup != null) {
-                                    modifyingGroup.setTier(groupTier);
-                                    SaveHelper.add(SaveHelper.EditType.GROUP_CHANGE);
-                                }else if(currentMode == EditMode.RENAME) {
-                                    editMenu = new GuiEditMenuTextEditor(this, player, groupTier);
-                                }else if(currentMode == EditMode.DELETE) {
-                                    if (tiers.size() > 1 || groups.size() == 0) {
-                                        for (Group group : groups) {
-                                            if (group.getTier() == groupTier) {
-                                                group.setTier(i == 0 ? tiers.get(1) : tiers.get(0));
-                                            }
-                                        }
-                                        tiers.remove(i);
-                                        SaveHelper.add(SaveHelper.EditType.TIER_REMOVE);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-
+                bagPageMouseClicked(button, x, y);
             }else if(isReputationPage) {
                 if (button == 1) {
                     isMenuPageOpen = true;
                     isReputationPage = false;
-                }else{
+                }else {
                     Reputation.onClick(this, x, y, player);
                 }
             }else if (selectedSet == null || !isSetOpened) {
@@ -916,163 +808,69 @@ public class GuiQuestBook extends GuiBase {
                     isMenuPageOpen = true;
                     return;
                 }
-
-                List<QuestSet> questSets = Quest.getQuestSets();
-                int start = setScroll.isVisible(this) ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
-                for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
-                    QuestSet questSet = questSets.get(i);
-
-                    int setY = LIST_Y + (i - start) * (TEXT_HEIGHT + TEXT_SPACING);
-                    if (inBounds(LIST_X, setY, getStringWidth(questSet.getName(i)), TEXT_HEIGHT, x, y)) {
-                        if (Quest.isEditing && currentMode == EditMode.DELETE && questSet.getQuests().isEmpty()) {
-                            for (int j = questSet.getId() + 1; j < Quest.getQuestSets().size(); j++) {
-                                Quest.getQuestSets().get(j).decreaseId();
-                            }
-                            Quest.getQuestSets().remove(questSet);
-                            SaveHelper.add(SaveHelper.EditType.SET_REMOVE);
-                        }else if (Quest.isEditing && currentMode == EditMode.SWAP_SELECT) {
-                            if (modifyingQuestSet == questSet) {
-                                modifyingQuestSet = null;
-                            }else{
-                                modifyingQuestSet = questSet;
-                            }
-                        }else if (Quest.isEditing && currentMode == EditMode.RENAME) {
-                            editMenu = new GuiEditMenuTextEditor(this, player,  questSet, true);
-                        }else if ((Quest.isEditing && currentMode == EditMode.NORMAL) || (!Quest.isEditing && questSet.isEnabled(player))) {
-                            if (selectedSet == questSet) {
-                                selectedSet = null;
-                            }else{
-                                selectedSet = questSet;
-                            }
-                        }
-                        break;
-                    }
-                }
-
-
-                if (Quest.isEditing && currentMode == EditMode.RENAME) {
-                    if (inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int)(VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                        editMenu = new GuiEditMenuTextEditor(this, player, selectedSet, false);
-                    }
-                }
-            }else{
+                QuestSet.mouseClickedOverview(this, setScroll, x, y);
+            }else {
                 if (selectedQuest == null) {
                     if (button == 1) {
                         isSetOpened = false;
-                    }else if (Quest.isEditing && currentMode == EditMode.CREATE) {
-                        if (x > 0 && Quest.size() < DataBitHelper.QUESTS.getMaximum()) {
-                            int i = 0;
-                            for (Quest quest : selectedSet.getQuests())
-                            {
-                                if (quest.getName().startsWith("Unnamed")) i++;
-                            }
-                            Quest newQuest = new Quest(Quest.size(), "Unnamed" + (i == 0 ? "" : i), "Unnamed quest", 0, 0, false);
-                            newQuest.setGuiCenterX(x);
-                            newQuest.setGuiCenterY(y);
-                            newQuest.setQuestSet(selectedSet);
-                            SaveHelper.add(SaveHelper.EditType.QUEST_CREATE);
-                        }
-                    }else if (Quest.isEditing && currentMode == EditMode.REP_BAR_CREATE) {
-                        if (x > 0) {
-                            editMenu = new ReputationBar.EditGui(this, player, x, y, selectedSet.getId());
-                        }
-                    }else{
-                        for (Quest quest : selectedSet.getQuests()) {
-                            if ((Quest.isEditing ||quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
-                                if (Quest.isEditing && currentMode != EditMode.NORMAL) {
-                                    if (currentMode == EditMode.MOVE) {
-                                        modifyingQuest = quest;
-                                        SaveHelper.add(SaveHelper.EditType.QUEST_MOVE);
-                                    }else if(currentMode == EditMode.REQUIREMENT) {
-                                        if (modifyingQuest == quest) {
-                                            if (GuiScreen.isShiftKeyDown()) {
-                                                modifyingQuest.clearRequirements();
-                                            }
-                                            modifyingQuest = null;
-                                        }else if(modifyingQuest == null) {
-                                            modifyingQuest = quest;
-                                        }else{
-                                            modifyingQuest.addRequirement(quest.getId());
-                                        }
-                                    }else if(currentMode == EditMode.SIZE) {
-                                        int cX = quest.getGuiCenterX();
-                                        int cY = quest.getGuiCenterY();
-                                        quest.setBigIcon(!quest.useBigIcon());
-                                        quest.setGuiCenterX(cX);
-                                        quest.setGuiCenterY(cY);
-                                        SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
-                                    }else if(currentMode == EditMode.ITEM) {
-                                        editMenu = new GuiEditMenuItem(this, player, quest.getIcon(), quest.getId(), GuiEditMenuItem.Type.QUEST_ICON, 1, ItemPrecision.PRECISE);
-                                    }else if(currentMode == EditMode.DELETE) {
-                                        Quest.removeQuest(quest);
-                                        SaveHelper.add(SaveHelper.EditType.QUEST_REMOVE);
-                                    }else if(currentMode == EditMode.SWAP && modifyingQuestSet != null && modifyingQuestSet != selectedSet) {
-                                        quest.setQuestSet(modifyingQuestSet);
-                                        SaveHelper.add(SaveHelper.EditType.QUEST_CHANGE_SET);
-                                    }else if(currentMode == EditMode.REPEATABLE) {
-                                        editMenu = new GuiEditMenuRepeat(this, player, quest);
-                                    }else if(currentMode == EditMode.TRIGGER) {
-                                        editMenu = new GuiEditMenuTrigger(this, player, quest);
-                                    }else if(currentMode == EditMode.REQUIRED_PARENTS) {
-                                        editMenu = new GuiEditMenuParentCount(this, player, quest);
-                                    }else if(currentMode == EditMode.QUEST_SELECTION) {
-                                        Quest.selectedQuestId = quest.getId();
-                                    }else if(currentMode == EditMode.QUEST_OPTION) {
-                                        if (modifyingQuest == quest) {
-                                            if (GuiScreen.isShiftKeyDown()) {
-                                                modifyingQuest.clearOptionLinks();
-                                            }
-                                            modifyingQuest = null;
-                                        }else if(modifyingQuest == null) {
-                                            modifyingQuest = quest;
-                                        }else{
-                                            modifyingQuest.addOptionLink(quest.getId());
-                                        }
-                                    }
-                                }else if (quest.isEnabled(player) || Quest.isEditing) {
-                                    if (isOpBook && GuiScreen.isShiftKeyDown()) {
-                                        OPBookHelper.reverseQuestCompletion(quest, player);
-                                    }else{
-                                        selectedQuest = quest;
-                                        quest.onOpen(this, player);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-
-                        for (ReputationBar reputationBar : new ArrayList<ReputationBar>(selectedSet.getReputationBars()))
-                        {
-                            if (Quest.isEditing && reputationBar.inBounds(x, y))
-                            {
-                                switch (currentMode)
-                                {
-                                    case MOVE:
-                                        modifyingBar = reputationBar;
-                                        SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
-                                        break;
-                                    case REP_BAR_CHANGE:
-                                        editMenu = new ReputationBar.EditGui(this, player, reputationBar);
-                                        break;
-                                    case DELETE:
-                                        selectedSet.removeRepBar(reputationBar);
-                                        SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_REMOVE);
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
+                    }else {
+                        selectedSet.mouseClicked(this, x, y);
                     }
-
-
-                }else{
+                }else {
                     selectedQuest.onClick(this, player, x, y, button);
                 }
             }
-
-
-        }else{
+        }else {
             editMenu.onClick(this, x, y, button);
+        }
+    }
+
+    private void bagPageMouseClicked(int button, int x, int y) {
+        if (selectedGroup != null) {
+            if (button == 1) {
+                selectedGroup = null;
+            }else{
+                selectedGroup.mouseClicked(this, x, y);
+                textBoxes.onClick(this, x, y);
+            }
+        }else{
+            if (button == 1) {
+                isBagPage = false;
+                isMenuPageOpen = true;
+            }else{
+                Group.mouseClickedOverview(this, groupScroll, x, y);
+                GroupTier.mouseClickedOverview(this, tierScroll, x, y);
+            }
+        }
+
+    }
+
+    private void menuPageMouseClicked(int button, int x, int y) {
+        if(button == 1) {
+            isMainPageOpen = true;
+        }else{
+            if(inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
+                editMenu = new GuiEditMenuTeam(this , player);
+            }else if(inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+                editMenu = new GuiEditMenuDeath(this, player);
+            }else if(inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
+                isMenuPageOpen = false;
+            }
+        }
+    }
+
+    private void mainPageMouseClicked(int x, int y) {
+        if (x > 0 && x < PAGE_WIDTH && y > 205) {
+            isMainPageOpen = false;
+            SoundHandler.stopLoreMusic();
+        }else if(x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
+            if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
+                SoundHandler.playLoreMusic();
+            }
+        }else{
+            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int)(VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
+                editMenu = new GuiEditMenuTextEditor(this, player);
+            }
         }
     }
 
@@ -1118,10 +916,11 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
-    private Group modifyingGroup;
-    private QuestSet modifyingQuestSet;
-    private Quest modifyingQuest;
-    private ReputationBar modifyingBar;
+    public Group modifyingGroup;
+    public QuestSet modifyingQuestSet;
+    public Quest modifyingQuest;
+    public ReputationBar modifyingBar;
+
     private void updatePosition(int x, int y) {
         if (Quest.isEditing && currentMode == EditMode.MOVE) {
             if (modifyingQuest != null) {
