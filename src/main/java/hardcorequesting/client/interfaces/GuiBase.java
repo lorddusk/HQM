@@ -253,7 +253,7 @@ public class GuiBase extends GuiScreen {
     }
 
     protected static final int ITEM_SRC_Y = 235;
-    protected static final int ITEM_SIZE = 18;
+    public static final int ITEM_SIZE = 18;
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
         GL11.glColor3f(1F, 1F, 1F);
 

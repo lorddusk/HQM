@@ -115,7 +115,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         @Override
         public List<String> getName(GuiBase gui) {
             List<String> ret = new ArrayList<String>();
-            ret.add(item.getLocalizedName());
+            ret.add(item.getLocalizedName(null));
             return ret;
         }
 
@@ -407,7 +407,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
             }
         }else{
-            ((GuiQuestBook)gui).getSelectedQuest().setItem(selected, id, type, precision, player);
+            GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
         }
     }
 

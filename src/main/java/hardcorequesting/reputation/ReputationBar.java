@@ -95,6 +95,27 @@ public class ReputationBar
                 this.y + Reputation.BAR_HEIGHT*6 >= mY;
     }
 
+    public void mouseClicked(GuiQuestBook gui, int x, int y) {
+        if (this.inBounds(x, y))
+        {
+            switch (gui.getCurrentMode())
+            {
+                case MOVE:
+                    gui.modifyingBar = this;
+                    SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
+                    break;
+                case REP_BAR_CHANGE:
+                    gui.setEditMenu(new ReputationBar.EditGui(gui, gui.getPlayer(), this));
+                    break;
+                case DELETE:
+                    this.getQuestSet().removeRepBar(this);
+                    SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_REMOVE);
+                default:
+                    break;
+            }
+        }
+    }
+
     public static class EditGui extends GuiEditMenu {
 
         private ReputationBar bar;
