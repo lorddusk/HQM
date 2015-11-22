@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;;
 import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiEditMenuReputationSetting;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -174,13 +175,13 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Override
     @SideOnly(Side.CLIENT)
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
+        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
             int size = Math.min(settings.length + 1, DataBitHelper.REPUTATION_SETTING.getMaximum());
             for (int i = 0; i < size; i++) {
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
-                    if (gui.getCurrentMode() == GuiQuestBook.EditMode.REPUTATION_TASK) {
+                    if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
                         gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, i >= settings.length ? null : settings[i]));
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE && i < settings.length) {
+                    }else if(gui.getCurrentMode() == EditMode.DELETE && i < settings.length) {
                         removeSetting(i);
                         SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_REMOVE);
                     }

@@ -6,6 +6,7 @@ import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
@@ -248,7 +249,7 @@ public class QuestTaskMob extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
+        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
             Mob[] mobs = getEditFriendlyMobs(this.mobs);
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
