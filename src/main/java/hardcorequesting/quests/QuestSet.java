@@ -235,19 +235,12 @@ public class QuestSet {
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
 
-        HashSet<Quest> visibleQuests = new HashSet<Quest>();
-        for (Quest quest : getQuests()) {
-            if (quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                visibleQuests.add(quest);
-            }
-        }
-
         for (Quest child : getQuests()) {
-            if (Quest.isEditing || visibleQuests.contains(child)) {
+            if (Quest.isEditing || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirement()) {
-                    if (Quest.isEditing || visibleQuests.contains(parent)) {
+                    if (Quest.isEditing || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
-                            int color = Quest.isEditing && (!visibleQuests.contains(child) || !visibleQuests.contains(parent)) ? 0x55404040 : 0xFF404040;
+                            int color = Quest.isEditing && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
                             gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
@@ -261,7 +254,7 @@ public class QuestSet {
             for (Quest child : getQuests()) {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
-                        int color = !visibleQuests.contains(child) || !visibleQuests.contains(parent) ? 0x554040DD : 0xFF4040DD;
+                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
                         gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                 5,
@@ -272,7 +265,7 @@ public class QuestSet {
         }
 
         for (Quest quest : getQuests()) {
-            if ((Quest.isEditing || visibleQuests.contains(quest))) {
+            if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
                 GL11.glPushMatrix();
                 GL11.glEnable(GL11.GL_BLEND);
@@ -299,7 +292,7 @@ public class QuestSet {
 
         for (Quest quest : getQuests()) {
             boolean editing = Quest.isEditing && !GuiScreen.isCtrlKeyDown();
-            if ((editing || visibleQuests.contains(quest)) && quest.isMouseInObject(x, y)) {
+            if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                 boolean shouldDrawText = false;
                 boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
                 String txt = "";
@@ -432,12 +425,12 @@ public class QuestSet {
                             txt += "\n" + triggerMessage;
                         }
 
-                        if (!visibleQuests.contains(quest)) {
+                        if (!quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                             String invisibilityMessage;
                             if (quest.isLinkFree(player, isLinkFreeCache)) {
                                 boolean parentInvisible = false;
                                 for (Quest parent : quest.getRequirement()) {
-                                    if (!visibleQuests.contains(parent)) {
+                                    if (!parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                                         parentInvisible = true;
                                         break;
                                     }

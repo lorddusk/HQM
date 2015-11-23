@@ -477,7 +477,7 @@ public class Quest {
         return isVisible(QuestingData.getUserName(player));
     }
 
-    public boolean isVisible(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    boolean isVisible(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isVisible(QuestingData.getUserName(player), isVisibleCache, isLinkFreeCache);
     }
 
@@ -485,7 +485,7 @@ public class Quest {
         return isVisible(playerName, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
     }
 
-    public boolean isVisible(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    boolean isVisible(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         if (isVisibleCache != null) {
             Boolean cached = isVisibleCache.get(this);
             if (cached != null) {
@@ -505,7 +505,7 @@ public class Quest {
         return isEnabled(QuestingData.getUserName(player));
     }
 
-    public boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isEnabled(QuestingData.getUserName(player), true, isVisibleCache, isLinkFreeCache);
     }
 
@@ -517,7 +517,7 @@ public class Quest {
         return isEnabled(playerName, requiresVisible, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
     }
 
-    public boolean isEnabled(String playerName, boolean requiresVisible, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    boolean isEnabled(String playerName, boolean requiresVisible, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return !(set == null || !isLinkFree(playerName, isLinkFreeCache) || (requiresVisible && !triggerType.doesWorkAsInvisible() && !isVisible(playerName, isVisibleCache, isLinkFreeCache))) && enabledParentEvaluator.isValid(playerName, isVisibleCache, isLinkFreeCache);
     }
 
@@ -525,7 +525,7 @@ public class Quest {
         return isLinkFree(QuestingData.getUserName(player), new HashMap<Quest, Boolean>());
     }
 
-    public boolean isLinkFree(EntityPlayer player, Map<Quest, Boolean> cache) {
+    boolean isLinkFree(EntityPlayer player, Map<Quest, Boolean> cache) {
         return isLinkFree(QuestingData.getUserName(player), cache);
     }
 
@@ -533,12 +533,10 @@ public class Quest {
         return isLinkFree(playerName, new HashMap<Quest, Boolean>());
     }
     
-    public boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
-        if (cache != null) {
-            Boolean cached = cache.get(this);
-            if (cached != null) {
-                return cached.booleanValue();
-            }
+    boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
+        Boolean cached = cache.get(this);
+        if (cached != null) {
+            return cached.booleanValue();
         }
 
         boolean result = true;
@@ -562,9 +560,7 @@ public class Quest {
             result = linkParentEvaluator.isValid(playerName, null, cache);
         }
 
-        if (cache != null) {
-            cache.put(this, result);
-        }
+        cache.put(this, result);
 
         return result;
     }
