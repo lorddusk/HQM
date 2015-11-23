@@ -486,17 +486,14 @@ public class Quest {
     }
 
     boolean isVisible(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-        if (isVisibleCache != null) {
-            Boolean cached = isVisibleCache.get(this);
-            if (cached != null) {
-                return cached.booleanValue();
-            }
+        Boolean cachedResult = isVisibleCache.get(this);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
         }
 
         boolean result = triggerType.isQuestVisible(this, playerName) && isLinkFree(playerName, isLinkFreeCache) && visibleParentEvaluator.isValid(playerName, isVisibleCache, isLinkFreeCache);
-        if (isVisibleCache != null) {
-            isVisibleCache.put(this, result);
-        }
+
+        isVisibleCache.put(this, result);
 
         return result;
     }
