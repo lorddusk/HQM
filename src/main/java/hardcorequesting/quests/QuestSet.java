@@ -14,7 +14,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class QuestSet {
     private String name;
@@ -69,10 +72,14 @@ public class QuestSet {
     }
 
     public boolean isEnabled(EntityPlayer player) {
+        return isEnabled(player, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+    }
+
+    private boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         if (quests.isEmpty()) return false;
 
         for (Quest quest : quests) {
-            if (quest.isEnabled(player)) {
+            if (quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
                 return true;
             }
         }
@@ -109,9 +116,13 @@ public class QuestSet {
     }
 
     public int getCompletedCount(EntityPlayer player) {
+        return getCompletedCount(player, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+    }
+
+    private int getCompletedCount(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         int count = 0;
         for (Quest quest : quests) {
-            if (quest.isCompleted(player) && quest.isEnabled(player)) {
+            if (quest.isCompleted(player) && quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
                 count++;
             }
         }
@@ -152,19 +163,22 @@ public class QuestSet {
         EntityPlayer player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
+
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
 
             int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
 
             int total = questSet.getQuests().size();
-            boolean enabled = questSet.isEnabled(player);
-            int completedCount = enabled ? questSet.getCompletedCount(player) : 0; //no need to check for the completed count if it's not enabled
+            boolean enabled = questSet.isEnabled(player, isVisibleCache, isLinkFreeCache);
+            int completedCount = enabled ? questSet.getCompletedCount(player, isVisibleCache, isLinkFreeCache) : 0; //no need to check for the completed count if it's not enabled
 
             boolean completed = true;
             int unclaimed = 0;
             for (Quest quest : questSet.getQuests()) {
-                if (completed && !quest.isCompleted(player) && quest.isLinkFree(player)) {
+                if (completed && !quest.isCompleted(player) && quest.isLinkFree(player, isLinkFreeCache)) {
                     completed = false;
                 }
                 if (quest.isCompleted(player) && quest.hasReward(player)) unclaimed++;
@@ -199,7 +213,7 @@ public class QuestSet {
                 gui.drawString(GuiQuestBook.selectedSet.getDescription(gui), startLine, GuiQuestBook.VISIBLE_DESCRIPTION_LINES, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
             }
 
-            drawQuestInfo(gui, GuiQuestBook.selectedSet, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.selectedSet == null ? GuiQuestBook.DESCRIPTION_Y : INFO_Y);
+            drawQuestInfo(gui, GuiQuestBook.selectedSet, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.selectedSet == null ? GuiQuestBook.DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
 
     }
@@ -218,12 +232,15 @@ public class QuestSet {
             bar.draw(gui, x, y, player);
         }
 
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
+
         for (Quest child : getQuests()) {
-            if ((Quest.isEditing || child.isVisible(player))) {
+            if (Quest.isEditing || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirement()) {
-                    if ((Quest.isEditing || parent.isVisible(player))) {
+                    if (Quest.isEditing || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
-                            int color = Quest.isEditing && (!child.isVisible(player) || !parent.isVisible(player)) ? 0x55404040 : 0xFF404040;
+                            int color = Quest.isEditing && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
                             gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
@@ -237,7 +254,7 @@ public class QuestSet {
             for (Quest child : getQuests()) {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
-                        int color = !child.isVisible(player) || !parent.isVisible(player) ? 0x554040DD : 0xFF4040DD;
+                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
                         gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                 5,
@@ -248,7 +265,7 @@ public class QuestSet {
         }
 
         for (Quest quest : getQuests()) {
-            if ((Quest.isEditing || quest.isVisible(player))) {
+            if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
                 GL11.glPushMatrix();
                 GL11.glEnable(GL11.GL_BLEND);
@@ -275,9 +292,9 @@ public class QuestSet {
 
         for (Quest quest : getQuests()) {
             boolean editing = Quest.isEditing && !GuiScreen.isCtrlKeyDown();
-            if ((editing || quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
+            if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                 boolean shouldDrawText = false;
-                boolean enabled = quest.isEnabled(player);
+                boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
                 String txt = "";
 
                 if (enabled || editing) {
@@ -408,12 +425,12 @@ public class QuestSet {
                             txt += "\n" + triggerMessage;
                         }
 
-                        if (!quest.isVisible(player)) {
+                        if (!quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                             String invisibilityMessage;
-                            if (quest.isLinkFree(player)) {
+                            if (quest.isLinkFree(player, isLinkFreeCache)) {
                                 boolean parentInvisible = false;
                                 for (Quest parent : quest.getRequirement()) {
-                                    if (!parent.isVisible(player)) {
+                                    if (!parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                                         parentInvisible = true;
                                         break;
                                     }
@@ -534,6 +551,11 @@ public class QuestSet {
 
     @SideOnly(Side.CLIENT)
     public static void drawQuestInfo(GuiQuestBook gui, QuestSet set, int x, int y) {
+        drawQuestInfo(gui, set, x, y, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void drawQuestInfo(GuiQuestBook gui, QuestSet set, int x, int y, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         int completed = 0;
         int reward = 0;
         int enabled = 0;
@@ -545,9 +567,9 @@ public class QuestSet {
         for (Quest quest : Quest.getQuests()) {
             if (set == null || quest.hasSet(set)) {
                 realTotal++;
-                if (quest.isVisible(player)) {
+                if (quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                     total++;
-                    if (quest.isEnabled(player)) {
+                    if (quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
                         enabled++;
                         if (quest.isCompleted(player)) {
                             completed++;
@@ -578,6 +600,10 @@ public class QuestSet {
     {
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
+        
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
 
@@ -601,7 +627,7 @@ public class QuestSet {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(),  questSet, true));
                         break;
                     default:
-                        if (!(!Quest.isEditing && questSet.isEnabled(gui.getPlayer())))
+                        if (!(!Quest.isEditing && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
                             break;
                     case NORMAL:
                         GuiQuestBook.selectedSet = (GuiQuestBook.selectedSet == questSet ? null : questSet);
@@ -645,8 +671,10 @@ public class QuestSet {
                     break;
             }
         } else {
+            HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
+            HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
             for (Quest quest : this.getQuests()) {
-                if ((Quest.isEditing || quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
+                if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                     if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:

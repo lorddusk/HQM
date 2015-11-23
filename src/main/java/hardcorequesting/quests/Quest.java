@@ -477,60 +477,109 @@ public class Quest {
         return isVisible(QuestingData.getUserName(player));
     }
 
+    boolean isVisible(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        return isVisible(QuestingData.getUserName(player), isVisibleCache, isLinkFreeCache);
+    }
+
     public boolean isVisible(String playerName) {
-        return triggerType.isQuestVisible(this, playerName) && isLinkFree(playerName) && visibleParentEvaluator.isValid(playerName);
+        return isVisible(playerName, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+    }
+
+    boolean isVisible(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        Boolean cachedResult = isVisibleCache.get(this);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
+        }
+
+        boolean result = triggerType.isQuestVisible(this, playerName) && isLinkFree(playerName, isLinkFreeCache) && visibleParentEvaluator.isValid(playerName, isVisibleCache, isLinkFreeCache);
+
+        isVisibleCache.put(this, result);
+
+        return result;
     }
 
     public boolean isEnabled(EntityPlayer player) {
         return isEnabled(QuestingData.getUserName(player));
     }
 
+    boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        return isEnabled(QuestingData.getUserName(player), true, isVisibleCache, isLinkFreeCache);
+    }
+
     public boolean isEnabled(String playerName) {
         return isEnabled(playerName, true);
     }
 
+    public boolean isEnabled(String playerName, boolean requiresVisible) {
+        return isEnabled(playerName, requiresVisible, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+    }
+
+    boolean isEnabled(String playerName, boolean requiresVisible, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        return !(set == null || !isLinkFree(playerName, isLinkFreeCache) || (requiresVisible && !triggerType.doesWorkAsInvisible() && !isVisible(playerName, isVisibleCache, isLinkFreeCache))) && enabledParentEvaluator.isValid(playerName, isVisibleCache, isLinkFreeCache);
+    }
+
     public boolean isLinkFree(EntityPlayer player) {
-        return isLinkFree(QuestingData.getUserName(player));
+        return isLinkFree(QuestingData.getUserName(player), new HashMap<Quest, Boolean>());
+    }
+
+    boolean isLinkFree(EntityPlayer player, Map<Quest, Boolean> cache) {
+        return isLinkFree(QuestingData.getUserName(player), cache);
     }
 
     public boolean isLinkFree(String playerName) {
+        return isLinkFree(playerName, new HashMap<Quest, Boolean>());
+    }
+    
+    boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
+        Boolean cachedResult = cache.get(this);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
+        }
+
+        boolean result = true;
         for (Quest optionLink : optionLinks) {
             if (optionLink.isCompleted(playerName)) {
-                return false;
+                result = false;
+                break;
             }
         }
 
-        for (Quest optionLink : reversedOptionLinks) {
-            if (optionLink.isCompleted(playerName)) {
-                return false;
+        if (result) {
+            for (Quest optionLink : reversedOptionLinks) {
+                if (optionLink.isCompleted(playerName)) {
+                    result = false;
+                    break;
+                }
             }
         }
 
-        return linkParentEvaluator.isValid(playerName);
-    }
+        if (result) {
+            result = linkParentEvaluator.isValid(playerName, null, cache);
+        }
 
-    public boolean isEnabled(String playerName, boolean requiresVisible) {
-        return !(set == null || !isLinkFree(playerName) || (requiresVisible && !triggerType.doesWorkAsInvisible() && !isVisible(playerName))) && enabledParentEvaluator.isValid(playerName);
+        cache.put(this, result);
+
+        return result;
     }
 
     private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
         @Override
-        protected boolean isValid(String playerName, Quest parent) {
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
             return parent.isCompleted(playerName);
         }
     };
 
     private ParentEvaluator linkParentEvaluator = new ParentEvaluator() {
         @Override
-        protected boolean isValid(String playerName, Quest parent) {
-            return parent.isLinkFree(playerName);
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            return parent.isLinkFree(playerName, isLinkFreeCache);
         }
     };
 
     private ParentEvaluator visibleParentEvaluator = new ParentEvaluator() {
         @Override
-        protected boolean isValid(String playerName, Quest parent) {
-            return parent.isVisible(playerName) || parent.isCompleted(playerName);
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            return parent.isVisible(playerName, isVisibleCache, isLinkFreeCache) || parent.isCompleted(playerName);
         }
     };
 
@@ -543,9 +592,9 @@ public class Quest {
     }
 
     private abstract class ParentEvaluator {
-        protected abstract boolean isValid(String playerName, Quest parent);
+        protected abstract boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache);
 
-        private boolean isValid(String playerName) {
+        private boolean isValid(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
             int parents = getRequirement().size();
             int requiredAmount = useModifiedParentRequirement ? parentRequirementCount : parents;
             if (requiredAmount > parents) {
@@ -555,7 +604,7 @@ public class Quest {
             int allowedUncompleted = parents - requiredAmount;
             int uncompleted = 0;
             for (Quest quest : getRequirement()) {
-                if (!isValid(playerName, quest)) {
+                if (!isValid(playerName, quest, isVisibleCache, isLinkFreeCache)) {
                     uncompleted++;
                     if (uncompleted > allowedUncompleted) {
                         return false;
