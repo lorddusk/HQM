@@ -531,9 +531,9 @@ public class Quest {
     }
     
     boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
-        Boolean cached = cache.get(this);
-        if (cached != null) {
-            return cached.booleanValue();
+        Boolean cachedResult = cache.get(this);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
         }
 
         boolean result = true;
