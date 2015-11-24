@@ -3,15 +3,14 @@ package hardcorequesting.client;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import org.lwjgl.input.Keyboard;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class KeyboardHandler {
 
     private static Map<Integer, Set<EditMode>> keyMap;
-    static {
+
+    public static void initDefault()
+    {
         addKeymap(Keyboard.KEY_M, EditMode.MOVE);
         addKeymap(Keyboard.KEY_R, EditMode.RENAME);
         addKeymap(Keyboard.KEY_N, EditMode.CREATE);
@@ -21,6 +20,11 @@ public class KeyboardHandler {
         addKeymap(Keyboard.KEY_S, EditMode.SWAP_SELECT);
         addKeymap(Keyboard.KEY_S, EditMode.SWAP);
         addKeymap(Keyboard.KEY_SPACE, EditMode.NORMAL);
+    }
+
+    public static void clear()
+    {
+        keyMap.clear();
     }
 
     private static void addKeymap(int key, EditMode mode)
@@ -57,5 +61,36 @@ public class KeyboardHandler {
             }
         }
         return false;
+    }
+
+    public static String[] toConfig()
+    {
+        List<String> list = new ArrayList<>();
+        for (Map.Entry<Integer, Set<EditMode>> entry : keyMap.entrySet())
+            for (EditMode mode : entry.getValue())
+                list.add(Keyboard.getKeyName(entry.getKey()) + ":" + mode.name().toLowerCase());
+        return list.toArray(new String[list.size()]);
+    }
+
+    public static void fromConfig(String[] config)
+    {
+        for (String entry : config)
+        {
+            String[] splitted = entry.split(":");
+            if (splitted.length != 2) continue;
+            int key = Keyboard.getKeyIndex(splitted[0]);
+            if (key == Keyboard.KEY_NONE) continue;
+            EditMode mode = EditMode.valueOf(splitted[1].toUpperCase());
+            if (mode == null) continue;
+            addKeymap(key, mode);
+        }
+    }
+
+    public static String[] getDefault()
+    {
+        initDefault();
+        String[] map = toConfig();
+        clear();
+        return map;
     }
 }
