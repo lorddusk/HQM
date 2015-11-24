@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class CommandBase implements ISubCommand
-{
+public abstract class CommandBase implements ISubCommand {
     protected static Gson GSON;
 
-    static
-    {
+    static {
         GSON = new GsonBuilder().registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
                 .setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES).create();
     }
@@ -34,34 +32,27 @@ public abstract class CommandBase implements ISubCommand
     private List<String> subCommands = new ArrayList<>();
     protected int permissionLevel = 3;
 
-    public CommandBase(String name, String... subCommands)
-    {
+    public CommandBase(String name, String... subCommands) {
         this.name = name;
         this.subCommands = Arrays.asList(subCommands);
     }
 
     @Override
-    public String getCommandName()
-    {
+    public String getCommandName() {
         return name;
     }
 
     @Override
-    public int getPermissionLevel()
-    {
+    public int getPermissionLevel() {
         return permissionLevel;
     }
 
     @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args)
-    {
-        if (args.length == 1)
-        {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 1) {
             List<String> results = new ArrayList<>();
-            for (String subCommand : subCommands)
-            {
-                if (subCommand.startsWith(args[0]))
-                {
+            for (String subCommand : subCommands) {
+                if (subCommand.startsWith(args[0])) {
                     results.add(subCommand);
                 }
             }
@@ -71,30 +62,25 @@ public abstract class CommandBase implements ISubCommand
     }
 
     @Override
-    public boolean isVisible(ICommandSender sender)
-    {
+    public boolean isVisible(ICommandSender sender) {
         return getPermissionLevel() <= 0 || isPlayerOp(sender);
     }
 
     @Override
-    public int[] getSyntaxOptions(ICommandSender sender)
-    {
+    public int[] getSyntaxOptions(ICommandSender sender) {
         return new int[]{0};
     }
 
-    public static File getFile(String name)
-    {
-        return new File(HardcoreQuesting.configDir, name + ".json");
+    public static File getFile(String name) {
+        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles" + File.separator, name + ".json");
     }
 
-    public String getCombinedArgs(String[] args)
-    {
+    public String getCombinedArgs(String[] args) {
         String text = "";
-        for (String arg : args)
-        {
+        for (String arg : args) {
             text += arg + " ";
         }
-        return text.substring(0, text.length()-1);
+        return text.substring(0, text.length() - 1);
     }
 
     protected void sendChat(ICommandSender sender, String key, Object... args) {
@@ -105,8 +91,7 @@ public abstract class CommandBase implements ISubCommand
         sender.addChatMessage(new ChatComponentText(Translator.translate(plural, key, args)));
     }
 
-    protected boolean isPlayerOp(ICommandSender sender)
-    {
+    protected boolean isPlayerOp(ICommandSender sender) {
         return CommandHandler.isOwnerOrOp(sender);
     }
 

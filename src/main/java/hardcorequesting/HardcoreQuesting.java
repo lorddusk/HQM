@@ -21,8 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.io.File;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
-public class HardcoreQuesting
-{
+public class HardcoreQuesting {
 
     @Instance(ModInformation.ID)
     public static HardcoreQuesting instance;
@@ -40,8 +39,7 @@ public class HardcoreQuesting
     private static EntityPlayer commandUser;
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         new hardcorequesting.EventHandler();
         packetHandler = NetworkRegistry.INSTANCE.newEventDrivenChannel(ModInformation.CHANNEL);
 
@@ -64,9 +62,8 @@ public class HardcoreQuesting
     }
 
     @EventHandler
-    public void load(FMLInitializationEvent event)
-    {
-
+    public void load(FMLInitializationEvent event) {
+        new File(configDir + File.separator + "QuestFiles").mkdir();
         FMLCommonHandler.instance().bus().register(instance);
 
         packetHandler.register(new PacketHandler());
@@ -82,44 +79,37 @@ public class HardcoreQuesting
     }
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
+    public void postInit(FMLPostInitializationEvent event) {
         Quest.init(path);
     }
 
 
     @EventHandler
-    public void modsLoaded(FMLPostInitializationEvent event)
-    {
+    public void modsLoaded(FMLPostInitializationEvent event) {
 
 
     }
-	
-	@EventHandler
-	public void serverStarting(FMLServerStartingEvent event)
-	{
+
+    @EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(CommandHandler.instance);
-	}
+    }
 
     @EventHandler
-    public void serverAboutToStart(FMLServerAboutToStartEvent event)
-    {
+    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
 
     }
 
     @EventHandler
-    public void serverAboutToStart(FMLServerStoppingEvent event)
-    {
+    public void serverAboutToStart(FMLServerStoppingEvent event) {
 
     }
 
-    public static EntityPlayer getPlayer()
-    {
+    public static EntityPlayer getPlayer() {
         return commandUser;
     }
 
-    public static void setPlayer(EntityPlayer player)
-    {
+    public static void setPlayer(EntityPlayer player) {
         commandUser = player;
     }
 }
