@@ -84,7 +84,7 @@ public abstract class CommandBase implements ISubCommand
 
     public static File getFile(String name)
     {
-        return new File(HardcoreQuesting.configDir, name + ".json");
+        return new File(HardcoreQuesting.configDir + File.separator + "QuestSheets" + File.separator, name + ".json");
     }
 
     public String getCombinedArgs(String[] args)

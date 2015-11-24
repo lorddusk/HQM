@@ -66,6 +66,7 @@ public class HardcoreQuesting
     @EventHandler
     public void load(FMLInitializationEvent event)
     {
+        new File(configDir + File.separator + "QuestSheets").mkdir();
 
         FMLCommonHandler.instance().bus().register(instance);
 
