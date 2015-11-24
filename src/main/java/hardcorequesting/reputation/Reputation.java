@@ -6,6 +6,7 @@ import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuReputationValue;
 import hardcorequesting.client.interfaces.GuiEditMenuTextEditor;
@@ -419,7 +420,7 @@ public class Reputation {
 
     @SideOnly(Side.CLIENT)
     public static void drawEditPage(GuiQuestBook gui, int mX, int mY) {
-        if (gui.getCurrentMode() != GuiQuestBook.EditMode.CREATE || selectedReputation == null) {
+        if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationList.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end =  Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationList.size());
             for (int i = start; i < end; i++) {
@@ -475,7 +476,7 @@ public class Reputation {
 
     @SideOnly(Side.CLIENT)
     public static void onClick(GuiQuestBook gui, int mX, int mY, EntityPlayer player) {
-        if (gui.getCurrentMode() != GuiQuestBook.EditMode.CREATE || selectedReputation == null) {
+        if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationList.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end =  Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationList.size());
             for (int i = start; i < end; i++) {
@@ -484,15 +485,15 @@ public class Reputation {
                 String str = reputationList.get(i).name;
 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
-                    if (gui.getCurrentMode() == GuiQuestBook.EditMode.NORMAL) {
+                    if (gui.getCurrentMode() == EditMode.NORMAL) {
                         if (reputationList.get(i).equals(selectedReputation)) {
                             selectedReputation = null;
                         }else{
                             selectedReputation = reputationList.get(i);
                         }
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
+                    }else if(gui.getCurrentMode() == EditMode.RENAME) {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputationList.get(i)));
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE) {
+                    }else if(gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests()) {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof QuestTaskReputation) {
@@ -532,7 +533,7 @@ public class Reputation {
         if (selectedReputation != null) {
             String neutralName = Translator.translate("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
-                if (gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
+                if (gui.getCurrentMode() == EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
                 }
                 return;
@@ -546,11 +547,11 @@ public class Reputation {
                 String str = selectedReputation.markers.get(i).getTitle();
 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
-                    if(gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
+                    if(gui.getCurrentMode() == EditMode.RENAME) {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.markers.get(i)));
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.REPUTATION_VALUE) {
+                    }else if(gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
-                    }else if(gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE) {
+                    }else if(gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests()) {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof QuestTaskReputation) {

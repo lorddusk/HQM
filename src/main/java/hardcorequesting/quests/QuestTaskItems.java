@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.*;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -378,9 +379,9 @@ public abstract class QuestTaskItems extends QuestTask {
             for (int i = 0; i < items.length; i++) {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
-                    if (gui.getCurrentMode() == GuiQuestBook.EditMode.ITEM) {
+                    if (gui.getCurrentMode() == EditMode.ITEM) {
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.item != null ? item.item.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
-                    } else if (gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE && (item.item != null || item.fluid != null)) {
+                    } else if (gui.getCurrentMode() == EditMode.DELETE && (item.item != null || item.fluid != null)) {
                         ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                         int id = 0;
                         for (int j = 0; j < this.items.length; j++) {

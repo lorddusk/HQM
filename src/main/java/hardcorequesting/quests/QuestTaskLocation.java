@@ -7,6 +7,7 @@ import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
@@ -386,7 +387,7 @@ public class QuestTaskLocation extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
+        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
             Location[] locations = getEditFriendlyLocations(this.locations);
             for (int i = 0; i < locations.length; i++) {
                 Location location = locations[i];

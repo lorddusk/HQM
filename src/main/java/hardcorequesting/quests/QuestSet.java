@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.OPBookHelper;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.reputation.ReputationBar;
@@ -191,7 +192,7 @@ public class QuestSet {
             }
         }
 
-        if ((Quest.isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.CREATE)) {
+        if ((Quest.isEditing && gui.getCurrentMode() == EditMode.CREATE)) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
         }else{
             if (GuiQuestBook.selectedSet != null){
@@ -612,7 +613,7 @@ public class QuestSet {
         }
 
 
-        if (Quest.isEditing && gui.getCurrentMode() == GuiQuestBook.EditMode.RENAME) {
+        if (Quest.isEditing && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int)(GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
                 gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
             }
@@ -622,7 +623,7 @@ public class QuestSet {
     public void mouseClicked(GuiQuestBook gui, int x, int y)
     {
         EntityPlayer player = gui.getPlayer();
-        if (Quest.isEditing && (gui.getCurrentMode() == GuiQuestBook.EditMode.CREATE || gui.getCurrentMode() == GuiQuestBook.EditMode.REP_BAR_CREATE))
+        if (Quest.isEditing && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE))
         {
             switch (gui.getCurrentMode())
             {
@@ -647,7 +648,7 @@ public class QuestSet {
         } else {
             for (Quest quest : this.getQuests()) {
                 if ((Quest.isEditing || quest.isVisible(player)) && quest.isMouseInObject(x, y)) {
-                    if (Quest.isEditing && gui.getCurrentMode() != GuiQuestBook.EditMode.NORMAL) {
+                    if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
                                 gui.modifyingQuest = quest;

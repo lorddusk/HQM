@@ -7,6 +7,7 @@ import hardcorequesting.FileVersion;
 import hardcorequesting.QuestingData;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
+import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
@@ -359,7 +360,7 @@ public class Group {
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
 
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
-                if (gui.getCurrentMode() == GuiQuestBook.EditMode.ITEM) {
+                if (gui.getCurrentMode() == EditMode.ITEM) {
                     ItemStack itemStack = i < items.size() ? items.get(i) : null;
                     int amount;
                     if (itemStack != null) {
@@ -370,7 +371,7 @@ public class Group {
                     }
 
                      gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), itemStack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE));
-                }else if (gui.getCurrentMode() == GuiQuestBook.EditMode.DELETE) {
+                }else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
                     SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
                 }
