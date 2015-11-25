@@ -49,16 +49,15 @@ public abstract class CommandBase implements ISubCommand {
 
     @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+        List<String> results = new ArrayList<>();
         if (args.length == 1) {
-            List<String> results = new ArrayList<>();
             for (String subCommand : subCommands) {
                 if (subCommand.startsWith(args[0])) {
                     results.add(subCommand);
                 }
             }
-            return results;
         }
-        return new ArrayList<>();
+        return results;
     }
 
     @Override

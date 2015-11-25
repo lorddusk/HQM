@@ -297,6 +297,10 @@ public class QuestingData {
 		}
 	}
 
+    public static void disableHardcore() {
+        hardcoreActive = false;
+    }
+
     public static void activateQuest(){
         if(!questActive) {
             questActive = true;
