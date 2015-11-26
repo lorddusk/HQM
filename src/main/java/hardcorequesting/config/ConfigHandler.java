@@ -1,37 +1,36 @@
 package hardcorequesting.config;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.quests.Quest;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 
-public class ConfigHandler
-{
+public class ConfigHandler {
     public static Configuration syncConfig;
 
-	public static void initModConfig(String configPath)
-    {
+    public static void initModConfig(String configPath) {
         ModConfig.init(new File(configPath + "hqmconfig.cfg"));
         FMLCommonHandler.instance().bus().register(new ModConfig());
     }
 
-    public static void initEditConfig(String configPath)
-    {
-        if (syncConfig == null)
-        {
+    public static void initEditConfig(String configPath) {
+        if (syncConfig == null) {
             syncConfig = new Configuration(new File(configPath + "editmode.cfg"));
             loadSyncConfig();
         }
     }
 
-    public static void loadSyncConfig()
-    {
+    public static void loadSyncConfig() {
         Quest.isEditing = syncConfig.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
-        KeyboardHandler.fromConfig(syncConfig.get(Configuration.CATEGORY_GENERAL, KEYMAP_KEY, KEYMAP_DEFAULT, KEYMAP_COMMENT).getStringList());
-        if(syncConfig.hasChanged())
+        if (HardcoreQuesting.proxy.isClient()) {
+            KeyboardHandler.fromConfig(syncConfig.get(Configuration.CATEGORY_GENERAL, KEYMAP_KEY, KEYMAP_DEFAULT, KEYMAP_COMMENT).getStringList());
+        }
+        if (syncConfig.hasChanged()) {
             syncConfig.save();
+        }
     }
 
     private static final String EDITOR_KEY = "UseEditor";

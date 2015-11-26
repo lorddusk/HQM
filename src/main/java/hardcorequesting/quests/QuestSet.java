@@ -46,8 +46,7 @@ public class QuestSet {
         return reputationBars;
     }
 
-    private void validateBars()
-    {
+    private void validateBars() {
         List<ReputationBar> toRemove = new ArrayList<>();
         for (ReputationBar reputationBar : reputationBars)
             if (!reputationBar.isValid())
@@ -159,8 +158,7 @@ public class QuestSet {
     private static final int INFO_Y = 100;
 
     @SideOnly(Side.CLIENT)
-    public static void drawOverview(GuiQuestBook gui, ScrollBar setScroll, ScrollBar descriptionScroll, int x, int y)
-    {
+    public static void drawOverview(GuiQuestBook gui, ScrollBar setScroll, ScrollBar descriptionScroll, int x, int y) {
         EntityPlayer player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
@@ -190,8 +188,7 @@ public class QuestSet {
             gui.drawString(questSet.getName(i), GuiQuestBook.LIST_X, setY, color);
 
             String info;
-            if (enabled)
-            {
+            if (enabled) {
                 if (completed)
                     info = Translator.translate("hqm.questBook.allQuests");
                 else
@@ -199,17 +196,16 @@ public class QuestSet {
             } else
                 info = Translator.translate("hqm.questBook.locked");
             gui.drawString(info, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
-            if (enabled && unclaimed != 0)
-            {
-                String toClaim = GuiColor.PURPLE.toString() + Translator.translate( unclaimed != 1, "hqm.questBook.unclaimedRewards", unclaimed);
+            if (enabled && unclaimed != 0) {
+                String toClaim = GuiColor.PURPLE.toString() + Translator.translate(unclaimed != 1, "hqm.questBook.unclaimedRewards", unclaimed);
                 gui.drawString(toClaim, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
         }
 
         if ((Quest.isEditing && gui.getCurrentMode() == EditMode.CREATE)) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
-        }else{
-            if (GuiQuestBook.selectedSet != null){
+        } else {
+            if (GuiQuestBook.selectedSet != null) {
                 int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - GuiQuestBook.VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
                 gui.drawString(GuiQuestBook.selectedSet.getDescription(gui), startLine, GuiQuestBook.VISIBLE_DESCRIPTION_LINES, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
             }
@@ -220,16 +216,14 @@ public class QuestSet {
     }
 
     @SideOnly(Side.CLIENT)
-    public void draw(GuiQuestBook gui, int x0, int y0, int x, int y)
-    {
+    public void draw(GuiQuestBook gui, int x0, int y0, int x, int y) {
         if (gui.isOpBook) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
         }
 
         EntityPlayer player = gui.getPlayer();
 
-        for (ReputationBar bar : getReputationBars())
-        {
+        for (ReputationBar bar : getReputationBars()) {
             bar.draw(gui, x, y, player);
         }
 
@@ -342,7 +336,7 @@ public class QuestSet {
                                     txt += " " + GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
                                 }
                             }
-                        }else{
+                        } else {
                             txt += " [" + Translator.translate("hqm.questBook.hold", "R") + "]";
                         }
                     }
@@ -360,7 +354,7 @@ public class QuestSet {
                                         txt += " " + GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
                                     }
                                 }
-                            }else{
+                            } else {
                                 txt += " [" + Translator.translate("hqm.questBook.hold", "E") + "]";
                             }
                         }
@@ -371,9 +365,9 @@ public class QuestSet {
                         int amount = quest.getParentRequirementCount();
                         if (amount < quest.getRequirement().size()) {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqOnly", amount);
-                        }else if(amount > quest.getRequirement().size()) {
+                        } else if (amount > quest.getRequirement().size()) {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqMore", amount);
-                        }else{
+                        } else {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqAll", amount);
                         }
 
@@ -405,7 +399,7 @@ public class QuestSet {
 
                         if (totalTasks == 0) {
                             txt += "\n" + GuiColor.RED + Translator.translate("hqm.questBook.noTasks");
-                        }else{
+                        } else {
                             txt += "\n" + GuiColor.CYAN + Translator.translate("hqm.questBook.completedTasks", completedTasks, totalTasks);
 
                             if (Keyboard.isKeyDown(Keyboard.KEY_T)) {
@@ -413,10 +407,10 @@ public class QuestSet {
                                 for (QuestTask task : quest.getTasks()) {
                                     txt += "\n" + GuiColor.CYAN + task.getDescription();
                                     if (task.isCompleted(player)) {
-                                        txt += GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") +"]";
+                                        txt += GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
                                     }
                                 }
-                            }else{
+                            } else {
                                 txt += " [" + Translator.translate("hqm.questBook.holding", "T") + "]";
                             }
                         }
@@ -457,12 +451,12 @@ public class QuestSet {
                                     String parentText = Translator.translate("hqm.questBook.invisInherit");
                                     if (invisibilityMessage == null) {
                                         invisibilityMessage = parentText;
-                                    }else{
+                                    } else {
                                         invisibilityMessage = parentText + " " + Translator.translate("hqm.questBook.and") + " " + invisibilityMessage;
                                     }
                                 }
 
-                            }else{
+                            } else {
                                 invisibilityMessage = Translator.translate("hqm.questBook.invisOption");
                             }
 
@@ -474,7 +468,7 @@ public class QuestSet {
 
                         List<Integer> ids = new ArrayList<Integer>();
                         for (Quest option : quest.getOptionLinks()) {
-                            ids.add((int)option.getId());
+                            ids.add((int) option.getId());
                         }
                         for (Quest option : quest.getReversedOptionLinks()) {
                             int id = option.getId();
@@ -495,7 +489,7 @@ public class QuestSet {
                                         txt += " (" + option.getQuestSet().getName() + ")";
                                     }
                                 }
-                            }else{
+                            } else {
                                 txt += " [" + Translator.translate("hqm.questBook.hold", "O") + "]";
                             }
                         }
@@ -520,7 +514,7 @@ public class QuestSet {
                                 for (Quest child : externalQuests) {
                                     txt += "\n" + GuiColor.PINK + child.getName() + " (" + child.getQuestSet().getName() + ")";
                                 }
-                            }else{
+                            } else {
                                 txt += " [" + Translator.translate("hqm.questBook.hold", "U") + "]";
                             }
                         }
@@ -536,7 +530,7 @@ public class QuestSet {
                 if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
                     if (quest.isCompleted(player)) {
                         txt += "\n\n" + GuiColor.RED + Translator.translate("hqm.questBook.resetQuest");
-                    }else{
+                    } else {
                         txt += "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.questBook.completeQuest");
                     }
                 }
@@ -597,21 +591,20 @@ public class QuestSet {
         gui.drawString(info, x, y, 0.7F, 0x404040);
     }
 
-    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar setScroll, int x, int y)
-    {
+    @SideOnly(Side.CLIENT)
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar setScroll, int x, int y) {
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
-        
+
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
-        
+
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
 
             int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
             if (gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y)) {
-                switch (gui.getCurrentMode())
-                {
+                switch (gui.getCurrentMode()) {
                     case DELETE:
                         if (questSet.getQuests().isEmpty()) {
                             for (int j = questSet.getId() + 1; j < Quest.getQuestSets().size(); j++) {
@@ -622,10 +615,10 @@ public class QuestSet {
                         }
                         break;
                     case SWAP_SELECT:
-                            gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
+                        gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(),  questSet, true));
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), questSet, true));
                         break;
                     default:
                         if (!(!Quest.isEditing && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
@@ -640,19 +633,17 @@ public class QuestSet {
 
 
         if (Quest.isEditing && gui.getCurrentMode() == EditMode.RENAME) {
-            if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int)(GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
+            if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
                 gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
             }
         }
     }
 
-    public void mouseClicked(GuiQuestBook gui, int x, int y)
-    {
+    @SideOnly(Side.CLIENT)
+    public void mouseClicked(GuiQuestBook gui, int x, int y) {
         EntityPlayer player = gui.getPlayer();
-        if (Quest.isEditing && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE))
-        {
-            switch (gui.getCurrentMode())
-            {
+        if (Quest.isEditing && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {
+            switch (gui.getCurrentMode()) {
                 case CREATE:
                     if (x > 0 && Quest.size() < DataBitHelper.QUESTS.getMaximum()) {
                         int i = 0;

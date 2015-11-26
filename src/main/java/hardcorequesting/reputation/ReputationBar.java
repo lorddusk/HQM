@@ -14,17 +14,14 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class ReputationBar
-{
+public class ReputationBar {
     private int repId, x, y, questSet;
 
-    public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet)
-    {
+    public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet) {
         this(reputation.getId(), x, y, questSet.getId());
     }
 
-    public ReputationBar(int repId, int x, int y, int questSet)
-    {
+    public ReputationBar(int repId, int x, int y, int questSet) {
         this.repId = repId;
         this.x = x;
         this.y = y;
@@ -33,45 +30,38 @@ public class ReputationBar
 
     private static final int posBits = 9, posBitMask = 511;
 
-    public ReputationBar(FileVersion version, int data)
-    {
+    public ReputationBar(FileVersion version, int data) {
         int questSetSize = DataBitHelper.QUEST_SETS.getBitCount(version);
-        this.repId = data >> questSetSize + posBits*2;
+        this.repId = data >> questSetSize + posBits * 2;
         this.x = (data >> questSetSize + posBits) & posBitMask;
         this.y = (data >> questSetSize) & posBitMask;
-        this.questSet = data & ((1 << questSetSize+1) - 1);
+        this.questSet = data & ((1 << questSetSize + 1) - 1);
     }
 
-    public void moveTo(int x, int y)
-    {
+    public void moveTo(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public int save()
-    {
+    public int save() {
         int questSetSize = DataBitHelper.QUEST_SETS.getBitCount();
         return this.repId << questSetSize + 18 | this.x << questSetSize + 9 | this.y << questSetSize | this.questSet;
     }
 
-    public QuestSet getQuestSet()
-    {
+    public QuestSet getQuestSet() {
         return Quest.getQuestSets().get(this.questSet);
     }
 
-    public void setQuestSet(int id)
-    {
+    public void setQuestSet(int id) {
         this.questSet = id;
     }
 
-    public boolean isValid()
-    {
+    public boolean isValid() {
         return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && Reputation.getReputation(this.repId) != null;
     }
 
     @SideOnly(Side.CLIENT)
-    public void draw(GuiQuestBook gui, int mX, int mY, EntityPlayer player)
-    {
+    public void draw(GuiQuestBook gui, int mX, int mY, EntityPlayer player) {
         Reputation reputation = Reputation.getReputation(this.repId);
         if (reputation == null) return;
 
@@ -86,20 +76,18 @@ public class ReputationBar
     }
 
     @SideOnly(Side.CLIENT)
-    public boolean inBounds(int mX, int mY)
-    {
+    public boolean inBounds(int mX, int mY) {
         return
                 this.x <= mX &&
-                this.x + Reputation.BAR_WIDTH >= mX &&
-                this.y - Reputation.BAR_HEIGHT*3 <= mY &&
-                this.y + Reputation.BAR_HEIGHT*6 >= mY;
+                        this.x + Reputation.BAR_WIDTH >= mX &&
+                        this.y - Reputation.BAR_HEIGHT * 3 <= mY &&
+                        this.y + Reputation.BAR_HEIGHT * 6 >= mY;
     }
 
+    @SideOnly(Side.CLIENT)
     public void mouseClicked(GuiQuestBook gui, int x, int y) {
-        if (this.inBounds(x, y))
-        {
-            switch (gui.getCurrentMode())
-            {
+        if (this.inBounds(x, y)) {
+            switch (gui.getCurrentMode()) {
                 case MOVE:
                     gui.modifyingBar = this;
                     SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
@@ -116,20 +104,19 @@ public class ReputationBar
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public static class EditGui extends GuiEditMenu {
 
         private ReputationBar bar;
         private boolean isNew;
 
-        public EditGui(GuiBase guiBase, EntityPlayer player, ReputationBar bar)
-        {
+        public EditGui(GuiBase guiBase, EntityPlayer player, ReputationBar bar) {
             super(guiBase, player);
             this.bar = bar;
             this.isNew = false;
         }
 
-        public EditGui(GuiBase guiBase, EntityPlayer player, int x, int y, int selectedSet)
-        {
+        public EditGui(GuiBase guiBase, EntityPlayer player, int x, int y, int selectedSet) {
             super(guiBase, player);
             this.bar = new ReputationBar(-1, x, y, selectedSet);
             this.isNew = true;
