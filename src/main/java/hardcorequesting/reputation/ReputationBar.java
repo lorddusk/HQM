@@ -48,6 +48,21 @@ public class ReputationBar
         this.y = y;
     }
 
+    public int getX()
+    {
+        return x;
+    }
+
+    public int getY()
+    {
+        return y;
+    }
+
+    public int getRepId()
+    {
+        return repId;
+    }
+
     public int save()
     {
         int questSetSize = DataBitHelper.QUEST_SETS.getBitCount();
@@ -67,6 +82,10 @@ public class ReputationBar
     public boolean isValid()
     {
         return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && Reputation.getReputation(this.repId) != null;
+    }
+
+    public boolean sameLocation(ReputationBar reputationBar) {
+        return reputationBar != null && reputationBar.x == this.x && reputationBar.y == this.y;
     }
 
     @SideOnly(Side.CLIENT)

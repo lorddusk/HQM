@@ -8,6 +8,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
@@ -25,6 +26,7 @@ public class QuestAdapter {
     public static QuestTask TASK;
     public static int QUEST_ID;
     private static List<Reputation> reputationList = new ArrayList<>();
+    private static List<ReputationBar> reputationBarList = new ArrayList<>();
     private static Map<Quest, List<Integer>> requirementMapping = new HashMap<>();
     private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
     private static Map<Quest, List<Integer>> optionMapping = new HashMap<>();
@@ -828,10 +830,12 @@ public class QuestAdapter {
         private final String DESCRIPTION = "description";
         private final String QUESTS = "quests";
         private final String REPUTATION = "reputation";
+        private final String REPUTATION_BAR = "reputationBar";
 
         @Override
         public void write(JsonWriter out, QuestSet value) throws IOException {
             reputationList.clear();
+            reputationBarList.clear();
             out.beginObject();
             out.name(NAME).value(value.getName());
             if (!value.getDescription().equalsIgnoreCase("No description"))
@@ -845,6 +849,11 @@ public class QuestAdapter {
             for (Reputation reputation : reputationList) {
                 REPUTATION_ADAPTER.write(out, reputation);
             }
+            out.endArray();
+            out.name(REPUTATION_BAR).beginArray();
+            for (ReputationBar reputationBar : value.getReputationBars()) {
+                REPUTATION_BAR_ADAPTER.write(out, reputationBar);
+            }
             out.endArray().endObject();
         }
 
@@ -856,6 +865,7 @@ public class QuestAdapter {
             optionLinkMapping.clear();
             prerequisiteMapping.clear();
             reputationList.clear();
+            reputationBarList.clear();
             taskReputationListMap.clear();
             List<Quest> quests = new ArrayList<>();
             in.beginObject();
@@ -875,11 +885,16 @@ public class QuestAdapter {
                         }
                     }
                     in.endArray();
-                } else if (next.equalsIgnoreCase(REPUTATION))
-                {
+                } else if (next.equalsIgnoreCase(REPUTATION)) {
                     in.beginArray();
                     while (in.hasNext()) {
                         reputationList.add(REPUTATION_ADAPTER.read(in));
+                    }
+                    in.endArray();
+                } else if (next.equalsIgnoreCase(REPUTATION_BAR)) {
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        reputationBarList.add(REPUTATION_BAR_ADAPTER.read(in));
                     }
                     in.endArray();
                 }
@@ -910,6 +925,13 @@ public class QuestAdapter {
                 for (Map.Entry<Quest, List<Integer>> entry : optionMapping.entrySet()) {
                     for (int i : entry.getValue())
                         entry.getKey().addOptionLink(i);
+                }
+                for (ReputationBar reputationBar : reputationBarList) {
+                    for (ReputationBar r : set.getReputationBars()) {
+                        if (r.sameLocation(reputationBar))
+                            set.removeRepBar(r);
+                    }
+                    set.addRepBar(reputationBar);
                 }
                 return set;
             }
@@ -969,6 +991,44 @@ public class QuestAdapter {
                 }
             }
             return null;
+        }
+    };
+
+    private static final TypeAdapter<ReputationBar> REPUTATION_BAR_ADAPTER = new TypeAdapter<ReputationBar>() {
+        private final String X = "x";
+        private final String Y = "y";
+        private final String REPUTATION_ID = "reputationId";
+
+        @Override
+        public void write(JsonWriter out, ReputationBar value) throws IOException {
+            out.beginObject();
+            out.name(REPUTATION_ID).value(value.getRepId());
+            out.name(X).value(value.getX());
+            out.name(Y).value(value.getY());
+            out.endObject();
+        }
+
+        @Override
+        public ReputationBar read(JsonReader in) throws IOException {
+            int id, x, y;
+            id = x = y = -1;
+            in.beginObject();
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case X:
+                        x = in.nextInt();
+                        break;
+                    case Y:
+                        y = in.nextInt();
+                        break;
+                    case REPUTATION_ID:
+                        id = in.nextInt();
+                        break;
+                }
+            }
+            in.endObject();
+            if (id*x*y < 0) return null;
+            return new ReputationBar(id, x, y, -1);
         }
     };
 
