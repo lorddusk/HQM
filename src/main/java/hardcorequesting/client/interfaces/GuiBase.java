@@ -296,26 +296,20 @@ public class GuiBase extends GuiScreen {
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GL11.glEnable(GL11.GL_LIGHTING);
-        //GL11.glEnable(GL11.GL_BLEND);
 
-        //itemRenderer.zLevel = 4F;
         setZLevel(4f);
         try {
             if(!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-                itemRenderer.renderItemIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top, renderEffect);
+                itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
             }
         } finally {
-            //itemRenderer.zLevel = 4F;
             setZLevel(0f);
 
-            //GL11.glDisable(GL11.GL_BLEND);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glEnable(GL11.GL_ALPHA_TEST);
-            //GL11.glPopMatrix();
         }
-        //GL11.glPopMatrix();
 
         GL11.glPopMatrix();
     }
