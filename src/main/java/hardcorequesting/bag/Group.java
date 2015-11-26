@@ -53,7 +53,7 @@ public class Group {
         id = QuestLine.getActiveQuestLine().groupCount++;
         if (GroupTier.getTiers().size() > 1) {
             this.tier = GroupTier.getTiers().get(1);
-        }else{
+        } else {
             this.tier = GroupTier.getTiers().get(0);
         }
         items = new ArrayList<ItemStack>();
@@ -72,8 +72,7 @@ public class Group {
         return hasName() ? name : Translator.translate("hqm.bag.group", tier.getName());
     }
 
-    public boolean hasName()
-    {
+    public boolean hasName() {
         return name != null && !name.isEmpty();
     }
 
@@ -89,7 +88,7 @@ public class Group {
         if (id >= items.size()) {
             items.add(item);
             SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CREATE);
-        }else{
+        } else {
             items.set(id, item);
             SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CHANGE);
         }
@@ -129,7 +128,7 @@ public class Group {
     }
 
     public void remove(int i) {
-        if (i >= 0 && i <  QuestLine.getActiveQuestLine().groupList.size()) {
+        if (i >= 0 && i < QuestLine.getActiveQuestLine().groupList.size()) {
             Group group = QuestLine.getActiveQuestLine().groupList.remove(i);
             QuestLine.getActiveQuestLine().groups.remove(group.id);
         }
@@ -153,7 +152,7 @@ public class Group {
             if (group.limit > 0) {
                 dw.writeBoolean(true);
                 dw.writeData(group.limit, DataBitHelper.LIMIT);
-            }else{
+            } else {
                 dw.writeBoolean(false);
             }
         }
@@ -229,14 +228,10 @@ public class Group {
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof Group)
-        {
-            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size())
-            {
-                for (ItemStack stack : items)
-                {
+    public boolean equals(Object obj) {
+        if (obj instanceof Group) {
+            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size()) {
+                for (ItemStack stack : items) {
                     if (!listContains(stack, ((Group) obj).items)) return false;
                 }
                 return true;
@@ -245,18 +240,15 @@ public class Group {
         return false;
     }
 
-    private boolean listContains(ItemStack stack, List<ItemStack> stacks)
-    {
-        for (ItemStack stack2 : stacks)
-        {
+    private boolean listContains(ItemStack stack, List<ItemStack> stacks) {
+        for (ItemStack stack2 : stacks) {
             if (ItemStack.areItemStacksEqual(stack, stack2)) return true;
         }
         return false;
     }
 
     @SideOnly(Side.CLIENT)
-    public static void drawOverview(GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y)
-    {
+    public static void drawOverview(GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y) {
         List<GroupTier> tiers = GroupTier.getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
@@ -319,8 +311,7 @@ public class Group {
     }
 
     @SideOnly(Side.CLIENT)
-    public void draw(GuiQuestBook gui, int x, int y)
-    {
+    public void draw(GuiQuestBook gui, int x, int y) {
         gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
         List<ItemStack> items = this.getItems();
         for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
@@ -342,7 +333,8 @@ public class Group {
                 if (itemStack != null && itemStack.getItem() != null) {
                     try {
                         gui.drawMouseOver(itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), x + gui.getLeft(), y + gui.getTop());
-                    }catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 break;
             }
@@ -352,8 +344,8 @@ public class Group {
         gui.drawString(Translator.translate("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
     }
 
-    public void mouseClicked(GuiQuestBook gui, int x, int y)
-    {
+    @SideOnly(Side.CLIENT)
+    public void mouseClicked(GuiQuestBook gui, int x, int y) {
         List<ItemStack> items = this.getItems();
         for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
@@ -366,12 +358,12 @@ public class Group {
                     if (itemStack != null) {
                         itemStack = itemStack.copy();
                         amount = itemStack.stackSize;
-                    }else{
+                    } else {
                         amount = 1;
                     }
 
-                     gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), itemStack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE));
-                }else if (gui.getCurrentMode() == EditMode.DELETE) {
+                    gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), itemStack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE));
+                } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
                     SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
                 }
@@ -380,6 +372,7 @@ public class Group {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar groupScroll, int x, int y) {
         List<Group> groups = getGroups();
         int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;

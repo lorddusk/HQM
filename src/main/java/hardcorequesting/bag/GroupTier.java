@@ -1,6 +1,8 @@
 package hardcorequesting.bag;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
@@ -19,7 +21,8 @@ public class GroupTier {
     private String name;
     private GuiColor color;
     private int[] weights;
-    public GroupTier(String name, GuiColor color, int ... weights) {
+
+    public GroupTier(String name, GuiColor color, int... weights) {
         this.name = name;
         this.color = color;
         this.weights = Arrays.copyOf(weights, weights.length);
@@ -85,8 +88,8 @@ public class GroupTier {
         }
     }
 
-    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar tierScroll, int x, int y)
-    {
+    @SideOnly(Side.CLIENT)
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar tierScroll, int x, int y) {
         List<GroupTier> tiers = GroupTier.getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
