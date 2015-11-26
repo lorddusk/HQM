@@ -20,7 +20,7 @@ apply plugin: 'forge'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-version = "4.4.2"
+version = "4.4.3"
 group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "HQM-The Journey"
 
@@ -90,8 +90,8 @@ task copyChicken(type: Copy, dependsOn: "extractUserDev") {
     mustRunAfter "deobfBinJar"
     mustRunAfter "repackMinecraft"
 }
-tasks.setupDevWorkspace.dependsOn copyChicken
-tasks.setupDecompWorkspace.dependsOn copyChicken
+//tasks.setupDevWorkspace.dependsOn copyChicken
+//tasks.setupDecompWorkspace.dependsOn copyChicken
 
 def libDir = './build/libs'
 
