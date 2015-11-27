@@ -9,6 +9,7 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.parsing.QuestAdapter;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,11 +25,12 @@ import java.util.regex.Pattern;
 
 public class CommandLoad extends CommandBase {
     private static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern NO_BAGS = Pattern.compile(".*bags\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final FileFilter JSON_FILTER = new FileFilter() {
+    private static final Pattern BAGS = Pattern.compile(".*bags\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern REPUTATIONS = Pattern.compile(".*reputations\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final FileFilter QUEST_SET_FILTER = new FileFilter() {
         @Override
         public boolean accept(File pathname) {
-            return !NO_BAGS.matcher(pathname.getName()).find() && JSON.matcher(pathname.getName()).find();
+            return JSON.matcher(pathname.getName()).find() && !REPUTATIONS.matcher(pathname.getName()).find() && !BAGS.matcher(pathname.getName()).find();
         }
     };
 
@@ -40,7 +42,8 @@ public class CommandLoad extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) {
         try {
             if (arguments.length == 1 && arguments[0].equals("all")) {
-                for (File file : getPossibleFiles()) {
+                loadReputation(sender, getFile("reputations"));
+                for (File file : getPossibleFiles(QUEST_SET_FILTER)) {
                     loadSet(sender, file);
                 }
                 QuestAdapter.postLoad();
@@ -57,8 +60,8 @@ public class CommandLoad extends CommandBase {
         }
     }
 
-    private File[] getPossibleFiles() {
-        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles").listFiles(JSON_FILTER);
+    private File[] getPossibleFiles(FileFilter filter) {
+        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles").listFiles(filter);
     }
 
     private void loadSet(ICommandSender sender, File file) {
@@ -75,6 +78,31 @@ public class CommandLoad extends CommandBase {
                 sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
             } else {
                 throw new CommandException(Lang.LOAD_FAILED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CommandException(Lang.LOAD_FAILED);
+        }
+    }
+
+    private void loadReputation(ICommandSender sender, File file) {
+        if (!file.exists()) {
+            throw new CommandException(Lang.FILE_NOT_FOUND);
+        }
+        try {
+            if (sender instanceof EntityPlayer)
+                HardcoreQuesting.setPlayer((EntityPlayer) sender);
+            JsonReader reader = new JsonReader(new FileReader(file));
+            List<Reputation> reputations = GSON.fromJson(reader, Reputation.getReputationList().getClass());
+            reader.close();
+            Reputation.getReputationList().clear();
+            for (Reputation reputation : reputations) {
+                if (reputation != null) {
+                    Reputation.getReputationList().add(reputation);
+                    sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
+                } else {
+                    throw new CommandException(Lang.LOAD_FAILED);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,7 +139,7 @@ public class CommandLoad extends CommandBase {
         String text = getCombinedArgs(args);
         Pattern pattern = Pattern.compile("^" + Pattern.quote(text), Pattern.CASE_INSENSITIVE);
         List<String> results = super.addTabCompletionOptions(sender, args);
-        for (File file : getPossibleFiles()) {
+        for (File file : getPossibleFiles(QUEST_SET_FILTER)) {
             if (pattern.matcher(file.getName()).find()) results.add(file.getName().replace(".json", ""));
         }
         return results;
