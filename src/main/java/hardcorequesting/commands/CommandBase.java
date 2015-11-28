@@ -9,7 +9,9 @@ import hardcorequesting.Translator;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.parsing.BagAdapter;
 import hardcorequesting.parsing.QuestAdapter;
+import hardcorequesting.parsing.ReputationAdapter;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
@@ -24,7 +26,7 @@ public abstract class CommandBase implements ISubCommand {
     protected static Gson GSON;
 
     static {
-        GSON = new GsonBuilder().registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
+        GSON = new GsonBuilder().registerTypeAdapter(Reputation.getReputationList().getClass(), ReputationAdapter.REPUTATION_LIST_ADAPTER).registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
                 .setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES).create();
     }
 

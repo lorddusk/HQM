@@ -112,6 +112,8 @@ public class QuestSet {
     }
 
     public void addRepBar(ReputationBar repBar) {
+        if (repBar == null) return;
+        repBar.setQuestSet(this.id);
         reputationBars.add(repBar);
     }
 

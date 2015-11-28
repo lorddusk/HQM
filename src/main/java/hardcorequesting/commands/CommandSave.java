@@ -5,6 +5,7 @@ import hardcorequesting.Lang;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
@@ -30,6 +31,12 @@ public class CommandSave extends CommandBase
     {
         if (arguments.length == 1 && arguments[0].equals("all"))
         {
+            try
+            {
+                save(sender, Reputation.getReputationList(), "reputations");
+            }catch (CommandException ignored)
+            {
+            }
             for (QuestSet set : Quest.getQuestSets())
             {
                 try
