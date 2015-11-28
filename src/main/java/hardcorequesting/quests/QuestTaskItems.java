@@ -95,23 +95,16 @@ public abstract class QuestTaskItems extends QuestTask {
         private void setPermutations()
         {
             if (item == null) return;
-            switch (precision)
-            {
-                case ORE_DICTIONARY:
-                    permutations = OreDictionaryHelper.getPermutations(item);
-                    break;
-                case FUZZY:
-                    List<ItemStack> items = new ArrayList<>();
-                    item.getItem().getSubItems(item.getItem(), null, items);
-                    permutations = items.toArray(new ItemStack[items.size()]);
+            permutations = precision.getPermutations(item);
+            if(permutations != null && permutations.length > 0) {
+                last = permutations.length-1;
+                cycleAt = -1;
             }
-            last = permutations.length-1;
-            cycleAt = -1;
         }
 
         public ItemStack getPermutatedItem()
         {
-            if (permutations == null && (precision == ItemPrecision.ORE_DICTIONARY || precision == ItemPrecision.FUZZY))
+            if (permutations == null && precision.hasPermutations())
                 setPermutations();
             if (permutations == null || permutations.length < 2)
                 return item;
@@ -260,7 +253,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 dw.writeData(item.item.getItemDamage(), DataBitHelper.SHORT);
                 dw.writeNBT(item.item.getTagCompound());
                 dw.writeData(item.required, DataBitHelper.TASK_REQUIREMENT);
-                dw.writeData(item.precision.ordinal(), DataBitHelper.ITEM_PRECISION);
+                dw.writeString(ItemPrecision.getUniqueID(item.precision), DataBitHelper.ITEM_PRECISION);
             } else {
                 FluidStack fluidStack = new FluidStack(item.fluid, item.required);
                 NBTTagCompound compound = new NBTTagCompound();
@@ -291,7 +284,9 @@ public abstract class QuestTaskItems extends QuestTask {
                 ItemStack itemStack = new ItemStack(item, 1, dmg);
                 itemStack.setTagCompound(compound);
                 items[i] = new ItemRequirement(itemStack, dr.readData(DataBitHelper.TASK_REQUIREMENT));
-                items[i].precision = ItemPrecision.values()[dr.readData(DataBitHelper.ITEM_PRECISION)];
+                items[i].precision = version.lacks(FileVersion.CUSTOM_PRECISION_TYPES) ?
+                    ItemPrecision.getOldPrecisionType(dr.readData(DataBitHelper.ITEM_PRECISION))
+                    : ItemPrecision.getPrecisionType(dr.readString(DataBitHelper.ITEM_PRECISION));
             } else {
                 NBTTagCompound compound = dr.readNBT();
                 FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(compound);

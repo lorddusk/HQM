@@ -58,7 +58,7 @@ public class QuestAdapter {
             if (required != 1)
                 out.name(REQUIRED).value(required);
             if (precision != ItemPrecision.PRECISE)
-                out.name(PRECISION).value(precision.name());
+                out.name(PRECISION).value(ItemPrecision.getUniqueID(precision));
             out.endObject();
         }
 
@@ -78,7 +78,7 @@ public class QuestAdapter {
                 } else if (next.equalsIgnoreCase(REQUIRED)) {
                     required = Math.max(in.nextInt(), required);
                 } else if (next.equalsIgnoreCase(PRECISION)) {
-                    ItemPrecision itemPrecision = ItemPrecision.valueOf(in.nextString());
+                    ItemPrecision itemPrecision = ItemPrecision.getPrecisionType(in.nextString());
                     if (itemPrecision != null) {
                         precision = itemPrecision;
                     }
