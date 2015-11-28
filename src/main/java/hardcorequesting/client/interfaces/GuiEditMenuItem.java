@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces;
 
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.items.ModItems;
@@ -18,6 +19,8 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -369,10 +372,12 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         if (usePrecision()) {
             if (inArrowBounds(gui, mX, mY, true)) {
-                precision = ItemPrecision.values()[(precision.ordinal() + ItemPrecision.values().length - 1) % ItemPrecision.values().length];
+                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
+                precision = precisionTypes.get((precisionTypes.indexOf(precision) + precisionTypes.size() - 1) % precisionTypes.size());
                 clicked = true;
             }else if (inArrowBounds(gui, mX, mY, false)) {
-                precision = ItemPrecision.values()[(precision.ordinal() + 1) % ItemPrecision.values().length];
+                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
+                precision = precisionTypes.get((precisionTypes.indexOf(precision) + 1) % precisionTypes.size());
                 clicked = true;
             }
         }

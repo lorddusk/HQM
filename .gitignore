@@ -10,3 +10,4 @@ libs
 *.ipr
 *.iws
 /bin/
+.idea
