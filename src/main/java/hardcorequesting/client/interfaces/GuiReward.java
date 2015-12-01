@@ -107,7 +107,15 @@ public class GuiReward extends GuiBase {
         int mX = mX0 - left;
         int mY = mY0 - top;
 
-        drawCenteredString(group.getTier().getColor() + Translator.translate("hqm.rewardGui.tierReward", group.getTier().getName()), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
+        String title = group.getName();
+
+        // fall back to the tier's name if this particular bag has no title,
+        // or if the user explicitly asked us to do so.
+        if (ModConfig.ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES || title == null || title.isEmpty()) {
+            title = Translator.translate("hqm.rewardGui.tierReward", group.getTier().getName());
+        }
+
+        drawCenteredString(group.getTier().getColor() + title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
         drawCenteredString(statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
         drawCenteredString(Translator.translate("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
 

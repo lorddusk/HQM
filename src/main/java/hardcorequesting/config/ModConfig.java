@@ -72,6 +72,11 @@ public class ModConfig
     public static final String NO_HARDCORE_MESSAGE_COMMENT = "Enable or disable sending a status message if Hardcore Questing mode is off";
     public static final String NO_HARDCORE_MESSAGE_KEY = "NoHardcoreMessage";
 
+    public static boolean ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES;
+    private static final String ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY = "AlwaysUseTierNameForRewardTitles";
+    private static final boolean ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT = false;
+    private static final String ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT = "Always display the tier name, instead of the individual bag's name, when opening a reward bag.";
+
     public static int OVERLAY_XPOS;
     public static int OVERLAY_YPOS;
     public static int OVERLAY_XPOSDEFAULT = 2;
@@ -134,6 +139,8 @@ public class ModConfig
         MAXROT = config.get(CATEGORY_GENERAL, ROT_KEY, ROT_DEFAULT, ROT_COMMENT).getInt(ROT_DEFAULT);
 
         NO_HARDCORE_MESSAGE = config.get(CATEGORY_GENERAL, NO_HARDCORE_MESSAGE_KEY, NO_HARDCORE_MESSAGE_DEFAULT, NO_HARDCORE_MESSAGE_COMMENT).getBoolean(NO_HARDCORE_MESSAGE_DEFAULT);
+
+        ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES = config.get(CATEGORY_GENERAL, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT).getBoolean(ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT);
 
         if (config.hasChanged())
             config.save();
