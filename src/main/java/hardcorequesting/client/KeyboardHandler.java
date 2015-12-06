@@ -1,6 +1,7 @@
 package hardcorequesting.client;
 
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.quests.Quest;
 import org.lwjgl.input.Keyboard;
 
 import java.util.*;
@@ -41,21 +42,22 @@ public class KeyboardHandler {
         if (key == Keyboard.KEY_BACK) {
             gui.goBack();
             return true;
-        } else if (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_0)
-        {
-            int i = key - Keyboard.KEY_1;
-            if (i < buttons.length) {
-                buttons[i].click();
-                return true;
-            }
-        } else if (keyMap.containsKey(key)) {
-            Set<EditMode> modes = keyMap.get(key);
-            for (EditButton button : buttons)
-            {
-                for (EditMode mode : modes) {
-                    if (button.matchesMode(mode)) {
-                        button.click();
-                        return true;
+        } else if (Quest.isEditing) {
+            if (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_0) {
+                int i = key - Keyboard.KEY_1;
+                if (i < buttons.length) {
+                    buttons[i].click();
+                    return true;
+                }
+            } else if (keyMap.containsKey(key)) {
+                Set<EditMode> modes = keyMap.get(key);
+                for (EditButton button : buttons)
+                {
+                    for (EditMode mode : modes) {
+                        if (button.matchesMode(mode)) {
+                            button.click();
+                            return true;
+                        }
                     }
                 }
             }
