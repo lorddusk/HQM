@@ -26,5 +26,15 @@ HQM crashes every time :bomb:?  Have a suggestion?  Found a :bug:?  Create an is
 		* Server log if applicable
 		* Detailed description of the bug and pictures if applicable
 		* Ways to reproduce the bug
+	* When including logs please use a [paste service](#list-of-paste-services)
 5. Click `Submit new issue`, and wait for feedback! :boom:
 6. (If not following this guidelines, I keep the privilege to close the issue without warning or explanation.)
+
+### List of paste services
+When posting a log use one of following sites to paste it.
+This improves readability and doesn't clutter the issue with log jibberish.
+
+* [Gist](https://gist.github.com/)
+* [Pastebin](http://pastebin.com/)
+* [Pastie](http://pastie.org/)
+* [BPaste](https://bpaste.net/)
