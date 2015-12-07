@@ -18,11 +18,11 @@ public class CommonProxy {
     }
 
     public boolean isClient() {
-        return true;
+        return false;
     }
 
     public boolean isServer() {
-        return false;
+        return true;
     }
 
 }
