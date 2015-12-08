@@ -26,6 +26,9 @@ public class ConfigHandler {
     public static void loadSyncConfig() {
         Quest.isEditing = syncConfig.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
         if (HardcoreQuesting.proxy.isClient()) {
+            if (KEYMAP_DEFAULT == null) {
+                KEYMAP_DEFAULT = KeyboardHandler.getDefault();
+            }
             KeyboardHandler.fromConfig(syncConfig.get(Configuration.CATEGORY_GENERAL, KEYMAP_KEY, KEYMAP_DEFAULT, KEYMAP_COMMENT).getStringList());
         }
         if (syncConfig.hasChanged()) {
@@ -38,6 +41,6 @@ public class ConfigHandler {
     private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
 
     private static final String KEYMAP_KEY = "KeyMap";
-    private static final String[] KEYMAP_DEFAULT = KeyboardHandler.getDefault();
+    private static String[] KEYMAP_DEFAULT = null;
     private static final String KEYMAP_COMMENT = "Hotkeys used in the book, one entry per line(Format: [key]:[mode]";
 }
