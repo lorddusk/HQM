@@ -727,6 +727,9 @@ public class QuestSet {
                                     gui.modifyingQuest.addOptionLink(quest.getId());
                                 }
                                 break;
+                            case TRIGGER:
+                                gui.setEditMenu(new GuiEditMenuTrigger(gui, player, quest));
+                                break;
                             default:
                                 break;
                         }
