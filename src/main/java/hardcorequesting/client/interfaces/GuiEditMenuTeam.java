@@ -36,7 +36,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
 
-        buttons.add(inviteButton = new LargeButton("invitePlayer", 250, 20) {
+        buttons.add(inviteButton = new LargeButton("hqm.party.invitePlayer", 250, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 return inviteName.getText().length() > 0;
@@ -321,7 +321,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                     str += GuiColor.ORANGE + " [" + Translator.translate("hqm.party.owner") + "]";
                 }else if (!player.isInTeam()) {
                     if (isOwner) {
-                        str += GuiColor.LIGHT_GRAY + " [" + Translator.translate("hqm.party.invited") + "]";
+                        str += GuiColor.LIGHT_GRAY + " [" + Translator.translate("hqm.party.invite") + "]";
                     }else{
                         continue;
                     }
