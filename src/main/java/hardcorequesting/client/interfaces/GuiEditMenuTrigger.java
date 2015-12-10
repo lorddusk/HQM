@@ -11,7 +11,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     private int triggerTasks;
     private int id;
 
-    protected GuiEditMenuTrigger(GuiQuestBook gui, EntityPlayer player, Quest quest) {
+    public GuiEditMenuTrigger(GuiQuestBook gui, EntityPlayer player, Quest quest) {
         super(gui, player, true, 25, 20, 25, 135);
 
         this.id = quest.getId();
