@@ -358,7 +358,7 @@ public class QuestTaskLocation extends QuestTask {
             gui.drawString(location.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
 
             if (visited(i, player)) {
-                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.locationMenu.visited="), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.locationMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }else if (location.visible.doShowCoordinate()) {
                 if (location.radius >= 0) {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
