@@ -42,116 +42,44 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class GuiQuestBook extends GuiBase {
 
-    public static final int PAGE_WIDTH = 170;
-    //region pixel info for all the things
-    public static final int VISIBLE_REPUTATION_TIERS = 9;
-    public static final int VISIBLE_REPUTATIONS = 10;
-    public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
-    public static final int LIST_X = 25;
-    public static final int LIST_Y = 20;
-    public static final int TEXT_HEIGHT = 9;
-    public static final int TEXT_SPACING = 20;
-    public static final int DESCRIPTION_X = 180;
-    public static final int DESCRIPTION_Y = 20;
-    public static final int VISIBLE_DESCRIPTION_LINES = 7;
-    public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
-    public static final int VISIBLE_SETS = 7;
-    public static final int TIERS_X = 180;
-    public static final int TIERS_Y = 20;
-    public static final int TIERS_SPACING = 25;
-    public static final int TIERS_SECOND_LINE_X = -5;
-    public static final int TIERS_SECOND_LINE_Y = 12;
-    public static final int WEIGHT_SPACING = 25;
-    public static final int VISIBLE_TIERS = 8;
-    public static final int GROUPS_X = 20;
-    public static final int GROUPS_Y = 20;
-    public static final int GROUPS_SPACING = 25;
-    public static final int GROUPS_SECOND_LINE_X = 5;
-    public static final int GROUPS_SECOND_LINE_Y = 12;
-    public static final int VISIBLE_GROUPS = 8;
-    public static final int GROUP_ITEMS_X = 20;
-    public static final int GROUP_ITEMS_Y = 40;
-    public static final int GROUP_ITEMS_SPACING = 20;
-    public static final int ITEMS_PER_LINE = 7;
-    private static final String FRONT_KEY = "hqm_front_texture";
-    private static final int TEXTURE_WIDTH = 170 * 2;
-    private static final int TEXTURE_HEIGHT = 234;
-    private static final int INFO_RIGHT_X = 180;
-    private static final int INFO_LIVES_Y = 20;
-    private static final int INFO_DEATHS_Y = 55;
-    private static final int INFO_TEAM_Y = 95;
-    private static final int INFO_LEFT_X = 20;
-    private static final int INFO_QUESTS_Y = 20;
-    private static final int INFO_REPUTATION_Y = 110;
-    private static final int INFO_HEARTS_X = 5;
-    private static final int INFO_HEARTS_Y = 12;
-    private static final int INFO_HEARTS_SPACING = 18;
-    private static final int TEAM_TEXT_Y = 12;
-    private static final int TEAM_CLICK_TEXT_Y = 30;
-    private static final int DEATH_TEXT_Y = 0;
-    private static final int DEATH_CLICK_TEXT_Y = 10;
-    private static final int QUEST_CLICK_TEXT_Y = 67;
-    private static final int INFO_REPUTATION_OFFSET_X = 5;
-    private static final int INFO_REPUTATION_OFFSET_Y = 12;
-    private static final int BACK_ARROW_X = 9;
-    private static final int BACK_ARROW_Y = 219;
-    private static final int BACK_ARROW_SRC_X = 0;
-    private static final int BACK_ARROW_SRC_Y = 113;
-    private static final int BACK_ARROW_WIDTH = 15;
-    private static final int BACK_ARROW_HEIGHT = 10;
-    private static final int MENU_ARROW_X = 161;
-    private static final int MENU_ARROW_Y = 217;
-    private static final int MENU_ARROW_SRC_X = 0;
-    private static final int MENU_ARROW_SRC_Y = 104;
-    private static final int MENU_ARROW_WIDTH = 14;
-    private static final int MENU_ARROW_HEIGHT = 9;
-    private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
+    public static void resetBookPosition() {
+        selectedSet = null;
+        isSetOpened = false;
+        selectedQuest = null;
+        isMainPageOpen = true;
+        isBagPage = false;
+        isReputationPage = false;
+        isMenuPageOpen = true;
+
+        selectedGroup = null;
+        selectedReputation = null;
+    }
+
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
-    public static Quest selectedQuest;
-    public static Group selectedGroup;
-    public static Reputation selectedReputation;
     private static boolean isSetOpened;
+    public static Quest selectedQuest;
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
     private static boolean isBagPage;
     private static boolean isReputationPage;
+    public static Group selectedGroup;
+    public static Reputation selectedReputation;
     private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
     private static ItemStack selected;
+
+	private final EntityPlayer player;
     public final boolean isOpBook;
-    private final EntityPlayer player;
-    public ScrollBar reputationDisplayScroll;
-    public ScrollBar reputationScroll;
-    public ScrollBar reputationTierScroll;
-    public Group modifyingGroup;
-    public QuestSet modifyingQuestSet;
-    public Quest modifyingQuest;
-    public ReputationBar modifyingBar;
+
     private ScrollBar setScroll;
     private ScrollBar descriptionScroll;
     private ScrollBar mainDescriptionScroll;
     private ScrollBar groupScroll;
     private ScrollBar tierScroll;
-    private List<ScrollBar> scrollBars;
-    private TextBoxGroup.TextBox textBoxGroupAmount;
-    private TextBoxGroup textBoxes;
-    private int tick;
-    private GuiEditMenu editMenu;
-    private FileHelper.SaveResult saveResult = null;
-    private LargeButton saveButton;
-    private List<LargeButton> buttons = new ArrayList<LargeButton>();
-    private EditMode currentMode = EditMode.NORMAL;
-    private EditButton[] groupButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
-    private EditButton[] bagButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
-    private EditButton[] reputationButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
-    private EditButton[] mainButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.RENAME);
-    private EditButton[] menuButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
-    private EditButton[] overviewButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
-    //endregion
-    private EditButton[] setButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
-    private EditButton[] questButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, EditMode.CHANGE_TASK, EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.DELETE);
-
-    {
+    public ScrollBar reputationDisplayScroll;
+    public ScrollBar reputationScroll;
+    public ScrollBar reputationTierScroll;
+    private List<ScrollBar> scrollBars; {
         scrollBars = new ArrayList<ScrollBar>();
         scrollBars.add(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
             @Override
@@ -177,14 +105,14 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
+                return !isReputationPage && isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS ;
             }
         });
 
         scrollBars.add(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && GroupTier.getTiers().size() > VISIBLE_TIERS;
+                return !isReputationPage && isBagPage && selectedGroup == null && GroupTier.getTiers().size() > VISIBLE_TIERS ;
             }
         });
 
@@ -198,19 +126,27 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputationList().size() > VISIBLE_REPUTATIONS;
+                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputationList().size() > VISIBLE_REPUTATIONS ;
             }
         });
 
         scrollBars.add(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputationList().size() > VISIBLE_DISPLAY_REPUTATIONS;
+                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputationList().size() > VISIBLE_DISPLAY_REPUTATIONS ;
             }
         });
     }
 
+
+    private TextBoxGroup.TextBox textBoxGroupAmount;
+
+    public TextBoxGroup.TextBox getTextBoxGroupAmount()
     {
+        return textBoxGroupAmount;
+    }
+
+    private TextBoxGroup textBoxes; {
         textBoxes = new TextBoxGroup();
         textBoxes.add(textBoxGroupAmount = new TextBoxGroup.TextBox(this, "0", 180, 30, false) {
             @Override
@@ -220,24 +156,58 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             protected void textChanged(GuiBase gui) {
-                try {
+                try{
                     int number;
                     if (getText().equals("")) {
                         number = 1;
-                    } else {
+                    }else{
                         number = Integer.parseInt(getText());
                     }
 
                     if (selectedGroup != null) {
                         selectedGroup.setLimit(number);
                     }
-                } catch (Exception ignored) {
-                }
+                }catch (Exception ignored) {}
 
             }
         });
     }
 
+	private int tick;
+
+    public int getTick()
+    {
+        return tick;
+    }
+
+    private GuiEditMenu editMenu;
+
+    public static Group getSelectedGroup() {
+        return selectedGroup;
+    }
+
+    public void setEditMenu(GuiEditMenu editMenu) {
+        this.editMenu = editMenu;
+    }
+
+    private GuiQuestBook(EntityPlayer player, boolean isOpBook) {
+		this.player = player;
+        this.isOpBook = isOpBook;
+
+        if (Quest.isEditing) {
+            Keyboard.enableRepeatEvents(true);
+        }
+        QuestingData data = QuestingData.getQuestingData(player);
+        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
+            SoundHandler.triggerFirstLore();
+            data.playedLore = true;
+        }
+	}
+
+    private FileHelper.SaveResult saveResult = null;
+
+    private LargeButton saveButton;
+    private List<LargeButton> buttons = new ArrayList<LargeButton>();
     {
         buttons.add(saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
             @Override
@@ -287,7 +257,8 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
                 int i = 0;
-                for (QuestSet set : Quest.getQuestSets()) {
+                for (QuestSet set : Quest.getQuestSets())
+                {
                     if (set.getName().startsWith("Unnamed set")) i++;
                 }
                 Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
@@ -385,61 +356,6 @@ public class GuiQuestBook extends GuiBase {
         });
     }
 
-    private GuiQuestBook(EntityPlayer player, boolean isOpBook) {
-        this.player = player;
-        this.isOpBook = isOpBook;
-
-        if (Quest.isEditing) {
-            Keyboard.enableRepeatEvents(true);
-        }
-        QuestingData data = QuestingData.getQuestingData(player);
-        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
-            SoundHandler.triggerFirstLore();
-            data.playedLore = true;
-        }
-    }
-
-    public static void resetBookPosition() {
-        selectedSet = null;
-        isSetOpened = false;
-        selectedQuest = null;
-        isMainPageOpen = true;
-        isBagPage = false;
-        isReputationPage = false;
-        isMenuPageOpen = true;
-
-        selectedGroup = null;
-        selectedReputation = null;
-    }
-
-    public static Group getSelectedGroup() {
-        return selectedGroup;
-    }
-
-    public static void displayGui(EntityPlayer player, boolean isOpBook) {
-        if (player != null) {
-            if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook)) {
-                Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
-            }
-        }
-    }
-
-    public static void setSelected(ItemStack stack) {
-        selected = stack;
-    }
-
-    public TextBoxGroup.TextBox getTextBoxGroupAmount() {
-        return textBoxGroupAmount;
-    }
-
-    public int getTick() {
-        return tick;
-    }
-
-    public void setEditMenu(GuiEditMenu editMenu) {
-        this.editMenu = editMenu;
-    }
-
     @Override
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(true);
@@ -447,14 +363,98 @@ public class GuiQuestBook extends GuiBase {
         PacketHandler.closeInterface();
     }
 
-    @Override
-    public void updateScreen() {
-        ++tick;
+    public static void displayGui(EntityPlayer player, boolean isOpBook) {
+		if (player != null) {
+            if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook)) {
+			    Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
+            }
+		}
+	}
 
-        super.updateScreen();
-    }
+    private static final String FRONT_KEY = "hqm_front_texture";
+	private static final int TEXTURE_WIDTH = 170*2;
+	public static final int PAGE_WIDTH = 170;
+	private static final int TEXTURE_HEIGHT = 234;
+	
+	@Override
+	public void updateScreen() {
+		++tick;
+		
+		super.updateScreen();
+	}
 
-    @Override
+    //region pixel info for all the things
+    public static final int VISIBLE_REPUTATION_TIERS = 9;
+    public static final int VISIBLE_REPUTATIONS = 10;
+    public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
+
+    public static final int LIST_X = 25;
+    public static final int LIST_Y = 20;
+    public static final int TEXT_HEIGHT = 9;
+    public static final int TEXT_SPACING = 20;
+    public static final int DESCRIPTION_X = 180;
+    public static final int DESCRIPTION_Y = 20;
+    public static final int VISIBLE_DESCRIPTION_LINES = 7;
+    public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
+    public static final int VISIBLE_SETS = 7;
+
+    private static final int INFO_RIGHT_X = 180;
+    private static final int INFO_LIVES_Y = 20;
+    private static final int INFO_DEATHS_Y = 55;
+    private static final int INFO_TEAM_Y = 95;
+    private static final int INFO_LEFT_X = 20;
+    private static final int INFO_QUESTS_Y = 20;
+    private static final int INFO_REPUTATION_Y = 110;
+
+    private static final int INFO_HEARTS_X = 5;
+    private static final int INFO_HEARTS_Y = 12;
+    private static final int INFO_HEARTS_SPACING = 18;
+    private static final int TEAM_TEXT_Y = 12;
+    private static final int TEAM_CLICK_TEXT_Y = 30;
+    private static final int DEATH_TEXT_Y = 0;
+    private static final int DEATH_CLICK_TEXT_Y = 10;
+    private static final int QUEST_CLICK_TEXT_Y = 67;
+    private static final int INFO_REPUTATION_OFFSET_X = 5;
+    private static final int INFO_REPUTATION_OFFSET_Y = 12;
+
+    public static final int TIERS_X = 180;
+    public static final int TIERS_Y = 20;
+    public static final int TIERS_SPACING = 25;
+    public static final int TIERS_SECOND_LINE_X = -5;
+    public static final int TIERS_SECOND_LINE_Y = 12;
+    public static final int WEIGHT_SPACING = 25;
+    public static final int VISIBLE_TIERS = 8;
+
+    public static final int GROUPS_X = 20;
+    public static final int GROUPS_Y = 20;
+    public static final int GROUPS_SPACING = 25;
+    public static final int GROUPS_SECOND_LINE_X = 5;
+    public static final int GROUPS_SECOND_LINE_Y = 12;
+    public static final int VISIBLE_GROUPS = 8;
+
+    public static final int GROUP_ITEMS_X = 20;
+    public static final int GROUP_ITEMS_Y = 40;
+    public static final int GROUP_ITEMS_SPACING = 20;
+    public static final int ITEMS_PER_LINE = 7;
+
+    private static final int BACK_ARROW_X = 9;
+    private static final int BACK_ARROW_Y = 219;
+    private static final int BACK_ARROW_SRC_X = 0;
+    private static final int BACK_ARROW_SRC_Y = 113;
+    private static final int BACK_ARROW_WIDTH = 15;
+    private static final int BACK_ARROW_HEIGHT = 10;
+
+    private static final int MENU_ARROW_X = 161;
+    private static final int MENU_ARROW_Y = 217;
+    private static final int MENU_ARROW_SRC_X = 0;
+    private static final int MENU_ARROW_SRC_Y = 104;
+    private static final int MENU_ARROW_WIDTH = 14;
+    private static final int MENU_ARROW_HEIGHT = 9;
+    //endregion
+
+    private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
+
+	@Override
     public void drawScreen(int x0, int y0, float f) {
         selected = null;
         left = (width - TEXTURE_WIDTH) / 2;
@@ -503,17 +503,17 @@ public class GuiQuestBook extends GuiBase {
 
             if (isMainPageOpen) {
                 drawMainPage();
-            } else if (isMenuPageOpen) {
+            }else if(isMenuPageOpen) {
                 drawMenuPage(x, y);
-            } else if (isBagPage) {
+            }else if (isBagPage) {
                 drawBagPage(x, y);
-            } else if (isReputationPage) {
+            }else if(isReputationPage) {
                 Reputation.drawEditPage(this, x, y);
-            } else if (selectedSet == null || !isSetOpened) {
+            }else if (selectedSet == null || !isSetOpened) {
                 QuestSet.drawOverview(this, setScroll, descriptionScroll, x, y);
-            } else if (selectedQuest == null) {
-                selectedSet.draw(this, x0, y0, x, y);
-            } else {
+            }else if (selectedQuest == null)  {
+                    selectedSet.draw(this, x0, y0, x, y);
+            }else {
                 selectedQuest.drawMenu(this, player, x, y);
             }
 
@@ -533,7 +533,7 @@ public class GuiQuestBook extends GuiBase {
                 GL11.glPopMatrix();
             }
 
-        } else {
+        }else {
             editMenu.draw(this, x, y);
             editMenu.drawMouseOver(this, x, y);
         }
@@ -552,7 +552,7 @@ public class GuiQuestBook extends GuiBase {
                     str += saveResult.getText();
 
                     drawMouseOver(getLinesFromText(str, 1F, 130), x + left, y + top);
-                } else {
+                }else{
                     saveResult = null;
                 }
             }
@@ -560,16 +560,16 @@ public class GuiQuestBook extends GuiBase {
 
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.goBack") + "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.rightClick"), x + left, y + top);
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        }else if(shouldDisplayAndIsInArrowBounds(true, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.backToMenu"), x + left, y + top);
         }
-    }
+     }
 
     private void drawBagPage(int x, int y) {
         if (selectedGroup != null) {
             selectedGroup.draw(this, x, y);
             textBoxes.draw(this);
-        } else {
+        }else{
             Group.drawOverview(this, tierScroll, groupScroll, x, y);
         }
     }
@@ -580,7 +580,7 @@ public class GuiQuestBook extends GuiBase {
         drawString(Translator.translate("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
         drawString(Translator.translate("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
 
-        QuestSet.drawQuestInfo(this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
+        QuestSet.drawQuestInfo(this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int)(TEXT_HEIGHT * 1.5F));
         drawString(Translator.translate("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
 
         if (QuestingData.isHardcoreActive()) {
@@ -596,7 +596,7 @@ public class GuiQuestBook extends GuiBase {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X;
                 count = lives;
                 spacing = INFO_HEARTS_SPACING;
-            } else {
+            }else{
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X + 20;
                 count = 3;
                 spacing = 3;
@@ -606,7 +606,7 @@ public class GuiQuestBook extends GuiBase {
             for (int i = 0; i < count; i++) {
                 drawItem(new ItemStack(ModItems.hearts, 1, 3), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
             }
-        } else {
+        }else{
             drawString(getLinesFromText(Translator.translate("hqm.questBook.infiniteLives"), 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
         }
 
@@ -622,10 +622,10 @@ public class GuiQuestBook extends GuiBase {
             int invites = team.getInvites() == null ? 0 : team.getInvites().size();
             if (invites > 0) {
                 str = Translator.translate(invites != 1, "hqm.questBook.invites", invites);
-            } else {
+            }else{
                 str = Translator.translate("hqm.questBook.notInParty");
             }
-        } else {
+        }else{
             int players = 0;
             for (Team.PlayerEntry player : team.getPlayers()) {
                 if (player.isInTeam()) {
@@ -661,10 +661,10 @@ public class GuiQuestBook extends GuiBase {
                     BufferedImage img = ImageIO.read(file);
                     DynamicTexture dm = new DynamicTexture(img);
                     QuestLine.getActiveQuestLine().front = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(FRONT_KEY, dm);
-                } catch (IOException ignored) {
+                }catch (IOException ignored) {
                     QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
                 }
-            } else {
+            }else{
                 QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
             }
         }
@@ -687,9 +687,9 @@ public class GuiQuestBook extends GuiBase {
         if (scroll != 0) {
             if (editMenu != null) {
                 editMenu.onScroll(this, x, y, scroll);
-            } else if (selectedQuest != null) {
+            }else if (selectedQuest != null) {
                 selectedQuest.onScroll(this, x, y, scroll);
-            } else {
+            }else{
                 for (ScrollBar scrollBar : scrollBars) {
                     scrollBar.onScroll(this, x, y, scroll);
                 }
@@ -702,7 +702,7 @@ public class GuiQuestBook extends GuiBase {
         super.keyTyped(c, k);
         if (editMenu != null) {
             editMenu.onKeyTyped(this, c, k);
-        } else if (isBagPage && selectedGroup != null) {
+        } else if(isBagPage && selectedGroup != null) {
             textBoxes.onKeyStroke(this, c, k);
         } else if (KeyboardHandler.pressedHotkey(this, k, getButtons())) {
             onButtonClicked();
@@ -711,26 +711,36 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
-    private boolean isNEIActive() {
+    private boolean isNEIActive()
+    {
         return isNEIActive;
     }
 
-    private void handleNEI(int k) {
+    public static void setSelected(ItemStack stack)
+    {
+        selected = stack;
+    }
+
+    private void handleNEI(int k)
+    {
         ItemStack stackover = selected;
-        if (stackover != null) {
-            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey())) {
+        if(stackover != null)
+        {
+            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey()))
+            {
                 GuiUsageRecipe.openRecipeGui("item", stackover.copy());
             }
 
-            if (k == NEIClientConfig.getKeyBinding("gui.recipe")) {
+            if (k == NEIClientConfig.getKeyBinding("gui.recipe"))
+            {
                 GuiCraftingRecipe.openRecipeGui("item", stackover.copy());
             }
         }
     }
 
     @Override
-    protected void mouseClicked(int x0, int y0, int button) {
-        super.mouseClicked(x0, y0, button);
+	protected void mouseClicked(int x0, int y0, int button) {
+		super.mouseClicked(x0, y0, button);
 
         int x = x0 - left;
         int y = y0 - top;
@@ -742,7 +752,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu.close(this);
                 return;
             }
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        }else if(shouldDisplayAndIsInArrowBounds(true, x, y)) {
             isMenuPageOpen = true;
             if (editMenu != null) {
                 editMenu.save(this);
@@ -779,40 +789,41 @@ public class GuiQuestBook extends GuiBase {
 
             if (isMainPageOpen) {
                 mainPageMouseClicked(x, y);
-            } else if (isMenuPageOpen) {
+            }else if(isMenuPageOpen) {
                 menuPageMouseClicked(button, x, y);
-            } else if (isBagPage) {
+            }else if (isBagPage) {
                 bagPageMouseClicked(button, x, y);
-            } else if (isReputationPage) {
+            }else if(isReputationPage) {
                 if (button == 1) {
                     isMenuPageOpen = true;
                     isReputationPage = false;
-                } else {
+                }else {
                     Reputation.onClick(this, x, y, player);
                 }
-            } else if (selectedSet == null || !isSetOpened) {
+            }else if (selectedSet == null || !isSetOpened) {
                 if (button == 1) {
                     isMenuPageOpen = true;
                     return;
                 }
                 QuestSet.mouseClickedOverview(this, setScroll, x, y);
-            } else {
+            }else {
                 if (selectedQuest == null) {
                     if (button == 1) {
                         isSetOpened = false;
-                    } else {
+                    }else {
                         selectedSet.mouseClicked(this, x, y);
                     }
-                } else {
+                }else {
                     selectedQuest.onClick(this, player, x, y, button);
                 }
             }
-        } else {
+        }else {
             editMenu.onClick(this, x, y, button);
         }
     }
 
-    public void goBack() {
+    public void goBack()
+    {
         if (isMenuPageOpen) {
             isMainPageOpen = true;
         } else if (isBagPage) {
@@ -834,7 +845,7 @@ public class GuiQuestBook extends GuiBase {
             currentMode = EditMode.NORMAL;
             isBagPage = true;
             isMenuPageOpen = false;
-        } else if (currentMode == EditMode.REPUTATION) {
+        }else if(currentMode == EditMode.REPUTATION) {
             currentMode = EditMode.NORMAL;
             isReputationPage = true;
             isMenuPageOpen = false;
@@ -845,15 +856,15 @@ public class GuiQuestBook extends GuiBase {
         if (selectedGroup != null) {
             if (button == 1) {
                 selectedGroup = null;
-            } else {
+            }else{
                 selectedGroup.mouseClicked(this, x, y);
                 textBoxes.onClick(this, x, y);
             }
-        } else {
+        }else{
             if (button == 1) {
                 isBagPage = false;
                 isMenuPageOpen = true;
-            } else {
+            }else{
                 Group.mouseClickedOverview(this, groupScroll, x, y);
                 GroupTier.mouseClickedOverview(this, tierScroll, x, y);
             }
@@ -862,14 +873,14 @@ public class GuiQuestBook extends GuiBase {
     }
 
     private void menuPageMouseClicked(int button, int x, int y) {
-        if (button == 1) {
+        if(button == 1) {
             isMainPageOpen = true;
-        } else {
-            if (inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
-                editMenu = new GuiEditMenuTeam(this, player);
-            } else if (inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+        }else{
+            if(inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
+                editMenu = new GuiEditMenuTeam(this , player);
+            }else if(inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuDeath(this, player);
-            } else if (inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+            }else if(inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
                 isMenuPageOpen = false;
             }
         }
@@ -879,12 +890,12 @@ public class GuiQuestBook extends GuiBase {
         if (x > 0 && x < PAGE_WIDTH && y > 205) {
             isMainPageOpen = false;
             SoundHandler.stopLoreMusic();
-        } else if (x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
+        }else if(x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
             if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
                 SoundHandler.playLoreMusic();
             }
-        } else {
-            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
+        }else{
+            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int)(VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuTextEditor(this, player);
             }
         }
@@ -904,9 +915,9 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
-        } else if (selectedQuest != null) {
+        }else if (selectedQuest != null) {
             selectedQuest.onRelease(this, player, x, y, button);
-        } else {
+        }else{
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
             }
@@ -923,14 +934,19 @@ public class GuiQuestBook extends GuiBase {
         updatePosition(x, y);
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
-        } else if (selectedQuest != null) {
+        }else if (selectedQuest != null) {
             selectedQuest.onDrag(this, player, x, y, button);
-        } else {
+        }else{
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);
             }
         }
     }
+
+    public Group modifyingGroup;
+    public QuestSet modifyingQuestSet;
+    public Quest modifyingQuest;
+    public ReputationBar modifyingBar;
 
     private void updatePosition(int x, int y) {
         if (Quest.isEditing && currentMode == EditMode.MOVE) {
@@ -938,26 +954,31 @@ public class GuiQuestBook extends GuiBase {
                 modifyingQuest.setGuiCenterX(x);
                 modifyingQuest.setGuiCenterY(y);
             }
-            if (modifyingBar != null) {
+            if (modifyingBar != null)
+            {
                 modifyingBar.moveTo(x, y);
             }
         }
     }
 
     @Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
 
     public void loadMap() {
         selectedQuest = null;
     }
 
+
+    private EditMode currentMode = EditMode.NORMAL;
+
     public EditMode getCurrentMode() {
         return currentMode;
     }
 
-    public void setCurrentMode(EditMode mode) {
+    public void setCurrentMode(EditMode mode)
+    {
         currentMode = mode;
     }
 
@@ -976,6 +997,15 @@ public class GuiQuestBook extends GuiBase {
         return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : selectedSet == null || !isSetOpened ? overviewButtons : selectedQuest == null ? setButtons : questButtons;
     }
 
+    private EditButton[] groupButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
+    private EditButton[] bagButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
+    private EditButton[] reputationButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
+    private EditButton[] mainButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.RENAME);
+    private EditButton[] menuButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
+    private EditButton[] overviewButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
+    private EditButton[] setButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
+    private EditButton[] questButtons = EditButton.createButtons(this, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, EditMode.CHANGE_TASK, EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.DELETE);
+
     private boolean shouldDisplayControlArrow(boolean isMenuArrow) {
         return !isMainPageOpen && ((!(isMenuArrow && isMenuPageOpen) && editMenu == null) || (editMenu != null && !editMenu.hasButtons()));
     }
@@ -983,7 +1013,7 @@ public class GuiQuestBook extends GuiBase {
     private boolean inArrowBounds(boolean isMenuArrow, int mX, int mY) {
         if (isMenuArrow) {
             return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
-        } else {
+        }else{
             return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
         }
     }

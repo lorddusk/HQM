@@ -53,16 +53,17 @@ public class GUIOverlay extends Gui {
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glDepthMask(true);
-        } else {
+        }
+        else{
             this.mc.fontRenderer.drawString(d, xPos + 1, yPos, 0xffffff);
         }
     }
 
-    public int getLives() {
+    public int getLives(){
         return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getLives();
     }
 
-    public int getDeaths() {
+    public int getDeaths(){
         return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getDeathStat().getTotalDeaths();
     }
 

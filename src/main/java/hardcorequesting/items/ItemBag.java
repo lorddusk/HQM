@@ -40,7 +40,7 @@ public class ItemBag extends Item {
     }
 
     private void pickIcons(IIconRegister register) {
-        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
+            itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
     }
 
     @SuppressWarnings("unchecked")

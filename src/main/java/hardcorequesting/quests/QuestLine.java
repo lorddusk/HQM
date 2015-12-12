@@ -20,26 +20,7 @@ import java.util.Map;
 
 public class QuestLine {
 
-    public static boolean doServerSync;
-    private static QuestLine config = new QuestLine();
-    private static QuestLine server;
-    private static QuestLine world;
-    private static boolean hasLoadedMainSound;
-    public final List<GroupTier> tiers = new ArrayList<GroupTier>();
-    public final Map<Integer, Group> groups = new HashMap<Integer, Group>();
-    public final List<Group> groupList = new ArrayList<Group>();
-    public List<QuestSet> questSets;
-    public Map<Short, Quest> quests;
-    public int questCount;
-    public String mainDescription = "No description";
-    public List<String> cachedMainDescription;
-    public int groupCount;
-    public String mainPath;
-    @SideOnly(Side.CLIENT)
-    public ResourceLocation front;
-
-
-    public QuestLine() {
+    public QuestLine(){
         tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
         tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
         tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
@@ -48,9 +29,30 @@ public class QuestLine {
         tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
     }
 
+
+    public List<QuestSet> questSets;
+    public Map<Short, Quest> quests;
+    public int questCount;
+    public String mainDescription = "No description";
+    public List<String> cachedMainDescription;
+    public final List<GroupTier> tiers = new ArrayList<GroupTier>();
+    public final Map<Integer, Group> groups = new HashMap<Integer, Group>();
+    public final List<Group> groupList = new ArrayList<Group>();
+    public int groupCount;
+    public String mainPath;
+    @SideOnly(Side.CLIENT)
+    public ResourceLocation front;
+
+    private static QuestLine config = new QuestLine();
+    private static QuestLine server;
+    private static QuestLine world;
     public static QuestLine getActiveQuestLine() {
         return server != null ? server : world != null ? world : config;
     }
+
+
+    private static boolean hasLoadedMainSound;
+    public static boolean doServerSync;
 
     public static void receiveServerSync(DataReader dr) {
         if (!hasLoadedMainSound) {
@@ -66,7 +68,7 @@ public class QuestLine {
             getActiveQuestLine().questSets = new ArrayList<QuestSet>();
 
             Quest.loadAll(dr, QuestingData.FILE_VERSION);
-        } else {
+        }else{
             String path = dr.readString(DataBitHelper.SHORT);
             if (path != null && new File(path).exists()) {
                 world = new QuestLine();
@@ -86,7 +88,7 @@ public class QuestLine {
         dw.writeBoolean(doServerSync);
         if (doServerSync) {
             Quest.saveAll(dw);
-        } else {
+        }else{
             String path = world == null ? null : world.mainPath;
             dw.writeString(path, DataBitHelper.SHORT);
         }

@@ -9,13 +9,7 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.File;
 
 public class ConfigHandler {
-    private static final String EDITOR_KEY = "UseEditor";
-    private static final boolean EDITOR_DEFAULT = false;
-    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
-    private static final String KEYMAP_KEY = "KeyMap";
-    private static final String KEYMAP_COMMENT = "Hotkeys used in the book, one entry per line(Format: [key]:[mode]";
     public static Configuration syncConfig;
-    private static String[] KEYMAP_DEFAULT = null;
 
     public static void initModConfig(String configPath) {
         ModConfig.init(new File(configPath + "hqmconfig.cfg"));
@@ -41,4 +35,12 @@ public class ConfigHandler {
             syncConfig.save();
         }
     }
+
+    private static final String EDITOR_KEY = "UseEditor";
+    private static final boolean EDITOR_DEFAULT = false;
+    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
+
+    private static final String KEYMAP_KEY = "KeyMap";
+    private static String[] KEYMAP_DEFAULT = null;
+    private static final String KEYMAP_COMMENT = "Hotkeys used in the book, one entry per line(Format: [key]:[mode]";
 }

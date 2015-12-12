@@ -37,8 +37,7 @@ public class ScrollBar {
     }
 
     @SideOnly(Side.CLIENT)
-    protected void onUpdate() {
-    }
+    protected void onUpdate() {}
 
     @SideOnly(Side.CLIENT)
     public void draw(GuiBase gui) {
@@ -82,7 +81,11 @@ public class ScrollBar {
     }
 
     public float getScroll() {
-        return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
+        return (float)scroll / (h - SCROLL_BAR_HEIGHT - 2);
+    }
+
+    public void resetScroll() {
+        scroll = 0;
     }
 
     private void setScroll(int newScroll) {
@@ -90,16 +93,12 @@ public class ScrollBar {
         scroll = newScroll;
         if (scroll < 0) {
             scroll = 0;
-        } else if (scroll > h - SCROLL_BAR_HEIGHT - 2) {
+        }else if(scroll > h - SCROLL_BAR_HEIGHT - 2) {
             scroll = h - SCROLL_BAR_HEIGHT - 2;
         }
         if (scroll != old) {
             onUpdate();
         }
-    }
-
-    public void resetScroll() {
-        scroll = 0;
     }
 
     public void onScroll(GuiBase gui, int mX, int mY, int scroll) {

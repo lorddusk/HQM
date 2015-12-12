@@ -28,8 +28,38 @@ public class GroupTier {
         this.weights = Arrays.copyOf(weights, weights.length);
     }
 
+    public String getName() {
+        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
+    }
+
+    public GuiColor getColor() {
+        return color;
+    }
+
+    public int[] getWeights() {
+        return weights;
+    }
+
     public static List<GroupTier> getTiers() {
         return QuestLine.getActiveQuestLine().tiers;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public GroupTier copy() {
+        return new GroupTier(getName(), getColor(), getWeights());
+    }
+
+    public void load(GroupTier tier) {
+        this.name = tier.name;
+        this.color = tier.color;
+        this.weights = Arrays.copyOf(weights, weights.length);
+    }
+
+    public void setColor(GuiColor color) {
+        this.color = color;
     }
 
     public static void saveAll(DataWriter dw) {
@@ -97,35 +127,5 @@ public class GroupTier {
                 break;
             }
         }
-    }
-
-    public String getName() {
-        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public GuiColor getColor() {
-        return color;
-    }
-
-    public void setColor(GuiColor color) {
-        this.color = color;
-    }
-
-    public int[] getWeights() {
-        return weights;
-    }
-
-    public GroupTier copy() {
-        return new GroupTier(getName(), getColor(), getWeights());
-    }
-
-    public void load(GroupTier tier) {
-        this.name = tier.name;
-        this.color = tier.color;
-        this.weights = Arrays.copyOf(weights, weights.length);
     }
 }

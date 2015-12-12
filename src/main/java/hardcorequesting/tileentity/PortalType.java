@@ -15,11 +15,13 @@ public enum PortalType {
         this.isPreset = isPreset;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return Translator.translate("hqm.portal." + this.id + ".title");
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return Translator.translate("hqm.portal." + this.id + ".desc");
     }
 

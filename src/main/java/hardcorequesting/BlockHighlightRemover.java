@@ -24,7 +24,7 @@ public class BlockHighlightRemover {
             if (ModBlocks.itemPortal == event.player.worldObj.getBlock(event.target.blockX, event.target.blockY, event.target.blockZ)) {
                 TileEntity te = event.player.worldObj.getTileEntity(event.target.blockX, event.target.blockY, event.target.blockZ);
                 if (te instanceof TileEntityPortal) {
-                    TileEntityPortal portal = (TileEntityPortal) te;
+                    TileEntityPortal portal = (TileEntityPortal)te;
                     if (!portal.hasCollision(event.player)) {
                         event.setCanceled(true);
                     }

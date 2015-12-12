@@ -7,7 +7,8 @@ import net.minecraft.util.ResourceLocation;
 
 @SideOnly(Side.CLIENT)
 public class ClientSound extends PositionedSound {
-    public ClientSound(ResourceLocation resource, float volume, float pitch) {
+    public ClientSound(ResourceLocation resource, float volume, float pitch)
+    {
         super(resource);
         this.volume = volume;
         this.field_147663_c = pitch;

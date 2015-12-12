@@ -33,10 +33,10 @@ public class ItemBlockPortal extends ItemBlock {
                     Quest quest = Quest.getQuest(compound.getShort(TileEntityPortal.NBT_QUEST));
                     if (quest != null) {
                         lst.add(GuiColor.GREEN + "Quest: " + quest.getName());
-                    } else {
+                    }else{
                         lst.add(GuiColor.GRAY + "No quest selected.");
                     }
-                } else {
+                }else{
                     lst.add(GuiColor.GRAY + "No quest selected.");
                 }
 
@@ -49,18 +49,18 @@ public class ItemBlockPortal extends ItemBlock {
 
                         ItemStack item = new ItemStack(Item.getItemById(id), 1, dmg);
                         lst.add(GuiColor.YELLOW + "Item: " + item.getDisplayName());
-                    } else {
+                    }else{
                         lst.add(GuiColor.GRAY + "No item selected.");
                     }
                 }
 
-                boolean completedCollision, completedTexture, uncompletedCollision, uncompletedTexture;
+                boolean completedCollision,completedTexture,uncompletedCollision,uncompletedTexture;
                 if (compound.hasKey(TileEntityPortal.NBT_COLLISION)) {
                     completedCollision = compound.getBoolean(TileEntityPortal.NBT_COLLISION);
                     completedTexture = compound.getBoolean(TileEntityPortal.NBT_COLLISION);
                     uncompletedCollision = compound.getBoolean(TileEntityPortal.NBT_NOT_COLLISION);
                     uncompletedTexture = compound.getBoolean(TileEntityPortal.NBT_NOT_TEXTURES);
-                } else {
+                }else{
                     completedCollision = completedTexture = false;
                     uncompletedCollision = uncompletedTexture = true;
                 }
@@ -72,11 +72,10 @@ public class ItemBlockPortal extends ItemBlock {
                 lst.add("Uncompleted textures: " + formatBoolean(uncompletedTexture));
 
             }
-        } catch (Exception ignored) {
-        } //just to make sure it doesn't crash because it tries to get some weird quests or items or whatever
+        }catch (Exception ignored) {} //just to make sure it doesn't crash because it tries to get some weird quests or items or whatever
     }
 
-    private String formatBoolean(boolean val) {
+    private String formatBoolean (boolean val) {
         return (val ? GuiColor.GREEN : GuiColor.GRAY) + String.valueOf(val);
     }
 

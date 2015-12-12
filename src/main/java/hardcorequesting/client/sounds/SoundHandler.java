@@ -35,16 +35,11 @@ import java.util.Map;
 
 public class SoundHandler {
 
-    private static final String LABEL = "lore";
-    private static List<String> paths = new ArrayList<String>();
-    private static int loreNumber;
-    private static boolean loreMusic = false;
-    @SideOnly(Side.CLIENT)
-    private static ISound loreSound;
-    private static int bitCount = -1;
-
     private SoundHandler() {
     }
+
+    private static List<String> paths = new ArrayList<String>();
+    private static final String LABEL = "lore";
 
     @SideOnly(Side.CLIENT)
     public static boolean loadLoreReading(String path) {
@@ -53,12 +48,12 @@ public class SoundHandler {
 
         int index = paths.indexOf(path);
         if (index == -1) {
-            if (new File(path + "lore.ogg").exists()) {
+            if(new File(path + "lore.ogg").exists()) {
                 int number = paths.size();
 
                 // Add resource pack to discover lore
-                Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
-                FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hqm");
+                Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager)Minecraft.getMinecraft().getResourceManager(), 2);
+                FallbackResourceManager resourceManager = (FallbackResourceManager)resourceManagers.get("hqm");
                 resourceManager.addResourcePack(new LoreResourcePack(new File(path)));
 
                 // Add lore file to sound handler
@@ -71,16 +66,16 @@ public class SoundHandler {
                 entry.setSoundEntryName(LABEL + number);
                 list.getSoundList().add(entry);
 
-                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[]{"loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
-                if (method == null || handler == null) {
+                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[] { "loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
+                if(method == null || handler == null){
                     return false;
                 }
                 try {
-                    method.invoke(handler, new ResourceLocation(ModInformation.SOUNDLOC, LABEL + number), list);
-                    loreMusic = true;
-                    loreNumber = number;
-                    paths.add(path);
-                    return true;
+                   method.invoke(handler, new ResourceLocation(ModInformation.SOUNDLOC, LABEL + number), list);
+                   loreMusic = true;
+                   loreNumber = number;
+                   paths.add(path);
+                   return true;
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -89,7 +84,7 @@ public class SoundHandler {
                     throw new RuntimeException(e);
                 }
             }
-        } else {
+        }else{
             loreNumber = index;
             loreMusic = true;
             return true;
@@ -97,14 +92,20 @@ public class SoundHandler {
         return false;
     }
 
+    private static int loreNumber;
+    private static boolean loreMusic = false;
+    @SideOnly(Side.CLIENT)
+    private static ISound loreSound;
     @SideOnly(Side.CLIENT)
     public static void playLoreMusic() {
         loreSound = play(LABEL + loreNumber, 4F, 1F);
     }
 
+
+    private static int bitCount = -1;
     private static int getBitCount() {
         if (bitCount == -1) {
-            bitCount = (int) (Math.log10(Sounds.values().length + 1) / Math.log10(2)) + 1;
+            bitCount = (int)(Math.log10(Sounds.values().length + 1) / Math.log10(2)) + 1;
         }
 
         return bitCount;
@@ -139,7 +140,7 @@ public class SoundHandler {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
+                    while(isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
                         Minecraft.getMinecraft().getSoundHandler().stopSound(loreSound);
                     }
                     loreSound = null;

@@ -37,15 +37,17 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
             if (player != null && item != null) {
                 //no need for the quest to be active
                 //if (parent.isVisible(player) && parent.isEnabled(player) && isVisible(player)) {
-                item = item.copy();
-                if (item.stackSize == 0) {
-                    item.stackSize = 1;
-                }
-                increaseItems(new ItemStack[]{item}, (QuestDataTaskItems) getData(player), QuestingData.getUserName(player));
-                //}
+                    item = item.copy();
+                    if (item.stackSize == 0) {
+                        item.stackSize = 1;
+                    }
+                    increaseItems(new ItemStack[] {item}, (QuestDataTaskItems)getData(player), QuestingData.getUserName(player));
+               //}
             }
         }
     }
+
+
 
 
 }

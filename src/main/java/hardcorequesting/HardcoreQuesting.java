@@ -38,14 +38,6 @@ public class HardcoreQuesting {
 
     private static EntityPlayer commandUser;
 
-    public static EntityPlayer getPlayer() {
-        return commandUser;
-    }
-
-    public static void setPlayer(EntityPlayer player) {
-        commandUser = player;
-    }
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         new hardcorequesting.EventHandler();
@@ -91,6 +83,7 @@ public class HardcoreQuesting {
         Quest.init(path);
     }
 
+
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent event) {
 
@@ -110,5 +103,13 @@ public class HardcoreQuesting {
     @EventHandler
     public void serverAboutToStart(FMLServerStoppingEvent event) {
 
+    }
+
+    public static EntityPlayer getPlayer() {
+        return commandUser;
+    }
+
+    public static void setPlayer(EntityPlayer player) {
+        commandUser = player;
     }
 }

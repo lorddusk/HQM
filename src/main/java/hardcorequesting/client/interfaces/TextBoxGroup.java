@@ -16,8 +16,9 @@ public class TextBoxGroup {
     private static final int TEXT_BOX_HEIGHT = 12;
     private static final int TEXT_BOX_SRC_X = 192;
     private static final int TEXT_BOX_SRC_Y = 77;
-    List<TextBox> textBoxes;
+
     private TextBox selectedTextBox;
+    List<TextBox> textBoxes;
 
     public TextBoxGroup() {
         textBoxes = new ArrayList<TextBox>();
@@ -42,7 +43,7 @@ public class TextBoxGroup {
             if (textBox.isVisible() && gui.inBounds(textBox.x, textBox.y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mX, mY)) {
                 if (selectedTextBox == textBox) {
                     selectedTextBox = null;
-                } else {
+                }else{
                     selectedTextBox = textBox;
                 }
                 break;
@@ -58,12 +59,12 @@ public class TextBoxGroup {
     }
 
     public static class TextBox extends TextBoxLogic {
-        private static final int WIDTH = 60;
-        protected int offsetY = 3;
         private int x;
         private int y;
+        protected int offsetY = 3;
         private int start;
         private String visibleText;
+        private static final int WIDTH = 60;
         private boolean scrollable;
 
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
@@ -77,7 +78,7 @@ public class TextBoxGroup {
         @SideOnly(Side.CLIENT)
         protected void draw(GuiBase gui, boolean selected) {
 
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+                ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
             GL11.glColor4f(1F, 1F, 1F, 1F);
             gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
@@ -98,10 +99,10 @@ public class TextBoxGroup {
             if (scrollable) {
                 if (updatedCursor) {
                     updateVisible(gui);
-                    cursorPositionX = (int) (getMult() * gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
+                    cursorPositionX = (int)(getMult() * gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
                     updatedCursor = false;
                 }
-            } else {
+            }else{
                 super.recalculateCursor(gui);
             }
         }
@@ -125,7 +126,7 @@ public class TextBoxGroup {
                 String text = getText().substring(start, cursor);
                 if (gui.getStringWidth(text) * getMult() > WIDTH) {
                     start++;
-                } else {
+                }else{
                     break;
                 }
             }

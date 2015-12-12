@@ -8,22 +8,7 @@ import hardcorequesting.config.ModConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
-public class GuiEditMenuTier extends GuiEditMenu {
-    private static final int ARROW_X_LEFT = 20;
-    private static final int ARROW_X_RIGHT = 150;
-    private static final int ARROW_Y = 40;
-    private static final int ARROW_SRC_X = 244;
-    private static final int ARROW_SRC_Y = 176;
-    private static final int ARROW_W = 6;
-    private static final int ARROW_H = 10;
-    private static final int TIERS_TEXT_X = 20;
-    private static final int TIERS_TEXT_Y = 20;
-    private static final int TIERS_WEIGHTS_X = 30;
-    private static final int TIERS_WEIGHTS_Y = 80;
-    private static final int TIERS_WEIGHTS_SPACING = 15;
-    private static final int TIERS_TEXT_BOX_X = 65;
-    private static final int TIERS_TEXT_BOX_Y = -2;
-    private static final int TIERS_WEIGHTS_TEXT_Y = 65;
+public class GuiEditMenuTier  extends GuiEditMenu {
     private GroupTier tier;
     private GroupTier original;
     private TextBoxGroup textBoxes;
@@ -46,22 +31,39 @@ public class GuiEditMenuTier extends GuiEditMenu {
 
                 @Override
                 protected void textChanged(GuiBase gui) {
-                    try {
+                    try{
                         int number;
                         if (getText().equals("")) {
                             number = 1;
-                        } else {
+                        }else{
                             number = Integer.parseInt(getText());
                         }
 
                         tier.getWeights()[id] = number;
-                    } catch (Exception ignored) {
-                    }
+                    }catch (Exception ignored) {}
 
                 }
             });
         }
     }
+
+    private static final int ARROW_X_LEFT = 20;
+    private static final int ARROW_X_RIGHT = 150;
+    private static final int ARROW_Y = 40;
+    private static final int ARROW_SRC_X = 244;
+    private static final int ARROW_SRC_Y = 176;
+    private static final int ARROW_W = 6;
+    private static final int ARROW_H = 10;
+
+    private static final int TIERS_TEXT_X = 20;
+    private static final int TIERS_TEXT_Y = 20;
+    private static final int TIERS_WEIGHTS_X = 30;
+    private static final int TIERS_WEIGHTS_Y = 80;
+    private static final int TIERS_WEIGHTS_SPACING = 15;
+    private static final int TIERS_TEXT_BOX_X = 65;
+    private static final int TIERS_TEXT_BOX_Y = -2;
+    private static final int TIERS_WEIGHTS_TEXT_Y = 65;
+
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -81,7 +83,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
 
         GL11.glColor3f(1F, 1F, 1F);
 
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
@@ -97,7 +99,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
         if (inArrowBounds(gui, mX, mY, true)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
             clicked = true;
-        } else if (inArrowBounds(gui, mX, mY, false)) {
+        }else if (inArrowBounds(gui, mX, mY, false)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
             clicked = true;
         }

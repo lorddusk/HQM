@@ -22,13 +22,11 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemHeart extends Item {
+public class ItemHeart extends Item
+{
 
-    public static final String[] names = ItemInfo.HEART_ICONS;
-    @SideOnly(Side.CLIENT)
-    private IIcon[] icons;
-
-    public ItemHeart() {
+    public ItemHeart()
+    {
         super();
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
@@ -38,59 +36,79 @@ public class ItemHeart extends Item {
     }
 
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister icon) {
+    private IIcon[] icons;
+
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister icon)
+    {
         pickIcon(icon);
     }
 
-    private void pickIcon(IIconRegister icon) {
+    private void pickIcon(IIconRegister icon)
+    {
         icons = new IIcon[ItemInfo.HEART_ICONS.length];
 
         for (int i = 0; i < icons.length; i++)
             icons[i] = icon.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.HEART_ICONS[i]);
     }
 
-    public String getUnlocalizedName(ItemStack par1ItemStack) {
+    public static final String[] names = ItemInfo.HEART_ICONS;
+
+    public String getUnlocalizedName(ItemStack par1ItemStack)
+    {
         int i = MathHelper.clamp_int(par1ItemStack.getItemDamage(), 0, 15);
         return super.getUnlocalizedName() + "_" + names[i];
     }
 
-    public IIcon getIconFromDamage(int par1) {
+    public IIcon getIconFromDamage(int par1)
+    {
         return icons[par1];
     }
 
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs creativeTabs, List stackList) {
+    public void getSubItems(Item item, CreativeTabs creativeTabs, List stackList)
+    {
         for (int x = 0; x < ItemInfo.HEART_ICONS.length; x++)
             stackList.add(new ItemStack(this, 1, x));
     }
 
 
     @Override
-    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
-        if (!world.isRemote) {
+    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
+    {
+        if (!world.isRemote)
+        {
 
-            if (item.getItemDamage() == 3) {
-                if (!QuestingData.isHardcoreActive()) {
+            if (item.getItemDamage() == 3)
+            {
+                if (!QuestingData.isHardcoreActive())
+                {
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
-                } else if (QuestingData.getQuestingData(player).getRawLives() < ModConfig.MAXLIVES) {
+                } else if (QuestingData.getQuestingData(player).getRawLives() < ModConfig.MAXLIVES)
+                {
                     QuestingData.getQuestingData(player).addLives(player, 1);
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.addOne"));
                     int lives = QuestingData.getQuestingData(player).getLives();
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveRemaining", lives));
                     SoundHandler.play(Sounds.LIFE, player);
-                    if (!player.capabilities.isCreativeMode) {
+                    if (!player.capabilities.isCreativeMode)
+                    {
                         --item.stackSize;
 
                     }
-                } else {
+                } else
+                {
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveMaxLives"));
                 }
             }
-            if (item.getItemDamage() == 4) {
-                if (!QuestingData.isHardcoreActive()) {
+            if (item.getItemDamage() == 4)
+            {
+                if (!QuestingData.isHardcoreActive())
+                {
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
-                } else {
+                } else
+                {
                     SoundHandler.play(Sounds.ROTTEN, player);
                     player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.eatRottenHearth"));
                     QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
@@ -109,18 +127,23 @@ public class ItemHeart extends Item {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack item, EntityPlayer player, List tooltip, boolean extraInfo) {
+    public void addInformation(ItemStack item, EntityPlayer player, List tooltip, boolean extraInfo)
+    {
         super.addInformation(item, player, tooltip, extraInfo);
 
-        if (item.getItemDamage() == 3) {
+        if (item.getItemDamage() == 3)
+        {
             tooltip.add(Translator.translate("item.hqm:hearts_heart.tooltip"));
-            if (ModConfig.ROTTIMER) {
+            if (ModConfig.ROTTIMER)
+            {
                 NBTTagCompound tagCompound = item.getTagCompound();
-                if (tagCompound == null) {
+                if (tagCompound == null)
+                {
                     tagCompound = new NBTTagCompound();
                     item.setTagCompound(tagCompound);
                 }
-                if (tagCompound.hasKey("RotTime")) {
+                if (tagCompound.hasKey("RotTime"))
+                {
                     int rot = tagCompound.getInteger("RotTime");
                     int maxRot = tagCompound.getInteger("MaxRot");
                     float percentage = (float) ((rot * 100) / maxRot);
@@ -128,36 +151,46 @@ public class ItemHeart extends Item {
                 }
             }
         }
-        if (item.getItemDamage() == 4) {
+        if (item.getItemDamage() == 4)
+        {
             tooltip.add(Translator.translate("item.hqm:hearts_rottenheart.tooltip"));
         }
     }
 
     @Override
-    public boolean hasEffect(ItemStack item, int pass) {
+    public boolean hasEffect(ItemStack item, int pass)
+    {
         return item.getItemDamage() == 3 || item.getItemDamage() == 4;
     }
 
     @Override
-    public void onUpdate(ItemStack itemStack, World world, Entity entity, int par4, boolean par5) {
-        if (entity instanceof EntityPlayer) {
+    public void onUpdate(ItemStack itemStack, World world, Entity entity, int par4, boolean par5)
+    {
+        if (entity instanceof EntityPlayer)
+        {
             EntityPlayer entityPlayer = (EntityPlayer) entity;
-            if (itemStack.getItemDamage() == 3 && ModConfig.ROTTIMER) {
+            if (itemStack.getItemDamage() == 3 && ModConfig.ROTTIMER)
+            {
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
-                if (tagCompound == null) {
+                if (tagCompound == null)
+                {
                     tagCompound = new NBTTagCompound();
                     itemStack.setTagCompound(tagCompound);
                 }
-                if (!tagCompound.hasKey("RotTime")) {
+                if (!tagCompound.hasKey("RotTime"))
+                {
                     int rot = (ModConfig.MAXROT * 20);
                     tagCompound.setInteger("MaxRot", rot);
                     tagCompound.setInteger("RotTime", rot);
-                } else {
+                } else
+                {
                     int newRot = tagCompound.getInteger("RotTime");
-                    if (newRot <= 0) {
+                    if (newRot <= 0)
+                    {
                         itemStack.setItemDamage(4);
                         entityPlayer.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.hearthDecay"));
-                    } else {
+                    } else
+                    {
                         tagCompound.setInteger("RotTime", newRot - 1);
                     }
                 }

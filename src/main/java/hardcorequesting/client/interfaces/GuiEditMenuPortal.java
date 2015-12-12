@@ -7,11 +7,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 public class GuiEditMenuPortal extends GuiEditMenuExtended {
+    private TileEntityPortal portal;
+    private GuiEditMenuPortal self = this;
+
+
     private static final int CHECK_BOX_X = 20;
     private static final int CHECK_BOX_Y = 110;
     private static final int CHECK_BOX_OFFSET = 12;
-    private TileEntityPortal portal;
-    private GuiEditMenuPortal self = this;
 
     public GuiEditMenuPortal(GuiBase gui, EntityPlayer player, TileEntityPortal portal) {
         super(gui, player, true, 20, 30, 20, 130);
@@ -101,7 +103,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             portal.setType(PortalType.values()[(portal.getType().ordinal() + PortalType.values().length - 1) % PortalType.values().length]);
-        } else {
+        }else{
             portal.setType(PortalType.values()[(portal.getType().ordinal() + 1) % PortalType.values().length]);
         }
     }
@@ -129,6 +131,8 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
     public void setItem(ItemStack item) {
         portal.setItem(item);
     }
+
+
 
 
 }

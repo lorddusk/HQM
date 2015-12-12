@@ -21,14 +21,15 @@ import java.util.List;
 
 public abstract class QuestTask {
 
-    static final int START_X = 180;
-    static final int START_Y = 95;
-    public String description;
     protected Quest parent;
     private List<QuestTask> requirements;
+    public String description;
     private String longDescription;
     private int id;
     private List<String> cachedDescription;
+
+    static final int START_X = 180;
+    static final int START_Y = 95;
 
     public QuestTask(Quest parent, String description, String longDescription) {
         this.parent = parent;
@@ -38,43 +39,12 @@ public abstract class QuestTask {
         updateId();
     }
 
-    public static void completeQuest(Quest quest, String playerName) {
-        if (!quest.isEnabled(playerName) || !quest.isAvailable(playerName)) return;
-        for (QuestTask questTask : quest.getTasks()) {
-            if (!questTask.getData(playerName).completed) {
-                return;
-            }
-        }
-        QuestData data = quest.getQuestData(playerName);
-
-        data.completed = true;
-        data.claimed = false;
-        data.available = false;
-        data.time = Quest.serverTicker.getHours();
-
-
-        if (QuestingData.getQuestingData(playerName).getTeam().getRewardSetting() == Team.RewardSetting.RANDOM) {
-            int rewardId = (int) (Math.random() * data.reward.length);
-            data.reward[rewardId] = true;
-        } else {
-            for (int i = 0; i < data.reward.length; i++) {
-                data.reward[i] = true;
-            }
-        }
-        TeamStats.refreshTeam(QuestingData.getQuestingData(playerName).getTeam());
-
-        for (Quest child : quest.getReversedRequirement()) {
-            completeQuest(child, playerName);
-            child.sendUpdatedDataToTeam(playerName);
-        }
-
-        if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
-            quest.reset(playerName);
-        }
-    }
-
     public void updateId() {
         this.id = parent.nextTaskId++;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean isCompleted(EntityPlayer player) {
@@ -90,12 +60,12 @@ public abstract class QuestTask {
 
         QuestTask requirement;
         do {
-            if (!var2.hasNext()) {
+            if(!var2.hasNext()) {
                 return true;
             }
 
-            requirement = (QuestTask) var2.next();
-        } while (requirement.isCompleted(player) && requirement.isVisible(player));
+            requirement = (QuestTask)var2.next();
+        } while(requirement.isCompleted(player) && requirement.isVisible(player));
 
         return false;
     }
@@ -113,7 +83,6 @@ public abstract class QuestTask {
     }
 
     public abstract void save(DataWriter dw);
-
     public abstract void load(DataReader dr, FileVersion version);
 
     public QuestDataTask getData(EntityPlayer player) {
@@ -122,7 +91,8 @@ public abstract class QuestTask {
 
     public QuestDataTask getData(String playerName) {
         QuestData questData = QuestingData.getQuestingData(playerName).getQuestData(parent.getId());
-        if (id >= questData.tasks.length) {
+        if (id >= questData.tasks.length)
+        {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
         }
@@ -137,12 +107,13 @@ public abstract class QuestTask {
         return data;
     }
 
-    private QuestDataTask newQuestData() {
+    private QuestDataTask newQuestData()
+    {
         try {
-            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[]{QuestTask.class});
+            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[] {QuestTask.class});
             Object obj = constructor.newInstance(this);
-            return (QuestDataTask) obj;
-        } catch (Exception ex) {
+            return (QuestDataTask)obj;
+        }catch (Exception ex){
             ex.printStackTrace();
         }
         return null;
@@ -156,21 +127,12 @@ public abstract class QuestTask {
         return Translator.translate(description);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getLangKeyLongDescription() {
         return longDescription;
     }
 
     public String getLongDescription() {
         return Translator.translate(longDescription);
-    }
-
-    public void setLongDescription(String longDescription) {
-        this.longDescription = longDescription;
-        cachedDescription = null;
     }
 
     @SideOnly(Side.CLIENT)
@@ -194,9 +156,43 @@ public abstract class QuestTask {
         completeQuest(parent, playerName);
     }
 
+    public static void completeQuest(Quest quest, String playerName) {
+        if (!quest.isEnabled(playerName) || !quest.isAvailable(playerName)) return;
+        for (QuestTask questTask : quest.getTasks()) {
+            if (!questTask.getData(playerName).completed) {
+                return;
+            }
+        }
+        QuestData data = quest.getQuestData(playerName);
+
+        data.completed = true;
+        data.claimed = false;
+        data.available = false;
+        data.time = Quest.serverTicker.getHours();
+
+
+        if (QuestingData.getQuestingData(playerName).getTeam().getRewardSetting() == Team.RewardSetting.RANDOM) {
+            int rewardId = (int)(Math.random() * data.reward.length);
+            data.reward[rewardId] = true;
+        }else{
+            for (int i = 0; i < data.reward.length; i++) {
+                data.reward[i] = true;
+            }
+        }
+        TeamStats.refreshTeam(QuestingData.getQuestingData(playerName).getTeam());
+
+        for (Quest child : quest.getReversedRequirement()) {
+            completeQuest(child, playerName);
+            child.sendUpdatedDataToTeam(playerName);
+        }
+
+        if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
+            quest.reset(playerName);
+        }
+    }
+
     @SideOnly(Side.CLIENT)
     public abstract void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY);
-
     @SideOnly(Side.CLIENT)
     public abstract void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b);
 
@@ -206,12 +202,17 @@ public abstract class QuestTask {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Quest getParent() {
         return parent;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setLongDescription(String longDescription) {
+        this.longDescription = longDescription;
+        cachedDescription = null;
     }
 
     public List<QuestTask> getRequirements() {
@@ -227,11 +228,8 @@ public abstract class QuestTask {
     }
 
     public abstract float getCompletedRatio(String playerName);
-
     public abstract void mergeProgress(String playerName, QuestDataTask own, QuestDataTask other);
-
     public abstract void autoComplete(String playerName);
-
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         own.completed = other.completed;
     }
@@ -240,29 +238,16 @@ public abstract class QuestTask {
         EventHandler.instance().remove(this);
     }
 
-    public void register(EventHandler.Type... types) {
+    public void register(EventHandler.Type ... types) {
         EventHandler.instance().add(this, types);
     }
 
     //for these to be called one must register the task using the method above using the correct types
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-    }
-
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-    }
-
-    public void onLivingDeath(LivingDeathEvent event) {
-    }
-
-    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
-    }
-
-    public void onItemPickUp(EntityItemPickupEvent event) {
-    }
-
-    public void onOpenBook(EventHandler.BookOpeningEvent event) {
-    }
-
-    public void onReputationChange(EventHandler.ReputationEvent event) {
-    }
+    public void onServerTick(TickEvent.ServerTickEvent event) {}
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {}
+    public void onLivingDeath(LivingDeathEvent event) {}
+    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {}
+    public void onItemPickUp(EntityItemPickupEvent event) {}
+    public void onOpenBook(EventHandler.BookOpeningEvent event) {}
+    public void onReputationChange(EventHandler.ReputationEvent event) {}
 }

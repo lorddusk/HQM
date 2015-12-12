@@ -28,26 +28,26 @@ import java.util.List;
 
 public class TileEntityPortal extends TileEntity implements IBlockSync {
 
-    public static final String NBT_QUEST = "Quest";
-    public static final String NBT_TYPE = "PortalType";
-    public static final String NBT_ID = "ItemId";
-    public static final String NBT_DMG = "ItemDmg";
-    public static final String NBT_COLLISION = "Collision";
-    public static final String NBT_TEXTURES = "Textures";
-    public static final String NBT_NOT_COLLISION = "NotCollision";
-    public static final String NBT_NOT_TEXTURES = "NotTextures";
     private Quest quest;
     private int questId = -1;
     private List<String> players = new ArrayList<String>();
     private PortalType type = PortalType.TECH;
     private ItemStack item;
+
     private boolean completedTexture;
     private boolean uncompletedTexture = true;
     private boolean completedCollision;
     private boolean uncompletedCollision = true;
-    private int delay = 20;
-    private int resetDelay = 0;
-    private boolean hasUpdatedData = false;
+
+    public static final String NBT_QUEST = "Quest";
+    public static final String NBT_TYPE = "PortalType";
+    public static final String NBT_ID = "ItemId";
+    public static final String NBT_DMG = "ItemDmg";
+
+    public static final String NBT_COLLISION = "Collision";
+    public static final String NBT_TEXTURES = "Textures";
+    public static final String NBT_NOT_COLLISION = "NotCollision";
+    public static final String NBT_NOT_TEXTURES = "NotTextures";
 
     public boolean isCompletedTexture() {
         return completedTexture;
@@ -89,14 +89,15 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
         this.type = type;
     }
 
+
     public void writeContentToNBT(NBTTagCompound compound) {
         if (quest != null) {
             compound.setShort(NBT_QUEST, quest.getId());
         }
-        compound.setByte(NBT_TYPE, (byte) type.ordinal());
+        compound.setByte(NBT_TYPE, (byte)type.ordinal());
         if (item != null) {
             compound.setShort(NBT_ID, (short) Item.getIdFromItem(item.getItem()));
-            compound.setShort(NBT_DMG, (short) item.getItemDamage());
+            compound.setShort(NBT_DMG, (short)item.getItemDamage());
         }
 
         compound.setBoolean(NBT_COLLISION, completedCollision);
@@ -123,7 +124,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
             if (Quest.getQuests() != null) {
                 quest = Quest.getQuest(questId);
             }
-        } else {
+        }else{
             quest = null;
         }
 
@@ -133,7 +134,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
             int dmg = compound.getShort(NBT_DMG);
 
             item = new ItemStack(Item.getItemById(id), 1, dmg);
-        } else {
+        }else{
             item = null;
         }
 
@@ -142,11 +143,14 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
             completedTexture = compound.getBoolean(NBT_COLLISION);
             uncompletedCollision = compound.getBoolean(NBT_NOT_COLLISION);
             uncompletedTexture = compound.getBoolean(NBT_NOT_TEXTURES);
-        } else {
+        }else{
             completedCollision = completedTexture = false;
             uncompletedCollision = uncompletedTexture = true;
         }
     }
+
+    private int delay = 20;
+    private int resetDelay = 0;
 
     @Override
     public void updateEntity() {
@@ -193,7 +197,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                             updated = true;
                         }
                     }
-                } else if (players.size() > 0) {
+                }else if(players.size() > 0) {
                     players.clear();
                     updated = true;
                 }
@@ -205,7 +209,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
             if (updated) {
                 PacketHandler.sendBlockPacket(this, null, 0);
             }
-        } else {
+        }else{
             keepClientDataUpdated();
         }
     }
@@ -228,13 +232,15 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
         return quest;
     }
 
+    private boolean hasUpdatedData = false;
+
     @SideOnly(Side.CLIENT)
     private void keepClientDataUpdated() {
         double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
             hasUpdatedData = false;
-        } else if (!hasUpdatedData && distance < Math.pow(PacketHandler.BLOCK_UPDATE_RANGE - PacketHandler.BLOCK_UPDATE_BUFFER_DISTANCE, 2)) {
+        }else if(!hasUpdatedData && distance < Math.pow(PacketHandler.BLOCK_UPDATE_RANGE - PacketHandler.BLOCK_UPDATE_BUFFER_DISTANCE, 2)) {
             hasUpdatedData = true;
             PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 0);
         }
@@ -267,14 +273,14 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                     for (String p : players) {
                         dw.writeString(p, DataBitHelper.NAME_LENGTH);
                     }
-                } else {
+                }else{
                     //send empty packet, no info required
                 }
                 break;
             case 1:
                 if (onServer) {
                     //empty
-                } else {
+                }else{
                     dw.writeData(type.ordinal(), DataBitHelper.PORTAL_TYPE);
                     if (!type.isPreset()) {
                         dw.writeBoolean(item != null);
@@ -298,10 +304,10 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                 if (onServer) {
                     //respond by sending the data to the client that required it
                     PacketHandler.sendBlockPacket(this, player, 0);
-                } else {
+                }else{
                     if (dr.readBoolean()) {
                         quest = Quest.getQuest(dr.readData(DataBitHelper.QUESTS));
-                    } else {
+                    }else{
                         quest = null;
                     }
                     type = PortalType.values()[dr.readData(DataBitHelper.PORTAL_TYPE)];
@@ -310,7 +316,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                             int itemId = dr.readData(DataBitHelper.SHORT);
                             int dmg = dr.readData(DataBitHelper.SHORT);
                             item = new ItemStack(Item.getItemById(itemId), 1, dmg);
-                        } else {
+                        }else{
                             item = null;
                         }
                     }
@@ -337,7 +343,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                                 int itemId = dr.readData(DataBitHelper.SHORT);
                                 int dmg = dr.readData(DataBitHelper.SHORT);
                                 item = new ItemStack(Item.getItemById(itemId), 1, dmg);
-                            } else {
+                            }else{
                                 item = null;
                             }
                         }
@@ -347,7 +353,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                         uncompletedTexture = dr.readBoolean();
                         PacketHandler.sendBlockPacket(this, null, 0); //refresh the clients
                     }
-                } else {
+                }else{
                     openInterfaceClient(player);
                 }
         }
@@ -381,8 +387,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
             if (block != null) {
                 try {
                     return block.getIcon(side, item.getItem().getMetadata(item.getItemDamage()));
-                } catch (Exception ignored) {
-                }
+                }catch (Exception ignored) {}
             }
         }
 

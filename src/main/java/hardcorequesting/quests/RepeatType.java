@@ -4,7 +4,7 @@ import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import net.minecraft.entity.player.EntityPlayer;
 
-public enum RepeatType {
+public enum  RepeatType {
     NONE("none", false) {
         @Override
         public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
@@ -30,7 +30,7 @@ public enum RepeatType {
 
         @Override
         public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + Translator.translate("hqm.repeat.interval.message") + " (" + days + ":" + hours + ")";
+            return GuiColor.YELLOW +  Translator.translate("hqm.repeat.interval.message") + " (" + days + ":" + hours + ")";
         }
     },
     TIME("time", true) {
@@ -45,14 +45,6 @@ public enum RepeatType {
         }
     };
 
-    private String id;
-    private boolean useTime;
-
-    RepeatType(String id, boolean useTime) {
-        this.id = id;
-        this.useTime = useTime;
-    }
-
     private static String formatRemainingTime(Quest quest, EntityPlayer player, int days, int hours) {
         if (!quest.getQuestData(player).available) {
             int total = days * 24 + hours;
@@ -62,7 +54,7 @@ public enum RepeatType {
             total = time + total - current;
 
             return "\n" + formatResetTime(quest, player, total / 24, total % 24);
-        } else {
+        }else{
             return "";
         }
     }
@@ -80,7 +72,7 @@ public enum RepeatType {
 
         if (!quest.isAvailable(player)) {
             return GuiColor.YELLOW + Translator.translate("hqm.repeat.resetIn", formatTime(resetDays, resetHours));
-        } else {
+        }else{
             return GuiColor.GRAY + Translator.translate("hqm.repeat.nextReset", formatTime(resetDays, resetHours));
         }
     }
@@ -109,17 +101,26 @@ public enum RepeatType {
         return str;
     }
 
+    RepeatType(String id, boolean useTime) {
+        this.id = id;
+        this.useTime = useTime;
+    }
+
     public String getName() {
         return Translator.translate("hqm.repeat." + id + ".title");
     }
 
     public String getDescription() {
-        return Translator.translate("hqm.repeat." + id + ".desc");
+        return  Translator.translate("hqm.repeat." + id + ".desc");
     }
 
     public boolean isUseTime() {
         return useTime;
     }
+
+    private String id;
+    private boolean useTime;
+
 
     public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
         return GuiColor.YELLOW + Translator.translate("hqm.repeat.repeatable") + "\n";

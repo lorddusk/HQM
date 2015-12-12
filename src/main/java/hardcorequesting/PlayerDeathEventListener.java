@@ -7,18 +7,19 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 public class PlayerDeathEventListener {
 
-    public PlayerDeathEventListener() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
+	public PlayerDeathEventListener() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
 
 
-    @SubscribeEvent
-    public void onPlayerDeath(LivingDeathEvent event) {
-        if (event.entityLiving instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.entityLiving;
-            QuestingData.getQuestingData(player).die(player);
+
+	@SubscribeEvent
+	public void onPlayerDeath(LivingDeathEvent event) {
+		if (event.entityLiving instanceof EntityPlayerMP) {
+			EntityPlayerMP player = (EntityPlayerMP)event.entityLiving;
+			QuestingData.getQuestingData(player).die(player);
             DeathType.onDeath(player, event.source);
-        }
-    }
+		}
+	}
 
 }

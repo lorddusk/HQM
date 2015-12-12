@@ -20,6 +20,15 @@ public class EditButton {
     private EditMode mode;
     private List<String> text;
 
+    public static EditButton[] createButtons(GuiQuestBook gui, EditMode... modes) {
+        EditButton[] ret = new EditButton[modes.length];
+        for (int i = 0; i < modes.length; i++) {
+            EditMode mode = modes[i];
+            ret[i] = new EditButton(gui, mode, i);
+        }
+        return ret;
+    }
+
     public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id) {
         this.guiQuestBook = guiQuestBook;
         this.mode = mode;
@@ -29,15 +38,6 @@ public class EditButton {
 
         this.x = -38 + x * 20;
         this.y = 5 + y * 20;
-    }
-
-    public static EditButton[] createButtons(GuiQuestBook gui, EditMode... modes) {
-        EditButton[] ret = new EditButton[modes.length];
-        for (int i = 0; i < modes.length; i++) {
-            EditMode mode = modes[i];
-            ret[i] = new EditButton(gui, mode, i);
-        }
-        return ret;
     }
 
     public void draw(int mX, int mY) {
@@ -63,7 +63,7 @@ public class EditButton {
     }
 
     public boolean onClick(int mX, int mY) {
-        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
+        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY))    {
             guiQuestBook.setCurrentMode(mode);
             guiQuestBook.modifyingQuest = null;
             guiQuestBook.modifyingBar = null;
@@ -73,11 +73,13 @@ public class EditButton {
         return false;
     }
 
-    public boolean click() {
+    public boolean click()
+    {
         return onClick(x, y);
     }
 
-    public boolean matchesMode(EditMode mode) {
+    public boolean matchesMode(EditMode mode)
+    {
         return this.mode == mode;
     }
 }

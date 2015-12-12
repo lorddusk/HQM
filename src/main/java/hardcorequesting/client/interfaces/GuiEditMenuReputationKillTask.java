@@ -16,13 +16,13 @@ public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
-            protected int getValue() {
-                return kills;
+            protected void setValue(int number) {
+                kills = number;
             }
 
             @Override
-            protected void setValue(int number) {
-                kills = number;
+            protected int getValue() {
+                return kills;
             }
         });
     }

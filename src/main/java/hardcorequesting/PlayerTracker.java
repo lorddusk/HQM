@@ -20,13 +20,13 @@ public class PlayerTracker {
     }
 
 
-    public int getRemainingLives(ICommandSender sender) {
-        return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
-    }
+	public int getRemainingLives(ICommandSender sender) {
+		return  QuestingData.getQuestingData((EntityPlayer) sender).getLives();
+	}
 
-
+		
     @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+	public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayer player = event.player;
         if (!QuestingData.hasData(player)) {
             QuestingData.getQuestingData(player).getDeathStat().refreshSync();
@@ -34,13 +34,13 @@ public class PlayerTracker {
 
         QuestLine.sendServerSync(player);
 
-        if (QuestingData.isHardcoreActive())
-            sendLoginMessage(player);
-        else if (ModConfig.NO_HARDCORE_MESSAGE)
-            player.addChatMessage(new ChatComponentTranslation("hqm.message.noHardcore"));
+		if(QuestingData.isHardcoreActive())
+			sendLoginMessage(player);
+		else if (ModConfig.NO_HARDCORE_MESSAGE)
+			player.addChatMessage(new ChatComponentTranslation("hqm.message.noHardcore"));
 
         NBTTagCompound tags = player.getEntityData();
-        if (tags.hasKey("HardcoreQuesting")) {
+        if(tags.hasKey("HardcoreQuesting")) {
             if (tags.getCompoundTag("HardcoreQuesting").getBoolean("questBook")) {
                 QuestingData.getQuestingData(player).receivedBook = true;
             }
@@ -50,23 +50,28 @@ public class PlayerTracker {
         }
 
 
+
         QuestingData.spawnBook(player);
 
-    }
+	}
+
 
 
     private void sendLoginMessage(EntityPlayer player) {
-        player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore") + " " + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))));
-
-    }
+		player.addChatMessage(new ChatComponentText(Translator.translate("hqm.message.hardcore")+ " " + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))));
+		
+	}
 
     @SubscribeEvent
-    public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+	public void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         EntityPlayer player = event.player;
         if (!player.worldObj.isRemote) {
             PacketHandler.remove(player);
         }
     }
 
+
+
+	
 
 }

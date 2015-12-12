@@ -7,26 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.util.*;
 
 public class DeathStats {
-    private static final DeathComparator deathComparator = new DeathComparator(-1);
-    private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
     private static Map<String, DeathStats> clientDeaths;
     private static DeathStats[] clientDeathList;
     private static DeathStats clientBest;
     private static DeathStats clientTotal;
-
-    static {
-        for (int i = 0; i < deathTypeComparator.length; i++) {
-            deathTypeComparator[i] = new DeathComparator(i);
-        }
-    }
-
-    protected int[] deaths = new int[DeathType.values().length];
-    private String name;
-    private int totalDeaths = -1;
-
-    public DeathStats(String name) {
-        this.name = name;
-    }
 
     public static DeathStats getBest() {
         return clientBest;
@@ -36,68 +20,15 @@ public class DeathStats {
         return clientTotal;
     }
 
-    public static void handlePacket(EntityPlayer player, DataReader dr) {
-        String name = dr.readString(DataBitHelper.NAME_LENGTH);
-        DeathStats deathStats = clientDeaths.get(name);
-        if (deathStats == null) {
-            deathStats = new DeathStats(name);
-            clientDeaths.put(name, deathStats);
-        }
-        deathStats.load(dr);
-        updateClientDeathList();
+    private String name;
+    protected int[] deaths = new int[DeathType.values().length];
+
+    public DeathStats(String name) {
+        this.name = name;
     }
 
-    public static void load(QuestingData questingData, DataReader dr, boolean light) {
-        if (light) {
-            clientDeaths = new HashMap<String, DeathStats>();
-            int count = dr.readData(DataBitHelper.PLAYERS);
-            for (int i = 0; i < count; i++) {
-                String name = dr.readString(DataBitHelper.NAME_LENGTH);
-                DeathStats stats = new DeathStats(name);
-                stats.load(dr);
-                clientDeaths.put(name, stats);
-            }
-            updateClientDeathList();
-        } else {
-            questingData.getDeathStat().load(dr);
-        }
-    }
-
-    public static void save(QuestingData questingData, DataWriter dw, boolean light) {
-        if (light) {
-            dw.writeData(QuestingData.getData().size(), DataBitHelper.PLAYERS);
-            for (QuestingData q : QuestingData.getData().values()) {
-                dw.writeString(q.getName(), DataBitHelper.NAME_LENGTH);
-                q.getDeathStat().save(dw);
-            }
-        } else {
-            questingData.getDeathStat().save(dw);
-        }
-    }
-
-    private static void updateClientDeathList() {
-        clientDeathList = new DeathStats[clientDeaths.size()];
-        int id = 0;
-        for (DeathStats deathStats : clientDeaths.values()) {
-            deathStats.totalDeaths = -1;
-            clientDeathList[id++] = deathStats;
-        }
-
-        clientBest = new DeathStatsBest();
-        clientTotal = new DeathStatsTotal();
-
-        Arrays.sort(clientDeathList, deathComparator);
-    }
-
-    public static DeathStats getDeathStats(String name) {
-        return clientDeaths.get(name);
-    }
-
-    public static DeathStats[] getDeathStats() {
-        return clientDeathList;
-    }
-
-    public String getName() {
+    public String getName()
+    {
         return Translator.translate(name);
     }
 
@@ -112,6 +43,18 @@ public class DeathStats {
         }
     }
 
+    public static void handlePacket(EntityPlayer player, DataReader dr) {
+        String name = dr.readString(DataBitHelper.NAME_LENGTH);
+        DeathStats deathStats = clientDeaths.get(name);
+        if (deathStats == null) {
+            deathStats = new DeathStats(name);
+            clientDeaths.put(name, deathStats);
+        }
+        deathStats.load(dr);
+        updateClientDeathList();
+    }
+
+    private int totalDeaths = -1;
     public int getTotalDeaths() {
         if (totalDeaths == -1) {
             totalDeaths = 0;
@@ -139,6 +82,38 @@ public class DeathStats {
         }
     }
 
+
+
+
+
+    public static void load(QuestingData questingData, DataReader dr, boolean light) {
+        if (light) {
+            clientDeaths = new HashMap<String, DeathStats>();
+            int count = dr.readData(DataBitHelper.PLAYERS);
+            for (int i = 0; i < count; i++) {
+                String name = dr.readString(DataBitHelper.NAME_LENGTH);
+                DeathStats stats = new DeathStats(name);
+                stats.load(dr);
+                clientDeaths.put(name, stats);
+            }
+            updateClientDeathList();
+        }else{
+            questingData.getDeathStat().load(dr);
+        }
+    }
+
+    public static void save(QuestingData questingData, DataWriter dw, boolean light) {
+        if (light) {
+            dw.writeData(QuestingData.getData().size(), DataBitHelper.PLAYERS);
+            for (QuestingData q : QuestingData.getData().values()) {
+                dw.writeString(q.getName(), DataBitHelper.NAME_LENGTH);
+                q.getDeathStat().save(dw);
+            }
+        }else{
+            questingData.getDeathStat().save(dw);
+        }
+    }
+
     public void refreshSync() {
         DataWriter dw = PacketHandler.getWriter(PacketId.DEATH_STATS_UPDATE);
         dw.writeString(name, DataBitHelper.NAME_LENGTH);
@@ -157,18 +132,46 @@ public class DeathStats {
         @Override
         public int compare(DeathStats o1, DeathStats o2) {
             if (id == -1) {
-                return ((Integer) o2.getTotalDeaths()).compareTo(o1.getTotalDeaths());
-            } else {
-                return ((Integer) o2.getDeaths(id)).compareTo(o1.getDeaths(id));
+                return ((Integer)o2.getTotalDeaths()).compareTo(o1.getTotalDeaths());
+            }else{
+                return ((Integer)o2.getDeaths(id)).compareTo(o1.getDeaths(id));
             }
         }
+    }
+
+    private static final DeathComparator deathComparator = new DeathComparator(-1);
+    private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
+    static {
+        for (int i = 0; i < deathTypeComparator.length; i++) {
+            deathTypeComparator[i] = new DeathComparator(i);
+        }
+    }
+    private static void updateClientDeathList() {
+        clientDeathList = new DeathStats[clientDeaths.size()];
+        int id = 0;
+        for (DeathStats deathStats : clientDeaths.values()) {
+            deathStats.totalDeaths = -1;
+            clientDeathList[id++] = deathStats;
+        }
+
+        clientBest = new DeathStatsBest();
+        clientTotal = new DeathStatsTotal();
+
+        Arrays.sort(clientDeathList, deathComparator);
+    }
+
+    public static DeathStats getDeathStats(String name) {
+        return clientDeaths.get(name);
+    }
+
+    public static DeathStats[] getDeathStats() {
+        return clientDeathList;
     }
 
     private static class DeathStatsBest extends DeathStats {
         private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
         private String[] messages = new String[DeathType.values().length];
-
         private DeathStatsBest() {
             super("hqm.deathStat.worstPlayers");
             for (int i = 0; i < messages.length; i++) {
@@ -176,11 +179,11 @@ public class DeathStats {
                 deaths[i] = clientDeathList[0].getDeaths(i);
                 if (clientDeathList[0].getDeaths(i) == 0) {
                     messages[i] = GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied");
-                } else {
+                }else{
                     messages[i] = "";
                     int currentValue = 0;
                     int standing = 0;
-                    for (int j = 0; j < clientDeathList.length; j++) {
+                    for (int j = 0; j < clientDeathList.length; j++)   {
                         int value = clientDeathList[j].getDeaths(i);
                         if (value < currentValue) {
                             standing = j;
@@ -208,7 +211,6 @@ public class DeathStats {
 
     private static class DeathStatsTotal extends DeathStats {
         private int[] count = new int[DeathType.values().length];
-
         private DeathStatsTotal() {
             super("hqm.deathStat.everyone");
             for (int i = 0; i < count.length; i++) {

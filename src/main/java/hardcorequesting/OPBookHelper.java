@@ -7,8 +7,7 @@ import hardcorequesting.quests.Quest;
 import net.minecraft.entity.player.EntityPlayer;
 
 public final class OPBookHelper {
-    private OPBookHelper() {
-    }
+    private OPBookHelper() {}
 
     public static void handlePacket(EntityPlayer player, DataReader dr) {
         if (CommandHandler.isOwnerOrOp(player)) {
@@ -22,7 +21,7 @@ public final class OPBookHelper {
                     if (quest != null) {
                         if (quest.isCompleted(player)) {
                             QuestingData.getQuestingData(player).getTeam().resetProgress(quest);
-                        } else {
+                        }else{
                             quest.completeQuest(player);
                         }
                         quest.sendUpdatedDataToTeam(player);
@@ -44,12 +43,12 @@ public final class OPBookHelper {
         PacketHandler.sendToServer(dw);
     }
 
-    public static void reset(EntityPlayer player) {
-        PacketHandler.sendToServer(getWriter(OpAction.RESET));
-    }
-
     private enum OpAction {
         RESET,
         QUEST_COMPLETION
+    }
+
+    public static void reset(EntityPlayer player) {
+        PacketHandler.sendToServer(getWriter(OpAction.RESET));
     }
 }

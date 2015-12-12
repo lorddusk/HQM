@@ -15,7 +15,6 @@ import hardcorequesting.quests.QuestSet;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class ReputationBar {
-    private static final int posBits = 9, posBitMask = 511;
     private int repId, x, y, questSet;
 
     public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet) {
@@ -28,6 +27,8 @@ public class ReputationBar {
         this.y = y;
         this.questSet = questSet;
     }
+
+    private static final int posBits = 9, posBitMask = 511;
 
     public ReputationBar(FileVersion version, int data) {
         int questSetSize = DataBitHelper.QUEST_SETS.getBitCount(version);
@@ -42,15 +43,18 @@ public class ReputationBar {
         this.y = y;
     }
 
-    public int getX() {
+    public int getX()
+    {
         return x;
     }
 
-    public int getY() {
+    public int getY()
+    {
         return y;
     }
 
-    public int getRepId() {
+    public int getRepId()
+    {
         return repId;
     }
 

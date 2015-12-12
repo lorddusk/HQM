@@ -30,6 +30,10 @@ import org.lwjgl.opengl.GL11;
 public class Group {
 
 
+    public static int size() {
+        return QuestLine.getActiveQuestLine().groupCount;
+    }
+
     private GroupTier tier;
     private List<ItemStack> items;
     private String name;
@@ -55,12 +59,79 @@ public class Group {
         items = new ArrayList<ItemStack>();
     }
 
-    public static int size() {
-        return QuestLine.getActiveQuestLine().groupCount;
+    public GroupTier getTier() {
+        return tier;
     }
 
     public static List<Group> getGroups() {
         return QuestLine.getActiveQuestLine().groupList;
+    }
+
+
+    public String getName() {
+        return hasName() ? name : Translator.translate("hqm.bag.group", tier.getName());
+    }
+
+    public boolean hasName() {
+        return name != null && !name.isEmpty();
+    }
+
+    public List<ItemStack> getItems() {
+        return items;
+    }
+
+    public void setTier(GroupTier tier) {
+        this.tier = tier;
+    }
+
+    public void setItem(int id, ItemStack item) {
+        if (id >= items.size()) {
+            items.add(item);
+            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CREATE);
+        } else {
+            items.set(id, item);
+            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CHANGE);
+        }
+    }
+
+    public void open(EntityPlayer player) {
+        if (limit > 0) {
+            GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+            if (data != null) {
+                data.retrieved++;
+            }
+        }
+
+        List<ItemStack> itemsToAdd = new ArrayList<ItemStack>();
+        for (ItemStack item : items) {
+            itemsToAdd.add(item.copy());
+        }
+
+        Quest.addItems(player, itemsToAdd);
+
+        for (ItemStack item : itemsToAdd) {
+            if (item.stackSize > 0) {
+                EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
+                player.worldObj.spawnEntityInWorld(entityItem);
+            }
+        }
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void removeItem(int i) {
+        if (i >= 0 && i < items.size()) {
+            items.remove(i);
+        }
+    }
+
+    public void remove(int i) {
+        if (i >= 0 && i < QuestLine.getActiveQuestLine().groupList.size()) {
+            Group group = QuestLine.getActiveQuestLine().groupList.remove(i);
+            QuestLine.getActiveQuestLine().groups.remove(group.id);
+        }
     }
 
     public static void saveAll(DataWriter dw) {
@@ -128,8 +199,52 @@ public class Group {
         QuestLine.getActiveQuestLine().groupList.add(group);
     }
 
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
     public static Group getGroup(int id) {
         return QuestLine.getActiveQuestLine().groups.get(id);
+    }
+
+    public int getRetrievalCount(EntityPlayer player) {
+        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+        return data != null ? data.retrieved : 0;
+    }
+
+    public void setRetrievalCount(EntityPlayer player, int count) {
+        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+        if (data != null) {
+            data.retrieved = count;
+        }
+    }
+
+    public boolean isValid(EntityPlayer player) {
+        return limit == 0 || getRetrievalCount(player) < limit;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Group) {
+            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size()) {
+                for (ItemStack stack : items) {
+                    if (!listContains(stack, ((Group) obj).items)) return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean listContains(ItemStack stack, List<ItemStack> stacks) {
+        for (ItemStack stack2 : stacks) {
+            if (ItemStack.areItemStacksEqual(stack, stack2)) return true;
+        }
+        return false;
     }
 
     @SideOnly(Side.CLIENT)
@@ -196,152 +311,6 @@ public class Group {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar groupScroll, int x, int y) {
-        List<Group> groups = getGroups();
-        int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
-        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
-            Group group = groups.get(i);
-
-            int posY = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
-            if (gui.inBounds(GuiQuestBook.GROUPS_X, posY, gui.getStringWidth(group.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
-                switch (gui.getCurrentMode()) {
-                    case TIER:
-                        gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
-                        break;
-                    case NORMAL:
-                        GuiQuestBook.selectedGroup = group;
-                        gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
-                        break;
-                    case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), group));
-                        break;
-                    case DELETE:
-                        group.remove(i);
-                        SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            }
-        }
-    }
-
-    public GroupTier getTier() {
-        return tier;
-    }
-
-    public void setTier(GroupTier tier) {
-        this.tier = tier;
-    }
-
-    public String getName() {
-        return hasName() ? name : Translator.translate("hqm.bag.group", tier.getName());
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean hasName() {
-        return name != null && !name.isEmpty();
-    }
-
-    public List<ItemStack> getItems() {
-        return items;
-    }
-
-    public void setItem(int id, ItemStack item) {
-        if (id >= items.size()) {
-            items.add(item);
-            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CREATE);
-        } else {
-            items.set(id, item);
-            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CHANGE);
-        }
-    }
-
-    public void open(EntityPlayer player) {
-        if (limit > 0) {
-            GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
-            if (data != null) {
-                data.retrieved++;
-            }
-        }
-
-        List<ItemStack> itemsToAdd = new ArrayList<ItemStack>();
-        for (ItemStack item : items) {
-            itemsToAdd.add(item.copy());
-        }
-
-        Quest.addItems(player, itemsToAdd);
-
-        for (ItemStack item : itemsToAdd) {
-            if (item.stackSize > 0) {
-                EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
-                player.worldObj.spawnEntityInWorld(entityItem);
-            }
-        }
-    }
-
-    public void removeItem(int i) {
-        if (i >= 0 && i < items.size()) {
-            items.remove(i);
-        }
-    }
-
-    public void remove(int i) {
-        if (i >= 0 && i < QuestLine.getActiveQuestLine().groupList.size()) {
-            Group group = QuestLine.getActiveQuestLine().groupList.remove(i);
-            QuestLine.getActiveQuestLine().groups.remove(group.id);
-        }
-    }
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-    public int getRetrievalCount(EntityPlayer player) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
-        return data != null ? data.retrieved : 0;
-    }
-
-    public void setRetrievalCount(EntityPlayer player, int count) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
-        if (data != null) {
-            data.retrieved = count;
-        }
-    }
-
-    public boolean isValid(EntityPlayer player) {
-        return limit == 0 || getRetrievalCount(player) < limit;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Group) {
-            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size()) {
-                for (ItemStack stack : items) {
-                    if (!listContains(stack, ((Group) obj).items)) return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean listContains(ItemStack stack, List<ItemStack> stacks) {
-        for (ItemStack stack2 : stacks) {
-            if (ItemStack.areItemStacksEqual(stack, stack2)) return true;
-        }
-        return false;
-    }
-
-    @SideOnly(Side.CLIENT)
     public void draw(GuiQuestBook gui, int x, int y) {
         gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
         List<ItemStack> items = this.getItems();
@@ -397,6 +366,38 @@ public class Group {
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
                     SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
+                }
+                break;
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar groupScroll, int x, int y) {
+        List<Group> groups = getGroups();
+        int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
+        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
+            Group group = groups.get(i);
+
+            int posY = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
+            if (gui.inBounds(GuiQuestBook.GROUPS_X, posY, gui.getStringWidth(group.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
+                switch (gui.getCurrentMode()) {
+                    case TIER:
+                        gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
+                        break;
+                    case NORMAL:
+                        GuiQuestBook.selectedGroup = group;
+                        gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
+                        break;
+                    case RENAME:
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), group));
+                        break;
+                    case DELETE:
+                        group.remove(i);
+                        SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
+                        break;
+                    default:
+                        break;
                 }
                 break;
             }

@@ -1,6 +1,7 @@
 package hardcorequesting;
 
-public class Lang {
+public class Lang
+{
 
     public static final String PREFIX = "hqm.";
 

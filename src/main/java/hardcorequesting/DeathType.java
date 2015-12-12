@@ -5,7 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 
 
-public enum DeathType {
+public enum  DeathType {
     LAVA("lava") {
         @Override
         boolean isSourceValid(DamageSource source) {
@@ -103,6 +103,10 @@ public enum DeathType {
         this.name = name;
     }
 
+    public void onDeath(EntityPlayer player) {
+        QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
+    }
+
     public static void onDeath(EntityPlayer player, DamageSource source) {
         if (source != null && source.getDamageType() != null) {
             for (DeathType deathType : values()) {
@@ -111,20 +115,17 @@ public enum DeathType {
                     break;
                 }
             }
-        } else {
+        }else{
             OTHER.onDeath(player);
         }
 
     }
 
-    public void onDeath(EntityPlayer player) {
-        QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
-    }
-
     //is only accurate if called in the values() order
     abstract boolean isSourceValid(DamageSource source);
 
-    public String getName() {
+    public String getName()
+    {
         return Translator.translate("hqm.deathType." + name);
     }
 

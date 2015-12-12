@@ -31,9 +31,9 @@ public class QuestTaskDeath extends QuestTask {
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
         if (event.entityLiving instanceof EntityPlayerMP) {
-            EntityPlayer player = (EntityPlayer) event.entityLiving;
+            EntityPlayer player = (EntityPlayer)event.entityLiving;
             if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
-                QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData(player);
+                QuestDataTaskDeath deathData = (QuestDataTaskDeath)getData(player);
                 if (deathData.deaths < deaths) {
                     deathData.deaths += 1;
 
@@ -51,14 +51,14 @@ public class QuestTaskDeath extends QuestTask {
     public void write(DataWriter dw, QuestDataTask task, boolean light) {
         super.write(dw, task, light);
 
-        dw.writeData(((QuestDataTaskDeath) task).deaths, DataBitHelper.DEATHS);
+        dw.writeData(((QuestDataTaskDeath)task).deaths, DataBitHelper.DEATHS);
     }
 
     @Override
     public void read(DataReader dr, QuestDataTask task, FileVersion version, boolean light) {
         super.read(dr, task, version, light);
 
-        ((QuestDataTaskDeath) task).deaths = dr.readData(DataBitHelper.DEATHS);
+        ((QuestDataTaskDeath)task).deaths = dr.readData(DataBitHelper.DEATHS);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class QuestTaskDeath extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
-        int died = ((QuestDataTaskDeath) getData(player)).deaths;
+        int died = ((QuestDataTaskDeath)getData(player)).deaths;
         gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + Translator.translate(deaths != 0, "hqm.deathMenu.deaths", deaths) : Translator.translate(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
 
@@ -91,14 +91,14 @@ public class QuestTaskDeath extends QuestTask {
 
     @Override
     public float getCompletedRatio(String playerName) {
-        return (float) ((QuestDataTaskDeath) getData(playerName)).deaths / deaths;
+        return (float)((QuestDataTaskDeath)getData(playerName)).deaths / deaths;
     }
 
     @Override
     public void mergeProgress(String playerName, QuestDataTask own, QuestDataTask other) {
-        ((QuestDataTaskDeath) own).deaths = Math.max(((QuestDataTaskDeath) own).deaths, ((QuestDataTaskDeath) other).deaths);
+        ((QuestDataTaskDeath)own).deaths = Math.max(((QuestDataTaskDeath)own).deaths, ((QuestDataTaskDeath)other).deaths);
 
-        if (((QuestDataTaskDeath) own).deaths == deaths) {
+        if (((QuestDataTaskDeath)own).deaths == deaths) {
             completeTask(playerName);
         }
     }
@@ -107,12 +107,12 @@ public class QuestTaskDeath extends QuestTask {
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
 
-        ((QuestDataTaskDeath) own).deaths = ((QuestDataTaskDeath) other).deaths;
+        ((QuestDataTaskDeath)own).deaths = ((QuestDataTaskDeath)other).deaths;
     }
 
     @Override
     public void autoComplete(String playerName) {
-        deaths = ((QuestDataTaskDeath) getData(playerName)).deaths;
+        deaths = ((QuestDataTaskDeath)getData(playerName)).deaths;
     }
 
     @Override

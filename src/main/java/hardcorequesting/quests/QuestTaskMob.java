@@ -23,13 +23,6 @@ import java.util.Arrays;
 public class QuestTaskMob extends QuestTask {
 
 
-    private static final int Y_OFFSET = 30;
-    private static final int X_TEXT_OFFSET = 23;
-    private static final int X_TEXT_INDENT = 0;
-    private static final int Y_TEXT_OFFSET = 0;
-    private static final int ITEM_SIZE = 18;
-    public Mob[] mobs = new Mob[0];
-
     public QuestTaskMob(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventHandler.Type.DEATH);
@@ -38,9 +31,9 @@ public class QuestTaskMob extends QuestTask {
     public static EntityPlayer getKiller(LivingDeathEvent event) {
         if (event.entityLiving != null && !event.entityLiving.worldObj.isRemote && event.source != null) {
             if (event.source.getSourceOfDamage() != null && event.source.getSourceOfDamage() instanceof EntityPlayer) {
-                return (EntityPlayer) event.source.getSourceOfDamage();
-            } else if (event.entityLiving.func_94060_bK() instanceof EntityPlayer) {
-                return (EntityPlayer) event.entityLiving.func_94060_bK();
+                return  (EntityPlayer)event.source.getSourceOfDamage();
+            }else if(event.entityLiving.func_94060_bK() instanceof EntityPlayer) {
+                return  (EntityPlayer)event.entityLiving.func_94060_bK();
             }
         }
 
@@ -55,17 +48,17 @@ public class QuestTaskMob extends QuestTask {
             boolean updated = false;
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
-                if (mob.count > ((QuestDataTaskMob) getData(player)).killed[i]) {
+                if (mob.count > ((QuestDataTaskMob)getData(player)).killed[i]) {
                     Class clazz = (Class) EntityList.stringToClassMapping.get(mob.mob);
                     if (clazz != null) {
                         if (mob.isExact()) {
                             if (clazz.equals(event.entityLiving.getClass())) {
-                                ((QuestDataTaskMob) getData(player)).killed[i]++;
+                                ((QuestDataTaskMob)getData(player)).killed[i]++;
                                 updated = true;
                             }
-                        } else {
+                        }else{
                             if (clazz.isAssignableFrom(event.entityLiving.getClass())) {
-                                ((QuestDataTaskMob) getData(player)).killed[i]++;
+                                ((QuestDataTaskMob)getData(player)).killed[i]++;
                                 updated = true;
                             }
                         }
@@ -94,13 +87,14 @@ public class QuestTaskMob extends QuestTask {
 
     }
 
+
     public void setMob(int id, Mob mob, EntityPlayer player) {
         if (id >= mobs.length) {
             mobs = Arrays.copyOf(mobs, mobs.length + 1);
-            QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
+            QuestDataTaskMob data = (QuestDataTaskMob)getData(player);
             data.killed = Arrays.copyOf(data.killed, data.killed.length + 1);
             SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
-        } else {
+        }else{
             SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
         }
 
@@ -119,15 +113,112 @@ public class QuestTaskMob extends QuestTask {
         mobs[id].name = str;
     }
 
+    public class Mob {
+        private ItemStack icon;
+        private String name = "New";
+        private String mob;
+        private int count = 1;
+        private boolean exact;
+
+        public Mob copy() {
+            Mob other = new Mob();
+            other.icon = icon == null ? null : icon.copy();
+            other.name = name;
+            other.mob = mob;
+            other.count = count;
+            other.exact = exact;
+
+            return other;
+        }
+
+        public void save(DataWriter dw) {
+            dw.writeBoolean(icon != null);
+            if (icon != null) {
+                dw.writeItem(icon.getItem());
+                dw.writeData(icon.getItemDamage(), DataBitHelper.SHORT);
+                dw.writeNBT(icon.getTagCompound());
+            }
+            dw.writeString(name, DataBitHelper.NAME_LENGTH);
+            dw.writeString(mob, DataBitHelper.MOB_ID_LENGTH);
+            dw.writeData(count, DataBitHelper.KILL_COUNT);
+            dw.writeBoolean(exact);
+        }
+
+        public void load(DataReader dr, FileVersion version) {
+            if (dr.readBoolean()) {
+                Item item = dr.readItem();
+                int dmg = dr.readData(DataBitHelper.SHORT);
+                NBTTagCompound compound = dr.readNBT();
+                ItemStack itemStack = new ItemStack(item, 1, dmg);
+                itemStack.setTagCompound(compound);
+                this.icon = itemStack;
+            }else{
+                this.icon = null;
+            }
+            name = dr.readString(DataBitHelper.NAME_LENGTH);
+            mob = dr.readString(DataBitHelper.MOB_ID_LENGTH);
+            count = dr.readData(DataBitHelper.KILL_COUNT);
+            exact = dr.readBoolean();
+        }
+
+        public ItemStack getIcon() {
+            return icon;
+        }
+
+        public void setIcon(ItemStack icon) {
+            this.icon = icon;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getMob() {
+            return mob;
+        }
+
+        public void setMob(String mob) {
+            this.mob = mob;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+
+        public boolean isExact() {
+            return exact;
+        }
+
+        public void setExact(boolean exact) {
+            this.exact = exact;
+        }
+    }
+
+    public Mob[] mobs = new Mob[0];
+
     private Mob[] getEditFriendlyMobs(Mob[] mobs) {
-        if (Quest.isEditing && mobs.length < DataBitHelper.TASK_MOB_COUNT.getMaximum()) {
+        if(Quest.isEditing && mobs.length < DataBitHelper.TASK_MOB_COUNT.getMaximum()){
             mobs = Arrays.copyOf(mobs, mobs.length + 1);
             mobs[mobs.length - 1] = new Mob();
             return mobs;
-        } else {
+        }else{
             return mobs;
         }
     }
+
+    private static final int Y_OFFSET = 30;
+    private static final int X_TEXT_OFFSET = 23;
+    private static final int X_TEXT_INDENT = 0;
+    private static final int Y_TEXT_OFFSET = 0;
+    private static final int ITEM_SIZE = 18;
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -143,8 +234,8 @@ public class QuestTaskMob extends QuestTask {
 
             int killed = killed(i, player);
             if (killed == mob.count) {
-                gui.drawString(GuiColor.GREEN + Translator.translate("hqm.mobTask.allKilled"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            } else {
+                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.mobTask.allKilled"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+            }else {
                 gui.drawString(Translator.translate("hqm.mobTask.partKills", killed, (100 * killed / mob.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
             gui.drawString(Translator.translate("hqm.mobTask.totalKills", mob.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
@@ -227,14 +318,13 @@ public class QuestTaskMob extends QuestTask {
             mobs[i].load(dr, version);
         }
     }
-
     public void write(DataWriter dw, QuestDataTask task, boolean light) {
         super.write(dw, task, light);
 
         if (!light) {
-            dw.writeData(((QuestDataTaskMob) task).killed.length, DataBitHelper.TASK_MOB_COUNT);
+            dw.writeData(((QuestDataTaskMob)task).killed.length, DataBitHelper.TASK_MOB_COUNT);
         }
-        for (int val : ((QuestDataTaskMob) task).killed) {
+        for (int val : ((QuestDataTaskMob)task).killed) {
             dw.writeData(val, DataBitHelper.KILL_COUNT);
         }
     }
@@ -243,18 +333,18 @@ public class QuestTaskMob extends QuestTask {
     public void read(DataReader dr, QuestDataTask task, FileVersion version, boolean light) {
         super.read(dr, task, version, light);
 
-        QuestDataTaskMob mobData = ((QuestDataTaskMob) task);
+        QuestDataTaskMob mobData = ((QuestDataTaskMob)task);
 
         if (light) {
             int[] killed = mobData.killed;
             for (int i = 0; i < killed.length; i++) {
                 killed[i] = dr.readData(DataBitHelper.KILL_COUNT);
             }
-        } else {
+        }else{
             int count = dr.readData(DataBitHelper.TASK_MOB_COUNT);
             int[] killed = mobData.killed;
             for (int i = 0; i < count; i++) {
-                int val = dr.readData(DataBitHelper.KILL_COUNT);
+                int val =  dr.readData(DataBitHelper.KILL_COUNT);
                 if (i < killed.length) {
                     killed[i] = Math.min(mobs[i].count, Math.max(0, val));
                 }
@@ -268,11 +358,11 @@ public class QuestTaskMob extends QuestTask {
         int total = 0;
 
         for (int i = 0; i < mobs.length; i++) {
-            killed += ((QuestDataTaskMob) getData(playerName)).killed[i];
+            killed += ((QuestDataTaskMob)getData(playerName)).killed[i];
             total += mobs[i].count;
         }
 
-        return (float) killed / total;
+        return (float)killed / total;
     }
 
     @Override
@@ -305,95 +395,6 @@ public class QuestTaskMob extends QuestTask {
         int[] killed = ((QuestDataTaskMob) getData(playerName)).killed;
         for (int i = 0; i < killed.length; i++) {
             killed[i] = mobs[i].count;
-        }
-    }
-
-    public class Mob {
-        private ItemStack icon;
-        private String name = "New";
-        private String mob;
-        private int count = 1;
-        private boolean exact;
-
-        public Mob copy() {
-            Mob other = new Mob();
-            other.icon = icon == null ? null : icon.copy();
-            other.name = name;
-            other.mob = mob;
-            other.count = count;
-            other.exact = exact;
-
-            return other;
-        }
-
-        public void save(DataWriter dw) {
-            dw.writeBoolean(icon != null);
-            if (icon != null) {
-                dw.writeItem(icon.getItem());
-                dw.writeData(icon.getItemDamage(), DataBitHelper.SHORT);
-                dw.writeNBT(icon.getTagCompound());
-            }
-            dw.writeString(name, DataBitHelper.NAME_LENGTH);
-            dw.writeString(mob, DataBitHelper.MOB_ID_LENGTH);
-            dw.writeData(count, DataBitHelper.KILL_COUNT);
-            dw.writeBoolean(exact);
-        }
-
-        public void load(DataReader dr, FileVersion version) {
-            if (dr.readBoolean()) {
-                Item item = dr.readItem();
-                int dmg = dr.readData(DataBitHelper.SHORT);
-                NBTTagCompound compound = dr.readNBT();
-                ItemStack itemStack = new ItemStack(item, 1, dmg);
-                itemStack.setTagCompound(compound);
-                this.icon = itemStack;
-            } else {
-                this.icon = null;
-            }
-            name = dr.readString(DataBitHelper.NAME_LENGTH);
-            mob = dr.readString(DataBitHelper.MOB_ID_LENGTH);
-            count = dr.readData(DataBitHelper.KILL_COUNT);
-            exact = dr.readBoolean();
-        }
-
-        public ItemStack getIcon() {
-            return icon;
-        }
-
-        public void setIcon(ItemStack icon) {
-            this.icon = icon;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getMob() {
-            return mob;
-        }
-
-        public void setMob(String mob) {
-            this.mob = mob;
-        }
-
-        public int getCount() {
-            return count;
-        }
-
-        public void setCount(int count) {
-            this.count = count;
-        }
-
-        public boolean isExact() {
-            return exact;
-        }
-
-        public void setExact(boolean exact) {
-            this.exact = exact;
         }
     }
 }

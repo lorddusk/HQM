@@ -8,17 +8,13 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.List;
 
-public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
-    private static final int BARS_X = 20;
-    private static final int LOWER_Y = 50;
-    private static final int UPPER_Y = 90;
-    private static final int RESULT_Y = 150;
-    private static final int BAR_OFFSET_Y = 10;
+public class GuiEditMenuReputationSetting extends  GuiEditMenuExtended {
     private Reputation reputation;
     private int reputationId;
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
+
     private QuestTaskReputation task;
     private int id;
 
@@ -31,10 +27,10 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             if (!Reputation.getReputationList().isEmpty()) {
                 reputation = Reputation.getReputationList().get(0);
                 reputationId = 0;
-            } else {
+            }else{
                 reputationId = -1;
             }
-        } else {
+        }else{
             reputation = setting.getReputation();
             id = -1;
             List<Reputation> reputationList = Reputation.getReputationList();
@@ -47,7 +43,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             }
             if (id == -1) {
                 reputation = null;
-            } else {
+            }else{
                 lower = setting.getLower();
                 upper = setting.getUpper();
                 inverted = setting.isInverted();
@@ -72,6 +68,12 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         });
     }
 
+    private static final int BARS_X = 20;
+    private static final int LOWER_Y = 50;
+    private static final int UPPER_Y = 90;
+    private static final int RESULT_Y = 150;
+    private static final int BAR_OFFSET_Y = 10;
+
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
@@ -83,17 +85,17 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             gui.drawString(Translator.translate("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
+            info = reputation.draw((GuiQuestBook)gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
 
             gui.drawString(Translator.translate("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
+            info = reputation.draw((GuiQuestBook)gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
 
             gui.drawString(Translator.translate("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
+            info = reputation.draw((GuiQuestBook)gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
 
 
             if (info != null) {
@@ -107,19 +109,19 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         super.onClick(gui, mX, mY, b);
 
         if (reputation != null) {
-            ReputationMarker marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
+            ReputationMarker marker = reputation.onActiveClick((GuiQuestBook)gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
             if (marker != null) {
                 if (marker.equals(lower)) {
                     lower = null;
-                } else {
+                }else{
                     lower = marker;
                 }
-            } else {
-                marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY);
+            }else{
+                marker = reputation.onActiveClick((GuiQuestBook)gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY);
                 if (marker != null) {
                     if (marker.equals(upper)) {
                         upper = null;
-                    } else {
+                    }else{
                         upper = marker;
                     }
                 }
@@ -133,7 +135,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             reputationId += left ? -1 : 1;
             if (reputationId < 0) {
                 reputationId = Reputation.getReputationList().size() - 1;
-            } else if (reputationId >= Reputation.getReputationList().size()) {
+            }else if(reputationId >= Reputation.getReputationList().size()) {
                 reputationId = 0;
             }
             lower = null;
@@ -146,7 +148,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     protected String getArrowText() {
         if (Reputation.getReputationList().isEmpty()) {
             return Translator.translate("hqm.repSetting.invalid");
-        } else {
+        }else{
             return reputation.getName();
         }
     }
@@ -155,7 +157,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     protected String getArrowDescription() {
         if (Reputation.getReputationList().isEmpty()) {
             return Translator.translate("hqm.repReward.noValidReps");
-        } else {
+        }else{
             return null;
         }
     }

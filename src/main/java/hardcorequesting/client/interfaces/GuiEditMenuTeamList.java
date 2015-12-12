@@ -5,6 +5,12 @@ import hardcorequesting.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
+    private GuiEditMenuTeam parent;
+    protected GuiEditMenuTeamList(GuiQuestBook gui, EntityPlayer player, GuiEditMenuTeam parent) {
+        super(gui, player);
+        this.parent = parent;
+    }
+
     private static final int TEAM_X = 20;
     private static final int TEAM_X_2ND_PAGE = 180;
     private static final int TEAM_Y = 20;
@@ -13,20 +19,8 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private static final int TEAM_LINE_INDENT = 5;
     private static final int TEAMS_PER_PAGE = 4;
     private static final int TEAMS_PER_PAIR = TEAMS_PER_PAGE * 2;
-    private static final int ARROW_X_LEFT = 30;
-    private static final int ARROW_X_RIGHT = 288;
-    private static final int ARROW_Y = 212;
-    private static final int ARROW_SRC_X = 181;
-    private static final int ARROW_SRC_Y = 69;
-    private static final int ARROW_W = 20;
-    private static final int ARROW_H = 9;
-    private GuiEditMenuTeam parent;
-    private int pagePair = 0;
 
-    protected GuiEditMenuTeamList(GuiQuestBook gui, EntityPlayer player, GuiEditMenuTeam parent) {
-        super(gui, player);
-        this.parent = parent;
-    }
+    private int pagePair = 0;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -56,6 +50,14 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         }
     }
 
+    private static final int ARROW_X_LEFT = 30;
+    private static final int ARROW_X_RIGHT = 288;
+    private static final int ARROW_Y = 212;
+    private static final int ARROW_SRC_X = 181;
+    private static final int ARROW_SRC_Y = 69;
+    private static final int ARROW_W = 20;
+    private static final int ARROW_H = 9;
+
     private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
         int x = left ? ARROW_X_LEFT : ARROW_X_RIGHT;
         int srcY = 0;
@@ -67,7 +69,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
 
     private boolean isArrowEnabled(boolean left) {
-        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamStats.getTeamStats().length / TEAMS_PER_PAIR) - 1);
+        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float)TeamStats.getTeamStats().length / TEAMS_PER_PAIR) - 1);
     }
 
     @Override
@@ -76,7 +78,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
 
         if (isArrowEnabled(true) && gui.inBounds(ARROW_X_LEFT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair--;
-        } else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
+        }else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair++;
         }
     }

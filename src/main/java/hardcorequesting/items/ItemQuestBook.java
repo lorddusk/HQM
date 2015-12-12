@@ -18,54 +18,57 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ItemQuestBook extends Item {
+public class ItemQuestBook extends Item
+{
 
-    private static final String NBT_PLAYER = "UseAsPlayer";
-    @SideOnly(Side.CLIENT)
-    private IIcon opIcon;
-
-    public ItemQuestBook() {
+    public ItemQuestBook()
+    {
         super();
         setCreativeTab(HardcoreQuesting.HQMTab);
         setMaxStackSize(1);
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
-    public static ItemStack getOPBook(String name) {
-        ItemStack itemStack = new ItemStack(ModItems.book, 1, 1);
-        itemStack.setTagCompound(new NBTTagCompound());
-        itemStack.getTagCompound().setString(NBT_PLAYER, name);
-        return itemStack;
-    }
-
     @Override
-    public String getUnlocalizedName(ItemStack itemStack) {
+    public String getUnlocalizedName(ItemStack itemStack)
+    {
         return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
     }
 
+    @SideOnly(Side.CLIENT)
+    private IIcon opIcon;
+
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
+    public void registerIcons(IIconRegister register)
+    {
         pickIcons(register);
 
     }
 
-    private void pickIcons(IIconRegister register) {
+    private void pickIcons(IIconRegister register)
+    {
         itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_ICON);
         opIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_OP_ICON);
     }
 
+
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int dmg) {
+    public IIcon getIconFromDamage(int dmg)
+    {
         return dmg == 1 ? opIcon : itemIcon;
     }
+
+    private static final String NBT_PLAYER = "UseAsPlayer";
 
     @SuppressWarnings("unchecked")
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List tooltip, boolean extraInfo) {
-        if (itemStack.getItemDamage() == 1) {
+    public void addInformation(ItemStack itemStack, EntityPlayer player, List tooltip, boolean extraInfo)
+    {
+        if (itemStack.getItemDamage() == 1)
+        {
             NBTTagCompound compound = itemStack.getTagCompound();
             if (compound != null && compound.hasKey(NBT_PLAYER))
                 tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs"));
@@ -75,26 +78,35 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
-        if (!world.isRemote) {
+    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
+    {
+        if (!world.isRemote)
+        {
 
-            if (!QuestingData.isQuestActive()) {
+            if (!QuestingData.isQuestActive())
+            {
                 player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noQuestYet"));
-            } else {
-                if (item.getItemDamage() == 1) {
+            } else
+            {
+                if (item.getItemDamage() == 1)
+                {
                     NBTTagCompound compound = item.getTagCompound();
-                    if (compound != null && compound.hasKey(NBT_PLAYER)) {
+                    if (compound != null && compound.hasKey(NBT_PLAYER))
+                    {
                         String name = compound.getString(NBT_PLAYER);
-                        if (QuestingData.hasData(name) && CommandHandler.isOwnerOrOp(player)) {
+                        if (QuestingData.hasData(name) && CommandHandler.isOwnerOrOp(player))
+                        {
                             if (PacketHandler.canOverride(name))
                                 QuestingData.getQuestingData(name).sendDataToClientAndOpenInterface(player, name);
                             else
                                 player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
-                        } else {
+                        } else
+                        {
                             player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
                         }
                     }
-                } else {
+                } else
+                {
                     QuestingData.getQuestingData(player).sendDataToClientAndOpenInterface(player, null);
                 }
             }
@@ -105,7 +117,16 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack itemStack, int pass) {
+    public boolean hasEffect(ItemStack itemStack, int pass)
+    {
         return itemStack.getItemDamage() == 1;
+    }
+
+    public static ItemStack getOPBook(String name)
+    {
+        ItemStack itemStack = new ItemStack(ModItems.book, 1, 1);
+        itemStack.setTagCompound(new NBTTagCompound());
+        itemStack.getTagCompound().setString(NBT_PLAYER, name);
+        return itemStack;
     }
 }

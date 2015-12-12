@@ -30,7 +30,7 @@ public class QuestTicker {
 
 
     public void tick(boolean isClient) {
-        if (++ticks == 1000) {
+        if(++ticks == 1000) {
             ticks = 0;
             hours++;
             if (!isClient) {
@@ -40,7 +40,7 @@ public class QuestTicker {
                         if (total != 0 && hours % total == 0) {
                             quest.resetAll();
                         }
-                    } else if (quest.getRepeatInfo().getType() == RepeatType.TIME) {
+                    }else if(quest.getRepeatInfo().getType() == RepeatType.TIME) {
                         quest.resetOnTime(hours - total);
                     }
                 }
