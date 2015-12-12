@@ -367,16 +367,23 @@ public abstract class QuestTaskItems extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing) {
+        boolean isOpBookWithShiftKeyDown = gui.isOpBook && GuiScreen.isShiftKeyDown();
+        if (Quest.isEditing || isOpBookWithShiftKeyDown) {
 
             ItemRequirement[] items = getEditFriendlyItems(this.items);
 
             for (int i = 0; i < items.length; i++) {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
-                    if (gui.getCurrentMode() == EditMode.ITEM) {
+                    if (isOpBookWithShiftKeyDown) {
+                        if (isCompleted(player)) {
+                            resetTask(QuestingData.getUserName(player), i);
+                        }else{
+                            completeTask(QuestingData.getUserName(player), i, item.required);
+                        }
+                    } else if (Quest.isEditing && gui.getCurrentMode() == EditMode.ITEM) {
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.item != null ? item.item.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
-                    } else if (gui.getCurrentMode() == EditMode.DELETE && (item.item != null || item.fluid != null)) {
+                    } else if (Quest.isEditing && gui.getCurrentMode() == EditMode.DELETE && (item.item != null || item.fluid != null)) {
                         ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                         int id = 0;
                         for (int j = 0; j < this.items.length; j++) {
@@ -387,12 +394,6 @@ public abstract class QuestTaskItems extends QuestTask {
                         }
                         setItems(newItems);
                         SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
-                    } else if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
-                        if (isCompleted(player)) {
-                            resetTask(QuestingData.getUserName(player), i);
-                        }else{
-                            completeTask(QuestingData.getUserName(player), i, item.required);
-                        }
                     }
                     break;
                 }
