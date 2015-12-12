@@ -20,6 +20,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     private final int ARROW_X_RIGHT;
     protected TextBoxGroup textBoxes;
     private boolean clicked;
+
     protected GuiEditMenuExtended(GuiBase gui, EntityPlayer player, boolean isControlOnFirstPage, int arrowX, int arrowY, int boxX, int boxY) {
         super(gui, player, isControlOnFirstPage);
 

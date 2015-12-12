@@ -63,9 +63,11 @@ public class Reputation {
     private ReputationMarker neutral;
     private List<ReputationMarker> markers;
     private int id;
+
     public Reputation(String name, String neutralName) {
         this(count, name, neutralName);
     }
+
     private Reputation(int id, String name, String neutralName) {
         this.name = name;
         this.neutral = new ReputationMarker(neutralName, 0, true);

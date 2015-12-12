@@ -136,11 +136,13 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this(gui, player, groupTier.getName(), true);
         this.groupTier = groupTier;
     }
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskLocation task, int id, QuestTaskLocation.Location location) {
         this(gui, player, location.getName(), true);
         this.task = task;
         this.location = id;
     }
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskMob task, int id, QuestTaskMob.Mob mob) {
         this(gui, player, mob.getName(), true);
         this.task = task;

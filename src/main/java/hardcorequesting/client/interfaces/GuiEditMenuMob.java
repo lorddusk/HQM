@@ -30,6 +30,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private ScrollBar scrollBar;
     private List<String> rawMobs;
     private List<String> mobs;
+
     public GuiEditMenuMob(GuiQuestBook gui, QuestTaskMob task, final QuestTaskMob.Mob mob, int id, EntityPlayer player) {
         super(gui, player, false, 180, 70, 180, 150);
         this.task = task;

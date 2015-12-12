@@ -42,6 +42,7 @@ public class SoundHandler {
     @SideOnly(Side.CLIENT)
     private static ISound loreSound;
     private static int bitCount = -1;
+
     private SoundHandler() {
     }
 

@@ -38,6 +38,7 @@ public class BlockPortal extends BlockContainer {
     private IIcon techEmptyIcon;
     @SideOnly(Side.CLIENT)
     private IIcon magicIcon;
+
     public BlockPortal() {
         super(Material.wood);
         setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);

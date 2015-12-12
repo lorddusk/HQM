@@ -36,6 +36,7 @@ public class GuiReward extends GuiBase {
     private int lines;
     private List<Reward> rewards;
     private String statisticsText;
+
     public GuiReward(Group group, int bagTier, EntityPlayer player) {
         this.group = group;
         this.rewards = new ArrayList<Reward>();

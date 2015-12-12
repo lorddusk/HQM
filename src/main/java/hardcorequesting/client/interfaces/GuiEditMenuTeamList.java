@@ -22,6 +22,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private static final int ARROW_H = 9;
     private GuiEditMenuTeam parent;
     private int pagePair = 0;
+
     protected GuiEditMenuTeamList(GuiQuestBook gui, EntityPlayer player, GuiEditMenuTeam parent) {
         super(gui, player);
         this.parent = parent;

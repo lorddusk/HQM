@@ -21,6 +21,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private boolean inverted;
     private QuestTaskReputation task;
     private int id;
+
     public GuiEditMenuReputationSetting(GuiQuestBook gui, EntityPlayer player, QuestTaskReputation task, int id, QuestTaskReputation.ReputationSetting setting) {
         super(gui, player, true, 25, 25, -1, -1);
 

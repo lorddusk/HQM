@@ -40,6 +40,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private TextBoxGroup.TextBox teamName;
     private TextBoxGroup.TextBox inviteName;
     private Team.PlayerEntry selectedEntry;
+
     public GuiEditMenuTeam(GuiQuestBook gui, EntityPlayer player) {
         super(gui, player);
 

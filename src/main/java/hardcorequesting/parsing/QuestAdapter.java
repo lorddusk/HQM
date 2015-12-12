@@ -899,6 +899,7 @@ public class QuestAdapter {
         private static final String INVERTED = "inverted";
         boolean inverted;
         private int upper, lower, reputation;
+
         private ReputationSettingConstructor(int reputation, int lower, int upper, boolean inverted) {
             this.reputation = reputation;
             this.lower = lower;

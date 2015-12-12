@@ -28,6 +28,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private GroupTier original;
     private TextBoxGroup textBoxes;
     private boolean clicked;
+
     public GuiEditMenuTier(GuiQuestBook gui, EntityPlayer player, final GroupTier tier) {
         super(gui, player, true);
         this.original = tier;

@@ -25,6 +25,7 @@ public class BlockTracker extends BlockContainer {
     private IIcon activeIcon;
     @SideOnly(Side.CLIENT)
     private IIcon emptyIcon;
+
     public BlockTracker() {
         super(Material.wood);
         setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);

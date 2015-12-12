@@ -22,6 +22,7 @@ public class BlockDelivery extends BlockContainer {
     private IIcon activeIcon;
     @SideOnly(Side.CLIENT)
     private IIcon emptyIcon;
+
     public BlockDelivery() {
         super(Material.wood);
         setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);

@@ -35,6 +35,7 @@ public class Group {
     private String name;
     private int limit;
     private int id;
+
     private Group(int id, String name, GroupTier tier, List<ItemStack> items, int limit) {
         this.id = id;
         this.name = name;
