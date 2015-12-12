@@ -340,7 +340,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (Quest.isEditing)
                     str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
                 if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
-                    if (isCompleted(player)) {
+                    if (getProgress(player, i) == item.required) {
                         str += "\n\n" + GuiColor.RED + Translator.translate("hqm.questBook.resetTask");
                     }else{
                         str += "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.questBook.completeTask");
@@ -376,7 +376,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                     if (isOpBookWithShiftKeyDown) {
-                        if (isCompleted(player)) {
+                        if (getProgress(player, i) == item.required) {
                             resetTask(QuestingData.getUserName(player), i);
                         }else{
                             completeTask(QuestingData.getUserName(player), i, item.required);
