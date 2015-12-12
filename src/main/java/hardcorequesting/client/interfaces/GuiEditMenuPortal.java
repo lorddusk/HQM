@@ -103,7 +103,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             portal.setType(PortalType.values()[(portal.getType().ordinal() + PortalType.values().length - 1) % PortalType.values().length]);
-        }else{
+        } else {
             portal.setType(PortalType.values()[(portal.getType().ordinal() + 1) % PortalType.values().length]);
         }
     }
@@ -131,8 +131,6 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
     public void setItem(ItemStack item) {
         portal.setItem(item);
     }
-
-
 
 
 }

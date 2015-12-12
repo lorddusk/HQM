@@ -33,7 +33,7 @@ public class TileEntityTracker extends TileEntity {
             compound.setShort(NBT_QUEST, quest.getId());
         }
         compound.setInteger(NBT_RADIUS, radius);
-        compound.setByte(NBT_TYPE, (byte)type.ordinal());
+        compound.setByte(NBT_TYPE, (byte) type.ordinal());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TileEntityTracker extends TileEntity {
 
         if (compound.hasKey(NBT_QUEST)) {
             questId = compound.getShort(NBT_QUEST);
-        }else{
+        } else {
             quest = null;
         }
         radius = compound.getInteger(NBT_RADIUS);
@@ -78,16 +78,16 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void notifyUpdate(int x, int y, int z, int i) {
-        if (i == 2 ||x != xCoord || y != yCoord || z != zCoord) {
+        if (i == 2 || x != xCoord || y != yCoord || z != zCoord) {
             worldObj.notifyBlockOfNeighborChange(x, y, z, getBlockType());
 
             if (i > 0) {
-                notifyUpdate(x - 1,     y,          z,      i - 1);
-                notifyUpdate(x + 1,     y,          z,      i - 1);
-                notifyUpdate(x,         y - 1,      z,      i - 1);
-                notifyUpdate(x,         y + 1,      z,      i - 1);
-                notifyUpdate(x,         y,          z - 1,  i - 1);
-                notifyUpdate(x,         y,          z + 1,  i - 1);
+                notifyUpdate(x - 1, y, z, i - 1);
+                notifyUpdate(x + 1, y, z, i - 1);
+                notifyUpdate(x, y - 1, z, i - 1);
+                notifyUpdate(x, y + 1, z, i - 1);
+                notifyUpdate(x, y, z - 1, i - 1);
+                notifyUpdate(x, y, z + 1, i - 1);
             }
         }
     }
@@ -130,7 +130,7 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void save(DataWriter dw, boolean saveQuest) {
-        if (saveQuest)  {
+        if (saveQuest) {
             dw.writeBoolean(quest != null);
             if (quest != null) {
                 dw.writeData(quest.getId(), DataBitHelper.QUESTS);
@@ -144,7 +144,7 @@ public class TileEntityTracker extends TileEntity {
         if (loadQuest) {
             if (dr.readBoolean()) {
                 quest = Quest.getQuest(dr.readData(DataBitHelper.QUESTS));
-            }else{
+            } else {
                 quest = null;
             }
         }
@@ -159,8 +159,8 @@ public class TileEntityTracker extends TileEntity {
 
         TileEntity te = world.getTileEntity(x, y, z);
         if (te instanceof TileEntityTracker) {
-            return (TileEntityTracker)te;
-        }else{
+            return (TileEntityTracker) te;
+        } else {
             return null;
         }
     }

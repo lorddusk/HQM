@@ -16,8 +16,7 @@ import java.util.List;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 
-public class ModConfig
-{
+public class ModConfig {
     private static final String CATEGORY_GENERAL = "General";
 
     private static final String LIVES_KEY = "Default lives";
@@ -84,24 +83,20 @@ public class ModConfig
 
     public static Configuration config;
 
-    public static void init(File file)
-    {
-        if (config == null)
-        {
+    public static void init(File file) {
+        if (config == null) {
             config = new Configuration(file);
             loadConfig();
         }
     }
 
     @SubscribeEvent
-    public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
-    {
+    public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.modID.equalsIgnoreCase(ModInformation.ID))
             loadConfig();
     }
 
-    private static void loadConfig()
-    {
+    private static void loadConfig() {
         int lives = config.get(CATEGORY_GENERAL, LIVES_KEY, LIVES_DEFAULT, LIVES_COMMENT).getInt(LIVES_DEFAULT);
         MAXLIVES = config.get(CATEGORY_GENERAL, MAXLIVES_KEY, MAXLIVES_DEFAULT, MAXLIVES_COMMENT).getInt(MAXLIVES_DEFAULT);
 
@@ -147,8 +142,7 @@ public class ModConfig
     }
 
     @SuppressWarnings("unchecked")
-    public static List<IConfigElement> getConfigElements()
-    {
+    public static List<IConfigElement> getConfigElements() {
         List<IConfigElement> list = new ArrayList<IConfigElement>();
         list.addAll(new ConfigElement(config.getCategory(Configuration.CATEGORY_GENERAL)).getChildElements());
         return list;

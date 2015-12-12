@@ -37,10 +37,12 @@ public abstract class LargeButton {
 
     @SideOnly(Side.CLIENT)
     public abstract boolean isEnabled(GuiBase gui, EntityPlayer player);
+
     @SideOnly(Side.CLIENT)
     public abstract boolean isVisible(GuiBase gui, EntityPlayer player);
+
     @SideOnly(Side.CLIENT)
-    public abstract void  onClick(GuiBase gui, EntityPlayer player);
+    public abstract void onClick(GuiBase gui, EntityPlayer player);
 
 
     @SideOnly(Side.CLIENT)
@@ -58,6 +60,7 @@ public abstract class LargeButton {
 
 
     private List<String> lines;
+
     @SideOnly(Side.CLIENT)
     public void drawMouseOver(GuiBase gui, EntityPlayer player, int mX, int mY) {
         if (isVisible(gui, player) && description != null && inButtonBounds(gui, mX, mY)) {
@@ -73,8 +76,7 @@ public abstract class LargeButton {
         return Translator.translate(name);
     }
 
-    protected String getDescription()
-    {
+    protected String getDescription() {
         return Translator.translate(description);
     }
 

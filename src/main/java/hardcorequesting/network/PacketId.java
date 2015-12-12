@@ -21,13 +21,12 @@ public enum PacketId {
     TRACKER_RESPONSE,
     BLOCK_SYNC;
 
-	
-	
-	public byte getId() {
-		return (byte)ordinal();
-	}
-	
-	public static PacketId getFromId(byte id) {
+
+    public byte getId() {
+        return (byte) ordinal();
+    }
+
+    public static PacketId getFromId(byte id) {
         return values()[id];
-	}
+    }
 }

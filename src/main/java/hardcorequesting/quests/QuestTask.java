@@ -60,12 +60,12 @@ public abstract class QuestTask {
 
         QuestTask requirement;
         do {
-            if(!var2.hasNext()) {
+            if (!var2.hasNext()) {
                 return true;
             }
 
-            requirement = (QuestTask)var2.next();
-        } while(requirement.isCompleted(player) && requirement.isVisible(player));
+            requirement = (QuestTask) var2.next();
+        } while (requirement.isCompleted(player) && requirement.isVisible(player));
 
         return false;
     }
@@ -83,6 +83,7 @@ public abstract class QuestTask {
     }
 
     public abstract void save(DataWriter dw);
+
     public abstract void load(DataReader dr, FileVersion version);
 
     public QuestDataTask getData(EntityPlayer player) {
@@ -91,8 +92,7 @@ public abstract class QuestTask {
 
     public QuestDataTask getData(String playerName) {
         QuestData questData = QuestingData.getQuestingData(playerName).getQuestData(parent.getId());
-        if (id >= questData.tasks.length)
-        {
+        if (id >= questData.tasks.length) {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
         }
@@ -107,13 +107,12 @@ public abstract class QuestTask {
         return data;
     }
 
-    private QuestDataTask newQuestData()
-    {
+    private QuestDataTask newQuestData() {
         try {
-            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[] {QuestTask.class});
+            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[]{QuestTask.class});
             Object obj = constructor.newInstance(this);
-            return (QuestDataTask)obj;
-        }catch (Exception ex){
+            return (QuestDataTask) obj;
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -172,9 +171,9 @@ public abstract class QuestTask {
 
 
         if (QuestingData.getQuestingData(playerName).getTeam().getRewardSetting() == Team.RewardSetting.RANDOM) {
-            int rewardId = (int)(Math.random() * data.reward.length);
+            int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
-        }else{
+        } else {
             for (int i = 0; i < data.reward.length; i++) {
                 data.reward[i] = true;
             }
@@ -193,6 +192,7 @@ public abstract class QuestTask {
 
     @SideOnly(Side.CLIENT)
     public abstract void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY);
+
     @SideOnly(Side.CLIENT)
     public abstract void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b);
 
@@ -228,8 +228,11 @@ public abstract class QuestTask {
     }
 
     public abstract float getCompletedRatio(String playerName);
+
     public abstract void mergeProgress(String playerName, QuestDataTask own, QuestDataTask other);
+
     public abstract void autoComplete(String playerName);
+
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         own.completed = other.completed;
     }
@@ -238,16 +241,29 @@ public abstract class QuestTask {
         EventHandler.instance().remove(this);
     }
 
-    public void register(EventHandler.Type ... types) {
+    public void register(EventHandler.Type... types) {
         EventHandler.instance().add(this, types);
     }
 
     //for these to be called one must register the task using the method above using the correct types
-    public void onServerTick(TickEvent.ServerTickEvent event) {}
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {}
-    public void onLivingDeath(LivingDeathEvent event) {}
-    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {}
-    public void onItemPickUp(EntityItemPickupEvent event) {}
-    public void onOpenBook(EventHandler.BookOpeningEvent event) {}
-    public void onReputationChange(EventHandler.ReputationEvent event) {}
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+    }
+
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    }
+
+    public void onLivingDeath(LivingDeathEvent event) {
+    }
+
+    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
+    }
+
+    public void onItemPickUp(EntityItemPickupEvent event) {
+    }
+
+    public void onOpenBook(EventHandler.BookOpeningEvent event) {
+    }
+
+    public void onReputationChange(EventHandler.ReputationEvent event) {
+    }
 }

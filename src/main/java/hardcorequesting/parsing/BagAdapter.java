@@ -13,32 +13,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BagAdapter
-{
-    public static final TypeAdapter<GroupTier> GROUP_TIER_ADAPTER = new TypeAdapter<GroupTier>()
-    {
+public class BagAdapter {
+    public static final TypeAdapter<GroupTier> GROUP_TIER_ADAPTER = new TypeAdapter<GroupTier>() {
         private final String NAME = "name";
         private final String COLOUR = "colour";
         private final String WEIGHTS = "weights";
         private final String GROUPS = "groups";
 
         @Override
-        public void write(JsonWriter out, GroupTier value) throws IOException
-        {
+        public void write(JsonWriter out, GroupTier value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
             out.name(COLOUR).value(value.getColor().name());
             out.name(WEIGHTS).beginArray();
-            for (int i : value.getWeights())
-            {
+            for (int i : value.getWeights()) {
                 out.value(i);
             }
             out.endArray();
             out.name(GROUPS).beginArray();
-            for (Group group : Group.getGroups())
-            {
-                if (group.getTier() == value)
-                {
+            for (Group group : Group.getGroups()) {
+                if (group.getTier() == value) {
                     GROUP_ADAPTER.write(out, group);
                 }
             }
@@ -47,17 +41,14 @@ public class BagAdapter
         }
 
         @Override
-        public GroupTier read(JsonReader in) throws IOException
-        {
+        public GroupTier read(JsonReader in) throws IOException {
             in.beginObject();
             String name = "";
             GuiColor colour = GuiColor.GRAY;
             int[] weights = new int[BagTier.values().length];
             List<Group> groups = new ArrayList<>();
-            while(in.hasNext())
-            {
-                switch (in.nextName().toLowerCase())
-                {
+            while (in.hasNext()) {
+                switch (in.nextName().toLowerCase()) {
                     case NAME:
                         name = in.nextString();
                         break;
@@ -66,16 +57,14 @@ public class BagAdapter
                         break;
                     case WEIGHTS:
                         in.beginArray();
-                        for (int i = 0; i < weights.length && in.hasNext(); i++)
-                        {
+                        for (int i = 0; i < weights.length && in.hasNext(); i++) {
                             weights[i] = in.nextInt();
                         }
                         in.endArray();
                         break;
                     case GROUPS:
                         in.beginArray();
-                        while (in.hasNext())
-                        {
+                        while (in.hasNext()) {
                             Group group = GROUP_ADAPTER.read(in);
                             if (group != null)
                                 groups.add(group);
@@ -86,32 +75,27 @@ public class BagAdapter
             }
             in.endObject();
             GroupTier tier = new GroupTier(name, colour, weights);
-            for (Group group : groups)
-            {
+            for (Group group : groups) {
                 group.setTier(tier);
             }
             return tier;
         }
     };
 
-    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>()
-    {
+    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
         private final String ITEMS = "items";
         private final String NAME = "name";
         private final String LIMIT = "limit";
 
         @Override
-        public void write(JsonWriter out, Group value) throws IOException
-        {
+        public void write(JsonWriter out, Group value) throws IOException {
             out.beginObject();
-            if (value.hasName())
-            {
+            if (value.hasName()) {
                 out.name(NAME).value(value.getName());
             }
             out.name(LIMIT).value(value.getLimit());
             out.name(ITEMS).beginArray();
-            for (ItemStack stack : value.getItems())
-            {
+            for (ItemStack stack : value.getItems()) {
                 MinecraftAdapter.ITEM_STACK.write(out, stack);
             }
             out.endArray();
@@ -119,16 +103,13 @@ public class BagAdapter
         }
 
         @Override
-        public Group read(JsonReader in) throws IOException
-        {
+        public Group read(JsonReader in) throws IOException {
             in.beginObject();
             String name = null;
             int limit = 0;
             List<ItemStack> items = new ArrayList<>();
-            while(in.hasNext())
-            {
-                switch (in.nextName().toLowerCase())
-                {
+            while (in.hasNext()) {
+                switch (in.nextName().toLowerCase()) {
                     case NAME:
                         name = in.nextString();
                         break;
@@ -137,11 +118,9 @@ public class BagAdapter
                         break;
                     case ITEMS:
                         in.beginArray();
-                        while (in.hasNext())
-                        {
+                        while (in.hasNext()) {
                             ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                            if (stack != null)
-                            {
+                            if (stack != null) {
                                 items.add(stack);
                             }
                         }

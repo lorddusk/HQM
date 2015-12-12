@@ -44,7 +44,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             tracker.setType(TrackerType.values()[(tracker.getType().ordinal() + TrackerType.values().length - 1) % TrackerType.values().length]);
-        }else{
+        } else {
             tracker.setType(TrackerType.values()[(tracker.getType().ordinal() + 1) % TrackerType.values().length]);
         }
     }

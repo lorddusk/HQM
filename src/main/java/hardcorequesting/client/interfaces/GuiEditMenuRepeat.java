@@ -74,7 +74,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             type = RepeatType.values()[(type.ordinal() + RepeatType.values().length - 1) % RepeatType.values().length];
-        }else{
+        } else {
             type = RepeatType.values()[(type.ordinal() + 1) % RepeatType.values().length];
         }
     }

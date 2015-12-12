@@ -1,7 +1,6 @@
 package hardcorequesting.client.interfaces;
 
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.config.ModConfig;
@@ -19,7 +18,7 @@ public class GuiWrapperEditMenu extends GuiBase {
 
         if (editMenu != null) {
             this.editMenu = editMenu;
-        }else{
+        } else {
             this.mc.displayGuiScreen(null);
         }
     }
@@ -40,7 +39,7 @@ public class GuiWrapperEditMenu extends GuiBase {
 
         applyColor(0xFFFFFFFF);
 
-            ResourceHelper.bindResource(BG_TEXTURE);
+        ResourceHelper.bindResource(BG_TEXTURE);
 
 
         drawRect(0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -50,7 +49,7 @@ public class GuiWrapperEditMenu extends GuiBase {
 
         applyColor(0xFFFFFFFF);
 
-            ResourceHelper.bindResource(MAP_TEXTURE);
+        ResourceHelper.bindResource(MAP_TEXTURE);
 
 
         int mX = mX0 - left;

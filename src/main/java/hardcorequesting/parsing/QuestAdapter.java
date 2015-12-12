@@ -129,7 +129,7 @@ public class QuestAdapter {
         @Override
         public QuestTaskLocation.Location read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskLocation.Location result =  new QuestTaskLocation.Location();
+            QuestTaskLocation.Location result = new QuestTaskLocation.Location();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
@@ -331,8 +331,7 @@ public class QuestAdapter {
                     in.beginArray();
                     while (in.hasNext()) {
                         ReputationSettingConstructor constructor = ReputationSettingConstructor.read(in);
-                        if (constructor != null)
-                        {
+                        if (constructor != null) {
                             list.add(constructor);
                         }
                     }
@@ -348,10 +347,10 @@ public class QuestAdapter {
         }
     };
 
-    private static class ReputationSettingConstructor
-    {
+    private static class ReputationSettingConstructor {
         private int upper, lower, reputation;
         boolean inverted;
+
         private ReputationSettingConstructor(int reputation, int lower, int upper, boolean inverted) {
             this.reputation = reputation;
             this.lower = lower;
@@ -359,14 +358,14 @@ public class QuestAdapter {
             this.inverted = inverted;
         }
 
-        public QuestTaskReputation.ReputationSetting constructReuptationSetting()
-        {
-            if (reputation >= 0 && reputation < Reputation.getReputationList().size())
-            {
+        public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
+            if (reputation >= 0 && reputation < Reputation.getReputationList().size()) {
                 Reputation reputation = Reputation.getReputationList().get(this.reputation);
                 ReputationMarker lower = null, upper = null;
-                if (this.lower >= 0 && this.lower < reputation.getMarkerCount()) lower = reputation.getMarker(this.lower);
-                if (this.upper >= 0 && this.upper < reputation.getMarkerCount()) upper = reputation.getMarker(this.lower);
+                if (this.lower >= 0 && this.lower < reputation.getMarkerCount())
+                    lower = reputation.getMarker(this.lower);
+                if (this.upper >= 0 && this.upper < reputation.getMarkerCount())
+                    upper = reputation.getMarker(this.lower);
                 return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
             }
             return null;
@@ -520,11 +519,9 @@ public class QuestAdapter {
             if (value.getUseModifiedParentRequirement()) {
                 out.name(PARENT_REQUIREMENT).value(value.getParentRequirementCount());
             }
-            if (!value.getTasks().isEmpty())
-            {
+            if (!value.getTasks().isEmpty()) {
                 out.name(TASKS).beginArray();
-                for (QuestTask task : value.getTasks())
-                {
+                for (QuestTask task : value.getTasks()) {
                     TASK_ADAPTER.write(out, task);
                 }
                 out.endArray();
@@ -542,12 +539,11 @@ public class QuestAdapter {
             out.endObject();
         }
 
-        private String getQuestSaveString(Quest quest, QuestSet set)
-        {
+        private String getQuestSaveString(Quest quest, QuestSet set) {
             if (quest.getQuestSet() == set)
                 return quest.getName();
             else
-                return "{"+quest.getQuestSet().getName()+"}["+quest.getName()+"]";
+                return "{" + quest.getQuestSet().getName() + "}[" + quest.getName() + "]";
         }
 
         private void writeQuestList(JsonWriter out, List<Quest> quests, QuestSet set, String name) throws IOException {
@@ -663,9 +659,9 @@ public class QuestAdapter {
                 optionalAdd(prerequisiteMapping, prerequisites);
                 optionalAdd(optionLinkMapping, optionLinks);
                 try {
-                    if(HardcoreQuesting.getPlayer() != null) {
+                    if (HardcoreQuesting.getPlayer() != null) {
                         QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
-                    }else{
+                    } else {
                         QUEST.addTaskData(QUEST.getQuestData("lorddusk"));
                     }
                 } catch (Exception e) {
@@ -677,16 +673,13 @@ public class QuestAdapter {
             return null;
         }
 
-        private void optionalAdd(Map map, List list)
-        {
-            if (!list.isEmpty())
-            {
+        private void optionalAdd(Map map, List list) {
+            if (!list.isEmpty()) {
                 map.put(QUEST, list);
             }
         }
 
-        private void readIntArray(List<Integer> list, JsonReader in) throws IOException
-        {
+        private void readIntArray(List<Integer> list, JsonReader in) throws IOException {
             in.beginArray();
             while (in.hasNext()) {
                 list.add(in.nextInt() + QUEST_ID);
@@ -694,8 +687,7 @@ public class QuestAdapter {
             in.endArray();
         }
 
-        private void readStringArray(List<String> list, JsonReader in) throws IOException
-        {
+        private void readStringArray(List<String> list, JsonReader in) throws IOException {
             in.beginArray();
             while (in.hasNext()) {
                 list.add(in.nextString());
@@ -823,29 +815,23 @@ public class QuestAdapter {
         }
 
         private void questReplace(List<Quest> existing, List<Quest> replacements) {
-            for (Quest current : new ArrayList<>(existing))
-            {
+            for (Quest current : new ArrayList<>(existing)) {
                 Quest replacement = getReplacement(current, replacements);
 
-                for (Quest requirement : current.getRequirement())
-                {
+                for (Quest requirement : current.getRequirement()) {
                     neatSwap(current, replacement, requirement.getReversedRequirement());
                 }
-                for (Quest dependent : current.getReversedRequirement())
-                {
+                for (Quest dependent : current.getReversedRequirement()) {
                     neatSwap(current, replacement, dependent.getRequirement());
                 }
-                for (Quest optionLink : current.getOptionLinks())
-                {
+                for (Quest optionLink : current.getOptionLinks()) {
                     neatSwap(current, replacement, optionLink.getReversedOptionLinks());
                 }
-                for (Quest optionLink : current.getReversedOptionLinks())
-                {
+                for (Quest optionLink : current.getReversedOptionLinks()) {
                     neatSwap(current, replacement, optionLink.getOptionLinks());
                 }
 
-                for (QuestTask task : current.getTasks())
-                {
+                for (QuestTask task : current.getTasks()) {
                     task.onDelete();
                 }
                 current.setQuestSet(null);
@@ -853,17 +839,14 @@ public class QuestAdapter {
             }
         }
 
-        private void neatSwap(Quest current, Quest replacement, List<Quest> replaceIn)
-        {
+        private void neatSwap(Quest current, Quest replacement, List<Quest> replaceIn) {
             replaceIn.remove(current);
             if (replacement != null) replaceIn.add(replacement);
         }
 
         private Quest getReplacement(Quest quest, List<Quest> replacements) {
-            for (Quest replacement : replacements)
-            {
-                if (quest.getName().equalsIgnoreCase(replacement.getName()))
-                {
+            for (Quest replacement : replacements) {
+                if (quest.getName().equalsIgnoreCase(replacement.getName())) {
                     return replacement;
                 }
             }
@@ -904,57 +887,45 @@ public class QuestAdapter {
                 }
             }
             in.endObject();
-            if (id*x*y < 0) return null;
+            if (id * x * y < 0) return null;
             return new ReputationBar(id, x, y, -1);
         }
     };
 
     private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
 
-    public static void postLoad() throws IOException
-    {
-        for (Map.Entry<Quest, List<String>> entry : prerequisiteMapping.entrySet())
-        {
-            for (String link : entry.getValue())
-            {
+    public static void postLoad() throws IOException {
+        for (Map.Entry<Quest, List<String>> entry : prerequisiteMapping.entrySet()) {
+            for (String link : entry.getValue()) {
                 Quest quest = getQuest(link, entry.getKey().getQuestSet());
                 if (quest != null)
                     entry.getKey().addRequirement(quest.getId());
             }
         }
-        for (Map.Entry<Quest, List<String>> entry : optionLinkMapping.entrySet())
-        {
-            for (String link : entry.getValue())
-            {
+        for (Map.Entry<Quest, List<String>> entry : optionLinkMapping.entrySet()) {
+            for (String link : entry.getValue()) {
                 Quest quest = getQuest(link, entry.getKey().getQuestSet());
                 if (quest != null)
                     entry.getKey().addOptionLink(quest.getId());
             }
         }
-        for (Map.Entry<Quest.ReputationReward, Integer> entry : reputationRewardMapping.entrySet())
-        {
+        for (Map.Entry<Quest.ReputationReward, Integer> entry : reputationRewardMapping.entrySet()) {
             int rep = entry.getValue();
-            if (rep >= 0 && rep < Reputation.getReputationList().size())
-            {
+            if (rep >= 0 && rep < Reputation.getReputationList().size()) {
                 Reputation reputation = Reputation.getReputationList().get(rep);
-                if (reputation == null)
-                {
+                if (reputation == null) {
                     throw new IOException("Failed to load reputation value " + rep);
                 }
                 entry.getKey().setReputation(reputation);
-            } else
-            {
+            } else {
                 throw new IOException("Missing reputation value " + rep);
             }
         }
-        for (Map.Entry<QuestTaskReputation, List<ReputationSettingConstructor>> entry : taskReputationListMap.entrySet())
-        {
+        for (Map.Entry<QuestTaskReputation, List<ReputationSettingConstructor>> entry : taskReputationListMap.entrySet()) {
             List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();
-            for (ReputationSettingConstructor constructor : entry.getValue())
-            {
+            for (ReputationSettingConstructor constructor : entry.getValue()) {
                 QuestTaskReputation.ReputationSetting setting = constructor.constructReuptationSetting();
-                if (setting != null)
-                {
+                if (setting != null) {
                     reputationSettingList.add(setting);
                 }
             }
@@ -962,29 +933,22 @@ public class QuestAdapter {
         }
     }
 
-    private static Quest getQuest(String string, QuestSet defaultSet)
-    {
+    private static Quest getQuest(String string, QuestSet defaultSet) {
         QuestSet set = defaultSet;
         String questName = string;
         Matcher matcher = OTHER_QUEST_SET.matcher(string);
-        if (matcher.find())
-        {
-            for (QuestSet questSet : Quest.getQuestSets())
-            {
-                if (questSet.getName().equalsIgnoreCase(matcher.group(1)))
-                {
+        if (matcher.find()) {
+            for (QuestSet questSet : Quest.getQuestSets()) {
+                if (questSet.getName().equalsIgnoreCase(matcher.group(1))) {
                     set = questSet;
                     break;
                 }
             }
             questName = matcher.group(2);
         }
-        if (set != null)
-        {
-            for (Quest quest : set.getQuests())
-            {
-                if (quest.getName().equalsIgnoreCase(questName))
-                {
+        if (set != null) {
+            for (Quest quest : set.getQuests()) {
+                if (quest.getName().equalsIgnoreCase(questName)) {
                     return quest;
                 }
             }

@@ -5,7 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 
 
-public enum  DeathType {
+public enum DeathType {
     LAVA("lava") {
         @Override
         boolean isSourceValid(DamageSource source) {
@@ -115,7 +115,7 @@ public enum  DeathType {
                     break;
                 }
             }
-        }else{
+        } else {
             OTHER.onDeath(player);
         }
 
@@ -124,8 +124,7 @@ public enum  DeathType {
     //is only accurate if called in the values() order
     abstract boolean isSourceValid(DamageSource source);
 
-    public String getName()
-    {
+    public String getName() {
         return Translator.translate("hqm.deathType." + name);
     }
 

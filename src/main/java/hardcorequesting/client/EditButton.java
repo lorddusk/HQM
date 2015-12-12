@@ -63,7 +63,7 @@ public class EditButton {
     }
 
     public boolean onClick(int mX, int mY) {
-        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY))    {
+        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             guiQuestBook.setCurrentMode(mode);
             guiQuestBook.modifyingQuest = null;
             guiQuestBook.modifyingBar = null;
@@ -73,13 +73,11 @@ public class EditButton {
         return false;
     }
 
-    public boolean click()
-    {
+    public boolean click() {
         return onClick(x, y);
     }
 
-    public boolean matchesMode(EditMode mode)
-    {
+    public boolean matchesMode(EditMode mode) {
         return this.mode == mode;
     }
 }

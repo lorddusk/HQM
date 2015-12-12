@@ -50,18 +50,24 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
 
 
-    public static abstract class Element <T> {
-        protected Element() {}
+    public static abstract class Element<T> {
+        protected Element() {
+        }
 
         protected T item;
+
         public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
+
         public abstract List<String> getName(GuiBase gui);
+
         public abstract int getAmount();
+
         public abstract void setAmount(int val);
 
         public T getItem() {
             return item;
         }
+
         public abstract Element copy();
     }
 
@@ -79,7 +85,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public List<String> getName(GuiBase gui) {
             if (item != null && item.getItem() != null) {
                 return item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-            }else{
+            } else {
                 List<String> ret = new ArrayList<String>();
                 ret.add("Unknown");
                 return ret;
@@ -106,6 +112,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
     public static class ElementFluid extends Element<Fluid> {
         private int size;
+
         public ElementFluid(Fluid fluid) {
             this.item = fluid;
         }
@@ -178,8 +185,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private Element getSelected() {
         return selected;
     }
+
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack)obj) : new ElementFluid((Fluid)obj), id, type, amount, precision) ;
+        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), id, type, amount, precision);
     }
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Element element, int id, final Type type, final int amount, ItemPrecision precision) {
@@ -200,7 +208,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 item.stackSize = 1;
                 boolean exists = false;
                 for (Element other : playerItems) {
-                    if (ItemStack.areItemStacksEqual(item, (ItemStack)other.getItem())) {
+                    if (ItemStack.areItemStacksEqual(item, (ItemStack) other.getItem())) {
                         exists = true;
                         break;
                     }
@@ -238,11 +246,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
                 @Override
                 protected void textChanged(GuiBase gui) {
-                    try{
+                    try {
                         int number;
                         if (getText().equals("")) {
                             number = 1;
-                        }else{
+                        } else {
                             number = Integer.parseInt(getText());
                         }
 
@@ -253,7 +261,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
                         if (getSelected() != null) {
                             getSelected().setAmount(number);
                         }
-                    }catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
 
                 }
             });
@@ -284,7 +293,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         if (usePrecision()) {
             GL11.glColor3f(1F, 1F, 1F);
 
-                ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);
@@ -339,7 +348,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     selected = element.copy();
                     if (amountTextBox != null) {
                         amountTextBox.textChanged(gui);
-                    }else{
+                    } else {
                         selected.setAmount(1);
                     }
                 }
@@ -375,7 +384,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
                 precision = precisionTypes.get((precisionTypes.indexOf(precision) + precisionTypes.size() - 1) % precisionTypes.size());
                 clicked = true;
-            }else if (inArrowBounds(gui, mX, mY, false)) {
+            } else if (inArrowBounds(gui, mX, mY, false)) {
                 List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
                 precision = precisionTypes.get((precisionTypes.indexOf(precision) + 1) % precisionTypes.size());
                 clicked = true;
@@ -399,19 +408,19 @@ public class GuiEditMenuItem extends GuiEditMenu {
     @Override
     protected void save(GuiBase gui) {
         if (type == Type.BAG_ITEM) {
-            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && (ItemStack)selected.getItem() != null) {
-                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack)selected.getItem());
+            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && (ItemStack) selected.getItem() != null) {
+                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getItem());
             }
-        }else if (type == Type.QUEST_ICON) {
-            if (Quest.getQuest(id)  != null && selected instanceof ElementItem) {
+        } else if (type == Type.QUEST_ICON) {
+            if (Quest.getQuest(id) != null && selected instanceof ElementItem) {
                 try {
                     Quest.getQuest(id).setIcon((ItemStack) selected.getItem());
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("Tell LordDusk that he found the issue.");
                 }
                 SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
             }
-        }else{
+        } else {
             GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
         }
     }
@@ -420,8 +429,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private TextBoxGroup textBoxes;
 
 
-    public static class Search implements Runnable
-    {
+    public static class Search implements Runnable {
         public static List<SearchEntry> searchItems = new ArrayList<>();
         public static List<SearchEntry> searchFluids = new ArrayList<>();
 
@@ -430,28 +438,23 @@ public class GuiEditMenuItem extends GuiEditMenu {
         private List<Element> elements;
         private long startTime;
 
-        public Search(String search, GuiEditMenuItem menu)
-        {
+        public Search(String search, GuiEditMenuItem menu) {
             this.search = search;
             this.menu = menu;
             startTime = System.currentTimeMillis();
         }
 
         @Override
-        public void run()
-        {
+        public void run() {
             elements = new ArrayList<>();
             Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
             boolean advanced = Minecraft.getMinecraft().gameSettings.advancedItemTooltips;
-            for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++)
-            {
+            for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
                 SearchEntry entry = searchItems.get(i);
                 entry.search(pattern, elements, advanced);
             }
-            if (menu.showFluids())
-            {
-                for (int i = 0; i < searchFluids.size() && elements.size() < ITEMS_TO_DISPLAY; i++)
-                {
+            if (menu.showFluids()) {
+                for (int i = 0; i < searchFluids.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
                     SearchEntry entry = searchFluids.get(i);
                     entry.search(pattern, elements, advanced);
                 }
@@ -459,93 +462,75 @@ public class GuiEditMenuItem extends GuiEditMenu {
             setResult(this.menu, this);
         }
 
-        public boolean isNewerThan(Search search)
-        {
+        public boolean isNewerThan(Search search) {
             return startTime > search.startTime;
         }
 
-        public static void setResult(GuiEditMenuItem menu, Search search)
-        {
+        public static void setResult(GuiEditMenuItem menu, Search search) {
             ThreadingHandler.handle(menu, search);
         }
 
-        public static void initItems()
-        {
+        public static void initItems() {
             clear();
-            if (searchItems.isEmpty())
-            {
+            if (searchItems.isEmpty()) {
                 List<ItemStack> stacks = new ArrayList<>();
-                for (Object anItemRegistry : Item.itemRegistry)
-                {
-                    try
-                    {
-                        Item item = (Item)anItemRegistry;
-    //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
-    //                    {
-    //                        ItemBlock itemBlock = (ItemBlock)item;
-    //                        if (itemBlock.field_150939_a == Blocks.lava || itemBlock.field_150939_a == Blocks.water || itemBlock.field_150939_a instanceof BlockLiquid || itemBlock.field_150939_a instanceof IFluidBlock)
-    //                            continue;
-    //                    }
+                for (Object anItemRegistry : Item.itemRegistry) {
+                    try {
+                        Item item = (Item) anItemRegistry;
+                        //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
+                        //                    {
+                        //                        ItemBlock itemBlock = (ItemBlock)item;
+                        //                        if (itemBlock.field_150939_a == Blocks.lava || itemBlock.field_150939_a == Blocks.water || itemBlock.field_150939_a instanceof BlockLiquid || itemBlock.field_150939_a instanceof IFluidBlock)
+                        //                            continue;
+                        //                    }
                         item.getSubItems(item, item.getCreativeTab(), stacks);
-                    } catch (Exception ignore)
-                    {
+                    } catch (Exception ignore) {
                     }
                 }
                 EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-                for (ItemStack stack : stacks)
-                {
-                    try
-                    {
+                for (ItemStack stack : stacks) {
+                    try {
                         List tooltipList = stack.getTooltip(player, false);
                         List advTooltipList = stack.getTooltip(player, true);
                         String searchString = "";
-                        for (Object string : tooltipList)
-                        {
+                        for (Object string : tooltipList) {
                             if (string != null)
                                 searchString += string + "\n";
                         }
                         String advSearchString = "";
-                        for (Object string : advTooltipList)
-                        {
+                        for (Object string : advTooltipList) {
                             if (string != null)
                                 advSearchString += string + "\n";
                         }
                         searchItems.add(new SearchEntry(searchString, advSearchString, new ElementItem(stack)));
-                    } catch (Throwable ignore)
-                    {
+                    } catch (Throwable ignore) {
                     }
                 }
-                for (Fluid fluid : FluidRegistry.getRegisteredFluids().values())
-                {
+                for (Fluid fluid : FluidRegistry.getRegisteredFluids().values()) {
                     String search = fluid.getLocalizedName(null);
                     searchFluids.add(new SearchEntry(search, search, new ElementFluid(fluid)));
                 }
             }
         }
 
-        public static void clear()
-        {
+        public static void clear() {
             searchFluids.clear();
             searchItems.clear();
         }
 
-        public static class SearchEntry
-        {
+        public static class SearchEntry {
             private String toolTip;
             private String advToolTip;
             private GuiEditMenuItem.Element element;
 
-            public SearchEntry(String searchString, String advSearchString, GuiEditMenuItem.Element element)
-            {
+            public SearchEntry(String searchString, String advSearchString, GuiEditMenuItem.Element element) {
                 this.toolTip = searchString;
                 this.advToolTip = advSearchString;
                 this.element = element;
             }
 
-            public void search(Pattern pattern, List<GuiEditMenuItem.Element> stackList, boolean advanced)
-            {
-                if (pattern.matcher(advanced? advToolTip : toolTip).find())
-                {
+            public void search(Pattern pattern, List<GuiEditMenuItem.Element> stackList, boolean advanced) {
+                if (pattern.matcher(advanced ? advToolTip : toolTip).find()) {
                     stackList.add(element);
                 }
             }
@@ -554,8 +539,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
     public static ThreadingHandler HANDLER = new ThreadingHandler();
 
-    public static class ThreadingHandler
-    {
+    public static class ThreadingHandler {
         private Map<GuiEditMenuItem, Search> handle = new LinkedHashMap<>();
 
         private ThreadingHandler() {
@@ -564,10 +548,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @SubscribeEvent
         public void renderEvent(RenderWorldLastEvent e) {
-            if (!handle.isEmpty())
-            {
-                for (Map.Entry<GuiEditMenuItem, Search> entry : handle.entrySet())
-                {
+            if (!handle.isEmpty()) {
+                for (Map.Entry<GuiEditMenuItem, Search> entry : handle.entrySet()) {
                     entry.getKey().searchItems = entry.getValue().elements;
                 }
                 handle.clear();

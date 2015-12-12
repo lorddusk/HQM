@@ -68,7 +68,7 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
     private static ItemStack selected;
 
-	private final EntityPlayer player;
+    private final EntityPlayer player;
     public final boolean isOpBook;
 
     private ScrollBar setScroll;
@@ -79,7 +79,9 @@ public class GuiQuestBook extends GuiBase {
     public ScrollBar reputationDisplayScroll;
     public ScrollBar reputationScroll;
     public ScrollBar reputationTierScroll;
-    private List<ScrollBar> scrollBars; {
+    private List<ScrollBar> scrollBars;
+
+    {
         scrollBars = new ArrayList<ScrollBar>();
         scrollBars.add(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
             @Override
@@ -105,14 +107,14 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS ;
+                return !isReputationPage && isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
             }
         });
 
         scrollBars.add(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && GroupTier.getTiers().size() > VISIBLE_TIERS ;
+                return !isReputationPage && isBagPage && selectedGroup == null && GroupTier.getTiers().size() > VISIBLE_TIERS;
             }
         });
 
@@ -126,14 +128,14 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputationList().size() > VISIBLE_REPUTATIONS ;
+                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputationList().size() > VISIBLE_REPUTATIONS;
             }
         });
 
         scrollBars.add(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputationList().size() > VISIBLE_DISPLAY_REPUTATIONS ;
+                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputationList().size() > VISIBLE_DISPLAY_REPUTATIONS;
             }
         });
     }
@@ -141,12 +143,13 @@ public class GuiQuestBook extends GuiBase {
 
     private TextBoxGroup.TextBox textBoxGroupAmount;
 
-    public TextBoxGroup.TextBox getTextBoxGroupAmount()
-    {
+    public TextBoxGroup.TextBox getTextBoxGroupAmount() {
         return textBoxGroupAmount;
     }
 
-    private TextBoxGroup textBoxes; {
+    private TextBoxGroup textBoxes;
+
+    {
         textBoxes = new TextBoxGroup();
         textBoxes.add(textBoxGroupAmount = new TextBoxGroup.TextBox(this, "0", 180, 30, false) {
             @Override
@@ -156,27 +159,27 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             protected void textChanged(GuiBase gui) {
-                try{
+                try {
                     int number;
                     if (getText().equals("")) {
                         number = 1;
-                    }else{
+                    } else {
                         number = Integer.parseInt(getText());
                     }
 
                     if (selectedGroup != null) {
                         selectedGroup.setLimit(number);
                     }
-                }catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
 
             }
         });
     }
 
-	private int tick;
+    private int tick;
 
-    public int getTick()
-    {
+    public int getTick() {
         return tick;
     }
 
@@ -191,7 +194,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     private GuiQuestBook(EntityPlayer player, boolean isOpBook) {
-		this.player = player;
+        this.player = player;
         this.isOpBook = isOpBook;
 
         if (Quest.isEditing) {
@@ -202,12 +205,13 @@ public class GuiQuestBook extends GuiBase {
             SoundHandler.triggerFirstLore();
             data.playedLore = true;
         }
-	}
+    }
 
     private FileHelper.SaveResult saveResult = null;
 
     private LargeButton saveButton;
     private List<LargeButton> buttons = new ArrayList<LargeButton>();
+
     {
         buttons.add(saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
             @Override
@@ -257,8 +261,7 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
                 int i = 0;
-                for (QuestSet set : Quest.getQuestSets())
-                {
+                for (QuestSet set : Quest.getQuestSets()) {
                     if (set.getName().startsWith("Unnamed set")) i++;
                 }
                 Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
@@ -364,24 +367,24 @@ public class GuiQuestBook extends GuiBase {
     }
 
     public static void displayGui(EntityPlayer player, boolean isOpBook) {
-		if (player != null) {
+        if (player != null) {
             if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook)) {
-			    Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
+                Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
             }
-		}
-	}
+        }
+    }
 
     private static final String FRONT_KEY = "hqm_front_texture";
-	private static final int TEXTURE_WIDTH = 170*2;
-	public static final int PAGE_WIDTH = 170;
-	private static final int TEXTURE_HEIGHT = 234;
-	
-	@Override
-	public void updateScreen() {
-		++tick;
-		
-		super.updateScreen();
-	}
+    private static final int TEXTURE_WIDTH = 170 * 2;
+    public static final int PAGE_WIDTH = 170;
+    private static final int TEXTURE_HEIGHT = 234;
+
+    @Override
+    public void updateScreen() {
+        ++tick;
+
+        super.updateScreen();
+    }
 
     //region pixel info for all the things
     public static final int VISIBLE_REPUTATION_TIERS = 9;
@@ -454,7 +457,7 @@ public class GuiQuestBook extends GuiBase {
 
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
 
-	@Override
+    @Override
     public void drawScreen(int x0, int y0, float f) {
         selected = null;
         left = (width - TEXTURE_WIDTH) / 2;
@@ -503,17 +506,17 @@ public class GuiQuestBook extends GuiBase {
 
             if (isMainPageOpen) {
                 drawMainPage();
-            }else if(isMenuPageOpen) {
+            } else if (isMenuPageOpen) {
                 drawMenuPage(x, y);
-            }else if (isBagPage) {
+            } else if (isBagPage) {
                 drawBagPage(x, y);
-            }else if(isReputationPage) {
+            } else if (isReputationPage) {
                 Reputation.drawEditPage(this, x, y);
-            }else if (selectedSet == null || !isSetOpened) {
+            } else if (selectedSet == null || !isSetOpened) {
                 QuestSet.drawOverview(this, setScroll, descriptionScroll, x, y);
-            }else if (selectedQuest == null)  {
-                    selectedSet.draw(this, x0, y0, x, y);
-            }else {
+            } else if (selectedQuest == null) {
+                selectedSet.draw(this, x0, y0, x, y);
+            } else {
                 selectedQuest.drawMenu(this, player, x, y);
             }
 
@@ -533,7 +536,7 @@ public class GuiQuestBook extends GuiBase {
                 GL11.glPopMatrix();
             }
 
-        }else {
+        } else {
             editMenu.draw(this, x, y);
             editMenu.drawMouseOver(this, x, y);
         }
@@ -552,7 +555,7 @@ public class GuiQuestBook extends GuiBase {
                     str += saveResult.getText();
 
                     drawMouseOver(getLinesFromText(str, 1F, 130), x + left, y + top);
-                }else{
+                } else {
                     saveResult = null;
                 }
             }
@@ -560,16 +563,16 @@ public class GuiQuestBook extends GuiBase {
 
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.goBack") + "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.rightClick"), x + left, y + top);
-        }else if(shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.backToMenu"), x + left, y + top);
         }
-     }
+    }
 
     private void drawBagPage(int x, int y) {
         if (selectedGroup != null) {
             selectedGroup.draw(this, x, y);
             textBoxes.draw(this);
-        }else{
+        } else {
             Group.drawOverview(this, tierScroll, groupScroll, x, y);
         }
     }
@@ -580,7 +583,7 @@ public class GuiQuestBook extends GuiBase {
         drawString(Translator.translate("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
         drawString(Translator.translate("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
 
-        QuestSet.drawQuestInfo(this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int)(TEXT_HEIGHT * 1.5F));
+        QuestSet.drawQuestInfo(this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
         drawString(Translator.translate("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
 
         if (QuestingData.isHardcoreActive()) {
@@ -596,7 +599,7 @@ public class GuiQuestBook extends GuiBase {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X;
                 count = lives;
                 spacing = INFO_HEARTS_SPACING;
-            }else{
+            } else {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X + 20;
                 count = 3;
                 spacing = 3;
@@ -606,7 +609,7 @@ public class GuiQuestBook extends GuiBase {
             for (int i = 0; i < count; i++) {
                 drawItem(new ItemStack(ModItems.hearts, 1, 3), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
             }
-        }else{
+        } else {
             drawString(getLinesFromText(Translator.translate("hqm.questBook.infiniteLives"), 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
         }
 
@@ -622,10 +625,10 @@ public class GuiQuestBook extends GuiBase {
             int invites = team.getInvites() == null ? 0 : team.getInvites().size();
             if (invites > 0) {
                 str = Translator.translate(invites != 1, "hqm.questBook.invites", invites);
-            }else{
+            } else {
                 str = Translator.translate("hqm.questBook.notInParty");
             }
-        }else{
+        } else {
             int players = 0;
             for (Team.PlayerEntry player : team.getPlayers()) {
                 if (player.isInTeam()) {
@@ -661,10 +664,10 @@ public class GuiQuestBook extends GuiBase {
                     BufferedImage img = ImageIO.read(file);
                     DynamicTexture dm = new DynamicTexture(img);
                     QuestLine.getActiveQuestLine().front = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(FRONT_KEY, dm);
-                }catch (IOException ignored) {
+                } catch (IOException ignored) {
                     QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
                 }
-            }else{
+            } else {
                 QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
             }
         }
@@ -687,9 +690,9 @@ public class GuiQuestBook extends GuiBase {
         if (scroll != 0) {
             if (editMenu != null) {
                 editMenu.onScroll(this, x, y, scroll);
-            }else if (selectedQuest != null) {
+            } else if (selectedQuest != null) {
                 selectedQuest.onScroll(this, x, y, scroll);
-            }else{
+            } else {
                 for (ScrollBar scrollBar : scrollBars) {
                     scrollBar.onScroll(this, x, y, scroll);
                 }
@@ -702,7 +705,7 @@ public class GuiQuestBook extends GuiBase {
         super.keyTyped(c, k);
         if (editMenu != null) {
             editMenu.onKeyTyped(this, c, k);
-        } else if(isBagPage && selectedGroup != null) {
+        } else if (isBagPage && selectedGroup != null) {
             textBoxes.onKeyStroke(this, c, k);
         } else if (KeyboardHandler.pressedHotkey(this, k, getButtons())) {
             onButtonClicked();
@@ -711,36 +714,30 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
-    private boolean isNEIActive()
-    {
+    private boolean isNEIActive() {
         return isNEIActive;
     }
 
-    public static void setSelected(ItemStack stack)
-    {
+    public static void setSelected(ItemStack stack) {
         selected = stack;
     }
 
-    private void handleNEI(int k)
-    {
+    private void handleNEI(int k) {
         ItemStack stackover = selected;
-        if(stackover != null)
-        {
-            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey()))
-            {
+        if (stackover != null) {
+            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey())) {
                 GuiUsageRecipe.openRecipeGui("item", stackover.copy());
             }
 
-            if (k == NEIClientConfig.getKeyBinding("gui.recipe"))
-            {
+            if (k == NEIClientConfig.getKeyBinding("gui.recipe")) {
                 GuiCraftingRecipe.openRecipeGui("item", stackover.copy());
             }
         }
     }
 
     @Override
-	protected void mouseClicked(int x0, int y0, int button) {
-		super.mouseClicked(x0, y0, button);
+    protected void mouseClicked(int x0, int y0, int button) {
+        super.mouseClicked(x0, y0, button);
 
         int x = x0 - left;
         int y = y0 - top;
@@ -752,7 +749,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu.close(this);
                 return;
             }
-        }else if(shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
             isMenuPageOpen = true;
             if (editMenu != null) {
                 editMenu.save(this);
@@ -789,41 +786,40 @@ public class GuiQuestBook extends GuiBase {
 
             if (isMainPageOpen) {
                 mainPageMouseClicked(x, y);
-            }else if(isMenuPageOpen) {
+            } else if (isMenuPageOpen) {
                 menuPageMouseClicked(button, x, y);
-            }else if (isBagPage) {
+            } else if (isBagPage) {
                 bagPageMouseClicked(button, x, y);
-            }else if(isReputationPage) {
+            } else if (isReputationPage) {
                 if (button == 1) {
                     isMenuPageOpen = true;
                     isReputationPage = false;
-                }else {
+                } else {
                     Reputation.onClick(this, x, y, player);
                 }
-            }else if (selectedSet == null || !isSetOpened) {
+            } else if (selectedSet == null || !isSetOpened) {
                 if (button == 1) {
                     isMenuPageOpen = true;
                     return;
                 }
                 QuestSet.mouseClickedOverview(this, setScroll, x, y);
-            }else {
+            } else {
                 if (selectedQuest == null) {
                     if (button == 1) {
                         isSetOpened = false;
-                    }else {
+                    } else {
                         selectedSet.mouseClicked(this, x, y);
                     }
-                }else {
+                } else {
                     selectedQuest.onClick(this, player, x, y, button);
                 }
             }
-        }else {
+        } else {
             editMenu.onClick(this, x, y, button);
         }
     }
 
-    public void goBack()
-    {
+    public void goBack() {
         if (isMenuPageOpen) {
             isMainPageOpen = true;
         } else if (isBagPage) {
@@ -845,7 +841,7 @@ public class GuiQuestBook extends GuiBase {
             currentMode = EditMode.NORMAL;
             isBagPage = true;
             isMenuPageOpen = false;
-        }else if(currentMode == EditMode.REPUTATION) {
+        } else if (currentMode == EditMode.REPUTATION) {
             currentMode = EditMode.NORMAL;
             isReputationPage = true;
             isMenuPageOpen = false;
@@ -856,15 +852,15 @@ public class GuiQuestBook extends GuiBase {
         if (selectedGroup != null) {
             if (button == 1) {
                 selectedGroup = null;
-            }else{
+            } else {
                 selectedGroup.mouseClicked(this, x, y);
                 textBoxes.onClick(this, x, y);
             }
-        }else{
+        } else {
             if (button == 1) {
                 isBagPage = false;
                 isMenuPageOpen = true;
-            }else{
+            } else {
                 Group.mouseClickedOverview(this, groupScroll, x, y);
                 GroupTier.mouseClickedOverview(this, tierScroll, x, y);
             }
@@ -873,14 +869,14 @@ public class GuiQuestBook extends GuiBase {
     }
 
     private void menuPageMouseClicked(int button, int x, int y) {
-        if(button == 1) {
+        if (button == 1) {
             isMainPageOpen = true;
-        }else{
-            if(inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
-                editMenu = new GuiEditMenuTeam(this , player);
-            }else if(inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+        } else {
+            if (inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+                editMenu = new GuiEditMenuTeam(this, player);
+            } else if (inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuDeath(this, player);
-            }else if(inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int)(TEXT_HEIGHT * 0.7F), x, y)) {
+            } else if (inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 isMenuPageOpen = false;
             }
         }
@@ -890,12 +886,12 @@ public class GuiQuestBook extends GuiBase {
         if (x > 0 && x < PAGE_WIDTH && y > 205) {
             isMainPageOpen = false;
             SoundHandler.stopLoreMusic();
-        }else if(x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
+        } else if (x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
             if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
                 SoundHandler.playLoreMusic();
             }
-        }else{
-            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int)(VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
+        } else {
+            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuTextEditor(this, player);
             }
         }
@@ -915,9 +911,9 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
-        }else if (selectedQuest != null) {
+        } else if (selectedQuest != null) {
             selectedQuest.onRelease(this, player, x, y, button);
-        }else{
+        } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
             }
@@ -934,9 +930,9 @@ public class GuiQuestBook extends GuiBase {
         updatePosition(x, y);
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
-        }else if (selectedQuest != null) {
+        } else if (selectedQuest != null) {
             selectedQuest.onDrag(this, player, x, y, button);
-        }else{
+        } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);
             }
@@ -954,17 +950,16 @@ public class GuiQuestBook extends GuiBase {
                 modifyingQuest.setGuiCenterX(x);
                 modifyingQuest.setGuiCenterY(y);
             }
-            if (modifyingBar != null)
-            {
+            if (modifyingBar != null) {
                 modifyingBar.moveTo(x, y);
             }
         }
     }
 
     @Override
-	public boolean doesGuiPauseGame() {
-		return false;
-	}
+    public boolean doesGuiPauseGame() {
+        return false;
+    }
 
     public void loadMap() {
         selectedQuest = null;
@@ -977,8 +972,7 @@ public class GuiQuestBook extends GuiBase {
         return currentMode;
     }
 
-    public void setCurrentMode(EditMode mode)
-    {
+    public void setCurrentMode(EditMode mode) {
         currentMode = mode;
     }
 
@@ -1013,7 +1007,7 @@ public class GuiQuestBook extends GuiBase {
     private boolean inArrowBounds(boolean isMenuArrow, int mX, int mY) {
         if (isMenuArrow) {
             return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
-        }else{
+        } else {
             return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
         }
     }

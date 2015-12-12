@@ -26,8 +26,8 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public void onLivingDeath(LivingDeathEvent event) {
         EntityPlayer killer = QuestTaskMob.getKiller(event);
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(event.entityLiving)) {
-            if (event.entityLiving instanceof EntityPlayer && isPlayerInRange((EntityPlayer)event.entityLiving)) {
-                QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill)getData(killer);
+            if (event.entityLiving instanceof EntityPlayer && isPlayerInRange((EntityPlayer) event.entityLiving)) {
+                QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill) getData(killer);
                 if (killData.kills < kills) {
                     killData.kills += 1;
 
@@ -50,14 +50,14 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public void write(DataWriter dw, QuestDataTask task, boolean light) {
         super.write(dw, task, light);
 
-        dw.writeData(((QuestDataTaskReputationKill)task).kills, DataBitHelper.DEATHS);
+        dw.writeData(((QuestDataTaskReputationKill) task).kills, DataBitHelper.DEATHS);
     }
 
     @Override
     public void read(DataReader dr, QuestDataTask task, FileVersion version, boolean light) {
         super.read(dr, task, version, light);
 
-        ((QuestDataTaskReputationKill)task).kills = dr.readData(DataBitHelper.DEATHS);
+        ((QuestDataTaskReputationKill) task).kills = dr.readData(DataBitHelper.DEATHS);
     }
 
     @Override
@@ -76,10 +76,10 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     @Override
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         super.draw(gui, player, mX, mY);
-        int killCount = ((QuestDataTaskReputationKill)getData(player)).kills;
+        int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
         if (Quest.isEditing) {
             gui.drawString(gui.getLinesFromText(Translator.translate(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
-        }else{
+        } else {
             gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }
     }
@@ -91,14 +91,14 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
 
     @Override
     public float getCompletedRatio(String playerName) {
-        return (float)((QuestDataTaskReputationKill)getData(playerName)).kills / kills;
+        return (float) ((QuestDataTaskReputationKill) getData(playerName)).kills / kills;
     }
 
     @Override
     public void mergeProgress(String playerName, QuestDataTask own, QuestDataTask other) {
-        ((QuestDataTaskReputationKill)own).kills = Math.max(((QuestDataTaskReputationKill)own).kills, ((QuestDataTaskReputationKill)other).kills);
+        ((QuestDataTaskReputationKill) own).kills = Math.max(((QuestDataTaskReputationKill) own).kills, ((QuestDataTaskReputationKill) other).kills);
 
-        if (((QuestDataTaskReputationKill)own).kills == kills) {
+        if (((QuestDataTaskReputationKill) own).kills == kills) {
             completeTask(playerName);
         }
     }
@@ -107,12 +107,12 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
 
-        ((QuestDataTaskReputationKill)own).kills = ((QuestDataTaskReputationKill)other).kills;
+        ((QuestDataTaskReputationKill) own).kills = ((QuestDataTaskReputationKill) other).kills;
     }
 
     @Override
     public void autoComplete(String playerName) {
-        kills = ((QuestDataTaskReputationKill)getData(playerName)).kills;
+        kills = ((QuestDataTaskReputationKill) getData(playerName)).kills;
     }
 
     @Override

@@ -5,16 +5,13 @@ import hardcorequesting.items.ItemQuestBook;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class CommandEdit extends CommandBase
-{
-    public CommandEdit()
-    {
+public class CommandEdit extends CommandBase {
+    public CommandEdit() {
         super("edit");
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments)
-    {
+    public void handleCommand(ICommandSender sender, String[] arguments) {
         if (sender instanceof EntityPlayer && isPlayerOp(sender)) {
             EntityPlayer player = (EntityPlayer) sender;
 

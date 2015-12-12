@@ -21,16 +21,16 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 version = "4.4.4"
-group= "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "HQM-The Journey"
 
 minecraft {
     version = "10.13.4.1448-1.7.10"
     runDir = "eclipse/assets"
 
-	//replacing stuff in code.
-	replace "@VERSION@", project.version
-	replaceIn "ModInformation.java"
+    //replacing stuff in code.
+    replace "@VERSION@", project.version
+    replaceIn "ModInformation.java"
 }
 
 def root = project.projectDir.parentFile
@@ -46,21 +46,21 @@ sourceSets {
 }
 
 processResources
-{
-	inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+        {
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
 
-    // replace stuff in text files, not binary ones.
-    from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
+            // replace stuff in text files, not binary ones.
+            from(sourceSets.main.resources.srcDirs) {
+                include '**/*.info'
+                expand 'version': project.version, 'mcversion': project.minecraft.version
+            }
 
-    // copy everything else, thats not text
-    from(sourceSets.main.resources.srcDirs) {
-		exclude '**/*.info'
-	}
-}
+            // copy everything else, thats not text
+            from(sourceSets.main.resources.srcDirs) {
+                exclude '**/*.info'
+            }
+        }
 
 jar {
     exclude "**/*.psd"

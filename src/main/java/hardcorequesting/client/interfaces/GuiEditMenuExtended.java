@@ -58,15 +58,16 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         @Override
         protected void textChanged(GuiBase gui) {
             if (loaded) {
-                try{
+                try {
                     int number;
                     if (getText().equals("")) {
                         number = 1;
-                    }else{
+                    } else {
                         number = Integer.parseInt(getText());
                     }
                     setValue(number);
-                }catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -78,6 +79,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         }
 
         protected abstract int getValue();
+
         protected abstract void setValue(int number);
     }
 
@@ -97,7 +99,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         super.draw(gui, mX, mY);
 
 
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
         GL11.glColor4f(1F, 1F, 1F, 1F);
         if (isArrowVisible()) {
@@ -137,7 +139,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
             if (inArrowBounds(gui, mX, mY, true)) {
                 onArrowClick(true);
                 clicked = true;
-            }else if (inArrowBounds(gui, mX, mY, false)) {
+            } else if (inArrowBounds(gui, mX, mY, false)) {
                 onArrowClick(false);
                 clicked = true;
             }
@@ -161,6 +163,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
 
     protected abstract void onArrowClick(boolean left);
+
     protected abstract String getArrowText();
+
     protected abstract String getArrowDescription();
 }

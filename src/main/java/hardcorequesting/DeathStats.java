@@ -27,8 +27,7 @@ public class DeathStats {
         this.name = name;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return Translator.translate(name);
     }
 
@@ -55,6 +54,7 @@ public class DeathStats {
     }
 
     private int totalDeaths = -1;
+
     public int getTotalDeaths() {
         if (totalDeaths == -1) {
             totalDeaths = 0;
@@ -83,9 +83,6 @@ public class DeathStats {
     }
 
 
-
-
-
     public static void load(QuestingData questingData, DataReader dr, boolean light) {
         if (light) {
             clientDeaths = new HashMap<String, DeathStats>();
@@ -97,7 +94,7 @@ public class DeathStats {
                 clientDeaths.put(name, stats);
             }
             updateClientDeathList();
-        }else{
+        } else {
             questingData.getDeathStat().load(dr);
         }
     }
@@ -109,7 +106,7 @@ public class DeathStats {
                 dw.writeString(q.getName(), DataBitHelper.NAME_LENGTH);
                 q.getDeathStat().save(dw);
             }
-        }else{
+        } else {
             questingData.getDeathStat().save(dw);
         }
     }
@@ -132,20 +129,22 @@ public class DeathStats {
         @Override
         public int compare(DeathStats o1, DeathStats o2) {
             if (id == -1) {
-                return ((Integer)o2.getTotalDeaths()).compareTo(o1.getTotalDeaths());
-            }else{
-                return ((Integer)o2.getDeaths(id)).compareTo(o1.getDeaths(id));
+                return ((Integer) o2.getTotalDeaths()).compareTo(o1.getTotalDeaths());
+            } else {
+                return ((Integer) o2.getDeaths(id)).compareTo(o1.getDeaths(id));
             }
         }
     }
 
     private static final DeathComparator deathComparator = new DeathComparator(-1);
     private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
+
     static {
         for (int i = 0; i < deathTypeComparator.length; i++) {
             deathTypeComparator[i] = new DeathComparator(i);
         }
     }
+
     private static void updateClientDeathList() {
         clientDeathList = new DeathStats[clientDeaths.size()];
         int id = 0;
@@ -172,6 +171,7 @@ public class DeathStats {
         private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
         private String[] messages = new String[DeathType.values().length];
+
         private DeathStatsBest() {
             super("hqm.deathStat.worstPlayers");
             for (int i = 0; i < messages.length; i++) {
@@ -179,11 +179,11 @@ public class DeathStats {
                 deaths[i] = clientDeathList[0].getDeaths(i);
                 if (clientDeathList[0].getDeaths(i) == 0) {
                     messages[i] = GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied");
-                }else{
+                } else {
                     messages[i] = "";
                     int currentValue = 0;
                     int standing = 0;
-                    for (int j = 0; j < clientDeathList.length; j++)   {
+                    for (int j = 0; j < clientDeathList.length; j++) {
                         int value = clientDeathList[j].getDeaths(i);
                         if (value < currentValue) {
                             standing = j;
@@ -211,6 +211,7 @@ public class DeathStats {
 
     private static class DeathStatsTotal extends DeathStats {
         private int[] count = new int[DeathType.values().length];
+
         private DeathStatsTotal() {
             super("hqm.deathStat.everyone");
             for (int i = 0; i < count.length; i++) {

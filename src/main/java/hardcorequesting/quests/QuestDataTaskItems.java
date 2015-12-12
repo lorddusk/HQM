@@ -6,6 +6,6 @@ public class QuestDataTaskItems extends QuestDataTask {
 
     public QuestDataTaskItems(QuestTask task) {
         super(task);
-        this.progress = new int[((QuestTaskItems)task).items.length];
+        this.progress = new int[((QuestTaskItems) task).items.length];
     }
 }

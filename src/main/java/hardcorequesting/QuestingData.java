@@ -36,7 +36,7 @@ public class QuestingData {
 
     private Team team;
     private int lives;
-	private String name;
+    private String name;
     private List<GroupData> groupData;
     public int selectedQuest = -1;
     public int selectedTask = -1;
@@ -59,14 +59,13 @@ public class QuestingData {
     }
 
     private QuestingData(String name) {
-		this.lives = defaultLives;
-		this.name = name;
+        this.lives = defaultLives;
+        this.name = name;
         this.team = new Team(name);
         createGroupData();
         deathStat = new DeathStats(name);
-		data.put(name, this);
-	}
-
+        data.put(name, this);
+    }
 
 
     private void createGroupData() {
@@ -82,17 +81,17 @@ public class QuestingData {
         for (int i = start; i <= id; i++) {
             if (Group.getGroup(i) != null) {
                 groupData.add(i, new GroupData());
-            }else{
+            } else {
                 groupData.add(i, null);
             }
         }
     }
 
-	public int getLives() {
+    public int getLives() {
         boolean shareLives = getTeam().isSharingLives();
         if (shareLives) {
             return getTeam().getSharedLives();
-        }else{
+        } else {
             return getRawLives();
         }
     }
@@ -101,15 +100,15 @@ public class QuestingData {
         boolean shareLives = getTeam().isSharingLives();
         if (shareLives) {
             return getTeam().getPlayerCount();
-        }else{
+        } else {
             return 1;
         }
     }
 
-	public int getRawLives() {
+    public int getRawLives() {
         return lives;
     }
-	
+
     public QuestData getQuestData(int id) {
         return getTeam().getQuestData(id);
     }
@@ -123,19 +122,19 @@ public class QuestingData {
         return groupData.get(id);
     }
 
-	public int addLives(EntityPlayer player, int amount) {
-		int max = ModConfig.MAXLIVES;
-		int i = getRawLives() + amount;
-		
-		if(i <= max){
-			this.lives = i;
-		}else {
-			this.lives = max;
-		}
+    public int addLives(EntityPlayer player, int amount) {
+        int max = ModConfig.MAXLIVES;
+        int i = getRawLives() + amount;
+
+        if (i <= max) {
+            this.lives = i;
+        } else {
+            this.lives = max;
+        }
 
         getTeam().refreshTeamLives();
         return this.lives;
-	}
+    }
 
     public void removeLifeAndSendMessage(EntityPlayer player) {
         boolean isDead = !removeLives(player, 1);
@@ -156,7 +155,7 @@ public class QuestingData {
 
     }
 
-	public boolean removeLives(EntityPlayer player, int amount) {
+    public boolean removeLives(EntityPlayer player, int amount) {
         boolean shareLives = getTeam().isSharingLives();
 
         if (shareLives) {
@@ -173,8 +172,8 @@ public class QuestingData {
                 }
                 if (players == 0) {
                     break;
-                }else{
-                    int id = (int)(Math.random() * players);
+                } else {
+                    int id = (int) (Math.random() * players);
                     for (Team.PlayerEntry entry : QuestingData.getQuestingData(player).getTeam().getPlayers()) {
                         if (!entry.getName().equals(getUserName(player)) && QuestingData.getQuestingData(entry.getName()).getRawLives() > 1) {
                             if (id == 0) {
@@ -189,8 +188,8 @@ public class QuestingData {
             }
 
             this.lives -= amount;
-        }else{
-		    this.lives = getRawLives() - amount;
+        } else {
+            this.lives = getRawLives() - amount;
         }
 
         getTeam().refreshTeamLives();
@@ -201,40 +200,41 @@ public class QuestingData {
             }
 
             return true;
-        }finally {
+        } finally {
             TeamStats.refreshTeam(team);
         }
     }
 
-	public void die(EntityPlayer player) {
-		if (!QuestingData.isHardcoreActive()) return;
+    public void die(EntityPlayer player) {
+        if (!QuestingData.isHardcoreActive()) return;
 
         removeLifeAndSendMessage(player);
-	}
+    }
 
 
-	/**
-	 * Deletes the world or bans the player from the server. This is handled on the server side
-	 * @param playerEntity The player that should be banned
-	 */
-	private void outOfLives(EntityPlayer playerEntity) {
+    /**
+     * Deletes the world or bans the player from the server. This is handled on the server side
+     *
+     * @param playerEntity The player that should be banned
+     */
+    private void outOfLives(EntityPlayer playerEntity) {
         QuestingData data = QuestingData.getQuestingData(playerEntity);
         Team team = data.getTeam();
         if (!team.isSingle() && !teams.isEmpty()) {
             team.removePlayer(QuestingData.getUserName(playerEntity));
             if (team.getPlayerCount() == 0) {
                 team.deleteTeam();
-            }else{
+            } else {
                 team.refreshTeamData(Team.UpdateType.ALL);
             }
         }
 
         playerEntity.inventory.clearInventory(null, -1); //had some problem with tconstruct, clear all items to prevent it
 
-		MinecraftServer mcServer = MinecraftServer.getServer();
+        MinecraftServer mcServer = MinecraftServer.getServer();
 
-		if (mcServer.isSinglePlayer() && playerEntity.getCommandSenderName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
+        if (mcServer.isSinglePlayer() && playerEntity.getCommandSenderName().equals(mcServer.getServerOwner())) {
+            ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
             mcServer.getActiveAnvilConverter().flushCache();
@@ -243,20 +243,20 @@ public class QuestingData {
             mcServer.initiateShutdown();*/
             mcServer.deleteWorldAndStopServer();
 
-		}else{
+        } else {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";
 
-            UserListBansEntry userlistbansentry = new UserListBansEntry(playerEntity.getGameProfile(), (Date)null, setBannedBy, (Date)null, setBanReason);
+            UserListBansEntry userlistbansentry = new UserListBansEntry(playerEntity.getGameProfile(), (Date) null, setBannedBy, (Date) null, setBanReason);
             mcServer.getConfigurationManager().func_152608_h().func_152687_a(userlistbansentry);
 
-			//mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((EntityPlayerMP)playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
+            //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
+            ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
-		}
+        }
 
 
-	}
+    }
 
     //keep all the red line code in one spot
     public static boolean isSinglePlayer() {
@@ -264,18 +264,18 @@ public class QuestingData {
     }
 
 
-	private static boolean hardcoreActive;
+    private static boolean hardcoreActive;
     private static boolean questActive;
-   // private static boolean debugActive = false;
-	public static int defaultLives;
+    // private static boolean debugActive = false;
+    public static int defaultLives;
 
    /* public static boolean isDebugActive() {
         return debugActive;
     }*/
 
-	public static boolean isHardcoreActive() {
-		return hardcoreActive;
-	}
+    public static boolean isHardcoreActive() {
+        return hardcoreActive;
+    }
 
     public static boolean isQuestActive() {
         return questActive;
@@ -291,18 +291,18 @@ public class QuestingData {
             debugActive = false;
     }*/
 
-	public static void activateHardcore() {
+    public static void activateHardcore() {
         if (!hardcoreActive && !MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-			hardcoreActive = true;
-		}
-	}
+            hardcoreActive = true;
+        }
+    }
 
     public static void disableHardcore() {
         hardcoreActive = false;
     }
 
-    public static void activateQuest(){
-        if(!questActive) {
+    public static void activateQuest() {
+        if (!questActive) {
             questActive = true;
             for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
                 if (name != null) {
@@ -317,21 +317,20 @@ public class QuestingData {
     }
 
 
-	
-	public static void deactivate() {
-		if (hardcoreActive || questActive /*|| debugActive*/) {
+    public static void deactivate() {
+        if (hardcoreActive || questActive /*|| debugActive*/) {
             PacketHandler.reset();
-			hardcoreActive = false;
+            hardcoreActive = false;
             questActive = false;
             //debugActive = false;
-			data = new HashMap<String, QuestingData>();
+            data = new HashMap<String, QuestingData>();
             teams = new ArrayList<Team>();
-		}
-	}
+        }
+    }
 
-	private static HashMap<String, QuestingData> data = new HashMap<String, QuestingData>();
+    private static HashMap<String, QuestingData> data = new HashMap<String, QuestingData>();
     private static List<Team> teams = new ArrayList<Team>();
-	public static boolean autoHardcoreActivate;
+    public static boolean autoHardcoreActivate;
     public static boolean autoQuestActivate;
 
 
@@ -353,8 +352,8 @@ public class QuestingData {
     }
 
     public static QuestingData getQuestingData(EntityPlayer player) {
-		return getQuestingData(getUserName(player));
-	}
+        return getQuestingData(getUserName(player));
+    }
 
     public static String getUserName(EntityPlayer player) {
         String name = player.getGameProfile().getName();
@@ -372,12 +371,12 @@ public class QuestingData {
     }
 
 
-	/**
-	 *  =============== SAVING/LOADING CODE ===============
-	 */
+    /**
+     * =============== SAVING/LOADING CODE ===============
+     */
 
 	/* This is saved as a header of the file and read again when it's loaded. This is used when it loads again so 
-	 * we can load it differently depending on the version. The version should manually increase if we change the
+     * we can load it differently depending on the version. The version should manually increase if we change the
 	 * way things are saved. This includes if we add extra things that has to be saved. If we can't treat different
 	 * versions differently then files from old version (i.e. from before the user updated the mod) will count as
 	 * corrupted since they can't be read. The version is sent as a parameter to the load constructor of the class.
@@ -396,7 +395,7 @@ public class QuestingData {
 	 * 
 	 * If you have any questions about the file version I'll be happy to answer them /Vswe
 	 */
-	public static final FileVersion FILE_VERSION = FileVersion.values()[FileVersion.values().length - 1];
+    public static final FileVersion FILE_VERSION = FileVersion.values()[FileVersion.values().length - 1];
 
     private static final FileHelper FILE_HELPER = new FileHelper() {
         @Override
@@ -410,16 +409,17 @@ public class QuestingData {
         }
     };
 
-	private static final String path = "HardcoreQuesting/players.dat";
+    private static final String path = "HardcoreQuesting/players.dat";
 
-	/**
-	 * Loads all the Questing Data
-	 * @param worldPath The path of the World's save path
-	 */
-	public static void load(File worldPath, WorldServer world) {
-		File file = new File(worldPath, path);
+    /**
+     * Loads all the Questing Data
+     *
+     * @param worldPath The path of the World's save path
+     */
+    public static void load(File worldPath, WorldServer world) {
+        File file = new File(worldPath, path);
         deactivate();
-		if (!file.exists()) {
+        if (!file.exists()) {
             if (world.getWorldInfo().getWorldTotalTime() == 0) {
                 if (autoHardcoreActivate) {
                     activateHardcore();
@@ -429,34 +429,33 @@ public class QuestingData {
                 }
             }
 
-			return;
-		}
+            return;
+        }
 
-		data.clear();
+        data.clear();
         teams.clear();
 
         FILE_HELPER.loadData(file);
 
-	}
+    }
 
-	/**
-	 * Saves all the QuestingData
-	 * @param worldPath The path of the World's save path
-	 */
-	public static void save(File worldPath, WorldServer world) {
-		if (!(isHardcoreActive() || isQuestActive()) || Quest.isEditing) {
-			return;
-		}
+    /**
+     * Saves all the QuestingData
+     *
+     * @param worldPath The path of the World's save path
+     */
+    public static void save(File worldPath, WorldServer world) {
+        if (!(isHardcoreActive() || isQuestActive()) || Quest.isEditing) {
+            return;
+        }
 
-		File file = new File(worldPath, path);
+        File file = new File(worldPath, path);
 
         FILE_HELPER.saveData(file);
-	}
+    }
 
 
-
-
-	public static void saveAllData(DataWriter dw){
+    public static void saveAllData(DataWriter dw) {
         dw.writeBoolean(isHardcoreActive());
         dw.writeBoolean(isQuestActive());
 
@@ -466,11 +465,11 @@ public class QuestingData {
         }
 
         dw.writeData(data.values().size(), DataBitHelper.PLAYERS);
-        for(QuestingData d : data.values()) {
+        for (QuestingData d : data.values()) {
             dw.writeString(d.name, DataBitHelper.NAME_LENGTH);
             d.saveData(dw, false);
         }
-	}
+    }
 
     public static void readAllData(DataReader dr, FileVersion version) {
         if (version.lacks(FileVersion.SETS)) {
@@ -479,10 +478,10 @@ public class QuestingData {
         }
 
         if (version.lacks(FileVersion.QUESTS)) {
-            while(dr.doesUnderlyingStreamHasMoreThanAByteOfData()) {
+            while (dr.doesUnderlyingStreamHasMoreThanAByteOfData()) {
                 new QuestingData(version, dr);
             }
-        }else{
+        } else {
             if (dr.readBoolean()) {
                 activateHardcore();
             }
@@ -507,20 +506,21 @@ public class QuestingData {
 
     }
 
-	/**
-	 * Creates a new QuestingData from the given DataInputStream with the given version
-	 * @param version The FILE_VERSION that the data is from
-	 */
-	private QuestingData(FileVersion version, DataReader dr) {
-        this.name  = dr.readString(version.lacks(FileVersion.QUESTS) ? DataBitHelper.BYTE : DataBitHelper.NAME_LENGTH);
+    /**
+     * Creates a new QuestingData from the given DataInputStream with the given version
+     *
+     * @param version The FILE_VERSION that the data is from
+     */
+    private QuestingData(FileVersion version, DataReader dr) {
+        this.name = dr.readString(version.lacks(FileVersion.QUESTS) ? DataBitHelper.BYTE : DataBitHelper.NAME_LENGTH);
 
         deathStat = new DeathStats(name);
         createGroupData();
-		loadData(version, dr, version.lacks(FileVersion.SETS));
+        loadData(version, dr, version.lacks(FileVersion.SETS));
 
-		if (!data.containsKey(name)) {
-			data.put(name, this);
-		}
+        if (!data.containsKey(name)) {
+            data.put(name, this);
+        }
         team.postRead(this, version);
 
         //When filling in data for a player on a team, we sometimes follow a codepath that causes us to attempt to
@@ -533,25 +533,24 @@ public class QuestingData {
         //This can be avoided by checking the database after loading a player & removing dummy teammates.  It should
         //probably be avoided by dropping a nuke on the code responsible, but you gotta do what ya gotta do.
         for (Object teammateObj : team.getPlayers()) {
-            Team.PlayerEntry teammate = (Team.PlayerEntry)teammateObj;
+            Team.PlayerEntry teammate = (Team.PlayerEntry) teammateObj;
 
             if (!teammate.isInTeam())
                 continue;
 
             String name = teammate.getName();
             if (QuestingData.data.containsKey(name)) {
-                QuestingData teammatePlayer = (QuestingData)QuestingData.data.get(name);
+                QuestingData teammatePlayer = (QuestingData) QuestingData.data.get(name);
                 if (teammatePlayer.getTeam().getId() != team.getId())
                     QuestingData.data.remove(name);
             }
         }
-	}
+    }
 
 
-	
-	private void saveData(DataWriter dw, boolean light){
+    private void saveData(DataWriter dw, boolean light) {
         if (isHardcoreActive()) {
-		    dw.writeData(this.lives, DataBitHelper.LIVES);
+            dw.writeData(this.lives, DataBitHelper.LIVES);
         }
 
         if (isQuestActive()) {
@@ -561,7 +560,7 @@ public class QuestingData {
                 dw.writeBoolean(true);
                 dw.writeData(selectedQuest, DataBitHelper.QUESTS);
                 dw.writeData(selectedTask, DataBitHelper.TASKS);
-            }else{
+            } else {
                 dw.writeBoolean(false);
             }
 
@@ -571,7 +570,7 @@ public class QuestingData {
             if (team.isSingle() || light) {
                 dw.writeBoolean(true);
                 team.saveData(dw, light);
-            }else{
+            } else {
                 dw.writeBoolean(false);
                 dw.writeData(team.getId(), DataBitHelper.TEAMS);
             }
@@ -599,19 +598,19 @@ public class QuestingData {
             TeamStats.save(dw);
         }
     }
-	
-	private void loadData(FileVersion version, DataReader dr, boolean light) {
+
+    private void loadData(FileVersion version, DataReader dr, boolean light) {
         if (isHardcoreActive()) {
-		    this.lives = dr.readData(DataBitHelper.LIVES);
-        }else{
+            this.lives = dr.readData(DataBitHelper.LIVES);
+        } else {
             this.lives = defaultLives;
         }
 
-		if (isQuestActive() && version.contains(FileVersion.QUESTS)) {
+        if (isQuestActive() && version.contains(FileVersion.QUESTS)) {
             if (version.contains(FileVersion.REPEATABLE_QUESTS)) {
                 if (light) {
                     Quest.clientTicker.load(dr);
-                }else{
+                } else {
                     Quest.serverTicker.load(dr);
                 }
             }
@@ -619,7 +618,7 @@ public class QuestingData {
             if (dr.readBoolean()) {
                 selectedQuest = dr.readData(DataBitHelper.QUESTS);
                 selectedTask = dr.readData(DataBitHelper.TASKS);
-            }else{
+            } else {
                 selectedQuest = -1;
                 selectedTask = -1;
             }
@@ -632,7 +631,7 @@ public class QuestingData {
             if (version.lacks(FileVersion.TEAMS) || dr.readBoolean()) {
                 team = new Team(getName());
                 team.loadData(version, dr, light);
-            }else{
+            } else {
                 team = teams.get(dr.readData(DataBitHelper.TEAMS));
             }
 
@@ -657,7 +656,7 @@ public class QuestingData {
         if (light) {
             TeamStats.load(dr);
         }
-	}
+    }
 
     private void sendDataToClient(DataWriter dw, String playerName) {
         dw.writeBoolean(isHardcoreActive());
@@ -667,7 +666,7 @@ public class QuestingData {
         PacketHandler.sendToPlayer(playerName, dw);
     }
 
-	public void sendDataToClientAndOpenInterface(EntityPlayer player, String name) {
+    public void sendDataToClientAndOpenInterface(EntityPlayer player, String name) {
         EventHandler.instance().onEvent(new EventHandler.BookOpeningEvent(QuestingData.getUserName(player), name != null, QuestingData.getUserName(player).equals(player.getGameProfile().getName())));
 
         PacketHandler.add(player, name);
@@ -677,20 +676,20 @@ public class QuestingData {
             dw.writeString(QuestingData.getUserName(player), DataBitHelper.NAME_LENGTH);
         }
         sendDataToClient(dw, QuestingData.getUserName(player));
-	}
+    }
 
     public void refreshClientData(String playerName) {
         sendDataToClient(PacketHandler.getWriter(PacketId.REFRESH_INTERFACE), playerName);
     }
 
-	
-	public void receiveDataFromServer(DataReader dr) {
+
+    public void receiveDataFromServer(DataReader dr) {
         hardcoreActive = dr.readBoolean();
         questActive = dr.readBoolean();
 
 
-	    loadData(FILE_VERSION, dr, true);
-	}
+        loadData(FILE_VERSION, dr, true);
+    }
 
 
     public static void disableVanillaHardcore(ICommandSender sender) {
@@ -698,7 +697,7 @@ public class QuestingData {
             sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcore"));
             try {
                 ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
-            }catch (Throwable ex) {
+            } catch (Throwable ex) {
                 ex.printStackTrace();
             }
 
@@ -709,12 +708,10 @@ public class QuestingData {
     }
 
     public static void spawnBook(EntityPlayer player) {
-        if(!Quest.isEditing && !player.worldObj.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive())
-        {
+        if (!Quest.isEditing && !player.worldObj.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
             ItemStack diary = new ItemStack(ModItems.book);
-            if(!player.inventory.addItemStackToInventory(diary))
-            {
+            if (!player.inventory.addItemStackToInventory(diary)) {
                 spawnItemAtPlayer(player, diary);
             }
         }
@@ -723,7 +720,7 @@ public class QuestingData {
     private static void spawnItemAtPlayer(EntityPlayer player, ItemStack stack) {
         EntityItem item = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, stack);
         player.worldObj.spawnEntityInWorld(item);
-        if(!(player instanceof FakePlayer))
+        if (!(player instanceof FakePlayer))
             item.onCollideWithPlayer(player);
     }
 
@@ -750,7 +747,7 @@ public class QuestingData {
     public static boolean hasData(String playerName) {
         if (data.containsKey(playerName)) {
             return true;
-        }else{
+        } else {
             EntityPlayer player = getPlayer(playerName);
             return player != null && player.getGameProfile().getName().equals(playerName);
         }

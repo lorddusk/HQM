@@ -16,7 +16,7 @@ public class Team {
 
 
     public void resetProgress(Quest quest) {
-        questData.set(quest.getId(),  Quest.getQuest(quest.getId()).createData(getPlayerCount()));
+        questData.set(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
     }
 
     public float getProgress() {
@@ -28,7 +28,7 @@ public class Team {
                 if (data.completed) completed++;
             }
         }
-        return (float)completed / total;
+        return (float) completed / total;
     }
 
     public void receiveAndSyncReputation(Quest quest, List<Quest.ReputationReward> reputationList) {
@@ -82,13 +82,11 @@ public class Team {
             this.description = description;
         }
 
-        public String getTitle()
-        {
+        public String getTitle() {
             return Translator.translate(title);
         }
 
-        public String getDescription()
-        {
+        public String getDescription() {
             return Translator.translate(description);
         }
     }
@@ -110,13 +108,11 @@ public class Team {
             this.description = description;
         }
 
-        public String getTitle()
-        {
+        public String getTitle() {
             return Translator.translate(title);
         }
 
-        public String getDescription()
-        {
+        public String getDescription() {
             return Translator.translate(description);
         }
 
@@ -324,11 +320,11 @@ public class Team {
     }
 
     public void deleteTeam() {
-        for (int i = players.size() - 1; i >= 0 ; i--) {
+        for (int i = players.size() - 1; i >= 0; i--) {
             PlayerEntry player = players.get(i);
             if (player.isInTeam()) {
                 removePlayer(player.getName());
-            }else{
+            } else {
                 players.remove(i);
             }
             QuestingData.getQuestingData(player.getName()).getTeam().refreshTeamData(player, UpdateType.ONLY_MEMBERS);
@@ -339,7 +335,7 @@ public class Team {
         teams.remove(id);
 
         for (int i = id; i < teams.size(); i++) {
-            Team team  = teams.get(i);
+            Team team = teams.get(i);
             team.id--;
         }
 
@@ -428,6 +424,7 @@ public class Team {
 
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static ErrorMessage latestError;
+
     public enum ErrorMessage {
         INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
         IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
@@ -441,13 +438,11 @@ public class Team {
             this.header = header;
         }
 
-        public String getMessage()
-        {
+        public String getMessage() {
             return Translator.translate(message);
         }
 
-        public String getHeader()
-        {
+        public String getHeader() {
             return Translator.translate(header);
         }
 
@@ -461,7 +456,7 @@ public class Team {
     public static void handlePacket(EntityPlayer player, DataReader dr, boolean onServer) {
         if (onServer) {
             handleServerPacket(player, dr);
-        }else{
+        } else {
             handleClientPacket(player, dr);
         }
     }
@@ -570,7 +565,7 @@ public class Team {
                                         int targetValue;
                                         if (Math.abs(joinValue) > Math.abs(teamValue)) {
                                             targetValue = joinValue;
-                                        }else{
+                                        } else {
                                             targetValue = teamValue;
                                         }
                                         team.setReputation(reputation, targetValue);
@@ -607,7 +602,7 @@ public class Team {
                             team.removePlayer(playerToRemove);
                             team.refreshTeamData(UpdateType.ALL);
                             TeamStats.refreshTeam(team);
-                        }else{
+                        } else {
                             team.getPlayers().remove(entryToRemove);
                             team.refreshTeamData(UpdateType.ONLY_OWNER);
                         }
@@ -762,7 +757,7 @@ public class Team {
     private void createReputation(int id) {
         if (Reputation.getReputation(id) == null) {
             reputation.add(null);
-        }else{
+        } else {
             reputation.add(0);
         }
     }
@@ -777,7 +772,7 @@ public class Team {
         createMissingReputation(id);
         if (id >= reputation.size()) {
             return 0;
-        }else{
+        } else {
             Integer value = reputation.get(id);
             return value == null ? 0 : value;
         }
@@ -791,6 +786,7 @@ public class Team {
     }
 
     private List<QuestData> questData;
+
     private void createQuestData() {
         questData = new ArrayList<QuestData>();
         for (int i = 0; i < Quest.size(); i++) {
@@ -805,7 +801,7 @@ public class Team {
 
         if (Quest.getQuest(id) != null) {
             questData.add(id, Quest.getQuest(id).createData(1));
-        }else{
+        } else {
             questData.add(id, null);
         }
     }
@@ -836,7 +832,7 @@ public class Team {
                     setReputation(i, dr.readData(DataBitHelper.REPUTATION_VALUE));
                 }
             }
-        }else{
+        } else {
 
             for (int i = 0; i < Quest.size(); i++) {
                 Quest quest = Quest.getQuest(i);
@@ -856,7 +852,7 @@ public class Team {
                 }
                 if (quest != null && questData.get(id) != null) {
                     quest.read(dr, questData.get(id), version, false);
-                }else if (version.contains(FileVersion.REMOVED_QUESTS)) {
+                } else if (version.contains(FileVersion.REMOVED_QUESTS)) {
                     dr.readData(bits); //Clear
                 }
             }
@@ -876,6 +872,7 @@ public class Team {
     }
 
     public static boolean reloadedInvites;
+
     private void readTeamData(FileVersion version, DataReader dr, boolean light) {
         if (light) {
             setId(dr.readBoolean() ? -1 : 0);
@@ -936,7 +933,7 @@ public class Team {
     }
 
     public void saveData(DataWriter dw, boolean light) {
-         writeTeamData(dw, light);
+        writeTeamData(dw, light);
 
 
         //quest progress
@@ -952,7 +949,7 @@ public class Team {
                     dw.writeData(getReputation(i), DataBitHelper.REPUTATION_VALUE);
                 }
             }
-        }else{
+        } else {
             int count = 0;
             for (Quest quest : Quest.getQuests()) {
                 if (quest != null) {
@@ -1013,7 +1010,7 @@ public class Team {
             saveTeamData(dw, light);
         }
 
-        if (light && !isSingle() && isSharingLives()){
+        if (light && !isSingle() && isSharingLives()) {
             dw.writeData(getSharedLives(), DataBitHelper.TEAM_LIVES);
         }
     }

@@ -347,23 +347,19 @@ public class Quest {
         this.y = y;
     }
 
-    public ItemStack[] getReward()
-    {
+    public ItemStack[] getReward() {
         return reward;
     }
 
-    public void setReward(ItemStack[] reward)
-    {
+    public void setReward(ItemStack[] reward) {
         this.reward = reward;
     }
 
-    public ItemStack[] getRewardChoice()
-    {
+    public ItemStack[] getRewardChoice() {
         return rewardChoice;
     }
 
-    public void setRewardChoice(ItemStack[] rewardChoice)
-    {
+    public void setRewardChoice(ItemStack[] rewardChoice) {
         this.rewardChoice = rewardChoice;
     }
 
@@ -530,7 +526,7 @@ public class Quest {
     public boolean isLinkFree(String playerName) {
         return isLinkFree(playerName, new HashMap<Quest, Boolean>());
     }
-    
+
     boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
         Boolean cachedResult = cache.get(this);
         if (cachedResult != null) {
@@ -888,7 +884,6 @@ public class Quest {
         }
 
 
-
         boolean claimed = getQuestData(player).claimed;
         int y = reward == null || reward.length <= MAX_REWARD_SLOTS - (isEditing ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
         boolean hover = gui.inBounds(REPUTATION_X, y, REPUTATION_SIZE, REPUTATION_SIZE, mX, mY);
@@ -903,20 +898,20 @@ public class Quest {
             int foregroundIndex;
             if (claimed) {
                 foregroundIndex = 3;
-            }else{
+            } else {
                 boolean positive = false;
                 boolean negative = false;
                 for (ReputationReward reputationReward : reputationRewards) {
                     if (reputationReward.value < 0) {
                         negative = true;
-                    }else if(reputationReward.value > 0) {
+                    } else if (reputationReward.value > 0) {
                         positive = true;
                     }
                 }
 
                 if (negative == positive) {
                     foregroundIndex = 2;
-                }else{
+                } else {
                     foregroundIndex = positive ? 0 : 1;
                 }
             }
@@ -1479,7 +1474,7 @@ public class Quest {
                         sendUpdatedData(QuestingData.getUserName(player));
                     }
                     sentInfo = true;
-                }else{
+                } else {
                     return;
                 }
             }
@@ -1640,24 +1635,20 @@ public class Quest {
             return CONSUME;
         }
 
-        public String getLangKeyDescription()
-        {
+        public String getLangKeyDescription() {
             return "hqm.taskType." + id + ".desc";
         }
 
-        public String getLangKeyName()
-        {
+        public String getLangKeyName() {
             return "hqm.taskType." + id + ".title";
         }
 
 
-        public String getDescription()
-        {
+        public String getDescription() {
             return Translator.translate(getLangKeyDescription());
         }
 
-        public String getName()
-        {
+        public String getName() {
             return Translator.translate(getLangKeyName());
         }
     }
@@ -1861,7 +1852,7 @@ public class Quest {
                 if (quest.useModifiedParentRequirement) {
                     dw.writeBoolean(true);
                     dw.writeData(quest.parentRequirementCount, DataBitHelper.QUESTS);
-                }else{
+                } else {
                     dw.writeBoolean(false);
                 }
 
@@ -1906,18 +1897,18 @@ public class Quest {
             }
             dw.writeData(count, DataBitHelper.REWARDS);
             for (ItemStack itemStack : reward) {
-                if (itemStack != null && itemStack.getItem()!=null) {
+                if (itemStack != null && itemStack.getItem() != null) {
                     dw.writeItemStack(itemStack, true);
                 } else {
                     FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards - substituting with HQM invalid item", quest.getName());
-                    dw.writeItemStack(new ItemStack(ModItems.invalidItem,1), false);
+                    dw.writeItemStack(new ItemStack(ModItems.invalidItem, 1), false);
                 }
             }
         }
     }
 
     public static void loadAll(DataReader dr, FileVersion version) {
-        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quests");
+        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quests");
         if (dr != null) {
             EventHandler.instance().clear();
             try {
@@ -1937,8 +1928,7 @@ public class Quest {
                         QuestSet questSet = new QuestSet(name, description);
                         if (version.contains(FileVersion.REPUTATION_BARS)) {
                             int barCount = dr.readData(DataBitHelper.BYTE);
-                            for (int ii = 0; ii < barCount ; ii++)
-                            {
+                            for (int ii = 0; ii < barCount; ii++) {
                                 int data = dr.readData(DataBitHelper.INT);
                                 questSet.addRepBar(new ReputationBar(version, data));
                             }
@@ -1951,7 +1941,7 @@ public class Quest {
 
 
                 int count = dr.readData(DataBitHelper.QUESTS);
-                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "%d quests found", count);
+                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "%d quests found", count);
                 for (int id = 0; id < count; id++) {
                     if (dr.readBoolean()) {
                         String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
@@ -1961,7 +1951,7 @@ public class Quest {
                         boolean big = dr.readBoolean();
 
                         Quest quest = new Quest(id, name, description, x, y, big);
-                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest %s", name);
+                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest %s", name);
 
                         if (version.lacks(FileVersion.SETS)) {
                             quest.setQuestSet(QuestLine.getActiveQuestLine().questSets.get(0));
@@ -2009,7 +1999,7 @@ public class Quest {
                         if (version.contains(FileVersion.PARENT_COUNT) && dr.readBoolean()) {
                             quest.useModifiedParentRequirement = true;
                             quest.parentRequirementCount = dr.readData(DataBitHelper.QUESTS);
-                        }else{
+                        } else {
                             quest.useModifiedParentRequirement = false;
                         }
 
@@ -2034,22 +2024,22 @@ public class Quest {
                             }
                         }
 
-                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest rewards", name);
+                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest rewards", name);
                         quest.reward = readRewardData(dr);
-                        if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading quest reward choices", name);
+                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest reward choices", name);
                         quest.rewardChoice = readRewardData(dr);
 
                         if (version.contains(FileVersion.REPUTATION)) {
                             int reputationCount = dr.readData(DataBitHelper.REPUTATION_REWARD);
                             if (reputationCount == 0) {
                                 quest.reputationRewards = null;
-                            }else{
+                            } else {
                                 quest.reputationRewards = new ArrayList<ReputationReward>();
                                 for (int i = 0; i < reputationCount; i++) {
                                     quest.reputationRewards.add(new ReputationReward(Reputation.getReputation(dr.readData(DataBitHelper.REPUTATION)), dr.readData(DataBitHelper.REPUTATION_VALUE)));
                                 }
                             }
-                        }else{
+                        } else {
                             quest.reputationRewards = null;
                         }
                     }
@@ -2071,12 +2061,12 @@ public class Quest {
                 }
 
 
-                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading bags");
+                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading bags");
                 if (version.contains(FileVersion.BAGS)) {
                     GroupTier.readAll(dr, version);
                     Group.readAll(dr, version);
                 }
-                if (isEditing) FMLLog.log("HQM-EDIT",Level.INFO, "Loading complete");
+                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading complete");
             } catch (Exception ex) {
                 ex.printStackTrace();
                 FMLLog.log("HQM", Level.ERROR, ex, "Error occurred during quest loading");
@@ -2135,7 +2125,7 @@ public class Quest {
                     reward[i] = rewardItemStack;
                 } else {
                     FMLLog.log("HQM", Level.ERROR, "Invalid reward item. Substituting with HQM invalid item.");
-                    reward[i] = new ItemStack(ModItems.invalidItem,1);
+                    reward[i] = new ItemStack(ModItems.invalidItem, 1);
                 }
             }
             return reward;

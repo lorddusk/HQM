@@ -19,7 +19,6 @@ public abstract class FileHelper {
         PRE_CRASH_FAILURE("Double save failure", "Couldn't save the data to file. And when trying to backup your previously saved data, this didn't work either.");
 
 
-
         private String name;
         private String text;
 
@@ -42,6 +41,7 @@ public abstract class FileHelper {
 
     /**
      * Makes sure that the supplied folder is created, along with all its parent folders. This is to make sure the path actually exists
+     *
      * @param dir The folder to create
      * @throws java.io.IOException
      */
@@ -73,7 +73,7 @@ public abstract class FileHelper {
             dw.writeFinalBits();
 
             return SaveResult.SUCCESS;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             FMLLog.log("HQM", Level.ERROR, e, "An error occurred during quest book writing");
             boolean success = false;
@@ -84,7 +84,7 @@ public abstract class FileHelper {
             }
 
             return success ? SaveResult.SAVE_FAIL : SaveResult.PRE_CRASH_FAILURE;
-        }finally {
+        } finally {
             if (dw != null) {
                 dw.close();
             }
@@ -106,10 +106,10 @@ public abstract class FileHelper {
             dr = new DataReader(new FileInputStream(file));
             read(dr, dr.readVersion());
             return true;
-        }catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             if (dr != null) {
                 dr.close();
             }
@@ -134,7 +134,7 @@ public abstract class FileHelper {
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
-            }finally {
+            } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
@@ -142,13 +142,15 @@ public abstract class FileHelper {
                     if (outputStream != null) {
                         outputStream.close();
                     }
-                }catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
-        }else{
+        } else {
             return true;
         }
     }
 
     public abstract void write(DataWriter dw);
+
     public abstract void read(DataReader dr, FileVersion version);
 }

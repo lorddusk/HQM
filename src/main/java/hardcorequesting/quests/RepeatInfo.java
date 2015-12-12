@@ -49,7 +49,7 @@ public class RepeatInfo {
                 days = total / 24;
                 hours = total % 24;
             }
-        }else{
+        } else {
             type = RepeatType.NONE;
         }
     }

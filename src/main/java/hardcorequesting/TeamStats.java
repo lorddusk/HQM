@@ -37,7 +37,7 @@ public class TeamStats {
         dw.writeString(team.getName(), DataBitHelper.NAME_LENGTH);
         dw.writeData(team.getPlayerCount(), DataBitHelper.PLAYERS);
         dw.writeData(team.getSharedLives(), DataBitHelper.TEAM_LIVES);
-        int progress = (int)(team.getProgress() * 100);
+        int progress = (int) (team.getProgress() * 100);
         dw.writeData(progress, DataBitHelper.TEAM_PROGRESS);
     }
 
@@ -77,11 +77,12 @@ public class TeamStats {
 
 
     private static TeamComparator teamComparator = new TeamComparator();
+
     private static class TeamComparator implements Comparator<TeamStats> {
 
         @Override
         public int compare(TeamStats o1, TeamStats o2) {
-            return ((Integer)o2.progress).compareTo(o1.progress);
+            return ((Integer) o2.progress).compareTo(o1.progress);
         }
     }
 

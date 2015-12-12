@@ -44,19 +44,19 @@ public class QuestTaskLocation extends QuestTask {
         if (!isPlayerEvent) {
             delay++;
             delay %= CHECK_DELAY;
-        }else if(this.delay == 0) {
+        } else if (this.delay == 0) {
             World world = player.worldObj;
-            if(!world.isRemote) {
-                boolean[] visited = ((QuestDataTaskLocation)this.getData(player)).visited;
+            if (!world.isRemote) {
+                boolean[] visited = ((QuestDataTaskLocation) this.getData(player)).visited;
                 boolean all = true;
                 boolean updated = false;
 
-                for(int i = 0; i < locations.length; ++i) {
+                for (int i = 0; i < locations.length; ++i) {
                     Location location = this.locations[i];
-                    if(!visited[i] && player.worldObj.provider.dimensionId == location.dimension) {
-                        int current = (int)player.getDistanceSq((double)location.x + 0.5D, (double)location.y + 0.5D, (double)location.z + 0.5D);
+                    if (!visited[i] && player.worldObj.provider.dimensionId == location.dimension) {
+                        int current = (int) player.getDistanceSq((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
-                        if(location.radius >= 0 && current > target) {
+                        if (location.radius >= 0 && current > target) {
                             all = false;
                         } else {
                             if (!this.isCompleted(player) && this.isVisible(player) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
@@ -67,15 +67,15 @@ public class QuestTaskLocation extends QuestTask {
                     }
                 }
 
-                    if (updated) {
-                        if (all) {
-                            completeTask(player.getGameProfile().getName());
-                        }
-                        parent.sendUpdatedDataToTeam(player);
+                if (updated) {
+                    if (all) {
+                        completeTask(player.getGameProfile().getName());
                     }
+                    parent.sendUpdatedDataToTeam(player);
                 }
             }
         }
+    }
 
 
     public static class Location {
@@ -183,7 +183,7 @@ public class QuestTaskLocation extends QuestTask {
                 ItemStack itemStack = new ItemStack(item, 1, dmg);
                 itemStack.setTagCompound(compound);
                 this.icon = itemStack;
-            }else{
+            } else {
                 this.icon = null;
             }
             name = dr.readString(DataBitHelper.NAME_LENGTH);
@@ -207,7 +207,7 @@ public class QuestTaskLocation extends QuestTask {
     public enum Visibility {
         FULL("Full", true, true),
         LOCATION("Location", true, false),
-        NONE("None" ,false, false);
+        NONE("None", false, false);
 
         private boolean showCoordinate;
         private boolean showRadius;
@@ -239,11 +239,11 @@ public class QuestTaskLocation extends QuestTask {
     public Location[] locations = new Location[0];
 
     private Location[] getEditFriendlyLocations(Location[] locations) {
-        if(Quest.isEditing && locations.length < DataBitHelper.TASK_LOCATION_COUNT.getMaximum()){
+        if (Quest.isEditing && locations.length < DataBitHelper.TASK_LOCATION_COUNT.getMaximum()) {
             locations = Arrays.copyOf(locations, locations.length + 1);
             locations[locations.length - 1] = new Location();
             return locations;
-        }else{
+        } else {
             return locations;
         }
     }
@@ -259,14 +259,13 @@ public class QuestTaskLocation extends QuestTask {
     }
 
 
-
     public void setLocation(int id, Location location, EntityPlayer player) {
         if (id >= locations.length) {
             locations = Arrays.copyOf(locations, locations.length + 1);
-            QuestDataTaskLocation data = (QuestDataTaskLocation)getData(player);
+            QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
             data.visited = Arrays.copyOf(data.visited, data.visited.length + 1);
             SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
-        }else{
+        } else {
             SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
         }
 
@@ -309,9 +308,9 @@ public class QuestTaskLocation extends QuestTask {
         super.write(dw, task, light);
 
         if (!light) {
-            dw.writeData(((QuestDataTaskLocation)task).visited.length, DataBitHelper.TASK_LOCATION_COUNT);
+            dw.writeData(((QuestDataTaskLocation) task).visited.length, DataBitHelper.TASK_LOCATION_COUNT);
         }
-        for (boolean b : ((QuestDataTaskLocation)task).visited) {
+        for (boolean b : ((QuestDataTaskLocation) task).visited) {
             dw.writeBoolean(b);
         }
     }
@@ -320,14 +319,14 @@ public class QuestTaskLocation extends QuestTask {
     public void read(DataReader dr, QuestDataTask task, FileVersion version, boolean light) {
         super.read(dr, task, version, light);
 
-        QuestDataTaskLocation locationData = ((QuestDataTaskLocation)task);
+        QuestDataTaskLocation locationData = ((QuestDataTaskLocation) task);
 
         if (light) {
             boolean[] visited = locationData.visited;
             for (int i = 0; i < visited.length; i++) {
                 visited[i] = dr.readBoolean();
             }
-        }else{
+        } else {
             int count = dr.readData(DataBitHelper.TASK_LOCATION_COUNT);
             boolean[] visited = locationData.visited;
             for (int i = 0; i < count; i++) {
@@ -358,8 +357,8 @@ public class QuestTaskLocation extends QuestTask {
             gui.drawString(location.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
 
             if (visited(i, player)) {
-                gui.drawString(GuiColor.GREEN  + Translator.translate("hqm.locationMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            }else if (location.visible.doShowCoordinate()) {
+                gui.drawString(GuiColor.GREEN + Translator.translate("hqm.locationMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+            } else if (location.visible.doShowCoordinate()) {
                 if (location.radius >= 0) {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
@@ -367,15 +366,15 @@ public class QuestTaskLocation extends QuestTask {
                 if (player.worldObj.provider.dimensionId == location.dimension) {
                     if (location.radius >= 0) {
                         String str;
-                        int distance = (int)player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);
+                        int distance = (int) player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);
                         str = Translator.translate("hqm.locationMenu.mAway", distance);
-                        if(location.visible.doShowRadius()) {
+                        if (location.visible.doShowRadius()) {
                             str += " [" + Translator.translate("hqm.locationMenu.mRadius", location.radius) + "]";
                         }
                         gui.drawString(str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
                     }
 
-                }else{
+                } else {
                     gui.drawString(Translator.translate("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
                 }
 
@@ -448,7 +447,7 @@ public class QuestTaskLocation extends QuestTask {
             }
         }
 
-        return (float)visited / locations.length;
+        return (float) visited / locations.length;
     }
 
     @Override
@@ -460,7 +459,7 @@ public class QuestTaskLocation extends QuestTask {
         for (int i = 0; i < visited.length; i++) {
             if (otherVisited[i]) {
                 visited[i] = true;
-            }else if(!visited[i]) {
+            } else if (!visited[i]) {
                 all = false;
             }
         }

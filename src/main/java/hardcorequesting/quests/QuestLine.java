@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class QuestLine {
 
-    public QuestLine(){
+    public QuestLine() {
         tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
         tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
         tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
@@ -46,6 +46,7 @@ public class QuestLine {
     private static QuestLine config = new QuestLine();
     private static QuestLine server;
     private static QuestLine world;
+
     public static QuestLine getActiveQuestLine() {
         return server != null ? server : world != null ? world : config;
     }
@@ -68,7 +69,7 @@ public class QuestLine {
             getActiveQuestLine().questSets = new ArrayList<QuestSet>();
 
             Quest.loadAll(dr, QuestingData.FILE_VERSION);
-        }else{
+        } else {
             String path = dr.readString(DataBitHelper.SHORT);
             if (path != null && new File(path).exists()) {
                 world = new QuestLine();
@@ -88,7 +89,7 @@ public class QuestLine {
         dw.writeBoolean(doServerSync);
         if (doServerSync) {
             Quest.saveAll(dw);
-        }else{
+        } else {
             String path = world == null ? null : world.mainPath;
             dw.writeString(path, DataBitHelper.SHORT);
         }

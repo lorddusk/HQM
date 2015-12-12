@@ -22,7 +22,7 @@ public class QuestData {
         int id = getId(player);
         if (id >= 0 && id < reward.length) {
             return reward[id];
-        }else{
+        } else {
             return true;
         }
     }

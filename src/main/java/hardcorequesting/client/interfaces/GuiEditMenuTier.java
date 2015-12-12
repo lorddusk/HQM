@@ -8,7 +8,7 @@ import hardcorequesting.config.ModConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
-public class GuiEditMenuTier  extends GuiEditMenu {
+public class GuiEditMenuTier extends GuiEditMenu {
     private GroupTier tier;
     private GroupTier original;
     private TextBoxGroup textBoxes;
@@ -31,16 +31,17 @@ public class GuiEditMenuTier  extends GuiEditMenu {
 
                 @Override
                 protected void textChanged(GuiBase gui) {
-                    try{
+                    try {
                         int number;
                         if (getText().equals("")) {
                             number = 1;
-                        }else{
+                        } else {
                             number = Integer.parseInt(getText());
                         }
 
                         tier.getWeights()[id] = number;
-                    }catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
 
                 }
             });
@@ -83,7 +84,7 @@ public class GuiEditMenuTier  extends GuiEditMenu {
 
         GL11.glColor3f(1F, 1F, 1F);
 
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
@@ -99,7 +100,7 @@ public class GuiEditMenuTier  extends GuiEditMenu {
         if (inArrowBounds(gui, mX, mY, true)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
             clicked = true;
-        }else if (inArrowBounds(gui, mX, mY, false)) {
+        } else if (inArrowBounds(gui, mX, mY, false)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
             clicked = true;
         }

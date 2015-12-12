@@ -24,7 +24,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return DeathStats.getDeathStats().length > VISIBLE_PLAYERS ;
+                return DeathStats.getDeathStats().length > VISIBLE_PLAYERS;
             }
         };
     }
@@ -78,7 +78,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
             boolean selected = stats.getName().equals(selectedName);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
-            gui.drawString((i + 1) +". " + stats.getName(), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
+            gui.drawString((i + 1) + ". " + stats.getName(), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
             gui.drawString(deaths, DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
@@ -90,7 +90,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
         if (stats != null) {
 
-                ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
             GL11.glColor4f(1F, 1F, 1F, 1F);
             for (int i = 0; i < DeathType.values().length; i++) {
@@ -125,11 +125,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private DeathStats getStats() {
         if (showBest) {
             return DeathStats.getBest();
-        }else if(showTotal) {
+        } else if (showTotal) {
             return DeathStats.getTotal();
-        }else if (selectedName != null) {
+        } else if (selectedName != null) {
             return DeathStats.getDeathStats(selectedName);
-        }else{
+        } else {
             return null;
         }
     }
@@ -145,7 +145,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int y = i / 3;
 
 
-
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
                     gui.drawMouseOver(stats.getDescription(i), mX + gui.getLeft(), mY + gui.getTop());
                     break;
@@ -155,7 +154,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
 
     private int getColor(boolean selected, boolean inBounds) {
-        return selected  ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
+        return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
     }
 
     @Override
@@ -168,11 +167,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             showBest = !showBest;
             showTotal = false;
             selectedName = null;
-        }else if(gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
+        } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
             selectedName = null;
-        }else{
+        } else {
             showBest = showTotal = false;
             DeathStats[] deathStats = DeathStats.getDeathStats();
             int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
@@ -183,7 +182,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
                     if (stats.getName().equals(selectedName)) {
                         selectedName = null;
-                    }else{
+                    } else {
                         selectedName = stats.getName();
                     }
                 }

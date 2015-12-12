@@ -63,7 +63,7 @@ public abstract class QuestTaskReputation extends QuestTask {
             }
             ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(playerName));
 
-            return  ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
+            return ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
         }
 
         public void setLower(ReputationMarker lower) {
@@ -79,7 +79,7 @@ public abstract class QuestTaskReputation extends QuestTask {
         if (id >= settings.length) {
             settings = Arrays.copyOf(settings, settings.length + 1);
             SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CREATE);
-        }else{
+        } else {
             SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CHANGE);
         }
 
@@ -155,7 +155,7 @@ public abstract class QuestTaskReputation extends QuestTask {
 
             if (i >= settings.length) {
                 gui.drawRect(START_X + Reputation.BAR_X, START_Y + startOffsetY + i * OFFSET_Y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
-            }else{
+            } else {
                 ReputationSetting setting = settings[i];
                 info = setting.reputation.draw(gui, START_X, START_Y + startOffsetY + i * OFFSET_Y, mX, mY, info, getPlayerForRender(player), true, setting.lower, setting.upper, setting.inverted, null, null, getData(player).completed);
             }
@@ -181,7 +181,7 @@ public abstract class QuestTaskReputation extends QuestTask {
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
                         gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, i >= settings.length ? null : settings[i]));
-                    }else if(gui.getCurrentMode() == EditMode.DELETE && i < settings.length) {
+                    } else if (gui.getCurrentMode() == EditMode.DELETE && i < settings.length) {
                         removeSetting(i);
                         SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_REMOVE);
                     }
@@ -223,7 +223,7 @@ public abstract class QuestTaskReputation extends QuestTask {
             }
         }
 
-        return (float)valid / count;
+        return (float) valid / count;
     }
 
     @Override

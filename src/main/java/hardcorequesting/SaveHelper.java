@@ -79,13 +79,11 @@ public final class SaveHelper {
             this.type = type;
         }
 
-        public String translate(int number)
-        {
+        public String translate(int number) {
             return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
         }
 
-        private enum BaseEditType
-        {
+        private enum BaseEditType {
             ADD("added", GuiColor.GREEN),
             CHANGE("changed", GuiColor.ORANGE),
             MOVE("moved", GuiColor.ORANGE),
@@ -94,20 +92,17 @@ public final class SaveHelper {
             private String id;
             private GuiColor colour;
 
-            BaseEditType(String id, GuiColor colour)
-            {
+            BaseEditType(String id, GuiColor colour) {
                 this.id = id;
                 this.colour = colour;
             }
 
-            private String translate()
-            {
+            private String translate() {
                 return Translator.translate("hqm.editType." + id);
             }
         }
 
-        private enum Type
-        {
+        private enum Type {
             QUEST("quest"),
             TASK("task"),
             TASK_TYPE("taskType"),
@@ -139,18 +134,15 @@ public final class SaveHelper {
 
             private String id;
 
-            Type(String id)
-            {
+            Type(String id) {
                 this.id = id;
             }
 
-            private String translate()
-            {
+            private String translate() {
                 return Translator.translate("hqm.editType." + id);
             }
         }
     }
-
 
 
     public static class ListElement implements Comparable<ListElement> {
@@ -164,7 +156,7 @@ public final class SaveHelper {
 
         @Override
         public int compareTo(ListElement o) {
-            return ((Integer)o.count).compareTo(count);
+            return ((Integer) o.count).compareTo(count);
         }
     }
 
@@ -240,7 +232,7 @@ public final class SaveHelper {
     public static void render(GuiQuestBook gui, int mX, int mY) {
         if (isLarge) {
             gui.drawRect(X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
-        }else{
+        } else {
             gui.drawRect(X, Y, SMALL_SRC_X, SMALL_SRC_Y, SMALL_SIZE, SMALL_SIZE);
         }
 
@@ -251,11 +243,11 @@ public final class SaveHelper {
         if (isLarge) {
             if (total == 0) {
                 gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
-            }else{
+            } else {
                 if (saveTime == 0) {
                     gui.drawString(Translator.translate("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
-                }else{
-                    gui.drawString(formatTime((int)((Minecraft.getSystemTime() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                } else {
+                    gui.drawString(formatTime((int) ((Minecraft.getSystemTime() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
 
                 gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
@@ -273,7 +265,7 @@ public final class SaveHelper {
                     gui.drawString(Translator.translate("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                 }
             }
-        }else{
+        } else {
             int index = inSaveBounds(gui, mX, mY) ? 1 : 0;
             gui.drawRect(X + SAVE_X, Y + SAVE_Y, SAVE_SRC_X + index * SAVE_SIZE, SRC_Y, SAVE_SIZE, SAVE_SIZE);
         }
@@ -283,7 +275,7 @@ public final class SaveHelper {
     public static void onClick(GuiQuestBook gui, int mX, int mY) {
         if (gui.inBounds(X + CHANGE_X, Y + CHANGE_Y, CHANGE_SIZE, CHANGE_SIZE, mX, mY)) {
             isLarge = !isLarge;
-        }else if(inSaveBounds(gui, mX, mY)) {
+        } else if (inSaveBounds(gui, mX, mY)) {
             gui.save();
         }
     }
@@ -301,10 +293,10 @@ public final class SaveHelper {
         if (hours == 0) {
             if (minutes == 0) {
                 return Translator.translate("hqm.editType.savedRecent");
-            }else {
+            } else {
                 return Translator.translate(minutes != 1, "hqm.editType.savedMinutes", minutes);
             }
-        }else {
+        } else {
             return Translator.translate(hours != 1, "hqm.editType.savedMinutes", hours);
         }
     }
@@ -314,5 +306,6 @@ public final class SaveHelper {
         return isLarge;
     }
 
-    private SaveHelper() {}
+    private SaveHelper() {
+    }
 }

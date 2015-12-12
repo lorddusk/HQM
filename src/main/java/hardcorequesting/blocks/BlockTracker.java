@@ -40,8 +40,8 @@ public class BlockTracker extends BlockContainer {
     }
 
     private void pickIcons(IIconRegister icon) {
-            activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
-            emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
+        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
+        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
     }
 
     @Override
@@ -63,7 +63,8 @@ public class BlockTracker extends BlockContainer {
                     TileEntity te = world.getTileEntity(x, y, z);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));;
+                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            ;
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {

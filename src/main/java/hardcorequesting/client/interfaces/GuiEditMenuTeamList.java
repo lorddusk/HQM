@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
     private GuiEditMenuTeam parent;
+
     protected GuiEditMenuTeamList(GuiQuestBook gui, EntityPlayer player, GuiEditMenuTeam parent) {
         super(gui, player);
         this.parent = parent;
@@ -69,7 +70,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
 
     private boolean isArrowEnabled(boolean left) {
-        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float)TeamStats.getTeamStats().length / TEAMS_PER_PAIR) - 1);
+        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamStats.getTeamStats().length / TEAMS_PER_PAIR) - 1);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
 
         if (isArrowEnabled(true) && gui.inBounds(ARROW_X_LEFT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair--;
-        }else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
+        } else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair++;
         }
     }

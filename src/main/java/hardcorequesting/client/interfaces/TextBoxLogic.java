@@ -43,7 +43,7 @@ public class TextBoxLogic {
         this.multiLine = multiLine;
         if (text == null) {
             this.text = "";
-        }else{
+        } else {
             this.text = text;
         }
         textChanged(gui);
@@ -82,7 +82,7 @@ public class TextBoxLogic {
         if (cursor + direction >= 0 && cursor + direction <= text.length()) {
             if (direction > 0) {
                 text = text.substring(0, cursor) + text.substring(cursor + 1);
-            }else{
+            } else {
                 text = text.substring(0, cursor - 1) + text.substring(cursor);
                 moveCursor(gui, direction);
             }
@@ -126,16 +126,16 @@ public class TextBoxLogic {
                 int tmpCursor = cursor;
                 for (int i = 0; i < lines.size(); i++) {
                     if (tmpCursor <= lines.get(i).length()) {
-                        cursorPositionX = (int)(mult * gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                        cursorPositionY = (int)(TEXT_HEIGHT * i * mult);
+                        cursorPositionX = (int) (mult * gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
+                        cursorPositionY = (int) (TEXT_HEIGHT * i * mult);
                         cursorLine = i;
                         break;
-                    }else{
+                    } else {
                         tmpCursor -= lines.get(i).length();
                     }
                 }
-            }else{
-                cursorPositionX = (int)(mult * gui.getStringWidth(text.substring(0, cursor)));
+            } else {
+                cursorPositionX = (int) (mult * gui.getStringWidth(text.substring(0, cursor)));
                 cursorPositionY = 0;
             }
 
@@ -152,13 +152,13 @@ public class TextBoxLogic {
     public void onKeyStroke(GuiBase gui, char c, int k) {
         if (k == 203) {
             moveCursor(gui, -1);
-        }else if(k == 205) {
+        } else if (k == 205) {
             moveCursor(gui, 1);
-        }else if (k == 14) {
+        } else if (k == 14) {
             deleteText(gui, -1);
-        }else if (k == 211) {
+        } else if (k == 211) {
             deleteText(gui, 1);
-        }else if (isCharacterValid(c)) {
+        } else if (isCharacterValid(c)) {
             addText(gui, Character.toString(c));
         }
     }
@@ -170,7 +170,7 @@ public class TextBoxLogic {
     private void updateCursor() {
         if (cursor < 0) {
             cursor = 0;
-        }else if (cursor > text.length()) {
+        } else if (cursor > text.length()) {
             cursor = text.length();
         }
 

@@ -24,5 +24,6 @@ public abstract class BlockInfo {
     public static final String QUEST_PORTAL_TECH_EMPTY_ICON = "hqmQuestPortalTechTop";
     public static final String QUEST_PORTAL_MAGIC_ICON = "hqmQuestPortalMagic";
 
-    private BlockInfo(){}
+    private BlockInfo() {
+    }
 }

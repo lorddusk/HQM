@@ -1,12 +1,12 @@
 package hardcorequesting.items;
 
 public abstract class ItemInfo {
-	public static final String TEXTURE_LOCATION = "hqm";
+    public static final String TEXTURE_LOCATION = "hqm";
     public static final String LOCALIZATION_START = "hqm:";
     //--Information for the Questing Book
 
-	public static final String BOOK_UNLOCALIZED_NAME = "quest_book";
-	public static final String BOOK_ICON = "hqmQuestBook";
+    public static final String BOOK_UNLOCALIZED_NAME = "quest_book";
+    public static final String BOOK_ICON = "hqmQuestBook";
     public static final String BOOK_OP_ICON = "hqmQuestBookOp";
 
     //--Information for the Hearts
@@ -22,5 +22,6 @@ public abstract class ItemInfo {
     public static final String INVALID_ICON = "hqmInvalidItem";
 
 
-    private ItemInfo(){}
+    private ItemInfo() {
+    }
 }

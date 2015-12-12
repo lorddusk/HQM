@@ -36,7 +36,7 @@ public class EventHandler {
         }
     }
 
-    public void add(QuestTask task, Type ... types) {
+    public void add(QuestTask task, Type... types) {
         for (Type type : types) {
             registeredTasks[type.ordinal()].add(task);
         }
@@ -49,6 +49,7 @@ public class EventHandler {
     }
 
     private static EventHandler instance;
+
     public static EventHandler instance() {
         return instance;
     }

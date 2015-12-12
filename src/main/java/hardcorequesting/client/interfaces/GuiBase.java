@@ -27,14 +27,16 @@ import java.util.List;
 public class GuiBase extends GuiScreen {
     protected int left, top;
 
-    public void setEditMenu(GuiEditMenu menu) {}
+    public void setEditMenu(GuiEditMenu menu) {
+    }
 
     public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
     protected static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
-	public void drawRect(int x, int y, int u, int v, int w, int h) {
-		drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
-	}
+    public void drawRect(int x, int y, int u, int v, int w, int h) {
+        drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
+    }
+
     public void drawRect(int x, int y, int u, int v, int w, int h, RenderRotation rotation) {
         boolean rotate = rotation == RenderRotation.ROTATE_90 || rotation == RenderRotation.ROTATE_270 || rotation == RenderRotation.ROTATE_90_FLIP || rotation == RenderRotation.ROTATE_270_FLIP;
 
@@ -46,87 +48,88 @@ public class GuiBase extends GuiScreen {
 
         float fw = 0.00390625F;
         float fy = 0.00390625F;
-        
-        double a = (double)((float)(u + 0) * fw);
-        double b = (double)((float)(u + w) * fw);
-        double c = (double)((float)(v + h) * fy);
-        double d = (double)((float)(v + 0) * fy);
-           
-        double [] ptA = new double[] {a, c};
-        double [] ptB = new double[] {b, c};
-        double [] ptC = new double[] {b, d};
-        double [] ptD = new double[] {a, d};  
-        
-        
-        double [] pt1, pt2, pt3, pt4;
-        
+
+        double a = (double) ((float) (u + 0) * fw);
+        double b = (double) ((float) (u + w) * fw);
+        double c = (double) ((float) (v + h) * fy);
+        double d = (double) ((float) (v + 0) * fy);
+
+        double[] ptA = new double[]{a, c};
+        double[] ptB = new double[]{b, c};
+        double[] ptC = new double[]{b, d};
+        double[] ptD = new double[]{a, d};
+
+
+        double[] pt1, pt2, pt3, pt4;
+
         switch (rotation) {
-        	default:
-        	case NORMAL:
-        		pt1 = ptA;
-        		pt2 = ptB;
-        		pt3 = ptC;
-	        	pt4 = ptD;        
-        		break;
-        	case ROTATE_90:
-        		pt1 = ptB;
-        		pt2 = ptC;
-        		pt3 = ptD;
-	        	pt4 = ptA;
-	        	break;
-        	case ROTATE_180:
-        		pt1 = ptC;
-        		pt2 = ptD;
-        		pt3 = ptA;
-	        	pt4 = ptB;
-	        	break;	        	
-        	case ROTATE_270:
-        		pt1 = ptD;
-        		pt2 = ptA;
-        		pt3 = ptB;
-	        	pt4 = ptC;
-	        	break;
-	        	
-        	case FLIP_HORIZONTAL:
-        		pt1 = ptB;
-        		pt2 = ptA;
-        		pt3 = ptD;
-	        	pt4 = ptC;
-	        	break;
-        	case ROTATE_90_FLIP:
-        		pt1 = ptA;
-        		pt2 = ptD;
-        		pt3 = ptC;
-	        	pt4 = ptB;
-	        	break;	
-        	case FLIP_VERTICAL:
-        		pt1 = ptD;
-        		pt2 = ptC;
-        		pt3 = ptB;
-	        	pt4 = ptA;
-	        	break;	        	
-        	case ROTATE_270_FLIP:
-        		pt1 = ptC;
-        		pt2 = ptB;
-        		pt3 = ptA;
-	        	pt4 = ptD;
-	        	break;	        	
+            default:
+            case NORMAL:
+                pt1 = ptA;
+                pt2 = ptB;
+                pt3 = ptC;
+                pt4 = ptD;
+                break;
+            case ROTATE_90:
+                pt1 = ptB;
+                pt2 = ptC;
+                pt3 = ptD;
+                pt4 = ptA;
+                break;
+            case ROTATE_180:
+                pt1 = ptC;
+                pt2 = ptD;
+                pt3 = ptA;
+                pt4 = ptB;
+                break;
+            case ROTATE_270:
+                pt1 = ptD;
+                pt2 = ptA;
+                pt3 = ptB;
+                pt4 = ptC;
+                break;
+
+            case FLIP_HORIZONTAL:
+                pt1 = ptB;
+                pt2 = ptA;
+                pt3 = ptD;
+                pt4 = ptC;
+                break;
+            case ROTATE_90_FLIP:
+                pt1 = ptA;
+                pt2 = ptD;
+                pt3 = ptC;
+                pt4 = ptB;
+                break;
+            case FLIP_VERTICAL:
+                pt1 = ptD;
+                pt2 = ptC;
+                pt3 = ptB;
+                pt4 = ptA;
+                break;
+            case ROTATE_270_FLIP:
+                pt1 = ptC;
+                pt2 = ptB;
+                pt3 = ptA;
+                pt4 = ptD;
+                break;
         }
-        
+
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(x + 0),        (double)(y + targetH),  (double)this.zLevel, pt1[0], pt1[1]);
-        tessellator.addVertexWithUV((double)(x + targetW),  (double)(y + targetH),  (double)this.zLevel, pt2[0], pt2[1]);
-        tessellator.addVertexWithUV((double)(x + targetW),  (double)(y + 0),        (double)this.zLevel, pt3[0], pt3[1]);
-        tessellator.addVertexWithUV((double)(x + 0),        (double)(y + 0),        (double)this.zLevel, pt4[0], pt4[1]);
+        tessellator.addVertexWithUV((double) (x + 0), (double) (y + targetH), (double) this.zLevel, pt1[0], pt1[1]);
+        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + targetH), (double) this.zLevel, pt2[0], pt2[1]);
+        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + 0), (double) this.zLevel, pt3[0], pt3[1]);
+        tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) this.zLevel, pt4[0], pt4[1]);
         tessellator.draw();
     }
+
     public void drawMouseOver(String str, int x, int y) {
         List<String> lst = new ArrayList<String>();
         Collections.addAll(lst, str.split("\n"));
         drawMouseOver(lst, x, y);
     }
-    
+
     public void drawMouseOver(List<String> str, int x, int y) {
         GL11.glDisable(GL11.GL_DEPTH_TEST);
 
@@ -144,7 +147,7 @@ public class GuiBase extends GuiScreen {
         y -= 12;
         int h = 8;
 
-        if (str.size() > 1){
+        if (str.size() > 1) {
             h += 2 + (str.size() - 1) * 10;
         }
 
@@ -186,35 +189,36 @@ public class GuiBase extends GuiScreen {
         GL11.glColor4f(1F, 1F, 1F, 1F);
 
     }
-    	
+
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
-    	GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
         applyColor(color);
-        
-    	GL11.glEnable(GL11.GL_LINE_SMOOTH );
-    	GL11.glLineWidth(1 + thickness * this.width / 500F);   
-        
-    	GL11.glBegin(GL11.GL_LINES );
-    	GL11.glVertex3f(x1, y1, 0);
-    	GL11.glVertex3f(x2, y2, 0);
-    	GL11.glEnd();        
-        
+
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glLineWidth(1 + thickness * this.width / 500F);
+
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex3f(x1, y1, 0);
+        GL11.glVertex3f(x2, y2, 0);
+        GL11.glEnd();
+
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-    }   
-    
-	public void applyColor(int color) {
-        float a = (float)(color >> 24 & 255) / 255.0F;
-        float r = (float)(color >> 16 & 255) / 255.0F;
-        float g = (float)(color >> 8 & 255) / 255.0F;
-        float b = (float)(color & 255) / 255.0F;		
-		
-		GL11.glColor4f(r, g, b, a);
-	}
+    }
+
+    public void applyColor(int color) {
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+
+        GL11.glColor4f(r, g, b, a);
+    }
 
 
     protected static RenderItem itemRenderer = new RenderItem();
     protected static RenderBlocks blockRenderer = new RenderBlocks();
+
     public void drawIcon(IIcon icon, int x, int y) {
         drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
@@ -232,7 +236,7 @@ public class GuiBase extends GuiScreen {
         if (icon == null) {
             if (FluidRegistry.WATER.equals(fluid)) {
                 icon = Blocks.water.getIcon(0, 0);
-            }else if(FluidRegistry.LAVA.equals(fluid)) {
+            } else if (FluidRegistry.LAVA.equals(fluid)) {
                 icon = Blocks.water.getIcon(0, 0);
             }
         }
@@ -240,7 +244,7 @@ public class GuiBase extends GuiScreen {
         if (icon != null) {
             GL11.glColor4f(1F, 1F, 1F, 1F);
 
-                ResourceHelper.bindResource(MAP_TEXTURE);
+            ResourceHelper.bindResource(MAP_TEXTURE);
 
             drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
 
@@ -254,10 +258,11 @@ public class GuiBase extends GuiScreen {
 
     protected static final int ITEM_SRC_Y = 235;
     public static final int ITEM_SIZE = 18;
+
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
         GL11.glColor3f(1F, 1F, 1F);
 
-            ResourceHelper.bindResource(MAP_TEXTURE);
+        ResourceHelper.bindResource(MAP_TEXTURE);
 
         drawRect(x, y, inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? ITEM_SIZE : 0, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
         if (selected) {
@@ -270,7 +275,7 @@ public class GuiBase extends GuiScreen {
 
         if (item != null && item.getItem() != null) {
             drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + + top + 1);
+            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + +top + 1);
         }
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glColor3f(1F, 1F, 1F);
@@ -299,7 +304,7 @@ public class GuiBase extends GuiScreen {
 
         setZLevel(4f);
         try {
-            if(!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
+            if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
                 itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
             }
         } finally {
@@ -332,7 +337,6 @@ public class GuiBase extends GuiScreen {
     }
 
 
-
     public int getStringWidth(String txt) {
         return fontRendererObj.getStringWidth(txt);
     }
@@ -345,7 +349,7 @@ public class GuiBase extends GuiScreen {
     public void drawString(String str, int x, int y, float mult, int color) {
         GL11.glPushMatrix();
         GL11.glScalef(mult, mult, 1F);
-        fontRendererObj.drawString(str, (int)((x + left) / mult), (int)((y + top) / mult), color);
+        fontRendererObj.drawString(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
         GL11.glPopMatrix();
     }
@@ -384,7 +388,7 @@ public class GuiBase extends GuiScreen {
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
-            fontRendererObj.drawString(str.get(i), (int)((x + left) / mult), (int)((y + top) / mult), color);
+            fontRendererObj.drawString(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
             y += fontRendererObj.FONT_HEIGHT;
         }
         GL11.glPopMatrix();
@@ -396,7 +400,7 @@ public class GuiBase extends GuiScreen {
 
     public List<String> getLinesFromText(String str, float mult, int width) {
         List<String> lst = new ArrayList<String>();
-        if(str == null) {
+        if (str == null) {
             str = "Missing info";
         }
         String[] lines = str.split("\n");
@@ -411,7 +415,7 @@ public class GuiBase extends GuiScreen {
                     char c = line.charAt(i);
                     if (c == ' ') {
                         spaceTail += c;
-                    }else{
+                    } else {
                         break;
                     }
                 }
@@ -429,8 +433,8 @@ public class GuiBase extends GuiScreen {
                 if (!other.isEmpty()) {
                     words.set(i, word);
                     words.add(i + 1, other);
-                }else {
-                    words.set(i, word +  " ");
+                } else {
+                    words.set(i, word + " ");
                 }
 
             }

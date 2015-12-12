@@ -1,7 +1,47 @@
-{ 
-    "complete": {"category": "master","sounds": [{"name": "complete","stream": false}]}, 
-	"heart": {"category": "master","sounds": [{"name": "addlife","stream": false}]}, 
-	"rotten": {"category": "master","sounds": [{"name": "addlife","stream": false}]}, 
-	"reward": {"category": "master","sounds": [{"name": "reward","stream": false}]}, 
-	"ban": {"category": "master","sounds": [{"name": "boom","stream": false}]}
+{
+  "complete": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "complete",
+        "stream": false
+      }
+    ]
+  },
+  "heart": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "addlife",
+        "stream": false
+      }
+    ]
+  },
+  "rotten": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "addlife",
+        "stream": false
+      }
+    ]
+  },
+  "reward": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "reward",
+        "stream": false
+      }
+    ]
+  },
+  "ban": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "boom",
+        "stream": false
+      }
+    ]
+  }
 }

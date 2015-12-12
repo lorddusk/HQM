@@ -37,7 +37,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return mobs.size() > VISIBLE_MOBS ;
+                return mobs.size() > VISIBLE_MOBS;
             }
         };
 
@@ -65,9 +65,9 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         mobs = new ArrayList<String>();
 
         for (Object obj : EntityList.classToStringMapping.keySet()) {
-            Class clazz = (Class)obj;
+            Class clazz = (Class) obj;
             if (EntityLivingBase.class.isAssignableFrom(clazz)) {
-                rawMobs.add((String)EntityList.classToStringMapping.get(clazz));
+                rawMobs.add((String) EntityList.classToStringMapping.get(clazz));
             }
         }
 
@@ -95,7 +95,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
 
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         GL11.glColor4f(1F, 1F, 1F, 1F);
         scrollBar.draw(gui);
 
@@ -105,7 +105,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             boolean selected = mobs.get(i).equals(mob.getMob());
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
 
-            gui.drawString(mobs.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected  ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(mobs.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
 
         gui.drawString(Translator.translate("hqm.mobTask.search"), 180, 20, 0x404040);
@@ -128,7 +128,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
                 if (mobs.get(i).equals(mob.getMob())) {
                     mob.setMob(null);
-                }else{
+                } else {
                     mob.setMob(mobs.get(i));
                 }
                 break;
@@ -176,7 +176,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
         if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.spawn_egg) && mob.getMob() != null) {
             HashMap ids = ReflectionHelper.getPrivateValue(EntityList.class, null, 4);
-            EntityList.EntityEggInfo info = (EntityList.EntityEggInfo)EntityList.entityEggs.get(ids.get(mob.getMob()));
+            EntityList.EntityEggInfo info = (EntityList.EntityEggInfo) EntityList.entityEggs.get(ids.get(mob.getMob()));
             if (info != null) {
                 mob.setIcon(new ItemStack(Items.spawn_egg, 1, info.spawnedID));
             }

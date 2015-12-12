@@ -27,7 +27,7 @@ public enum TriggerType {
         public boolean isQuestVisible(Quest quest, String playerName) {
             if (quest.getTriggerTasks() >= quest.getTasks().size()) {
                 return quest.isCompleted(playerName);
-            }else{
+            } else {
                 return quest.getTasks().get(quest.getTriggerTasks() - 1).isCompleted(playerName);
             }
         }

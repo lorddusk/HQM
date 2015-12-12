@@ -21,6 +21,7 @@ public abstract class GuiEditMenu {
 
         checkboxes = new ArrayList<CheckBox>();
     }
+
     protected GuiEditMenu(final GuiBase gui, EntityPlayer player, boolean isControlOnFirstPage) {
         this(gui, player);
         hasButtons = true;
@@ -72,6 +73,7 @@ public abstract class GuiEditMenu {
             checkbox.draw(gui, mX, mY);
         }
     }
+
     public void drawMouseOver(GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible(gui, null)) {
@@ -182,6 +184,7 @@ public abstract class GuiEditMenu {
         }
 
         public abstract boolean getValue();
+
         public abstract void setValue(boolean val);
     }
 }
