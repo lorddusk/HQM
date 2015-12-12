@@ -355,6 +355,18 @@ public abstract class QuestTaskItems extends QuestTask {
         return items;
     }
 
+    private ItemRequirement[] getFriendlyItems(ItemRequirement[] items) {
+        if (items.length < DataBitHelper.TASK_ITEM_COUNT.getMaximum()) {
+            items = Arrays.copyOf(items, items.length + 1);
+        } else {
+            return items;
+        }
+
+        items[items.length - 1] = new ItemRequirement((ItemStack) null, 1);
+        setPositions(items);
+        return items;
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
@@ -382,12 +394,20 @@ public abstract class QuestTaskItems extends QuestTask {
                     break;
                 }
             }
-        }
-        if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
-            if (isCompleted(player)) {
-                resetTask(QuestingData.getUserName(player), i);
-            } else {
-                completeTask(QuestingData.getUserName(player), i, item.required);
+
+        } else {
+            ItemRequirement[] items = getFriendlyItems(this.items);
+
+            for (int i = 0; i < items.length; i++) {
+                ItemRequirement item = items[i];
+                if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
+                    if (isCompleted(player)) {
+                        resetTask(QuestingData.getUserName(player), i);
+                    } else {
+                        completeTask(QuestingData.getUserName(player), i, item.required);
+                    }
+                    break;
+                }
             }
         }
     }
