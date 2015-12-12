@@ -17,13 +17,13 @@ public class GuiEditMenuDeathTask extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.deathTask.reqDeathCount") {
             @Override
-            protected void setValue(int number) {
-                deaths = number;
+            protected int getValue() {
+                return deaths;
             }
 
             @Override
-            protected int getValue() {
-                return deaths;
+            protected void setValue(int number) {
+                deaths = number;
             }
         });
     }

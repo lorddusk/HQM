@@ -16,13 +16,13 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repValue.tierValue") {
             @Override
-            protected void setValue(int number) {
-                value = number;
+            protected int getValue() {
+                return value;
             }
 
             @Override
-            protected int getValue() {
-                return value;
+            protected void setValue(int number) {
+                value = number;
             }
 
             @Override

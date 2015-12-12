@@ -17,7 +17,20 @@ import net.minecraft.entity.player.EntityPlayer;
 public class GuiEditMenuTextEditor extends GuiEditMenu {
 
     private static final int TEXT_HEIGHT = 9;
+    private static final int START_X = 20;
+    private static final int START_Y = 20;
+    private static final int LINES_PER_PAGE = 21;
     private TextBoxLogic text;
+    private Quest quest;
+    private QuestTask task;
+    private QuestSet questSet;
+    private Group group;
+    private GroupTier groupTier;
+    private Reputation reputation;
+    private ReputationMarker reputationMarker;
+    private int location = -1;
+    private int mob = -1;
+    private boolean isName;
 
     private GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
         super(gui, player, false);
@@ -93,16 +106,6 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         });
     }
 
-    private Quest quest;
-    private QuestTask task;
-    private QuestSet questSet;
-    private Group group;
-    private GroupTier groupTier;
-    private Reputation reputation;
-    private ReputationMarker reputationMarker;
-    private int location = -1;
-    private int mob = -1;
-    private boolean isName;
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTask task, boolean isName) {
         this(gui, player, isName ? task.getDescription() : task.getLongDescription(), isName);
         this.task = task;
@@ -118,6 +121,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.questSet = questSet;
     }
 
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player) {
         this(gui, player, Quest.getRawMainDescription(), false);
     }
@@ -127,28 +131,21 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.group = group;
     }
 
-    public GuiEditMenuTextEditor(GuiQuestBook gui,EntityPlayer player, GroupTier groupTier) {
+
+    public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, GroupTier groupTier) {
         this(gui, player, groupTier.getName(), true);
         this.groupTier = groupTier;
     }
-
-
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskLocation task, int id, QuestTaskLocation.Location location) {
-       this(gui, player, location.getName(), true);
+        this(gui, player, location.getName(), true);
         this.task = task;
         this.location = id;
     }
-
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskMob task, int id, QuestTaskMob.Mob mob) {
-        this(gui, player, mob.getName(),true);
+        this(gui, player, mob.getName(), true);
         this.task = task;
         this.mob = id;
     }
-
-
-    private static final int START_X = 20;
-    private static final int START_Y = 20;
-    private static final int LINES_PER_PAGE = 21;
 
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, Reputation reputation) {
         this(gui, player, reputation.getName(), true);
@@ -185,49 +182,49 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         if (quest != null) {
             if (isName) {
                 quest.setName(str);
-            }else{
+            } else {
                 quest.setDescription(str);
             }
-        }else if(task != null) {
+        } else if (task != null) {
             if (location != -1) {
-                while(gui.getStringWidth(str) > 110) {
+                while (gui.getStringWidth(str) > 110) {
                     str = str.substring(0, str.length() - 1);
                 }
-                ((QuestTaskLocation)task).setName(location, str, player);
-            }else if (mob != -1) {
-                while(gui.getStringWidth(str) > 110) {
+                ((QuestTaskLocation) task).setName(location, str, player);
+            } else if (mob != -1) {
+                while (gui.getStringWidth(str) > 110) {
                     str = str.substring(0, str.length() - 1);
                 }
-                ((QuestTaskMob)task).setName(mob, str, player);
-            }else if (isName) {
+                ((QuestTaskMob) task).setName(mob, str, player);
+            } else if (isName) {
                 task.setDescription(str);
-            }else{
+            } else {
                 task.setLongDescription(str);
             }
-        }else if(questSet != null) {
+        } else if (questSet != null) {
             if (isName) {
                 questSet.setName(str);
-            }else{
+            } else {
                 questSet.setDescription(str);
             }
-        }else if(group != null) {
+        } else if (group != null) {
             group.setName(str);
-        }else if(groupTier != null) {
-            while(gui.getStringWidth(str) > 110) {
+        } else if (groupTier != null) {
+            while (gui.getStringWidth(str) > 110) {
                 str = str.substring(0, str.length() - 1);
             }
             groupTier.setName(str);
-        }else if(reputation != null) {
+        } else if (reputation != null) {
             reputation.setName(str);
-        }else if(reputationMarker != null) {
+        } else if (reputationMarker != null) {
             reputationMarker.setName(str);
-        }else{
+        } else {
             Quest.setMainDescription(str);
         }
 
         if (isName) {
             SaveHelper.add(SaveHelper.EditType.NAME_CHANGE);
-        }else{
+        } else {
             SaveHelper.add(SaveHelper.EditType.DESCRIPTION_CHANGE);
         }
     }

@@ -10,10 +10,8 @@ import net.minecraftforge.common.config.Configuration;
 
 import java.util.List;
 
-public class HQMConfigGui extends GuiConfig
-{
-    public HQMConfigGui(GuiScreen parentScreen)
-    {
+public class HQMConfigGui extends GuiConfig {
+    public HQMConfigGui(GuiScreen parentScreen) {
         super(parentScreen,
                 ModConfig.getConfigElements(),
                 ModInformation.ID,

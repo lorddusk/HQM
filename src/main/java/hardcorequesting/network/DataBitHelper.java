@@ -17,13 +17,13 @@ public enum DataBitHelper {
     PLAYERS(16) {
         @Override
         public int getBitCount(FileVersion version) {
-            return version.lacks(FileVersion.REPEATABLE_QUESTS) ? 10 :  super.getBitCount(version);
+            return version.lacks(FileVersion.REPEATABLE_QUESTS) ? 10 : super.getBitCount(version);
         }
     },
     QUESTS(10) {
         @Override
         public int getBitCount(FileVersion version) {
-            return version.lacks(FileVersion.SETS) ? 7 :  super.getBitCount(version);
+            return version.lacks(FileVersion.SETS) ? 7 : super.getBitCount(version);
         }
     },
     TASKS(4),
@@ -37,7 +37,7 @@ public enum DataBitHelper {
     TASK_TYPE(4) {
         @Override
         public int getBitCount(FileVersion version) {
-            return version.lacks(FileVersion.REPUTATION_KILL) ? 3 :  super.getBitCount(version);
+            return version.lacks(FileVersion.REPUTATION_KILL) ? 3 : super.getBitCount(version);
         }
     },
     TASK_ITEM_COUNT(6, 35),
@@ -91,6 +91,8 @@ public enum DataBitHelper {
     ;
 
     private int bitCount;
+    private boolean hasMaximum;
+    private int cachedMaximum;
 
     DataBitHelper(int bitCount, int maximum) {
         this(bitCount);
@@ -111,10 +113,6 @@ public enum DataBitHelper {
     public final int getBitCount() {
         return getBitCount(QuestingData.FILE_VERSION);
     }
-
-
-    private boolean hasMaximum;
-    private int cachedMaximum;
 
     public int getMaximum() {
         if (!hasMaximum) {

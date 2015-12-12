@@ -31,102 +31,24 @@ import java.util.Arrays;
 
 public abstract class QuestTaskItems extends QuestTask {
 
+    private static final int MAX_X = 300;
+    private static final int OFFSET = 20;
+    private static final int SIZE = 18;
+    private static final int TEXT_HEIGHT = 9;
+    ItemRequirement[] items;
+
     public QuestTaskItems(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         setItems(new ItemRequirement[0]);
-    }
-
-    public void setItems(ItemRequirement[] items) {
-        this.items = items;
-        setPositions(this.items);
     }
 
     public ItemRequirement[] getItems() {
         return items;
     }
 
-
-    public static class ItemRequirement {
-        private ItemStack item;
-        public Fluid fluid;
-        public int required;
-        public boolean hasItem;
-        private ItemPrecision precision = ItemPrecision.PRECISE;
-
-        public ItemRequirement(ItemStack item, int required) {
-            this.item = item;
-            this.required = required;
-            this.hasItem = true;
-        }
-
-        public ItemRequirement(Fluid fluid, int required) {
-            this.fluid = fluid;
-            this.required = required;
-            this.hasItem = false;
-        }
-
-        public ItemPrecision getPrecision() {
-            return precision;
-        }
-
-        public void setPrecision(ItemPrecision precision) {
-            this.precision = precision;
-            permutations = null;
-        }
-
-        public ItemStack getItem() {
-            return item;
-        }
-
-        public void setItem(ItemStack item) {
-            this.item = item;
-            this.permutations = null;
-        }
-
-        private ItemStack[] permutations;
-        private int cycleAt = -1;
-        private int current = 0;
-        private int last;
-        private static int CYCLE_TIME = 2;//2 second cycle
-
-        private void setPermutations() {
-            if (item == null) return;
-            permutations = precision.getPermutations(item);
-            if (permutations != null && permutations.length > 0) {
-                last = permutations.length - 1;
-                cycleAt = -1;
-            }
-        }
-
-        public ItemStack getPermutatedItem() {
-            if (permutations == null && precision.hasPermutations())
-                setPermutations();
-            if (permutations == null || permutations.length < 2)
-                return item;
-            int ticks = (int) (System.currentTimeMillis() / 1000);
-            if (cycleAt == -1)
-                cycleAt = ticks + CYCLE_TIME;
-            if (ticks >= cycleAt) {
-                if (++current > last) current = 0;
-                while (ticks >= cycleAt)
-                    cycleAt += CYCLE_TIME;
-            }
-            return permutations[current];
-        }
-
-        private int x;
-        private int y;
-
-        public String getDisplayName() {
-            ItemStack item = getPermutatedItem();
-            if (hasItem && item == null) {
-                return "Nothing";
-            } else if (item != null) {
-                return item.getItem() != null ? item.getDisplayName() : "Unknown";
-            } else {
-                return fluid.getLocalizedName(null);
-            }
-        }
+    public void setItems(ItemRequirement[] items) {
+        this.items = items;
+        setPositions(this.items);
     }
 
     public void setItem(GuiEditMenuItem.Element element, int id, ItemPrecision precision) {
@@ -182,10 +104,6 @@ public abstract class QuestTaskItems extends QuestTask {
         data.progress[id] = count;
         doCompletionCheck(data, playerName);
     }
-
-
-    ItemRequirement[] items;
-
 
     private void setPositions(ItemRequirement[] items) {
         int x = START_X;
@@ -289,11 +207,6 @@ public abstract class QuestTaskItems extends QuestTask {
 
         setItems(items);
     }
-
-    private static final int MAX_X = 300;
-    private static final int OFFSET = 20;
-    private static final int SIZE = 18;
-    private static final int TEXT_HEIGHT = 9;
 
     @SideOnly(Side.CLIENT)
     @Override
@@ -415,7 +328,6 @@ public abstract class QuestTaskItems extends QuestTask {
     @SideOnly(Side.CLIENT)
     protected abstract GuiEditMenuItem.Type getMenuTypeId();
 
-
     public boolean increaseItems(ItemStack[] itemsToConsume, QuestDataTaskItems data, String playerName) {
         if (!parent.isAvailable(playerName)) return false;
 
@@ -522,6 +434,85 @@ public abstract class QuestTaskItems extends QuestTask {
         QuestDataTaskItems data = (QuestDataTaskItems) getData(playerName);
         for (int i = 0; i < items.length; i++) {
             data.progress[i] = items[i].required;
+        }
+    }
+
+    public static class ItemRequirement {
+        private static int CYCLE_TIME = 2;//2 second cycle
+        public Fluid fluid;
+        public int required;
+        public boolean hasItem;
+        private ItemStack item;
+        private ItemPrecision precision = ItemPrecision.PRECISE;
+        private ItemStack[] permutations;
+        private int cycleAt = -1;
+        private int current = 0;
+        private int last;
+        private int x;
+        private int y;
+        public ItemRequirement(ItemStack item, int required) {
+            this.item = item;
+            this.required = required;
+            this.hasItem = true;
+        }
+        public ItemRequirement(Fluid fluid, int required) {
+            this.fluid = fluid;
+            this.required = required;
+            this.hasItem = false;
+        }
+
+        public ItemPrecision getPrecision() {
+            return precision;
+        }
+
+        public void setPrecision(ItemPrecision precision) {
+            this.precision = precision;
+            permutations = null;
+        }
+
+        public ItemStack getItem() {
+            return item;
+        }
+
+        public void setItem(ItemStack item) {
+            this.item = item;
+            this.permutations = null;
+        }
+
+        private void setPermutations() {
+            if (item == null) return;
+            permutations = precision.getPermutations(item);
+            if (permutations != null && permutations.length > 0) {
+                last = permutations.length - 1;
+                cycleAt = -1;
+            }
+        }
+
+        public ItemStack getPermutatedItem() {
+            if (permutations == null && precision.hasPermutations())
+                setPermutations();
+            if (permutations == null || permutations.length < 2)
+                return item;
+            int ticks = (int) (System.currentTimeMillis() / 1000);
+            if (cycleAt == -1)
+                cycleAt = ticks + CYCLE_TIME;
+            if (ticks >= cycleAt) {
+                if (++current > last) current = 0;
+                while (ticks >= cycleAt)
+                    cycleAt += CYCLE_TIME;
+            }
+            return permutations[current];
+        }
+
+        public String getDisplayName() {
+            ItemStack item = getPermutatedItem();
+            if (hasItem && item == null) {
+                return "Nothing";
+            } else if (item != null) {
+                return item.getItem() != null ? item.getDisplayName() : "Unknown";
+            } else {
+                return fluid.getLocalizedName(null);
+            }
         }
     }
 }

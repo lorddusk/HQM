@@ -5,16 +5,13 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 
-public class CommandEnable extends CommandBase
-{
-    public CommandEnable()
-    {
+public class CommandEnable extends CommandBase {
+    public CommandEnable() {
         super("enable");
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments)
-    {
+    public void handleCommand(ICommandSender sender, String[] arguments) {
         QuestingData.disableVanillaHardcore(sender);
         if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
             sendChat(sender, "hqm.message.vanillaHardcoreOn");

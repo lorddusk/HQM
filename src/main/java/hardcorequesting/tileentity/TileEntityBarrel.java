@@ -19,6 +19,15 @@ import net.minecraftforge.fluids.IFluidHandler;
 
 public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler {
 
+    private static final int SYNC_TIME = 20;
+    private static final String NBT_PLAYER_NAME = "Player";
+    private static final String NBT_QUEST = "Quest";
+    private static final String NBT_TASK = "Task";
+    public int selectedQuest;
+    public int selectedTask;
+    private int modifiedSyncTimer;
+    private String playerName;
+
     @Override
     public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
         if (resource == null) {
@@ -28,7 +37,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         if (doFill) {
             QuestTask task = getCurrentTask();
             if (task != null && task instanceof QuestTaskItemsConsume) {
-                if (((QuestTaskItemsConsume)task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
                     modifiedSyncTimer = SYNC_TIME;
                 }
             }
@@ -82,13 +91,11 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return null;
     }
 
-    private static final int SYNC_TIME = 20;
-    private int modifiedSyncTimer;
     @Override
     public void setInventorySlotContents(int i, ItemStack itemstack) {
         QuestTask task = getCurrentTask();
         if (task != null && task instanceof QuestTaskItemsConsume) {
-            if (((QuestTaskItemsConsume)task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
                 modifiedSyncTimer = SYNC_TIME;
             }
         }
@@ -178,12 +185,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return true;
     }
 
-
-
-    private String playerName;
-    public int selectedQuest;
-    public int selectedTask;
-
     public void storeSettings(EntityPlayer player) {
         if (modifiedSyncTimer > 0) {
             modifiedSyncTimer = 0;
@@ -198,10 +199,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         updateState();
     }
 
-    private static final String NBT_PLAYER_NAME = "Player";
-    private static final String NBT_QUEST = "Quest";
-    private static final String NBT_TASK = "Task";
-
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
@@ -210,7 +207,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             playerName = compound.getString(NBT_PLAYER_NAME);
             selectedQuest = compound.getShort(NBT_QUEST);
             selectedTask = compound.getByte(NBT_TASK);
-        }else{
+        } else {
             playerName = null;
         }
     }
@@ -221,8 +218,8 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
         if (playerName != null) {
             compound.setString(NBT_PLAYER_NAME, playerName);
-            compound.setShort(NBT_QUEST, (short)selectedQuest);
-            compound.setByte(NBT_TASK, (byte)selectedTask);
+            compound.setShort(NBT_QUEST, (short) selectedQuest);
+            compound.setByte(NBT_TASK, (byte) selectedTask);
         }
     }
 

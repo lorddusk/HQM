@@ -6,6 +6,6 @@ public class QuestDataTaskLocation extends QuestDataTask {
 
     public QuestDataTaskLocation(QuestTask task) {
         super(task);
-        this.visited = new boolean[((QuestTaskLocation)task).locations.length];
+        this.visited = new boolean[((QuestTaskLocation) task).locations.length];
     }
 }

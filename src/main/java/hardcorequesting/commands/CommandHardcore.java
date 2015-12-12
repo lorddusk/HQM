@@ -7,20 +7,17 @@ import net.minecraft.server.MinecraftServer;
 
 import java.util.List;
 
-public class CommandHardcore extends CommandBase
-{
-    public CommandHardcore()
-    {
+public class CommandHardcore extends CommandBase {
+    public CommandHardcore() {
         super("hardcore");
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments)
-    {
+    public void handleCommand(ICommandSender sender, String[] arguments) {
         if (arguments.length == 1 && arguments[0].equalsIgnoreCase("disable")) {
             QuestingData.disableHardcore();
             sendChat(sender, "hqm.message.hardcoreDisabled");
-        }else {
+        } else {
             QuestingData.disableVanillaHardcore(sender);
             if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
                 sendChat(sender, "hqm.message.vanillaHardcoreOn");
@@ -34,10 +31,10 @@ public class CommandHardcore extends CommandBase
 
     @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
-        List<String> list =  super.addTabCompletionOptions(sender, args);
+        List<String> list = super.addTabCompletionOptions(sender, args);
         if (args[0].isEmpty() || args[0].startsWith("e"))
             list.add("enable");
-        if (args[0].isEmpty()|| args[0].startsWith("d"))
+        if (args[0].isEmpty() || args[0].startsWith("d"))
             list.add("disable");
         return list;
     }

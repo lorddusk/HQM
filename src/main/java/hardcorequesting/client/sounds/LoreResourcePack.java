@@ -28,13 +28,11 @@ public class LoreResourcePack extends AbstractResourcePack {
         return name.contains("lore") && name.endsWith(".ogg") && new File(this.resourcePackFile, "lore.ogg").isFile();
     }
 
-    public InputStream getInputStream(ResourceLocation resource) throws IOException
-    {
+    public InputStream getInputStream(ResourceLocation resource) throws IOException {
         return this.getInputStreamByName(resource.getResourcePath().replace("sounds/", ""));
     }
 
-    public boolean resourceExists(ResourceLocation resource)
-    {
+    public boolean resourceExists(ResourceLocation resource) {
         return hasResourceName(resource.getResourcePath().replace("sounds/", ""));
     }
 

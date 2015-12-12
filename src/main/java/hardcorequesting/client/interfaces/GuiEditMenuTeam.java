@@ -15,7 +15,31 @@ import java.util.List;
 
 public class GuiEditMenuTeam extends GuiEditMenu {
 
+    private static final int TEXT_HEIGHT = 9;
+    private static final int TITLE_X = 20;
+    private static final int TITLE_Y = 20;
+    private static final int PLAYER_X = 25;
+    private static final int PLAYER_Y = 32;
+    private static final int PLAYER_SPACING = 11;
+    private static final int VISIBLE_INVITES = 16;
+    private static final int VISIBLE_MEMBERS = 16;
+    private static final int INFO_BOX_X = 180;
+    private static final int INFO_BOX_SIZE = 16;
+    private static final int INFO_BOX_TEXT_OFFSET_X = 20;
+    private static final int INFO_BOX_TEXT_OFFSET_Y = 6;
+    private static final int INFO_BOX_SRC_X = 240;
+    private static final int INFO_BOX_SRC_Y = 224;
+    private static final int REWARD_SETTING_Y = 20;
     private GuiEditMenuTeam self = this;
+    private ScrollBar memberScroll;
+    private ScrollBar inviteScroll;
+    private List<ScrollBar> scrollBars;
+    private LargeButton inviteButton;
+    private Team inviteTeam;
+    private TextBoxGroup textBoxes;
+    private TextBoxGroup.TextBox teamName;
+    private TextBoxGroup.TextBox inviteName;
+    private Team.PlayerEntry selectedEntry;
     public GuiEditMenuTeam(GuiQuestBook gui, EntityPlayer player) {
         super(gui, player);
 
@@ -177,7 +201,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                gui.setEditMenu(new GuiEditMenuTeamList((GuiQuestBook)gui, player, self));
+                gui.setEditMenu(new GuiEditMenuTeamList((GuiQuestBook) gui, player, self));
             }
         });
 
@@ -188,7 +212,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 return getTeam().isSingle() && inviteTeam == null;
             }
         });
-        teamName.setWidth((int)((GuiQuestBook.PAGE_WIDTH - TITLE_X - 10) * 0.7F));
+        teamName.setWidth((int) ((GuiQuestBook.PAGE_WIDTH - TITLE_X - 10) * 0.7F));
 
         textBoxes.add(inviteName = new TextBoxName(gui, "", 180, 26) {
             @Override
@@ -201,7 +225,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         scrollBars.add(inviteScroll = new ScrollBar(155, 22, 186, 171, 69, PLAYER_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return inviteTeam == null && getTeam().isSingle() && getTeam().getInvites() != null && getTeam().getInvites().size() > VISIBLE_INVITES ;
+                return inviteTeam == null && getTeam().isSingle() && getTeam().getInvites() != null && getTeam().getInvites().size() > VISIBLE_INVITES;
             }
         });
 
@@ -212,44 +236,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
     }
-
-
-
-    private class TextBoxName extends TextBoxGroup.TextBox {
-
-        public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
-            super(gui, str, x, y, true);
-            setMaxLength(DataBitHelper.NAME_LENGTH.getMaximum());
-            setMult(0.7F);
-            offsetY = 5;
-        }
-    }
-
-    private static final int TEXT_HEIGHT = 9;
-    private static final int TITLE_X = 20;
-    private static final int TITLE_Y = 20;
-    private static final int PLAYER_X = 25;
-    private static final int PLAYER_Y = 32;
-    private static final int PLAYER_SPACING = 11;
-    private static final int VISIBLE_INVITES = 16;
-    private static final int VISIBLE_MEMBERS = 16;
-    private static final int INFO_BOX_X = 180;
-    private static final int INFO_BOX_SIZE = 16;
-    private static final int INFO_BOX_TEXT_OFFSET_X = 20;
-    private static final int INFO_BOX_TEXT_OFFSET_Y = 6;
-    private static final int INFO_BOX_SRC_X = 240;
-    private static final int INFO_BOX_SRC_Y = 224;
-    private static final int REWARD_SETTING_Y = 20;
-
-    private ScrollBar memberScroll;
-    private ScrollBar inviteScroll;
-    private List<ScrollBar> scrollBars;
-    private LargeButton inviteButton;
-    private Team inviteTeam;
-    private TextBoxGroup textBoxes;
-    private TextBoxGroup.TextBox teamName;
-    private TextBoxGroup.TextBox inviteName;
-    private Team.PlayerEntry selectedEntry;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -262,7 +248,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             if (inviteTeam != null) {
                 if (team.getInvites() == null) {
                     inviteTeam = null;
-                }else{
+                } else {
                     boolean stillThere = false;
                     for (Team t : team.getInvites()) {
                         if (t.getName().equals(inviteTeam.getName())) {
@@ -283,7 +269,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
         textBoxes.draw(gui);
 
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
         GL11.glColor4f(1F, 1F, 1F, 1F);
         for (ScrollBar scrollBar : scrollBars) {
@@ -301,12 +287,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                     Team invite = invites.get(i);
                     gui.drawString(invite.getName(), PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), 0x404040);
                 }
-            }else{
+            } else {
                 gui.drawString(Translator.translate("hqm.party.noInvites"), TITLE_X, TITLE_Y, 0x404040);
             }
 
             gui.drawString(Translator.translate("hqm.party.name"), 180, 20, 0.7F, 0x404040);
-        }else{
+        } else {
             boolean isOwner = inviteTeam == null && entry.isOwner();
             String title = (inviteTeam == null ? team : inviteTeam).getName();
             gui.drawString(title, TITLE_X, TITLE_Y, 0x404040);
@@ -319,10 +305,10 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
                 if (player.isOwner()) {
                     str += GuiColor.ORANGE + " [" + Translator.translate("hqm.party.owner") + "]";
-                }else if (!player.isInTeam()) {
+                } else if (!player.isInTeam()) {
                     if (isOwner) {
                         str += GuiColor.LIGHT_GRAY + " [" + Translator.translate("hqm.party.invite") + "]";
-                    }else{
+                    } else {
                         continue;
                     }
                 }
@@ -332,7 +318,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                     if (isOwner) {
                         if (player.equals(selectedEntry)) {
                             color = 0xD0D0D0;
-                        }else if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), (int)(gui.getStringWidth(player.getName()) * 0.7F), (int)(TEXT_HEIGHT * 0.7F), mX, mY))  {
+                        } else if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), (int) (gui.getStringWidth(player.getName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
                             color = 0x808080;
                         }
                     }
@@ -356,7 +342,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                         }
                     }
 
-                }else{
+                } else {
                     gui.drawString(gui.getLinesFromText(Translator.translate("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, GuiColor.RED.getHexColor());
                 }
             }
@@ -367,7 +353,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
 
 
-                ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
             GL11.glColor4f(1F, 1F, 1F, 1F);
             gui.drawRect(INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
@@ -377,10 +363,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             gui.drawString(Translator.translate("hqm.party.rewardSetting", infoTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
 
         }
-
-
-
-
 
 
     }
@@ -398,7 +380,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
                 gui.drawMouseOver(gui.getLinesFromText(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.party.change") : ""), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
-            }else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
+            } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
                 gui.drawMouseOver(gui.getLinesFromText(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.party.change") : ""), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
@@ -406,7 +388,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         if (Team.latestError != null) {
             if (inviteButton.inButtonBounds(gui, mX, mY)) {
                 gui.drawMouseOver(gui.getLinesFromText(GuiColor.RED + Team.latestError.getHeader() + "\n" + Team.latestError.getMessage(), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
-            }else{
+            } else {
                 Team.latestError = null;
             }
         }
@@ -415,9 +397,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private int getInfoY() {
         if (inviteTeam != null) {
             return 80;
-        }else if(getEntry(getTeam()).isOwner()) {
+        } else if (getEntry(getTeam()).isOwner()) {
             return selectedEntry != null ? 80 : 50;
-        }else{
+        } else {
             return 20;
         }
     }
@@ -435,18 +417,18 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 int end = Math.min(invites.size(), start + VISIBLE_INVITES);
                 for (int i = start; i < end; i++) {
                     Team invite = invites.get(i);
-                    if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * i, (int)(gui.getStringWidth(invite.getName()) * 0.7F), (int)(TEXT_HEIGHT * 0.7F), mX, mY)) {
+                    if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * i, (int) (gui.getStringWidth(invite.getName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
                         inviteTeam = invite;
                         break;
                     }
                 }
             }
-        }else if(!team.isSingle() && getEntry(team).isOwner()) {
+        } else if (!team.isSingle() && getEntry(team).isOwner()) {
             int start = memberScroll.isVisible(gui) ? Math.round((team.getPlayers().size() - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
             int end = Math.min(team.getPlayers().size(), start + VISIBLE_MEMBERS);
             for (int i = start; i < end; i++) {
                 Team.PlayerEntry entry = team.getPlayers().get(i);
-                if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), (int)(gui.getStringWidth(entry.getName()) * 0.7F), (int)(TEXT_HEIGHT * 0.7F), mX, mY)) {
+                if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), (int) (gui.getStringWidth(entry.getName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
                     selectedEntry = selectedEntry == entry ? null : entry;
                     break;
                 }
@@ -456,13 +438,10 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
                 team.nextLifeSetting();
-            }else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
+            } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
                 team.nextRewardSetting();
             }
         }
-
-
-
 
 
         textBoxes.onClick(gui, mX, mY);
@@ -515,6 +494,16 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
     private Team.PlayerEntry getEntry(Team team) {
         return team.getEntry(QuestingData.getUserName(player));
+    }
+
+    private class TextBoxName extends TextBoxGroup.TextBox {
+
+        public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
+            super(gui, str, x, y, true);
+            setMaxLength(DataBitHelper.NAME_LENGTH.getMaximum());
+            setMult(0.7F);
+            offsetY = 5;
+        }
     }
 
 

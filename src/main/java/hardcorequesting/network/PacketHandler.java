@@ -33,11 +33,16 @@ public class PacketHandler {
     public static final int BLOCK_UPDATE_BUFFER_DISTANCE = 5;
     public static final int BIT_MASK[] = {
             0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff,
-            0x1ff,0x3ff,0x7ff,0xfff,0x1fff,0x3fff,0x7fff,0xffff,
-            0x1ffff,0x3ffff,0x7ffff,0xfffff,0x1fffff,0x3fffff,
-            0x7fffff,0xffffff,0x1ffffff,0x3ffffff,0x7ffffff,
-            0xfffffff,0x1fffffff,0x3fffffff,0x7fffffff,0xffffffff
+            0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff, 0xffff,
+            0x1ffff, 0x3ffff, 0x7ffff, 0xfffff, 0x1fffff, 0x3fffff,
+            0x7fffff, 0xffffff, 0x1ffffff, 0x3ffffff, 0x7ffffff,
+            0xfffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff, 0xffffffff
     };
+    private static final Map<String, String> nameOverride = new HashMap<String, String>();
+    private static final Map<String, String> nameOverrideReversed = new HashMap<String, String>();
+    private static String clientNameOverride;
+    private int missingPackets;
+    private byte[][] data;
 
     public static DataWriter getWriter(PacketId id) {
         DataWriter dw = new DataWriter();
@@ -45,10 +50,6 @@ public class PacketHandler {
         dw.writeData(id.getId(), DataBitHelper.PACKET_ID);
         return dw;
     }
-
-    private static final Map<String, String> nameOverride = new HashMap<String, String>();
-    private static final Map<String, String> nameOverrideReversed = new HashMap<String, String>();
-    private static String clientNameOverride;
 
     public static void add(EntityPlayer player, String name) {
         if (name != null) {
@@ -67,7 +68,7 @@ public class PacketHandler {
         String name = nameOverride.remove(player.getGameProfile().getName());
         if (name != null) {
             nameOverrideReversed.remove(name);
-        }else{
+        } else {
             setBookState(player, false);
         }
     }
@@ -104,8 +105,84 @@ public class PacketHandler {
         sendToServer(getWriter(PacketId.CLOSE_INTERFACE));
     }
 
-    private int missingPackets;
-    private byte[][] data;
+    public static void sendToPlayer(String name, DataWriter dw) {
+        if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
+            sendToBookPlayer(name, dw);
+        }
+        dw.close();
+    }
+
+    private static void sendToBookPlayer(String name, DataWriter dw) {
+        if (QuestingData.getQuestingData(name).getTeam().getEntry(name).isBookOpen()) {
+            EntityPlayer player = QuestingData.getPlayer(name);
+            if (player != null) {
+                dw.sendToPlayer((EntityPlayerMP) player);
+            }
+        }
+
+        String playerName = nameOverrideReversed.get(name);
+        if (playerName != null) {
+            EntityPlayer other = QuestingData.getPlayer(playerName);
+            if (other != null) {
+                dw.sendToPlayer((EntityPlayerMP) other);
+            }
+        }
+    }
+
+    public static void sendToRawPlayer(EntityPlayer player, DataWriter dw) {
+        if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
+            dw.sendToPlayer((EntityPlayerMP) player);
+        }
+        dw.close();
+    }
+
+    public static void sendToAllPlayers(DataWriter dw) {
+        if (!Quest.isEditing && !QuestingData.isSinglePlayer()) {
+            dw.sendToAllPlayers();
+        }
+        dw.close();
+    }
+
+    public static void sendToServer(DataWriter dw) {
+        if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
+            dw.sendToServer();
+        }
+        dw.close();
+    }
+
+    public static void sendToAllPlayersWithOpenBook(DataWriter dw) {
+        if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
+            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+                sendToBookPlayer(name, dw);
+            }
+        }
+        dw.close();
+    }
+
+    public static void sendBlockPacket(IBlockSync block, EntityPlayer player, int id) {
+        if (block instanceof TileEntity) {
+            DataWriter dw = getWriter(PacketId.BLOCK_SYNC);
+            TileEntity te = (TileEntity) block;
+            boolean onServer = !te.getWorldObj().isRemote;
+
+            dw.writeData(te.xCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.yCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.zCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(id, block.infoBitLength());
+
+            block.writeData(dw, player, onServer, id);
+
+            if (!onServer) {
+                dw.sendToServer();
+            } else if (player != null) {
+                dw.sendToPlayer((EntityPlayerMP) player);
+            } else {
+                dw.sendToAllPlayersAround(te, BLOCK_UPDATE_RANGE);
+            }
+
+            dw.close();
+        }
+    }
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
@@ -115,10 +192,10 @@ public class PacketHandler {
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-        onPacketData(event.packet.payload().array(), ((NetHandlerPlayServer)event.handler).playerEntity, true);
+        onPacketData(event.packet.payload().array(), ((NetHandlerPlayServer) event.handler).playerEntity, true);
     }
 
-	private void onPacketData(byte[] incomingData, EntityPlayer player, boolean onServer) {
+    private void onPacketData(byte[] incomingData, EntityPlayer player, boolean onServer) {
 
         DataReader dr = null;
         try {
@@ -130,7 +207,7 @@ public class PacketHandler {
             //read the packet count that was manually read before the creation of the data reader
             dr.readByte();
 
-            PacketId id = PacketId.getFromId((byte)dr.readData(DataBitHelper.PACKET_ID));
+            PacketId id = PacketId.getFromId((byte) dr.readData(DataBitHelper.PACKET_ID));
 
             switch (id) {
                 case OPEN_INTERFACE:
@@ -197,21 +274,21 @@ public class PacketHandler {
                 case BLOCK_SYNC:
                     handleBlockSync(player, dr);
             }
-        }catch (Throwable ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
-        }finally {
+        } finally {
             if (dr != null) {
                 dr.close();
             }
         }
     }
 
-    private DataReader getDataReaderForPacket(byte[] incomingData) throws Throwable{
+    private DataReader getDataReaderForPacket(byte[] incomingData) throws Throwable {
         if (missingPackets == 0) {
             int count = incomingData[0];
             if (count == 1) {
                 return new DataReader(incomingData);
-            }else{
+            } else {
                 missingPackets = incomingData[0];
                 if (missingPackets < 0) {
                     missingPackets += 256;
@@ -225,7 +302,7 @@ public class PacketHandler {
 
         if (missingPackets != 0) {
             return null;
-        }else{
+        } else {
             int byteCount = 0;
             for (byte[] bytes : this.data) {
                 byteCount += bytes.length;
@@ -241,7 +318,6 @@ public class PacketHandler {
             return new DataReader(packetData);
         }
     }
-
 
     private void handleSelectTask(EntityPlayer player, DataReader dr) {
         int questId = dr.readData(DataBitHelper.QUESTS);
@@ -281,87 +357,6 @@ public class PacketHandler {
         }
     }
 
-
-    public static void sendToPlayer(String name, DataWriter dw) {
-        if (!Quest.isEditing  || QuestingData.isSinglePlayer()) {
-            sendToBookPlayer(name, dw);
-        }
-        dw.close();
-    }
-
-    private static void sendToBookPlayer(String name, DataWriter dw) {
-        if (QuestingData.getQuestingData(name).getTeam().getEntry(name).isBookOpen()) {
-            EntityPlayer player = QuestingData.getPlayer(name);
-            if (player != null) {
-                dw.sendToPlayer((EntityPlayerMP)player);
-            }
-        }
-
-        String playerName = nameOverrideReversed.get(name);
-        if (playerName != null) {
-            EntityPlayer other = QuestingData.getPlayer(playerName);
-            if (other != null) {
-                dw.sendToPlayer((EntityPlayerMP)other);
-            }
-        }
-    }
-
-    public static void sendToRawPlayer(EntityPlayer player, DataWriter dw) {
-        if (!Quest.isEditing  || QuestingData.isSinglePlayer()) {
-            dw.sendToPlayer((EntityPlayerMP) player);
-        }
-        dw.close();
-    }
-
-    public static void sendToAllPlayers(DataWriter dw) {
-        if (!Quest.isEditing  && !QuestingData.isSinglePlayer()) {
-            dw.sendToAllPlayers();
-        }
-        dw.close();
-    }
-
-    public static void sendToServer(DataWriter dw) {
-        if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
-            dw.sendToServer();
-        }
-        dw.close();
-    }
-
-
-    public static void sendToAllPlayersWithOpenBook(DataWriter dw) {
-        if (!Quest.isEditing  || QuestingData.isSinglePlayer()) {
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()){
-                sendToBookPlayer(name, dw);
-            }
-        }
-        dw.close();
-    }
-
-    public static void sendBlockPacket(IBlockSync block, EntityPlayer player, int id) {
-        if (block instanceof TileEntity) {
-            DataWriter dw = getWriter(PacketId.BLOCK_SYNC);
-            TileEntity te = (TileEntity)block;
-            boolean onServer = !te.getWorldObj().isRemote;
-
-            dw.writeData(te.xCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.yCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.zCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(id, block.infoBitLength());
-
-            block.writeData(dw, player, onServer, id);
-
-            if (!onServer) {
-                dw.sendToServer();
-            }else if(player != null) {
-                dw.sendToPlayer((EntityPlayerMP)player);
-            }else{
-                dw.sendToAllPlayersAround(te, BLOCK_UPDATE_RANGE);
-            }
-
-            dw.close();
-        }
-    }
-
     private void handleBlockSync(EntityPlayer player, DataReader dr) {
         boolean onServer = !player.worldObj.isRemote;
         int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
@@ -370,7 +365,7 @@ public class PacketHandler {
 
         TileEntity te = player.worldObj.getTileEntity(x, y, z);
         if (te instanceof IBlockSync) {
-            IBlockSync block = (IBlockSync)te;
+            IBlockSync block = (IBlockSync) te;
             int id = dr.readData(block.infoBitLength());
 
             block.readData(dr, player, onServer, id);

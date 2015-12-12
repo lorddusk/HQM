@@ -15,13 +15,13 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTracker.radius.title") {
             @Override
-            protected void setValue(int number) {
-                tracker.setRadius(number);
+            protected int getValue() {
+                return tracker.getRadius();
             }
 
             @Override
-            protected int getValue() {
-                return tracker.getRadius();
+            protected void setValue(int number) {
+                tracker.setRadius(number);
             }
 
             @Override
@@ -44,7 +44,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             tracker.setType(TrackerType.values()[(tracker.getType().ordinal() + TrackerType.values().length - 1) % TrackerType.values().length]);
-        }else{
+        } else {
             tracker.setType(TrackerType.values()[(tracker.getType().ordinal() + 1) % TrackerType.values().length]);
         }
     }

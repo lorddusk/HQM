@@ -17,6 +17,7 @@ import java.util.List;
 
 public class EventHandler {
 
+    private static EventHandler instance;
     private List<QuestTask>[] registeredTasks;
 
     public EventHandler() {
@@ -30,13 +31,17 @@ public class EventHandler {
         instance = this;
     }
 
+    public static EventHandler instance() {
+        return instance;
+    }
+
     public void clear() {
         for (List<QuestTask> registeredTask : registeredTasks) {
             registeredTask.clear();
         }
     }
 
-    public void add(QuestTask task, Type ... types) {
+    public void add(QuestTask task, Type... types) {
         for (Type type : types) {
             registeredTasks[type.ordinal()].add(task);
         }
@@ -46,11 +51,6 @@ public class EventHandler {
         for (List<QuestTask> registeredTask : registeredTasks) {
             registeredTask.remove(task);
         }
-    }
-
-    private static EventHandler instance;
-    public static EventHandler instance() {
-        return instance;
     }
 
     @SubscribeEvent
@@ -105,6 +105,16 @@ public class EventHandler {
     }
 
 
+    public enum Type {
+        SERVER,
+        PLAYER,
+        DEATH,
+        CRAFTING,
+        PICK_UP,
+        OPEN_BOOK,
+        REPUTATION_CHANGE,
+    }
+
     public static class BookOpeningEvent {
         private String playerName;
         private boolean isOpBook;
@@ -144,16 +154,6 @@ public class EventHandler {
         public EntityPlayer getPlayer() {
             return player;
         }
-    }
-
-    public enum Type {
-        SERVER,
-        PLAYER,
-        DEATH,
-        CRAFTING,
-        PICK_UP,
-        OPEN_BOOK,
-        REPUTATION_CHANGE,
     }
 
 }

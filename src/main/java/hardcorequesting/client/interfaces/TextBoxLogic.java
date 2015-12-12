@@ -9,17 +9,29 @@ import java.util.List;
 @SideOnly(Side.CLIENT)
 public class TextBoxLogic {
     private static final int TEXT_HEIGHT = 9;
-    private String text;
-    private List<String> lines;
     protected int cursor;
     protected int cursorPositionX;
+    protected boolean updatedCursor;
+    private String text;
+    private List<String> lines;
     private int cursorPositionY;
     private boolean multiLine;
     private int width;
-    protected boolean updatedCursor;
     private float mult = 1F;
     private int maxLength = Integer.MAX_VALUE;
     private int cursorLine;
+
+    public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine) {
+        this.width = width;
+        this.multiLine = multiLine;
+        if (text == null) {
+            this.text = "";
+        } else {
+            this.text = text;
+        }
+        textChanged(gui);
+        resetCursor();
+    }
 
     public int getCursorLine(GuiBase gui) {
         recalculateCursor(gui);
@@ -30,24 +42,12 @@ public class TextBoxLogic {
         this.maxLength = maxLength;
     }
 
-    public void setMult(float mult) {
-        this.mult = mult;
-    }
-
     public float getMult() {
         return mult;
     }
 
-    public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine) {
-        this.width = width;
-        this.multiLine = multiLine;
-        if (text == null) {
-            this.text = "";
-        }else{
-            this.text = text;
-        }
-        textChanged(gui);
-        resetCursor();
+    public void setMult(float mult) {
+        this.mult = mult;
     }
 
     @SideOnly(Side.CLIENT)
@@ -82,7 +82,7 @@ public class TextBoxLogic {
         if (cursor + direction >= 0 && cursor + direction <= text.length()) {
             if (direction > 0) {
                 text = text.substring(0, cursor) + text.substring(cursor + 1);
-            }else{
+            } else {
                 text = text.substring(0, cursor - 1) + text.substring(cursor);
                 moveCursor(gui, direction);
             }
@@ -126,16 +126,16 @@ public class TextBoxLogic {
                 int tmpCursor = cursor;
                 for (int i = 0; i < lines.size(); i++) {
                     if (tmpCursor <= lines.get(i).length()) {
-                        cursorPositionX = (int)(mult * gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                        cursorPositionY = (int)(TEXT_HEIGHT * i * mult);
+                        cursorPositionX = (int) (mult * gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
+                        cursorPositionY = (int) (TEXT_HEIGHT * i * mult);
                         cursorLine = i;
                         break;
-                    }else{
+                    } else {
                         tmpCursor -= lines.get(i).length();
                     }
                 }
-            }else{
-                cursorPositionX = (int)(mult * gui.getStringWidth(text.substring(0, cursor)));
+            } else {
+                cursorPositionX = (int) (mult * gui.getStringWidth(text.substring(0, cursor)));
                 cursorPositionY = 0;
             }
 
@@ -152,13 +152,13 @@ public class TextBoxLogic {
     public void onKeyStroke(GuiBase gui, char c, int k) {
         if (k == 203) {
             moveCursor(gui, -1);
-        }else if(k == 205) {
+        } else if (k == 205) {
             moveCursor(gui, 1);
-        }else if (k == 14) {
+        } else if (k == 14) {
             deleteText(gui, -1);
-        }else if (k == 211) {
+        } else if (k == 211) {
             deleteText(gui, 1);
-        }else if (isCharacterValid(c)) {
+        } else if (isCharacterValid(c)) {
             addText(gui, Character.toString(c));
         }
     }
@@ -170,7 +170,7 @@ public class TextBoxLogic {
     private void updateCursor() {
         if (cursor < 0) {
             cursor = 0;
-        }else if (cursor > text.length()) {
+        } else if (cursor > text.length()) {
             cursor = text.length();
         }
 

@@ -1,7 +1,6 @@
 package hardcorequesting.client.interfaces;
 
 
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.config.ModConfig;
@@ -11,25 +10,21 @@ import org.lwjgl.input.Mouse;
 @SideOnly(Side.CLIENT)
 public class GuiWrapperEditMenu extends GuiBase {
 
+    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
+    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
+    private static final int TEXTURE_WIDTH = 170;
+    private static final int TEXTURE_HEIGHT = 234;
     private GuiEditMenu editMenu;
-
 
     @Override
     public void setEditMenu(GuiEditMenu editMenu) {
 
         if (editMenu != null) {
             this.editMenu = editMenu;
-        }else{
+        } else {
             this.mc.displayGuiScreen(null);
         }
     }
-
-    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
-    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
-
-
-    private static final int TEXTURE_WIDTH = 170;
-    private static final int TEXTURE_HEIGHT = 234;
 
     @Override
     public void drawScreen(int mX0, int mY0, float f) {
@@ -40,7 +35,7 @@ public class GuiWrapperEditMenu extends GuiBase {
 
         applyColor(0xFFFFFFFF);
 
-            ResourceHelper.bindResource(BG_TEXTURE);
+        ResourceHelper.bindResource(BG_TEXTURE);
 
 
         drawRect(0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -50,7 +45,7 @@ public class GuiWrapperEditMenu extends GuiBase {
 
         applyColor(0xFFFFFFFF);
 
-            ResourceHelper.bindResource(MAP_TEXTURE);
+        ResourceHelper.bindResource(MAP_TEXTURE);
 
 
         int mX = mX0 - left;

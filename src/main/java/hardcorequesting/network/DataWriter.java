@@ -22,15 +22,19 @@ import static hardcorequesting.HardcoreQuesting.packetHandler;
 
 
 public class DataWriter {
+    private static final int MAX_PACKET_SIZE = 32766;
+    private static final double LOG_2 = Math.log10(2);
     private OutputStream stream;
     private int byteBuffer;
     private int bitCountBuffer;
     private int bits;
-
+    private DataBitHelper bufferSize;
+    private DataWriter buffer;
 
     DataWriter() {
         stream = new ByteArrayOutputStream();
     }
+
 
     DataWriter(OutputStream stream) {
         this.stream = stream;
@@ -47,7 +51,6 @@ public class DataWriter {
     public void writeData(int data, DataBitHelper bitCount) {
         writeData(data, bitCount.getBitCount());
     }
-
 
     public void writeData(int data, int bitCount) {
         if (buffer != null) {
@@ -85,7 +88,6 @@ public class DataWriter {
         }
     }
 
-
     void close() {
         try {
             stream.close();
@@ -93,7 +95,6 @@ public class DataWriter {
             e.printStackTrace();
         }
     }
-
 
     public void writeString(String str, DataBitHelper bits) {
         if (str != null) {
@@ -127,9 +128,6 @@ public class DataWriter {
             }
         }
     }
-
-
-    private static final int MAX_PACKET_SIZE = 32766;
 
     void sendToPlayer(EntityPlayerMP player) {
         writeFinalBits();
@@ -180,7 +178,6 @@ public class DataWriter {
         packetHandler.sendToServer(createPacket());
     }
 
-
     public void sendToAllPlayers() {
         packetHandler.sendToAll(createPacket());
     }
@@ -188,9 +185,6 @@ public class DataWriter {
     public void sendToAllPlayersAround(TileEntity te, double range) {
         packetHandler.sendToAllAround(createPacket(), new NetworkRegistry.TargetPoint(te.getWorldObj().provider.dimensionId, te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord, range));
     }
-
-    private DataBitHelper bufferSize;
-    private DataWriter buffer;
 
     public void createBuffer(DataBitHelper bits) {
         buffer = new DataWriter();
@@ -228,8 +222,6 @@ public class DataWriter {
     public void writeItem(Item item) {
         writeString(Item.itemRegistry.getNameForObject(item), DataBitHelper.SHORT);
     }
-
-    private static final double LOG_2 = Math.log10(2);
 
     public void writeEnum(Enum data) {
         try {

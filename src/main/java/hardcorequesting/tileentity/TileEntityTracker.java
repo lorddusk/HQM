@@ -16,14 +16,45 @@ import net.minecraft.world.World;
 public class TileEntityTracker extends TileEntity {
 
 
+    private static final String NBT_QUEST = "Quest";
+    private static final String NBT_RADIUS = "Radius";
+    private static final String NBT_TYPE = "TrackerType";
     private Quest quest;
     private int questId = -1;
     private int radius;
     private TrackerType type = TrackerType.TEAM;
+    private int delay = 0;
 
-    private static final String NBT_QUEST = "Quest";
-    private static final String NBT_RADIUS = "Radius";
-    private static final String NBT_TYPE = "TrackerType";
+    private static TileEntityTracker getTracker(World world, DataReader dr) {
+        int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
+        int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
+        int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
+
+        TileEntity te = world.getTileEntity(x, y, z);
+        if (te instanceof TileEntityTracker) {
+            return (TileEntityTracker) te;
+        } else {
+            return null;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void openInterface(EntityPlayer player, DataReader dr) {
+        TileEntityTracker tracker = getTracker(player.worldObj, dr);
+        if (tracker != null) {
+            tracker.load(dr, true);
+            GuiBase gui = new GuiWrapperEditMenu();
+            gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
+            Minecraft.getMinecraft().displayGuiScreen(gui);
+        }
+    }
+
+    public static void saveToServer(EntityPlayer player, DataReader dr) {
+        TileEntityTracker tracker = getTracker(player.worldObj, dr);
+        if (Quest.isEditing && tracker != null) {
+            tracker.load(dr, false);
+        }
+    }
 
     @Override
     public void writeToNBT(NBTTagCompound compound) {
@@ -33,7 +64,7 @@ public class TileEntityTracker extends TileEntity {
             compound.setShort(NBT_QUEST, quest.getId());
         }
         compound.setInteger(NBT_RADIUS, radius);
-        compound.setByte(NBT_TYPE, (byte)type.ordinal());
+        compound.setByte(NBT_TYPE, (byte) type.ordinal());
     }
 
     @Override
@@ -42,14 +73,12 @@ public class TileEntityTracker extends TileEntity {
 
         if (compound.hasKey(NBT_QUEST)) {
             questId = compound.getShort(NBT_QUEST);
-        }else{
+        } else {
             quest = null;
         }
         radius = compound.getInteger(NBT_RADIUS);
         type = TrackerType.values()[compound.getByte(NBT_TYPE)];
     }
-
-    private int delay = 0;
 
     @Override
     public void updateEntity() {
@@ -78,16 +107,16 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void notifyUpdate(int x, int y, int z, int i) {
-        if (i == 2 ||x != xCoord || y != yCoord || z != zCoord) {
+        if (i == 2 || x != xCoord || y != yCoord || z != zCoord) {
             worldObj.notifyBlockOfNeighborChange(x, y, z, getBlockType());
 
             if (i > 0) {
-                notifyUpdate(x - 1,     y,          z,      i - 1);
-                notifyUpdate(x + 1,     y,          z,      i - 1);
-                notifyUpdate(x,         y - 1,      z,      i - 1);
-                notifyUpdate(x,         y + 1,      z,      i - 1);
-                notifyUpdate(x,         y,          z - 1,  i - 1);
-                notifyUpdate(x,         y,          z + 1,  i - 1);
+                notifyUpdate(x - 1, y, z, i - 1);
+                notifyUpdate(x + 1, y, z, i - 1);
+                notifyUpdate(x, y - 1, z, i - 1);
+                notifyUpdate(x, y + 1, z, i - 1);
+                notifyUpdate(x, y, z - 1, i - 1);
+                notifyUpdate(x, y, z + 1, i - 1);
             }
         }
     }
@@ -130,7 +159,7 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void save(DataWriter dw, boolean saveQuest) {
-        if (saveQuest)  {
+        if (saveQuest) {
             dw.writeBoolean(quest != null);
             if (quest != null) {
                 dw.writeData(quest.getId(), DataBitHelper.QUESTS);
@@ -144,7 +173,7 @@ public class TileEntityTracker extends TileEntity {
         if (loadQuest) {
             if (dr.readBoolean()) {
                 quest = Quest.getQuest(dr.readData(DataBitHelper.QUESTS));
-            }else{
+            } else {
                 quest = null;
             }
         }
@@ -152,42 +181,10 @@ public class TileEntityTracker extends TileEntity {
         type = TrackerType.values()[dr.readData(DataBitHelper.TRACKER_TYPE)];
     }
 
-    private static TileEntityTracker getTracker(World world, DataReader dr) {
-        int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
-        int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
-        int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
-
-        TileEntity te = world.getTileEntity(x, y, z);
-        if (te instanceof TileEntityTracker) {
-            return (TileEntityTracker)te;
-        }else{
-            return null;
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void openInterface(EntityPlayer player, DataReader dr) {
-        TileEntityTracker tracker = getTracker(player.worldObj, dr);
-        if (tracker != null) {
-            tracker.load(dr, true);
-            GuiBase gui = new GuiWrapperEditMenu();
-            gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
-            Minecraft.getMinecraft().displayGuiScreen(gui);
-        }
-    }
-
-
     public void sendToServer() {
         DataWriter dw = PacketHandler.getWriter(PacketId.TRACKER_RESPONSE);
         saveCoordinate(dw);
         save(dw, false);
         PacketHandler.sendToServer(dw);
-    }
-
-    public static void saveToServer(EntityPlayer player, DataReader dr) {
-        TileEntityTracker tracker = getTracker(player.worldObj, dr);
-        if (Quest.isEditing && tracker != null) {
-            tracker.load(dr, false);
-        }
     }
 }

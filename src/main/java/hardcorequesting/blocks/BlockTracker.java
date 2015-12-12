@@ -21,17 +21,16 @@ import net.minecraft.world.World;
 
 public class BlockTracker extends BlockContainer {
 
+    @SideOnly(Side.CLIENT)
+    private IIcon activeIcon;
+    @SideOnly(Side.CLIENT)
+    private IIcon emptyIcon;
     public BlockTracker() {
         super(Material.wood);
         setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
     }
-
-    @SideOnly(Side.CLIENT)
-    private IIcon activeIcon;
-    @SideOnly(Side.CLIENT)
-    private IIcon emptyIcon;
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -40,8 +39,8 @@ public class BlockTracker extends BlockContainer {
     }
 
     private void pickIcons(IIconRegister icon) {
-            activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
-            emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
+        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
+        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
     }
 
     @Override
@@ -63,7 +62,8 @@ public class BlockTracker extends BlockContainer {
                     TileEntity te = world.getTileEntity(x, y, z);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));;
+                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            ;
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {

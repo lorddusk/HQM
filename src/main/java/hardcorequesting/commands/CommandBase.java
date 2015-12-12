@@ -30,13 +30,17 @@ public abstract class CommandBase implements ISubCommand {
                 .setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES).create();
     }
 
+    protected int permissionLevel = 3;
     private String name;
     private List<String> subCommands = new ArrayList<>();
-    protected int permissionLevel = 3;
 
     public CommandBase(String name, String... subCommands) {
         this.name = name;
         this.subCommands = Arrays.asList(subCommands);
+    }
+
+    public static File getFile(String name) {
+        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles" + File.separator, name + ".json");
     }
 
     @Override
@@ -70,10 +74,6 @@ public abstract class CommandBase implements ISubCommand {
     @Override
     public int[] getSyntaxOptions(ICommandSender sender) {
         return new int[]{0};
-    }
-
-    public static File getFile(String name) {
-        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles" + File.separator, name + ".json");
     }
 
     public String getCombinedArgs(String[] args) {

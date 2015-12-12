@@ -15,453 +15,31 @@ import java.util.List;
 public class Team {
 
 
-    public void resetProgress(Quest quest) {
-        questData.set(quest.getId(),  Quest.getQuest(quest.getId()).createData(getPlayerCount()));
-    }
-
-    public float getProgress() {
-        int completed = 0;
-        int total = 0;
-        for (QuestData data : questData) {
-            if (data != null) {
-                total++;
-                if (data.completed) completed++;
-            }
-        }
-        return (float)completed / total;
-    }
-
-    public void receiveAndSyncReputation(Quest quest, List<Quest.ReputationReward> reputationList) {
-        for (Quest.ReputationReward reputationReward : reputationList) {
-            setReputation(reputationReward.getReputation(), getReputation(reputationReward.getReputation()) + reputationReward.getValue());
-        }
-
-        DataWriter dw = getRefreshDataWriter(RefreshType.REPUTATION_RECEIVED);
-        dw.writeData(quest.getId(), DataBitHelper.QUESTS);
-        dw.writeData(reputationList.size(), DataBitHelper.REPUTATION);
-        for (Quest.ReputationReward reputationReward : reputationList) {
-            dw.writeData(reputationReward.getReputation().getId(), DataBitHelper.REPUTATION);
-            dw.writeData(getReputation(reputationReward.getReputation()), DataBitHelper.REPUTATION_VALUE);
-        }
-
-        for (PlayerEntry entry : getPlayers()) {
-            if (entry.shouldRefreshData() && entry.isInTeam()) {
-                PacketHandler.sendToPlayer(entry.getName(), dw);
-            }
-        }
-    }
-
-
-    private void readReceivedReputationData(DataReader dr) {
-        int questId = dr.readData(DataBitHelper.QUESTS);
-        Quest quest = Quest.getQuest(questId);
-        if (quest != null) {
-            QuestData data = getQuestData(questId);
-            if (data != null) {
-                data.claimed = true;
-                int count = dr.readData(DataBitHelper.REPUTATION);
-                for (int i = 0; i < count; i++) {
-                    int id = dr.readData(DataBitHelper.REPUTATION);
-                    int val = dr.readData(DataBitHelper.REPUTATION_VALUE);
-                    setReputation(id, val);
-                }
-            }
-        }
-    }
-
-
-    public enum LifeSetting {
-        SHARE("hqm.team.sharedLives.title", "hqm.team.sharedLives.desc"),
-        INDIVIDUAL("hqm.team.individualLives.title", "hqm.team.individualLives.desc");
-
-        private String title;
-        private String description;
-
-        LifeSetting(String title, String description) {
-            this.title = title;
-            this.description = description;
-        }
-
-        public String getTitle()
-        {
-            return Translator.translate(title);
-        }
-
-        public String getDescription()
-        {
-            return Translator.translate(description);
-        }
-    }
-
-    public enum RewardSetting {
-        ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
-        ANY("hqm.team.anyReward.title", "hqm.team.anyReward.desc"),
-        RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");
-
-        private static RewardSetting getDefault() {
-            return isAllModeEnabled ? ALL : ANY;
-        }
-
-        private String title;
-        private String description;
-
-        RewardSetting(String title, String description) {
-            this.title = title;
-            this.description = description;
-        }
-
-        public String getTitle()
-        {
-            return Translator.translate(title);
-        }
-
-        public String getDescription()
-        {
-            return Translator.translate(description);
-        }
-
-        public static boolean isAllModeEnabled;
-    }
-
-    private RewardSetting rewardSetting = RewardSetting.getDefault();
-    private LifeSetting lifeSetting = LifeSetting.SHARE;
-
-    public RewardSetting getRewardSetting() {
-        return rewardSetting;
-    }
-
-    public LifeSetting getLifeSetting() {
-        return lifeSetting;
-    }
-
-    private int clientTeamLives = -1;
-
-    public int getId() {
-        return id;
-    }
-
-    public boolean isSharingLives() {
-        return lifeSetting == LifeSetting.SHARE;
-    }
-
-    public int getSharedLives() {
-        if (clientTeamLives != -1) {
-            return clientTeamLives;
-        }
-
-        int lives = 0;
-        for (Team.PlayerEntry entry : getPlayers()) {
-            if (entry.inTeam) {
-                lives += QuestingData.getQuestingData(entry.getName()).getRawLives();
-            }
-        }
-        return lives;
-    }
-
-    public int getPlayerCount() {
-        int count = 0;
-        for (PlayerEntry player : players) {
-            if (player.inTeam) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public void removePlayer(String playerName) {
-        int id = 0;
-        for (PlayerEntry player : players) {
-            if (player.inTeam) {
-                if (player.getName().equals(playerName)) {
-                    Team leaveTeam = new Team(playerName);
-                    leaveTeam.getPlayers().get(0).setBookOpen(player.bookOpen);
-                    for (int i = 0; i < questData.size(); i++) {
-                        QuestData leaveData = leaveTeam.questData.get(i);
-                        QuestData data = questData.get(i);
-                        if (data != null) {
-                            boolean[] old = data.reward;
-                            data.reward = new boolean[old.length - 1];
-                            for (int j = 0; j < data.reward.length; j++) {
-                                if (j < id) {
-                                    data.reward[j] = old[j];
-                                } else {
-                                    data.reward[j] = old[j + 1];
-                                }
-                            }
-
-                            leaveData.reward[0] = old[id];
-                        }
-                    }
-
-                    players.remove(id);
-
-                    for (int i = 0; i < questData.size(); i++) {
-                        QuestData leaveData = leaveTeam.questData.get(i);
-                        QuestData data = questData.get(i);
-                        if (data != null && Quest.getQuest(i) != null) {
-                            Quest.getQuest(i).copyProgress(leaveData, data);
-                        }
-                    }
-
-                    for (int i = 0; i < Reputation.size(); i++) {
-                        Reputation reputation = Reputation.getReputation(i);
-                        if (reputation != null) {
-                            leaveTeam.setReputation(reputation, this.getReputation(reputation));
-                        }
-                    }
-
-                    QuestingData.getQuestingData(playerName).setTeam(leaveTeam);
-                    break;
-                }
-                id++;
-            }
-        }
-
-
-    }
-
-    public enum UpdateType {
-        ALL,
-        ONLY_MEMBERS,
-        ONLY_INVITES,
-        ONLY_OWNER
-    }
-
-    public void refreshTeamData(UpdateType type) {
-        for (PlayerEntry entry : getPlayers()) {
-            refreshTeamData(entry, type);
-        }
-    }
-
-    private void refreshTeamData(PlayerEntry entry, UpdateType type) {
-        Team team = this;
-        boolean valid = false;
-        switch (type) {
-            case ALL:
-                if (entry.shouldRefreshData()) {
-                    valid = true;
-                    break; //the break is here on purpose
-                }
-            case ONLY_INVITES:
-                //refresh that team instead
-                team = QuestingData.getQuestingData(entry.getName()).getTeam();
-                valid = !entry.isInTeam() && team.getEntry(entry.getName()).shouldRefreshData();
-                break;
-            case ONLY_MEMBERS:
-                valid = entry.shouldRefreshData();
-                break;
-            case ONLY_OWNER:
-                valid = entry.shouldRefreshData() && entry.isOwner();
-                break;
-        }
-
-        if (valid) {
-            DataWriter dw = getRefreshDataWriter(RefreshType.FULL);
-            team.writeTeamData(dw, true);
-            PacketHandler.sendToPlayer(entry.getName(), dw);
-        }
-    }
-
-    public enum RefreshType {
-        FULL,
-        LIVES,
-        REPUTATION_RECEIVED
-    }
-
-    private DataWriter getRefreshDataWriter(RefreshType type) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.REFRESH_TEAM);
-        dw.writeEnum(type);
-        return dw;
-    }
-
-    public void refreshTeamLives() {
-        if (!isSingle() && isSharingLives()) {
-            for (PlayerEntry entry : getPlayers()) {
-                if (entry.shouldRefreshData()) {
-                    DataWriter dw = getRefreshDataWriter(RefreshType.LIVES);
-                    dw.writeData(getSharedLives(), DataBitHelper.TEAM_LIVES);
-                    PacketHandler.sendToPlayer(entry.getName(), dw);
-                }
-            }
-        }
-    }
-
-
-    public void refreshData() {
-        for (PlayerEntry entry : getPlayers()) {
-            if (entry.shouldRefreshData()) {
-                QuestingData.getQuestingData(entry.getName()).refreshClientData(entry.getName());
-            }
-        }
-    }
-
-    public void clearProgress() {
-        questData.clear();
-        createQuestData();
-        int playerCount = getPlayerCount();
-        for (int i = 0; i < Quest.size(); i++) {
-            if (Quest.getQuest(i) != null && questData.get(i) != null) {
-                Quest.getQuest(i).preRead(playerCount, questData.get(i));
-            }
-        }
-        refreshData();
-    }
-
-    public void onPacket(DataReader dr) {
-        RefreshType type = dr.readEnum(RefreshType.class);
-        switch (type) {
-            case FULL:
-                readTeamData(QuestingData.FILE_VERSION, dr, true);
-                break;
-            case LIVES:
-                clientTeamLives = dr.readData(DataBitHelper.TEAM_LIVES);
-                break;
-            case REPUTATION_RECEIVED:
-                readReceivedReputationData(dr);
-                break;
-        }
-
-    }
-
-    public void deleteTeam() {
-        for (int i = players.size() - 1; i >= 0 ; i--) {
-            PlayerEntry player = players.get(i);
-            if (player.isInTeam()) {
-                removePlayer(player.getName());
-            }else{
-                players.remove(i);
-            }
-            QuestingData.getQuestingData(player.getName()).getTeam().refreshTeamData(player, UpdateType.ONLY_MEMBERS);
-        }
-
-
-        List<Team> teams = QuestingData.getTeams();
-        teams.remove(id);
-
-        for (int i = id; i < teams.size(); i++) {
-            Team team  = teams.get(i);
-            team.id--;
-        }
-
-        //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
-            Team team = QuestingData.getQuestingData(username).getTeam();
-            PlayerEntry entry = team.getEntry(username);
-            if (entry != null) {
-                team.refreshTeamData(entry, UpdateType.ONLY_MEMBERS);
-            }
-        }
-    }
-
-
-    private enum TeamAction {
-        CREATE,
-        INVITE,
-        ACCEPT,
-        DECLINE,
-        KICK,
-        LEAVE,
-        DISBAND,
-        NEXT_LIFE_SETTING,
-        NEXT_REWARD_SETTING
-    }
-
-    public List<Team> getInvites() {
-        return invites;
-    }
-
-    public List<PlayerEntry> getPlayers() {
-        return players;
-    }
-
-    private DataWriter getWriter(TeamAction action) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.TEAM);
-        dw.writeData(action.ordinal(), DataBitHelper.TEAM_ACTION_ID);
-        return dw;
-    }
-
-    public void create(String name) {
-        DataWriter dw = getWriter(TeamAction.CREATE);
-        dw.writeString(name, DataBitHelper.NAME_LENGTH);
-        PacketHandler.sendToServer(dw);
-    }
-
-    public void invite(String name) {
-        DataWriter dw = getWriter(TeamAction.INVITE);
-        dw.writeString(name, DataBitHelper.NAME_LENGTH);
-        PacketHandler.sendToServer(dw);
-    }
-
-    public void accept() {
-        DataWriter dw = getWriter(TeamAction.ACCEPT);
-        dw.writeData(id, DataBitHelper.TEAMS);
-        PacketHandler.sendToServer(dw);
-    }
-
-    public void decline() {
-        DataWriter dw = getWriter(TeamAction.DECLINE);
-        dw.writeData(id, DataBitHelper.TEAMS);
-        PacketHandler.sendToServer(dw);
-    }
-
-    public void kick(String name) {
-        DataWriter dw = getWriter(TeamAction.KICK);
-        dw.writeString(name, DataBitHelper.NAME_LENGTH);
-        PacketHandler.sendToServer(dw);
-    }
-
-    public void leave() {
-        PacketHandler.sendToServer(getWriter(TeamAction.LEAVE));
-    }
-
-    public void disband() {
-        PacketHandler.sendToServer(getWriter(TeamAction.DISBAND));
-    }
-
-    public void nextLifeSetting() {
-        PacketHandler.sendToServer(getWriter(TeamAction.NEXT_LIFE_SETTING));
-    }
-
-    public void nextRewardSetting() {
-        PacketHandler.sendToServer(getWriter(TeamAction.NEXT_REWARD_SETTING));
-    }
-
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static ErrorMessage latestError;
-    public enum ErrorMessage {
-        INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
-        IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
-        USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
+    public static boolean reloadedInvites;
+    private RewardSetting rewardSetting = RewardSetting.getDefault();
+    private LifeSetting lifeSetting = LifeSetting.SHARE;
+    private int clientTeamLives = -1;
+    private int id = -1;
+    private List<PlayerEntry> players = new ArrayList<PlayerEntry>();
+    private List<Team> invites;
+    private String name;
+    private List<Integer> reputation;
+    private List<QuestData> questData;
 
-        private String header;
-        private String message;
-
-        ErrorMessage(String header, String message) {
-            this.message = message;
-            this.header = header;
+    public Team(String player) {
+        if (player != null) {
+            players.add(new PlayerEntry(player, true, true));
         }
-
-        public String getMessage()
-        {
-            return Translator.translate(message);
-        }
-
-        public String getHeader()
-        {
-            return Translator.translate(header);
-        }
-
-        public void sendToClient(EntityPlayer player) {
-            DataWriter dw = PacketHandler.getWriter(PacketId.TEAM);
-            dw.writeData(ordinal(), DataBitHelper.TEAM_ERROR);
-            PacketHandler.sendToPlayer(QuestingData.getUserName(player), dw);
-        }
+        createQuestData();
+        createReputation();
     }
 
     public static void handlePacket(EntityPlayer player, DataReader dr, boolean onServer) {
         if (onServer) {
             handleServerPacket(player, dr);
-        }else{
+        } else {
             handleClientPacket(player, dr);
         }
     }
@@ -570,7 +148,7 @@ public class Team {
                                         int targetValue;
                                         if (Math.abs(joinValue) > Math.abs(teamValue)) {
                                             targetValue = joinValue;
-                                        }else{
+                                        } else {
                                             targetValue = teamValue;
                                         }
                                         team.setReputation(reputation, targetValue);
@@ -607,7 +185,7 @@ public class Team {
                             team.removePlayer(playerToRemove);
                             team.refreshTeamData(UpdateType.ALL);
                             TeamStats.refreshTeam(team);
-                        }else{
+                        } else {
                             team.getPlayers().remove(entryToRemove);
                             team.refreshTeamData(UpdateType.ONLY_OWNER);
                         }
@@ -649,21 +227,6 @@ public class Team {
 
     }
 
-    private boolean isOwner(String playerName) {
-        PlayerEntry entry = getEntry(playerName);
-        return entry != null && entry.isOwner();
-    }
-
-    public PlayerEntry getEntry(String playerName) {
-        for (Team.PlayerEntry playerEntry : getPlayers()) {
-            if (playerEntry.getName().equals(playerName)) {
-                return playerEntry;
-            }
-        }
-
-        return null;
-    }
-
     private static void declineAll(String playerName) {
         for (Team team : QuestingData.getTeams()) {
             for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
@@ -677,71 +240,347 @@ public class Team {
         }
     }
 
-    public static class PlayerEntry {
-        private String name;
-        private boolean inTeam;
-        private boolean owner;
-        private boolean bookOpen;
+    public void resetProgress(Quest quest) {
+        questData.set(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
+    }
 
-        public PlayerEntry(String name, boolean inTeam, boolean owner) {
-            this.name = name;
-            this.inTeam = inTeam;
-            this.owner = owner;
-            this.bookOpen = false;
+    public float getProgress() {
+        int completed = 0;
+        int total = 0;
+        for (QuestData data : questData) {
+            if (data != null) {
+                total++;
+                if (data.completed) completed++;
+            }
+        }
+        return (float) completed / total;
+    }
+
+    public void receiveAndSyncReputation(Quest quest, List<Quest.ReputationReward> reputationList) {
+        for (Quest.ReputationReward reputationReward : reputationList) {
+            setReputation(reputationReward.getReputation(), getReputation(reputationReward.getReputation()) + reputationReward.getValue());
         }
 
-        public String getName() {
-            return name;
+        DataWriter dw = getRefreshDataWriter(RefreshType.REPUTATION_RECEIVED);
+        dw.writeData(quest.getId(), DataBitHelper.QUESTS);
+        dw.writeData(reputationList.size(), DataBitHelper.REPUTATION);
+        for (Quest.ReputationReward reputationReward : reputationList) {
+            dw.writeData(reputationReward.getReputation().getId(), DataBitHelper.REPUTATION);
+            dw.writeData(getReputation(reputationReward.getReputation()), DataBitHelper.REPUTATION_VALUE);
         }
 
-        public boolean isInTeam() {
-            return inTeam;
-        }
-
-        public boolean isOwner() {
-            return owner;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            PlayerEntry entry = (PlayerEntry) o;
-
-            return name != null ? name.equals(entry.name) : entry.name == null;
-        }
-
-        @Override
-        public int hashCode() {
-            return name != null ? name.hashCode() : 0;
-        }
-
-        public boolean shouldRefreshData() {
-            return bookOpen || PacketHandler.getOverriddenBy(name) != null;
-        }
-
-        public boolean isBookOpen() {
-            return bookOpen;
-        }
-
-        public void setBookOpen(boolean bookOpen) {
-            this.bookOpen = bookOpen;
+        for (PlayerEntry entry : getPlayers()) {
+            if (entry.shouldRefreshData() && entry.isInTeam()) {
+                PacketHandler.sendToPlayer(entry.getName(), dw);
+            }
         }
     }
 
-    private int id = -1;
-    private List<PlayerEntry> players = new ArrayList<PlayerEntry>();
-    private List<Team> invites;
-    private String name;
-    private List<Integer> reputation;
-
-    public Team(String player) {
-        if (player != null) {
-            players.add(new PlayerEntry(player, true, true));
+    private void readReceivedReputationData(DataReader dr) {
+        int questId = dr.readData(DataBitHelper.QUESTS);
+        Quest quest = Quest.getQuest(questId);
+        if (quest != null) {
+            QuestData data = getQuestData(questId);
+            if (data != null) {
+                data.claimed = true;
+                int count = dr.readData(DataBitHelper.REPUTATION);
+                for (int i = 0; i < count; i++) {
+                    int id = dr.readData(DataBitHelper.REPUTATION);
+                    int val = dr.readData(DataBitHelper.REPUTATION_VALUE);
+                    setReputation(id, val);
+                }
+            }
         }
+    }
+
+    public RewardSetting getRewardSetting() {
+        return rewardSetting;
+    }
+
+    public LifeSetting getLifeSetting() {
+        return lifeSetting;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isSharingLives() {
+        return lifeSetting == LifeSetting.SHARE;
+    }
+
+    public int getSharedLives() {
+        if (clientTeamLives != -1) {
+            return clientTeamLives;
+        }
+
+        int lives = 0;
+        for (Team.PlayerEntry entry : getPlayers()) {
+            if (entry.inTeam) {
+                lives += QuestingData.getQuestingData(entry.getName()).getRawLives();
+            }
+        }
+        return lives;
+    }
+
+    public int getPlayerCount() {
+        int count = 0;
+        for (PlayerEntry player : players) {
+            if (player.inTeam) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void removePlayer(String playerName) {
+        int id = 0;
+        for (PlayerEntry player : players) {
+            if (player.inTeam) {
+                if (player.getName().equals(playerName)) {
+                    Team leaveTeam = new Team(playerName);
+                    leaveTeam.getPlayers().get(0).setBookOpen(player.bookOpen);
+                    for (int i = 0; i < questData.size(); i++) {
+                        QuestData leaveData = leaveTeam.questData.get(i);
+                        QuestData data = questData.get(i);
+                        if (data != null) {
+                            boolean[] old = data.reward;
+                            data.reward = new boolean[old.length - 1];
+                            for (int j = 0; j < data.reward.length; j++) {
+                                if (j < id) {
+                                    data.reward[j] = old[j];
+                                } else {
+                                    data.reward[j] = old[j + 1];
+                                }
+                            }
+
+                            leaveData.reward[0] = old[id];
+                        }
+                    }
+
+                    players.remove(id);
+
+                    for (int i = 0; i < questData.size(); i++) {
+                        QuestData leaveData = leaveTeam.questData.get(i);
+                        QuestData data = questData.get(i);
+                        if (data != null && Quest.getQuest(i) != null) {
+                            Quest.getQuest(i).copyProgress(leaveData, data);
+                        }
+                    }
+
+                    for (int i = 0; i < Reputation.size(); i++) {
+                        Reputation reputation = Reputation.getReputation(i);
+                        if (reputation != null) {
+                            leaveTeam.setReputation(reputation, this.getReputation(reputation));
+                        }
+                    }
+
+                    QuestingData.getQuestingData(playerName).setTeam(leaveTeam);
+                    break;
+                }
+                id++;
+            }
+        }
+
+
+    }
+
+    public void refreshTeamData(UpdateType type) {
+        for (PlayerEntry entry : getPlayers()) {
+            refreshTeamData(entry, type);
+        }
+    }
+
+    private void refreshTeamData(PlayerEntry entry, UpdateType type) {
+        Team team = this;
+        boolean valid = false;
+        switch (type) {
+            case ALL:
+                if (entry.shouldRefreshData()) {
+                    valid = true;
+                    break; //the break is here on purpose
+                }
+            case ONLY_INVITES:
+                //refresh that team instead
+                team = QuestingData.getQuestingData(entry.getName()).getTeam();
+                valid = !entry.isInTeam() && team.getEntry(entry.getName()).shouldRefreshData();
+                break;
+            case ONLY_MEMBERS:
+                valid = entry.shouldRefreshData();
+                break;
+            case ONLY_OWNER:
+                valid = entry.shouldRefreshData() && entry.isOwner();
+                break;
+        }
+
+        if (valid) {
+            DataWriter dw = getRefreshDataWriter(RefreshType.FULL);
+            team.writeTeamData(dw, true);
+            PacketHandler.sendToPlayer(entry.getName(), dw);
+        }
+    }
+
+    private DataWriter getRefreshDataWriter(RefreshType type) {
+        DataWriter dw = PacketHandler.getWriter(PacketId.REFRESH_TEAM);
+        dw.writeEnum(type);
+        return dw;
+    }
+
+    public void refreshTeamLives() {
+        if (!isSingle() && isSharingLives()) {
+            for (PlayerEntry entry : getPlayers()) {
+                if (entry.shouldRefreshData()) {
+                    DataWriter dw = getRefreshDataWriter(RefreshType.LIVES);
+                    dw.writeData(getSharedLives(), DataBitHelper.TEAM_LIVES);
+                    PacketHandler.sendToPlayer(entry.getName(), dw);
+                }
+            }
+        }
+    }
+
+    public void refreshData() {
+        for (PlayerEntry entry : getPlayers()) {
+            if (entry.shouldRefreshData()) {
+                QuestingData.getQuestingData(entry.getName()).refreshClientData(entry.getName());
+            }
+        }
+    }
+
+    public void clearProgress() {
+        questData.clear();
         createQuestData();
-        createReputation();
+        int playerCount = getPlayerCount();
+        for (int i = 0; i < Quest.size(); i++) {
+            if (Quest.getQuest(i) != null && questData.get(i) != null) {
+                Quest.getQuest(i).preRead(playerCount, questData.get(i));
+            }
+        }
+        refreshData();
+    }
+
+    public void onPacket(DataReader dr) {
+        RefreshType type = dr.readEnum(RefreshType.class);
+        switch (type) {
+            case FULL:
+                readTeamData(QuestingData.FILE_VERSION, dr, true);
+                break;
+            case LIVES:
+                clientTeamLives = dr.readData(DataBitHelper.TEAM_LIVES);
+                break;
+            case REPUTATION_RECEIVED:
+                readReceivedReputationData(dr);
+                break;
+        }
+
+    }
+
+    public void deleteTeam() {
+        for (int i = players.size() - 1; i >= 0; i--) {
+            PlayerEntry player = players.get(i);
+            if (player.isInTeam()) {
+                removePlayer(player.getName());
+            } else {
+                players.remove(i);
+            }
+            QuestingData.getQuestingData(player.getName()).getTeam().refreshTeamData(player, UpdateType.ONLY_MEMBERS);
+        }
+
+
+        List<Team> teams = QuestingData.getTeams();
+        teams.remove(id);
+
+        for (int i = id; i < teams.size(); i++) {
+            Team team = teams.get(i);
+            team.id--;
+        }
+
+        //refresh all clients with open books,
+        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+            Team team = QuestingData.getQuestingData(username).getTeam();
+            PlayerEntry entry = team.getEntry(username);
+            if (entry != null) {
+                team.refreshTeamData(entry, UpdateType.ONLY_MEMBERS);
+            }
+        }
+    }
+
+    public List<Team> getInvites() {
+        return invites;
+    }
+
+    public List<PlayerEntry> getPlayers() {
+        return players;
+    }
+
+    private DataWriter getWriter(TeamAction action) {
+        DataWriter dw = PacketHandler.getWriter(PacketId.TEAM);
+        dw.writeData(action.ordinal(), DataBitHelper.TEAM_ACTION_ID);
+        return dw;
+    }
+
+    public void create(String name) {
+        DataWriter dw = getWriter(TeamAction.CREATE);
+        dw.writeString(name, DataBitHelper.NAME_LENGTH);
+        PacketHandler.sendToServer(dw);
+    }
+
+    public void invite(String name) {
+        DataWriter dw = getWriter(TeamAction.INVITE);
+        dw.writeString(name, DataBitHelper.NAME_LENGTH);
+        PacketHandler.sendToServer(dw);
+    }
+
+    public void accept() {
+        DataWriter dw = getWriter(TeamAction.ACCEPT);
+        dw.writeData(id, DataBitHelper.TEAMS);
+        PacketHandler.sendToServer(dw);
+    }
+
+    public void decline() {
+        DataWriter dw = getWriter(TeamAction.DECLINE);
+        dw.writeData(id, DataBitHelper.TEAMS);
+        PacketHandler.sendToServer(dw);
+    }
+
+    public void kick(String name) {
+        DataWriter dw = getWriter(TeamAction.KICK);
+        dw.writeString(name, DataBitHelper.NAME_LENGTH);
+        PacketHandler.sendToServer(dw);
+    }
+
+    public void leave() {
+        PacketHandler.sendToServer(getWriter(TeamAction.LEAVE));
+    }
+
+    public void disband() {
+        PacketHandler.sendToServer(getWriter(TeamAction.DISBAND));
+    }
+
+    public void nextLifeSetting() {
+        PacketHandler.sendToServer(getWriter(TeamAction.NEXT_LIFE_SETTING));
+    }
+
+    public void nextRewardSetting() {
+        PacketHandler.sendToServer(getWriter(TeamAction.NEXT_REWARD_SETTING));
+    }
+
+    private boolean isOwner(String playerName) {
+        PlayerEntry entry = getEntry(playerName);
+        return entry != null && entry.isOwner();
+    }
+
+    public PlayerEntry getEntry(String playerName) {
+        for (Team.PlayerEntry playerEntry : getPlayers()) {
+            if (playerEntry.getName().equals(playerName)) {
+                return playerEntry;
+            }
+        }
+
+        return null;
     }
 
     private void createReputation() {
@@ -762,7 +601,7 @@ public class Team {
     private void createReputation(int id) {
         if (Reputation.getReputation(id) == null) {
             reputation.add(null);
-        }else{
+        } else {
             reputation.add(0);
         }
     }
@@ -777,7 +616,7 @@ public class Team {
         createMissingReputation(id);
         if (id >= reputation.size()) {
             return 0;
-        }else{
+        } else {
             Integer value = reputation.get(id);
             return value == null ? 0 : value;
         }
@@ -790,7 +629,6 @@ public class Team {
         }
     }
 
-    private List<QuestData> questData;
     private void createQuestData() {
         questData = new ArrayList<QuestData>();
         for (int i = 0; i < Quest.size(); i++) {
@@ -805,7 +643,7 @@ public class Team {
 
         if (Quest.getQuest(id) != null) {
             questData.add(id, Quest.getQuest(id).createData(1));
-        }else{
+        } else {
             questData.add(id, null);
         }
     }
@@ -836,7 +674,7 @@ public class Team {
                     setReputation(i, dr.readData(DataBitHelper.REPUTATION_VALUE));
                 }
             }
-        }else{
+        } else {
 
             for (int i = 0; i < Quest.size(); i++) {
                 Quest quest = Quest.getQuest(i);
@@ -856,7 +694,7 @@ public class Team {
                 }
                 if (quest != null && questData.get(id) != null) {
                     quest.read(dr, questData.get(id), version, false);
-                }else if (version.contains(FileVersion.REMOVED_QUESTS)) {
+                } else if (version.contains(FileVersion.REMOVED_QUESTS)) {
                     dr.readData(bits); //Clear
                 }
             }
@@ -875,7 +713,6 @@ public class Team {
         }
     }
 
-    public static boolean reloadedInvites;
     private void readTeamData(FileVersion version, DataReader dr, boolean light) {
         if (light) {
             setId(dr.readBoolean() ? -1 : 0);
@@ -930,13 +767,12 @@ public class Team {
         }
     }
 
-
     public boolean isSingle() {
         return id == -1;
     }
 
     public void saveData(DataWriter dw, boolean light) {
-         writeTeamData(dw, light);
+        writeTeamData(dw, light);
 
 
         //quest progress
@@ -952,7 +788,7 @@ public class Team {
                     dw.writeData(getReputation(i), DataBitHelper.REPUTATION_VALUE);
                 }
             }
-        }else{
+        } else {
             int count = 0;
             for (Quest quest : Quest.getQuests()) {
                 if (quest != null) {
@@ -1013,7 +849,7 @@ public class Team {
             saveTeamData(dw, light);
         }
 
-        if (light && !isSingle() && isSharingLives()){
+        if (light && !isSingle() && isSharingLives()) {
             dw.writeData(getSharedLives(), DataBitHelper.TEAM_LIVES);
         }
     }
@@ -1044,11 +880,162 @@ public class Team {
         }
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
+    }
+
+
+    public enum LifeSetting {
+        SHARE("hqm.team.sharedLives.title", "hqm.team.sharedLives.desc"),
+        INDIVIDUAL("hqm.team.individualLives.title", "hqm.team.individualLives.desc");
+
+        private String title;
+        private String description;
+
+        LifeSetting(String title, String description) {
+            this.title = title;
+            this.description = description;
+        }
+
+        public String getTitle() {
+            return Translator.translate(title);
+        }
+
+        public String getDescription() {
+            return Translator.translate(description);
+        }
+    }
+
+    public enum RewardSetting {
+        ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
+        ANY("hqm.team.anyReward.title", "hqm.team.anyReward.desc"),
+        RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");
+
+        public static boolean isAllModeEnabled;
+        private String title;
+        private String description;
+
+        RewardSetting(String title, String description) {
+            this.title = title;
+            this.description = description;
+        }
+
+        private static RewardSetting getDefault() {
+            return isAllModeEnabled ? ALL : ANY;
+        }
+
+        public String getTitle() {
+            return Translator.translate(title);
+        }
+
+        public String getDescription() {
+            return Translator.translate(description);
+        }
+    }
+
+    public enum UpdateType {
+        ALL,
+        ONLY_MEMBERS,
+        ONLY_INVITES,
+        ONLY_OWNER
+    }
+
+    public enum RefreshType {
+        FULL,
+        LIVES,
+        REPUTATION_RECEIVED
+    }
+
+    private enum TeamAction {
+        CREATE,
+        INVITE,
+        ACCEPT,
+        DECLINE,
+        KICK,
+        LEAVE,
+        DISBAND,
+        NEXT_LIFE_SETTING,
+        NEXT_REWARD_SETTING
+    }
+
+    public enum ErrorMessage {
+        INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
+        IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
+        USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
+
+        private String header;
+        private String message;
+
+        ErrorMessage(String header, String message) {
+            this.message = message;
+            this.header = header;
+        }
+
+        public String getMessage() {
+            return Translator.translate(message);
+        }
+
+        public String getHeader() {
+            return Translator.translate(header);
+        }
+
+        public void sendToClient(EntityPlayer player) {
+            DataWriter dw = PacketHandler.getWriter(PacketId.TEAM);
+            dw.writeData(ordinal(), DataBitHelper.TEAM_ERROR);
+            PacketHandler.sendToPlayer(QuestingData.getUserName(player), dw);
+        }
+    }
+
+    public static class PlayerEntry {
+        private String name;
+        private boolean inTeam;
+        private boolean owner;
+        private boolean bookOpen;
+
+        public PlayerEntry(String name, boolean inTeam, boolean owner) {
+            this.name = name;
+            this.inTeam = inTeam;
+            this.owner = owner;
+            this.bookOpen = false;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public boolean isInTeam() {
+            return inTeam;
+        }
+
+        public boolean isOwner() {
+            return owner;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            PlayerEntry entry = (PlayerEntry) o;
+
+            return name != null ? name.equals(entry.name) : entry.name == null;
+        }
+
+        @Override
+        public int hashCode() {
+            return name != null ? name.hashCode() : 0;
+        }
+
+        public boolean shouldRefreshData() {
+            return bookOpen || PacketHandler.getOverriddenBy(name) != null;
+        }
+
+        public boolean isBookOpen() {
+            return bookOpen;
+        }
+
+        public void setBookOpen(boolean bookOpen) {
+            this.bookOpen = bookOpen;
+        }
     }
 }

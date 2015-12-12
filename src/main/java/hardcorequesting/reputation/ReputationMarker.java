@@ -31,7 +31,7 @@ public class ReputationMarker implements Comparable<ReputationMarker> {
 
     @Override
     public int compareTo(ReputationMarker o) {
-        return ((Integer)value).compareTo(o.value);
+        return ((Integer) value).compareTo(o.value);
     }
 
     public String getTitle() {

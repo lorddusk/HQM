@@ -19,41 +19,23 @@ import java.util.List;
 public class GuiReward extends GuiBase {
 
 
-    private class Reward {
-        private ItemStack item;
-        private int x;
-        private int y;
-
-        private Reward(ItemStack item, int x, int y) {
-            this.item = item;
-            this.x = x;
-            this.y = y;
-        }
-    }
-
-    private Group group;
-    private int lines;
-    private List<Reward> rewards;
-    private String statisticsText;
-
-
+    public static final ResourceLocation TEXTURE = ResourceHelper.getResource("reward");
+    public static final ResourceLocation C_TEXTURE = ResourceHelper.getResource("c_reward");
     private static final int ITEMS_PER_LINE = 7;
     private static final int ITEM_SIZE = 16;
     private static final int ITEM_MARGIN = 5;
-
     private static final int TOP_HEIGHT = 52;
     private static final int MIDDLE_HEIGHT = 22;
     private static final int BOTTOM_HEIGHT = 24;
     private static final int TITLE_HEIGHT = 25;
-
     private static final int TOP_SRC_Y = 0;
     private static final int MIDDLE_SRC_Y = 67;
     private static final int BOTTOM_SRC_Y = 107;
-
     private static final int TEXTURE_WIDTH = 170;
-    public static final ResourceLocation TEXTURE = ResourceHelper.getResource("reward");
-    public static final ResourceLocation C_TEXTURE = ResourceHelper.getResource("c_reward");
-
+    private Group group;
+    private int lines;
+    private List<Reward> rewards;
+    private String statisticsText;
     public GuiReward(Group group, int bagTier, EntityPlayer player) {
         this.group = group;
         this.rewards = new ArrayList<Reward>();
@@ -67,18 +49,18 @@ public class GuiReward extends GuiBase {
         }
 
         int myWeight = group.getTier().getWeights()[bagTier];
-        float chance = ((float)myWeight / totalWeight);
+        float chance = ((float) myWeight / totalWeight);
 
-        statisticsText = Translator.translate("hqm.rewardGui.chance", ((int)(chance * 10000)) / 100F);
+        statisticsText = Translator.translate("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
 
 
-        lines = (int)Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
+        lines = (int) Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
         for (int i = 0; i < lines; i++) {
             int y = TOP_HEIGHT + MIDDLE_HEIGHT * i + (MIDDLE_HEIGHT - ITEM_SIZE) / 2;
             int itemsInLine = Math.min(group.getItems().size() - i * ITEMS_PER_LINE, ITEMS_PER_LINE);
             for (int j = 0; j < itemsInLine; j++) {
                 int x = (TEXTURE_WIDTH - (itemsInLine * ITEM_SIZE + (itemsInLine - 1) * ITEM_MARGIN)) / 2 + j * (ITEM_SIZE + ITEM_MARGIN);
-                ItemStack item = group.getItems().get(i * ITEMS_PER_LINE  + j);
+                ItemStack item = group.getItems().get(i * ITEMS_PER_LINE + j);
                 if (item != null && item.getItem() != null) {
                     rewards.add(new Reward(item, x, y));
                 }
@@ -86,6 +68,20 @@ public class GuiReward extends GuiBase {
         }
     }
 
+    public static void open(EntityPlayer player, DataReader dr) {
+        Group rewardGroup = Group.getGroups().get(dr.readData(DataBitHelper.GROUP_COUNT));
+        int bagTier = dr.readData(DataBitHelper.BAG_TIER);
+
+        for (Group group : Group.getGroups()) {
+            if (group.getLimit() != 0) {
+                group.setRetrievalCount(player, dr.readData(DataBitHelper.LIMIT));
+            }
+        }
+
+        if (ItemBag.displayGui) {
+            Minecraft.getMinecraft().displayGuiScreen(new GuiReward(rewardGroup, bagTier, player));
+        }
+    }
 
     @Override
     public void drawScreen(int mX0, int mY0, float f) {
@@ -123,7 +119,8 @@ public class GuiReward extends GuiBase {
             try {
                 drawItem(reward.item, reward.x, reward.y, true);
                 itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), reward.item, reward.x + left + 1, reward.y + top + 1);
-            }catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
 
         for (Reward reward : rewards) {
@@ -131,20 +128,22 @@ public class GuiReward extends GuiBase {
                 try {
                     if (GuiScreen.isShiftKeyDown()) {
                         drawMouseOver(reward.item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), mX0, mY0);
-                    }else{
+                    } else {
                         List<String> str = new ArrayList<String>();
                         try {
                             List info = reward.item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                             if (info.size() > 0) {
-                                str.add((String)info.get(0));
+                                str.add((String) info.get(0));
                                 if (info.size() > 1) {
                                     str.add(GuiColor.GRAY + Translator.translate("hqm.rewardGui.shiftInfo"));
                                 }
                             }
                             drawMouseOver(str, mX0, mY0);
-                        }catch (Throwable ignored) {}
+                        } catch (Throwable ignored) {
+                        }
                     }
-                }catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
         }
     }
@@ -162,18 +161,15 @@ public class GuiReward extends GuiBase {
         return false;
     }
 
-    public static void open(EntityPlayer player, DataReader dr) {
-        Group rewardGroup = Group.getGroups().get(dr.readData(DataBitHelper.GROUP_COUNT));
-        int bagTier = dr.readData(DataBitHelper.BAG_TIER);
+    private class Reward {
+        private ItemStack item;
+        private int x;
+        private int y;
 
-        for (Group group : Group.getGroups()) {
-            if (group.getLimit() != 0) {
-                group.setRetrievalCount(player, dr.readData(DataBitHelper.LIMIT));
-            }
-        }
-
-        if (ItemBag.displayGui) {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiReward(rewardGroup, bagTier, player));
+        private Reward(ItemStack item, int x, int y) {
+            this.item = item;
+            this.x = x;
+            this.y = y;
         }
     }
 

@@ -12,36 +12,12 @@ import cpw.mods.fml.common.FMLLog;
 
 public abstract class FileHelper {
 
-    public enum SaveResult {
-        SUCCESS("Success", "Everything was successfully saved"),
-        BACKUP_FAIL("Backup failure", "Couldn't backup the previous saved data. Please fix this and save again."),
-        SAVE_FAIL("Save failure", "Couldn't save the data to file. Your previous backup has been saved."),
-        PRE_CRASH_FAILURE("Double save failure", "Couldn't save the data to file. And when trying to backup your previously saved data, this didn't work either.");
-
-
-
-        private String name;
-        private String text;
-
-        SaveResult(String name, String text) {
-            this.name = name;
-            this.text = text;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getText() {
-            return text;
-        }
-    }
-
     private static final String BACKUP_SUFFIX = "-backup";
     private static final String PRE_CRASH_SUFFIX = "-pre-crash-";
 
     /**
      * Makes sure that the supplied folder is created, along with all its parent folders. This is to make sure the path actually exists
+     *
      * @param dir The folder to create
      * @throws java.io.IOException
      */
@@ -56,7 +32,6 @@ public abstract class FileHelper {
             dir.mkdirs();
         }
     }
-
 
     public SaveResult saveData(File file) {
         if (!backup(file)) {
@@ -73,7 +48,7 @@ public abstract class FileHelper {
             dw.writeFinalBits();
 
             return SaveResult.SUCCESS;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             FMLLog.log("HQM", Level.ERROR, e, "An error occurred during quest book writing");
             boolean success = false;
@@ -84,7 +59,7 @@ public abstract class FileHelper {
             }
 
             return success ? SaveResult.SAVE_FAIL : SaveResult.PRE_CRASH_FAILURE;
-        }finally {
+        } finally {
             if (dw != null) {
                 dw.close();
             }
@@ -106,10 +81,10 @@ public abstract class FileHelper {
             dr = new DataReader(new FileInputStream(file));
             read(dr, dr.readVersion());
             return true;
-        }catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             if (dr != null) {
                 dr.close();
             }
@@ -134,7 +109,7 @@ public abstract class FileHelper {
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
-            }finally {
+            } finally {
                 try {
                     if (inputStream != null) {
                         inputStream.close();
@@ -142,13 +117,39 @@ public abstract class FileHelper {
                     if (outputStream != null) {
                         outputStream.close();
                     }
-                }catch (IOException ignored) {}
+                } catch (IOException ignored) {
+                }
             }
-        }else{
+        } else {
             return true;
         }
     }
 
     public abstract void write(DataWriter dw);
+
     public abstract void read(DataReader dr, FileVersion version);
+
+    public enum SaveResult {
+        SUCCESS("Success", "Everything was successfully saved"),
+        BACKUP_FAIL("Backup failure", "Couldn't backup the previous saved data. Please fix this and save again."),
+        SAVE_FAIL("Save failure", "Couldn't save the data to file. Your previous backup has been saved."),
+        PRE_CRASH_FAILURE("Double save failure", "Couldn't save the data to file. And when trying to backup your previously saved data, this didn't work either.");
+
+
+        private String name;
+        private String text;
+
+        SaveResult(String name, String text) {
+            this.name = name;
+            this.text = text;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
 }

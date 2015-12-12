@@ -52,18 +52,6 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         });
     }
 
-
-    private abstract class TextBoxHidden extends TextBoxNumber {
-        public TextBoxHidden(GuiQuestBook gui, int id, String title) {
-            super(gui, id, title);
-        }
-
-        @Override
-        protected boolean isVisible() {
-            return type.isUseTime();
-        }
-    }
-
     @Override
     protected void save(GuiBase gui) {
         quest.setRepeatInfo(new RepeatInfo(type, days, hours));
@@ -74,7 +62,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     protected void onArrowClick(boolean left) {
         if (left) {
             type = RepeatType.values()[(type.ordinal() + RepeatType.values().length - 1) % RepeatType.values().length];
-        }else{
+        } else {
             type = RepeatType.values()[(type.ordinal() + 1) % RepeatType.values().length];
         }
     }
@@ -87,5 +75,16 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     @Override
     protected String getArrowDescription() {
         return type.getDescription();
+    }
+
+    private abstract class TextBoxHidden extends TextBoxNumber {
+        public TextBoxHidden(GuiQuestBook gui, int id, String title) {
+            super(gui, id, title);
+        }
+
+        @Override
+        protected boolean isVisible() {
+            return type.isUseTime();
+        }
     }
 }
