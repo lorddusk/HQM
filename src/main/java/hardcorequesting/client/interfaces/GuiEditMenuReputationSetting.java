@@ -50,7 +50,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             }
         }
 
-        checkboxes.add(new CheckBox("hqm.repSetting.invRang", 21, 124) {
+        checkboxes.add(new CheckBox("hqm.repSetting.invRange", 21, 124) {
             @Override
             public boolean getValue() {
                 return inverted;

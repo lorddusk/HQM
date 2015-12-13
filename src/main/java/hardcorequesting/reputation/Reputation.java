@@ -153,7 +153,6 @@ public class Reputation {
             return info;
         }
 
-
         int lowerValue = 0;
         int upperValue = 0;
         boolean lowerMoved = false;
@@ -168,8 +167,7 @@ public class Reputation {
             } else {
                 lowerValue = lower.getValue();
                 lowerOnMarker = lower.getId() == 0 && lower.getValue() > 0;
-                if (lower.isNeutral() && markers.get(markers.size() - 1).getValue() < 0) {
-                    lowerValue = markers.get(markers.size() - 1).getValue();
+                if (lower.isNeutral()) {
                     lowerOnMarker = true;
                     lowerMovedInner = true;
                     lowerMoved = true;
@@ -178,16 +176,12 @@ public class Reputation {
                 } else if (lowerValue <= 0) {
                     for (int i = 0; i < markers.size(); i++) {
                         if (markers.get(i).getValue() >= lowerValue) {
-                            if (i != 0) {
-                                lowerValue = markers.get(i - 1).getValue();
-                                if (i - 1 != 0) {
-                                    lowerMovedInner = true;
-                                }
+                            lowerValue = markers.get(i).getValue();
+                            if (i - 1 != 0) {
                                 lowerMoved = true;
                             }
                             break;
                         }
-
                     }
                 }
             }
@@ -196,8 +190,7 @@ public class Reputation {
             } else {
                 upperValue = upper.getValue();
                 upperOnMarker = upper.getId() == markers.size() - 1 && upper.getValue() < 0;
-                if (upper.isNeutral() && markers.get(0).getValue() > 0) {
-                    upperValue = markers.get(0).getValue();
+                if (upper.isNeutral()) {
                     upperOnMarker = true;
                     upperMovedInner = true;
                     upperMoved = true;
@@ -206,11 +199,8 @@ public class Reputation {
                 } else if (upperValue >= 0) {
                     for (int i = markers.size() - 1; i >= 0; i--) {
                         if (markers.get(i).getValue() <= upperValue) {
-                            if (i != markers.size() - 1) {
-                                upperValue = markers.get(i + 1).getValue();
-                                if (i + 1 != markers.size() - 1) {
-                                    upperMovedInner = true;
-                                }
+                            upperValue = markers.get(i).getValue();
+                            if (i + 1 == markers.size()) {
                                 upperMoved = true;
                             }
                             break;
@@ -239,13 +229,6 @@ public class Reputation {
                 rightX -= upperMovedInner ? 1 : ARROW_MARKER_OFFSET;
             }
             gui.drawRect(x + BAR_X + leftX, y + BAR_Y, BAR_SRC_X + leftX, selectedSrcY, rightX - leftX, BAR_HEIGHT);
-        }
-
-        if (upperMoved) {
-            upperValue--;
-        }
-        if (lowerMoved) {
-            lowerValue++;
         }
 
         for (int i = 0; i < markers.size(); i++) {
@@ -285,7 +268,7 @@ public class Reputation {
 
         if (text != null) {
             str = text;
-        } else if (current == null) {
+        } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
                 str = GuiColor.RED + Translator.translate("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
 
