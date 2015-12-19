@@ -29,6 +29,7 @@ public class CommandSave extends CommandBase {
         if (arguments.length == 1 && arguments[0].equals("all")) {
             try {
                 save(sender, Reputation.getReputationList(), "reputations");
+                save(sender, GroupTier.getTiers(), "bags");
             } catch (CommandException ignored) {
             }
             for (QuestSet set : Quest.getQuestSets()) {
