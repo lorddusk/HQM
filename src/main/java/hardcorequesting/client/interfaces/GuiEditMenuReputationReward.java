@@ -3,8 +3,8 @@ package hardcorequesting.client.interfaces;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.Translator;
 import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.quests.Quest;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reward.ReputationReward;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -12,16 +12,16 @@ import java.util.List;
 
 public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
-    private List<Quest.ReputationReward> rewards;
-    private Quest.ReputationReward selectedReward;
+    private List<ReputationReward> rewards;
+    private ReputationReward selectedReward;
 
-    public GuiEditMenuReputationReward(GuiBase gui, EntityPlayer player, List<Quest.ReputationReward> rewards) {
+    public GuiEditMenuReputationReward(GuiBase gui, EntityPlayer player, List<ReputationReward> rewards) {
         super(gui, player, true, 185, 25, 185, 55);
 
-        this.rewards = new ArrayList<Quest.ReputationReward>();
+        this.rewards = new ArrayList<ReputationReward>();
         if (rewards != null) {
-            for (Quest.ReputationReward reward : rewards) {
-                this.rewards.add(new Quest.ReputationReward(reward.getReputation(), reward.getValue()));
+            for (ReputationReward reward : rewards) {
+                this.rewards.add(new ReputationReward(reward.getReward(), reward.getValue()));
             }
         }
 
@@ -60,7 +60,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                GuiEditMenuReputationReward.this.rewards.add(new Quest.ReputationReward(Reputation.getReputationList().get(0), 0));
+                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputationList().get(0), 0));
             }
         });
 
@@ -140,16 +140,16 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
     @Override
     protected void onArrowClick(boolean left) {
-        if (selectedReward != null && selectedReward.getReputation() != null) {
+        if (selectedReward != null && selectedReward.getReward() != null) {
             for (int i = 0; i < Reputation.getReputationList().size(); i++) {
-                if (Reputation.getReputationList().get(i).equals(selectedReward.getReputation())) {
+                if (Reputation.getReputationList().get(i).equals(selectedReward.getReward())) {
                     int id = i + (left ? -1 : 1);
                     if (id < 0) {
                         id = Reputation.getReputationList().size() - 1;
                     } else if (id >= Reputation.getReputationList().size()) {
                         id = 0;
                     }
-                    selectedReward.setReputation(Reputation.getReputationList().get(id));
+                    selectedReward.setReward(Reputation.getReputationList().get(id));
                     break;
                 }
             }
@@ -158,7 +158,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
     @Override
     protected String getArrowText() {
-        return selectedReward.getReputation().getName();
+        return selectedReward.getReward().getName();
     }
 
     @Override

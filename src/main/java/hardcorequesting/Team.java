@@ -6,6 +6,7 @@ import hardcorequesting.network.*;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reward.ReputationReward;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
@@ -31,17 +32,17 @@ public class Team {
         return (float) completed / total;
     }
 
-    public void receiveAndSyncReputation(Quest quest, List<Quest.ReputationReward> reputationList) {
-        for (Quest.ReputationReward reputationReward : reputationList) {
-            setReputation(reputationReward.getReputation(), getReputation(reputationReward.getReputation()) + reputationReward.getValue());
+    public void receiveAndSyncReputation(Quest quest, List<ReputationReward> reputationList) {
+        for (ReputationReward reputationReward : reputationList) {
+            setReputation(reputationReward.getReward(), getReputation(reputationReward.getReward()) + reputationReward.getValue());
         }
 
         DataWriter dw = getRefreshDataWriter(RefreshType.REPUTATION_RECEIVED);
         dw.writeData(quest.getId(), DataBitHelper.QUESTS);
         dw.writeData(reputationList.size(), DataBitHelper.REPUTATION);
-        for (Quest.ReputationReward reputationReward : reputationList) {
-            dw.writeData(reputationReward.getReputation().getId(), DataBitHelper.REPUTATION);
-            dw.writeData(getReputation(reputationReward.getReputation()), DataBitHelper.REPUTATION_VALUE);
+        for (ReputationReward reputationReward : reputationList) {
+            dw.writeData(reputationReward.getReward().getId(), DataBitHelper.REPUTATION);
+            dw.writeData(getReputation(reputationReward.getReward()), DataBitHelper.REPUTATION_VALUE);
         }
 
         for (PlayerEntry entry : getPlayers()) {
