@@ -29,7 +29,9 @@ public enum EditMode {
     REPUTATION_TASK("repTask"),
     REPUTATION_REWARD("repReward"),
     REP_BAR_CREATE("repBarCreate"),
-    REP_BAR_CHANGE("repBarChange");
+    REP_BAR_CHANGE("repBarChange"),
+    COMMAND_CREATE("commandCreate"),
+    COMMAND_CHANGE("commandChange");
 
     private String id;
 

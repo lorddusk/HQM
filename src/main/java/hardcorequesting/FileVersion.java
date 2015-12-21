@@ -24,7 +24,8 @@ public enum FileVersion {
     REPUTATION,
     REPUTATION_KILL,
     REPUTATION_BARS,
-    CUSTOM_PRECISION_TYPES;
+    CUSTOM_PRECISION_TYPES,
+    COMMAND_REWARDS;
 
     public boolean contains(FileVersion other) {
         return ordinal() >= other.ordinal();

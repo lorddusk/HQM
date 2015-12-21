@@ -17,9 +17,9 @@ import net.minecraft.entity.player.EntityPlayer;
 public class GuiEditMenuTextEditor extends GuiEditMenu {
 
     private static final int TEXT_HEIGHT = 9;
-    private TextBoxLogic text;
+    protected TextBoxLogic text;
 
-    private GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
+    protected GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
         super(gui, player, false);
         this.text = new TextBoxLogic(gui, txt, 140, true);
         this.text.setMaxLength(isName ? DataBitHelper.QUEST_NAME_LENGTH.getMaximum() : DataBitHelper.QUEST_DESCRIPTION_LENGTH.getMaximum());

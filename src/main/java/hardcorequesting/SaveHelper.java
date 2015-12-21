@@ -68,8 +68,10 @@ public final class SaveHelper {
         REPUTATION_BAR_ADD(BaseEditType.ADD, Type.REPUTATION_BAR),
         REPUTATION_BAR_MOVE(BaseEditType.MOVE, Type.REPUTATION_BAR),
         REPUTATION_BAR_CHANGE(BaseEditType.CHANGE, Type.REPUTATION_BAR),
-        REPUTATION_BAR_REMOVE(BaseEditType.REMOVE, Type.REPUTATION_BAR);
-
+        REPUTATION_BAR_REMOVE(BaseEditType.REMOVE, Type.REPUTATION_BAR),
+        COMMAND_ADD(BaseEditType.ADD, Type.COMMAND),
+        COMMAND_CHANGE(BaseEditType.CHANGE, Type.COMMAND),
+        COMMAND_REMOVE(BaseEditType.REMOVE, Type.COMMAND);
 
         private BaseEditType basType;
         private Type type;
@@ -130,7 +132,8 @@ public final class SaveHelper {
             REPUTATION_REWARD("repReward"),
             KILLS("kills"),
             REPUTATION_BAR("repBar"),
-            BETWEEN_SETS("betweenSets");
+            BETWEEN_SETS("betweenSets"),
+            COMMAND("command");
 
             private String id;
 

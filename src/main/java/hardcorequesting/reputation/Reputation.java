@@ -18,6 +18,7 @@ import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTask;
 import hardcorequesting.quests.QuestTaskReputation;
+import hardcorequesting.reward.ReputationReward;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -488,11 +489,11 @@ public class Reputation {
                                 }
                             }
 
-                            List<Quest.ReputationReward> rewards = quest.getReputationRewards();
+                            List<ReputationReward> rewards = quest.getReputationRewards();
                             if (rewards != null) {
-                                for (Iterator<Quest.ReputationReward> iterator = rewards.iterator(); iterator.hasNext(); ) {
-                                    Quest.ReputationReward reward = iterator.next();
-                                    if (reputationList.get(i).equals(reward.getReputation())) {
+                                for (Iterator<ReputationReward> iterator = rewards.iterator(); iterator.hasNext(); ) {
+                                    ReputationReward reward = iterator.next();
+                                    if (reputationList.get(i).equals(reward.getReward())) {
                                         iterator.remove();
                                     }
                                 }

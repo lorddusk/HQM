@@ -10,6 +10,7 @@ import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.reward.ReputationReward;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 
@@ -30,7 +31,7 @@ public class QuestAdapter {
     private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
     private static Map<Quest, List<Integer>> optionMapping = new HashMap<>();
     private static Map<Quest, List<String>> optionLinkMapping = new HashMap<>();
-    private static Map<Quest.ReputationReward, Integer> reputationRewardMapping = new HashMap<>();
+    private static Map<ReputationReward, Integer> reputationRewardMapping = new HashMap<>();
     private static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
 
     private static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
@@ -438,20 +439,20 @@ public class QuestAdapter {
         }
     };
 
-    private static final TypeAdapter<Quest.ReputationReward> REPUTATION_REWARD_ADAPTER = new TypeAdapter<Quest.ReputationReward>() {
+    private static final TypeAdapter<ReputationReward> REPUTATION_REWARD_ADAPTER = new TypeAdapter<ReputationReward>() {
         private final String REPUTATION = "reputation";
         private final String VALUE = "value";
 
         @Override
-        public void write(JsonWriter out, Quest.ReputationReward value) throws IOException {
+        public void write(JsonWriter out, ReputationReward value) throws IOException {
             out.beginObject();
-            out.name(REPUTATION).value(value.getReputation().getId());
+            out.name(REPUTATION).value(value.getReward().getId());
             out.name(VALUE).value(value.getValue());
             out.endObject();
         }
 
         @Override
-        public Quest.ReputationReward read(JsonReader in) throws IOException {
+        public ReputationReward read(JsonReader in) throws IOException {
             in.beginObject();
             int rep = 0, val = 0;
             while (in.hasNext()) {
@@ -465,7 +466,7 @@ public class QuestAdapter {
                 }
             }
             in.endObject();
-            Quest.ReputationReward result = new Quest.ReputationReward(null, val);
+            ReputationReward result = new ReputationReward(null, val);
             reputationRewardMapping.put(result, rep);
             return result;
         }
@@ -490,6 +491,7 @@ public class QuestAdapter {
         private final String REWARDS = "reward";
         private final String REWARDS_CHOICE = "rewardchoice";
         private final String REWARDS_REPUTATION = "reputationrewards";
+        private final String REWARDS_COMMAND = "commandrewards";
 
         @Override
         public void write(JsonWriter out, Quest value) throws IOException {
@@ -529,9 +531,11 @@ public class QuestAdapter {
 
             writeItemStackArray(out, value.getReward(), REWARDS);
             writeItemStackArray(out, value.getRewardChoice(), REWARDS_CHOICE);
+            writeStringArray(out, value.getCommandRewardsAsStrings(), REWARDS_COMMAND);
+
             if (value.getReputationRewards() != null && !value.getReputationRewards().isEmpty()) {
                 out.name(REWARDS_REPUTATION).beginArray();
-                for (Quest.ReputationReward reward : value.getReputationRewards()) {
+                for (ReputationReward reward : value.getReputationRewards()) {
                     REPUTATION_REWARD_ADAPTER.write(out, reward);
                 }
                 out.endArray();
@@ -562,6 +566,18 @@ public class QuestAdapter {
                 for (ItemStack stack : stacks) {
                     if (stack != null) {
                         MinecraftAdapter.ITEM_STACK.write(out, stack);
+                    }
+                }
+                out.endArray();
+            }
+        }
+
+        private void writeStringArray(JsonWriter out, String[] list, String name) throws IOException {
+            if(list != null) {
+                out.name(name).beginArray();
+                for (String s : list) {
+                    if (s != null) {
+                        out.value(s);
                     }
                 }
                 out.endArray();
@@ -638,14 +654,19 @@ public class QuestAdapter {
                         break;
                     case REWARDS_REPUTATION:
                         in.beginArray();
-                        List<Quest.ReputationReward> reputationRewards = new ArrayList<>();
+                        List<ReputationReward> reputationRewards = new ArrayList<>();
                         while (in.hasNext()) {
-                            Quest.ReputationReward reward = REPUTATION_REWARD_ADAPTER.read(in);
+                            ReputationReward reward = REPUTATION_REWARD_ADAPTER.read(in);
                             if (reward != null)
                                 reputationRewards.add(reward);
                         }
                         QUEST.setReputationRewards(reputationRewards);
                         in.endArray();
+                        break;
+                    case REWARDS_COMMAND:
+                            List<String> commands = new ArrayList<>();
+                            readStringArray(commands, in);
+                            QUEST.setCommandRewards(commands.toArray(new String[commands.size()]));
                         break;
                     default:
                         QuestLine.getActiveQuestLine().quests.remove(QUEST.getId());
@@ -909,14 +930,14 @@ public class QuestAdapter {
                     entry.getKey().addOptionLink(quest.getId());
             }
         }
-        for (Map.Entry<Quest.ReputationReward, Integer> entry : reputationRewardMapping.entrySet()) {
+        for (Map.Entry<ReputationReward, Integer> entry : reputationRewardMapping.entrySet()) {
             int rep = entry.getValue();
             if (rep >= 0 && rep < Reputation.getReputationList().size()) {
                 Reputation reputation = Reputation.getReputationList().get(rep);
                 if (reputation == null) {
                     throw new IOException("Failed to load reputation value " + rep);
                 }
-                entry.getKey().setReputation(reputation);
+                entry.getKey().setReward(reputation);
             } else {
                 throw new IOException("Missing reputation value " + rep);
             }

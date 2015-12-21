@@ -26,7 +26,7 @@ public abstract class CommandBase implements ISubCommand {
     protected static Gson GSON;
 
     static {
-        GSON = new GsonBuilder().registerTypeAdapter(Reputation.getReputationList().getClass(), ReputationAdapter.REPUTATION_LIST_ADAPTER).registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
+        GSON = new GsonBuilder().registerTypeAdapter(Reputation.getReputationList().getClass(), ReputationAdapter.REPUTATION_ADAPTER).registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
                 .setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES).create();
     }
 

@@ -42,7 +42,7 @@ public class ReputationAdapter {
         }
     };
 
-    private static final TypeAdapter<Reputation> REPUTATION_ADAPTER = new TypeAdapter<Reputation>() {
+    public static final TypeAdapter<Reputation> REPUTATION_ADAPTER = new TypeAdapter<Reputation>() {
         private final String NAME = "name";
         private final String NEUTRAL = "neutral";
         private final String MARKERS = "markers";
@@ -98,27 +98,6 @@ public class ReputationAdapter {
                 reputation.add(marker);
             }
             return reputation;
-        }
-    };
-
-    public static final TypeAdapter<List<Reputation>> REPUTATION_LIST_ADAPTER = new TypeAdapter<List<Reputation>>() {
-        @Override
-        public void write(JsonWriter out, List<Reputation> value) throws IOException {
-            out.beginArray();
-            for (Reputation reputation : value)
-                REPUTATION_ADAPTER.write(out, reputation);
-            out.endArray();
-        }
-
-        @Override
-        public List<Reputation> read(JsonReader in) throws IOException {
-            List<Reputation> reputations = new ArrayList<>();
-            in.beginArray();
-            while (in.hasNext()) {
-                reputations.add(REPUTATION_ADAPTER.read(in));
-            }
-            in.endArray();
-            return reputations;
         }
     };
 }
