@@ -379,6 +379,18 @@ public class Quest {
         this.commandRewardList.set(commands);
     }
 
+    public void addCommand(String command) {
+        this.commandRewardList.add(command);
+    }
+
+    public void editCommand(int id, String command) {
+        this.commandRewardList.set(id, command);
+    }
+
+    public void removeCommand(int id) {
+        this.commandRewardList.remove(id);
+    }
+
     public RepeatInfo getRepeatInfo() {
         return repeatInfo;
     }
@@ -1872,8 +1884,8 @@ public class Quest {
         if (!commands.isEmpty())
         {
             dw.writeData(commands.size(), DataBitHelper.REWARDS);
-            for (QuestReward<CommandReward.Command> command : commands)
-                dw.writeString(command.getReward().asString(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
+            for (String command : commands.asStrings())
+                dw.writeString(command, DataBitHelper.QUEST_DESCRIPTION_LENGTH);
         }
     }
 

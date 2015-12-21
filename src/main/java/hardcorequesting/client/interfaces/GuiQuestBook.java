@@ -974,6 +974,8 @@ public class GuiQuestBook extends GuiBase {
 
     public void setCurrentMode(EditMode mode) {
         currentMode = mode;
+        if (currentMode == EditMode.COMMAND_CREATE || currentMode == EditMode.COMMAND_CHANGE)
+            setEditMenu(new GuiEditMenuCommandEditor(this, player));
     }
 
     public EntityPlayer getPlayer() {

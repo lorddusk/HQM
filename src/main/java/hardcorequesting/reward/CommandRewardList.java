@@ -15,8 +15,9 @@ public class CommandRewardList extends QuestRewardList<CommandReward.Command> {
     public void set(String[] commands)
     {
         clear();
-        for (String command : commands)
-            add(new CommandReward(new CommandReward.Command(command)));
+        if (commands != null)
+            for (String command : commands)
+                add(new CommandReward(new CommandReward.Command(command)));
     }
 
     public String[] asStrings()
@@ -25,5 +26,13 @@ public class CommandRewardList extends QuestRewardList<CommandReward.Command> {
         for (QuestReward<CommandReward.Command> reward : list)
             commands.add(reward.getReward().asString());
         return commands.toArray(new String[commands.size()]);
+    }
+
+    public void add(String command) {
+        list.add(new CommandReward(new CommandReward.Command(command)));
+    }
+
+    public void set(int id, String command) {
+        list.set(id, new CommandReward(new CommandReward.Command(command)));
     }
 }
