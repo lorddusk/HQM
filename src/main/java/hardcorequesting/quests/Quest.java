@@ -976,11 +976,11 @@ public class Quest {
     }
 
     private boolean canPlayerClaimReward(EntityPlayer player) {
-        return hasReward(player) && (rewardChoices == null || selectedReward != -1) && isEnabled(player);
+        return hasReward(player) && (rewardChoices.isEmpty() || selectedReward != -1) && isEnabled(player);
     }
 
     public boolean hasReward(EntityPlayer player) {
-        return (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && reputationRewards != null);
+        return (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
     }
 
     @SideOnly(Side.CLIENT)
@@ -1398,7 +1398,6 @@ public class Quest {
                     }
                 }
 
-
                 List<ItemStack> itemsToAdd = new ArrayList<ItemStack>();
                 for (ItemStack item : items) {
                     boolean added = false;
@@ -1469,6 +1468,12 @@ public class Quest {
                 getQuestData(player).claimed = true;
                 QuestingData.getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
                 EventHandler.instance().onEvent(new EventHandler.ReputationEvent(player));
+                sentInfo = true;
+            }
+
+            if (commandRewardList != null && getQuestData(player).canClaim()) {
+                getQuestData(player).claimed = true;
+                commandRewardList.executeAll(player);
                 sentInfo = true;
             }
 
