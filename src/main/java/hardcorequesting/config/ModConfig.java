@@ -76,6 +76,11 @@ public class ModConfig {
     private static final boolean ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT = false;
     private static final String ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT = "Always display the tier name, instead of the individual bag's name, when opening a reward bag.";
 
+    public static boolean LOOSE_QUEST_BOOK_ON_DEATH;
+    private static final String LOOSE_QUEST_BOOK_ON_DEATH_KEY = "LooseQuestBookOnDeath";
+    private static final boolean LOOSE_QUEST_BOOK_ON_DEATH_DEFAULT = true;
+    private static final String LOOSE_QUEST_BOOK_ON_DEATH_COMMENT = "Loose the quest book when you die, if set to false it will stay in your inventory";
+
     public static int OVERLAY_XPOS;
     public static int OVERLAY_YPOS;
     public static int OVERLAY_XPOSDEFAULT = 2;
@@ -136,6 +141,8 @@ public class ModConfig {
         NO_HARDCORE_MESSAGE = config.get(CATEGORY_GENERAL, NO_HARDCORE_MESSAGE_KEY, NO_HARDCORE_MESSAGE_DEFAULT, NO_HARDCORE_MESSAGE_COMMENT).getBoolean(NO_HARDCORE_MESSAGE_DEFAULT);
 
         ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES = config.get(CATEGORY_GENERAL, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT).getBoolean(ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT);
+
+        LOOSE_QUEST_BOOK_ON_DEATH = config.get(CATEGORY_GENERAL, LOOSE_QUEST_BOOK_ON_DEATH_KEY, LOOSE_QUEST_BOOK_ON_DEATH_DEFAULT, LOOSE_QUEST_BOOK_ON_DEATH_COMMENT).getBoolean(LOOSE_QUEST_BOOK_ON_DEATH_DEFAULT);
 
         if (config.hasChanged())
             config.save();
