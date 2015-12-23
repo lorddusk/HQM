@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 
 import java.util.Iterator;
 
@@ -50,6 +51,29 @@ public class PlayerDeathEventListener {
                 event.entityPlayer.inventory.addItemStackToInventory(itemStack);
                 iter.remove();
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawn(PlayerEvent.Clone event) {
+        if (event.entityPlayer == null
+                || event.entityPlayer instanceof FakePlayer
+                || !event.wasDeath
+                || event.isCanceled()
+                || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
+                || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
+            return;
+        }
+
+        if (event.original.inventory.hasItem(ModItems.book)) {
+            ItemStack bookStack = new ItemStack(ModItems.book);
+            for (ItemStack itemStack : event.original.inventory.mainInventory) {
+                if (itemStack.isItemEqual(bookStack)) {
+                    bookStack = itemStack.copy(); // Copy the actual stack
+                    break;
+                }
+            }
+            event.entityPlayer.inventory.addItemStackToInventory(bookStack);
         }
     }
 }
