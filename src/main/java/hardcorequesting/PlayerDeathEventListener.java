@@ -36,7 +36,7 @@ public class PlayerDeathEventListener {
                 || event.entityPlayer instanceof FakePlayer
                 || event.isCanceled()
                 || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
-                || ModConfig.LOOSE_QUEST_BOOK_ON_DEATH) {
+                || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }
 
