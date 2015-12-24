@@ -301,6 +301,10 @@ hqm.editMode.repBarCreate.title=Add Reputation Bar
 hqm.editMode.repBarCreate.desc=Click to add a new reputation bar to display on the set page.
 hqm.editMode.repBarChange.title=Edit Reputation Bar
 hqm.editMode.repBarChange.desc=Click on the reputation bar you want to edit.
+hqm.editMode.commandCreate.title=Add a new Command
+hqm.editMode.commandCreate.desc=Adds a new Command to be executed on quest claim.\n@p will be replaced by the player's name.
+hqm.editMode.commandChange.title=Change Commands
+hqm.editMode.commandChange.desc=Change existing Commands.\n@p will be replaced by the player's name.
 
 # ======================================
 #				COMMAND
@@ -666,3 +670,4 @@ hqm.editType.repReward=rep rewards
 hqm.editType.kills=kills
 hqm.editType.repBar=rep bar
 hqm.editType.betweenSets=between sets
+hqm.editType.command=commands
