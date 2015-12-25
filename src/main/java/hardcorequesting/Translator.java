@@ -13,7 +13,7 @@ public class Translator {
     private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)\\]\\]");
 
     public static String translate(String id) {
-        return StatCollector.translateToLocal(id);
+        return StatCollector.translateToLocal(id).replace("\\n", "\n");
     }
 
     public static String translate(String id, Object... args) {
