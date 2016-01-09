@@ -1,21 +1,16 @@
 package hardcorequesting.client.interfaces;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -115,12 +110,12 @@ public class GuiBase extends GuiScreen {
                 break;
         }
 
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double) (x + 0), (double) (y + targetH), (double) this.zLevel, pt1[0], pt1[1]);
-        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + targetH), (double) this.zLevel, pt2[0], pt2[1]);
-        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + 0), (double) this.zLevel, pt3[0], pt3[1]);
-        tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) this.zLevel, pt4[0], pt4[1]);
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        worldRenderer.pos((double) (x + 0), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]);
+        worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]);
+        worldRenderer.pos((double) (x + targetW), (double) (y + 0), (double) this.zLevel).tex(pt3[0], pt3[1]);
+        worldRenderer.pos((double) (x + 0), (double) (y + 0), (double) this.zLevel).tex(pt4[0], pt4[1]);
         tessellator.draw();
     }
 
@@ -202,7 +197,6 @@ public class GuiBase extends GuiScreen {
         GL11.glVertex3f(x2, y2, 0);
         GL11.glEnd();
 
-
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
@@ -216,45 +210,48 @@ public class GuiBase extends GuiScreen {
     }
 
 
-    protected static RenderItem itemRenderer = new RenderItem();
-    protected static RenderBlocks blockRenderer = new RenderBlocks();
+    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
+    //protected static RenderBlocks blockRenderer = new RenderBlocks();
 
-    public void drawIcon(IIcon icon, int x, int y) {
-        drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
+    public void drawIcon(ItemStack item, int x, int y) {
+        itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
+        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
 
-    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
-        drawItemBackground(x, y, mX, mY, false);
-        if (fluid != null) {
-            drawFluid(fluid, x + 1, y + 1);
-        }
-    }
-
-    public void drawFluid(Fluid fluid, int x, int y) {
-        IIcon icon = fluid.getIcon();
-
-        if (icon == null) {
-            if (FluidRegistry.WATER.equals(fluid)) {
-                icon = Blocks.water.getIcon(0, 0);
-            } else if (FluidRegistry.LAVA.equals(fluid)) {
-                icon = Blocks.water.getIcon(0, 0);
-            }
-        }
-
-        if (icon != null) {
-            GL11.glColor4f(1F, 1F, 1F, 1F);
-
-            ResourceHelper.bindResource(MAP_TEXTURE);
-
-            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
-
-            ResourceHelper.bindResource(TERRAIN);
-            setColor(fluid.getColor());
-            drawIcon(icon, x, y);
-
-            GL11.glColor4f(1F, 1F, 1F, 1F);
-        }
-    }
+//TODO Fix Fluid drawing
+//    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
+//        drawItemBackground(x, y, mX, mY, false);
+//        if (fluid != null) {
+//            drawFluid(fluid, x + 1, y + 1);
+//        }
+//    }
+//
+//    public void drawFluid(Fluid fluid, int x, int y) {
+//        //IIcon icon = fluid.getIcon();
+//        Item item = null;
+//
+//        if (icon == null) {
+//            if (FluidRegistry.WATER.equals(fluid)) {
+//                icon = Blocks.water.getIcon(0, 0);
+//            } else if (FluidRegistry.LAVA.equals(fluid)) {
+//                icon = Blocks.water.getIcon(0, 0);
+//            }
+//        }
+//
+//        if (icon != null) {
+//            GL11.glColor4f(1F, 1F, 1F, 1F);
+//
+//            ResourceHelper.bindResource(MAP_TEXTURE);
+//
+//            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
+//
+//            ResourceHelper.bindResource(TERRAIN);
+//            setColor(fluid.getColor());
+//            drawIcon(icon, x, y);
+//
+//            GL11.glColor4f(1F, 1F, 1F, 1F);
+//        }
+//    }
 
     protected static final int ITEM_SRC_Y = 235;
     public static final int ITEM_SIZE = 18;
@@ -275,7 +272,7 @@ public class GuiBase extends GuiScreen {
 
         if (item != null && item.getItem() != null) {
             drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + +top + 1);
+            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
         }
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glColor3f(1F, 1F, 1F);
@@ -304,9 +301,9 @@ public class GuiBase extends GuiScreen {
 
         setZLevel(4f);
         try {
-            if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-                itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
-            }
+            // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
+            itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
+            // }
         } finally {
             setZLevel(0f);
 

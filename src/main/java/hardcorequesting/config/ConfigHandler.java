@@ -1,6 +1,6 @@
 package hardcorequesting.config;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.quests.Quest;
@@ -13,7 +13,7 @@ public class ConfigHandler {
 
     public static void initModConfig(String configPath) {
         ModConfig.init(new File(configPath + "hqmconfig.cfg"));
-        FMLCommonHandler.instance().bus().register(new ModConfig());
+        MinecraftForge.EVENT_BUS.register(new ModConfig());
     }
 
     public static void initEditConfig(String configPath) {

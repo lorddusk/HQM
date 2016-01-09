@@ -7,6 +7,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 
 import java.util.*;
 
@@ -46,7 +47,7 @@ public class CommandHandler extends CommandBase {
 
     @Override
     @SuppressWarnings(value = "unchecked")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1) {
             String subCommand = args[0];
             List result = new ArrayList();
@@ -67,7 +68,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             args = new String[]{"help"};
         }
@@ -94,18 +95,7 @@ public class CommandHandler extends CommandBase {
 
 
     public static boolean isCommandsAllowedOrOwner(GameProfile username) {
-        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username);
-    }
-
-    @Override
-    public int compareTo(Object obj) {
-        {
-            if (obj instanceof ICommand) {
-                return this.compareTo((ICommand) obj);
-            } else {
-                return 0;
-            }
-        }
+        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username);
     }
 
     public static ISubCommand getCommand(String commandName) {

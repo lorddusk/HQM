@@ -1,7 +1,7 @@
 package hardcorequesting;
 
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import hardcorequesting.network.*;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;

@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.QuestingData;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.network.DataReader;
@@ -23,7 +23,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
                 continue;
             }
 
-            if (fluidStack != null && fluidStack.getFluidID() == item.fluid.getID()) {
+            if (fluidStack != null && fluidStack.getFluid().getName().equals(item.fluid.getName())) {
                 //System.out.println(fluidStack.amount);
                 int amount = Math.min(item.required - data.progress[i], fluidStack.amount);
                 data.progress[i] += amount;

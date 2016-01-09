@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "normal": { "model": "hqm:quest_tracker" }
+  }
+}

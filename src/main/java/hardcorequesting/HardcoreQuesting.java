@@ -1,13 +1,13 @@
 package hardcorequesting;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.*;
-import cpw.mods.fml.common.network.FMLEventChannel;
-import cpw.mods.fml.common.network.NetworkRegistry;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
@@ -55,7 +55,6 @@ public class HardcoreQuesting {
         ModItems.init();
 
         ModBlocks.init();
-        ModBlocks.registerBlocks();
         ModBlocks.registerTileEntities();
 
         //Quest.init(this.path);
@@ -64,7 +63,7 @@ public class HardcoreQuesting {
     @EventHandler
     public void load(FMLInitializationEvent event) {
         new File(configDir + File.separator + "QuestFiles").mkdir();
-        FMLCommonHandler.instance().bus().register(instance);
+        MinecraftForge.EVENT_BUS.register(instance);
 
         packetHandler.register(new PacketHandler());
         new WorldEventListener();
@@ -75,12 +74,14 @@ public class HardcoreQuesting {
         ModItems.registerRecipes();
         ModBlocks.registerRecipes();
 
-        FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
+        //FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         Quest.init(path);
+        ModItems.initRender();
+        ModBlocks.initRender();
     }
 
 

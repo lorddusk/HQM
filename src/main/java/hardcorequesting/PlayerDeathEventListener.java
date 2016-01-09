@@ -1,7 +1,7 @@
 package hardcorequesting;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ModItems;
 import net.minecraft.entity.item.EntityItem;
@@ -36,7 +36,7 @@ public class PlayerDeathEventListener {
         if (event.entityPlayer == null
                 || event.entityPlayer instanceof FakePlayer
                 || event.isCanceled()
-                || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
+                || event.entityPlayer.worldObj.getGameRules().getBoolean("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }
@@ -60,7 +60,7 @@ public class PlayerDeathEventListener {
                 || event.entityPlayer instanceof FakePlayer
                 || !event.wasDeath
                 || event.isCanceled()
-                || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
+                || event.entityPlayer.worldObj.getGameRules().getBoolean("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }

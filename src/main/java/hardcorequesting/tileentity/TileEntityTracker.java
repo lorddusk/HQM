@@ -1,7 +1,10 @@
 package hardcorequesting.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import hardcorequesting.blocks.ModBlocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ITickable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiEditMenuTracker;
 import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
@@ -13,7 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-public class TileEntityTracker extends TileEntity {
+public class TileEntityTracker extends TileEntity implements ITickable {
 
 
     private Quest quest;
@@ -52,7 +55,7 @@ public class TileEntityTracker extends TileEntity {
     private int delay = 0;
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (quest == null && questId != -1) {
             quest = Quest.getQuest(questId);
             questId = -1;
@@ -62,15 +65,15 @@ public class TileEntityTracker extends TileEntity {
             if (quest != null && Quest.getQuest(quest.getId()) == null) {
                 quest = null;
             }
-            int oldMeta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+            int oldMeta = worldObj.getBlockState(pos).getBlock().getMetaFromState(ModBlocks.itemTracker.getDefaultState());
             int meta = 0;
             if (quest != null) {
                 meta = type.getMeta(this, quest, radius);
             }
 
             if (oldMeta != meta) {
-                worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, meta, 3);
-                notifyUpdate(xCoord, yCoord, zCoord, 2);
+                worldObj.setBlockState(pos, ModBlocks.itemTracker.getDefaultState(), 3);
+                notifyUpdate(pos.getX(), pos.getY(), pos.getZ(), 2);
             }
 
             delay = 0;
@@ -78,8 +81,8 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void notifyUpdate(int x, int y, int z, int i) {
-        if (i == 2 || x != xCoord || y != yCoord || z != zCoord) {
-            worldObj.notifyBlockOfNeighborChange(x, y, z, getBlockType());
+        if (i == 2 || x != pos.getX() || y != pos.getY() || z != pos.getZ()) {
+            worldObj.notifyNeighborsOfStateChange(pos, getBlockType());
 
             if (i > 0) {
                 notifyUpdate(x - 1, y, z, i - 1);
@@ -124,9 +127,9 @@ public class TileEntityTracker extends TileEntity {
     }
 
     private void saveCoordinate(DataWriter dw) {
-        dw.writeData(xCoord, DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(yCoord, DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(zCoord, DataBitHelper.WORLD_COORDINATE);
+        dw.writeData(pos.getX(), DataBitHelper.WORLD_COORDINATE);
+        dw.writeData(pos.getY(), DataBitHelper.WORLD_COORDINATE);
+        dw.writeData(pos.getZ(), DataBitHelper.WORLD_COORDINATE);
     }
 
     private void save(DataWriter dw, boolean saveQuest) {
@@ -157,7 +160,7 @@ public class TileEntityTracker extends TileEntity {
         int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
         int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
 
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
         if (te instanceof TileEntityTracker) {
             return (TileEntityTracker) te;
         } else {

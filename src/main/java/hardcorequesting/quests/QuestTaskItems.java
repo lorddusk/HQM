@@ -1,9 +1,9 @@
 package hardcorequesting.quests;
 
 
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.*;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
@@ -304,7 +304,8 @@ public abstract class QuestTaskItems extends QuestTask {
             if (item.hasItem) {
                 gui.drawItem(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
             } else {
-                gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
+                //Todo fix fluid drawing
+                //gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
 
             String str = (getProgress(player, i) * 100 / item.required) + "%";

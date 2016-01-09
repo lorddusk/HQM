@@ -1,7 +1,8 @@
 package hardcorequesting.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.ITickable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Team;
 import hardcorequesting.client.interfaces.GuiBase;
@@ -20,13 +21,13 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+//import net.minecraft.util.IIcon;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TileEntityPortal extends TileEntity implements IBlockSync {
+public class TileEntityPortal extends TileEntity implements IBlockSync, ITickable {
 
     private Quest quest;
     private int questId = -1;
@@ -153,7 +154,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
     private int resetDelay = 0;
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (!worldObj.isRemote) {
             if (quest == null && questId != -1) {
                 quest = Quest.getQuest(questId);
@@ -236,7 +237,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
 
     @SideOnly(Side.CLIENT)
     private void keepClientDataUpdated() {
-        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
             hasUpdatedData = false;
@@ -331,7 +332,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
                     for (int i = 0; i < count; i++) {
                         players.add(dr.readString(DataBitHelper.NAME_LENGTH));
                     }
-                    worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+                    worldObj.markBlockForUpdate(pos);
                 }
                 break;
             case 1:
@@ -378,22 +379,6 @@ public class TileEntityPortal extends TileEntity implements IBlockSync {
     @Override
     public int infoBitLength() {
         return 1;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public IIcon getBlockIcon(int side) {
-        if (item != null && item.getItem() instanceof ItemBlock) {
-            Block block = Block.getBlockFromItem(item.getItem());
-            if (block != null) {
-                try {
-                    return block.getIcon(side, item.getItem().getMetadata(item.getItemDamage()));
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-
-        return null;
     }
 
     public ItemStack getItem() {

@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
@@ -12,7 +12,7 @@ import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataWriter;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.network.PacketId;
-import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -34,14 +34,14 @@ public class ItemBag extends Item {
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
     }
 
-    @Override
-    public void registerIcons(IIconRegister register) {
-        pickIcons(register);
-    }
-
-    private void pickIcons(IIconRegister register) {
-        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
-    }
+//    @Override
+//    public void registerIcons(IIconRegister register) {
+//        pickIcons(register);
+//    }
+//
+//    private void pickIcons(IIconRegister register) {
+//        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
+//    }
 
     @SuppressWarnings("unchecked")
     @Override

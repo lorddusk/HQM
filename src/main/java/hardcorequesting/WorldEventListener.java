@@ -1,6 +1,6 @@
 package hardcorequesting;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,7 +16,7 @@ public class WorldEventListener {
 
     @SubscribeEvent
     public void onLoad(WorldEvent.Load event) {
-        if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
+        if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
             QuestLine.reset();
             WorldServer world = (WorldServer) event.world;
             QuestLine.loadWorldData(getWorldPath(world));
@@ -26,9 +26,7 @@ public class WorldEventListener {
 
     @SubscribeEvent
     public void onSave(WorldEvent.Save event) {
-        if (!event.world.isRemote && event.world.provider.dimensionId == 0) {
-
-
+        if (!event.world.isRemote && event.world.provider.getDimensionId() == 0) {
             WorldServer world = (WorldServer) event.world;
             QuestingData.save(getWorldPath(world), world);
         }

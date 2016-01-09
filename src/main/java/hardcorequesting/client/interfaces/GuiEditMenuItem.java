@@ -1,7 +1,6 @@
 package hardcorequesting.client.interfaces;
 
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.ItemPrecision;
@@ -119,7 +118,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawFluid(item, x, y, mX, mY);
+            //Todo fix fluid drawing
+            //gui.drawFluid(item, x, y, mX, mY);
         }
 
         @Override
@@ -220,13 +220,13 @@ public class GuiEditMenuItem extends GuiEditMenu {
             }
         }
         if (type.allowFluids) {
-            List<Integer> fluids = new ArrayList<Integer>();
+            List<String> fluids = new ArrayList<>();
             int end = playerItems.size();
             for (int i = 0; i < end; i++) {
                 Element item = playerItems.get(i);
                 FluidStack fluidStack = FluidContainerRegistry.getFluidForFilledItem((ItemStack) item.getItem());
-                if (fluidStack != null && !fluids.contains(fluidStack.getFluidID())) {
-                    fluids.add(fluidStack.getFluidID());
+                if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
+                    fluids.add(fluidStack.getFluid().getName());
                     playerItems.add(new ElementFluid(fluidStack.getFluid()));
                     if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
                         break;

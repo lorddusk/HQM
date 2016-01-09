@@ -1,6 +1,6 @@
 package hardcorequesting.client.interfaces;
 
-import cpw.mods.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.GuiConfig;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.ModInformation;
 import hardcorequesting.config.ModConfig;

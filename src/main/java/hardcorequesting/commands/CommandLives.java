@@ -1,6 +1,6 @@
 package hardcorequesting.commands;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import hardcorequesting.Lang;
 import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
@@ -35,7 +35,7 @@ public class CommandLives extends CommandBase {
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments) {
+    public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (!QuestingData.isHardcoreActive()) {
             sendChat(sender, "hqm.message.noHardcoreYet");
             return;
@@ -142,12 +142,12 @@ public class CommandLives extends CommandBase {
     }
 
     private void removeLivesFrom(ICommandSender sender, String playerName, int amount) {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
 
         QuestingData.getQuestingData(player).removeLives((EntityPlayerMP) sender, amount);
 
         sendChat(sender, amount != 1, "hqm.message.removeLivesFrom", amount, playerName);
-        sendChat(player, amount != 1, "hqm.message.removeLivesBy", amount, sender.getCommandSenderName());
+        sendChat(player, amount != 1, "hqm.message.removeLivesBy", amount, sender.getName());
         currentLives(player);
     }
 
@@ -164,24 +164,24 @@ public class CommandLives extends CommandBase {
     }
 
     private void addLivesTo(ICommandSender sender, String playerName, int amount) {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
 
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
             sendChat(sender, amount != 1, "hqm.message.addLivesTo", amount, playerName);
-            sendChat(player, amount != 1, "hqm.message.addLivesBy", amount, sender.getCommandSenderName());
+            sendChat(player, amount != 1, "hqm.message.addLivesBy", amount, sender.getName());
             currentLives(player);
         } else {
             QuestingData.getQuestingData(player).addLives(player, amount);
             sendChat(sender, "hqm.message.cantGiveMoreLives", playerName, ModConfig.MAXLIVES);
             sendChat(sender, "hqm.massage.setLivesInstead", player, ModConfig.MAXLIVES);
-            sendChat(player, "hqm.massage.setLivesBy", ModConfig.MAXLIVES, sender.getCommandSenderName());
+            sendChat(player, "hqm.massage.setLivesBy", ModConfig.MAXLIVES, sender.getName());
             currentLives(player);
         }
     }
 
-    private void getPlayerLives(ICommandSender sender, String playerName) {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+    private void getPlayerLives(ICommandSender sender, String playerName) throws CommandException {
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
         if (player != null) {
             int lives = QuestingData.getQuestingData(player).getLives();
             sendChat(sender, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);

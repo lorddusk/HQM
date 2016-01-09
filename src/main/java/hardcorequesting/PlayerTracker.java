@@ -1,8 +1,8 @@
 package hardcorequesting;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.QuestLine;
@@ -14,9 +14,8 @@ import net.minecraft.util.ChatComponentTranslation;
 
 public class PlayerTracker {
 
-
     public PlayerTracker() {
-        FMLCommonHandler.instance().bus().register(this);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
 

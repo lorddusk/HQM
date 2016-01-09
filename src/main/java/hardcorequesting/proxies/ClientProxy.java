@@ -1,6 +1,6 @@
 package hardcorequesting.proxies;
 
-import hardcorequesting.BlockHighlightRemover;
+//import hardcorequesting.BlockHighlightRemover;
 import hardcorequesting.client.interfaces.hud.GUIOverlay;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.quests.Quest;
@@ -24,7 +24,7 @@ public class ClientProxy extends CommonProxy {
 
 
         //MinecraftForge.EVENT_BUS.register(new GUIOverlay(Minecraft.getMinecraft()));
-        new BlockHighlightRemover();
+        //new BlockHighlightRemover();
     }
 
     @Override

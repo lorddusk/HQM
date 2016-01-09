@@ -6,6 +6,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class CommandHelp extends CommandBase {
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments) {
+    public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         switch (arguments.length) {
             case 0:
                 StringBuilder output = new StringBuilder(Translator.translate(Lang.HELP_START) + " ");
@@ -68,7 +69,7 @@ public class CommandHelp extends CommandBase {
     @SuppressWarnings(value = "unchecked")
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
-            return CommandHandler.instance.addTabCompletionOptions(sender, new String[]{args[1]});
+            return CommandHandler.instance.addTabCompletionOptions(sender, new String[]{args[1]},new BlockPos(0,0,0));
         }
         return null;
     }

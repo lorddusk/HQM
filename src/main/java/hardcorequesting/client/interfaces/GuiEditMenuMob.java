@@ -1,6 +1,6 @@
 package hardcorequesting.client.interfaces;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.Translator;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.DataBitHelper;
@@ -176,7 +176,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
         if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.spawn_egg) && mob.getMob() != null) {
             HashMap ids = ReflectionHelper.getPrivateValue(EntityList.class, null, 4);
-            EntityList.EntityEggInfo info = (EntityList.EntityEggInfo) EntityList.entityEggs.get(ids.get(mob.getMob()));
+            EntityList.EntityEggInfo info = EntityList.entityEggs.get(ids.get(mob.getMob()));
             if (info != null) {
                 mob.setIcon(new ItemStack(Items.spawn_egg, 1, info.spawnedID));
             }

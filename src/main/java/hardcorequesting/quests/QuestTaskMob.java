@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
@@ -32,8 +32,8 @@ public class QuestTaskMob extends QuestTask {
         if (event.entityLiving != null && !event.entityLiving.worldObj.isRemote && event.source != null) {
             if (event.source.getSourceOfDamage() != null && event.source.getSourceOfDamage() instanceof EntityPlayer) {
                 return (EntityPlayer) event.source.getSourceOfDamage();
-            } else if (event.entityLiving.func_94060_bK() instanceof EntityPlayer) {
-                return (EntityPlayer) event.entityLiving.func_94060_bK();
+            } else if (event.entityLiving.getCommandSenderEntity() instanceof EntityPlayer) {
+                return (EntityPlayer) event.entityLiving.getCommandSenderEntity();
             }
         }
 

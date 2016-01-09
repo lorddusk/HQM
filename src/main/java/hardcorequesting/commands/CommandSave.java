@@ -27,7 +27,7 @@ public class CommandSave extends CommandBase {
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments) {
+    public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (arguments.length == 1 && arguments[0].equals("all")) {
             try {
                 save(sender, Reputation.getReputationList(), new TypeToken<List<Reputation>>(){}.getType(), "reputations");
@@ -86,7 +86,7 @@ public class CommandSave extends CommandBase {
         return true;
     }
 
-    private static void save(ICommandSender sender, Object save, Type type, String name) {
+    private static void save(ICommandSender sender, Object save, Type type, String name) throws CommandException {
         try {
             File file = getFile(name);
             if (!file.exists()) file.createNewFile();

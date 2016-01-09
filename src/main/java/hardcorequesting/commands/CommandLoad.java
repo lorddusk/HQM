@@ -39,7 +39,7 @@ public class CommandLoad extends CommandBase {
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments) {
+    public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         try {
             if (arguments.length == 1 && arguments[0].equals("all")) {
                 loadReputation(sender, getFile("reputations"));
@@ -64,7 +64,7 @@ public class CommandLoad extends CommandBase {
         return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles").listFiles(filter);
     }
 
-    private void loadSet(ICommandSender sender, File file) {
+    private void loadSet(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
             throw new CommandException(Lang.FILE_NOT_FOUND);
         }
@@ -85,7 +85,7 @@ public class CommandLoad extends CommandBase {
         }
     }
 
-    private void loadReputation(ICommandSender sender, File file) {
+    private void loadReputation(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
             throw new CommandException(Lang.FILE_NOT_FOUND);
         }
@@ -110,7 +110,7 @@ public class CommandLoad extends CommandBase {
         }
     }
 
-    private void loadBags(ICommandSender sender, File file) {
+    private void loadBags(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
             throw new CommandException(Lang.FILE_NOT_FOUND);
         }
@@ -147,7 +147,7 @@ public class CommandLoad extends CommandBase {
 
     @Override
     public boolean isVisible(ICommandSender sender) {
-        return Quest.isEditing && QuestingData.hasData(sender.getCommandSenderName()) && super.isVisible(sender);
+        return Quest.isEditing && QuestingData.hasData(sender.getName()) && super.isVisible(sender);
     }
 
     @Override

@@ -1,11 +1,12 @@
 package hardcorequesting.network;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.*;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -17,7 +18,7 @@ import hardcorequesting.quests.QuestTask;
 import hardcorequesting.tileentity.IBlockSync;
 import hardcorequesting.tileentity.TileEntityPortal;
 import hardcorequesting.tileentity.TileEntityTracker;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+//import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -341,11 +342,11 @@ public class PacketHandler {
         if (block instanceof TileEntity) {
             DataWriter dw = getWriter(PacketId.BLOCK_SYNC);
             TileEntity te = (TileEntity) block;
-            boolean onServer = !te.getWorldObj().isRemote;
+            boolean onServer = !te.getWorld().isRemote;
 
-            dw.writeData(te.xCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.yCoord, DataBitHelper.WORLD_COORDINATE);
-            dw.writeData(te.zCoord, DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.getPos().getX(), DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.getPos().getY(), DataBitHelper.WORLD_COORDINATE);
+            dw.writeData(te.getPos().getZ(), DataBitHelper.WORLD_COORDINATE);
             dw.writeData(id, block.infoBitLength());
 
             block.writeData(dw, player, onServer, id);
@@ -368,7 +369,7 @@ public class PacketHandler {
         int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
         int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
 
-        TileEntity te = player.worldObj.getTileEntity(x, y, z);
+        TileEntity te = player.worldObj.getTileEntity(new BlockPos(x, y, z));
         if (te instanceof IBlockSync) {
             IBlockSync block = (IBlockSync) te;
             int id = dr.readData(block.infoBitLength());

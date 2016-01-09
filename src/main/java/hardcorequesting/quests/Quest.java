@@ -1,8 +1,8 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.*;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;

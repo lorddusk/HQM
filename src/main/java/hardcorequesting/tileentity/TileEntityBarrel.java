@@ -2,6 +2,7 @@ package hardcorequesting.tileentity;
 
 import hardcorequesting.QuestingData;
 import hardcorequesting.blocks.BlockInfo;
+import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestDataTaskItems;
 import hardcorequesting.quests.QuestTask;
@@ -11,16 +12,18 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler {
+public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler, ITickable {
 
     @Override
-    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
         if (resource == null) {
             return 0;
         }
@@ -38,27 +41,27 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
         return null;
     }
 
     @Override
-    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
         return null;
     }
 
     @Override
-    public boolean canFill(ForgeDirection from, Fluid fluid) {
+    public boolean canFill(EnumFacing from, Fluid fluid) {
         return true;
     }
 
     @Override
-    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+    public boolean canDrain(EnumFacing from, Fluid fluid) {
         return false;
     }
 
     @Override
-    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+    public FluidTankInfo[] getTankInfo(EnumFacing from) {
         return new FluidTankInfo[0];
     }
 
@@ -78,7 +81,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
+    public ItemStack removeStackFromSlot(int index) {
         return null;
     }
 
@@ -96,7 +99,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (modifiedSyncTimer > 0 && --modifiedSyncTimer == 0) {
             doSync();
             updateState();
@@ -128,7 +131,11 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             }
             boolean oldState = getBlockMetadata() == 1;
             if (state != oldState) {
-                worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, state ? 1 : 0, 3);
+                if (state) {
+                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                } else {
+                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                }
             }
         }
     }
@@ -144,14 +151,24 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return null;
     }
 
+//    @Override
+//    public String getInventoryName() {
+//        return BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME;
+//    }
+
     @Override
-    public String getInventoryName() {
-        return BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME;
+    public String getName() {
+        return null;
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean hasCustomName() {
         return false;
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return null;
     }
 
     @Override
@@ -165,12 +182,12 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void openInventory() {
+    public void openInventory(EntityPlayer player) {
 
     }
 
     @Override
-    public void closeInventory() {
+    public void closeInventory(EntityPlayer player) {
 
     }
 
@@ -179,6 +196,25 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return true;
     }
 
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+
+    }
 
     private String playerName;
     public int selectedQuest;

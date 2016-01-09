@@ -1,19 +1,19 @@
 package hardcorequesting.items;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.PacketHandler;
-import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
+//import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -32,27 +32,27 @@ public class ItemQuestBook extends Item {
         return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
     }
 
-    @SideOnly(Side.CLIENT)
-    private IIcon opIcon;
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister register) {
-        pickIcons(register);
-
-    }
-
-    private void pickIcons(IIconRegister register) {
-        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_ICON);
-        opIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_OP_ICON);
-    }
-
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int dmg) {
-        return dmg == 1 ? opIcon : itemIcon;
-    }
+//    @SideOnly(Side.CLIENT)
+//    private IIcon opIcon;
+//
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public void registerIcons(IIconRegister register) {
+//        pickIcons(register);
+//
+//    }
+//
+//    private void pickIcons(IIconRegister register) {
+//        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_ICON);
+//        opIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_OP_ICON);
+//    }
+//
+//
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public IIcon getIconFromDamage(int dmg) {
+//        return dmg == 1 ? opIcon : itemIcon;
+//    }
 
     private static final String NBT_PLAYER = "UseAsPlayer";
 
@@ -100,7 +100,7 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack itemStack, int pass) {
+    public boolean hasEffect(ItemStack itemStack) {
         return itemStack.getItemDamage() == 1;
     }
 

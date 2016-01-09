@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.DeathType;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
@@ -9,14 +9,14 @@ import hardcorequesting.Translator;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
-import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
+//import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
@@ -32,21 +32,21 @@ public class ItemHeart extends Item {
         this.setCreativeTab(HardcoreQuesting.HQMTab);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
     }
-
-    @SideOnly(Side.CLIENT)
-    private IIcon[] icons;
-
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister icon) {
-        pickIcon(icon);
-    }
-
-    private void pickIcon(IIconRegister icon) {
-        icons = new IIcon[ItemInfo.HEART_ICONS.length];
-
-        for (int i = 0; i < icons.length; i++)
-            icons[i] = icon.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.HEART_ICONS[i]);
-    }
+//
+//    @SideOnly(Side.CLIENT)
+//    private IIcon[] icons;
+//
+//    @SideOnly(Side.CLIENT)
+//    public void registerIcons(IIconRegister icon) {
+//        pickIcon(icon);
+//    }
+//
+//    private void pickIcon(IIconRegister icon) {
+//        icons = new IIcon[ItemInfo.HEART_ICONS.length];
+//
+//        for (int i = 0; i < icons.length; i++)
+//            icons[i] = icon.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.HEART_ICONS[i]);
+//    }
 
     public static final String[] names = ItemInfo.HEART_ICONS;
 
@@ -55,9 +55,9 @@ public class ItemHeart extends Item {
         return super.getUnlocalizedName() + "_" + names[i];
     }
 
-    public IIcon getIconFromDamage(int par1) {
-        return icons[par1];
-    }
+//    public IIcon getIconFromDamage(int par1) {
+//        return icons[par1];
+//    }
 
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
@@ -135,7 +135,7 @@ public class ItemHeart extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack item, int pass) {
+    public boolean hasEffect(ItemStack item) {
         return item.getItemDamage() == 3 || item.getItemDamage() == 4;
     }
 

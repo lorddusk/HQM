@@ -1,12 +1,8 @@
 package hardcorequesting.client.interfaces;
 
-import codechicken.nei.NEIClientConfig;
-import codechicken.nei.NEIClientUtils;
-import codechicken.nei.recipe.GuiCraftingRecipe;
-import codechicken.nei.recipe.GuiUsageRecipe;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.*;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
@@ -680,7 +676,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    public void handleMouseInput() {
+    public void handleMouseInput() throws IOException {
         super.handleMouseInput();
 
         int x = (Mouse.getEventX() * this.width / this.mc.displayWidth) - left;
@@ -701,7 +697,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    protected void keyTyped(char c, int k) {
+    protected void keyTyped(char c, int k) throws IOException {
         super.keyTyped(c, k);
         if (editMenu != null) {
             editMenu.onKeyTyped(this, c, k);
@@ -709,8 +705,6 @@ public class GuiQuestBook extends GuiBase {
             textBoxes.onKeyStroke(this, c, k);
         } else if (KeyboardHandler.pressedHotkey(this, k, getButtons())) {
             onButtonClicked();
-        } else if (isNEIActive()) {
-            handleNEI(k);
         }
     }
 
@@ -722,21 +716,8 @@ public class GuiQuestBook extends GuiBase {
         selected = stack;
     }
 
-    private void handleNEI(int k) {
-        ItemStack stackover = selected;
-        if (stackover != null) {
-            if (k == NEIClientConfig.getKeyBinding("gui.usage") || (k == NEIClientConfig.getKeyBinding("gui.recipe") && NEIClientUtils.shiftKey())) {
-                GuiUsageRecipe.openRecipeGui("item", stackover.copy());
-            }
-
-            if (k == NEIClientConfig.getKeyBinding("gui.recipe")) {
-                GuiCraftingRecipe.openRecipeGui("item", stackover.copy());
-            }
-        }
-    }
-
     @Override
-    protected void mouseClicked(int x0, int y0, int button) {
+    protected void mouseClicked(int x0, int y0, int button) throws IOException {
         super.mouseClicked(x0, y0, button);
 
         int x = x0 - left;
@@ -898,8 +879,8 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    protected void mouseMovedOrUp(int x0, int y0, int button) {
-        super.mouseMovedOrUp(x0, y0, button);
+    protected void mouseReleased(int x0, int y0, int button) {
+        super.mouseReleased(x0, y0, button);
 
         int x = x0 - left;
         int y = y0 - top;

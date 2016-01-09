@@ -1,6 +1,6 @@
 package hardcorequesting.tileentity;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Team;
 import hardcorequesting.Translator;
@@ -81,7 +81,7 @@ public enum TrackerType {
             for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
                 EntityPlayer player = QuestingData.getPlayer(name);
                 if (player != null) {
-                    double distance = player.getDistanceSq(tracker.xCoord + 0.5, tracker.yCoord + 0.5, tracker.zCoord + 0.5);
+                    double distance = player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
                     if (closestPlayer == null || distance < closest) {
                         closest = distance;
                         closestPlayer = player;
@@ -99,7 +99,7 @@ public enum TrackerType {
 
 
     private static boolean isPlayerWithinRadius(TileEntityTracker tracker, EntityPlayer player, int radius) {
-        return player.getDistanceSq(tracker.xCoord + 0.5, tracker.yCoord + 0.5, tracker.zCoord + 0.5) < radius * radius;
+        return player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
     }
 
     private static boolean isValid(boolean valid, Team team, TileEntityTracker tracker, int radius) {

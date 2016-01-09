@@ -4,8 +4,8 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,7 +33,7 @@ public class MinecraftAdapter {
                 out.nullValue();
                 return;
             }
-            String id = GameData.getItemRegistry().getNameForObject(value.getItem());
+            String id = GameData.getItemRegistry().getNameForObject(value.getItem()).toString();
             out.beginObject();
             out.name(ID).value(id);
             if (value.getItemDamage() != 0) {
@@ -105,7 +105,7 @@ public class MinecraftAdapter {
         @Override
         public NBTTagCompound read(JsonReader in) throws IOException {
             try {
-                NBTBase nbtBase = JsonToNBT.func_150315_a(in.nextString());
+                NBTBase nbtBase = JsonToNBT.getTagFromJson(in.nextString());
                 if (nbtBase instanceof NBTTagCompound) {
                     return (NBTTagCompound) nbtBase;
                 }

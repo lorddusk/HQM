@@ -1,8 +1,9 @@
 package hardcorequesting.network;
 
 
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import hardcorequesting.ModInformation;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -14,8 +15,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 import static hardcorequesting.HardcoreQuesting.packetHandler;
@@ -113,7 +116,9 @@ public class DataWriter {
 
         if (nbtTagCompound != null) {
             try {
-                bytes = CompressedStreamTools.compress(nbtTagCompound);
+                ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
+                DataOutputStream dataoutputstream = new DataOutputStream(new GZIPOutputStream(bytearrayoutputstream));
+                CompressedStreamTools.writeCompressed(nbtTagCompound, dataoutputstream);
             } catch (IOException ex) {
                 bytes = null;
             }
@@ -173,7 +178,7 @@ public class DataWriter {
 
     private FMLProxyPacket createPacket(byte[] bytes) {
         ByteBuf buf = Unpooled.copiedBuffer(bytes);
-        return new FMLProxyPacket(buf, ModInformation.CHANNEL);
+        return new FMLProxyPacket(new PacketBuffer(buf), ModInformation.CHANNEL);
     }
 
     public void sendToServer() {
@@ -186,7 +191,7 @@ public class DataWriter {
     }
 
     public void sendToAllPlayersAround(TileEntity te, double range) {
-        packetHandler.sendToAllAround(createPacket(), new NetworkRegistry.TargetPoint(te.getWorldObj().provider.dimensionId, te.xCoord + 0.5, te.yCoord + 0.5, te.zCoord, range));
+        packetHandler.sendToAllAround(createPacket(), new NetworkRegistry.TargetPoint(te.getWorld().provider.getDimensionId(), te.getPos().getX() + 0.5, te.getPos().getY() + 0.5, te.getPos().getZ(), range));
     }
 
     private DataBitHelper bufferSize;
@@ -226,7 +231,7 @@ public class DataWriter {
     }
 
     public void writeItem(Item item) {
-        writeString(Item.itemRegistry.getNameForObject(item), DataBitHelper.SHORT);
+        writeString(Item.itemRegistry.getNameForObject(item).toString(), DataBitHelper.SHORT);
     }
 
     private static final double LOG_2 = Math.log10(2);

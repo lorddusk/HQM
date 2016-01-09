@@ -14,7 +14,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         }
 
         public void execute(EntityPlayer player) {
-            MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), commandString.replaceAll("@p", player.getDisplayName()));
+            MinecraftServer.getServer().getCommandManager().executeCommand(MinecraftServer.getServer(), commandString.replaceAll("@p", player.getDisplayNameString()));
         }
 
         public String asString()

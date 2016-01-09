@@ -9,13 +9,13 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.zip.GZIPInputStream;
 
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Level;
 
-import cpw.mods.fml.common.FMLLog;
+import net.minecraftforge.fml.common.FMLLog;
 
 public class DataReader {
 
@@ -105,7 +105,8 @@ public class DataReader {
             }
 
             try {
-                return CompressedStreamTools.func_152457_a(bytes, new NBTSizeTracker(2087152L));
+                DataInputStream data = new DataInputStream(new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes))));
+                return CompressedStreamTools.read(data, new NBTSizeTracker(2087152L));
             } catch (IOException ex) {
                 return null;
             }
@@ -163,7 +164,7 @@ public class DataReader {
                 FMLLog.log("HQM", Level.ERROR, "Attempted to read an item that doesn't exist %s", readString);
                 return null;
             }
-            Object obj = Item.itemRegistry.getObject(readString);
+            Object obj = Item.itemRegistry.getObject(new ResourceLocation(readString));
             if (obj == null) {
                 FMLLog.log("HQM", Level.ERROR, "Attempted to read an item that doesn't exist %s", readString);
                 return null;

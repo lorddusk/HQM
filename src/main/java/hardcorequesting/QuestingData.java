@@ -1,7 +1,7 @@
 package hardcorequesting;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -229,11 +229,11 @@ public class QuestingData {
             }
         }
 
-        playerEntity.inventory.clearInventory(null, -1); //had some problem with tconstruct, clear all items to prevent it
+        playerEntity.inventory.clear(); //had some problem with tconstruct, clear all items to prevent it
 
         MinecraftServer mcServer = MinecraftServer.getServer();
 
-        if (mcServer.isSinglePlayer() && playerEntity.getCommandSenderName().equals(mcServer.getServerOwner())) {
+        if (mcServer.isSinglePlayer() && playerEntity.getName().equals(mcServer.getServerOwner())) {
             ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
@@ -248,7 +248,7 @@ public class QuestingData {
             String setBannedBy = "HQM";
 
             UserListBansEntry userlistbansentry = new UserListBansEntry(playerEntity.getGameProfile(), (Date) null, setBannedBy, (Date) null, setBanReason);
-            mcServer.getConfigurationManager().func_152608_h().func_152687_a(userlistbansentry);
+            mcServer.getConfigurationManager().getBannedPlayers().addEntry(userlistbansentry);
 
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
             ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
@@ -306,7 +306,7 @@ public class QuestingData {
             questActive = true;
             for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
                 if (name != null) {
-                    EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(name);
+                    EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(name);
                     if (player != null) {
                         spawnBook(player);
                     }
@@ -633,9 +633,8 @@ public class QuestingData {
                 team.loadData(version, dr, light);
             } else {
             	int _team = dr.readData(DataBitHelper.TEAMS);
-            	if (teams.contains(_team)) {
+            	if (_team < teams.size())
                 	team = teams.get(_team);
-            	}
             }
 
 
@@ -744,7 +743,7 @@ public class QuestingData {
     }
 
     public static EntityPlayer getPlayer(String playerName) {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+        return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
     }
 
     public static boolean hasData(String playerName) {

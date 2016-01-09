@@ -1,9 +1,9 @@
 package hardcorequesting.client.interfaces.hud;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.DeathStats;
 import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
@@ -46,15 +46,15 @@ public class GUIOverlay extends Gui {
 
         if (QuestingData.isHardcoreActive()) {
             if (getLives() <= 2) {
-                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xf50505);
+                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xf50505);
             } else {
-                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xffffff);
+                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xffffff);
             }
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glDepthMask(true);
         } else {
-            this.mc.fontRenderer.drawString(d, xPos + 1, yPos, 0xffffff);
+            this.mc.fontRendererObj.drawString(d, xPos + 1, yPos, 0xffffff);
         }
     }
 

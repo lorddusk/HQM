@@ -1,8 +1,9 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.SaveHelper;
@@ -53,7 +54,7 @@ public class QuestTaskLocation extends QuestTask {
 
                 for (int i = 0; i < locations.length; ++i) {
                     Location location = this.locations[i];
-                    if (!visited[i] && player.worldObj.provider.dimensionId == location.dimension) {
+                    if (!visited[i] && player.worldObj.provider.getDimensionId() == location.dimension) {
                         int current = (int) player.getDistanceSq((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
@@ -363,7 +364,7 @@ public class QuestTaskLocation extends QuestTask {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
 
-                if (player.worldObj.provider.dimensionId == location.dimension) {
+                if (player.worldObj.provider.getDimensionId() == location.dimension) {
                     if (location.radius >= 0) {
                         String str;
                         int distance = (int) player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);
