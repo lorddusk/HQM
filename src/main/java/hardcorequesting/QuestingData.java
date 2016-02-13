@@ -634,7 +634,7 @@ public class QuestingData {
             } else {
             	int _team = dr.readData(DataBitHelper.TEAMS);
             	if (teams.contains(_team)) {
-                	team = teams.get(team);
+                	team = teams.get(_team);
             	}
             }
 
