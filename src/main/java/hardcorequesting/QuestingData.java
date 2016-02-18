@@ -632,7 +632,10 @@ public class QuestingData {
                 team = new Team(getName());
                 team.loadData(version, dr, light);
             } else {
-                team = teams.get(dr.readData(DataBitHelper.TEAMS));
+            	int _team = dr.readData(DataBitHelper.TEAMS);
+            	if (teams.contains(_team)) {
+                	team = teams.get(_team);
+            	}
             }
 
 
