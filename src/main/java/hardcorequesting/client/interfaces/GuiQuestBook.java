@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,7 +27,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -523,13 +523,13 @@ public class GuiQuestBook extends GuiBase {
             }
 
             if (currentMode == EditMode.DELETE) {
-                GL11.glPushMatrix();
-                GL11.glTranslatef(0, 0, 200);
+                GlStateManager.pushMatrix();
+                GlStateManager.translate(0, 0, 200);
                 drawCenteredString(Translator.translate("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 drawCenteredString(Translator.translate("hqm.questBook.deleteOnClick"), 0, fontRendererObj.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 applyColor(0xFFFFFFFF);
                 ResourceHelper.bindResource(MAP_TEXTURE);
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
             }
 
         } else {
@@ -588,7 +588,7 @@ public class GuiQuestBook extends GuiBase {
                 drawString(GuiColor.RED + Translator.translate("hqm.questBook.deadOut"), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
 
-            GL11.glColor4f(1, 1, 1, 1);
+            GlStateManager.resetColor();
             int lives = QuestingData.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {
@@ -706,10 +706,6 @@ public class GuiQuestBook extends GuiBase {
         } else if (KeyboardHandler.pressedHotkey(this, k, getButtons())) {
             onButtonClicked();
         }
-    }
-
-    private boolean isNEIActive() {
-        return isNEIActive;
     }
 
     public static void setSelected(ItemStack stack) {

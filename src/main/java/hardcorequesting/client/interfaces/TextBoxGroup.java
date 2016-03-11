@@ -1,14 +1,11 @@
 package hardcorequesting.client.interfaces;
 
-
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.config.ModConfig;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class TextBoxGroup {
 
@@ -80,7 +77,7 @@ public class TextBoxGroup {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GL11.glColor4f(1F, 1F, 1F, 1F);
+            GlStateManager.resetColor();
             gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
             gui.drawString(scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
             if (selected) {

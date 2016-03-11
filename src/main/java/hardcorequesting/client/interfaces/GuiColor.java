@@ -1,8 +1,8 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
 
 public enum GuiColor {
     BLACK(0, 0.1F, 0.1F, 0.1F),
@@ -40,7 +40,7 @@ public enum GuiColor {
 
     @SideOnly(Side.CLIENT)
     public void applyColor() {
-        GL11.glColor4f(red, green, blue, 1F);
+        GlStateManager.color(red, green, blue, 1F);
     }
 
     public int getHexColor() {

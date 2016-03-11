@@ -1,15 +1,13 @@
 package hardcorequesting.client.interfaces.hud;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.DeathStats;
 import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import org.lwjgl.opengl.GL11;
@@ -33,12 +31,12 @@ public class GUIOverlay extends Gui {
 
         int xPos = ModConfig.OVERLAY_XPOS;
         int yPos = ModConfig.OVERLAY_YPOS;
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        GL11.glDepthMask(false);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GlStateManager.enableBlend();
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.resetColor();
+        GlStateManager.disableAlpha();
         //String s = " Lives: " + QuestingData.getQuestingData(mc.thePlayer).getLives();
         String s = " Lives: " + getLives();
         String d = " Deaths: " + getDeaths();
@@ -50,9 +48,9 @@ public class GUIOverlay extends Gui {
             } else {
                 this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xffffff);
             }
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
-            GL11.glDepthMask(true);
+            GlStateManager.disableBlend();
+            GlStateManager.enableDepth();
+            GlStateManager.depthMask(true);
         } else {
             this.mc.fontRendererObj.drawString(d, xPos + 1, yPos, 0xffffff);
         }

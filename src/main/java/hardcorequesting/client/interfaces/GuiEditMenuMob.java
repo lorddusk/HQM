@@ -1,17 +1,15 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.Translator;
-import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.quests.QuestTaskMob;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +94,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         super.draw(gui, mX, mY);
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GlStateManager.resetColor();
         scrollBar.draw(gui);
 
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;

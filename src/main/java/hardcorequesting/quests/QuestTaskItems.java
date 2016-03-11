@@ -1,6 +1,6 @@
 package hardcorequesting.quests;
 
-
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -21,12 +21,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.logging.log4j.Level;
-import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
 
 public abstract class QuestTaskItems extends QuestTask {
 
@@ -311,11 +307,11 @@ public abstract class QuestTaskItems extends QuestTask {
             String str = (getProgress(player, i) * 100 / item.required) + "%";
             //float z = gui.getZLevel();
             //gui.setZLevel(z + 100);
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0, 0, 100);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, 0, 100);
             float textSize = 0.8F;
             gui.drawStringWithShadow(str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
-            GL11.glPopMatrix();
+            GlStateManager.popMatrix();
             //gui.setZLevel(z);
         }
 

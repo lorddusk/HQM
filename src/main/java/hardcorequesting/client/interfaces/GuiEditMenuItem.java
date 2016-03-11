@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.SaveHelper;
 import hardcorequesting.items.ModItems;
@@ -16,7 +17,6 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -291,7 +291,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         textBoxes.draw(gui);
 
         if (usePrecision()) {
-            GL11.glColor3f(1F, 1F, 1F);
+            GlStateManager.resetColor();
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 

@@ -1,5 +1,6 @@
 package hardcorequesting.quests;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.OPBookHelper;
@@ -16,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -264,9 +264,9 @@ public class QuestSet {
         for (Quest quest : getQuests()) {
             if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
-                GL11.glPushMatrix();
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.pushMatrix();
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getColorFilter(player, gui.getTick()));
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
                 gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
@@ -280,7 +280,7 @@ public class QuestSet {
                 }
 
                 gui.drawItem(quest.getIcon(), iconX, iconY, true);
-                GL11.glPopMatrix();
+                GlStateManager.popMatrix();
                 //ResourceHelper.bindResource(QUEST_ICONS);
                 //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
             }

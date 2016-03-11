@@ -1,8 +1,8 @@
 package hardcorequesting.client.interfaces;
 
 import hardcorequesting.Translator;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import org.lwjgl.opengl.GL11;
 
 public abstract class GuiEditMenuExtended extends GuiEditMenu {
 
@@ -101,7 +101,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GlStateManager.resetColor();
         if (isArrowVisible()) {
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);

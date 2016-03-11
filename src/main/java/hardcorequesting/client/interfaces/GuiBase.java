@@ -1,6 +1,8 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -12,7 +14,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,6 +113,7 @@ public class GuiBase extends GuiScreen {
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         worldRenderer.pos((double) (x + 0), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]);
         worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]);
         worldRenderer.pos((double) (x + targetW), (double) (y + 0), (double) this.zLevel).tex(pt3[0], pt3[1]);
@@ -126,7 +128,7 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawMouseOver(List<String> str, int x, int y) {
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GlStateManager.disableDepth();
 
         int w = 0;
 
@@ -180,13 +182,12 @@ public class GuiBase extends GuiScreen {
         }
 
         this.zLevel = 0.0F;
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glColor4f(1F, 1F, 1F, 1F);
-
+        GlStateManager.enableDepth();
+        GlStateManager.resetColor();
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GlStateManager.disableTexture2D();
         applyColor(color);
 
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -197,7 +198,7 @@ public class GuiBase extends GuiScreen {
         GL11.glVertex3f(x2, y2, 0);
         GL11.glEnd();
 
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.enableTexture2D();
     }
 
     public void applyColor(int color) {
@@ -206,7 +207,7 @@ public class GuiBase extends GuiScreen {
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
 
-        GL11.glColor4f(r, g, b, a);
+        GlStateManager.color(r, g, b, a);
     }
 
 
@@ -239,7 +240,7 @@ public class GuiBase extends GuiScreen {
 //        }
 //
 //        if (icon != null) {
-//            GL11.glColor4f(1F, 1F, 1F, 1F);
+//            GlStateManager.resetColor();
 //
 //            ResourceHelper.bindResource(MAP_TEXTURE);
 //
@@ -249,7 +250,7 @@ public class GuiBase extends GuiScreen {
 //            setColor(fluid.getColor());
 //            drawIcon(icon, x, y);
 //
-//            GL11.glColor4f(1F, 1F, 1F, 1F);
+//            GlStateManager.resetColor();
 //        }
 //    }
 
@@ -257,7 +258,7 @@ public class GuiBase extends GuiScreen {
     public static final int ITEM_SIZE = 18;
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
-        GL11.glColor3f(1F, 1F, 1F);
+        GlStateManager.resetColor();
 
         ResourceHelper.bindResource(MAP_TEXTURE);
 
@@ -274,8 +275,8 @@ public class GuiBase extends GuiScreen {
             drawItem(item, x + 1, y + 1, true);
             itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
         }
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glColor3f(1F, 1F, 1F);
+        GlStateManager.disableLighting();
+        GlStateManager.resetColor();
     }
 
 
@@ -284,20 +285,20 @@ public class GuiBase extends GuiScreen {
         for (int i = 0; i < colorComponents.length; i++) {
             colorComponents[i] = ((color & (255 << (i * 8))) >> (i * 8)) / 255F;
         }
-        GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
+        GlStateManager.color(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
 
 
     public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
         if (itemstack == null || itemstack.getItem() == null) return;
 
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         RenderHelper.enableGUIStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-        GL11.glEnable(GL11.GL_LIGHTING);
+        GlStateManager.disableLighting();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableColorMaterial();
+        GlStateManager.enableLighting();
 
         setZLevel(4f);
         try {
@@ -307,13 +308,13 @@ public class GuiBase extends GuiScreen {
         } finally {
             setZLevel(0f);
 
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GlStateManager.resetColor();
+            GlStateManager.disableLighting();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.enableAlpha();
         }
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public float getZLevel() {
@@ -344,19 +345,19 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawString(String str, int x, int y, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(mult, mult, 1F);
         fontRendererObj.drawString(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public void drawStringWithShadow(String str, int x, int y, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(mult, mult, 1F);
         fontRendererObj.drawStringWithShadow(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public boolean inBounds(int x, int y, int w, int h, int mX, int mY) {
@@ -364,15 +365,15 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawCursor(int x, int y, int z, float size, int color) {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(0, 0, z);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0, 0, z);
         x += left;
         y += top;
-        GL11.glTranslatef(x, y, 0);
-        GL11.glScalef(size, size, 0);
-        GL11.glTranslatef(-x, -y, 0);
+        GlStateManager.translate(x, y, 0);
+        GlStateManager.scale(size, size, 0);
+        GlStateManager.translate(-x, -y, 0);
         Gui.drawRect(x, y + 1, x + 1, y + 10, color);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public void drawString(List<String> str, int x, int y, float mult, int color) {
@@ -380,15 +381,15 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawString(List<String> str, int start, int length, int x, int y, float mult, int color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(mult, mult, 1F);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(mult, mult, 1F);
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
             fontRendererObj.drawString(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
             y += fontRendererObj.FONT_HEIGHT;
         }
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public void drawCenteredString(String str, int x, int y, float mult, int width, int height, int color) {

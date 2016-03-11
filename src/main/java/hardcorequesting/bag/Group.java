@@ -1,6 +1,6 @@
 package hardcorequesting.bag;
 
-
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.FileVersion;
@@ -25,7 +25,6 @@ import java.util.*;
 import org.apache.logging.log4j.Level;
 
 import net.minecraftforge.fml.common.FMLLog;
-import org.lwjgl.opengl.GL11;
 
 public class Group {
 
@@ -261,11 +260,11 @@ public class Group {
             if (inBounds) {
                 color &= 0xFFFFFF;
                 color |= 0xBB << 24;
-                GL11.glEnable(GL11.GL_BLEND);
+                GlStateManager.enableBlend();
             }
             gui.drawString(str, GuiQuestBook.TIERS_X, yPos, color);
             if (inBounds) {
-                GL11.glDisable(GL11.GL_BLEND);
+                GlStateManager.disableBlend();
             }
 
             for (int j = 0; j < BagTier.values().length; j++) {
@@ -289,7 +288,7 @@ public class Group {
             boolean selected = group == gui.modifyingGroup;
             if (inBounds || selected) {
                 color &= 0xFFFFFF;
-                GL11.glEnable(GL11.GL_BLEND);
+                GlStateManager.enableBlend();
 
                 if (selected) {
                     color |= 0x50 << 24;
@@ -300,7 +299,7 @@ public class Group {
 
             gui.drawString(str, GuiQuestBook.GROUPS_X, yPos, color);
             if (inBounds || selected) {
-                GL11.glDisable(GL11.GL_BLEND);
+                GlStateManager.disableBlend();
             }
 
             gui.drawString(Translator.translate("hqm.questBook.items", group.getItems().size()),

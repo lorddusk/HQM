@@ -1,5 +1,6 @@
 package hardcorequesting.quests;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import org.apache.logging.log4j.Level;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.*;
@@ -863,7 +863,7 @@ public class Quest {
         for (LargeButton button : buttons) {
             button.draw(gui, player, mX, mY);
         }
-        GL11.glColor3f(1F, 1F, 1F);
+        GlStateManager.resetColor();
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);
