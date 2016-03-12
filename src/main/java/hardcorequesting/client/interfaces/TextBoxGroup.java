@@ -77,7 +77,7 @@ public class TextBoxGroup {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.resetColor();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
             gui.drawString(scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
             if (selected) {

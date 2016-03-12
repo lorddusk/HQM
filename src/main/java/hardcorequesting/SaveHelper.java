@@ -245,15 +245,15 @@ public final class SaveHelper {
 
         if (isLarge) {
             if (total == 0) {
-                gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0x404040);
+                gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
             } else {
                 if (saveTime == 0) {
-                    gui.drawString(Translator.translate("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0x404040);
+                    gui.drawString(Translator.translate("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 } else {
-                    gui.drawString(formatTime((int) ((Minecraft.getSystemTime() - saveTime) / 60000)), X + START_X, Y + START_Y, 0x404040);
+                    gui.drawString(formatTime((int) ((Minecraft.getSystemTime() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
 
-                gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0x404040);
+                gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
                 int others = total;
                 for (int i = 0; i < LISTED_TYPES; i++) {
                     ListElement element = sortedList.get(i);
@@ -261,11 +261,11 @@ public final class SaveHelper {
                         //since it's sorted, the first 0 means the rest is empty
                         break;
                     }
-                    gui.drawString(element.type.translate(element.count), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0x404040);
+                    gui.drawString(element.type.translate(element.count), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                     others -= element.count;
                 }
                 if (others > 0) {
-                    gui.drawString(Translator.translate("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0x404040);
+                    gui.drawString(Translator.translate("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                 }
             }
         } else {

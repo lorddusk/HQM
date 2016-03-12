@@ -291,7 +291,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         textBoxes.draw(gui);
 
         if (usePrecision()) {
-            GlStateManager.resetColor();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 

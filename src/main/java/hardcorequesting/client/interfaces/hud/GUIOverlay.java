@@ -35,7 +35,7 @@ public class GUIOverlay extends Gui {
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableAlpha();
         //String s = " Lives: " + QuestingData.getQuestingData(mc.thePlayer).getLives();
         String s = " Lives: " + getLives();

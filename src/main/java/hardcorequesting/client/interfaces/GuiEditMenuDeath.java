@@ -91,7 +91,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.resetColor();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;

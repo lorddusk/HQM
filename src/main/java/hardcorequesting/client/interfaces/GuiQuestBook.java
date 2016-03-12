@@ -61,7 +61,6 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isReputationPage;
     public static Group selectedGroup;
     public static Reputation selectedReputation;
-    private static boolean isNEIActive = Loader.isModLoaded("NotEnoughItems");
     private static ItemStack selected;
 
     private final EntityPlayer player;
@@ -588,7 +587,7 @@ public class GuiQuestBook extends GuiBase {
                 drawString(GuiColor.RED + Translator.translate("hqm.questBook.deadOut"), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
 
-            GlStateManager.resetColor();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             int lives = QuestingData.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {

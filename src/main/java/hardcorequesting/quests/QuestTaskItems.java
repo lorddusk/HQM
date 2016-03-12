@@ -305,14 +305,11 @@ public abstract class QuestTaskItems extends QuestTask {
             }
 
             String str = (getProgress(player, i) * 100 / item.required) + "%";
-            //float z = gui.getZLevel();
-            //gui.setZLevel(z + 100);
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 100);
+            GlStateManager.translate(0, 0, 200);// magic z value to write over item render
             float textSize = 0.8F;
             gui.drawStringWithShadow(str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
             GlStateManager.popMatrix();
-            //gui.setZLevel(z);
         }
 
         for (int i = 0; i < items.length; i++) {

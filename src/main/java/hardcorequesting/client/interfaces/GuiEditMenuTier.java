@@ -81,7 +81,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
 
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 

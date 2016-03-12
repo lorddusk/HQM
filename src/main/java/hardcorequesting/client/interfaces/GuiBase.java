@@ -183,7 +183,7 @@ public class GuiBase extends GuiScreen {
 
         this.zLevel = 0.0F;
         GlStateManager.enableDepth();
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
@@ -240,7 +240,7 @@ public class GuiBase extends GuiScreen {
 //        }
 //
 //        if (icon != null) {
-//            GlStateManager.resetColor();
+//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 //
 //            ResourceHelper.bindResource(MAP_TEXTURE);
 //
@@ -250,7 +250,7 @@ public class GuiBase extends GuiScreen {
 //            setColor(fluid.getColor());
 //            drawIcon(icon, x, y);
 //
-//            GlStateManager.resetColor();
+//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 //        }
 //    }
 
@@ -258,7 +258,7 @@ public class GuiBase extends GuiScreen {
     public static final int ITEM_SIZE = 18;
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         ResourceHelper.bindResource(MAP_TEXTURE);
 
@@ -276,7 +276,7 @@ public class GuiBase extends GuiScreen {
             itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
         }
         GlStateManager.disableLighting();
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
 
@@ -308,7 +308,7 @@ public class GuiBase extends GuiScreen {
         } finally {
             setZLevel(0f);
 
-            GlStateManager.resetColor();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableLighting();
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GlStateManager.enableAlpha();

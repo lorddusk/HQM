@@ -94,7 +94,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         super.draw(gui, mX, mY);
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         scrollBar.draw(gui);
 
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;

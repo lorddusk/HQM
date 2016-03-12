@@ -863,7 +863,7 @@ public class Quest {
         for (LargeButton button : buttons) {
             button.draw(gui, player, mX, mY);
         }
-        GlStateManager.resetColor();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);

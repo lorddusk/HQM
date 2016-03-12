@@ -51,7 +51,7 @@ public abstract class LargeButton {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.resetColor();
+            GlStateManager.color(1F, 1F, 1F);
             boolean enabled = isEnabled(gui, player);
             gui.drawRect(x, y, BUTTON_SRC_X + (enabled && inButtonBounds(gui, mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
             gui.drawCenteredString(getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
