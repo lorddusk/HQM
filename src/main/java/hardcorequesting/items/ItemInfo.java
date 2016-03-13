@@ -14,7 +14,7 @@ public abstract class ItemInfo {
     public static final String[] HEART_ICONS = {"quarterheart", "halfheart", "threequarts", "heart", "rottenheart"};
 
     //--Information for the Bags
-    public static final Object BAG_ICON = "lootbag";
+    public static final String BAG_ICON = "lootbag";
     public static final String BAG_UNLOCALIZED_NAME = "bags";
 
 

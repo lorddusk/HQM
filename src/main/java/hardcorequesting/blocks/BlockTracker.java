@@ -31,28 +31,6 @@ public class BlockTracker extends BlockContainer {
         setHardness(10f);
     }
 
-//    @SideOnly(Side.CLIENT)
-//    private IIcon activeIcon;
-//    @SideOnly(Side.CLIENT)
-//    private IIcon emptyIcon;
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void registerBlockIcons(IIconRegister icon) {
-//        pickIcons(icon);
-//    }
-//
-//    private void pickIcons(IIconRegister icon) {
-//        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
-//        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
-//    }
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public IIcon getIcon(int side, int meta) {
-//        return side == 0 || side == 1 ? emptyIcon : activeIcon;
-//    }
-
     @Override
     public TileEntity createNewTileEntity(World world, int var2) {
         return new TileEntityTracker();
@@ -96,6 +74,11 @@ public class BlockTracker extends BlockContainer {
         }
 
         return false;
+    }
+
+    @Override
+    public int getRenderType() {
+        return 3;
     }
 
     @Override

@@ -105,22 +105,26 @@ public class BlockPortal extends BlockContainer {
         super.addCollisionBoxesToList(world, pos, state, box, lst, entity);
     }
 
+    @Override
+    public int getRenderType() {
+        return 3;
+    }
 
-//    @Override
+    //    @Override
 //    public boolean renderAsNormalBlock() {
 //        return false;
 //    }
 
-    @Override
-    public boolean isBlockNormalCube() {
-        return false;
-    }
-
-
-    @Override
-    public boolean isOpaqueCube() {
-        return false;
-    }
+//    @Override
+//    public boolean isBlockNormalCube() {
+//        return false;
+//    }
+//
+//
+//    @Override
+//    public boolean isOpaqueCube() {
+//        return false;
+//    }
 
 //    @SideOnly(Side.CLIENT)
 //    @Override

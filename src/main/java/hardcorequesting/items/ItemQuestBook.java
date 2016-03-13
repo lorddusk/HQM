@@ -32,28 +32,6 @@ public class ItemQuestBook extends Item {
         return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
     }
 
-//    @SideOnly(Side.CLIENT)
-//    private IIcon opIcon;
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void registerIcons(IIconRegister register) {
-//        pickIcons(register);
-//
-//    }
-//
-//    private void pickIcons(IIconRegister register) {
-//        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_ICON);
-//        opIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_OP_ICON);
-//    }
-//
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public IIcon getIconFromDamage(int dmg) {
-//        return dmg == 1 ? opIcon : itemIcon;
-//    }
-
     private static final String NBT_PLAYER = "UseAsPlayer";
 
     @SuppressWarnings("unchecked")

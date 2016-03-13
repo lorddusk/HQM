@@ -1,11 +1,8 @@
 package hardcorequesting.proxies;
 
-//import hardcorequesting.BlockHighlightRemover;
-import hardcorequesting.client.interfaces.hud.GUIOverlay;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 
 
@@ -22,9 +19,8 @@ public class ClientProxy extends CommonProxy {
     public void initRenderers() {
         //init the rendering stuff
 
-
         //MinecraftForge.EVENT_BUS.register(new GUIOverlay(Minecraft.getMinecraft()));
-        //new BlockHighlightRemover();
+        //MinecraftForge.EVENT_BUS.register(new BlockHighlightRemover());
     }
 
     @Override

@@ -9,9 +9,9 @@ import net.minecraft.item.ItemStack;
 
 public class ModItems {
     public static Item book = new ItemQuestBook().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
-    public static Item hearts= new ItemHeart().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
-    public static Item bags= new ItemBag().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
-    public static Item invalidItem= new ItemInvalid().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.INVALID_UNLOCALIZED_NAME);
+    public static Item hearts = new ItemHeart().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
+    public static Item bags = new ItemBag().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
+    public static Item invalidItem = new ItemInvalid().setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.INVALID_UNLOCALIZED_NAME);
 
     public static void init() {
         RegisterHelper.registerItem(book);

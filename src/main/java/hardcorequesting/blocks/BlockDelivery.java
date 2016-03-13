@@ -99,6 +99,11 @@ public class BlockDelivery extends BlockContainer {
         return false;
     }
 
+    @Override
+    public int getRenderType() {
+        return 3;
+    }
+
 
     public boolean hasComparatorInputOverride() {
         return true;

@@ -52,12 +52,10 @@ public class HardcoreQuesting {
         proxy.initRenderers();
         proxy.initSounds(path);
 
-        ModItems.init();
-
         ModBlocks.init();
         ModBlocks.registerTileEntities();
 
-        //Quest.init(this.path);
+        ModItems.init();
     }
 
     @EventHandler
@@ -74,14 +72,19 @@ public class HardcoreQuesting {
         ModItems.registerRecipes();
         ModBlocks.registerRecipes();
 
-        //FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
+        FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
+    }
+
+    @EventHandler
+    public void init(FMLInitializationEvent event)
+    {
+        ModItems.initRender();
+        ModBlocks.initRender();
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         Quest.init(path);
-        ModItems.initRender();
-        ModBlocks.initRender();
     }
 
 

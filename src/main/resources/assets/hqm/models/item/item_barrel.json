@@ -1,5 +1,5 @@
 {
-  "parent": "hqm:block/item_barrel",
+  "parent":"hqm:block/item_barrel",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

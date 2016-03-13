@@ -1,5 +1,5 @@
 {
-  "parent": "hqm:block/quest_tracker",
+  "parent":"hqm:block/quest_tracker",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],
