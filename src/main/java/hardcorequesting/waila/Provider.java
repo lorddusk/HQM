@@ -4,7 +4,7 @@ package hardcorequesting.waila;
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.BlockPortal;
 import hardcorequesting.blocks.ModBlocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.quests.QuestTask;

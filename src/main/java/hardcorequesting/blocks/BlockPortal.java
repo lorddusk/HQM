@@ -1,38 +1,36 @@
 package hardcorequesting.blocks;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityPortal;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-//import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-//import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import java.util.List;
 
+//import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.util.IIcon;
+
 
 public class BlockPortal extends BlockContainer {
     public BlockPortal() {
-        super(Material.wood);
+        super(Material.WOOD);
         setRegistryName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
@@ -70,8 +68,9 @@ public class BlockPortal extends BlockContainer {
 //        transparentIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_TRANSPARENT_ICON);
 //    }
 
+
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null && Quest.isEditing) {
             if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
@@ -98,16 +97,16 @@ public class BlockPortal extends BlockContainer {
     }
 
     @Override
-    public void addCollisionBoxesToList(World world, BlockPos pos, IBlockState state, AxisAlignedBB box, List lst, Entity entity) {
+    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity) {
         TileEntity te = world.getTileEntity(pos);
         if (entity instanceof EntityPlayer && te instanceof TileEntityPortal && !((TileEntityPortal) te).hasCollision((EntityPlayer) entity))
             return;
-        super.addCollisionBoxesToList(world, pos, state, box, lst, entity);
+        super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity);
     }
 
     @Override
-    public int getRenderType() {
-        return 3;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     //    @Override
@@ -158,12 +157,13 @@ public class BlockPortal extends BlockContainer {
 //        return side == 0 || side == 1 ? emptyIcon : blockIcon;
 //    }
 
+
     @Override
-    public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
         TileEntity te = world.getTileEntity(pos);
         if (te != null && te instanceof TileEntityPortal) {
             TileEntityPortal portal = (TileEntityPortal) te;
-            ItemStack itemStack = super.getPickBlock(target, world, pos, player);
+            ItemStack itemStack = super.getPickBlock(state, target, world, pos, player);
             if (itemStack != null) {
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
                 if (tagCompound == null) {

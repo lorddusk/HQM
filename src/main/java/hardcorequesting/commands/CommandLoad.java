@@ -13,8 +13,8 @@ import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.translation.I18n;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -75,7 +75,7 @@ public class CommandLoad extends CommandBase {
             QuestSet set = GSON.fromJson(reader, QuestSet.class);
             reader.close();
             if (set != null) {
-                sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
+                sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
             } else {
                 throw new CommandException(Lang.LOAD_FAILED);
             }
@@ -99,7 +99,7 @@ public class CommandLoad extends CommandBase {
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
                     Reputation.getReputationList().add(reputation);
-                    sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
+                    sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
                 } else {
                     throw new CommandException(Lang.LOAD_FAILED);
                 }
@@ -124,7 +124,7 @@ public class CommandLoad extends CommandBase {
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
-                sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Bags")));
+                sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Bags")));
             } else {
                 throw new CommandException(Lang.LOAD_FAILED);
             }
