@@ -1,12 +1,5 @@
 package hardcorequesting.network;
 
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.*;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -16,17 +9,23 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestTask;
 import hardcorequesting.tileentity.IBlockSync;
-import hardcorequesting.tileentity.TileEntityPortal;
 import hardcorequesting.tileentity.TileEntityTracker;
-//import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashMap;
 import java.util.Map;
+
+//import net.minecraft.client.entity.EntityClientPlayerMP;
 
 public class PacketHandler {
 
@@ -111,12 +110,12 @@ public class PacketHandler {
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        onPacketData(event.packet.payload().array(), FMLClientHandler.instance().getClient().thePlayer, false);
+        onPacketData(event.getPacket().payload().array(), FMLClientHandler.instance().getClient().thePlayer, false);
     }
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-        onPacketData(event.packet.payload().array(), ((NetHandlerPlayServer) event.handler).playerEntity, true);
+        onPacketData(event.getPacket().payload().array(), ((NetHandlerPlayServer) event.getHandler()).playerEntity, true);
     }
 
     private void onPacketData(byte[] incomingData, EntityPlayer player, boolean onServer) {
@@ -331,7 +330,7 @@ public class PacketHandler {
 
     public static void sendToAllPlayersWithOpenBook(DataWriter dw) {
         if (!Quest.isEditing || QuestingData.isSinglePlayer()) {
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
                 sendToBookPlayer(name, dw);
             }
         }

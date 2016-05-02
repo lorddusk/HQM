@@ -1,7 +1,5 @@
 package hardcorequesting;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -17,19 +15,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.BanEntry;
-import net.minecraft.server.management.UserListBans;
 import net.minecraft.server.management.UserListBansEntry;
-import net.minecraft.server.management.UserListEntry;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class QuestingData {
 
@@ -139,14 +138,14 @@ public class QuestingData {
     public void removeLifeAndSendMessage(EntityPlayer player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.addChatMessage(new ChatComponentText(Translator.translate(getLives() != 1, "hqm.message.lostLife", getLives())));
+            player.addChatMessage(new TextComponentString(Translator.translate(getLives() != 1, "hqm.message.lostLife", getLives())));
         }
         if (getTeam().isSharingLives()) {
             for (Team.PlayerEntry entry : getTeam().getPlayers()) {
                 if (entry.isInTeam() && !entry.getName().equals(getUserName(player))) {
                     EntityPlayer other = getPlayer(entry.getName());
                     if (other != null) {
-                        other.addChatMessage(new ChatComponentText(
+                        other.addChatMessage(new TextComponentString(
                                 Translator.translate(getLives() != 1, "hqm.message.lostTeamLife", getUserName(player), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
                     }
                 }
@@ -231,7 +230,7 @@ public class QuestingData {
 
         playerEntity.inventory.clear(); //had some problem with tconstruct, clear all items to prevent it
 
-        MinecraftServer mcServer = MinecraftServer.getServer();
+        MinecraftServer mcServer = playerEntity.getServer();
 
         if (mcServer.isSinglePlayer() && playerEntity.getName().equals(mcServer.getServerOwner())) {
             ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
@@ -241,14 +240,18 @@ public class QuestingData {
 
             mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectoryName());
             mcServer.initiateShutdown();*/
-            mcServer.deleteWorldAndStopServer();
+            // @todo: is this correct?
+            mcServer.getActiveAnvilConverter().flushCache();
+            mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectory().getName());
+            mcServer.initiateShutdown();
+//            mcServer.deleteWorldAndStopServer();
 
         } else {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";
 
             UserListBansEntry userlistbansentry = new UserListBansEntry(playerEntity.getGameProfile(), (Date) null, setBannedBy, (Date) null, setBanReason);
-            mcServer.getConfigurationManager().getBannedPlayers().addEntry(userlistbansentry);
+            mcServer.getPlayerList().getBannedPlayers().addEntry(userlistbansentry);
 
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
             ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
@@ -260,7 +263,7 @@ public class QuestingData {
 
     //keep all the red line code in one spot
     public static boolean isSinglePlayer() {
-        return MinecraftServer.getServer().isSinglePlayer();
+        return FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer();
     }
 
 
@@ -292,7 +295,7 @@ public class QuestingData {
     }*/
 
     public static void activateHardcore() {
-        if (!hardcoreActive && !MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+        if (!hardcoreActive && !FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
             hardcoreActive = true;
         }
     }
@@ -304,9 +307,9 @@ public class QuestingData {
     public static void activateQuest() {
         if (!questActive) {
             questActive = true;
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
                 if (name != null) {
-                    EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(name);
+                    EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(name);
                     if (player != null) {
                         spawnBook(player);
                     }
@@ -695,16 +698,16 @@ public class QuestingData {
 
 
     public static void disableVanillaHardcore(ICommandSender sender) {
-        if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcore"));
+        if (sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+            sender.addChatMessage(new TextComponentTranslation("hqm.message.vanillaHardcore"));
             try {
                 ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
             } catch (Throwable ex) {
                 ex.printStackTrace();
             }
 
-            if (!MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-                sender.addChatMessage(new ChatComponentTranslation("hqm.message.vanillaHardcoreOverride"));
+            if (!sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+                sender.addChatMessage(new TextComponentTranslation("hqm.message.vanillaHardcoreOverride"));
             }
         }
     }
@@ -743,7 +746,7 @@ public class QuestingData {
     }
 
     public static EntityPlayer getPlayer(String playerName) {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
+        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
     }
 
     public static boolean hasData(String playerName) {

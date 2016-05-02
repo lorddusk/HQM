@@ -7,7 +7,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
 
@@ -36,7 +36,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
         return true;
     }
 
@@ -46,11 +46,10 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1) {
             String subCommand = args[0];
-            List result = new ArrayList();
+            List<String> result = new ArrayList<String>();
             for (ISubCommand command : commands.values()) {
                 if (command.isVisible(sender) && command.getCommandName().startsWith(subCommand))
                     result.add(command.getCommandName());
@@ -68,7 +67,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             args = new String[]{"help"};
         }
@@ -88,14 +87,14 @@ public class CommandHandler extends CommandBase {
         if (sender instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) sender;
             GameProfile username = player.getGameProfile();
-            return isCommandsAllowedOrOwner(username);
+            return isCommandsAllowedOrOwner(sender, username);
         } else
             return true;
     }
 
 
-    public static boolean isCommandsAllowedOrOwner(GameProfile username) {
-        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username);
+    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
+        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
     }
 
     public static ISubCommand getCommand(String commandName) {

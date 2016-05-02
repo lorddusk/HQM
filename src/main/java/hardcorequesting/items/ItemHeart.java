@@ -1,7 +1,5 @@
 package hardcorequesting.items;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.DeathType;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
@@ -9,18 +7,25 @@ import hardcorequesting.Translator;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
-//import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-//import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+
+//import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.util.IIcon;
 
 public class ItemHeart extends Item {
 
@@ -68,32 +73,32 @@ public class ItemHeart extends Item {
 
 
     @Override
-    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
 
             if (item.getItemDamage() == 3) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.noHardcoreYet"));
                 } else if (QuestingData.getQuestingData(player).getRawLives() < ModConfig.MAXLIVES) {
                     QuestingData.getQuestingData(player).addLives(player, 1);
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.addOne"));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.addOne"));
                     int lives = QuestingData.getQuestingData(player).getLives();
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveRemaining", lives));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.haveRemaining", lives));
                     SoundHandler.play(Sounds.LIFE, player);
                     if (!player.capabilities.isCreativeMode) {
                         --item.stackSize;
 
                     }
                 } else {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveMaxLives"));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.haveMaxLives"));
                 }
             }
             if (item.getItemDamage() == 4) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.noHardcoreYet"));
                 } else {
                     SoundHandler.play(Sounds.ROTTEN, player);
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.eatRottenHearth"));
+                    player.addChatComponentMessage(new TextComponentTranslation("hqm.message.eatRottenHearth"));
                     QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
 
@@ -102,10 +107,10 @@ public class ItemHeart extends Item {
                 }
 
             }
-            return item;
+            return new ActionResult<>(EnumActionResult.SUCCESS, item);
 
         }
-        return item;
+        return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
     @SuppressWarnings("unchecked")
@@ -157,7 +162,7 @@ public class ItemHeart extends Item {
                     int newRot = tagCompound.getInteger("RotTime");
                     if (newRot <= 0) {
                         itemStack.setItemDamage(4);
-                        entityPlayer.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.hearthDecay"));
+                        entityPlayer.addChatComponentMessage(new TextComponentTranslation("hqm.message.hearthDecay"));
                     } else {
                         tagCompound.setInteger("RotTime", newRot - 1);
                     }

@@ -9,8 +9,8 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.translation.I18n;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -93,7 +93,7 @@ public class CommandSave extends CommandBase {
             FileWriter fileWriter = new FileWriter(file);
             GSON.toJson(save, type, fileWriter);
             fileWriter.close();
-            sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
+            sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
         } catch (IOException e) {
             throw new CommandException(Lang.SAVE_FAILED, name);
         }

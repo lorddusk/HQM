@@ -14,8 +14,7 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.text.TextComponentString;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -89,7 +88,7 @@ public abstract class CommandBase implements ISubCommand {
     }
 
     protected void sendChat(ICommandSender sender, boolean plural, String key, Object... args) {
-        sender.addChatMessage(new ChatComponentText(Translator.translate(plural, key, args)));
+        sender.addChatMessage(new TextComponentString(Translator.translate(plural, key, args)));
     }
 
     protected boolean isPlayerOp(ICommandSender sender) {

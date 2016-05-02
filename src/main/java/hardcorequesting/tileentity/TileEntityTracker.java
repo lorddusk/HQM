@@ -1,8 +1,8 @@
 package hardcorequesting.tileentity;
 
 import hardcorequesting.blocks.ModBlocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;

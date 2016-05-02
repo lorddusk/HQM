@@ -474,15 +474,14 @@ public class GuiEditMenuItem extends GuiEditMenu {
             clear();
             if (searchItems.isEmpty()) {
                 List<ItemStack> stacks = new ArrayList<>();
-                for (Object anItemRegistry : Item.itemRegistry) {
+                for (Item item : Item.REGISTRY) {
+                    //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
+                    //                    {
+                    //                        ItemBlock itemBlock = (ItemBlock)item;
+                    //                        if (itemBlock.field_150939_a == Blocks.lava || itemBlock.field_150939_a == Blocks.water || itemBlock.field_150939_a instanceof BlockLiquid || itemBlock.field_150939_a instanceof IFluidBlock)
+                    //                            continue;
+                    //                    }
                     try {
-                        Item item = (Item) anItemRegistry;
-                        //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
-                        //                    {
-                        //                        ItemBlock itemBlock = (ItemBlock)item;
-                        //                        if (itemBlock.field_150939_a == Blocks.lava || itemBlock.field_150939_a == Blocks.water || itemBlock.field_150939_a instanceof BlockLiquid || itemBlock.field_150939_a instanceof IFluidBlock)
-                        //                            continue;
-                        //                    }
                         item.getSubItems(item, item.getCreativeTab(), stacks);
                     } catch (Exception ignore) {
                     }

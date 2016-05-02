@@ -2,7 +2,6 @@ package hardcorequesting.blocks;
 
 import hardcorequesting.RegisterHelper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -40,7 +39,7 @@ public class ModBlocks {
                 "wgw",
                 "gqg",
                 "wgw",
-                'w', Blocks.planks, 'q', ModItems.book.setContainerItem(ModItems.book), 'g', Blocks.glass);
+                'w', Blocks.PLANKS, 'q', ModItems.book.setContainerItem(ModItems.book), 'g', Blocks.GLASS);
     }
 
 

@@ -29,20 +29,20 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.8.9:2.28.7.174"
-    deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
+    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B2_1.9"
+    deobfCompile "mezz.jei:jei_1.9:3.2.4.177"
 }
 
 version = "5.0.0"
 group = "hardcorequesting"
 archivesBaseName = "HQM-The Journey"
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 minecraft {
-    version = "1.8.9-11.15.1.1722"
-    mappings = "stable_22"
+    version = "1.9-12.16.0.1865-1.9"
+    mappings = "snapshot_20160421"
     runDir = "run"
 
     useDepAts = true
