@@ -35,6 +35,7 @@ public class ItemHeart extends Item {
         this.setMaxDamage(0);
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setRegistryName(ItemInfo.HEART_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
     }
 //

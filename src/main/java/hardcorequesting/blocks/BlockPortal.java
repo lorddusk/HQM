@@ -31,7 +31,7 @@ import java.util.List;
 public class BlockPortal extends BlockContainer {
     public BlockPortal() {
         super(Material.WOOD);
-        setRegistryName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
+        setRegistryName(BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
     }

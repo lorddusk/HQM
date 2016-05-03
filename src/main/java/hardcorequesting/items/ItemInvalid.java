@@ -16,6 +16,7 @@ public class ItemInvalid extends Item {
         super();
         this.setMaxStackSize(1);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setRegistryName(ItemInfo.INVALID_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.INVALID_UNLOCALIZED_NAME);
     }
 

@@ -35,6 +35,7 @@ public class ItemBag extends Item {
         this.setMaxDamage(0);
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setRegistryName(ItemInfo.BAG_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
     }
 

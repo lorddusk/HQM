@@ -30,9 +30,9 @@ public class ModBlocks {
     }
 
     public static void registerTileEntities() {
-        GameRegistry.registerTileEntity(TileEntityBarrel.class, BlockInfo.ITEMBARREL_TE_KEY);
-        GameRegistry.registerTileEntity(TileEntityTracker.class, BlockInfo.QUEST_TRACKER_TE_KEY);
-        GameRegistry.registerTileEntity(TileEntityPortal.class, BlockInfo.QUEST_PORTAL_TE_KEY);
+        GameRegistry.registerTileEntity(TileEntityBarrel.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.ITEMBARREL_TE_KEY);
+        GameRegistry.registerTileEntity(TileEntityTracker.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.QUEST_TRACKER_TE_KEY);
+        GameRegistry.registerTileEntity(TileEntityPortal.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.QUEST_PORTAL_TE_KEY);
     }
 
     public static void registerRecipes() {

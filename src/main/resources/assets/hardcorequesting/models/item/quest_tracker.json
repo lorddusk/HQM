@@ -1,5 +1,5 @@
 {
-  "parent":"hqm:block/quest_portal",
+  "parent":"hardcorequesting:block/quest_tracker",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],

@@ -1,6 +1,0 @@
-{
-  "parent":"hqm:item/base_item",
-  "textures": {
-    "layer0":"hqm:items/hqmQuestBook"
-  }
-}

@@ -28,6 +28,7 @@ public class ItemQuestBook extends Item {
         super();
         setCreativeTab(HardcoreQuesting.HQMTab);
         setMaxStackSize(1);
+        setRegistryName(ItemInfo.BOOK_UNLOCALIZED_NAME);
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 

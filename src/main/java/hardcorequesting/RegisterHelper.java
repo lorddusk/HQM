@@ -36,18 +36,17 @@ public class RegisterHelper
 
 
     public static void registerItem(Item item) {
-        // @todo, check with setRegistryName and replace
-        GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5));
+        GameRegistry.register(item);
     }
 
     public static void registerItemRenderer(Item item) {
         ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-        mesher.register(item, 0, new ModelResourceLocation(item.getUnlocalizedName().substring(5), "inventory"));
+        mesher.register(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
     public static void registerBlockRenderer(Block block) {
         ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-        mesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getUnlocalizedName().substring(5), "inventory"));
+        mesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 
 

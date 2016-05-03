@@ -25,7 +25,7 @@ public class BlockTracker extends BlockContainer {
 
     public BlockTracker() {
         super(Material.WOOD);
-        setRegistryName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
+        setRegistryName(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
     }

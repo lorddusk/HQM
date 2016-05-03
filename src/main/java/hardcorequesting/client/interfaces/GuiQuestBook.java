@@ -184,6 +184,7 @@ public class GuiQuestBook extends GuiBase {
         return selectedGroup;
     }
 
+    @Override
     public void setEditMenu(GuiEditMenu editMenu) {
         this.editMenu = editMenu;
     }

@@ -24,7 +24,7 @@ public class BlockDelivery extends BlockContainer {
 
     public BlockDelivery() {
         super(Material.WOOD);
-        setRegistryName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
+        setRegistryName(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(1f);
     }
