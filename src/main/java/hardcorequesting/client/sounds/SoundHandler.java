@@ -47,7 +47,7 @@ public class SoundHandler {
 
                 // Add resource pack to discover lore
                 Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
-                FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hqm");
+                FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hardcorequesting");
                 resourceManager.addResourcePack(new LoreResourcePack(new File(path)));
 
                 // Add lore file to sound handler
