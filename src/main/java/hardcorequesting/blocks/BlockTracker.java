@@ -1,31 +1,30 @@
 package hardcorequesting.blocks;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Translator;
-import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityTracker;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-//import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-//import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+//import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.util.IIcon;
 
 
 public class BlockTracker extends BlockContainer {
 
     public BlockTracker() {
-        super(Material.wood);
+        super(Material.WOOD);
         setRegistryName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
@@ -37,7 +36,7 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null) {
             if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
@@ -77,12 +76,12 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public int getRenderType() {
-        return 3;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    public boolean canProvidePower() {
+    public boolean canProvidePower(IBlockState state) {
         return true;
     }
 

@@ -1,10 +1,9 @@
 package hardcorequesting.quests;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.*;
+import hardcorequesting.FileVersion;
+import hardcorequesting.QuestingData;
+import hardcorequesting.SaveHelper;
+import hardcorequesting.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiEditMenuItem;
@@ -13,6 +12,7 @@ import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -20,6 +20,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
 
 import java.util.Arrays;
@@ -261,7 +264,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (Quest.isEditing) {
                     if (item == null) {
                         FMLLog.log("HQM-EDIT", Level.INFO, "Changed invalid item to bedrock.");
-                        item = Item.getItemFromBlock(Blocks.bedrock);
+                        item = Item.getItemFromBlock(Blocks.BEDROCK);
                     }
                 }
 

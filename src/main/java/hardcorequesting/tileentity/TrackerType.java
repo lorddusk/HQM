@@ -78,7 +78,7 @@ public enum TrackerType {
         public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
             double closest = 0;
             EntityPlayer closestPlayer = null;
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
                 EntityPlayer player = QuestingData.getPlayer(name);
                 if (player != null) {
                     double distance = player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);

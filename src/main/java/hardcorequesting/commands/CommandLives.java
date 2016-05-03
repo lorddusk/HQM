@@ -1,6 +1,5 @@
 package hardcorequesting.commands;
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import hardcorequesting.Lang;
 import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
@@ -9,6 +8,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.List;
 
@@ -142,7 +142,7 @@ public class CommandLives extends CommandBase {
     }
 
     private void removeLivesFrom(ICommandSender sender, String playerName, int amount) {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
 
         QuestingData.getQuestingData(player).removeLives((EntityPlayerMP) sender, amount);
 
@@ -164,7 +164,7 @@ public class CommandLives extends CommandBase {
     }
 
     private void addLivesTo(ICommandSender sender, String playerName, int amount) {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
 
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
@@ -181,7 +181,7 @@ public class CommandLives extends CommandBase {
     }
 
     private void getPlayerLives(ICommandSender sender, String playerName) throws CommandException {
-        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
+        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
         if (player != null) {
             int lives = QuestingData.getQuestingData(player).getLives();
             sendChat(sender, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);

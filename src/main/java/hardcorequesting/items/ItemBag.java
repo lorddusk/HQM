@@ -1,5 +1,9 @@
 package hardcorequesting.items;
 
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
@@ -55,6 +59,9 @@ public class ItemBag extends Item {
         }
     }
 
+
+
+    @Override
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tabs, List stackList) {
@@ -64,7 +71,7 @@ public class ItemBag extends Item {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
             int dmg = item.getItemDamage();
             if (dmg >= 0 && dmg < BagTier.values().length) {
@@ -85,7 +92,8 @@ public class ItemBag extends Item {
                                 group.open(player);
                                 player.inventory.markDirty();
                                 openClientInterface(player, i, dmg);
-                                world.playSoundAtEntity(player, Sounds.BAG.getSound(), 1, 1);
+                                // @todo
+//                                world.playSound(player, player.getPosition(), Sounds.BAG.getSound(), SoundCategory.BLOCKS, 1, 1);
                                 break;
                             } else {
                                 rng -= weight;
@@ -101,7 +109,7 @@ public class ItemBag extends Item {
             //}
         }
 
-        return item;
+        return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
     private void openClientInterface(EntityPlayer player, int id, int bag) {

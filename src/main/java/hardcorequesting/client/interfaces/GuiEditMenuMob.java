@@ -1,10 +1,9 @@
 package hardcorequesting.client.interfaces;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.Translator;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.quests.QuestTaskMob;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +12,6 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
@@ -62,10 +60,10 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         rawMobs = new ArrayList<String>();
         mobs = new ArrayList<String>();
 
-        for (Object obj : EntityList.classToStringMapping.keySet()) {
+        for (Object obj : EntityList.CLASS_TO_NAME.keySet()) {
             Class clazz = (Class) obj;
             if (EntityLivingBase.class.isAssignableFrom(clazz)) {
-                rawMobs.add((String) EntityList.classToStringMapping.get(clazz));
+                rawMobs.add(EntityList.CLASS_TO_NAME.get(clazz));
             }
         }
 
@@ -172,11 +170,11 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     protected void save(GuiBase gui) {
         mob.setCount(Math.min(DataBitHelper.KILL_COUNT.getMaximum(), Math.max(1, mob.getCount())));
 
-        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.spawn_egg) && mob.getMob() != null) {
-            HashMap ids = ReflectionHelper.getPrivateValue(EntityList.class, null, 4);
-            EntityList.EntityEggInfo info = EntityList.entityEggs.get(ids.get(mob.getMob()));
+        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
+            EntityList.EntityEggInfo info = EntityList.ENTITY_EGGS.get(mob.getMob());
             if (info != null) {
-                mob.setIcon(new ItemStack(Items.spawn_egg, 1, info.spawnedID));
+                int id = EntityList.getIDFromString(mob.getMob());
+                mob.setIcon(new ItemStack(Items.SPAWN_EGG, 1, id));
             }
         }
 

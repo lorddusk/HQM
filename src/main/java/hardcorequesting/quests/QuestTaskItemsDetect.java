@@ -39,8 +39,8 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
     @Override
     public void onItemPickUp(EntityItemPickupEvent event) {
-        if (event.entityPlayer.inventory.inventoryChanged) {
-            countItems(event.entityPlayer, event.item.getEntityItem());
+        if (event.getEntityPlayer().inventory.inventoryChanged) {
+            countItems(event.getEntityPlayer(), event.getItem().getEntityItem());
         }
     }
 

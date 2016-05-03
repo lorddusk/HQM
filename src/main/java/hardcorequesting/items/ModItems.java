@@ -30,7 +30,7 @@ public class ModItems {
 
     public static void registerRecipes() {
         //Questing Book
-        GameRegistry.addShapelessRecipe(new ItemStack(ModItems.book), Items.book, Items.string);
+        GameRegistry.addShapelessRecipe(new ItemStack(ModItems.book), Items.BOOK, Items.STRING);
 
         //Hearts
         //1-1-1-1

@@ -1,8 +1,6 @@
 package hardcorequesting.client.sounds;
 
 
-import hardcorequesting.ModInformation;
-
 public enum Sounds {
     COMPLETE("complete"),
     LIFE("heart"),

@@ -3,7 +3,6 @@ package hardcorequesting.commands;
 import hardcorequesting.QuestingData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 
 public class CommandEnable extends CommandBase {
     public CommandEnable() {
@@ -13,7 +12,7 @@ public class CommandEnable extends CommandBase {
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments) {
         QuestingData.disableVanillaHardcore(sender);
-        if (MinecraftServer.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
+        if (sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
             sendChat(sender, "hqm.message.vanillaHardcoreOn");
         else
             sendChat(sender, QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore");

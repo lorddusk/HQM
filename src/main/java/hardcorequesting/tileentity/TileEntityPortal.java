@@ -1,8 +1,5 @@
 package hardcorequesting.tileentity;
 
-import net.minecraft.util.ITickable;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Team;
 import hardcorequesting.client.interfaces.GuiBase;
@@ -13,19 +10,22 @@ import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.Quest;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-//import net.minecraft.util.IIcon;
+import net.minecraft.util.ITickable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+//import net.minecraft.util.IIcon;
 
 public class TileEntityPortal extends TileEntity implements IBlockSync, ITickable {
 
@@ -332,7 +332,8 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     for (int i = 0; i < count; i++) {
                         players.add(dr.readString(DataBitHelper.NAME_LENGTH));
                     }
-                    worldObj.markBlockForUpdate(pos);
+                    IBlockState state = worldObj.getBlockState(pos);
+                    worldObj.notifyBlockUpdate(pos, state, state, 3);
                 }
                 break;
             case 1:

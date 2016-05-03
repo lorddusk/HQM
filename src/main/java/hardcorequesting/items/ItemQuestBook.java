@@ -1,22 +1,26 @@
 package hardcorequesting.items;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
 import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.PacketHandler;
-//import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-//import net.minecraft.util.IIcon;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+
+//import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.util.IIcon;
 
 public class ItemQuestBook extends Item {
 
@@ -48,7 +52,7 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
 
             if (!QuestingData.isQuestActive()) {
@@ -74,7 +78,7 @@ public class ItemQuestBook extends Item {
 
         }
 
-        return item;
+        return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
     @Override

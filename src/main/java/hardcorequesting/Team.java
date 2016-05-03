@@ -1,13 +1,13 @@
 package hardcorequesting;
 
 
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import hardcorequesting.network.*;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reward.ReputationReward;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -341,7 +341,7 @@ public class Team {
         }
 
         //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
+        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
             Team team = QuestingData.getQuestingData(username).getTeam();
             PlayerEntry entry = team.getEntry(username);
             if (entry != null) {

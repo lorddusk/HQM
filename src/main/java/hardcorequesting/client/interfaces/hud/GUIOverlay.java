@@ -25,7 +25,7 @@ public class GUIOverlay extends Gui {
 
     @SubscribeEvent
     public void onRenderExperienceBar(RenderGameOverlayEvent event) {
-        if (event.isCancelable() || event.type != ElementType.EXPERIENCE) {
+        if (event.isCancelable() || event.getType() != ElementType.EXPERIENCE) {
             return;
         }
 

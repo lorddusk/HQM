@@ -9,7 +9,6 @@ import hardcorequesting.network.PacketHandler;
 import hardcorequesting.network.PacketId;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.SoundList;
 import net.minecraft.client.resources.FallbackResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,8 +18,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,30 +48,31 @@ public class SoundHandler {
                 // Add lore file to sound handler
                 net.minecraft.client.audio.SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
 
-                SoundList list = new SoundList();
-                list.setSoundCategory(SoundCategory.MASTER);
+                //@todo
+//                SoundList list = new SoundList();
+//                list.setSoundCategory(SoundCategory.MASTER);
+//
+//                SoundList.SoundEntry entry = new SoundList.SoundEntry();
+//                entry.setSoundEntryName(LABEL + number);
+//                list.getSoundList().add(entry);
 
-                SoundList.SoundEntry entry = new SoundList.SoundEntry();
-                entry.setSoundEntryName(LABEL + number);
-                list.getSoundList().add(entry);
-
-                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[]{"loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
-                if (method == null || handler == null) {
-                    return false;
-                }
-                try {
-                    method.invoke(handler, new ResourceLocation(ModInformation.SOUNDLOC, LABEL + number), list);
-                    loreMusic = true;
-                    loreNumber = number;
-                    paths.add(path);
-                    return true;
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                }
+//                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[]{"loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
+//                if (method == null || handler == null) {
+//                    return false;
+//                }
+//                try {
+//                    method.invoke(handler, new ResourceLocation(ModInformation.SOUNDLOC, LABEL + number), list);
+//                    loreMusic = true;
+//                    loreNumber = number;
+//                    paths.add(path);
+//                    return true;
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                    throw new RuntimeException(e);
+//                } catch (InvocationTargetException e) {
+//                    e.printStackTrace();
+//                    throw new RuntimeException(e);
+//                }
             }
         } else {
             loreNumber = index;

@@ -1,7 +1,5 @@
 package hardcorequesting.quests;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.EventHandler;
 import hardcorequesting.FileVersion;
 import hardcorequesting.Translator;
@@ -12,6 +10,8 @@ import hardcorequesting.network.DataReader;
 import hardcorequesting.network.DataWriter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskReputationKill extends QuestTaskReputation {
     public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
@@ -25,8 +25,8 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
         EntityPlayer killer = QuestTaskMob.getKiller(event);
-        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(event.entityLiving)) {
-            if (event.entityLiving instanceof EntityPlayer && isPlayerInRange((EntityPlayer) event.entityLiving)) {
+        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(event.getEntityLiving())) {
+            if (event.getEntityLiving() instanceof EntityPlayer && isPlayerInRange((EntityPlayer) event.getEntityLiving())) {
                 QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill) getData(killer);
                 if (killData.kills < kills) {
                     killData.kills += 1;

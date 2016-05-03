@@ -30,8 +30,8 @@ public class QuestTaskDeath extends QuestTask {
 
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
-        if (event.entityLiving instanceof EntityPlayerMP) {
-            EntityPlayer player = (EntityPlayer) event.entityLiving;
+        if (event.getEntityLiving() instanceof EntityPlayerMP) {
+            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
             if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
                 QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData(player);
                 if (deathData.deaths < deaths) {

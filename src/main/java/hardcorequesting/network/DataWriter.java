@@ -191,7 +191,7 @@ public class DataWriter {
     }
 
     public void sendToAllPlayersAround(TileEntity te, double range) {
-        packetHandler.sendToAllAround(createPacket(), new NetworkRegistry.TargetPoint(te.getWorld().provider.getDimensionId(), te.getPos().getX() + 0.5, te.getPos().getY() + 0.5, te.getPos().getZ(), range));
+        packetHandler.sendToAllAround(createPacket(), new NetworkRegistry.TargetPoint(te.getWorld().provider.getDimension(), te.getPos().getX() + 0.5, te.getPos().getY() + 0.5, te.getPos().getZ(), range));
     }
 
     private DataBitHelper bufferSize;
@@ -231,7 +231,7 @@ public class DataWriter {
     }
 
     public void writeItem(Item item) {
-        writeString(Item.itemRegistry.getNameForObject(item).toString(), DataBitHelper.SHORT);
+        writeString(Item.REGISTRY.getNameForObject(item).toString(), DataBitHelper.SHORT);
     }
 
     private static final double LOG_2 = Math.log10(2);

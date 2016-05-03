@@ -97,7 +97,7 @@ public class ModConfig {
 
     @SubscribeEvent
     public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.modID.equalsIgnoreCase(ModInformation.ID))
+        if (event.getModID().equalsIgnoreCase(ModInformation.ID))
             loadConfig();
     }
 
