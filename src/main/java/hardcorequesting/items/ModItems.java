@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 
 public class ModItems {
     public static Item book = new ItemQuestBook();
-    public static Item hearts = new ItemHeart();
+    public static ItemHeart hearts = new ItemHeart();
     public static Item bags = new ItemBag();
     public static Item invalidItem = new ItemInvalid();
 
@@ -22,7 +22,8 @@ public class ModItems {
 
     public static void initRender(){
         RegisterHelper.registerItemRenderer(book);
-        RegisterHelper.registerItemRenderer(hearts);
+//        RegisterHelper.registerItemRenderer(hearts);
+        hearts.initModel();
         RegisterHelper.registerItemRenderer(bags);
         RegisterHelper.registerItemRenderer(invalidItem);
     }

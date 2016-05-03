@@ -1,12 +1,10 @@
 package hardcorequesting.items;
 
-import hardcorequesting.DeathType;
-import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Translator;
+import hardcorequesting.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,10 +17,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+
+import static hardcorequesting.items.ItemInfo.HEART_ICONS;
 
 //import net.minecraft.client.renderer.texture.IIconRegister;
 //import net.minecraft.util.IIcon;
@@ -38,38 +39,27 @@ public class ItemHeart extends Item {
         this.setRegistryName(ItemInfo.HEART_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
     }
-//
-//    @SideOnly(Side.CLIENT)
-//    private IIcon[] icons;
-//
-//    @SideOnly(Side.CLIENT)
-//    public void registerIcons(IIconRegister icon) {
-//        pickIcon(icon);
-//    }
-//
-//    private void pickIcon(IIconRegister icon) {
-//        icons = new IIcon[ItemInfo.HEART_ICONS.length];
-//
-//        for (int i = 0; i < icons.length; i++)
-//            icons[i] = icon.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.HEART_ICONS[i]);
-//    }
 
-    public static final String[] names = ItemInfo.HEART_ICONS;
-
-    public String getUnlocalizedName(ItemStack par1ItemStack) {
-        int i = MathHelper.clamp_int(par1ItemStack.getItemDamage(), 0, 15);
-        return super.getUnlocalizedName() + "_" + names[i];
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        for (int i = 0 ; i < HEART_ICONS.length ; i++) {
+            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ID + ":" + HEART_ICONS[i], "inventory"));
+        }
     }
 
-//    public IIcon getIconFromDamage(int par1) {
-//        return icons[par1];
-//    }
+    @Override
+    public String getUnlocalizedName(ItemStack par1ItemStack) {
+        int i = MathHelper.clamp_int(par1ItemStack.getItemDamage(), 0, 15);
+        return super.getUnlocalizedName() + "_" + HEART_ICONS[i];
+    }
 
+    @Override
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs creativeTabs, List stackList) {
-        for (int x = 0; x < ItemInfo.HEART_ICONS.length; x++)
+        for (int x = 0; x < HEART_ICONS.length; x++) {
             stackList.add(new ItemStack(this, 1, x));
+        }
     }
 
 

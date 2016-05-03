@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
 public abstract class ItemInfo {
-    public static final String TEXTURE_LOCATION = "hqm";
+    public static final String TEXTURE_LOCATION = "hardcorequesting";
     public static final String LOCALIZATION_START = "hqm:";
     //--Information for the Questing Book
 

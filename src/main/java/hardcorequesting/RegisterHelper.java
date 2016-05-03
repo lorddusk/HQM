@@ -1,11 +1,10 @@
 package hardcorequesting;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.lang.reflect.Constructor;
@@ -40,13 +39,15 @@ public class RegisterHelper
     }
 
     public static void registerItemRenderer(Item item) {
-        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-        mesher.register(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+//        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+//        mesher.register(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
     public static void registerBlockRenderer(Block block) {
-        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-        mesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+//        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
+//        mesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 
 

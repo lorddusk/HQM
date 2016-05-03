@@ -49,13 +49,13 @@ public class HardcoreQuesting {
         ConfigHandler.initEditConfig(path);
 
         proxy.init();
-        proxy.initRenderers();
         proxy.initSounds(path);
 
         ModBlocks.init();
         ModBlocks.registerTileEntities();
 
         ModItems.init();
+        proxy.initRenderers();
     }
 
     @EventHandler
@@ -76,10 +76,7 @@ public class HardcoreQuesting {
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-        ModItems.initRender();
-        ModBlocks.initRender();
+    public void init(FMLInitializationEvent event){
     }
 
     @EventHandler
