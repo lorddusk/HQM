@@ -1,7 +1,6 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.RegisterHelper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -9,7 +8,9 @@ import hardcorequesting.tileentity.TileEntityPortal;
 import hardcorequesting.tileentity.TileEntityTracker;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModBlocks {
     public static Block itemBarrel = new BlockDelivery().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
@@ -17,8 +18,8 @@ public class ModBlocks {
     public static Block itemPortal = new BlockPortal().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
 
     public static void init() {
-        RegisterHelper.registerBlock(itemBarrel);
-        RegisterHelper.registerBlock(itemTracker);
+        RegisterHelper.registerBlock(itemBarrel, ItemBlock.class);
+        RegisterHelper.registerBlock(itemTracker, ItemBlock.class);
         RegisterHelper.registerBlock(itemPortal, ItemBlockPortal.class);
     }
 

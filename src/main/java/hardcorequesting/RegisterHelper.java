@@ -1,6 +1,5 @@
 package hardcorequesting;
 
-import hardcorequesting.items.ItemBlockPortal;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
@@ -18,12 +17,12 @@ public class RegisterHelper
         GameRegistry.register(block);
     }
 
-    public static void registerBlock(Block block, Class<ItemBlockPortal> blockClass) {
+    public static void registerBlock(Block block, Class<? extends ItemBlock> blockClass) {
         GameRegistry.register(block);
         GameRegistry.register(createItemBlock(block, blockClass), block.getRegistryName());
     }
 
-    private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlockPortal> itemBlockClass) {
+    private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
         try {
             Class<?>[] ctorArgClasses = new Class<?>[1];
             ctorArgClasses[0] = Block.class;
