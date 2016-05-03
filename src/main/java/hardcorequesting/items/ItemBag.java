@@ -1,34 +1,32 @@
 package hardcorequesting.items;
 
-import hardcorequesting.ModInformation;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.ModInformation;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.config.ModConfig;
 import hardcorequesting.network.DataBitHelper;
 import hardcorequesting.network.DataWriter;
 import hardcorequesting.network.PacketHandler;
 import hardcorequesting.network.PacketId;
-//import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
-import static hardcorequesting.items.ItemInfo.HEART_ICONS;
+//import net.minecraft.client.renderer.texture.IIconRegister;
 
 
 public class ItemBag extends Item {
@@ -96,8 +94,7 @@ public class ItemBag extends Item {
                                 group.open(player);
                                 player.inventory.markDirty();
                                 openClientInterface(player, i, dmg);
-                                // @todo
-//                                world.playSound(player, player.getPosition(), Sounds.BAG.getSound(), SoundCategory.BLOCKS, 1, 1);
+                                world.playSound(player, player.getPosition(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
                                 break;
                             } else {
                                 rng -= weight;

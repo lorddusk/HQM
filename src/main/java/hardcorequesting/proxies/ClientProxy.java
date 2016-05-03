@@ -2,10 +2,10 @@ package hardcorequesting.proxies;
 
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.client.sounds.SoundHandler;
+import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
-import net.minecraftforge.common.MinecraftForge;
 
 
 public class ClientProxy extends CommonProxy {
@@ -25,6 +25,7 @@ public class ClientProxy extends CommonProxy {
         //MinecraftForge.EVENT_BUS.register(new BlockHighlightRemover());
         ModItems.initRender();
         ModBlocks.initRender();
+        Sounds.initSounds();
     }
 
     @Override
