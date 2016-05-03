@@ -1,9 +1,12 @@
 package hardcorequesting.items;
 
+import hardcorequesting.ModInformation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
@@ -25,6 +28,8 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+import static hardcorequesting.items.ItemInfo.HEART_ICONS;
+
 
 public class ItemBag extends Item {
     public static boolean displayGui;
@@ -39,14 +44,12 @@ public class ItemBag extends Item {
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
     }
 
-//    @Override
-//    public void registerIcons(IIconRegister register) {
-//        pickIcons(register);
-//    }
-//
-//    private void pickIcons(IIconRegister register) {
-//        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
-//    }
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        for (int i = 0; i < BagTier.values().length; i++) {
+            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + ItemInfo.BAG_UNLOCALIZED_NAME, "inventory"));
+        }
+    }
 
     @SuppressWarnings("unchecked")
     @Override

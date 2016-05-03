@@ -2,16 +2,15 @@ package hardcorequesting.items;
 
 
 import hardcorequesting.RegisterHelper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
-    public static Item book = new ItemQuestBook();
+    public static ItemQuestBook book = new ItemQuestBook();
     public static ItemHeart hearts = new ItemHeart();
-    public static Item bags = new ItemBag();
-    public static Item invalidItem = new ItemInvalid();
+    public static ItemBag bags = new ItemBag();
+    public static ItemInvalid invalidItem = new ItemInvalid();
 
     public static void init() {
         RegisterHelper.registerItem(book);
@@ -21,11 +20,10 @@ public class ModItems {
     }
 
     public static void initRender(){
-        RegisterHelper.registerItemRenderer(book);
-//        RegisterHelper.registerItemRenderer(hearts);
+        book.initModel();
         hearts.initModel();
-        RegisterHelper.registerItemRenderer(bags);
-        RegisterHelper.registerItemRenderer(invalidItem);
+        bags.initModel();
+        invalidItem.initModel();
     }
 
 

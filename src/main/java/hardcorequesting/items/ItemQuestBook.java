@@ -2,6 +2,7 @@ package hardcorequesting.items;
 
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.QuestingData;
+import hardcorequesting.RegisterHelper;
 import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.commands.CommandHandler;
@@ -38,6 +39,11 @@ public class ItemQuestBook extends Item {
     }
 
     private static final String NBT_PLAYER = "UseAsPlayer";
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        RegisterHelper.registerItemRenderer(this);
+    }
 
     @SuppressWarnings("unchecked")
     @Override

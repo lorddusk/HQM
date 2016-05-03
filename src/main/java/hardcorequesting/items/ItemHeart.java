@@ -43,7 +43,7 @@ public class ItemHeart extends Item {
     @SideOnly(Side.CLIENT)
     public void initModel() {
         for (int i = 0 ; i < HEART_ICONS.length ; i++) {
-            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ID + ":" + HEART_ICONS[i], "inventory"));
+            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + HEART_ICONS[i], "inventory"));
         }
     }
 

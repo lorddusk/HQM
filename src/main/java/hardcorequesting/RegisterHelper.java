@@ -40,14 +40,10 @@ public class RegisterHelper
 
     public static void registerItemRenderer(Item item) {
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-//        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-//        mesher.register(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
     public static void registerBlockRenderer(Block block) {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
-//        ItemModelMesher mesher = Minecraft.getMinecraft().getRenderItem().getItemModelMesher();
-//        mesher.register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 
 

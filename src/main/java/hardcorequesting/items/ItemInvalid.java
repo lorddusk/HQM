@@ -1,5 +1,6 @@
 package hardcorequesting.items;
 
+import hardcorequesting.RegisterHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
@@ -24,11 +25,9 @@ public class ItemInvalid extends Item {
     public String getUnlocalizedName(ItemStack itemStack) {
         return super.getUnlocalizedName(itemStack);
     }
-//
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void registerIcons(IIconRegister register) {
-//        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.INVALID_ICON);
-//    }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        RegisterHelper.registerItemRenderer(this);
+    }
 }
