@@ -33,9 +33,9 @@ dependencies {
     deobfCompile "mezz.jei:jei_1.9:3.2.4.177"
 }
 
-version = "5.0.0"
+version = "5.0.0alpha1"
 group = "hardcorequesting"
-archivesBaseName = "HQM-The Journey"
+archivesBaseName = "HQM-New Heights"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
