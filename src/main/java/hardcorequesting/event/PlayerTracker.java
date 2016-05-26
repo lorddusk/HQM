@@ -1,0 +1,64 @@
+package hardcorequesting.event;
+
+import hardcorequesting.death.DeathStats;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.Translator;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import hardcorequesting.config.ModConfig;
+import hardcorequesting.quests.QuestLine;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+
+public class PlayerTracker {
+
+    public PlayerTracker() {
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
+
+    public int getRemainingLives(ICommandSender sender) {
+        return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
+    }
+
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        EntityPlayer player = event.player;
+        if (!QuestingData.hasData(player)) {
+            DeathStats.resync();
+        }
+
+        QuestLine.sendServerSync(player);
+
+        if (QuestingData.isHardcoreActive())
+            sendLoginMessage(player);
+        else if (ModConfig.NO_HARDCORE_MESSAGE)
+            player.addChatMessage(new TextComponentTranslation("hqm.message.noHardcore"));
+
+        NBTTagCompound tags = player.getEntityData();
+        if (tags.hasKey("HardcoreQuesting")) {
+            if (tags.getCompoundTag("HardcoreQuesting").getBoolean("questBook")) {
+                QuestingData.getQuestingData(player).receivedBook = true;
+            }
+            if (QuestingData.isQuestActive()) {
+                tags.removeTag("HardcoreQuesting");
+            }
+        }
+        QuestingData.spawnBook(player);
+    }
+
+
+    private void sendLoginMessage(EntityPlayer player)
+    {
+        player.addChatMessage(new TextComponentString(
+                Translator.translate("hqm.message.hardcore") + " "
+                + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
+        ));
+
+    }
+}

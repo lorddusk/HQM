@@ -7,7 +7,7 @@ import hardcorequesting.blocks.ModBlocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.quests.QuestTask;
+import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityBarrel;
 import hardcorequesting.tileentity.TileEntityPortal;

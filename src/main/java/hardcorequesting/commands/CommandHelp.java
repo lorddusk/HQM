@@ -1,7 +1,7 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.Lang;
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
 import net.minecraft.command.ICommandSender;

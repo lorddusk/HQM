@@ -1,7 +1,7 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityPortal;

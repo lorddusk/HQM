@@ -1,13 +1,10 @@
 package hardcorequesting.client.sounds;
 
-
 import com.google.common.collect.Lists;
 import hardcorequesting.ModInformation;
-import hardcorequesting.QuestingData;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
-import hardcorequesting.network.PacketHandler;
-import hardcorequesting.network.PacketId;
+import hardcorequesting.client.ClientChange;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.Sound;
@@ -15,6 +12,7 @@ import net.minecraft.client.audio.SoundList;
 import net.minecraft.client.resources.FallbackResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,22 +25,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class SoundHandler {
+public class SoundHandler
+{
+    private SoundHandler() {}
 
-    private SoundHandler() {
-    }
-
-    private static List<String> paths = new ArrayList<String>();
+    private static List<String> paths = new ArrayList<>();
     private static final String LABEL = "lore";
 
     @SideOnly(Side.CLIENT)
-    public static boolean loadLoreReading(String path) {
+    public static boolean loadLoreReading(String path)
+    {
         loreMusic = false;
         loreNumber = -1;
 
         int index = paths.indexOf(path);
-        if (index == -1) {
-            if (new File(path + "lore.ogg").exists()) {
+        if (index == -1)
+        {
+            if (new File(path + "lore.ogg").exists())
+            {
                 int number = paths.size();
 
                 // Add resource pack to discover lore
@@ -97,60 +97,51 @@ public class SoundHandler {
     }
 
 
-    private static int bitCount = -1;
-
-    private static int getBitCount() {
-        if (bitCount == -1) {
-            bitCount = (int) (Math.log10(Sounds.values().length + 1) / Math.log10(2)) + 1;
-        }
-
-        return bitCount;
+    public static void play(Sounds sound, EntityPlayer player)
+    {
+        if (player instanceof EntityPlayerMP)
+            NetworkManager.sendToPlayer(ClientChange.SOUND.build(sound), (EntityPlayerMP) player);
     }
 
-    public static void play(Sounds sound, EntityPlayer player) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.SOUND);
-        dw.writeData(sound.ordinal(), getBitCount());
-        PacketHandler.sendToRawPlayer(player, dw);
-    }
-
-    public static void playToAll(Sounds sound) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.SOUND);
-        dw.writeData(sound.ordinal(), getBitCount());
-        PacketHandler.sendToAllPlayers(dw);
+    public static void playToAll(Sounds sound)
+    {
+        NetworkManager.sendToAllPlayers(ClientChange.SOUND.build(sound));
     }
 
     @SideOnly(Side.CLIENT)
-    private static ISound play(String sound, float volume, float pitch) {
+    private static ISound play(String sound, float volume, float pitch)
+    {
         return play(new ResourceLocation(ModInformation.SOUNDLOC, sound), volume, pitch);
     }
 
     @SideOnly(Side.CLIENT)
-    private static ISound play(ResourceLocation resource, float volume, float pitch) {
+    private static ISound play(ResourceLocation resource, float volume, float pitch)
+    {
         ISound soundObj = new ClientSound(resource, volume, pitch);
         Minecraft.getMinecraft().getSoundHandler().playSound(soundObj);
         return soundObj;
     }
 
-    public static void stopLoreMusic() {
-        if (isLorePlaying()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
-                        Minecraft.getMinecraft().getSoundHandler().stopSound(loreSound);
-                    }
-                    loreSound = null;
+    public static void stopLoreMusic()
+    {
+        if (isLorePlaying())
+        {
+            new Thread(() ->
+            {
+                while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
+                    Minecraft.getMinecraft().getSoundHandler().stopSound(loreSound);
                 }
+                loreSound = null;
             }).start();
         }
     }
 
-    public static boolean isLorePlaying() {
+    public static boolean isLorePlaying()
+    {
         boolean value = loreSound != null && Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(loreSound);
 
-        if (!value) {
+        if (!value)
             loreSound = null;
-        }
 
         return value;
     }
@@ -159,17 +150,19 @@ public class SoundHandler {
         return loreMusic;
     }
 
-    public static void handleSoundPacket(DataReader dr) {
-        int id = dr.readData(getBitCount());
-        play(Sounds.values()[id].getSoundName(), 1F, 1F);
+    public static void handleSoundPacket(Sounds sound)
+    {
+        play(sound.getSoundName(), 1F, 1F);
     }
 
-    public static void triggerFirstLore() {
-        PacketHandler.sendToServer(PacketHandler.getWriter(PacketId.LORE));
+    public static void triggerFirstLore()
+    {
+        NetworkManager.sendToServer(ClientChange.LORE.build(null));
         playLoreMusic();
     }
 
-    public static void handleLorePacket(EntityPlayer player, DataReader dr) {
+    public static void handleLorePacket(EntityPlayer player)
+    {
         QuestingData.getQuestingData(player).playedLore = true;
     }
 }

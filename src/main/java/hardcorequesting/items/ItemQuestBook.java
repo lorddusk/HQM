@@ -1,13 +1,15 @@
 package hardcorequesting.items;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.QuestingData;
-import hardcorequesting.RegisterHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.client.interfaces.GuiType;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.RegisterHelper;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.commands.CommandHandler;
-import hardcorequesting.network.PacketHandler;
+import hardcorequesting.network.NetworkManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,9 +21,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
-
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
 
 public class ItemQuestBook extends Item {
 
@@ -52,7 +51,7 @@ public class ItemQuestBook extends Item {
         if (itemStack.getItemDamage() == 1) {
             NBTTagCompound compound = itemStack.getTagCompound();
             if (compound != null && compound.hasKey(NBT_PLAYER))
-                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs"));
+                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", QuestingData.getPlayer(compound.getString(NBT_PLAYER)).getDisplayName()));
             else
                 tooltip.add(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid"));
         }
@@ -60,7 +59,7 @@ public class ItemQuestBook extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
-        if (!world.isRemote) {
+        if (!world.isRemote && player instanceof EntityPlayerMP) {
 
             if (!QuestingData.isQuestActive()) {
                 player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noQuestYet"));
@@ -68,18 +67,18 @@ public class ItemQuestBook extends Item {
                 if (item.getItemDamage() == 1) {
                     NBTTagCompound compound = item.getTagCompound();
                     if (compound != null && compound.hasKey(NBT_PLAYER)) {
-                        String name = compound.getString(NBT_PLAYER);
-                        if (QuestingData.hasData(name) && CommandHandler.isOwnerOrOp(player)) {
-                            if (PacketHandler.canOverride(name))
-                                QuestingData.getQuestingData(name).sendDataToClientAndOpenInterface(player, name);
-                            else
-                                player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
+                        String uuid = compound.getString(NBT_PLAYER);
+                        if (QuestingData.hasData(uuid) && CommandHandler.isOwnerOrOp(player)) {
+                            EntityPlayer subject = QuestingData.getPlayer(uuid);
+                            if (subject instanceof EntityPlayerMP)
+                                NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.TRUE.toString()), (EntityPlayerMP) subject);
+                            //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                         } else {
                             player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
                         }
                     }
                 } else {
-                    QuestingData.getQuestingData(player).sendDataToClientAndOpenInterface(player, null);
+                    NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.FALSE.toString()), (EntityPlayerMP) player);
                 }
             }
 
@@ -93,10 +92,10 @@ public class ItemQuestBook extends Item {
         return itemStack.getItemDamage() == 1;
     }
 
-    public static ItemStack getOPBook(String name) {
+    public static ItemStack getOPBook(EntityPlayer player) {
         ItemStack itemStack = new ItemStack(ModItems.book, 1, 1);
         itemStack.setTagCompound(new NBTTagCompound());
-        itemStack.getTagCompound().setString(NBT_PLAYER, name);
+        itemStack.getTagCompound().setString(NBT_PLAYER, player.getUniqueID().toString());
         return itemStack;
     }
 }

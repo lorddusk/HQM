@@ -1,76 +1,66 @@
 package hardcorequesting.quests;
 
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.*;
-import hardcorequesting.bag.Group;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.*;
+import hardcorequesting.client.ClientChange;
+import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.items.ModItems;
-import hardcorequesting.network.*;
-import hardcorequesting.reputation.Reputation;
-import hardcorequesting.reputation.ReputationBar;
-import hardcorequesting.reward.*;
+import hardcorequesting.event.EventHandler;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.QuestDataUpdateMessage;
+import hardcorequesting.quests.data.QuestDataTask;
+import hardcorequesting.quests.task.*;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.RewardSetting;
+import hardcorequesting.team.Team;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.Tuple;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import hardcorequesting.client.EditMode;
+import hardcorequesting.client.interfaces.*;
+import hardcorequesting.quests.reward.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
-import org.apache.logging.log4j.Level;
-
 import java.awt.*;
-import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class Quest {
-
-    private static Map<Short, Quest> quests;
-
+public class Quest
+{
     public static boolean isEditing = false;
-    public static int selectedQuestId;
+    public static String selectedQuestId;
 
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
 
-
-    public static Collection<Quest> getQuests() {
-        return QuestLine.getActiveQuestLine().quests.values();
+    public static Map<String, Quest> getQuests()
+    {
+        return QuestLine.getActiveQuestLine().quests;
     }
 
     public static List<QuestSet> getQuestSets() {
         return QuestLine.getActiveQuestLine().questSets;
     }
 
-    public static int size() {
-        return QuestLine.getActiveQuestLine().questCount;
-    }
-
-
-    //static {
-    //    quests = new HashMap<Short, Quest>();
-    //    new Quest(0, "The burnt village","Testing 1.2.3", 50, 50, false);
-    //}
-
-
-    private short id;
+    private String uuid;
     private String name;
     private String description;
-    private List<Quest> requirement;
-    private List<Integer> requirementIds;
-    private List<Quest> reversedRequirement;
-    private List<Quest> optionLinks;
-    private List<Integer> optionLinkIds;
-    private List<Quest> reversedOptionLinks;
+    private List<String> requirement;
+    private List<String> reversedRequirement;
+    private List<String> optionLinks;
+    private List<String> reversedOptionLinks;
     private List<QuestTask> tasks;
     private List<String> cachedDescription;
     private List<ReputationReward> reputationRewards;
-    int nextTaskId;
+    public int nextTaskId;
     private QuestTask selectedTask;
     private ItemStackRewardList rewards;
     private ItemStackRewardList rewardChoices;
@@ -86,7 +76,7 @@ public class Quest {
     private ItemStack icon;
     private QuestSet set;
     private int selectedReward = -1;
-    private final List<LargeButton> buttons = new ArrayList<LargeButton>();
+    private final List<LargeButton> buttons = new ArrayList<>();
 
     {
         buttons.add(new LargeButton("hqm.quest.claim", 100, 190) {
@@ -101,13 +91,9 @@ public class Quest {
             }
 
             @Override
-            public void onClick(GuiBase gui, EntityPlayer player) {
-                DataWriter dw = PacketHandler.getWriter(PacketId.CLAIM_REWARD);
-                dw.writeData(getId(), DataBitHelper.QUESTS);
-                if (!rewardChoices.isEmpty()) {
-                    dw.writeData(selectedReward, DataBitHelper.REWARDS);
-                }
-                PacketHandler.sendToServer(dw);
+            public void onClick(GuiBase gui, EntityPlayer player)
+            {
+                NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<String, Integer>(getId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
             }
         });
 
@@ -123,11 +109,8 @@ public class Quest {
             }
 
             @Override
-            public void onClick(GuiBase gui, EntityPlayer player) {
-                //if(!QuestingData.isDebugActive())
-                //{
-                PacketHandler.sendToServer(selectedTask.getWriterForTask(PacketId.TASK_REQUEST));
-                //}
+            public void onClick(GuiBase gui, EntityPlayer player){
+                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
 
@@ -144,7 +127,7 @@ public class Quest {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                PacketHandler.sendToServer(selectedTask.getWriterForTask(PacketId.TASK_REQUEST));
+                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
 
@@ -192,7 +175,7 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return QuestingData.getQuestingData(player).selectedQuest != getId() || QuestingData.getQuestingData(player).selectedTask != selectedTask.getId();
+                return !QuestingData.getQuestingData(player).selectedQuest.equals(getId()) || QuestingData.getQuestingData(player).selectedTask != selectedTask.getId();
             }
 
             @Override
@@ -206,7 +189,7 @@ public class Quest {
                 QuestingData.getQuestingData(player).selectedQuest = getId();
                 QuestingData.getQuestingData(player).selectedTask = selectedTask.getId();
 
-                PacketHandler.sendToServer(selectedTask.getWriterForTask(PacketId.SELECT_TASK));
+                NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
             }
         });
 
@@ -215,7 +198,7 @@ public class Quest {
             buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 35) {
                 @Override
                 public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                    return tasks.size() < DataBitHelper.TASKS.getMaximum();
+                    return true;
                 }
 
                 @Override
@@ -250,12 +233,11 @@ public class Quest {
                         Class<? extends QuestTask> clazz = taskType.clazz;
                         try {
                             Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                            QuestTask task = constructor.newInstance(self, taskType.getLangKeyName(), taskType.getLangKeyDescription());
+                            QuestTask task = constructor.newInstance(this, taskType.getLangKeyName(), taskType.getLangKeyDescription());
 
-                            for (QuestTask questTask : selectedTask.getRequirements()) {
-                                task.addRequirement(questTask);
-                            }
-                            for (QuestTask questTask : tasks) {
+                            selectedTask.getRequirements().forEach(task::addRequirement);
+                            for (QuestTask questTask : tasks)
+                            {
                                 List<QuestTask> requirements = questTask.getRequirements();
                                 for (int j = 0; j < requirements.size(); j++) {
                                     if (requirements.get(j).equals(selectedTask)) {
@@ -290,11 +272,10 @@ public class Quest {
         }
     }
 
-    private Quest self = this;
     private final ScrollBar descriptionScroll;
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
-    private final List<ScrollBar> scrollBars = new ArrayList<ScrollBar>();
+    private final List<ScrollBar> scrollBars = new ArrayList<>();
     private static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
 
@@ -320,29 +301,38 @@ public class Quest {
         });
     }
 
-
-    public Quest(int id, String name, String description, int x, int y, boolean isBig) {
-        this.id = (short) id;
+    public Quest(String name, String description, int x, int y, boolean isBig)
+    {
+        do {
+            this.uuid = UUID.randomUUID().toString();
+        } while (getQuests().containsKey(this.uuid));
         this.name = name;
         this.x = x;
         this.y = y;
         this.isBig = isBig;
         this.description = description;
 
-        requirement = new ArrayList<Quest>();
-        reversedRequirement = new ArrayList<Quest>();
-        optionLinks = new ArrayList<Quest>();
-        reversedOptionLinks = new ArrayList<Quest>();
-        tasks = new ArrayList<QuestTask>();
+        requirement = new ArrayList<>();
+        reversedRequirement = new ArrayList<>();
+        optionLinks = new ArrayList<>();
+        reversedOptionLinks = new ArrayList<>();
+        tasks = new ArrayList<>();
         rewards = new ItemStackRewardList();
         rewardChoices = new ItemStackRewardList();
         commandRewardList = new CommandRewardList();
 
-        QuestLine.getActiveQuestLine().quests.put(this.id, this);
+        QuestLine.getActiveQuestLine().quests.put(getId(), this);
+    }
 
-        if (this.id >= QuestLine.getActiveQuestLine().questCount) {
-            QuestLine.getActiveQuestLine().questCount = this.id + 1;
-        }
+    public void setId(String id)
+    {
+        if (getQuestSet() != null)
+            getQuestSet().removeQuest(this);
+        getQuests().remove(getId());
+        this.uuid = id;
+        getQuests().put(getId(), this);
+        if (getQuestSet() != null)
+            getQuestSet().addQuest(this);
     }
 
     public void setX(int x) {
@@ -417,81 +407,81 @@ public class Quest {
         QuestLine.getActiveQuestLine().cachedMainDescription = null;
     }
 
-    public void addRequirement(int id) {
-        if (lookForId(id, false) || lookForId(id, true)) {
-            return;
-        }
+    public void addRequirement(String id) {
+        if (lookForId(id, false) || lookForId(id, true)) return;
 
-        Quest quest = QuestLine.getActiveQuestLine().quests.get((short) id);
-        if (quest != null) {
-            requirement.add(quest);
-            quest.reversedRequirement.add(this);
+        Quest quest = QuestLine.getActiveQuestLine().quests.get(id);
+        if (quest != null)
+        {
+            requirement.add(quest.getId());
+            quest.reversedRequirement.add(this.getId());
             SaveHelper.add(SaveHelper.EditType.REQUIREMENT_CHANGE);
         }
     }
 
-    private boolean lookForId(int id, boolean reversed) {
-        List<Quest> quests = reversed ? reversedRequirement : requirement;
-        for (Quest quest : quests) {
-            if (quest.id == id || quest.lookForId(id, reversed)) {
+    private boolean lookForId(String id, boolean reversed) {
+        List<String> quests = reversed ? reversedRequirement : requirement;
+        for (String questId : quests)
+            if (questId.equals(id) || QuestLine.getActiveQuestLine().quests.get(questId).lookForId(id, reversed))
                 return true;
-            }
-        }
-
         return false;
     }
 
     public void clearRequirements() {
         SaveHelper.add(SaveHelper.EditType.REQUIREMENT_REMOVE, requirement.size());
-        for (Quest quest : requirement) {
-            quest.reversedRequirement.remove(this);
-        }
+        for (String questId : requirement)
+            QuestLine.getActiveQuestLine().quests.get(questId).reversedRequirement.remove(getId());
         requirement.clear();
     }
 
-    public void addOptionLink(int id) {
-        for (Quest quest : optionLinks) {
-            if (quest.id == id) {
+    public void addOptionLink(String id) {
+        for (String questId : optionLinks) {
+            if (questId.equals(id)) {
                 return;
             }
         }
-        for (Quest quest : reversedOptionLinks) {
-            if (quest.id == id) {
+        for (String questId : reversedOptionLinks) {
+            if (questId.equals(id)) {
                 return;
             }
         }
 
-        Quest quest = QuestLine.getActiveQuestLine().quests.get((short) id);
+        Quest quest = QuestLine.getActiveQuestLine().quests.get(id);
         if (quest != null) {
             SaveHelper.add(SaveHelper.EditType.OPTION_CHANGE);
-            optionLinks.add(quest);
-            quest.reversedOptionLinks.add(this);
+            optionLinks.add(quest.getId());
+            quest.reversedOptionLinks.add(getId());
         }
     }
 
     public void clearOptionLinks() {
         SaveHelper.add(SaveHelper.EditType.OPTION_REMOVE, optionLinks.size());
-        for (Quest quest : reversedOptionLinks) {
-            quest.optionLinks.remove(this);
+        for (String questId : reversedOptionLinks) {
+            QuestLine.getActiveQuestLine().quests.get(questId).optionLinks.remove(getId());
         }
 
-        for (Quest quest : optionLinks) {
-            quest.reversedOptionLinks.remove(this);
+        for (String questId : optionLinks) {
+            QuestLine.getActiveQuestLine().quests.get(questId).reversedOptionLinks.remove(getId());
         }
         reversedRequirement.clear();
         optionLinks.clear();
     }
 
     public QuestData getQuestData(EntityPlayer player) {
-        return QuestingData.getQuestingData(player).getQuestData(id);
+        return QuestingData.getQuestingData(player).getQuestData(getId());
     }
 
-    public QuestData getQuestData(String playerName) {
-        return QuestingData.getQuestingData(playerName).getQuestData(id);
+    public QuestData getQuestData(String uuid) {
+        return QuestingData.getQuestingData(uuid).getQuestData(getId());
     }
 
-    public short getId() {
-        return id;
+    public void setQuestData(EntityPlayer player, QuestData data)
+    {
+        QuestingData.getQuestingData(player).setQuestData(getId(), data);
+    }
+
+    public String getId() {
+        return uuid;
     }
 
     public String getName() {
@@ -499,36 +489,32 @@ public class Quest {
     }
 
     public boolean isVisible(EntityPlayer player) {
-        return isVisible(QuestingData.getUserName(player));
+        return isVisible(QuestingData.getUserUUID(player));
     }
 
     boolean isVisible(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-        return isVisible(QuestingData.getUserName(player), isVisibleCache, isLinkFreeCache);
+        return isVisible(QuestingData.getUserUUID(player), isVisibleCache, isLinkFreeCache);
     }
 
     public boolean isVisible(String playerName) {
-        return isVisible(playerName, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+        return isVisible(playerName, new HashMap<>(), new HashMap<>());
     }
 
     boolean isVisible(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         Boolean cachedResult = isVisibleCache.get(this);
-        if (cachedResult != null) {
-            return cachedResult.booleanValue();
-        }
+        if (cachedResult != null) return cachedResult;
 
         boolean result = triggerType.isQuestVisible(this, playerName) && isLinkFree(playerName, isLinkFreeCache) && visibleParentEvaluator.isValid(playerName, isVisibleCache, isLinkFreeCache);
-
         isVisibleCache.put(this, result);
-
         return result;
     }
 
     public boolean isEnabled(EntityPlayer player) {
-        return isEnabled(QuestingData.getUserName(player));
+        return isEnabled(QuestingData.getUserUUID(player));
     }
 
     boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-        return isEnabled(QuestingData.getUserName(player), true, isVisibleCache, isLinkFreeCache);
+        return isEnabled(QuestingData.getUserUUID(player), true, isVisibleCache, isLinkFreeCache);
     }
 
     public boolean isEnabled(String playerName) {
@@ -536,7 +522,7 @@ public class Quest {
     }
 
     public boolean isEnabled(String playerName, boolean requiresVisible) {
-        return isEnabled(playerName, requiresVisible, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+        return isEnabled(playerName, requiresVisible, new HashMap<>(), new HashMap<>());
     }
 
     boolean isEnabled(String playerName, boolean requiresVisible, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
@@ -544,34 +530,32 @@ public class Quest {
     }
 
     public boolean isLinkFree(EntityPlayer player) {
-        return isLinkFree(QuestingData.getUserName(player), new HashMap<Quest, Boolean>());
+        return isLinkFree(QuestingData.getUserUUID(player), new HashMap<>());
     }
 
     boolean isLinkFree(EntityPlayer player, Map<Quest, Boolean> cache) {
-        return isLinkFree(QuestingData.getUserName(player), cache);
+        return isLinkFree(QuestingData.getUserUUID(player), cache);
     }
 
     public boolean isLinkFree(String playerName) {
-        return isLinkFree(playerName, new HashMap<Quest, Boolean>());
+        return isLinkFree(playerName, new HashMap<>());
     }
 
     boolean isLinkFree(String playerName, Map<Quest, Boolean> cache) {
         Boolean cachedResult = cache.get(this);
-        if (cachedResult != null) {
-            return cachedResult.booleanValue();
-        }
+        if (cachedResult != null) return cachedResult;
 
         boolean result = true;
-        for (Quest optionLink : optionLinks) {
-            if (optionLink.isCompleted(playerName)) {
+        for (String optionLink : optionLinks) {
+            if (QuestLine.getActiveQuestLine().quests.get(optionLink).isCompleted(playerName)) {
                 result = false;
                 break;
             }
         }
 
         if (result) {
-            for (Quest optionLink : reversedOptionLinks) {
-                if (optionLink.isCompleted(playerName)) {
+            for (String optionLink : reversedOptionLinks) {
+                if (QuestLine.getActiveQuestLine().quests.get(optionLink).isCompleted(playerName)) {
                     result = false;
                     break;
                 }
@@ -620,7 +604,7 @@ public class Quest {
         protected abstract boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache);
 
         private boolean isValid(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-            int parents = getRequirement().size();
+            int parents = getRequirements().size();
             int requiredAmount = useModifiedParentRequirement ? parentRequirementCount : parents;
             if (requiredAmount > parents) {
                 return false;
@@ -628,7 +612,7 @@ public class Quest {
 
             int allowedUncompleted = parents - requiredAmount;
             int uncompleted = 0;
-            for (Quest quest : getRequirement()) {
+            for (Quest quest : getRequirements()) {
                 if (!isValid(playerName, quest, isVisibleCache, isLinkFreeCache)) {
                     uncompleted++;
                     if (uncompleted > allowedUncompleted) {
@@ -643,11 +627,11 @@ public class Quest {
     }
 
     public boolean isAvailable(EntityPlayer player) {
-        return isAvailable(QuestingData.getUserName(player));
+        return isAvailable(QuestingData.getUserUUID(player));
     }
 
     public boolean isCompleted(EntityPlayer player) {
-        return isCompleted(QuestingData.getUserName(player));
+        return isCompleted(QuestingData.getUserUUID(player));
     }
 
     public boolean isAvailable(String playerName) {
@@ -660,8 +644,11 @@ public class Quest {
         return data != null && data.completed;
     }
 
-    public List<Quest> getRequirement() {
-        return requirement;
+    public List<Quest> getRequirements()
+    {
+        return QuestLine.getActiveQuestLine().quests.values().stream()
+                .filter(quest -> requirement.contains(quest.getId()))
+                .collect(Collectors.toList());
     }
 
     //interface stuff
@@ -778,8 +765,8 @@ public class Quest {
     }
 
 
-    public static Quest getQuest(int id) {
-        return QuestLine.getActiveQuestLine().quests.get((short) id);
+    public static Quest getQuest(String id) {
+        return QuestLine.getActiveQuestLine().quests.get(id);
     }
 
     //region pixelinfo
@@ -1233,164 +1220,54 @@ public class Quest {
         return true;
     }
 
-
-    public void save(DataWriter dw, QuestData questData, boolean light) {
-        dw.writeBoolean(questData.completed);
-        dw.writeBoolean(questData.claimed);
-        dw.writeBoolean(questData.available);
-        dw.writeData(questData.time, DataBitHelper.HOURS);
-        if (questData.completed) {
-            for (boolean b : questData.reward) {
-                dw.writeBoolean(b);
-            }
-        }
-
-        if (light) {
-            for (int i = 0; i < tasks.size(); i++) {
-                QuestTask task = tasks.get(i);
-                questData.tasks[i] = task.validateData(questData.tasks[i]);
-                task.write(dw, questData.tasks[i], true);
-            }
-        } else {
-            dw.writeData(tasks.size(), DataBitHelper.TASKS);
-            for (int i = 0; i < tasks.size(); i++) {
-                dw.writeData(TaskType.getType(tasks.get(i).getClass()).ordinal(), DataBitHelper.TASK_TYPE);
-                QuestTask task = tasks.get(i);
-                questData.tasks[i] = task.validateData(questData.tasks[i]);
-                task.write(dw, questData.tasks[i], false);
-            }
-        }
-    }
-
-
     public void preRead(int players, QuestData data) {
         data.reward = new boolean[players];
     }
-
-    public void read(DataReader dr, QuestData questData, FileVersion version, boolean light) {
-        questData.completed = dr.readBoolean();
-        questData.claimed = version.contains(FileVersion.REPUTATION) && dr.readBoolean();
-        if (version.contains(FileVersion.REPEATABLE_QUESTS)) {
-            questData.available = dr.readBoolean();
-            questData.time = dr.readData(DataBitHelper.HOURS);
-            if (questData.completed && repeatInfo.getType() == RepeatType.NONE) {
-                questData.available = false;
-            }
-        } else if (repeatInfo.getType() != RepeatType.INSTANT) {
-            questData.available = !questData.completed;
-        }
-        if (questData.completed) {
-            for (int i = 0; i < questData.reward.length; i++) {
-                if (version.contains(FileVersion.REPEATABLE_QUESTS)) {
-                    questData.reward[i] = dr.readBoolean();
-                } else {
-                    questData.reward[i] = !dr.readBoolean() && questData.completed;
-                }
-            }
-        }
-
-
-        if (light) {
-            for (int i = 0; i < tasks.size(); i++) {
-                QuestTask task = tasks.get(i);
-                questData.tasks[i] = task.validateData(questData.tasks[i]);
-                task.read(dr, questData.tasks[i], version, true);
-            }
-        } else {
-            int count = dr.readData(DataBitHelper.TASKS);
-            for (int i = 0; i < count; i++) {
-                int type = dr.readData(DataBitHelper.TASK_TYPE);
-                if (i >= tasks.size()) {
-                    try {
-                        Class<? extends QuestTask> clazz = TaskType.values()[type].clazz;
-                        Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                        Object obj = constructor.newInstance(this, "Fake", "Fake");
-                        QuestTask task = (QuestTask) obj;
-                        nextTaskId--; //we created a fake task, it shouldn't occupy an id. It doesn't really matter since we're not editing, but what ever.
-
-                        Constructor<? extends QuestDataTask> constructor2 = task.getDataType().getConstructor(new Class[]{QuestTask.class});
-                        Object obj2 = constructor2.newInstance(task);
-
-                        task.read(dr, (QuestDataTask) obj2, version, false); //read data to clear the data reader from it
-                        task.onDelete();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                } else {
-                    QuestTask task = tasks.get(i);
-                    questData.tasks[i] = task.validateData(questData.tasks[i]);
-                    task.read(dr, questData.tasks[i], version, false);
-                }
-            }
-        }
-    }
-
-    public void postRead(QuestingData questingData, QuestData questData, FileVersion version) {
-        String name = questingData.getName();
-        if (version.lacks(FileVersion.UNCOMPLETED_DISABLED)) {
-            if (isCompleted(name) && !isEnabled(name)) {
-                questData.completed = false;
-            }
-        } else {
-            boolean update = false;
-            for (QuestTask task : tasks) {
-                if (task.isCompleted(name)) {
-                    task.autoComplete(name);
-                } else if (task.getCompletedRatio(name) >= 1F) {
-                    task.autoComplete(name);
-                    task.completeTask(name);
-                    update = true;
-                }
-            }
-
-            if (update) {
-                QuestTask.completeQuest(this, name);
-            }
-        }
-    }
-
 
     public List<QuestTask> getTasks() {
         return tasks;
     }
 
-
     public void sendUpdatedDataToTeam(EntityPlayer player) {
         sendUpdatedDataToTeam(QuestingData.getQuestingData(player).getTeam());
     }
 
-    public void sendUpdatedDataToTeam(String playerName) {
-        sendUpdatedDataToTeam(QuestingData.getQuestingData(playerName).getTeam());
+    public void sendUpdatedDataToTeam(String uuid) {
+        sendUpdatedDataToTeam(QuestingData.getQuestingData(uuid).getTeam());
     }
 
     public void sendUpdatedDataToTeam(Team team) {
-        for (Team.PlayerEntry entry : team.getPlayers()) {
+        for (PlayerEntry entry : team.getPlayers()) {
             if (entry.shouldRefreshData()) {
-                sendUpdatedData(entry.getName());
+                sendUpdatedData(entry.getPlayerMP());
             }
         }
     }
 
-    private void sendUpdatedData(String playerName) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.QUEST_DATA);
-        dw.writeData(id, DataBitHelper.QUESTS);
-        dw.writeData(QuestingData.getQuestingData(playerName).getTeam().getPlayerCount(), DataBitHelper.PLAYERS);
-        save(dw, getQuestData(playerName), true);
-        PacketHandler.sendToPlayer(playerName, dw);
+    private void sendUpdatedData(EntityPlayerMP player) {
+        IMessage update = new QuestDataUpdateMessage(
+                getId(),
+                QuestingData.getQuestingData(player).getTeam().getPlayerCount(),
+                QuestingData.getQuestingData(player).getQuestData(getId())
+        );
+        NetworkManager.sendToPlayer(update, player);
     }
 
-    public void claimReward(EntityPlayer player, DataReader dr) {
-        if (hasReward(player)) {
+    public void claimReward(EntityPlayer player, int selectedReward)
+    {
+        if (hasReward(player))
+        {
             boolean sentInfo = false;
-            if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
-                List<ItemStack> items = new ArrayList<ItemStack>();
+            if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty()))
+            {
+                List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
                     for (ItemStack itemStack : rewards.toArray()) {
                         items.add(itemStack.copy());
                     }
                 }
                 if (!rewardChoices.isEmpty()) {
-                    int id = dr.readData(DataBitHelper.REWARDS);
+                    int id = selectedReward;
                     if (id >= 0 && id < rewardChoices.size()) {
                         items.add(rewardChoices.getReward(id).copy());
                     } else {
@@ -1398,7 +1275,7 @@ public class Quest {
                     }
                 }
 
-                List<ItemStack> itemsToAdd = new ArrayList<ItemStack>();
+                List<ItemStack> itemsToAdd = new ArrayList<>();
                 for (ItemStack item : items) {
                     boolean added = false;
                     for (ItemStack itemStack : itemsToAdd) {
@@ -1414,7 +1291,7 @@ public class Quest {
                     }
                 }
 
-                List<ItemStack> itemsToCheck = new ArrayList<ItemStack>();
+                List<ItemStack> itemsToCheck = new ArrayList<>();
                 for (ItemStack itemStack : itemsToAdd) {
                     itemsToCheck.add(itemStack.copy());
                 }
@@ -1448,14 +1325,15 @@ public class Quest {
                     player.inventory.markDirty();
                     QuestData data = getQuestData(player);
                     Team team = QuestingData.getQuestingData(player).getTeam();
-                    if (!team.isSingle() && team.getRewardSetting() == Team.RewardSetting.ANY) {
+                    if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
                         for (int i = 0; i < data.reward.length; i++) {
                             data.reward[i] = false;
                         }
                         sendUpdatedDataToTeam(player);
                     } else {
                         data.claimReward(player);
-                        sendUpdatedData(QuestingData.getUserName(player));
+                        if (player instanceof EntityPlayerMP)
+                            sendUpdatedData((EntityPlayerMP) player);
                     }
                     sentInfo = true;
                 } else {
@@ -1658,9 +1536,13 @@ public class Quest {
             }
         }
 
-        if (selectedTask == null && tasks.size() > 0) {
+        if (selectedTask == null && tasks.size() > 0)
             selectedTask = tasks.get(0);
-        }
+
+        QuestingData.getQuestingData(player).selectedQuest = getId();
+        QuestingData.getQuestingData(player).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
+        if (selectedTask != null)
+            NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
     }
 
     public boolean hasSet(QuestSet selectedSet) {
@@ -1698,10 +1580,10 @@ public class Quest {
 
     public void completeQuest(EntityPlayer player) {
         for (QuestTask task : tasks) {
-            task.autoComplete(QuestingData.getUserName(player));
+            task.autoComplete(QuestingData.getUserUUID(player));
             task.getData(player).completed = true;
         }
-        QuestTask.completeQuest(this, QuestingData.getUserName(player));
+        QuestTask.completeQuest(this, QuestingData.getUserUUID(player));
     }
 
     public void reset(String playerName) {
@@ -1715,7 +1597,7 @@ public class Quest {
 
     public void resetAll() {
         for (Team team : QuestingData.getAllTeams()) {
-            QuestData data = team.getQuestData(id);
+            QuestData data = team.getQuestData(getId());
             if (data != null && !data.available) {
                 reset(data);
                 sendUpdatedDataToTeam(team);
@@ -1725,7 +1607,7 @@ public class Quest {
 
     public void resetOnTime(int time) {
         for (Team team : QuestingData.getAllTeams()) {
-            QuestData data = team.getQuestData(id);
+            QuestData data = team.getQuestData(getId());
             if (data != null && !data.available && data.time <= time) {
                 reset(data);
                 sendUpdatedDataToTeam(team);
@@ -1734,7 +1616,7 @@ public class Quest {
     }
 
     public float getProgress(Team team) {
-        String name = team.getPlayers().get(0).getName();
+        String name = team.getPlayers().get(0).getUUID();
         float data = 0;
         for (QuestTask task : tasks) {
             data += task.getCompletedRatio(name);
@@ -1744,11 +1626,11 @@ public class Quest {
     }
 
     public List<Quest> getOptionLinks() {
-        return optionLinks;
+        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> optionLinks.contains(quest.getId())).collect(Collectors.toList());
     }
 
     public List<Quest> getReversedOptionLinks() {
-        return reversedOptionLinks;
+        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedOptionLinks.contains(quest.getId())).collect(Collectors.toList());
     }
 
     public void setUseModifiedParentRequirement(boolean useModifiedParentRequirement) {
@@ -1767,479 +1649,32 @@ public class Quest {
         return parentRequirementCount;
     }
 
-    public static FileHelper FILE_HELPER;
-
-    public static void saveAll(DataWriter dw) {
-        dw.writeString(QuestLine.getActiveQuestLine().mainDescription, DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-
-        dw.writeData(QuestLine.getActiveQuestLine().questSets.size(), DataBitHelper.QUEST_SETS);
-        for (QuestSet questSet : QuestLine.getActiveQuestLine().questSets) {
-            dw.writeString(questSet.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-            dw.writeString(questSet.getDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-            dw.writeData(questSet.getReputationBars().size(), DataBitHelper.BYTE);
-            for (ReputationBar reputationBar : questSet.getReputationBars())
-                dw.writeData(reputationBar.save(), DataBitHelper.INT);
-        }
-
-        Reputation.save(dw);
-
-        dw.writeData(size(), DataBitHelper.QUESTS);
-        for (int id = 0; id < size(); id++) {
-            Quest quest = getQuest(id);
-            dw.writeBoolean(quest != null);
-            if (quest != null) {
-                dw.writeString(quest.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-                dw.writeString(quest.getDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                dw.writeData(quest.getGuiX(), DataBitHelper.QUEST_POS_X);
-                dw.writeData(quest.getGuiY(), DataBitHelper.QUEST_POS_Y);
-                dw.writeBoolean(quest.useBigIcon());
-
-                dw.writeData(quest.set.getId(), DataBitHelper.QUEST_SETS);
-
-                if (quest.getIcon() != null && quest.getIcon().getItem() != null) {
-                    dw.writeBoolean(true);
-                    dw.writeItemStack(quest.getIcon(), false);
-                } else {
-                    dw.writeBoolean(false);
-                }
-
-                dw.writeBoolean(!quest.requirement.isEmpty());
-                if (!quest.requirement.isEmpty()) {
-                    dw.writeData(quest.requirement.size(), DataBitHelper.QUESTS);
-                    for (Quest required : quest.requirement) {
-                        dw.writeData(required.getId(), DataBitHelper.QUESTS);
-                    }
-                }
-
-                dw.writeBoolean(!quest.optionLinks.isEmpty());
-                if (!quest.optionLinks.isEmpty()) {
-                    dw.writeData(quest.optionLinks.size(), DataBitHelper.QUESTS);
-                    for (Quest optionLink : quest.optionLinks) {
-                        dw.writeData(optionLink.getId(), DataBitHelper.QUESTS);
-                    }
-                }
-
-                quest.getRepeatInfo().save(dw);
-                dw.writeData(quest.triggerType.ordinal(), DataBitHelper.TRIGGER_TYPE);
-                if (quest.triggerType.isUseTaskCount()) {
-                    dw.writeData(quest.triggerTasks, DataBitHelper.TASKS);
-                }
-
-                if (quest.useModifiedParentRequirement) {
-                    dw.writeBoolean(true);
-                    dw.writeData(quest.parentRequirementCount, DataBitHelper.QUESTS);
-                } else {
-                    dw.writeBoolean(false);
-                }
-
-
-                dw.writeData(quest.tasks.size(), DataBitHelper.TASKS);
-                for (int i = 0; i < quest.tasks.size(); i++) {
-                    QuestTask task = quest.tasks.get(i);
-                    int type = TaskType.getType(task.getClass()).ordinal();
-                    dw.writeData(type, DataBitHelper.TASK_TYPE);
-                    dw.writeString(task.getDescription(), DataBitHelper.QUEST_NAME_LENGTH);
-                    dw.writeString(task.getLongDescription(), DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                    task.save(dw);
-                }
-
-                writeRewardData(dw, quest.rewards.toArray(), quest);
-                writeRewardData(dw, quest.rewardChoices.toArray(), quest);
-                writeRewardData(dw, quest.commandRewardList);
-
-                int count = quest.reputationRewards != null ? quest.reputationRewards.size() : 0;
-                dw.writeData(count, DataBitHelper.REPUTATION_REWARD);
-                if (quest.reputationRewards != null) {
-                    for (ReputationReward reputationReward : quest.reputationRewards) {
-                        dw.writeData(reputationReward.getReward().getId(), DataBitHelper.REPUTATION);
-                        dw.writeData(reputationReward.getValue(), DataBitHelper.REPUTATION_VALUE);
-                    }
-                }
-            }
-        }
-
-
-        GroupTier.saveAll(dw);
-        Group.saveAll(dw);
-    }
-
-    private static void writeRewardData(DataWriter dw, ItemStack[] reward, Quest quest) {
-        dw.writeBoolean(reward != null);
-        if (reward != null) {
-            int count = 0;
-            for (ItemStack itemStack : reward) {
-                if (itemStack != null) {
-                    count++;
-                }
-            }
-            dw.writeData(count, DataBitHelper.REWARDS);
-            for (ItemStack itemStack : reward) {
-                if (itemStack != null && itemStack.getItem() != null) {
-                    dw.writeItemStack(itemStack, true);
-                } else {
-                    FMLLog.log("HQM", Level.ERROR, "The quest %s has an invalid item reference in it's rewards - substituting with HQM invalid item", quest.getName());
-                    dw.writeItemStack(new ItemStack(ModItems.invalidItem, 1), false);
-                }
-            }
-        }
-    }
-
-    private static void writeRewardData(DataWriter dw, CommandRewardList commands) {
-        dw.writeBoolean(!commands.isEmpty());
-        if (!commands.isEmpty())
-        {
-            dw.writeData(commands.size(), DataBitHelper.REWARDS);
-            for (String command : commands.asStrings())
-                dw.writeString(command, DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-        }
-    }
-
-    public static void loadAll(DataReader dr, FileVersion version) {
-        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quests");
-        if (dr != null) {
-            EventHandler.instance().clear();
-            try {
-                if (version.lacks(FileVersion.LORE)) {
-                    QuestLine.getActiveQuestLine().mainDescription = "No description";
-                } else {
-                    QuestLine.getActiveQuestLine().mainDescription = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                }
-
-                if (version.lacks(FileVersion.SETS)) {
-                    QuestLine.getActiveQuestLine().questSets.add(new QuestSet("Automatically generated", "This set was automatically generated. All your quests were put in this one."));
-                } else {
-                    int setCount = dr.readData(DataBitHelper.QUEST_SETS);
-                    for (int i = 0; i < setCount; i++) {
-                        String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-                        String description = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                        QuestSet questSet = new QuestSet(name, description);
-                        if (version.contains(FileVersion.REPUTATION_BARS)) {
-                            int barCount = dr.readData(DataBitHelper.BYTE);
-                            for (int ii = 0; ii < barCount; ii++) {
-                                int data = dr.readData(DataBitHelper.INT);
-                                questSet.addRepBar(new ReputationBar(version, data));
-                            }
-                        }
-                        QuestLine.getActiveQuestLine().questSets.add(questSet);
-                    }
-                }
-
-                Reputation.load(dr, version);
-
-
-                int count = dr.readData(DataBitHelper.QUESTS);
-                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "%d quests found", count);
-                for (int id = 0; id < count; id++) {
-                    if (dr.readBoolean()) {
-                        String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-                        String description = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                        int x = dr.readData(DataBitHelper.QUEST_POS_X);
-                        int y = dr.readData(DataBitHelper.QUEST_POS_Y);
-                        boolean big = dr.readBoolean();
-
-                        Quest quest = new Quest(id, name, description, x, y, big);
-                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest %s", name);
-
-                        if (version.lacks(FileVersion.SETS)) {
-                            quest.setQuestSet(QuestLine.getActiveQuestLine().questSets.get(0));
-                        } else {
-                            int setId = dr.readData(DataBitHelper.QUEST_SETS);
-                            quest.setQuestSet(QuestLine.getActiveQuestLine().questSets.get(setId));
-                        }
-
-                        if (version.contains(FileVersion.SETS) && dr.readBoolean()) {
-                            ItemStack readItemStack = dr.readItemStack(false);
-                            if (readItemStack.getItem() == null) {
-                                FMLLog.log("HQM", Level.ERROR, "Attempted to read invalid icon for quest");
-                                readItemStack = null;
-                            }
-                            quest.setIcon(readItemStack);
-                        } else {
-                            quest.setIcon(null);
-                        }
-
-
-                        if (dr.readBoolean()) {
-                            quest.requirementIds = new ArrayList<Integer>();
-                            int requirementCount = dr.readData(DataBitHelper.QUESTS);
-                            for (int i = 0; i < requirementCount; i++) {
-                                quest.requirementIds.add(dr.readData(DataBitHelper.QUESTS));
-                            }
-                        }
-
-                        if (version.contains(FileVersion.OPTION_LINKS) && dr.readBoolean()) {
-                            quest.optionLinkIds = new ArrayList<Integer>();
-                            int optionLinkCount = dr.readData(DataBitHelper.QUESTS);
-                            for (int i = 0; i < optionLinkCount; i++) {
-                                quest.optionLinkIds.add(dr.readData(DataBitHelper.QUESTS));
-                            }
-                        }
-
-                        quest.getRepeatInfo().load(dr, version);
-                        if (version.contains(FileVersion.TRIGGER_QUESTS)) {
-                            quest.triggerType = TriggerType.values()[dr.readData(DataBitHelper.TRIGGER_TYPE)];
-                            if (quest.triggerType.isUseTaskCount()) {
-                                quest.triggerTasks = dr.readData(DataBitHelper.TASKS);
-                            }
-                        }
-
-                        if (version.contains(FileVersion.PARENT_COUNT) && dr.readBoolean()) {
-                            quest.useModifiedParentRequirement = true;
-                            quest.parentRequirementCount = dr.readData(DataBitHelper.QUESTS);
-                        } else {
-                            quest.useModifiedParentRequirement = false;
-                        }
-
-                        int tasks = dr.readData(DataBitHelper.TASKS);
-                        for (int i = 0; i < tasks; i++) {
-                            int type = dr.readData(DataBitHelper.TASK_TYPE);
-                            String taskName = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-                            String taskDescription = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-
-                            try {
-                                Class<? extends QuestTask> clazz = TaskType.values()[type].clazz;
-                                Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                                Object obj = constructor.newInstance(quest, taskName, taskDescription);
-                                QuestTask task = (QuestTask) obj;
-                                task.load(dr, version);
-                                if (quest.tasks.size() > 0) {
-                                    task.addRequirement(quest.tasks.get(quest.tasks.size() - 1));
-                                }
-                                quest.tasks.add(task);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-
-                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest rewards", name);
-                        quest.rewards.set(readRewardData(dr));
-                        if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest reward choices", name);
-                        quest.rewardChoices.set(readRewardData(dr));
-
-                        if (version.contains(FileVersion.COMMAND_REWARDS)) {
-                            if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest reward choices", name);
-                            quest.commandRewardList.addAll(readCommandRewardData(dr));
-                        }
-
-                        if (version.contains(FileVersion.REPUTATION)) {
-                            int reputationCount = dr.readData(DataBitHelper.REPUTATION_REWARD);
-                            if (reputationCount == 0) {
-                                quest.reputationRewards = null;
-                            } else {
-                                quest.reputationRewards = new ArrayList<ReputationReward>();
-                                for (int i = 0; i < reputationCount; i++) {
-                                    quest.reputationRewards.add(new ReputationReward(Reputation.getReputation(dr.readData(DataBitHelper.REPUTATION)), dr.readData(DataBitHelper.REPUTATION_VALUE)));
-                                }
-                            }
-                        } else {
-                            quest.reputationRewards = null;
-                        }
-                    }
-                }
-
-
-                for (Quest quest : QuestLine.getActiveQuestLine().quests.values()) {
-                    if (quest.requirementIds != null) {
-                        for (Integer requirementId : quest.requirementIds) {
-                            quest.addRequirement(requirementId);
-                        }
-                    }
-
-                    if (quest.optionLinkIds != null) {
-                        for (Integer optionLinkId : quest.optionLinkIds) {
-                            quest.addOptionLink(optionLinkId);
-                        }
-                    }
-                }
-
-
-                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading bags");
-                if (version.contains(FileVersion.BAGS)) {
-                    GroupTier.readAll(dr, version);
-                    Group.readAll(dr, version);
-                }
-                if (isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading complete");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                FMLLog.log("HQM", Level.ERROR, ex, "Error occurred during quest loading");
-            }
-
-            /*PrintWriter writer = null;
-            try {
-                writer = new PrintWriter("english.txt", "UTF-8");
-
-                writer.println("<Lore>" + getRawMainDescription());
-                writer.println();
-
-
-                List<GroupTier> tiers = GroupTier.getTiers();
-                for (int i = 0; i < tiers.size(); i++) {
-                    GroupTier tier = tiers.get(i);
-                    writer.println("<RewardTier#" + i + ">" + tier.getName());
-                }
-                writer.println();
-
-                for (Quest quest : getQuests()) {
-                    if (quest != null) {
-                        writer.println("<Quest#" + quest.getId() +">");
-                        writer.println("<Name>" + quest.getName());
-                        writer.println("<Description>" + quest.getDescription());
-                        for (QuestTask task : quest.getTasks()) {
-                            writer.println("<Task#" + task.getId() + ">");
-                            writer.println("<Name>" + task.getDescription());
-                            writer.println("<Description>" + task.getLongDescription());
-                        }
-                        writer.println();
-                    }
-                }
-                writer.close();
-            }catch (IOException ex) {
-                ex.printStackTrace();
-            }finally {
-                if (writer != null) {
-                    writer.close();
-                }
-            }*/
-
-
-        }
-
-        SaveHelper.onLoad();
-    }
-
-    private static ItemStack[] readRewardData(DataReader dr) {
-        if (dr.readBoolean()) {
-            int count = dr.readData(DataBitHelper.REWARDS);
-            ItemStack[] reward = new ItemStack[count];
-            for (int i = 0; i < reward.length; i++) {
-                ItemStack rewardItemStack = dr.readAndFixItemStack(true);
-                if (rewardItemStack != null && rewardItemStack.getItem() != null) {
-                    reward[i] = rewardItemStack;
-                } else {
-                    FMLLog.log("HQM", Level.ERROR, "Invalid reward item. Substituting with HQM invalid item.");
-                    reward[i] = new ItemStack(ModItems.invalidItem, 1);
-                }
-            }
-            return reward;
-        } else {
-            return null;
-        }
-    }
-
-    private static List<CommandReward> readCommandRewardData(DataReader dr) {
-        List<CommandReward> rewards = new ArrayList<>();
-        if(dr.readBoolean()) {
-            int count  = dr.readData(DataBitHelper.REWARDS);
-            for (int i = 0; i < count; i++) {
-                String commandString = dr.readString(DataBitHelper.QUEST_DESCRIPTION_LENGTH);
-                rewards.add(new CommandReward(new CommandReward.Command(commandString)));
-            }
-        }
-        return rewards;
-    }
-
-
-    public static void init(final String path) {
-        FILE_HELPER = new FileHelper() {
-            private boolean isUnLocked = true;
-            private File file = new File(path + "quests.hqm");
-            private File lock = new File(path + "lock.txt");
-
-            @Override
-            public boolean loadData(File file) {
-                return super.loadData(this.file);
-            }
-
-            @Override
-            public SaveResult saveData(File file) {
-                return super.saveData(this.file);
-            }
-
-            @Override
-            public void write(DataWriter dw) {
-                String lockCode = readCode();
-                dw.writeString(lockCode, DataBitHelper.PASS_CODE);
-                saveAll(dw);
-            }
-
-            @Override
-            public void read(DataReader dr, FileVersion version) {
-                isUnLocked = false;
-                String code = version.lacks(FileVersion.LOCK) ? null : dr.readString(DataBitHelper.PASS_CODE);
-
-                if (code == null || code.equals(readCode())) {
-                    isUnLocked = true;
-                }
-
-                if (!isEditing || isUnLocked) {
-                    loadAll(dr, version);
-                }
-            }
-
-            private String readCode() {
-                if (lock.exists()) {
-                    BufferedReader br = null;
-                    try {
-                        br = new BufferedReader(new FileReader(lock));
-                        String str = br.readLine();
-                        return str.substring(0, Math.min(DataBitHelper.PASS_CODE.getMaximum(), str.length()));
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                        return null;
-                    } finally {
-                        if (br != null) {
-                            try {
-                                br.close();
-                            } catch (IOException ignored) {
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
-
-        };
-
-        QuestLine.getActiveQuestLine().mainPath = path;
-
-        QuestLine.getActiveQuestLine().quests = new HashMap<Short, Quest>();
-        QuestLine.getActiveQuestLine().questSets = new ArrayList<QuestSet>();
-        FILE_HELPER.loadData(null);
-
-    }
-
-    //Todo at the moment this can create empty quests, not a problem but they will take up ids
     public static void removeQuest(Quest quest) {
-        for (Quest requirement : quest.requirement) {
-            requirement.reversedRequirement.remove(quest);
+        for (String requirement : quest.requirement) {
+            Quest.getQuest(requirement).reversedRequirement.remove(quest.getId());
         }
-        for (Quest optionLink : quest.optionLinks) {
-            optionLink.reversedOptionLinks.remove(quest);
+        for (String optionLink : quest.optionLinks) {
+            Quest.getQuest(optionLink).reversedOptionLinks.remove(quest.getId());
         }
 
-        for (QuestTask task : quest.tasks) {
-            task.onDelete();
-        }
+        quest.tasks.forEach(QuestTask::onDelete);
 
         quest.setQuestSet(null);
-        QuestLine.getActiveQuestLine().quests.remove((Short) quest.getId());
-        /*if (quest.getId() == size() - 1) {
-            QuestLine.getActiveQuestLine().questCount--;
-        }*/
+        QuestLine.getActiveQuestLine().quests.remove(quest.getId());
 
         for (Quest other : QuestLine.getActiveQuestLine().quests.values()) {
-            Iterator<Quest> iterator = other.requirement.iterator();
+            Iterator<String> iterator = other.requirement.iterator();
             while (iterator.hasNext()) {
-                Quest element = iterator.next();
-                if (element.getId() == quest.getId()) {
+                String element = iterator.next();
+                if (element.equals(quest.getId())) {
                     iterator.remove();
                 }
             }
 
             iterator = other.optionLinks.iterator();
             while (iterator.hasNext()) {
-                Quest element = iterator.next();
-                if (element.getId() == quest.getId()) {
+                String element = iterator.next();
+                if (element.equals(quest.getId())) {
                     iterator.remove();
                 }
             }
@@ -2251,17 +1686,15 @@ public class Quest {
     }
 
     public void setQuestSet(QuestSet set) {
-        if (this.set != null) {
+        if (this.set != null)
             this.set.removeQuest(this);
-        }
         this.set = set;
-        if (this.set != null) {
+        if (this.set != null)
             this.set.addQuest(this);
-        }
     }
 
     public List<Quest> getReversedRequirement() {
-        return reversedRequirement;
+        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedRequirement.contains(quest.getId())).collect(Collectors.toList());
     }
 
 }

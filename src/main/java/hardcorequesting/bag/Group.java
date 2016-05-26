@@ -1,17 +1,15 @@
 package hardcorequesting.bag;
 
+import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.FileVersion;
-import hardcorequesting.QuestingData;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
@@ -21,49 +19,40 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Level;
-
-import net.minecraftforge.fml.common.FMLLog;
-
-public class Group {
-
-
+public class Group
+{
     public static int size() {
-        return QuestLine.getActiveQuestLine().groupCount;
+        return QuestLine.getActiveQuestLine().groups.size();
     }
 
     private GroupTier tier;
     private List<ItemStack> items;
     private String name;
     private int limit;
-    private int id;
+    private String uuid;
 
-    private Group(int id, String name, GroupTier tier, List<ItemStack> items, int limit) {
-        this.id = id;
-        this.name = name;
-        this.tier = tier;
-        this.items = items;
-        this.limit = limit;
-        QuestLine.getActiveQuestLine().groupCount = Math.max(QuestLine.getActiveQuestLine().groupCount, id + 1);
-    }
-
-    public Group() {
-        id = QuestLine.getActiveQuestLine().groupCount++;
-        if (GroupTier.getTiers().size() > 1) {
-            this.tier = GroupTier.getTiers().get(1);
-        } else {
+    public Group(String id) {
+        this.uuid = id;
+        while (this.uuid == null || getGroups().containsKey(this.uuid)) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+        if (id == null)
+        {
+            if (GroupTier.getTiers().size() < 1)
+                GroupTier.initBaseTiers(QuestLine.getActiveQuestLine());
             this.tier = GroupTier.getTiers().get(0);
         }
-        items = new ArrayList<ItemStack>();
+        items = new ArrayList<>();
     }
 
     public GroupTier getTier() {
         return tier;
     }
 
-    public static List<Group> getGroups() {
-        return QuestLine.getActiveQuestLine().groupList;
+    public static Map<String, Group> getGroups() {
+        return QuestLine.getActiveQuestLine().groups;
     }
 
 
@@ -95,29 +84,29 @@ public class Group {
 
     public void open(EntityPlayer player) {
         if (limit > 0) {
-            GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+            GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
             if (data != null) {
                 data.retrieved++;
             }
         }
 
-        List<ItemStack> itemsToAdd = new ArrayList<ItemStack>();
-        for (ItemStack item : items) {
-            itemsToAdd.add(item.copy());
-        }
+        List<ItemStack> itemsToAdd = items.stream().map(ItemStack::copy).collect(Collectors.toList());
 
         Quest.addItems(player, itemsToAdd);
 
-        for (ItemStack item : itemsToAdd) {
-            if (item.stackSize > 0) {
-                EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
-                player.worldObj.spawnEntityInWorld(entityItem);
-            }
-        }
+        itemsToAdd.stream().filter(item -> item.stackSize > 0).forEach(item -> {
+            EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
+            player.worldObj.spawnEntityInWorld(entityItem);
+        });
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getId()
+    {
+        return uuid;
     }
 
     public void removeItem(int i) {
@@ -126,76 +115,12 @@ public class Group {
         }
     }
 
-    public void remove(int i) {
-        if (i >= 0 && i < QuestLine.getActiveQuestLine().groupList.size()) {
-            Group group = QuestLine.getActiveQuestLine().groupList.remove(i);
-            QuestLine.getActiveQuestLine().groups.remove(group.id);
-        }
-    }
-
-    public static void saveAll(DataWriter dw) {
-        dw.writeData(getGroups().size(), DataBitHelper.GROUP_COUNT);
-        for (Group group : getGroups()) {
-            dw.writeData(group.id, DataBitHelper.GROUP_COUNT);
-            dw.writeString(group.name, DataBitHelper.QUEST_NAME_LENGTH);
-            int id = GroupTier.getTiers().indexOf(group.tier);
-            if (id == -1) id = 0;
-            dw.writeData(id, DataBitHelper.TIER_COUNT);
-            dw.writeData(group.items.size(), DataBitHelper.GROUP_ITEMS);
-            for (ItemStack item : group.items) {
-                dw.writeItemStack(item, true);
-            }
-
-            //most of the time the limit will be at 0, therefore I'm saving an extra bit in the case there is a limit
-            //to allow me to only use one bit if there is no limit
-            if (group.limit > 0) {
-                dw.writeBoolean(true);
-                dw.writeData(group.limit, DataBitHelper.LIMIT);
-            } else {
-                dw.writeBoolean(false);
-            }
-        }
-    }
-
-    public static void readAll(DataReader dr, FileVersion version) {
-        QuestLine.getActiveQuestLine().groups.clear();
-        QuestLine.getActiveQuestLine().groupList.clear();
-        QuestLine.getActiveQuestLine().groupCount = 0;
-        int count = dr.readData(DataBitHelper.GROUP_COUNT);
-        for (int i = 0; i < count; i++) {
-            int id = i;
-            if (version.contains(FileVersion.BAG_LIMITS)) {
-                id = dr.readData(DataBitHelper.GROUP_COUNT);
-            }
-            String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-
-            GroupTier tier = GroupTier.getTiers().get(dr.readData(DataBitHelper.TIER_COUNT));
-            List<ItemStack> items = new ArrayList<ItemStack>();
-            if (Quest.isEditing) FMLLog.log("HQM-EDIT", Level.INFO, "Loading quest group %s", name);
-            int itemCount = dr.readData(DataBitHelper.GROUP_ITEMS);
-            for (int j = 0; j < itemCount; j++) {
-                ItemStack itemStack = dr.readItemStack(true);
-                if (itemStack != null) {
-                    if (itemStack.getItem() != null) {
-                        items.add(itemStack);
-                    } else {
-                        FMLLog.log("HQM", Level.ERROR, "The bag item is invalid, skipping");
-                    }
-                }
-            }
-
-            int limit = 0;
-            if (version.contains(FileVersion.BAG_LIMITS) && dr.readBoolean()) {
-                limit = dr.readData(DataBitHelper.LIMIT);
-            }
-
-            add(new Group(id, name, tier, items, limit));
-        }
+    public static void remove(String id) {
+        getGroups().remove(id);
     }
 
     public static void add(Group group) {
-        QuestLine.getActiveQuestLine().groups.put(group.id, group);
-        QuestLine.getActiveQuestLine().groupList.add(group);
+        getGroups().put(group.getId(), group);
     }
 
     public void setLimit(int limit) {
@@ -206,17 +131,17 @@ public class Group {
         return limit;
     }
 
-    public static Group getGroup(int id) {
-        return QuestLine.getActiveQuestLine().groups.get(id);
+    public static Group getGroup(String id) {
+        return Group.getGroups().get(id);
     }
 
     public int getRetrievalCount(EntityPlayer player) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+        GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
         return data != null ? data.retrieved : 0;
     }
 
     public void setRetrievalCount(EntityPlayer player, int count) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(this.id);
+        GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
         if (data != null) {
             data.retrieved = count;
         }
@@ -276,7 +201,7 @@ public class Group {
             }
         }
 
-        List<Group> groups = Group.getGroups();
+        List<Group> groups = new ArrayList<>(Group.getGroups().values());
         start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
@@ -313,7 +238,7 @@ public class Group {
     public void draw(GuiQuestBook gui, int x, int y) {
         gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
         List<ItemStack> items = this.getItems();
-        for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
+        for (int i = 0; i < items.size(); i++) {
             ItemStack itemStack = i < items.size() ? items.get(i) : null;
 
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
@@ -346,7 +271,7 @@ public class Group {
     @SideOnly(Side.CLIENT)
     public void mouseClicked(GuiQuestBook gui, int x, int y) {
         List<ItemStack> items = this.getItems();
-        for (int i = 0; i < Math.min(DataBitHelper.GROUP_ITEMS.getMaximum(), items.size() + 1); i++) {
+        for (int i = 0; i < items.size(); i++) {
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
 
@@ -373,7 +298,7 @@ public class Group {
 
     @SideOnly(Side.CLIENT)
     public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar groupScroll, int x, int y) {
-        List<Group> groups = getGroups();
+        List<Group> groups = new ArrayList<>(getGroups().values());
         int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - GuiQuestBook.VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
@@ -392,7 +317,7 @@ public class Group {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), group));
                         break;
                     case DELETE:
-                        group.remove(i);
+                        remove(group.getId());
                         SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
                         break;
                     default:

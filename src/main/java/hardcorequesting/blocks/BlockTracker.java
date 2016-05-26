@@ -1,7 +1,7 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityTracker;
@@ -44,7 +44,6 @@ public class BlockTracker extends BlockContainer {
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
                             player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
-                            ;
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {

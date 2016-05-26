@@ -1,10 +1,15 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.client.interfaces.edit.*;
+import hardcorequesting.death.DeathStats;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.Team;
+import hardcorequesting.util.OPBookHelper;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.*;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.EditButton;
@@ -12,9 +17,6 @@ import hardcorequesting.client.EditMode;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.items.ModItems;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.FileHelper;
-import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
@@ -77,7 +79,7 @@ public class GuiQuestBook extends GuiBase {
     private List<ScrollBar> scrollBars;
 
     {
-        scrollBars = new ArrayList<ScrollBar>();
+        scrollBars = new ArrayList<>();
         scrollBars.add(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
@@ -123,14 +125,14 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputationList().size() > VISIBLE_REPUTATIONS;
+                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputations().size() > VISIBLE_REPUTATIONS;
             }
         });
 
         scrollBars.add(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputationList().size() > VISIBLE_DISPLAY_REPUTATIONS;
+                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputations().size() > VISIBLE_DISPLAY_REPUTATIONS;
             }
         });
     }
@@ -153,7 +155,7 @@ public class GuiQuestBook extends GuiBase {
             }
 
             @Override
-            protected void textChanged(GuiBase gui) {
+            public void textChanged(GuiBase gui) {
                 try {
                     int number;
                     if (getText().equals("")) {
@@ -203,8 +205,6 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
-    private FileHelper.SaveResult saveResult = null;
-
     private LargeButton saveButton;
     private List<LargeButton> buttons = new ArrayList<LargeButton>();
 
@@ -246,7 +246,7 @@ public class GuiQuestBook extends GuiBase {
         buttons.add(new LargeButton("hqm.questBook.createSet", 185, 50) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return Quest.getQuestSets().size() < DataBitHelper.QUEST_SETS.getMaximum();
+                return true;
             }
 
             @Override
@@ -268,7 +268,7 @@ public class GuiQuestBook extends GuiBase {
         buttons.add(new LargeButton("hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return GroupTier.getTiers().size() > 0 && Group.getGroups().size() < DataBitHelper.GROUP_COUNT.getMaximum();
+                return true;
             }
 
             @Override
@@ -278,7 +278,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                Group.add(new Group());
+                Group.add(new Group(null));
                 SaveHelper.add(SaveHelper.EditType.GROUP_CREATE);
             }
         });
@@ -286,7 +286,7 @@ public class GuiQuestBook extends GuiBase {
         buttons.add(new LargeButton("hqm.questBook.createTier", 100, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return GroupTier.getTiers().size() < DataBitHelper.TIER_COUNT.getMaximum();
+                return true;
             }
 
             @Override
@@ -321,7 +321,7 @@ public class GuiQuestBook extends GuiBase {
         buttons.add(new LargeButton("Create New", 180, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return Reputation.size() < DataBitHelper.REPUTATION.getMaximum();
+                return true;
             }
 
             @Override
@@ -331,7 +331,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                new Reputation("Unnamed", "Neutral");
+                Reputation.addReputation(new Reputation("Unnamed", "Neutral"));
                 SaveHelper.add(SaveHelper.EditType.REPUTATION_ADD);
             }
         });
@@ -339,7 +339,7 @@ public class GuiQuestBook extends GuiBase {
         buttons.add(new LargeButton("hqm.questBook.createTier", 20, 20) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return selectedReputation.getMarkerCount() < DataBitHelper.REPUTATION_MARKER.getMaximum();
+                return true;
             }
 
             @Override
@@ -359,15 +359,13 @@ public class GuiQuestBook extends GuiBase {
     public void onGuiClosed() {
         Keyboard.enableRepeatEvents(true);
         SoundHandler.stopLoreMusic();
-        PacketHandler.closeInterface();
     }
 
-    public static void displayGui(EntityPlayer player, boolean isOpBook) {
-        if (player != null) {
-            if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook)) {
+    public static void displayGui(EntityPlayer player, boolean isOpBook)
+    {
+        if (player != null)
+            if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook))
                 Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
-            }
-        }
     }
 
     private static final String FRONT_KEY = "hqm_front_texture";
@@ -378,7 +376,6 @@ public class GuiQuestBook extends GuiBase {
     @Override
     public void updateScreen() {
         ++tick;
-
         super.updateScreen();
     }
 
@@ -537,25 +534,7 @@ public class GuiQuestBook extends GuiBase {
             editMenu.drawMouseOver(this, x, y);
         }
 
-        for (LargeButton button : buttons) {
-            button.drawMouseOver(this, player, x, y);
-        }
-
-        if (Quest.isEditing) {
-            if (saveResult != null) {
-                if (saveButton.inButtonBounds(this, x, y) || SaveHelper.inSaveBounds(this, x, y)) {
-                    String str = (saveResult == FileHelper.SaveResult.SUCCESS ? GuiColor.GREEN : GuiColor.RED).toString();
-
-                    str += saveResult.getName() + "\n\n";
-                    str += GuiColor.WHITE;
-                    str += saveResult.getText();
-
-                    drawMouseOver(getLinesFromText(str, 1F, 130), x + left, y + top);
-                } else {
-                    saveResult = null;
-                }
-            }
-        }
+        buttons.forEach(button -> button.drawMouseOver(this, player, x, y));
 
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.goBack") + "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.rightClick"), x + left, y + top);
@@ -610,7 +589,7 @@ public class GuiQuestBook extends GuiBase {
         }
 
 
-        int deaths = DeathStats.getDeathStats(QuestingData.getUserName(player)).getTotalDeaths();
+        int deaths = DeathStats.getDeathStats(QuestingData.getUserUUID(player)).getTotalDeaths();
         drawString(Translator.translate(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         drawString(Translator.translate("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
 
@@ -626,7 +605,7 @@ public class GuiQuestBook extends GuiBase {
             }
         } else {
             int players = 0;
-            for (Team.PlayerEntry player : team.getPlayers()) {
+            for (PlayerEntry player : team.getPlayers()) {
                 if (player.isInTeam()) {
                     players++;
                 }
@@ -959,11 +938,11 @@ public class GuiQuestBook extends GuiBase {
         return player;
     }
 
-    public void save() {
-        saveResult = Quest.FILE_HELPER.saveData(null);
-        if (saveResult == FileHelper.SaveResult.SUCCESS) {
-            SaveHelper.onSave();
-        }
+    public void save()
+    {
+        // TODO send message to server with updated quests
+        QuestLine.saveAll();
+        SaveHelper.onSave();
     }
 
     private EditButton[] getButtons() {

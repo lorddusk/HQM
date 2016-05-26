@@ -1,6 +1,6 @@
 package hardcorequesting.client;
 
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 
 public enum EditMode {
     NORMAL("normal"),

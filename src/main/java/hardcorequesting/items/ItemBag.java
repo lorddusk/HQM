@@ -4,15 +4,14 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.ModInformation;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
+import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataWriter;
-import hardcorequesting.network.PacketHandler;
-import hardcorequesting.network.PacketId;
+import hardcorequesting.network.NetworkManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -24,15 +23,17 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-//import net.minecraft.client.renderer.texture.IIconRegister;
 
-
-public class ItemBag extends Item {
+public class ItemBag extends Item
+{
     public static boolean displayGui;
 
-    public ItemBag() {
+    public ItemBag()
+    {
         super();
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
@@ -78,22 +79,22 @@ public class ItemBag extends Item {
             int dmg = item.getItemDamage();
             if (dmg >= 0 && dmg < BagTier.values().length) {
                 int totalWeight = 0;
-                for (Group group : Group.getGroups()) {
+                for (Group group : Group.getGroups().values()) {
                     if (group.isValid(player)) {
                         totalWeight += group.getTier().getWeights()[dmg];
                     }
                 }
                 if (totalWeight > 0) {
                     int rng = (int) (Math.random() * totalWeight);
-                    List<Group> groups = Group.getGroups();
-                    for (int i = 0; i < groups.size(); i++) {
-                        Group group = groups.get(i);
-                        if (group.isValid(player)) {
+                    for (Group group : Group.getGroups().values())
+                    {
+                        if (group.isValid(player))
+                        {
                             int weight = group.getTier().getWeights()[dmg];
                             if (rng < weight) {
                                 group.open(player);
                                 player.inventory.markDirty();
-                                openClientInterface(player, i, dmg);
+                                openClientInterface(player, group.getId(), dmg);
                                 world.playSound(player, player.getPosition(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
                                 break;
                             } else {
@@ -113,19 +114,17 @@ public class ItemBag extends Item {
         return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
-    private void openClientInterface(EntityPlayer player, int id, int bag) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.BAG_INTERFACE);
-        dw.writeData(id, DataBitHelper.GROUP_COUNT);
-        dw.writeData(bag, DataBitHelper.BAG_TIER);
-        for (Group group : Group.getGroups()) {
-            if (group.getLimit() != 0) {
-                dw.writeData(group.getRetrievalCount(player), DataBitHelper.LIMIT);
-            }
-        }
-
-        if (ItemBag.displayGui) {
-            PacketHandler.sendToRawPlayer(player, dw);
-        }
+    private void openClientInterface(EntityPlayer player, String id, int bag)
+    {
+        List<String> data = new ArrayList<>();
+        data.add(id);
+        data.add("" + bag);
+        data.addAll(Group.getGroups().values().stream()
+                .filter(group -> group.getLimit() != 0)
+                .map(group -> group.getRetrievalCount(player) + "")
+                .collect(Collectors.toList()));
+        if (ItemBag.displayGui && player instanceof EntityPlayerMP)
+            NetworkManager.sendToPlayer(GuiType.BAG.build(data.toArray(new String[data.size()])), (EntityPlayerMP) player);
         SoundHandler.play(Sounds.BAG, player);
     }
 }

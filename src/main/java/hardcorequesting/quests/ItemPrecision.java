@@ -1,8 +1,8 @@
 package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
-import hardcorequesting.OreDictionaryHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.util.OreDictionaryHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.QuestingData;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.config.ModConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -57,11 +57,11 @@ public class GUIOverlay extends Gui {
     }
 
     public int getLives() {
-        return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getLives();
+        return QuestingData.getQuestingData(mc.thePlayer).getLives();
     }
 
     public int getDeaths() {
-        return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getDeathStat().getTotalDeaths();
+        return QuestingData.getQuestingData(mc.thePlayer).getDeathStat().getTotalDeaths();
     }
 
 }

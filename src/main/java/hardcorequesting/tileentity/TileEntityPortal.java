@@ -1,14 +1,15 @@
 package hardcorequesting.tileentity;
 
-import hardcorequesting.QuestingData;
-import hardcorequesting.Team;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.Team;
 import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiEditMenuPortal;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuPortal;
 import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
-import hardcorequesting.network.PacketHandler;
 import hardcorequesting.quests.Quest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -18,20 +19,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-//import net.minecraft.util.IIcon;
-
+@SuppressWarnings("Duplicates")
 public class TileEntityPortal extends TileEntity implements IBlockSync, ITickable {
 
     private Quest quest;
-    private int questId = -1;
-    private List<String> players = new ArrayList<String>();
+    private String questId;
+    private List<String> players = new ArrayList<>();
     private PortalType type = PortalType.TECH;
     private ItemStack item;
 
@@ -93,7 +95,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     public void writeContentToNBT(NBTTagCompound compound) {
         if (quest != null) {
-            compound.setShort(NBT_QUEST, quest.getId());
+            compound.setString(NBT_QUEST, quest.getId());
         }
         compound.setByte(NBT_TYPE, (byte) type.ordinal());
         if (item != null) {
@@ -121,7 +123,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     public void readContentFromNBT(NBTTagCompound compound) {
         if (compound.hasKey(NBT_QUEST)) {
-            questId = compound.getShort(NBT_QUEST);
+            questId = compound.getString(NBT_QUEST);
             if (Quest.getQuests() != null) {
                 quest = Quest.getQuest(questId);
             }
@@ -156,9 +158,9 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     @Override
     public void update() {
         if (!worldObj.isRemote) {
-            if (quest == null && questId != -1) {
+            if (quest == null && questId != null) {
                 quest = Quest.getQuest(questId);
-                questId = -1;
+                questId = null;
             }
 
             boolean updated = false;
@@ -171,9 +173,9 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                 if (quest != null) {
                     for (Team team : QuestingData.getAllTeams()) {
                         if (team.getQuestData(quest.getId()).completed) {
-                            for (Team.PlayerEntry entry : team.getPlayers()) {
-                                if (entry.isInTeam() && !players.contains(entry.getName())) {
-                                    players.add(entry.getName());
+                            for (PlayerEntry entry : team.getPlayers()) {
+                                if (entry.isInTeam() && !players.contains(entry.getUUID())) {
+                                    players.add(entry.getUUID());
                                     updated = true;
                                 }
                             }
@@ -208,7 +210,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
             }
 
             if (updated) {
-                PacketHandler.sendBlockPacket(this, null, 0);
+                NetworkManager.sendBlockUpdate(this, null, 0);
             }
         } else {
             keepClientDataUpdated();
@@ -226,7 +228,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     public void setCurrentQuest() {
         quest = Quest.getQuest(Quest.selectedQuestId);
         resetDelay = delay = 1200;
-        PacketHandler.sendBlockPacket(this, null, 0);
+        NetworkManager.sendBlockUpdate(this, null, 0);
     }
 
     public Quest getCurrentQuest() {
@@ -239,41 +241,49 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     private void keepClientDataUpdated() {
         double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
-        if (distance > Math.pow(PacketHandler.BLOCK_UPDATE_RANGE, 2)) {
+        if (distance > Math.pow(BLOCK_UPDATE_RANGE, 2)) {
             hasUpdatedData = false;
-        } else if (!hasUpdatedData && distance < Math.pow(PacketHandler.BLOCK_UPDATE_RANGE - PacketHandler.BLOCK_UPDATE_BUFFER_DISTANCE, 2)) {
+        } else if (!hasUpdatedData && distance < Math.pow(BLOCK_UPDATE_RANGE - BLOCK_UPDATE_BUFFER_DISTANCE, 2)) {
             hasUpdatedData = true;
-            PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 0);
+            NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().thePlayer, 0);
         }
     }
 
+    private static final String QUEST = "quest";
+    private static final String PORTAL_TYPE = "portalType";
+    private static final String HAS_ITEM = "hasItem";
+    private static final String ITEM = "item";
+    private static final String ITEM_DAMAGE = "itemDamage";
+    private static final String COMPLETED_COLLISION = "completedCollision";
+    private static final String COMPLETED_TEXTURE = "completedTexture";
+    private static final String UNCOMPLETED_COLLISION = "uncompletedCollision";
+    private static final String UNCOMPLETED_TEXTURE = "uncompletedTexture";
+    private static final String PLAYERS = "players";
+
     @Override
-    public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id) {
-        switch (id) {
+    public void writeData(EntityPlayer player, boolean onServer, int type, JsonWriter writer) throws IOException {
+       switch (type) {
             case 0:
                 if (onServer) {
-                    dw.writeBoolean(quest != null);
-                    if (quest != null) {
-                        dw.writeData(quest.getId(), DataBitHelper.QUESTS);
-                    }
-                    dw.writeData(type.ordinal(), DataBitHelper.PORTAL_TYPE);
-                    if (!type.isPreset()) {
-                        dw.writeBoolean(item != null);
+                    writer.name(QUEST).value(this.quest == null ? null : this.quest.getId());
+                    writer.name(PORTAL_TYPE).value(this.type.ordinal());
+                    if (!this.type.isPreset()) {
+                        writer.name(HAS_ITEM).value(item != null);
                         if (item != null) {
-                            dw.writeData(Item.getIdFromItem(item.getItem()), DataBitHelper.SHORT);
-                            dw.writeData(item.getItemDamage(), DataBitHelper.SHORT);
+                            writer.name(ITEM).value(item.getItem().getRegistryName().toString());
+                            writer.name(ITEM_DAMAGE).value(item.getItemDamage());
                         }
                     }
 
-                    dw.writeBoolean(completedCollision);
-                    dw.writeBoolean(completedTexture);
-                    dw.writeBoolean(uncompletedCollision);
-                    dw.writeBoolean(uncompletedTexture);
+                    writer.name(COMPLETED_COLLISION).value(completedCollision);
+                    writer.name(COMPLETED_TEXTURE).value(completedTexture);
+                    writer.name(UNCOMPLETED_COLLISION).value(uncompletedCollision);
+                    writer.name(UNCOMPLETED_TEXTURE).value(uncompletedTexture);
 
-                    dw.writeData(players.size(), DataBitHelper.PLAYERS);
-                    for (String p : players) {
-                        dw.writeString(p, DataBitHelper.NAME_LENGTH);
-                    }
+                    writer.name(PLAYERS).beginArray();
+                    for (String p : players)
+                        writer.value(p);
+                    writer.endArray();
                 } else {
                     //send empty packet, no info required
                 }
@@ -282,56 +292,51 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                 if (onServer) {
                     //empty
                 } else {
-                    dw.writeData(type.ordinal(), DataBitHelper.PORTAL_TYPE);
-                    if (!type.isPreset()) {
-                        dw.writeBoolean(item != null);
+                    writer.name(PORTAL_TYPE).value(this.type.ordinal());
+                    if (!this.type.isPreset()) {
+                        writer.name(HAS_ITEM).value(item != null);
                         if (item != null) {
-                            dw.writeData(Item.getIdFromItem(item.getItem()), DataBitHelper.SHORT);
-                            dw.writeData(item.getItemDamage(), DataBitHelper.SHORT);
+                            writer.name(ITEM).value(item.getItem().getRegistryName().toString());
+                            writer.name(ITEM_DAMAGE).value(item.getItemDamage());
                         }
                     }
-                    dw.writeBoolean(completedCollision);
-                    dw.writeBoolean(completedTexture);
-                    dw.writeBoolean(uncompletedCollision);
-                    dw.writeBoolean(uncompletedTexture);
+                    writer.name(COMPLETED_COLLISION).value(completedCollision);
+                    writer.name(COMPLETED_TEXTURE).value(completedTexture);
+                    writer.name(UNCOMPLETED_COLLISION).value(uncompletedCollision);
+                    writer.name(UNCOMPLETED_TEXTURE).value(uncompletedTexture);
                 }
         }
     }
 
     @Override
-    public void readData(DataReader dr, EntityPlayer player, boolean onServer, int id) {
-        switch (id) {
+    public void readData(EntityPlayer player, boolean onServer, int type, JsonObject data) {
+        switch (type) {
             case 0:
                 if (onServer) {
                     //respond by sending the data to the client that required it
-                    PacketHandler.sendBlockPacket(this, player, 0);
+                    NetworkManager.sendBlockUpdate(this, player, 0);
                 } else {
-                    if (dr.readBoolean()) {
-                        quest = Quest.getQuest(dr.readData(DataBitHelper.QUESTS));
-                    } else {
-                        quest = null;
-                    }
-                    type = PortalType.values()[dr.readData(DataBitHelper.PORTAL_TYPE)];
-                    if (!type.isPreset()) {
-                        if (dr.readBoolean()) {
-                            int itemId = dr.readData(DataBitHelper.SHORT);
-                            int dmg = dr.readData(DataBitHelper.SHORT);
-                            item = new ItemStack(Item.getItemById(itemId), 1, dmg);
+                    JsonElement questElement = data.get(QUEST);
+                    this.quest = questElement.isJsonNull() ? null : Quest.getQuest(questElement.getAsString());
+                    this.type = PortalType.values()[data.get(PORTAL_TYPE).getAsInt()];
+                    if (!this.type.isPreset()) {
+                        if (data.get(HAS_ITEM).getAsBoolean()) {
+                            String itemId = data.get(ITEM).getAsString();
+                            int dmg = data.get(ITEM_DAMAGE).getAsInt();
+                            item = new ItemStack(Item.REGISTRY.getObject(new ResourceLocation(itemId)), 1, dmg);
                         } else {
                             item = null;
                         }
                     }
 
-                    completedCollision = dr.readBoolean();
-                    completedTexture = dr.readBoolean();
-                    uncompletedCollision = dr.readBoolean();
-                    uncompletedTexture = dr.readBoolean();
+                    completedCollision = data.get(COMPLETED_COLLISION).getAsBoolean();
+                    completedTexture = data.get(COMPLETED_TEXTURE).getAsBoolean();
+                    uncompletedCollision = data.get(UNCOMPLETED_COLLISION).getAsBoolean();
+                    uncompletedTexture = data.get(UNCOMPLETED_TEXTURE).getAsBoolean();
 
                     players.clear();
-                    int count = dr.readData(DataBitHelper.PLAYERS);
-                    for (int i = 0; i < count; i++) {
-                        players.add(dr.readString(DataBitHelper.NAME_LENGTH));
-                    }
+                    for (JsonElement p : data.get(PLAYERS).getAsJsonArray())
+                        players.add(p.getAsString());
                     IBlockState state = worldObj.getBlockState(pos);
                     worldObj.notifyBlockUpdate(pos, state, state, 3);
                 }
@@ -339,21 +344,23 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
             case 1:
                 if (onServer) {
                     if (Quest.isEditing) {
-                        type = PortalType.values()[dr.readData(DataBitHelper.PORTAL_TYPE)];
-                        if (!type.isPreset()) {
-                            if (dr.readBoolean()) {
-                                int itemId = dr.readData(DataBitHelper.SHORT);
-                                int dmg = dr.readData(DataBitHelper.SHORT);
-                                item = new ItemStack(Item.getItemById(itemId), 1, dmg);
+                        this.type = PortalType.values()[data.get(PORTAL_TYPE).getAsInt()];
+                        if (!this.type.isPreset()) {
+                            if (data.get(HAS_ITEM).getAsBoolean()) {
+                                String itemId = data.get(ITEM).getAsString();
+                                int dmg = data.get(ITEM_DAMAGE).getAsInt();
+                                item = new ItemStack(Item.REGISTRY.getObject(new ResourceLocation(itemId)), 1, dmg);
                             } else {
                                 item = null;
                             }
                         }
-                        completedCollision = dr.readBoolean();
-                        completedTexture = dr.readBoolean();
-                        uncompletedCollision = dr.readBoolean();
-                        uncompletedTexture = dr.readBoolean();
-                        PacketHandler.sendBlockPacket(this, null, 0); //refresh the clients
+
+                        completedCollision = data.get(COMPLETED_COLLISION).getAsBoolean();
+                        completedTexture = data.get(COMPLETED_TEXTURE).getAsBoolean();
+                        uncompletedCollision = data.get(UNCOMPLETED_COLLISION).getAsBoolean();
+                        uncompletedTexture = data.get(UNCOMPLETED_TEXTURE).getAsBoolean();
+
+                        NetworkManager.sendBlockUpdate(this, null, 0); //refresh the clients
                     }
                 } else {
                     openInterfaceClient(player);
@@ -369,17 +376,12 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     }
 
     public void openInterface(EntityPlayer player) {
-        PacketHandler.sendBlockPacket(this, player, 1);
+        NetworkManager.sendBlockUpdate(this, player, 1);
     }
 
     @SideOnly(Side.CLIENT)
     public void sendToServer() {
-        PacketHandler.sendBlockPacket(this, Minecraft.getMinecraft().thePlayer, 1);
-    }
-
-    @Override
-    public int infoBitLength() {
-        return 1;
+        NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().thePlayer, 1);
     }
 
     public ItemStack getItem() {
@@ -398,7 +400,6 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
         this.writeToNBT(compound);
         portal.readFromNBT(compound);
         portal.worldObj = this.worldObj;
-
 
         return portal;
     }

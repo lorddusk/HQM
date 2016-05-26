@@ -1,6 +1,6 @@
 package hardcorequesting.commands;
 
-import hardcorequesting.QuestingData;
+import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 

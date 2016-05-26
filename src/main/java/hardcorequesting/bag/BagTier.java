@@ -1,7 +1,7 @@
 package hardcorequesting.bag;
 
 
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 
 public enum BagTier {

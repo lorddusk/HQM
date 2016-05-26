@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
 
-import hardcorequesting.RegisterHelper;
+import hardcorequesting.util.RegisterHelper;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;

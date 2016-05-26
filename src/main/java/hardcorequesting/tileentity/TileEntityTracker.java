@@ -1,26 +1,29 @@
 package hardcorequesting.tileentity;
 
 import hardcorequesting.blocks.ModBlocks;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiEditMenuTracker;
+import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
-import hardcorequesting.network.*;
-import hardcorequesting.quests.Quest;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTracker;
+import hardcorequesting.network.NetworkManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ITickable;
+import hardcorequesting.quests.Quest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityTracker extends TileEntity implements ITickable {
 
 
     private Quest quest;
-    private int questId = -1;
+    private String questId;
     private int radius;
     private TrackerType type = TrackerType.TEAM;
 
@@ -33,7 +36,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         super.writeToNBT(compound);
 
         if (quest != null) {
-            compound.setShort(NBT_QUEST, quest.getId());
+            compound.setString(NBT_QUEST, quest.getId());
         }
         compound.setInteger(NBT_RADIUS, radius);
         compound.setByte(NBT_TYPE, (byte) type.ordinal());
@@ -44,7 +47,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         super.readFromNBT(compound);
 
         if (compound.hasKey(NBT_QUEST)) {
-            questId = compound.getShort(NBT_QUEST);
+            questId = compound.getString(NBT_QUEST);
         } else {
             quest = null;
         }
@@ -56,9 +59,9 @@ public class TileEntityTracker extends TileEntity implements ITickable {
 
     @Override
     public void update() {
-        if (quest == null && questId != -1) {
+        if (quest == null && questId != null) {
             quest = Quest.getQuest(questId);
-            questId = -1;
+            questId = null;
         }
 
         if (!worldObj.isRemote && delay++ == 20) {
@@ -119,60 +122,38 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         return quest;
     }
 
-    public void openInterface(EntityPlayer player) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.TRACKER_ACTIVATE);
-        saveCoordinate(dw);
-        save(dw, true);
-        PacketHandler.sendToRawPlayer(player, dw);
+    public void openInterface(EntityPlayer player)
+    {
+        if (player instanceof EntityPlayerMP)
+            NetworkManager.sendToPlayer(GuiType.TRACKER.build(build()), (EntityPlayerMP) player);
     }
 
-    private void saveCoordinate(DataWriter dw) {
-        dw.writeData(pos.getX(), DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(pos.getY(), DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(pos.getZ(), DataBitHelper.WORLD_COORDINATE);
+    private String[] build()
+    {
+        String[] data = new String[4];
+        data[0] = "" + pos.toLong();
+        data[1] = quest != null ? quest.getId() : null;
+        data[2] = "" + radius;
+        data[3] = "" + type.ordinal();
+        return data;
     }
 
-    private void save(DataWriter dw, boolean saveQuest) {
-        if (saveQuest) {
-            dw.writeBoolean(quest != null);
-            if (quest != null) {
-                dw.writeData(quest.getId(), DataBitHelper.QUESTS);
-            }
-        }
-        dw.writeData(radius, DataBitHelper.WORLD_COORDINATE);
-        dw.writeData(type.ordinal(), DataBitHelper.TRACKER_TYPE);
-    }
-
-    private void load(DataReader dr, boolean loadQuest) {
-        if (loadQuest) {
-            if (dr.readBoolean()) {
-                quest = Quest.getQuest(dr.readData(DataBitHelper.QUESTS));
-            } else {
-                quest = null;
-            }
-        }
-        radius = dr.readData(DataBitHelper.WORLD_COORDINATE);
-        type = TrackerType.values()[dr.readData(DataBitHelper.TRACKER_TYPE)];
-    }
-
-    private static TileEntityTracker getTracker(World world, DataReader dr) {
-        int x = dr.readData(DataBitHelper.WORLD_COORDINATE);
-        int y = dr.readData(DataBitHelper.WORLD_COORDINATE);
-        int z = dr.readData(DataBitHelper.WORLD_COORDINATE);
-
-        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-        if (te instanceof TileEntityTracker) {
-            return (TileEntityTracker) te;
-        } else {
-            return null;
-        }
+    private static TileEntityTracker getTracker(World world, BlockPos pos)
+    {
+        TileEntity te = world.getTileEntity(pos);
+        return (te instanceof TileEntityTracker) ? (TileEntityTracker) te : null;
     }
 
     @SideOnly(Side.CLIENT)
-    public static void openInterface(EntityPlayer player, DataReader dr) {
-        TileEntityTracker tracker = getTracker(player.worldObj, dr);
-        if (tracker != null) {
-            tracker.load(dr, true);
+    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type)
+    {
+        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        if (tracker != null)
+        {
+            tracker.questId = questId;
+            tracker.quest = null;
+            tracker.radius = radius;
+            tracker.type = type;
             GuiBase gui = new GuiWrapperEditMenu();
             gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
             Minecraft.getMinecraft().displayGuiScreen(gui);
@@ -180,17 +161,18 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     }
 
 
-    public void sendToServer() {
-        DataWriter dw = PacketHandler.getWriter(PacketId.TRACKER_RESPONSE);
-        saveCoordinate(dw);
-        save(dw, false);
-        PacketHandler.sendToServer(dw);
+    public void sendToServer()
+    {
+        NetworkManager.sendToServer(ClientChange.TRACKER_UPDATE.build(this));
     }
 
-    public static void saveToServer(EntityPlayer player, DataReader dr) {
-        TileEntityTracker tracker = getTracker(player.worldObj, dr);
-        if (Quest.isEditing && tracker != null) {
-            tracker.load(dr, false);
+    public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type)
+    {
+        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        if (Quest.isEditing && tracker != null)
+        {
+            tracker.radius = radius;
+            tracker.type = type;
         }
     }
 }

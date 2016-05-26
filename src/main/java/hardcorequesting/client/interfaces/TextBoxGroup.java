@@ -15,14 +15,19 @@ public class TextBoxGroup {
     private static final int TEXT_BOX_SRC_Y = 77;
 
     private TextBox selectedTextBox;
-    List<TextBox> textBoxes;
+    private List<TextBox> textBoxes;
 
     public TextBoxGroup() {
-        textBoxes = new ArrayList<TextBox>();
+        textBoxes = new ArrayList<>();
     }
 
     public void add(TextBox textBox) {
         textBoxes.add(textBox);
+    }
+
+    public List<TextBox> getTextBoxes()
+    {
+        return textBoxes;
     }
 
     @SideOnly(Side.CLIENT)
@@ -106,7 +111,7 @@ public class TextBoxGroup {
 
         @SideOnly(Side.CLIENT)
         @Override
-        protected void textChanged(GuiBase gui) {
+        public void textChanged(GuiBase gui) {
             super.textChanged(gui);
             if (scrollable) {
                 updateVisible(gui);

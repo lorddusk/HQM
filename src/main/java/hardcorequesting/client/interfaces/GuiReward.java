@@ -1,12 +1,10 @@
 package hardcorequesting.client.interfaces;
 
 
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ItemBag;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,15 +14,16 @@ import net.minecraft.util.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiReward extends GuiBase {
-
-
-    private class Reward {
+public class GuiReward extends GuiBase
+{
+    private class Reward
+    {
         private ItemStack item;
         private int x;
         private int y;
 
-        private Reward(ItemStack item, int x, int y) {
+        private Reward(ItemStack item, int x, int y)
+        {
             this.item = item;
             this.x = x;
             this.y = y;
@@ -54,13 +53,14 @@ public class GuiReward extends GuiBase {
     public static final ResourceLocation TEXTURE = ResourceHelper.getResource("reward");
     public static final ResourceLocation C_TEXTURE = ResourceHelper.getResource("c_reward");
 
-    public GuiReward(Group group, int bagTier, EntityPlayer player) {
+    public GuiReward(Group group, int bagTier, EntityPlayer player)
+    {
         this.group = group;
-        this.rewards = new ArrayList<Reward>();
+        this.rewards = new ArrayList<>();
 
 
         int totalWeight = 0;
-        for (Group other : Group.getGroups()) {
+        for (Group other : Group.getGroups().values()) {
             if (other.isValid(player)) {
                 totalWeight += other.getTier().getWeights()[bagTier];
             }
@@ -166,20 +166,17 @@ public class GuiReward extends GuiBase {
         return false;
     }
 
-    public static void open(EntityPlayer player, DataReader dr) {
-        Group rewardGroup = Group.getGroups().get(dr.readData(DataBitHelper.GROUP_COUNT));
-        int bagTier = dr.readData(DataBitHelper.BAG_TIER);
-
-        for (Group group : Group.getGroups()) {
-            if (group.getLimit() != 0) {
-                group.setRetrievalCount(player, dr.readData(DataBitHelper.LIMIT));
-            }
-        }
+    public static void open(EntityPlayer player, String groupId, int bag, List<Integer> limits)
+    {
+        Group rewardGroup = Group.getGroups().get(groupId);
+        int i = 0;
+        for (Group group : Group.getGroups().values())
+            if (group.getLimit() != 0)
+                group.setRetrievalCount(player, limits.get(i++));
 
         if (ItemBag.displayGui) {
-            Minecraft.getMinecraft().displayGuiScreen(new GuiReward(rewardGroup, bagTier, player));
+            Minecraft.getMinecraft().displayGuiScreen(new GuiReward(rewardGroup, bag, player));
         }
     }
-
 
 }

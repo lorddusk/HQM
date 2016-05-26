@@ -2,6 +2,9 @@ package hardcorequesting.proxies;
 
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class CommonProxy {
 
@@ -25,4 +28,8 @@ public class CommonProxy {
         return true;
     }
 
+    public EntityPlayer getPlayer(MessageContext ctx)
+    {
+        return ctx.getServerHandler().playerEntity;
+    }
 }

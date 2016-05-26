@@ -1,11 +1,11 @@
 package hardcorequesting.config;
 
+import hardcorequesting.team.RewardSetting;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.ModInformation;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Team;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.items.ItemBag;
 import hardcorequesting.quests.QuestLine;
 
@@ -127,7 +127,7 @@ public class ModConfig {
 
         QuestingData.autoQuestActivate = config.get(CATEGORY_GENERAL, AUTO_QUEST_KEY, AUTO_QUEST_DEFAULT, AUTO_QUEST_COMMENT).getBoolean(AUTO_QUEST_DEFAULT);
 
-        Team.RewardSetting.isAllModeEnabled = config.get(CATEGORY_GENERAL, MULTI_REWARD_KEY, MULTI_REWARD_DEFAULT, MULTI_REWARD_COMMENT).getBoolean(MULTI_REWARD_DEFAULT);
+        RewardSetting.isAllModeEnabled = config.get(CATEGORY_GENERAL, MULTI_REWARD_KEY, MULTI_REWARD_DEFAULT, MULTI_REWARD_COMMENT).getBoolean(MULTI_REWARD_DEFAULT);
 
         ItemBag.displayGui = config.get(CATEGORY_GENERAL, REWARD_KEY, REWARD_DEFAULT, REWARD_COMMENT).getBoolean(REWARD_DEFAULT);
 

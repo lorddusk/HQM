@@ -1,12 +1,11 @@
 package hardcorequesting.commands;
 
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Lang;
-import hardcorequesting.QuestingData;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.bag.GroupTier;
-import hardcorequesting.parsing.QuestAdapter;
+import hardcorequesting.io.SaveHandler;
+import hardcorequesting.io.adapter.QuestAdapter;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
 import hardcorequesting.reputation.Reputation;
@@ -18,21 +17,12 @@ import net.minecraft.util.text.translation.I18n;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class CommandLoad extends CommandBase {
-    private static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern BAGS = Pattern.compile(".*bags\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern REPUTATIONS = Pattern.compile(".*reputations\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final FileFilter QUEST_SET_FILTER = new FileFilter() {
-        @Override
-        public boolean accept(File pathname) {
-            return JSON.matcher(pathname.getName()).find() && !REPUTATIONS.matcher(pathname.getName()).find() && !BAGS.matcher(pathname.getName()).find();
-        }
-    };
+
 
     public CommandLoad() {
         super("load", "all");
@@ -42,19 +32,18 @@ public class CommandLoad extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         try {
             if (arguments.length == 1 && arguments[0].equals("all")) {
-                loadReputation(sender, getFile("reputations"));
-                for (File file : getPossibleFiles(QUEST_SET_FILTER)) {
+                loadReputation(sender, SaveHandler.getExportFile("reputations"));
+                for (File file : getPossibleFiles(SaveHandler.QUEST_SET_FILTER)) {
                     loadSet(sender, file);
                 }
                 QuestAdapter.postLoad();
             } else if (arguments.length == 1 && arguments[0].equals("bags")) {
-                loadBags(sender, getFile("bags"));
+                loadBags(sender, SaveHandler.getExportFile("bags"));
             } else if (arguments.length > 0) {
                 String file = getCombinedArgs(arguments);
-                loadSet(sender, getFile(file));
+                loadSet(sender, SaveHandler.getExportFile(file));
                 QuestAdapter.postLoad();
             }
-            Quest.FILE_HELPER.saveData(null);
         } catch (IOException e) {
             throw new CommandException(e.getMessage());
         }
@@ -71,9 +60,7 @@ public class CommandLoad extends CommandBase {
         try {
             if (sender instanceof EntityPlayer)
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
-            JsonReader reader = new JsonReader(new FileReader(file));
-            QuestSet set = GSON.fromJson(reader, QuestSet.class);
-            reader.close();
+                QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
                 sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
             } else {
@@ -92,13 +79,11 @@ public class CommandLoad extends CommandBase {
         try {
             if (sender instanceof EntityPlayer)
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
-            JsonReader reader = new JsonReader(new FileReader(file));
-            List<Reputation> reputations = GSON.fromJson(reader, Reputation.getReputationList().getClass());
-            reader.close();
-            Reputation.getReputationList().clear();
+            List<Reputation> reputations = SaveHandler.loadReputations(file);
+            Reputation.clear();
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
-                    Reputation.getReputationList().add(reputation);
+                    Reputation.addReputation(reputation);
                     sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
                 } else {
                     throw new CommandException(Lang.LOAD_FAILED);
@@ -117,10 +102,7 @@ public class CommandLoad extends CommandBase {
         try {
             if (sender instanceof EntityPlayer)
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
-            JsonReader reader = new JsonReader(new FileReader(file));
-            List<GroupTier> bags = GSON.fromJson(reader, new TypeToken<List<GroupTier>>() {
-            }.getType());
-            reader.close();
+            List<GroupTier> bags = SaveHandler.loadBags(file);
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
@@ -139,7 +121,7 @@ public class CommandLoad extends CommandBase {
         String text = getCombinedArgs(args);
         Pattern pattern = Pattern.compile("^" + Pattern.quote(text), Pattern.CASE_INSENSITIVE);
         List<String> results = super.addTabCompletionOptions(sender, args);
-        for (File file : getPossibleFiles(QUEST_SET_FILTER)) {
+        for (File file : getPossibleFiles(SaveHandler.QUEST_SET_FILTER)) {
             if (pattern.matcher(file.getName()).find()) results.add(file.getName().replace(".json", ""));
         }
         return results;
@@ -147,7 +129,7 @@ public class CommandLoad extends CommandBase {
 
     @Override
     public boolean isVisible(ICommandSender sender) {
-        return Quest.isEditing && QuestingData.hasData(sender.getName()) && super.isVisible(sender);
+        return Quest.isEditing && sender instanceof EntityPlayer && QuestingData.hasData(((EntityPlayer) sender)) && super.isVisible(sender);
     }
 
     @Override

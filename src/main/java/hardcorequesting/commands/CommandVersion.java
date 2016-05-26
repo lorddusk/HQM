@@ -1,7 +1,7 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.ModInformation;
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 
 public class CommandVersion extends CommandBase {

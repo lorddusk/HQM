@@ -1,14 +1,19 @@
 package hardcorequesting.quests;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.QuestingData;
-import hardcorequesting.bag.Group;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.death.DeathStats;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.sounds.SoundHandler;
-import hardcorequesting.network.*;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.DeathStatsMessage;
+import hardcorequesting.network.message.FullSyncMessage;
+import hardcorequesting.reputation.Reputation;
+import hardcorequesting.team.Team;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import hardcorequesting.bag.Group;
+import hardcorequesting.bag.GroupTier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -18,27 +23,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QuestLine {
-
-    public QuestLine() {
-        tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
-        tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
-        tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
-        tiers.add(new GroupTier("Uncommon", GuiColor.BLUE, 5, 10, 15, 20, 25));
-        tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
-        tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
+public class QuestLine
+{
+    public QuestLine()
+    {
+        GroupTier.initBaseTiers(this);
     }
 
-
     public List<QuestSet> questSets;
-    public Map<Short, Quest> quests;
-    public int questCount;
+    public HashMap<String, Quest> quests;
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
-    public final List<GroupTier> tiers = new ArrayList<GroupTier>();
-    public final Map<Integer, Group> groups = new HashMap<Integer, Group>();
-    public final List<Group> groupList = new ArrayList<Group>();
-    public int groupCount;
+    public final List<GroupTier> tiers = new ArrayList<>();
+    public final Map<String, Group> groups = new HashMap<>();
     public String mainPath;
     @SideOnly(Side.CLIENT)
     public ResourceLocation front;
@@ -47,60 +44,93 @@ public class QuestLine {
     private static QuestLine server;
     private static QuestLine world;
 
-    public static QuestLine getActiveQuestLine() {
+    public static QuestLine getActiveQuestLine()
+    {
         return server != null ? server : world != null ? world : config;
     }
-
 
     private static boolean hasLoadedMainSound;
     public static boolean doServerSync;
 
-    public static void receiveServerSync(DataReader dr) {
-        if (!hasLoadedMainSound) {
+    public static void receiveServerSync(boolean local)
+    {
+        if (!hasLoadedMainSound)
+        {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
         }
-        reset();
         GuiQuestBook.resetBookPosition();
-        if (dr.readBoolean() && !Quest.isEditing) {
+        if (!local)
+        {
+            reset();
             server = new QuestLine();
             server.mainPath = config.mainPath;
-            getActiveQuestLine().quests = new HashMap<Short, Quest>();
-            getActiveQuestLine().questSets = new ArrayList<QuestSet>();
-
-            Quest.loadAll(dr, QuestingData.FILE_VERSION);
-        } else {
-            String path = dr.readString(DataBitHelper.SHORT);
-            if (path != null && new File(path).exists()) {
-                world = new QuestLine();
-                Quest.init(path);
-            }
+            server.quests = new HashMap<>();
+            server.questSets = new ArrayList<>();
         }
+        loadAll(true);
         SoundHandler.loadLoreReading(getActiveQuestLine().mainPath);
     }
 
-    public static void reset() {
+    public static void reset()
+    {
         server = null;
         world = null;
     }
 
-    public static void sendServerSync(EntityPlayer player) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.QUEST_SYNC);
-        dw.writeBoolean(doServerSync);
-        if (doServerSync) {
-            Quest.saveAll(dw);
-        } else {
-            String path = world == null ? null : world.mainPath;
-            dw.writeString(path, DataBitHelper.SHORT);
+    public static void sendServerSync(EntityPlayer player)
+    {
+        if (player instanceof EntityPlayerMP)
+        {
+            if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
+                NetworkManager.sendToPlayer(new FullSyncMessage(true), (EntityPlayerMP) player);
+            else
+            {
+                NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
+            }
         }
-        PacketHandler.sendToRawPlayer(player, dw);
     }
 
-    public static void loadWorldData(File worldPath) {
-        String path = new File(worldPath, "HardcoreQuesting" + File.separator + "Quests").getAbsolutePath() + File.separator;
-        if (new File(path).exists()) {
-            world = new QuestLine();
-            Quest.init(path);
-        }
+    public static void loadWorldData(File worldPath, boolean isClient)
+    {
+        String path = new File(worldPath, "hqm").getAbsolutePath() + File.separator;
+        File pathFile = new File(path);
+        if (!pathFile.exists()) pathFile.mkdirs();
+        world = new QuestLine();
+        init(path, isClient);
+    }
+
+    public static void saveAll()
+    {
+        QuestingData.saveState();
+        DeathStats.saveAll();
+        Reputation.saveAll();
+        GroupTier.saveAll();
+        QuestSet.saveAll();
+        Team.saveAll();
+        QuestingData.saveQuestingData();
+        SaveHelper.onSave();
+    }
+
+    public static void loadAll(boolean isClient)
+    {
+        QuestingData.loadState();
+        DeathStats.loadAll(isClient);
+        Reputation.loadAll();
+        GroupTier.loadAll();
+        Team.loadAll(isClient);
+        QuestSet.loadAll();
+        QuestingData.loadQuestingData();
+        SaveHelper.onLoad();
+    }
+
+    public static void init(String path, boolean isClient)
+    {
+        QuestLine.getActiveQuestLine().mainPath = path;
+        QuestLine.getActiveQuestLine().quests = new HashMap<>();
+        QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
+
+        loadAll(isClient);
     }
 }

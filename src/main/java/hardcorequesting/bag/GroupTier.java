@@ -1,23 +1,23 @@
 package hardcorequesting.bag;
 
-
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTier;
+import hardcorequesting.io.SaveHandler;
+import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.FileVersion;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.*;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.QuestLine;
+import org.apache.logging.log4j.Level;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class GroupTier {
-
-
+public class GroupTier
+{
     private String name;
     private GuiColor color;
     private int[] weights;
@@ -55,36 +55,32 @@ public class GroupTier {
     public void load(GroupTier tier) {
         this.name = tier.name;
         this.color = tier.color;
-        this.weights = Arrays.copyOf(weights, weights.length);
+        this.weights = Arrays.copyOf(tier.weights, tier.weights.length);
     }
 
     public void setColor(GuiColor color) {
         this.color = color;
     }
 
-    public static void saveAll(DataWriter dw) {
-        dw.writeData(QuestLine.getActiveQuestLine().tiers.size(), DataBitHelper.TIER_COUNT);
-        for (GroupTier tier : QuestLine.getActiveQuestLine().tiers) {
-            dw.writeString(tier.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-            dw.writeData(tier.getColor().ordinal(), DataBitHelper.COLOR);
-            for (int weight : tier.weights) {
-                dw.writeData(weight, DataBitHelper.WEIGHT);
-            }
+    public static void saveAll() {
+        try
+        {
+            SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
+        } catch (IOException e)
+        {
+            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
 
-    public static void readAll(DataReader dr, FileVersion version) {
-        QuestLine.getActiveQuestLine().tiers.clear();
-        int count = dr.readData(DataBitHelper.TIER_COUNT);
-        for (int i = 0; i < count; i++) {
-            String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-            GuiColor color = GuiColor.values()[dr.readData(DataBitHelper.COLOR)];
-            int[] weights = new int[BagTier.values().length];
-            for (int j = 0; j < weights.length; j++) {
-                weights[j] = dr.readData(DataBitHelper.WEIGHT);
-            }
-
-            QuestLine.getActiveQuestLine().tiers.add(new GroupTier(name, color, weights));
+    public static void loadAll() {
+        try
+        {
+            Group.getGroups().clear();
+            GroupTier.getTiers().clear();
+            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getLocalFile("bags")));
+        } catch (IOException e)
+        {
+            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
 
@@ -112,7 +108,7 @@ public class GroupTier {
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {
-                            for (Group group : Group.getGroups()) {
+                            for (Group group : Group.getGroups().values()) {
                                 if (group.getTier() == groupTier) {
                                     group.setTier(i == 0 ? tiers.get(1) : tiers.get(0));
                                 }
@@ -127,5 +123,15 @@ public class GroupTier {
                 break;
             }
         }
+    }
+
+    public static void initBaseTiers(QuestLine questLine)
+    {
+        questLine.tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
+        questLine.tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
+        questLine.tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
+        questLine.tiers.add(new GroupTier("Uncommon", GuiColor.BLUE, 5, 10, 15, 20, 25));
+        questLine.tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
+        questLine.tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
     }
 }

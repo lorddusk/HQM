@@ -1,6 +1,6 @@
 package hardcorequesting.quests;
 
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import net.minecraft.entity.player.EntityPlayer;
 

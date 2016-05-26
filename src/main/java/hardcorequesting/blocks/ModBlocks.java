@@ -1,6 +1,6 @@
 package hardcorequesting.blocks;
 
-import hardcorequesting.RegisterHelper;
+import hardcorequesting.util.RegisterHelper;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;

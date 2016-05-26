@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Lang;
 import hardcorequesting.bag.GroupTier;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
 import hardcorequesting.reputation.Reputation;
@@ -13,7 +14,6 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -30,13 +30,13 @@ public class CommandSave extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (arguments.length == 1 && arguments[0].equals("all")) {
             try {
-                save(sender, Reputation.getReputationList(), new TypeToken<List<Reputation>>(){}.getType(), "reputations");
+                save(sender, Reputation.getReputations(), new TypeToken<List<Reputation>>(){}.getType(), "reputations");
                 save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>(){}.getType(), "bags");
             } catch (CommandException ignored) {
             }
             for (QuestSet set : Quest.getQuestSets()) {
                 try {
-                    save(sender, set, new TypeToken<QuestSet>(){}.getType(), set.getName());
+                    save(sender, set, new TypeToken<QuestSet>(){}.getType(), set.getFilename());
                 } catch (CommandException ignored) {
                 }
             }
@@ -86,13 +86,9 @@ public class CommandSave extends CommandBase {
         return true;
     }
 
-    private static void save(ICommandSender sender, Object save, Type type, String name) throws CommandException {
+    private static void save(ICommandSender sender, Object object, Type type, String name) throws CommandException {
         try {
-            File file = getFile(name);
-            if (!file.exists()) file.createNewFile();
-            FileWriter fileWriter = new FileWriter(file);
-            GSON.toJson(save, type, fileWriter);
-            fileWriter.close();
+            File file = SaveHandler.save(SaveHandler.getExportFile(name), object, type);
             sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
         } catch (IOException e) {
             throw new CommandException(Lang.SAVE_FAILED, name);

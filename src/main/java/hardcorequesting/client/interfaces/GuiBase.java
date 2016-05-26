@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;

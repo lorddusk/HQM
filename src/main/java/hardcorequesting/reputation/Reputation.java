@@ -1,76 +1,91 @@
 package hardcorequesting.reputation;
 
+import hardcorequesting.io.SaveHandler;
+import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.FileVersion;
-import hardcorequesting.QuestingData;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.GuiEditMenuReputationValue;
-import hardcorequesting.client.interfaces.GuiEditMenuTextEditor;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationValue;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestTask;
-import hardcorequesting.quests.QuestTaskReputation;
-import hardcorequesting.reward.ReputationReward;
+import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskReputation;
+import hardcorequesting.quests.reward.ReputationReward;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import org.apache.logging.log4j.Level;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 import static hardcorequesting.client.interfaces.GuiQuestBook.selectedReputation;
 
 public class Reputation {
-    private static List<Reputation> reputationList = new ArrayList<Reputation>();
-    private static Map<Integer, Reputation> reputationMap = new HashMap<Integer, Reputation>();
+    private static Map<String, Reputation> reputationMap = new HashMap<>();
 
-    public static List<Reputation> getReputationList() {
-        return reputationList;
+    public static Map<String, Reputation> getReputations()
+    {
+        return reputationMap;
     }
 
-    public static Reputation getReputation(int id) {
+    public static List<Reputation> getReputationList()
+    {
+        return new ArrayList<>(reputationMap.values());
+    }
+
+    public static Reputation getReputation(String id)
+    {
         return reputationMap.get(id);
     }
 
-    public int getId() {
-        return id;
+    public static void clear()
+    {
+        reputationMap.clear();
     }
 
-    private static int count;
+    public static void addReputation(Reputation reputation)
+    {
+        reputationMap.put(reputation.getId(), reputation);
+    }
+
+    public String getId() {
+        return uuid;
+    }
 
     public static int size() {
-        return count;
+        return reputationMap.size();
     }
 
+    private String uuid;
     private String name;
     private ReputationMarker neutral;
     private List<ReputationMarker> markers;
-    private int id;
 
-    public Reputation(String name, String neutralName) {
-        this(count, name, neutralName);
-    }
-
-    private Reputation(int id, String name, String neutralName) {
+    public Reputation(String name, String neutralName)
+    {
+        do {
+        this.uuid = UUID.randomUUID().toString();
+        } while (reputationMap.containsKey(this.uuid));
         this.name = name;
         this.neutral = new ReputationMarker(neutralName, 0, true);
-        markers = new ArrayList<ReputationMarker>();
-        this.id = id;
-        reputationList.add(this);
-        reputationMap.put(id, this);
-        count = Math.max(id + 1, count);
+        this.markers = new ArrayList<>();
+    }
+
+    public Reputation(String id, String name, String neutralName)
+    {
+        this.uuid = id;
+        while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+        this.name = name;
+        this.neutral = new ReputationMarker(neutralName, 0, true);
+        this.markers = new ArrayList<>();
     }
 
     public String getNeutralName() {
@@ -87,11 +102,11 @@ public class Reputation {
     }
 
     public int getValue(EntityPlayer player) {
-        return getValue(QuestingData.getUserName(player));
+        return getValue(QuestingData.getUserUUID(player));
     }
 
-    public int getValue(String playerName) {
-        return QuestingData.getQuestingData(playerName).getTeam().getReputation(this);
+    public int getValue(String uuid) {
+        return QuestingData.getQuestingData(uuid).getTeam().getReputation(this);
     }
 
     private static final int OFFSET_Y = 24;
@@ -100,7 +115,7 @@ public class Reputation {
     public static void drawAll(GuiQuestBook gui, int x, int y, int mX, int mY, final EntityPlayer player) {
         String info = null;
 
-        List<Reputation> reputations = new ArrayList<Reputation>(reputationList);
+        List<Reputation> reputations = getReputationList();
 
         Collections.sort(reputations, new Comparator<Reputation>() {
             @Override
@@ -108,7 +123,6 @@ public class Reputation {
                 return ((Integer) Math.abs(reputation2.getValue(player))).compareTo(Math.abs(reputation1.getValue(player)));
             }
         });
-
 
         int start = gui.reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * gui.reputationDisplayScroll.getScroll()) : 0;
         int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
@@ -402,8 +416,9 @@ public class Reputation {
     @SideOnly(Side.CLIENT)
     public static void drawEditPage(GuiQuestBook gui, int mX, int mY) {
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationList.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationList.size());
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
+            List<Reputation> reputationList = getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
                 int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
@@ -458,31 +473,33 @@ public class Reputation {
     @SideOnly(Side.CLIENT)
     public static void onClick(GuiQuestBook gui, int mX, int mY, EntityPlayer player) {
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationList.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationList.size());
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
+            List<Reputation> reputationList = getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
                 int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
-                String str = reputationList.get(i).name;
+                Reputation reputation = reputationList.get(i);
+                String str = reputation.name;
 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.NORMAL) {
-                        if (reputationList.get(i).equals(selectedReputation)) {
+                        if (reputation.equals(selectedReputation)) {
                             selectedReputation = null;
                         } else {
-                            selectedReputation = reputationList.get(i);
+                            selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputationList.get(i)));
+                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputation));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                        for (Quest quest : Quest.getQuests()) {
+                        for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof QuestTaskReputation) {
                                     QuestTaskReputation reputationTask = (QuestTaskReputation) task;
                                     QuestTaskReputation.ReputationSetting[] settings = reputationTask.getSettings();
                                     for (int j = settings.length - 1; j >= 0; j--) {
                                         QuestTaskReputation.ReputationSetting setting = settings[j];
-                                        if (reputationList.get(i).equals(setting.getReputation())) {
+                                        if (reputation.equals(setting.getReputation())) {
                                             reputationTask.removeSetting(j);
                                         }
                                     }
@@ -493,7 +510,7 @@ public class Reputation {
                             if (rewards != null) {
                                 for (Iterator<ReputationReward> iterator = rewards.iterator(); iterator.hasNext(); ) {
                                     ReputationReward reward = iterator.next();
-                                    if (reputationList.get(i).equals(reward.getReward())) {
+                                    if (reputation.equals(reward.getReward())) {
                                         iterator.remove();
                                     }
                                 }
@@ -501,7 +518,6 @@ public class Reputation {
 
                         }
 
-                        Reputation reputation = reputationList.remove(i);
                         reputationMap.remove(reputation.getId());
                         SaveHelper.add(SaveHelper.EditType.REPUTATION_REMOVE);
                     }
@@ -533,7 +549,7 @@ public class Reputation {
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                        for (Quest quest : Quest.getQuests()) {
+                        for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof QuestTaskReputation) {
                                     QuestTaskReputation reputationTask = (QuestTaskReputation) task;
@@ -590,38 +606,25 @@ public class Reputation {
         return markers.size() >= 2;
     }
 
-    public static void load(DataReader dr, FileVersion version) {
-        reputationList.clear();
+    public static void loadAll() {
         reputationMap.clear();
-        count = 0;
-        if (version.contains(FileVersion.REPUTATION)) {
-            int reputationCount = dr.readData(DataBitHelper.REPUTATION);
-            for (int i = 0; i < reputationCount; i++) {
-                int id = dr.readData(DataBitHelper.REPUTATION);
-                String name = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-                String neutral = dr.readString(DataBitHelper.QUEST_NAME_LENGTH);
-                Reputation reputation = new Reputation(id, name, neutral);
-                int markerCount = dr.readData(DataBitHelper.REPUTATION_MARKER);
-                for (int j = 0; j < markerCount; j++) {
-                    ReputationMarker marker = new ReputationMarker(dr.readString(DataBitHelper.QUEST_NAME_LENGTH), dr.readData(DataBitHelper.REPUTATION_VALUE), false);
-                    reputation.add(marker);
-                }
-                reputation.sort();
-            }
+        try
+        {
+            SaveHandler.loadReputations(SaveHandler.getLocalFile("reputations")).forEach(Reputation::addReputation);
+        } catch (IOException ignored)
+        {
+            FMLLog.log("HQM", Level.INFO, "Failed loading reputations");
         }
     }
 
-    public static void save(DataWriter dw) {
-        dw.writeData(reputationList.size(), DataBitHelper.REPUTATION);
-        for (Reputation reputation : reputationList) {
-            dw.writeData(reputation.getId(), DataBitHelper.REPUTATION);
-            dw.writeString(reputation.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-            dw.writeString(reputation.neutral.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-            dw.writeData(reputation.markers.size(), DataBitHelper.REPUTATION_MARKER);
-            for (ReputationMarker marker : reputation.markers) {
-                dw.writeString(marker.getName(), DataBitHelper.QUEST_NAME_LENGTH);
-                dw.writeData(marker.getValue(), DataBitHelper.REPUTATION_VALUE);
-            }
+    public static void saveAll()
+    {
+        try
+        {
+            SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
+        } catch (IOException e)
+        {
+            FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
         }
     }
 

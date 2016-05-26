@@ -6,6 +6,10 @@ import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
 
 public class ClientProxy extends CommonProxy {
@@ -42,5 +46,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public boolean isServer() {
         return false;
+    }
+
+    @Override
+    public EntityPlayer getPlayer(MessageContext ctx)
+    {
+        return ctx.side == Side.CLIENT ? Minecraft.getMinecraft().thePlayer : super.getPlayer(ctx);
     }
 }
