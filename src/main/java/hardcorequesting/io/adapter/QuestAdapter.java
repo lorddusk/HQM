@@ -384,8 +384,6 @@ public class QuestAdapter {
             String name = null, description = "No description";
             requirementMapping.clear();
             optionMapping.clear();
-            optionLinkMapping.clear();
-            prerequisiteMapping.clear();
             reputationBarList.clear();
             QuestTaskAdapter.taskReputationListMap.clear();
             List<Quest> quests = new ArrayList<>();
@@ -505,6 +503,7 @@ public class QuestAdapter {
                     entry.getKey().addRequirement(quest.getId());
             }
         }
+        prerequisiteMapping.clear();
         for (Map.Entry<Quest, List<String>> entry : optionLinkMapping.entrySet()) {
             for (String link : entry.getValue()) {
                 Quest quest = getQuest(link);
@@ -512,6 +511,7 @@ public class QuestAdapter {
                     entry.getKey().addOptionLink(quest.getId());
             }
         }
+        optionLinkMapping.clear();
         for (Map.Entry<ReputationReward, String> entry : reputationRewardMapping.entrySet()) {
             String rep = entry.getValue();
             Reputation reputation = Reputation.getReputations().get(rep);
@@ -519,6 +519,7 @@ public class QuestAdapter {
                 throw new IOException("Failed to load reputation " + rep);
             entry.getKey().setReward(reputation);
         }
+        reputationRewardMapping.clear();
         for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
             List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();
             for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {
@@ -529,6 +530,8 @@ public class QuestAdapter {
             }
             ReflectionHelper.setPrivateValue(QuestTaskReputation.class, entry.getKey(), reputationSettingList.toArray(new QuestTaskReputation.ReputationSetting[reputationSettingList.size()]), "settings");
         }
+        QuestTaskAdapter.taskReputationListMap.clear();
+        nameToQuestMap.clear();
     }
 
     private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
