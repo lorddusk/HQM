@@ -32,7 +32,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     private static final String NBT_TYPE = "TrackerType";
 
     @Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
         if (quest != null) {
@@ -40,6 +40,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         }
         compound.setInteger(NBT_RADIUS, radius);
         compound.setByte(NBT_TYPE, (byte) type.ordinal());
+        return compound;
     }
 
     @Override
