@@ -6,8 +6,8 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.RegisterHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -17,6 +17,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -33,6 +34,8 @@ public class ItemQuestBook extends Item {
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
+
+
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
         return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
@@ -42,7 +45,8 @@ public class ItemQuestBook extends Item {
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        RegisterHelper.registerItemRenderer(this);
+        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(this.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(this, 1, new ModelResourceLocation(this.getRegistryName(), "inventory"));
     }
 
     @SuppressWarnings("unchecked")
