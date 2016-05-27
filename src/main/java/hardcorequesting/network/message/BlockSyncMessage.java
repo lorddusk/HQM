@@ -1,4 +1,4 @@
-package hardcorequesting.io.adapter;
+package hardcorequesting.network.message;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

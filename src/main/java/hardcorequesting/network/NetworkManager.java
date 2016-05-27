@@ -2,8 +2,8 @@ package hardcorequesting.network;
 
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.ModInformation;
-import hardcorequesting.io.adapter.BlockSyncMessage;
-import hardcorequesting.io.adapter.BlockSyncMessageClient;
+import hardcorequesting.network.message.BlockSyncMessage;
+import hardcorequesting.network.message.BlockSyncMessageClient;
 import hardcorequesting.network.message.*;
 import hardcorequesting.tileentity.IBlockSync;
 import net.minecraft.entity.player.EntityPlayer;
