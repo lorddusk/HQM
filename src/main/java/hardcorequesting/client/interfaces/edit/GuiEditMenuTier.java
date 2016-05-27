@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 

@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces;
 
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ItemBag;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,16 +14,13 @@ import net.minecraft.util.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiReward extends GuiBase
-{
-    private class Reward
-    {
+public class GuiReward extends GuiBase {
+    private class Reward {
         private ItemStack item;
         private int x;
         private int y;
 
-        private Reward(ItemStack item, int x, int y)
-        {
+        private Reward(ItemStack item, int x, int y) {
             this.item = item;
             this.x = x;
             this.y = y;
@@ -53,8 +50,7 @@ public class GuiReward extends GuiBase
     public static final ResourceLocation TEXTURE = ResourceHelper.getResource("reward");
     public static final ResourceLocation C_TEXTURE = ResourceHelper.getResource("c_reward");
 
-    public GuiReward(Group group, int bagTier, EntityPlayer player)
-    {
+    public GuiReward(Group group, int bagTier, EntityPlayer player) {
         this.group = group;
         this.rewards = new ArrayList<>();
 
@@ -123,7 +119,7 @@ public class GuiReward extends GuiBase
             try {
                 drawItem(reward.item, reward.x, reward.y, true);
                 //itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), reward.item, reward.x + left + 1, reward.y + top + 1);
-                itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, reward.item, (reward.x + left + 1), (reward.y + top + 1),"");
+                itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, reward.item, (reward.x + left + 1), (reward.y + top + 1), "");
             } catch (Throwable ignored) {
             }
         }
@@ -166,8 +162,7 @@ public class GuiReward extends GuiBase
         return false;
     }
 
-    public static void open(EntityPlayer player, String groupId, int bag, List<Integer> limits)
-    {
+    public static void open(EntityPlayer player, String groupId, int bag, List<Integer> limits) {
         Group rewardGroup = Group.getGroups().get(groupId);
         int i = 0;
         for (Group group : Group.getGroups().values())

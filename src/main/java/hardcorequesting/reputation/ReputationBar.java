@@ -1,16 +1,16 @@
 package hardcorequesting.reputation;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
+import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -18,13 +18,11 @@ public class ReputationBar {
     private String repId;
     private int x, y, questSet;
 
-    public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet)
-    {
+    public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet) {
         this(reputation.getId(), x, y, questSet.getId());
     }
 
-    public ReputationBar(String repId, int x, int y, int questSet)
-    {
+    public ReputationBar(String repId, int x, int y, int questSet) {
         this.repId = repId;
         this.x = x;
         this.y = y;

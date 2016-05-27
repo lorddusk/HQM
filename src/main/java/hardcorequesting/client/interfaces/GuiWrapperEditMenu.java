@@ -2,9 +2,9 @@ package hardcorequesting.client.interfaces;
 
 
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;

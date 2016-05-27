@@ -1,18 +1,18 @@
 package hardcorequesting.event;
 
+import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathStats;
+import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import hardcorequesting.config.ModConfig;
-import hardcorequesting.quests.QuestLine;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class PlayerTracker {
 
@@ -53,11 +53,10 @@ public class PlayerTracker {
     }
 
 
-    private void sendLoginMessage(EntityPlayer player)
-    {
+    private void sendLoginMessage(EntityPlayer player) {
         player.addChatMessage(new TextComponentString(
                 Translator.translate("hqm.message.hardcore") + " "
-                + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
+                        + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
         ));
 
     }

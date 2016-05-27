@@ -1,7 +1,7 @@
 package hardcorequesting.death;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;

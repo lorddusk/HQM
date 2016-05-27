@@ -14,31 +14,25 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public final class OPBookHelper
-{
-    private OPBookHelper() {}
+public final class OPBookHelper {
+    private OPBookHelper() {
+    }
 
-    public static void reverseQuestCompletion(Quest quest, EntityPlayer subject)
-    {
+    public static void reverseQuestCompletion(Quest quest, EntityPlayer subject) {
         NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, subject));
     }
 
-    public enum OpAction
-    {
-        RESET
-        {
+    public enum OpAction {
+        RESET {
             @Override
-            public void process(String data)
-            {
+            public void process(String data) {
                 fromJson(data);
                 QuestingData.getQuestingData(subject).getTeam().clearProgress();
             }
         },
-        QUEST_COMPLETION
-        {
+        QUEST_COMPLETION {
             @Override
-            public void process(String data)
-            {
+            public void process(String data) {
                 fromJson(data);
                 if (quest != null) {
                     if (quest.isCompleted(subject)) {
@@ -53,13 +47,11 @@ public final class OPBookHelper
 
         public abstract void process(String data);
 
-        public IMessage build(Quest quest, EntityPlayer subject)
-        {
+        public IMessage build(Quest quest, EntityPlayer subject) {
             return new OpActionMessage(this, toJson(quest, subject));
         }
 
-        public void process(EntityPlayer player, String data)
-        {
+        public void process(EntityPlayer player, String data) {
             if (CommandHandler.isOwnerOrOp(player))
                 process(data);
         }
@@ -70,11 +62,9 @@ public final class OPBookHelper
         protected Quest quest;
         protected EntityPlayer subject;
 
-        private static String toJson(Quest quest, EntityPlayer subject)
-        {
+        private static String toJson(Quest quest, EntityPlayer subject) {
             StringWriter stringWriter = new StringWriter();
-            try
-            {
+            try {
                 JsonWriter writer = new JsonWriter(stringWriter);
                 writer.beginObject();
                 if (quest != null)
@@ -83,12 +73,12 @@ public final class OPBookHelper
                     writer.name(SUBJECT).value(subject.getUniqueID().toString());
                 writer.endObject();
                 writer.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
             return stringWriter.toString();
         }
 
-        protected void fromJson(String data)
-        {
+        protected void fromJson(String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             if (root.has(QUEST))
@@ -98,8 +88,7 @@ public final class OPBookHelper
         }
     }
 
-    public static void reset(EntityPlayer player)
-    {
+    public static void reset(EntityPlayer player) {
         NetworkManager.sendToServer(OpAction.RESET.build(null, player));
     }
 }

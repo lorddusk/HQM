@@ -30,18 +30,22 @@ public class CommandSave extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (arguments.length == 1 && arguments[0].equals("all")) {
             try {
-                save(sender, Reputation.getReputations(), new TypeToken<List<Reputation>>(){}.getType(), "reputations");
-                save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>(){}.getType(), "bags");
+                save(sender, Reputation.getReputations(), new TypeToken<List<Reputation>>() {
+                }.getType(), "reputations");
+                save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
+                }.getType(), "bags");
             } catch (CommandException ignored) {
             }
             for (QuestSet set : Quest.getQuestSets()) {
                 try {
-                    save(sender, set, new TypeToken<QuestSet>(){}.getType(), set.getFilename());
+                    save(sender, set, new TypeToken<QuestSet>() {
+                    }.getType(), set.getFilename());
                 } catch (CommandException ignored) {
                 }
             }
         } else if (arguments.length == 1 && arguments[0].equals("bags")) {
-            save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>(){}.getType(), "bags");
+            save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
+            }.getType(), "bags");
         } else if (arguments.length > 0) {
             for (QuestSet set : Quest.getQuestSets()) {
                 String[] name = set.getName().split(" ");
@@ -51,10 +55,12 @@ public class CommandSave extends CommandBase {
                         fileName += subName + " ";
                     }
                     fileName = fileName.substring(0, fileName.length() - 1);
-                    save(sender, set, new TypeToken<QuestSet>(){}.getType(), fileName);
+                    save(sender, set, new TypeToken<QuestSet>() {
+                    }.getType(), fileName);
                     return;
                 } else if (name.length == arguments.length && stringsMatch(name, arguments)) {
-                    save(sender, set, new TypeToken<QuestSet>(){}.getType(), set.getName());
+                    save(sender, set, new TypeToken<QuestSet>() {
+                    }.getType(), set.getName());
                     return;
                 }
             }

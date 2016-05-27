@@ -1,20 +1,19 @@
 package hardcorequesting.config;
 
+import hardcorequesting.ModInformation;
+import hardcorequesting.items.ItemBag;
+import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.RewardSetting;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import hardcorequesting.ModInformation;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.items.ItemBag;
-import hardcorequesting.quests.QuestLine;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
 
 public class ModConfig {
     private static final String CATEGORY_GENERAL = "General";

@@ -28,12 +28,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class ItemBag extends Item
-{
+public class ItemBag extends Item {
     public static boolean displayGui;
 
-    public ItemBag()
-    {
+    public ItemBag() {
         super();
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
@@ -63,7 +61,6 @@ public class ItemBag extends Item
     }
 
 
-
     @Override
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
@@ -86,10 +83,8 @@ public class ItemBag extends Item
                 }
                 if (totalWeight > 0) {
                     int rng = (int) (Math.random() * totalWeight);
-                    for (Group group : Group.getGroups().values())
-                    {
-                        if (group.isValid(player))
-                        {
+                    for (Group group : Group.getGroups().values()) {
+                        if (group.isValid(player)) {
                             int weight = group.getTier().getWeights()[dmg];
                             if (rng < weight) {
                                 group.open(player);
@@ -114,8 +109,7 @@ public class ItemBag extends Item
         return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
-    private void openClientInterface(EntityPlayer player, String id, int bag)
-    {
+    private void openClientInterface(EntityPlayer player, String id, int bag) {
         List<String> data = new ArrayList<>();
         data.add(id);
         data.add("" + bag);

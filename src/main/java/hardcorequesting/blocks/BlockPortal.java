@@ -1,10 +1,10 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.util.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityPortal;
+import hardcorequesting.util.Translator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

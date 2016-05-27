@@ -4,14 +4,14 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.ScrollBar;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiEditMenuDeath extends GuiEditMenu {
@@ -91,14 +91,12 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
         DeathStats stats = getStats();
 
-        if (stats != null)
-        {
+        if (stats != null) {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            for (int i = 0; i < DeathType.values().length; i++)
-            {
+            for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
 
@@ -109,8 +107,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             gui.drawString(stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
             gui.drawString(Translator.translate("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
 
-            for (int i = 0; i < DeathType.values().length; i++)
-            {
+            for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
 

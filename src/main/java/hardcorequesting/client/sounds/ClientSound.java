@@ -1,10 +1,10 @@
 package hardcorequesting.client.sounds;
 
+import net.minecraft.client.audio.PositionedSound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.audio.PositionedSound;
-import net.minecraft.util.ResourceLocation;
 
 @SideOnly(Side.CLIENT)
 public class ClientSound extends PositionedSound {

@@ -7,13 +7,13 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTracker;
 import hardcorequesting.network.NetworkManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ITickable;
 import hardcorequesting.quests.Quest;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -122,14 +122,12 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         return quest;
     }
 
-    public void openInterface(EntityPlayer player)
-    {
+    public void openInterface(EntityPlayer player) {
         if (player instanceof EntityPlayerMP)
             NetworkManager.sendToPlayer(GuiType.TRACKER.build(build()), (EntityPlayerMP) player);
     }
 
-    private String[] build()
-    {
+    private String[] build() {
         String[] data = new String[4];
         data[0] = "" + pos.toLong();
         data[1] = quest != null ? quest.getId() : null;
@@ -138,18 +136,15 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         return data;
     }
 
-    private static TileEntityTracker getTracker(World world, BlockPos pos)
-    {
+    private static TileEntityTracker getTracker(World world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         return (te instanceof TileEntityTracker) ? (TileEntityTracker) te : null;
     }
 
     @SideOnly(Side.CLIENT)
-    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type)
-    {
+    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type) {
         TileEntityTracker tracker = getTracker(player.worldObj, pos);
-        if (tracker != null)
-        {
+        if (tracker != null) {
             tracker.questId = questId;
             tracker.quest = null;
             tracker.radius = radius;
@@ -161,16 +156,13 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     }
 
 
-    public void sendToServer()
-    {
+    public void sendToServer() {
         NetworkManager.sendToServer(ClientChange.TRACKER_UPDATE.build(this));
     }
 
-    public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type)
-    {
+    public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
         TileEntityTracker tracker = getTracker(player.worldObj, pos);
-        if (Quest.isEditing && tracker != null)
-        {
+        if (Quest.isEditing && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;
         }

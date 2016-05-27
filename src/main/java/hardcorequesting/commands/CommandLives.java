@@ -1,8 +1,8 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.Lang;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.config.ModConfig;
+import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;

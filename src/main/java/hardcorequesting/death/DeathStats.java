@@ -1,10 +1,10 @@
 package hardcorequesting.death;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
@@ -14,8 +14,7 @@ import org.apache.logging.log4j.Level;
 import java.io.IOException;
 import java.util.*;
 
-public class DeathStats
-{
+public class DeathStats {
     private static Map<String, DeathStats> deathMap;
     private static DeathStats[] clientDeathList;
     private static DeathStats clientBest;
@@ -32,20 +31,24 @@ public class DeathStats
     private String uuid;
     protected int[] deaths = new int[DeathType.values().length];
 
-    public DeathStats(String uuid)
-    {
+    public DeathStats(String uuid) {
         this.uuid = uuid;
     }
 
-    public String getUuid()
-    {
+    public String getUuid() {
         return uuid;
     }
 
     @SideOnly(Side.CLIENT)
-    public String getName()
-    {
-        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(UUID.fromString(uuid)).getDisplayNameString();
+    public String getName() {
+        if (Minecraft.getMinecraft().theWorld != null) {
+            try {
+                UUID uuid = UUID.fromString(this.uuid);
+                return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(uuid).getDisplayNameString();
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return this.uuid;
     }
 
     public String getDescription(int id) {
@@ -57,9 +60,9 @@ public class DeathStats
         resync();
     }
 
-    public void increaseDeath(int id, int count) {
+    public void increaseDeath(int id, int count, boolean resync) {
         deaths[id] += count;
-        resync();
+        if (resync) resync();
     }
 
     private int totalDeaths = -1;
@@ -74,32 +77,25 @@ public class DeathStats
         return totalDeaths;
     }
 
-    public static List<DeathStats> getDeathStatsList()
-    {
+    public static List<DeathStats> getDeathStatsList() {
         return new ArrayList<>(deathMap.values());
     }
 
-    public static void loadAll(boolean isClient)
-    {
+    public static void loadAll(boolean isClient) {
         deathMap = new HashMap<>();
-        try
-        {
+        try {
             for (DeathStats stats : SaveHandler.loadDeaths(SaveHandler.getLocalFile("deaths")))
                 deathMap.put(stats.uuid, stats);
             if (isClient) updateClientDeathList();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void saveAll()
-    {
-        try
-        {
+    public static void saveAll() {
+        try {
             SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving bags");
         }
     }
@@ -108,8 +104,7 @@ public class DeathStats
         return deaths[id];
     }
 
-    public static void resync()
-    {
+    public static void resync() {
         NetworkManager.sendToAllPlayers(new DeathStatsMessage("TIMESTAMP"));
     }
 
@@ -140,12 +135,10 @@ public class DeathStats
         }
     }
 
-    private static void updateClientDeathList()
-    {
+    private static void updateClientDeathList() {
         clientDeathList = new DeathStats[deathMap.size()];
         int id = 0;
-        for (DeathStats deathStats : deathMap.values())
-        {
+        for (DeathStats deathStats : deathMap.values()) {
             deathStats.totalDeaths = -1;
             clientDeathList[id++] = deathStats;
         }
@@ -158,8 +151,7 @@ public class DeathStats
 
     public static DeathStats getDeathStats(String uuid) {
         DeathStats stats = deathMap.get(uuid);
-        if (stats == null)
-        {
+        if (stats == null) {
             stats = new DeathStats(uuid);
             deathMap.put(uuid, stats);
         }
@@ -179,12 +171,10 @@ public class DeathStats
             super("hqm.deathStat.worstPlayers");
             for (int i = 0; i < messages.length; i++) {
                 Arrays.sort(clientDeathList, deathTypeComparator[i]);
-                if (clientDeathList.length < 1)
-                {
+                if (clientDeathList.length < 1) {
                     deaths[i] = 0;
                     messages[i] = GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied");
-                } else
-                {
+                } else {
                     deaths[i] = clientDeathList[0].getDeaths(i);
                     messages[i] = "";
                     int currentValue = 0;
@@ -215,8 +205,7 @@ public class DeathStats
         }
 
         @Override
-        public String getName()
-        {
+        public String getName() {
             return Translator.translate(getUuid());
         }
     }
@@ -246,8 +235,7 @@ public class DeathStats
         }
 
         @Override
-        public String getName()
-        {
+        public String getName() {
             return Translator.translate(getUuid());
         }
     }

@@ -1,14 +1,14 @@
 package hardcorequesting.event;
 
 import hardcorequesting.quests.QuestingData;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import hardcorequesting.quests.task.QuestTask;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,14 +104,12 @@ public class EventHandler {
     }
 
 
-    public static class BookOpeningEvent
-    {
+    public static class BookOpeningEvent {
         private String playerName;
         private boolean isOpBook;
         private boolean isRealName;
 
-        public BookOpeningEvent(String playerName, boolean isOpBook, boolean isRealName)
-        {
+        public BookOpeningEvent(String playerName, boolean isOpBook, boolean isRealName) {
             this.playerName = playerName;
             this.isOpBook = isOpBook;
             this.isRealName = isRealName;

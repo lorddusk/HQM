@@ -1,8 +1,8 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskMob;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;

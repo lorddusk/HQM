@@ -1,13 +1,13 @@
 package hardcorequesting.items;
 
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiType;
+import hardcorequesting.commands.CommandHandler;
+import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.RegisterHelper;
 import hardcorequesting.util.Translator;
-import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.commands.CommandHandler;
-import hardcorequesting.network.NetworkManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -21,6 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ItemQuestBook extends Item {
 
@@ -67,7 +68,14 @@ public class ItemQuestBook extends Item {
                 if (item.getItemDamage() == 1) {
                     NBTTagCompound compound = item.getTagCompound();
                     if (compound != null && compound.hasKey(NBT_PLAYER)) {
-                        String uuid = compound.getString(NBT_PLAYER);
+                        String uuidS = compound.getString(NBT_PLAYER);
+                        UUID uuid;
+                        try {
+                            uuid = UUID.fromString(uuidS);
+                        } catch (IllegalArgumentException e) {
+                            compound.removeTag(NBT_PLAYER);
+                            return new ActionResult<>(EnumActionResult.FAIL, item);
+                        }
                         if (QuestingData.hasData(uuid) && CommandHandler.isOwnerOrOp(player)) {
                             EntityPlayer subject = QuestingData.getPlayer(uuid);
                             if (subject instanceof EntityPlayerMP)

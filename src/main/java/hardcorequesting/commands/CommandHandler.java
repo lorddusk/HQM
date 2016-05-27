@@ -2,8 +2,10 @@ package hardcorequesting.commands;
 
 import com.mojang.authlib.GameProfile;
 import hardcorequesting.Lang;
-import net.minecraft.command.*;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.CommandNotFoundException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;

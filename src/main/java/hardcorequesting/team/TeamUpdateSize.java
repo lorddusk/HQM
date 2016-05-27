@@ -1,7 +1,6 @@
 package hardcorequesting.team;
 
-public enum TeamUpdateSize
-{
+public enum TeamUpdateSize {
     ALL,
     ONLY_MEMBERS,
     ONLY_INVITES,

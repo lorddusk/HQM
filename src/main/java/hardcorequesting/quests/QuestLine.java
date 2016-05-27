@@ -1,21 +1,21 @@
 package hardcorequesting.quests;
 
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.bag.Group;
+import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.sounds.SoundHandler;
+import hardcorequesting.death.DeathStats;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
+import hardcorequesting.util.SaveHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.bag.Group;
-import hardcorequesting.bag.GroupTier;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ResourceLocation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,10 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QuestLine
-{
-    public QuestLine()
-    {
+public class QuestLine {
+    public QuestLine() {
         GroupTier.initBaseTiers(this);
     }
 
@@ -44,24 +42,20 @@ public class QuestLine
     private static QuestLine server;
     private static QuestLine world;
 
-    public static QuestLine getActiveQuestLine()
-    {
+    public static QuestLine getActiveQuestLine() {
         return server != null ? server : world != null ? world : config;
     }
 
     private static boolean hasLoadedMainSound;
     public static boolean doServerSync;
 
-    public static void receiveServerSync(boolean local)
-    {
-        if (!hasLoadedMainSound)
-        {
+    public static void receiveServerSync(boolean local) {
+        if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
         }
         GuiQuestBook.resetBookPosition();
-        if (!local)
-        {
+        if (!local) {
             reset();
             server = new QuestLine();
             server.mainPath = config.mainPath;
@@ -72,28 +66,23 @@ public class QuestLine
         SoundHandler.loadLoreReading(getActiveQuestLine().mainPath);
     }
 
-    public static void reset()
-    {
+    public static void reset() {
         server = null;
         world = null;
     }
 
-    public static void sendServerSync(EntityPlayer player)
-    {
-        if (player instanceof EntityPlayerMP)
-        {
+    public static void sendServerSync(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP) {
             if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
                 NetworkManager.sendToPlayer(new FullSyncMessage(true), (EntityPlayerMP) player);
-            else
-            {
+            else {
                 NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), (EntityPlayerMP) player);
                 NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
             }
         }
     }
 
-    public static void loadWorldData(File worldPath, boolean isClient)
-    {
+    public static void loadWorldData(File worldPath, boolean isClient) {
         String path = new File(worldPath, "hqm").getAbsolutePath() + File.separator;
         File pathFile = new File(path);
         if (!pathFile.exists()) pathFile.mkdirs();
@@ -101,8 +90,7 @@ public class QuestLine
         init(path, isClient);
     }
 
-    public static void saveAll()
-    {
+    public static void saveAll() {
         QuestingData.saveState();
         DeathStats.saveAll();
         Reputation.saveAll();
@@ -113,8 +101,7 @@ public class QuestLine
         SaveHelper.onSave();
     }
 
-    public static void loadAll(boolean isClient)
-    {
+    public static void loadAll(boolean isClient) {
         QuestingData.loadState();
         DeathStats.loadAll(isClient);
         Reputation.loadAll();
@@ -125,8 +112,7 @@ public class QuestLine
         SaveHelper.onLoad();
     }
 
-    public static void init(String path, boolean isClient)
-    {
+    public static void init(String path, boolean isClient) {
         QuestLine.getActiveQuestLine().mainPath = path;
         QuestLine.getActiveQuestLine().quests = new HashMap<>();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();

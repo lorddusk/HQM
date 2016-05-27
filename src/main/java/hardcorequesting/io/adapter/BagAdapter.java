@@ -80,8 +80,7 @@ public class BagAdapter {
         }
     };
 
-    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>()
-    {
+    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
         private final String ID = "id";
         private final String ITEMS = "items";
         private final String NAME = "name";

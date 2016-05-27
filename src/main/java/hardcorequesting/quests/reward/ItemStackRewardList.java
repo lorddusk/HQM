@@ -18,8 +18,7 @@ public class ItemStackRewardList extends QuestRewardList<ItemStack> {
             addAll(array);
     }
 
-    public void set(int id, ItemStack stack)
-    {
+    public void set(int id, ItemStack stack) {
         set(id, new ItemStackReward(stack));
     }
 

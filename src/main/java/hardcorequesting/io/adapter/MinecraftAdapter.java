@@ -4,8 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +12,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.IOException;
 
@@ -33,7 +33,7 @@ public class MinecraftAdapter {
                 out.nullValue();
                 return;
             }
-            String id = GameData.getItemRegistry().getNameForObject(value.getItem()).toString();
+            String id = value.getItem().getRegistryName().toString();
             out.beginObject();
             out.name(ID).value(id);
             if (value.getItemDamage() != 0) {
@@ -70,29 +70,14 @@ public class MinecraftAdapter {
                 }
             }
             in.endObject();
-            String modid = "minecraft", name = "";
-            int colon = id.indexOf(':');
 
-            if (colon == -1) name = id;
-            else {
-                modid = id.substring(0, colon);
-                name = id.substring(colon + 1);
-            }
-            Item item = getItemFromID(modid, name);
+            Item item = Item.getByNameOrId(id);
             if (item == null) {
                 return null;
             }
             ItemStack result = new ItemStack(item, size, damage);
             result.setTagCompound(tag);
             return result;
-        }
-
-        private Item getItemFromID(String mod, String name) {
-            Block block;
-            Item item;
-            if ((item = GameRegistry.findItem(mod, name)) != null) return item;
-            else if ((block = GameRegistry.findBlock(mod, name)) != null) return Item.getItemFromBlock(block);
-            else return null;
         }
     };
 

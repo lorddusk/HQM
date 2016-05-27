@@ -25,24 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class SoundHandler
-{
-    private SoundHandler() {}
+public class SoundHandler {
+    private SoundHandler() {
+    }
 
     private static List<String> paths = new ArrayList<>();
     private static final String LABEL = "lore";
 
     @SideOnly(Side.CLIENT)
-    public static boolean loadLoreReading(String path)
-    {
+    public static boolean loadLoreReading(String path) {
         loreMusic = false;
         loreNumber = -1;
 
         int index = paths.indexOf(path);
-        if (index == -1)
-        {
-            if (new File(path + "lore.ogg").exists())
-            {
+        if (index == -1) {
+            if (new File(path + "lore.ogg").exists()) {
                 int number = paths.size();
 
                 // Add resource pack to discover lore
@@ -97,35 +94,29 @@ public class SoundHandler
     }
 
 
-    public static void play(Sounds sound, EntityPlayer player)
-    {
+    public static void play(Sounds sound, EntityPlayer player) {
         if (player instanceof EntityPlayerMP)
             NetworkManager.sendToPlayer(ClientChange.SOUND.build(sound), (EntityPlayerMP) player);
     }
 
-    public static void playToAll(Sounds sound)
-    {
+    public static void playToAll(Sounds sound) {
         NetworkManager.sendToAllPlayers(ClientChange.SOUND.build(sound));
     }
 
     @SideOnly(Side.CLIENT)
-    private static ISound play(String sound, float volume, float pitch)
-    {
+    private static ISound play(String sound, float volume, float pitch) {
         return play(new ResourceLocation(ModInformation.SOUNDLOC, sound), volume, pitch);
     }
 
     @SideOnly(Side.CLIENT)
-    private static ISound play(ResourceLocation resource, float volume, float pitch)
-    {
+    private static ISound play(ResourceLocation resource, float volume, float pitch) {
         ISound soundObj = new ClientSound(resource, volume, pitch);
         Minecraft.getMinecraft().getSoundHandler().playSound(soundObj);
         return soundObj;
     }
 
-    public static void stopLoreMusic()
-    {
-        if (isLorePlaying())
-        {
+    public static void stopLoreMusic() {
+        if (isLorePlaying()) {
             new Thread(() ->
             {
                 while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
@@ -136,8 +127,7 @@ public class SoundHandler
         }
     }
 
-    public static boolean isLorePlaying()
-    {
+    public static boolean isLorePlaying() {
         boolean value = loreSound != null && Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(loreSound);
 
         if (!value)
@@ -150,19 +140,16 @@ public class SoundHandler
         return loreMusic;
     }
 
-    public static void handleSoundPacket(Sounds sound)
-    {
+    public static void handleSoundPacket(Sounds sound) {
         play(sound.getSoundName(), 1F, 1F);
     }
 
-    public static void triggerFirstLore()
-    {
+    public static void triggerFirstLore() {
         NetworkManager.sendToServer(ClientChange.LORE.build(null));
         playLoreMusic();
     }
 
-    public static void handleLorePacket(EntityPlayer player)
-    {
+    public static void handleLorePacket(EntityPlayer player) {
         QuestingData.getQuestingData(player).playedLore = true;
     }
 }

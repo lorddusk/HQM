@@ -20,15 +20,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 @SuppressWarnings("Duplicates")
-public enum ClientChange
-{
-    SELECT_QUEST(new ClientUpdater<QuestTask>()
-    {
+public enum ClientChange {
+    SELECT_QUEST(new ClientUpdater<QuestTask>() {
         private static final String PARENT = "parent";
         private static final String TASK = "task";
+
         @Override
-        public IMessage build(QuestTask data) throws IOException
-        {
+        public IMessage build(QuestTask data) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
@@ -40,21 +38,19 @@ public enum ClientChange
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             QuestingData.getQuestingData(player).selectedQuest = root.get(PARENT).getAsString();
             QuestingData.getQuestingData(player).selectedTask = root.get(TASK).getAsInt();
         }
     }),
-    UPDATE_TASK(new ClientUpdater<QuestTask>()
-    {
+    UPDATE_TASK(new ClientUpdater<QuestTask>() {
         private static final String QUEST = "quest";
         private static final String TASK = "task";
+
         @Override
-        public IMessage build(QuestTask questTask) throws IOException
-        {
+        public IMessage build(QuestTask questTask) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
@@ -66,24 +62,22 @@ public enum ClientChange
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             Quest quest = Quest.getQuest(root.get(QUEST).getAsString());
             int task = root.get(TASK).getAsInt();
             if (quest != null && task > -1 && task < quest.getTasks().size())
                 quest.getTasks().get(task).onUpdate(player);
-                quest.getTasks().get(task).onUpdate(player);
+            quest.getTasks().get(task).onUpdate(player);
         }
     }),
-    CLAIM_QUEST(new ClientUpdater<Tuple<String, Integer>>()
-    {
+    CLAIM_QUEST(new ClientUpdater<Tuple<String, Integer>>() {
         private static final String QUEST = "quest";
         private static final String REWARD = "reward";
+
         @Override
-        public IMessage build(Tuple<String, Integer> data) throws IOException
-        {
+        public IMessage build(Tuple<String, Integer> data) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
@@ -95,8 +89,7 @@ public enum ClientChange
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             Quest quest = Quest.getQuest(root.get(QUEST).getAsString());
@@ -104,15 +97,13 @@ public enum ClientChange
                 quest.claimReward(player, root.get(REWARD).getAsInt());
         }
     }),
-    TRACKER_UPDATE(new ClientUpdater<TileEntityTracker>()
-    {
+    TRACKER_UPDATE(new ClientUpdater<TileEntityTracker>() {
         private static final String BLOCK_POS = "blockPos";
         private static final String RADIUS = "radius";
         private static final String TYPE = "trackerType";
 
         @Override
-        public IMessage build(TileEntityTracker data) throws IOException
-        {
+        public IMessage build(TileEntityTracker data) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
@@ -124,8 +115,7 @@ public enum ClientChange
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
@@ -134,61 +124,51 @@ public enum ClientChange
             TileEntityTracker.saveToServer(player, pos, radius, type);
         }
     }),
-    SOUND(new ClientUpdater<Sounds>()
-    {
+    SOUND(new ClientUpdater<Sounds>() {
         @Override
-        public IMessage build(Sounds data) throws IOException
-        {
+        public IMessage build(Sounds data) throws IOException {
             return new ClientUpdateMessage(SOUND, data.ordinal() + "");
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
         }
     }),
-    LORE(new ClientUpdater()
-    {
+    LORE(new ClientUpdater() {
         @Override
-        public IMessage build(Object data) throws IOException
-        {
+        public IMessage build(Object data) throws IOException {
             return new ClientUpdateMessage(LORE, "nothing");
         }
 
         @Override
-        public void parse(EntityPlayer player, String data)
-        {
+        public void parse(EntityPlayer player, String data) {
             SoundHandler.handleLorePacket(player);
         }
     });
 
     private ClientUpdater updater;
-    ClientChange(ClientUpdater updater)
-    {
+
+    ClientChange(ClientUpdater updater) {
         this.updater = updater;
     }
 
-    public void parse(EntityPlayer player, String data)
-    {
+    public void parse(EntityPlayer player, String data) {
         updater.parse(player, data);
     }
 
     @SuppressWarnings("unchecked")
-    public IMessage build(Object data)
-    {
-        try
-        {
+    public IMessage build(Object data) {
+        try {
             return updater.build(data);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             return null;
         }
     }
 
-    public interface ClientUpdater<T>
-    {
+    public interface ClientUpdater<T> {
         IMessage build(T data) throws IOException;
+
         void parse(EntityPlayer player, String data);
     }
 }

@@ -1,17 +1,17 @@
 package hardcorequesting.quests.task;
 
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.data.QuestDataTaskItems;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.event.EventHandler;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.event.EventHandler;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
     public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {

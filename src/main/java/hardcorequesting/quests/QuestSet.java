@@ -1,20 +1,20 @@
 package hardcorequesting.quests;
 
+import hardcorequesting.client.EditMode;
+import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.task.QuestTask;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.util.OPBookHelper;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.*;
-import hardcorequesting.reputation.ReputationBar;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -58,39 +58,30 @@ public class QuestSet {
         reputationBars.removeAll(toRemove);
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getFilename()
-    {
+    public String getFilename() {
         return name.replaceAll(" ", "_");
     }
 
-    public String getName(int i)
-    {
+    public String getName(int i) {
         return (i + 1) + ". " + name;
     }
 
-    public static void loadAll()
-    {
-        try
-        {
+    public static void loadAll() {
+        try {
             SaveHandler.loadAllQuestSets(SaveHandler.getLocalFolder());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
         }
     }
 
-    public static void saveAll()
-    {
-        try
-        {
+    public static void saveAll() {
+        try {
             SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
         }
     }
@@ -132,13 +123,11 @@ public class QuestSet {
         return true;
     }
 
-    public void removeQuest(Quest quest)
-    {
+    public void removeQuest(Quest quest) {
         quests.remove(quest.getId());
     }
 
-    public void addQuest(Quest quest)
-    {
+    public void addQuest(Quest quest) {
         quests.put(quest.getId(), quest);
     }
 

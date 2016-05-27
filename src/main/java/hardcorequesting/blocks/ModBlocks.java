@@ -1,11 +1,11 @@
 package hardcorequesting.blocks;
 
-import hardcorequesting.util.RegisterHelper;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;
 import hardcorequesting.tileentity.TileEntityPortal;
 import hardcorequesting.tileentity.TileEntityTracker;
+import hardcorequesting.util.RegisterHelper;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;

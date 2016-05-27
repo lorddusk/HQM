@@ -1,12 +1,13 @@
 package hardcorequesting.items;
 
-import hardcorequesting.util.RegisterHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
-//import net.minecraft.client.renderer.texture.IIconRegister;
+import hardcorequesting.util.RegisterHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+//import net.minecraft.client.renderer.texture.IIconRegister;
 
 /**
  * Created by Tim on 5/10/2015.

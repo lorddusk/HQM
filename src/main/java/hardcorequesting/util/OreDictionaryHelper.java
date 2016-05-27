@@ -3,7 +3,8 @@ package hardcorequesting.util;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OreDictionaryHelper {
     public static boolean match(ItemStack itemStack1, ItemStack itemStack2) {

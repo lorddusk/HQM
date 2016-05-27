@@ -2,8 +2,7 @@ package hardcorequesting.team;
 
 import hardcorequesting.util.Translator;
 
-public enum LifeSetting
-{
+public enum LifeSetting {
     SHARE("hqm.team.sharedLives.title", "hqm.team.sharedLives.desc"),
     INDIVIDUAL("hqm.team.individualLives.title", "hqm.team.individualLives.desc");
 

@@ -25,8 +25,7 @@ public class TextBoxGroup {
         textBoxes.add(textBox);
     }
 
-    public List<TextBox> getTextBoxes()
-    {
+    public List<TextBox> getTextBoxes() {
         return textBoxes;
     }
 

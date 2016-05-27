@@ -14,29 +14,24 @@ public class QuestDataTaskLocation extends QuestDataTask {
     private static final String COUNT = "count";
     private static final String VISITED = "visited";
 
-    public QuestDataTaskLocation(QuestTask task)
-    {
+    public QuestDataTaskLocation(QuestTask task) {
         super(task);
         this.visited = new boolean[((QuestTaskLocation) task).locations.length];
     }
 
-    protected QuestDataTaskLocation()
-    {
+    protected QuestDataTaskLocation() {
         super();
         this.visited = new boolean[0];
     }
 
     @Override
-    public QuestTaskAdapter.QuestDataType getDataType()
-    {
+    public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.LOCATION;
     }
 
-    public static QuestDataTask construct(JsonReader in)
-    {
+    public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskLocation taskData = new QuestDataTaskLocation();
-        try
-        {
+        try {
             taskData.completed = in.nextBoolean();
             int count = in.nextInt();
             taskData.visited = new boolean[count];
@@ -44,13 +39,13 @@ public class QuestDataTaskLocation extends QuestDataTask {
             for (int i = 0; i < count; i++)
                 taskData.visited[i] = in.nextBoolean();
             in.endArray();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return taskData;
     }
 
     @Override
-    public void write(JsonWriter out) throws IOException
-    {
+    public void write(JsonWriter out) throws IOException {
         super.write(out);
         out.name(COUNT).value(visited.length);
         out.name(VISITED).beginArray();
@@ -60,9 +55,8 @@ public class QuestDataTaskLocation extends QuestDataTask {
     }
 
     @Override
-    public void update(QuestDataTask taskData)
-    {
+    public void update(QuestDataTask taskData) {
         super.update(taskData);
-        this.visited = ((QuestDataTaskLocation)taskData).visited;
+        this.visited = ((QuestDataTaskLocation) taskData).visited;
     }
 }

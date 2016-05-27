@@ -3,14 +3,14 @@ package hardcorequesting.tileentity;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.client.interfaces.GuiBase;
+import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuPortal;
 import hardcorequesting.network.NetworkManager;
+import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
-import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuPortal;
-import hardcorequesting.client.interfaces.GuiWrapperEditMenu;
-import hardcorequesting.quests.Quest;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -262,7 +262,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     @Override
     public void writeData(EntityPlayer player, boolean onServer, int type, JsonWriter writer) throws IOException {
-       switch (type) {
+        switch (type) {
             case 0:
                 if (onServer) {
                     writer.name(QUEST).value(this.quest == null ? null : this.quest.getId());

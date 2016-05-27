@@ -1,23 +1,24 @@
 package hardcorequesting.client.interfaces.edit;
 
+import hardcorequesting.bag.Group;
+import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.client.interfaces.TextBoxLogic;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskLocation;
 import hardcorequesting.quests.task.QuestTaskMob;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
-import hardcorequesting.bag.Group;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiEditMenuTextEditor extends GuiEditMenu {

@@ -21,8 +21,7 @@ import java.util.function.Function;
 
 import static hardcorequesting.io.adapter.QuestAdapter.QUEST;
 
-public class QuestTaskAdapter
-{
+public class QuestTaskAdapter {
     public static QuestTask TASK;
     protected static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
 
@@ -354,8 +353,7 @@ public class QuestTaskAdapter
 
         public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
             Reputation reputation = Reputation.getReputations().get(this.reputation);
-            if (reputation != null)
-            {
+            if (reputation != null) {
                 ReputationMarker lower = null, upper = null;
                 if (this.lower >= 0 && this.lower < reputation.getMarkerCount())
                     lower = reputation.getMarker(this.lower);
@@ -394,13 +392,11 @@ public class QuestTaskAdapter
         }
     }
 
-    public static final TypeAdapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new TypeAdapter<QuestDataTask>()
-    {
+    public static final TypeAdapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new TypeAdapter<QuestDataTask>() {
         private static final String TYPE = "type";
 
         @Override
-        public void write(JsonWriter out, QuestDataTask value) throws IOException
-        {
+        public void write(JsonWriter out, QuestDataTask value) throws IOException {
             out.beginObject();
             out.name(TYPE).value(String.valueOf(value.getDataType()));
             value.write(out);
@@ -408,8 +404,7 @@ public class QuestTaskAdapter
         }
 
         @Override
-        public QuestDataTask read(JsonReader in) throws IOException
-        {
+        public QuestDataTask read(JsonReader in) throws IOException {
             in.beginObject();
             QuestDataTask dataTask = null;
             if (in.hasNext())
@@ -419,8 +414,7 @@ public class QuestTaskAdapter
         }
     };
 
-    public enum QuestDataType
-    {
+    public enum QuestDataType {
         GENERIC(QuestDataTask::construct),
         DEATH(QuestDataTaskDeath::construct),
         ITEMS(QuestDataTaskItems::construct),
@@ -429,13 +423,12 @@ public class QuestTaskAdapter
         REPUTATION_KILL(QuestDataTaskReputationKill::construct);
 
         private Function<JsonReader, QuestDataTask> func;
-        QuestDataType(Function<JsonReader, QuestDataTask> func)
-        {
+
+        QuestDataType(Function<JsonReader, QuestDataTask> func) {
             this.func = func;
         }
 
-        public QuestDataTask construct(JsonReader in)
-        {
+        public QuestDataTask construct(JsonReader in) {
             return func.apply(in);
         }
     }

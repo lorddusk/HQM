@@ -3,7 +3,6 @@ package hardcorequesting.quests.data;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.io.adapter.QuestDataAdapter;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
 import hardcorequesting.quests.task.QuestTask;
 
@@ -16,33 +15,28 @@ public class QuestDataTask {
     public QuestDataTask(QuestTask task) {
     }
 
-    protected QuestDataTask()
-    {
+    protected QuestDataTask() {
 
     }
 
-    public QuestTaskAdapter.QuestDataType getDataType()
-    {
+    public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.GENERIC;
     }
 
-    public static QuestDataTask construct(JsonReader in)
-    {
+    public static QuestDataTask construct(JsonReader in) {
         QuestDataTask data = new QuestDataTask();
-        try
-        {
+        try {
             data.completed = in.nextBoolean();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return data;
     }
 
-    public void write(JsonWriter out) throws IOException
-    {
+    public void write(JsonWriter out) throws IOException {
         out.name(COMPLETED).value(completed);
     }
 
-    public void update(QuestDataTask taskData)
-    {
+    public void update(QuestDataTask taskData) {
         this.completed = taskData.completed;
     }
 }

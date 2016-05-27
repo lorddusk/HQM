@@ -11,30 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TeamStatsMessage implements IMessage
-{
+public class TeamStatsMessage implements IMessage {
     private List<TeamStats> stats;
 
-    public TeamStatsMessage() {}
+    public TeamStatsMessage() {
+    }
 
-    public TeamStatsMessage(Team team)
-    {
+    public TeamStatsMessage(Team team) {
         stats = new ArrayList<>();
         stats.add(team.toStat());
     }
 
-    public TeamStatsMessage(List<Team> teams)
-    {
+    public TeamStatsMessage(List<Team> teams) {
         stats = teams.stream().map(Team::toStat).collect(Collectors.toList());
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
-    {
+    public void fromBytes(ByteBuf buf) {
         int size = buf.readInt();
         stats = new ArrayList<>();
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             int ssize = buf.readInt();
             String name = new String(buf.readBytes(ssize).array());
             int players = buf.readInt();
@@ -45,11 +41,9 @@ public class TeamStatsMessage implements IMessage
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
-    {
+    public void toBytes(ByteBuf buf) {
         buf.writeInt(stats.size());
-        for (TeamStats teamStats : stats)
-        {
+        for (TeamStats teamStats : stats) {
             buf.writeInt(teamStats.getName().getBytes().length);
             buf.writeBytes(teamStats.getName().getBytes());
             buf.writeInt(teamStats.getPlayers());
@@ -58,11 +52,9 @@ public class TeamStatsMessage implements IMessage
         }
     }
 
-    public static class Handler implements IMessageHandler<TeamStatsMessage, IMessage>
-    {
+    public static class Handler implements IMessageHandler<TeamStatsMessage, IMessage> {
         @Override
-        public IMessage onMessage(TeamStatsMessage message, MessageContext ctx)
-        {
+        public IMessage onMessage(TeamStatsMessage message, MessageContext ctx) {
             if (message.stats.size() == 1)
                 TeamStats.updateTeam(message.stats.get(0));
             else

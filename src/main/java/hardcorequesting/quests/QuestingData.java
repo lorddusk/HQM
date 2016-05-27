@@ -1,18 +1,18 @@
 package hardcorequesting.quests;
 
-import hardcorequesting.death.DeathStats;
-import hardcorequesting.util.Translator;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
+import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.team.TeamUpdateSize;
+import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,8 +32,7 @@ import org.apache.logging.log4j.Level;
 import java.io.IOException;
 import java.util.*;
 
-public class QuestingData
-{
+public class QuestingData {
     private Team team;
     private int lives;
     private String uuid;
@@ -58,10 +57,8 @@ public class QuestingData
         return uuid;
     }
 
-    public String getName()
-    {
-        if (name == null)
-        {
+    public String getName() {
+        if (name == null) {
             EntityPlayer player = QuestingData.getPlayer(uuid);
             if (player != null)
                 name = player.getDisplayNameString();
@@ -69,8 +66,7 @@ public class QuestingData
         return name;
     }
 
-    private QuestingData(String uuid)
-    {
+    private QuestingData(String uuid) {
         this.lives = defaultLives;
         this.uuid = uuid;
         this.team = new Team(uuid);
@@ -79,8 +75,7 @@ public class QuestingData
         data.put(uuid, this);
     }
 
-    public QuestingData(String uuid, int lives, int teamId, Map<String, GroupData> groupData, DeathStats deathStat)
-    {
+    public QuestingData(String uuid, int lives, int teamId, Map<String, GroupData> groupData, DeathStats deathStat) {
         this.uuid = uuid;
         this.lives = lives;
         if (teamId > -1 && teamId < QuestingData.getTeams().size())
@@ -93,31 +88,26 @@ public class QuestingData
         data.put(uuid, this);
     }
 
-    private void createGroupData()
-    {
+    private void createGroupData() {
         groupData = new HashMap<>();
         Group.getGroups().keySet().forEach(this::createGroupData);
     }
 
-    private void createGroupData(String id)
-    {
+    private void createGroupData(String id) {
         groupData.put(id, new GroupData());
     }
 
-    public int getLives()
-    {
+    public int getLives() {
         boolean shareLives = getTeam().isSharingLives();
         return shareLives ? getTeam().getSharedLives() : getRawLives();
     }
 
-    public int getLivesToStayAlive()
-    {
+    public int getLivesToStayAlive() {
         boolean shareLives = getTeam().isSharingLives();
         return shareLives ? getTeam().getPlayerCount() : 1;
     }
 
-    public int getRawLives()
-    {
+    public int getRawLives() {
         return lives;
     }
 
@@ -125,13 +115,11 @@ public class QuestingData
         return getTeam().getQuestData(id);
     }
 
-    public void setQuestData(String id, QuestData data)
-    {
+    public void setQuestData(String id, QuestData data) {
         getTeam().setQuestData(id, data);
     }
 
-    public GroupData getGroupData(String id)
-    {
+    public GroupData getGroupData(String id) {
         if (!groupData.containsKey(id))
             createGroupData(id);
         return groupData.get(id);
@@ -345,47 +333,35 @@ public class QuestingData
         }
     }
 
-    public static void saveState()
-    {
-        try
-        {
+    public static void saveState() {
+        try {
             SaveHandler.saveQuestingState(SaveHandler.getLocalFile("state"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save questing state");
         }
     }
 
-    public static void loadState()
-    {
-        try
-        {
+    public static void loadState() {
+        try {
             SaveHandler.loadQuestingState(SaveHandler.getLocalFile("state"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
         }
     }
 
-    public static void saveQuestingData()
-    {
-        try
-        {
+    public static void saveQuestingData() {
+        try {
             SaveHandler.saveQuestingData(SaveHandler.getLocalFile("data"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save questing data");
         }
     }
 
-    public static void loadQuestingData()
-    {
-        try
-        {
+    public static void loadQuestingData() {
+        try {
             data.clear();
             SaveHandler.loadQuestingData(SaveHandler.getLocalFile("data")).forEach(qData -> data.put(qData.getUuid(), qData));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing data");
         }
     }
@@ -411,13 +387,11 @@ public class QuestingData
         return getQuestingData(getUserUUID(player));
     }
 
-    public static String getUserUUID(EntityPlayer player)
-    {
+    public static String getUserUUID(EntityPlayer player) {
         return player.getGameProfile().getId().toString();
     }
 
-    public static QuestingData getQuestingData(String uuid)
-    {
+    public static QuestingData getQuestingData(String uuid) {
         if (!data.containsKey(uuid))
             new QuestingData(uuid);
 
@@ -456,8 +430,7 @@ public class QuestingData
             item.onCollideWithPlayer(player);
     }
 
-    public Team getTeam()
-    {
+    public Team getTeam() {
         if (!team.isSingle() && !getTeams().isEmpty())
             team = getTeams().get(team.getId());
         return team;
@@ -472,18 +445,15 @@ public class QuestingData
         this.team = team;
     }
 
-    public static EntityPlayer getPlayerFromUsername(String playerName)
-    {
+    public static EntityPlayer getPlayerFromUsername(String playerName) {
         return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
     }
 
-    public static EntityPlayer getPlayer(String uuid)
-    {
+    public static EntityPlayer getPlayer(String uuid) {
         return getPlayer(UUID.fromString(uuid));
     }
 
-    public static EntityPlayer getPlayer(UUID uuid)
-    {
+    public static EntityPlayer getPlayer(UUID uuid) {
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
         return server == null ? null : server.getPlayerList().getPlayerByUUID(uuid);
     }
@@ -492,18 +462,19 @@ public class QuestingData
         data.remove(getUserUUID(player));
     }
 
-    public static boolean hasData(EntityPlayer player)
-    {
+    public static boolean hasData(EntityPlayer player) {
         return data.containsKey(player.getGameProfile().getId().toString());
     }
 
-    public static boolean hasData(String uuid)
-    {
-        return hasData(getPlayer(uuid));
+    public static boolean hasData(UUID uuid) {
+        return data.containsKey(uuid.toString());
     }
 
-    public Map<String, GroupData> getGroupData()
-    {
+    public static boolean hasData(String uuid) {
+        return data.containsKey(uuid);
+    }
+
+    public Map<String, GroupData> getGroupData() {
         return groupData;
     }
 }

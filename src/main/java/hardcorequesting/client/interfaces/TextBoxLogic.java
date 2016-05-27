@@ -1,8 +1,8 @@
 package hardcorequesting.client.interfaces;
 
+import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.util.ChatAllowedCharacters;
 
 import java.util.List;
 

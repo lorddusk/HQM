@@ -17,24 +17,19 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum GuiType
-{
-    NONE
-    {
+public enum GuiType {
+    NONE {
         @Override
-        public IMessage build(String... data)
-        {
+        public IMessage build(String... data) {
             return null;
         }
 
         @Override
-        public void open(EntityPlayer player, String data)
-        {
+        public void open(EntityPlayer player, String data) {
 
         }
     },
-    TRACKER
-    {
+    TRACKER {
         private static final String BLOCK_POS = "blockPos";
         private static final String QUEST = "quest";
         private static final String RADIUS = "radius";
@@ -42,11 +37,9 @@ public enum GuiType
 
 
         @Override
-        public IMessage build(String... data)
-        {
+        public IMessage build(String... data) {
             StringWriter stringWriter = new StringWriter();
-            try
-            {
+            try {
                 JsonWriter writer = new JsonWriter(stringWriter);
                 writer.beginObject();
                 writer.name(BLOCK_POS).value(data[0]);
@@ -54,14 +47,14 @@ public enum GuiType
                 writer.name(RADIUS).value(data[2]);
                 writer.name(TYPE).value(data[3]);
                 writer.endObject();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
 
             return new OpenGuiMessage(this, stringWriter.toString());
         }
 
         @Override
-        public void open(EntityPlayer player, String data)
-        {
+        public void open(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
@@ -72,33 +65,27 @@ public enum GuiType
             TileEntityTracker.openInterface(player, pos, questId, radius, type);
         }
     },
-    BOOK
-    {
+    BOOK {
         @Override
-        public IMessage build(String... data)
-        {
+        public IMessage build(String... data) {
             return new OpenGuiMessage(this, data[0]);
         }
 
         @Override
-        public void open(EntityPlayer player, String data)
-        {
+        public void open(EntityPlayer player, String data) {
             GuiQuestBook.displayGui(player, Boolean.parseBoolean(data));
         }
     },
-    BAG
-    {
+    BAG {
         private static final String GROUP = "group";
         private static final String BAG = "bag";
         private static final String LIMIT = "limit";
 
         @Override
-        public IMessage build(String... data)
-        {
+        public IMessage build(String... data) {
             StringWriter stringWriter = new StringWriter();
 
-            try
-            {
+            try {
                 JsonWriter writer = new JsonWriter(stringWriter);
                 writer.beginObject();
                 writer.name(GROUP).value(data[0]);
@@ -110,8 +97,7 @@ public enum GuiType
                 writer.endArray();
                 writer.endObject();
                 writer.close();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -119,8 +105,7 @@ public enum GuiType
         }
 
         @Override
-        public void open(EntityPlayer player, String data)
-        {
+        public void open(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             String groupId = root.get(GROUP).getAsString();

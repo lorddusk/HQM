@@ -5,9 +5,9 @@ import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.network.message.TeamMessage;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Team
-{
+public class Team {
     private int id = -1;
     private List<PlayerEntry> players = new ArrayList<>();
     private List<Team> invites;
@@ -38,18 +37,15 @@ public class Team
         this.invites = new ArrayList<>();
     }
 
-    public void resetProgress(Quest quest)
-    {
+    public void resetProgress(Quest quest) {
         questData.put(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
     }
 
-    public Map<String, QuestData> getQuestData()
-    {
+    public Map<String, QuestData> getQuestData() {
         return this.questData;
     }
 
-    public TeamStats toStat()
-    {
+    public TeamStats toStat() {
         return new TeamStats(name, getPlayerCount(), getSharedLives(), getProgress());
     }
 
@@ -65,8 +61,7 @@ public class Team
         return (float) completed / total;
     }
 
-    public void receiveAndSyncReputation(Quest quest, List<ReputationReward> reputationList)
-    {
+    public void receiveAndSyncReputation(Quest quest, List<ReputationReward> reputationList) {
         for (ReputationReward reputationReward : reputationList)
             setReputation(reputationReward.getReward(), getReputation(reputationReward.getReward()) + reputationReward.getValue());
 
@@ -86,18 +81,15 @@ public class Team
         return lifeSetting;
     }
 
-    public void setLifeSetting(LifeSetting lifeSetting)
-    {
+    public void setLifeSetting(LifeSetting lifeSetting) {
         this.lifeSetting = lifeSetting;
     }
 
-    public void setRewardSetting(RewardSetting rewardSetting)
-    {
+    public void setRewardSetting(RewardSetting rewardSetting) {
         this.rewardSetting = rewardSetting;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
@@ -105,8 +97,7 @@ public class Team
         return lifeSetting == LifeSetting.SHARE;
     }
 
-    public int getSharedLives()
-    {
+    public int getSharedLives() {
         if (clientTeamLives != -1) {
             return clientTeamLives;
         }
@@ -120,30 +111,23 @@ public class Team
         return lives;
     }
 
-    public int getPlayerCount()
-    {
-        return (int)players.stream().filter(PlayerEntry::isInTeam).count();
+    public int getPlayerCount() {
+        return (int) players.stream().filter(PlayerEntry::isInTeam).count();
     }
 
-    public void addPlayer(PlayerEntry entry)
-    {
+    public void addPlayer(PlayerEntry entry) {
         players.add(entry);
     }
 
-    public void removePlayer(EntityPlayer player)
-    {
+    public void removePlayer(EntityPlayer player) {
         removePlayer(QuestingData.getUserUUID(player));
     }
 
-    public void removePlayer(String playerName)
-    {
+    public void removePlayer(String playerName) {
         int id = 0;
-        for (PlayerEntry player : players)
-        {
-            if (player.isInTeam())
-            {
-                if (player.getUUID().equals(playerName))
-                {
+        for (PlayerEntry player : players) {
+            if (player.isInTeam()) {
+                if (player.getUUID().equals(playerName)) {
                     Team leaveTeam = new Team(playerName);
                     leaveTeam.getPlayers().get(0).setBookOpen(player.isBookOpen());
                     for (String i : questData.keySet()) {
@@ -191,10 +175,8 @@ public class Team
 
     }
 
-    public static void loadAll(boolean isClient)
-    {
-        try
-        {
+    public static void loadAll(boolean isClient) {
+        try {
             QuestingData.getTeams().clear();
             TeamAdapter.clearInvitesMap();
             List<Team> teams = SaveHandler.loadTeams(SaveHandler.getLocalFile("teams"));
@@ -204,38 +186,30 @@ public class Team
             TeamAdapter.commitInvitesMap();
             if (isClient)
                 TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Can't load teams");
         }
     }
 
-    public static void saveAll()
-    {
-        try
-        {
+    public static void saveAll() {
+        try {
             SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving teams");
         }
     }
 
-    public void refreshTeamData(TeamUpdateSize type)
-    {
+    public void refreshTeamData(TeamUpdateSize type) {
         for (PlayerEntry entry : getPlayers())
             refreshTeamData(entry, type);
     }
 
-    private void refreshTeamData(PlayerEntry entry, TeamUpdateSize type)
-    {
+    private void refreshTeamData(PlayerEntry entry, TeamUpdateSize type) {
         Team team = this;
         boolean valid = false;
-        switch (type)
-        {
+        switch (type) {
             case ALL:
-                if (entry.shouldRefreshData())
-                {
+                if (entry.shouldRefreshData()) {
                     valid = true;
                     break; //the break is here on purpose
                 }
@@ -267,8 +241,7 @@ public class Team
     }
 
 
-    public void refreshData()
-    {
+    public void refreshData() {
         for (PlayerEntry entry : getPlayers())
             if (entry.shouldRefreshData())
                 NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), entry.getPlayerMP());
@@ -325,8 +298,7 @@ public class Team
         return players;
     }
 
-    public void create(String name)
-    {
+    public void create(String name) {
         NetworkManager.sendToServer(new TeamMessage(TeamAction.CREATE, name));
     }
 
@@ -363,8 +335,7 @@ public class Team
     }
 
 
-    public boolean isOwner(EntityPlayer player)
-    {
+    public boolean isOwner(EntityPlayer player) {
         return isOwner(QuestingData.getUserUUID(player));
     }
 
@@ -398,7 +369,7 @@ public class Team
 
     private void createReputation() {
         reputation = new HashMap<>();
-        for (Reputation reputation: Reputation.getReputations().values())
+        for (Reputation reputation : Reputation.getReputations().values())
             createReputation(reputation.getId());
     }
 
@@ -423,34 +394,29 @@ public class Team
         reputation.put(id, value);
     }
 
-    private void createQuestData()
-    {
+    private void createQuestData() {
         questData = new HashMap<>();
         Quest.getQuests().keySet().forEach(this::createQuestData);
     }
 
-    private void createQuestData(String id)
-    {
+    private void createQuestData(String id) {
         questData.put(id, Quest.getQuest(id).createData(1));
     }
 
-    public QuestData getQuestData(String id)
-    {
+    public QuestData getQuestData(String id) {
         if (!questData.containsKey(id)) {
             createQuestData(id);
         }
         return questData.get(id);
     }
 
-    public void setQuestData(String id, QuestData data)
-    {
+    public void setQuestData(String id, QuestData data) {
         questData.put(id, data);
     }
 
     public static boolean reloadedInvites;
 
-    public boolean isSingle()
-    {
+    public boolean isSingle() {
         return id == -1;
     }
 
@@ -466,13 +432,11 @@ public class Team
         this.name = name;
     }
 
-    public void setClientTeamLives(int lives)
-    {
+    public void setClientTeamLives(int lives) {
         this.clientTeamLives = lives;
     }
 
-    public void update(Team team)
-    {
+    public void update(Team team) {
         this.name = team.name;
         this.questData = team.questData;
         this.reputation = team.reputation;

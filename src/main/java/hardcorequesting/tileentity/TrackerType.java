@@ -1,13 +1,13 @@
 package hardcorequesting.tileentity;
 
 import com.mojang.authlib.GameProfile;
-import hardcorequesting.team.PlayerEntry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.Translator;
-import hardcorequesting.quests.Quest;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public enum TrackerType {
     TEAM("team") {

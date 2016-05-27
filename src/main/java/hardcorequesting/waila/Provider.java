@@ -4,9 +4,6 @@ package hardcorequesting.waila;
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.BlockPortal;
 import hardcorequesting.blocks.ModBlocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -23,7 +20,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 

@@ -3,6 +3,8 @@ package hardcorequesting.quests.task;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.client.interfaces.GuiBase;
+import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
 import hardcorequesting.quests.Quest;
@@ -13,15 +15,13 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiQuestBook;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -30,8 +30,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class QuestTask
-{
+public abstract class QuestTask {
     protected Quest parent;
     private List<QuestTask> requirements;
     public String description;
@@ -66,12 +65,10 @@ public abstract class QuestTask
         return getData(uuid).completed;
     }
 
-    public boolean isVisible(EntityPlayer player)
-    {
+    public boolean isVisible(EntityPlayer player) {
         Iterator itr = this.requirements.iterator();
         QuestTask requirement;
-        do
-        {
+        do {
             if (!itr.hasNext()) return true;
             requirement = (QuestTask) itr.next();
         } while (requirement.isCompleted(player) && requirement.isVisible(player));
@@ -82,13 +79,11 @@ public abstract class QuestTask
         return QuestDataTask.class;
     }
 
-    public void write(QuestDataTask task, JsonWriter out) throws IOException
-    {
+    public void write(QuestDataTask task, JsonWriter out) throws IOException {
         task.write(out);
     }
 
-    public void read(QuestDataTask task, JsonReader in) throws IOException
-    {
+    public void read(QuestDataTask task, JsonReader in) throws IOException {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
 

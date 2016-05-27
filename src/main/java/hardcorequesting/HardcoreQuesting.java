@@ -1,23 +1,26 @@
 package hardcorequesting;
 
+import hardcorequesting.blocks.ModBlocks;
+import hardcorequesting.commands.CommandHandler;
+import hardcorequesting.config.ConfigHandler;
 import hardcorequesting.event.PlayerDeathEventListener;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.event.WorldEventListener;
+import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
+import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.QuestLine;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
-import hardcorequesting.blocks.ModBlocks;
-import hardcorequesting.commands.CommandHandler;
-import hardcorequesting.config.ConfigHandler;
-import hardcorequesting.items.ModItems;
-import hardcorequesting.proxies.CommonProxy;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import java.io.File;
 
@@ -58,8 +61,7 @@ public class HardcoreQuesting {
     }
 
     @EventHandler
-    public void load(FMLInitializationEvent event)
-    {
+    public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
 
         new WorldEventListener();

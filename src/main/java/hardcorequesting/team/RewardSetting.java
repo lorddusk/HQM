@@ -2,8 +2,7 @@ package hardcorequesting.team;
 
 import hardcorequesting.util.Translator;
 
-public enum RewardSetting
-{
+public enum RewardSetting {
     ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
     ANY("hqm.team.anyReward.title", "hqm.team.anyReward.desc"),
     RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");

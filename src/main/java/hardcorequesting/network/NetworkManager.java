@@ -16,13 +16,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public class NetworkManager
-{
+public class NetworkManager {
     private static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(ModInformation.CHANNEL);
     private static int id = 0;
 
-    public static void init()
-    {
+    public static void init() {
         WRAPPER.registerMessage(OpenGuiMessage.Handler.class, OpenGuiMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(FullSyncMessage.Handler.class, FullSyncMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, Side.CLIENT);
@@ -37,28 +35,23 @@ public class NetworkManager
         WRAPPER.registerMessage(OpActionMessage.Handler.class, OpActionMessage.class, id++, Side.SERVER);
     }
 
-    public static void sendToPlayer(IMessage message, EntityPlayerMP player)
-    {
+    public static void sendToPlayer(IMessage message, EntityPlayerMP player) {
         WRAPPER.sendTo(message, player);
     }
 
-    public static void sendToAllPlayers(IMessage message)
-    {
+    public static void sendToAllPlayers(IMessage message) {
         WRAPPER.sendToAll(message);
     }
 
-    public static void sendToServer(IMessage message)
-    {
+    public static void sendToServer(IMessage message) {
         WRAPPER.sendToServer(message);
     }
 
-    public static void sendToPlayersAround(IMessage message, TileEntity te, double radius)
-    {
+    public static void sendToPlayersAround(IMessage message, TileEntity te, double radius) {
         WRAPPER.sendToAllAround(message, asTarget(te, radius));
     }
 
-    public static NetworkRegistry.TargetPoint asTarget(TileEntity te, double radius)
-    {
+    public static NetworkRegistry.TargetPoint asTarget(TileEntity te, double radius) {
         return new NetworkRegistry.TargetPoint(
                 te.getWorld().provider.getDimension(),
                 te.getPos().getX(),
@@ -68,19 +61,16 @@ public class NetworkManager
         );
     }
 
-    public static <T extends TileEntity & IBlockSync> void sendBlockUpdate(T block, EntityPlayer player, int type)
-    {
+    public static <T extends TileEntity & IBlockSync> void sendBlockUpdate(T block, EntityPlayer player, int type) {
         StringWriter data = new StringWriter();
         boolean onServer = !block.getWorld().isRemote;
-        try
-        {
+        try {
             JsonWriter writer = new JsonWriter(data);
             writer.beginObject();
             block.writeData(player, onServer, type, writer);
             writer.endObject();
             writer.close();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             return;
         }
 

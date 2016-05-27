@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.util.Translator;
-import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.List;
 

@@ -16,40 +16,35 @@ public class QuestDataTaskDeath extends QuestDataTask {
         super(task);
     }
 
-    protected QuestDataTaskDeath()
-    {
+    protected QuestDataTaskDeath() {
         super();
     }
 
     @Override
-    public QuestTaskAdapter.QuestDataType getDataType()
-    {
+    public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.DEATH;
     }
 
-    public static QuestDataTask construct(JsonReader in)
-    {
+    public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskDeath taskData = new QuestDataTaskDeath();
-        try
-        {
+        try {
             taskData.completed = in.nextBoolean();
             taskData.deaths = in.nextInt();
             return taskData;
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return taskData;
     }
 
     @Override
-    public void write(JsonWriter out) throws IOException
-    {
+    public void write(JsonWriter out) throws IOException {
         super.write(out);
         out.name(DEATHS).value(deaths);
     }
 
     @Override
-    public void update(QuestDataTask taskData)
-    {
+    public void update(QuestDataTask taskData) {
         super.update(taskData);
-        this.deaths = ((QuestDataTaskDeath)taskData).deaths;
+        this.deaths = ((QuestDataTaskDeath) taskData).deaths;
     }
 }

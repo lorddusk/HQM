@@ -1,17 +1,17 @@
 package hardcorequesting.quests.task;
 
+import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskDeath;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.event.EventHandler;
 import hardcorequesting.util.Translator;
-import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.GuiQuestBook;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 public class QuestTaskDeath extends QuestTask {

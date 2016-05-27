@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.SaveHelper;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.TriggerType;
+import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTrigger extends GuiEditMenuExtended {

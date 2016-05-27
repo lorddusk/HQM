@@ -1,9 +1,9 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.tileentity.TrackerType;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTracker extends GuiEditMenuExtended {

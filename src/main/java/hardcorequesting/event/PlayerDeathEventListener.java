@@ -33,8 +33,7 @@ public class PlayerDeathEventListener {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPlayerDropItemsOnDeath(PlayerDropsEvent event)
-    {
+    public void onPlayerDropItemsOnDeath(PlayerDropsEvent event) {
         if (event.getEntityPlayer() == null
                 || event.getEntityPlayer() instanceof FakePlayer
                 || event.isCanceled()

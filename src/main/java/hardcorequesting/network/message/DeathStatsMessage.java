@@ -10,22 +10,24 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMessage, IMessage>
-{
+public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMessage, IMessage> {
     private boolean local;
     private String timestamp, deaths;
 
-    public DeathStatsMessage() {}
-    public DeathStatsMessage(boolean local) { this.local = local; }
-    public DeathStatsMessage(String timestamp)
-    {
+    public DeathStatsMessage() {
+    }
+
+    public DeathStatsMessage(boolean local) {
+        this.local = local;
+    }
+
+    public DeathStatsMessage(String timestamp) {
         this.timestamp = timestamp;
         this.deaths = SaveHandler.saveDeaths();
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
-    {
+    public void fromBytes(ByteBuf buf) {
         this.local = buf.readBoolean();
         if (this.local) return;
         int size = buf.readInt();
@@ -33,8 +35,7 @@ public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMe
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
-    {
+    public void toBytes(ByteBuf buf) {
         buf.writeBoolean(this.local);
         if (local) return;
         buf.writeInt(this.deaths.getBytes().length);
@@ -42,15 +43,14 @@ public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMe
     }
 
     @Override
-    public IMessage onMessage(DeathStatsMessage message, MessageContext ctx)
-    {
-        try
-        {
+    public IMessage onMessage(DeathStatsMessage message, MessageContext ctx) {
+        try {
             if (!message.local)
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) { out.print(message.deaths); }
+                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
+                    out.print(message.deaths);
+                }
             DeathStats.loadAll(true);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

@@ -1,13 +1,12 @@
 package hardcorequesting.team;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.TeamErrorMessage;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-public enum TeamError
-{
+public enum TeamError {
     INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
     IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
     USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
@@ -31,8 +30,7 @@ public enum TeamError
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static TeamError latestError;
 
-    public void sendToClient(EntityPlayer player)
-    {
+    public void sendToClient(EntityPlayer player) {
         if (player instanceof EntityPlayerMP)
             NetworkManager.sendToPlayer(new TeamErrorMessage(this), (EntityPlayerMP) player);
     }

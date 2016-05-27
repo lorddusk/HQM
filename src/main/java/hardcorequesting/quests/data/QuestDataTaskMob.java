@@ -9,35 +9,29 @@ import hardcorequesting.quests.task.QuestTaskMob;
 
 import java.io.IOException;
 
-public class QuestDataTaskMob extends QuestDataTask
-{
+public class QuestDataTaskMob extends QuestDataTask {
     public int[] killed;
     private static final String COUNT = "count";
     private static final String KILLED = "killed";
 
-    public QuestDataTaskMob(QuestTask task)
-    {
+    public QuestDataTaskMob(QuestTask task) {
         super(task);
         this.killed = new int[((QuestTaskMob) task).mobs.length];
     }
 
-    protected QuestDataTaskMob()
-    {
+    protected QuestDataTaskMob() {
         super();
         this.killed = new int[0];
     }
 
     @Override
-    public QuestTaskAdapter.QuestDataType getDataType()
-    {
+    public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.MOB;
     }
 
-    public static QuestDataTask construct(JsonReader in)
-    {
+    public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskMob taskData = new QuestDataTaskMob();
-        try
-        {
+        try {
             taskData.completed = in.nextBoolean();
             int count = in.nextInt();
             taskData.killed = new int[count];
@@ -45,13 +39,13 @@ public class QuestDataTaskMob extends QuestDataTask
             for (int i = 0; i < count; i++)
                 taskData.killed[i] = in.nextInt();
             in.endArray();
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
         return taskData;
     }
 
     @Override
-    public void write(JsonWriter out) throws IOException
-    {
+    public void write(JsonWriter out) throws IOException {
         super.write(out);
         out.name(COUNT).value(killed.length);
         out.name(KILLED).beginArray();
@@ -61,9 +55,8 @@ public class QuestDataTaskMob extends QuestDataTask
     }
 
     @Override
-    public void update(QuestDataTask taskData)
-    {
+    public void update(QuestDataTask taskData) {
         super.update(taskData);
-        this.killed = ((QuestDataTaskMob)taskData).killed;
+        this.killed = ((QuestDataTaskMob) taskData).killed;
     }
 }

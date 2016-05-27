@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityPortal;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 

@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.TextBoxGroup;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 

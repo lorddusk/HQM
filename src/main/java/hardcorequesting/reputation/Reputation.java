@@ -1,24 +1,24 @@
 package hardcorequesting.reputation;
 
+import hardcorequesting.client.EditMode;
+import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.ResourceHelper;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationValue;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.io.SaveHandler;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.reward.ReputationReward;
+import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskReputation;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
-import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationValue;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.client.interfaces.ResourceHelper;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.task.QuestTask;
-import hardcorequesting.quests.task.QuestTaskReputation;
-import hardcorequesting.quests.reward.ReputationReward;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -29,28 +29,23 @@ import static hardcorequesting.client.interfaces.GuiQuestBook.selectedReputation
 public class Reputation {
     private static Map<String, Reputation> reputationMap = new HashMap<>();
 
-    public static Map<String, Reputation> getReputations()
-    {
+    public static Map<String, Reputation> getReputations() {
         return reputationMap;
     }
 
-    public static List<Reputation> getReputationList()
-    {
+    public static List<Reputation> getReputationList() {
         return new ArrayList<>(reputationMap.values());
     }
 
-    public static Reputation getReputation(String id)
-    {
+    public static Reputation getReputation(String id) {
         return reputationMap.get(id);
     }
 
-    public static void clear()
-    {
+    public static void clear() {
         reputationMap.clear();
     }
 
-    public static void addReputation(Reputation reputation)
-    {
+    public static void addReputation(Reputation reputation) {
         reputationMap.put(reputation.getId(), reputation);
     }
 
@@ -67,18 +62,16 @@ public class Reputation {
     private ReputationMarker neutral;
     private List<ReputationMarker> markers;
 
-    public Reputation(String name, String neutralName)
-    {
+    public Reputation(String name, String neutralName) {
         do {
-        this.uuid = UUID.randomUUID().toString();
+            this.uuid = UUID.randomUUID().toString();
         } while (reputationMap.containsKey(this.uuid));
         this.name = name;
         this.neutral = new ReputationMarker(neutralName, 0, true);
         this.markers = new ArrayList<>();
     }
 
-    public Reputation(String id, String name, String neutralName)
-    {
+    public Reputation(String id, String name, String neutralName) {
         this.uuid = id;
         while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
             this.uuid = UUID.randomUUID().toString();
@@ -608,22 +601,17 @@ public class Reputation {
 
     public static void loadAll() {
         reputationMap.clear();
-        try
-        {
+        try {
             SaveHandler.loadReputations(SaveHandler.getLocalFile("reputations")).forEach(Reputation::addReputation);
-        } catch (IOException ignored)
-        {
+        } catch (IOException ignored) {
             FMLLog.log("HQM", Level.INFO, "Failed loading reputations");
         }
     }
 
-    public static void saveAll()
-    {
-        try
-        {
+    public static void saveAll() {
+        try {
             SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
         }
     }

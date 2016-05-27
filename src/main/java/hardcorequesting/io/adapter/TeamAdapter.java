@@ -6,7 +6,10 @@ import com.google.gson.stream.JsonWriter;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
-import hardcorequesting.team.*;
+import hardcorequesting.team.LifeSetting;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.RewardSetting;
+import hardcorequesting.team.Team;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,23 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TeamAdapter
-{
+public class TeamAdapter {
     private static Map<Team, List<Integer>> invitesMap = new HashMap<>();
 
-    public static void clearInvitesMap()
-    {
+    public static void clearInvitesMap() {
         invitesMap.clear();
     }
 
-    public static void commitInvitesMap()
-    {
-        if (invitesMap.size() > 0)
-        {
+    public static void commitInvitesMap() {
+        if (invitesMap.size() > 0) {
             Map<Integer, Team> tempMap = new HashMap<>();
             QuestingData.getTeams().stream().filter(team -> team != null).forEach(team -> tempMap.put(team.getId(), team));
-            for (Team team : QuestingData.getTeams())
-            {
+            for (Team team : QuestingData.getTeams()) {
                 List<Integer> invites = invitesMap.get(team);
                 if (invites != null)
                     invites.forEach(id ->
@@ -43,8 +41,7 @@ public class TeamAdapter
         clearInvitesMap();
     }
 
-    public static final TypeAdapter<Team> TEAM_ADAPTER = new TypeAdapter<Team>()
-    {
+    public static final TypeAdapter<Team> TEAM_ADAPTER = new TypeAdapter<Team>() {
         private static final String ID = "id";
         private static final String NAME = "name";
         private static final String LIFE_SETTING = "lifeSetting";
@@ -59,8 +56,7 @@ public class TeamAdapter
         private static final String INVITES = "invites";
 
         @Override
-        public void write(JsonWriter out, Team value) throws IOException
-        {
+        public void write(JsonWriter out, Team value) throws IOException {
             out.beginObject();
             out.name(ID).value(value.getId());
             out.name(NAME).value(value.getName());
@@ -71,8 +67,7 @@ public class TeamAdapter
                 entry.write(out);
             out.endArray();
             out.name(REPUTATIONS).beginArray();
-            for (Reputation reputation : Reputation.getReputations().values())
-            {
+            for (Reputation reputation : Reputation.getReputations().values()) {
                 out.beginObject();
                 out.name(REP_ID).value(reputation.getId());
                 out.name(REP_VAL).value(value.getReputation(reputation));
@@ -80,8 +75,7 @@ public class TeamAdapter
             }
             out.endArray();
             out.name(QUEST_DATA_LIST).beginArray();
-            for (Map.Entry<String, QuestData> data : value.getQuestData().entrySet())
-            {
+            for (Map.Entry<String, QuestData> data : value.getQuestData().entrySet()) {
                 out.beginObject();
                 out.name(QUEST_ID).value(data.getKey());
                 out.name(QUEST_DATA);
@@ -97,15 +91,12 @@ public class TeamAdapter
         }
 
         @Override
-        public Team read(JsonReader in) throws IOException
-        {
+        public Team read(JsonReader in) throws IOException {
             in.beginObject();
             Team team = new Team(null);
             List<Integer> invites = new ArrayList<>();
-            while (in.hasNext())
-            {
-                switch (in.nextName())
-                {
+            while (in.hasNext()) {
+                switch (in.nextName()) {
                     case ID:
                         team.setId(in.nextInt());
                         break;
@@ -126,8 +117,7 @@ public class TeamAdapter
                         break;
                     case REPUTATIONS:
                         in.beginArray();
-                        while (in.hasNext())
-                        {
+                        while (in.hasNext()) {
                             in.beginObject();
                             String id = in.nextString();
                             int val = in.nextInt();
@@ -138,15 +128,12 @@ public class TeamAdapter
                         break;
                     case QUEST_DATA_LIST:
                         in.beginArray();
-                        while (in.hasNext())
-                        {
+                        while (in.hasNext()) {
                             in.beginObject();
                             String id = null;
                             QuestData data = null;
-                            while (in.hasNext())
-                            {
-                                switch (in.nextName())
-                                {
+                            while (in.hasNext()) {
+                                switch (in.nextName()) {
                                     case QUEST_ID:
                                         id = in.nextString();
                                         break;

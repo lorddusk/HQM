@@ -32,8 +32,7 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
     }
 
     @Override
-    public void onUpdate(EntityPlayer player)
-    {
+    public void onUpdate(EntityPlayer player) {
 
     }
 }

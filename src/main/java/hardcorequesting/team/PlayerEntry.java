@@ -2,8 +2,6 @@ package hardcorequesting.team;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.quests.QuestData;
-import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,22 +9,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.server.FMLServerHandler;
 
 import java.io.IOException;
-import java.util.UUID;
 
-public class PlayerEntry
-{
+public class PlayerEntry {
     private String uuid;
     private boolean inTeam;
     private boolean owner;
     private boolean bookOpen;
 
-    private PlayerEntry()
-    {
+    private PlayerEntry() {
 
     }
 
-    public PlayerEntry(String uuid, boolean inTeam, boolean owner)
-    {
+    public PlayerEntry(String uuid, boolean inTeam, boolean owner) {
         this.uuid = uuid;
         this.inTeam = inTeam;
         this.owner = owner;
@@ -38,8 +32,7 @@ public class PlayerEntry
     }
 
     @SideOnly(Side.CLIENT)
-    public String getDisplayName()
-    {
+    public String getDisplayName() {
         return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
     }
 
@@ -83,8 +76,7 @@ public class PlayerEntry
     private static final String BOOK = "bookOpen";
     private static final String IN_TEAM = "inTeam";
 
-    public void write(JsonWriter out) throws IOException
-    {
+    public void write(JsonWriter out) throws IOException {
         out.beginObject();
         out.name(UUID).value(uuid);
         out.name(OWNER).value(owner);
@@ -93,14 +85,11 @@ public class PlayerEntry
         out.endObject();
     }
 
-    public static PlayerEntry read(JsonReader in) throws IOException
-    {
+    public static PlayerEntry read(JsonReader in) throws IOException {
         PlayerEntry playerEntry = new PlayerEntry();
         in.beginObject();
-        while (in.hasNext())
-        {
-            switch (in.nextName())
-            {
+        while (in.hasNext()) {
+            switch (in.nextName()) {
                 case UUID:
                     playerEntry.uuid = in.nextString();
                     break;
@@ -121,14 +110,12 @@ public class PlayerEntry
         return playerEntry;
     }
 
-    public void setInTeam(boolean inTeam)
-    {
+    public void setInTeam(boolean inTeam) {
         this.inTeam = inTeam;
     }
 
     @SideOnly(Side.SERVER)
-    public EntityPlayerMP getPlayerMP()
-    {
+    public EntityPlayerMP getPlayerMP() {
         return FMLServerHandler.instance().getServer().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(this.uuid));
     }
 }

@@ -1,23 +1,24 @@
 package hardcorequesting.bag;
 
+import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.io.SaveHandler;
+import hardcorequesting.quests.QuestLine;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
-import hardcorequesting.client.interfaces.*;
-import hardcorequesting.quests.QuestLine;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class GroupTier
-{
+public class GroupTier {
     private String name;
     private GuiColor color;
     private int[] weights;
@@ -63,23 +64,19 @@ public class GroupTier
     }
 
     public static void saveAll() {
-        try
-        {
+        try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
 
     public static void loadAll() {
-        try
-        {
+        try {
             Group.getGroups().clear();
             GroupTier.getTiers().clear();
             GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getLocalFile("bags")));
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
@@ -125,8 +122,7 @@ public class GroupTier
         }
     }
 
-    public static void initBaseTiers(QuestLine questLine)
-    {
+    public static void initBaseTiers(QuestLine questLine) {
         questLine.tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
         questLine.tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
         questLine.tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));

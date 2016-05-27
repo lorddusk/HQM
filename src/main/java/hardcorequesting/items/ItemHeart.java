@@ -1,6 +1,7 @@
 package hardcorequesting.items;
 
-import hardcorequesting.*;
+import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.ModInformation;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
@@ -45,7 +46,7 @@ public class ItemHeart extends Item {
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
-        for (int i = 0 ; i < HEART_ICONS.length ; i++) {
+        for (int i = 0; i < HEART_ICONS.length; i++) {
             ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + HEART_ICONS[i], "inventory"));
         }
     }

@@ -1,28 +1,28 @@
 package hardcorequesting.bag;
 
+import hardcorequesting.client.EditMode;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
-import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Group
-{
+public class Group {
     public static int size() {
         return QuestLine.getActiveQuestLine().groups.size();
     }
@@ -38,8 +38,7 @@ public class Group
         while (this.uuid == null || getGroups().containsKey(this.uuid)) {
             this.uuid = UUID.randomUUID().toString();
         }
-        if (id == null)
-        {
+        if (id == null) {
             if (GroupTier.getTiers().size() < 1)
                 GroupTier.initBaseTiers(QuestLine.getActiveQuestLine());
             this.tier = GroupTier.getTiers().get(0);
@@ -104,8 +103,7 @@ public class Group
         this.name = name;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return uuid;
     }
 

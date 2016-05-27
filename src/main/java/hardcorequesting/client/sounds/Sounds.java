@@ -19,17 +19,14 @@ public enum Sounds {
 
     private static Map<Sounds, SoundEvent> sounds = new HashMap<>();
 
-    public static void initSounds()
-    {
-        for (Sounds sound : Sounds.values())
-        {
+    public static void initSounds() {
+        for (Sounds sound : Sounds.values()) {
             SoundEvent event = registerSound(new ResourceLocation(ModInformation.ID, sound.getSoundName()));
             sounds.put(sound, event);
         }
     }
 
-    private static SoundEvent registerSound(ResourceLocation sound)
-    {
+    private static SoundEvent registerSound(ResourceLocation sound) {
         SoundEvent event = new SoundEvent(sound).setRegistryName(sound);
         SoundEvent.REGISTRY.register(-1, sound, event);
         return event;

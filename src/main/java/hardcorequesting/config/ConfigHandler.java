@@ -1,9 +1,9 @@
 package hardcorequesting.config;
 
-import net.minecraftforge.common.MinecraftForge;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.quests.Quest;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;

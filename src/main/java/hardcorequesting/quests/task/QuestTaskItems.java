@@ -1,16 +1,16 @@
 package hardcorequesting.quests.task;
 
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;

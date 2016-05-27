@@ -5,15 +5,13 @@ import hardcorequesting.network.message.TeamStatsMessage;
 
 import java.util.*;
 
-public class TeamStats
-{
+public class TeamStats {
     private String name;
     private int players;
     private int lives;
     private float progress;
 
-    public TeamStats(String name, int players, int lives, float progress)
-    {
+    public TeamStats(String name, int players, int lives, float progress) {
         this.name = name;
         this.players = players;
         this.lives = lives;
@@ -25,32 +23,27 @@ public class TeamStats
 
     private static TeamComparator teamComparator = new TeamComparator();
 
-    public static void refreshTeam(Team team)
-    {
+    public static void refreshTeam(Team team) {
         NetworkManager.sendToAllPlayers(new TeamStatsMessage(team));
     }
 
-    private static class TeamComparator implements Comparator<TeamStats>
-    {
+    private static class TeamComparator implements Comparator<TeamStats> {
         @Override
         public int compare(TeamStats o1, TeamStats o2) {
             return ((Float) o2.progress).compareTo(o1.progress);
         }
     }
 
-    public static void updateTeams(List<TeamStats> stats)
-    {
+    public static void updateTeams(List<TeamStats> stats) {
         clientTeams = new HashMap<>();
-        for (TeamStats stat : stats)
-        {
+        for (TeamStats stat : stats) {
             if (stat.getPlayers() > 0)
                 clientTeams.put(stat.name, stat);
         }
         updateTeams();
     }
 
-    public static void updateTeam(TeamStats stat)
-    {
+    public static void updateTeam(TeamStats stat) {
         if (clientTeams == null) clientTeams = new HashMap<>();
         if (stat.getPlayers() > 0)
             clientTeams.put(stat.name, stat);
@@ -59,8 +52,7 @@ public class TeamStats
         updateTeams();
     }
 
-    private static void updateTeams()
-    {
+    private static void updateTeams() {
         clientTeamsList = new TeamStats[clientTeams.size()];
         int id = 0;
         for (TeamStats teamStats : clientTeams.values())

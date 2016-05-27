@@ -1,9 +1,9 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuParentCount extends GuiEditMenuExtended {

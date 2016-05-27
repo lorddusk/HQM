@@ -9,22 +9,19 @@ public class QuestRewardList<T> implements List<QuestReward<T>> {
         this.list = new LinkedList<>();
     }
 
-    public T getReward(int index)
-    {
+    public T getReward(int index) {
         QuestReward<T> reward = get(index);
         return reward == null ? null : reward.getReward();
     }
 
-    public void setReward(int index, T reward)
-    {
+    public void setReward(int index, T reward) {
         QuestReward<T> qReward = get(index);
         if (qReward != null)
             qReward.setReward(reward);
     }
 
     @Override
-    public Object[] toArray()
-    {
+    public Object[] toArray() {
         return list.toArray();
     }
 

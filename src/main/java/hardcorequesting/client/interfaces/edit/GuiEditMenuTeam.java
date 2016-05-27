@@ -1,11 +1,11 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.client.interfaces.*;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
-import hardcorequesting.util.Translator;
 import hardcorequesting.team.TeamError;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;

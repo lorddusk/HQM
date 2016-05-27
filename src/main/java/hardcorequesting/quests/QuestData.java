@@ -6,10 +6,7 @@ import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import net.minecraft.entity.player.EntityPlayer;
 
-import java.util.Arrays;
-
-public class QuestData
-{
+public class QuestData {
     public boolean[] reward;
     public boolean completed;
     public boolean claimed;
@@ -22,8 +19,7 @@ public class QuestData
     }
 
 
-    public boolean getReward(EntityPlayer player)
-    {
+    public boolean getReward(EntityPlayer player) {
         int id = getId(player);
         return !(id >= 0 && id < reward.length) || reward[id];
     }

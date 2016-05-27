@@ -4,13 +4,12 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.TextBoxGroup;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import hardcorequesting.util.SaveHelper;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.util.SaveHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -21,10 +20,12 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class GuiEditMenuItem extends GuiEditMenu {
@@ -89,7 +90,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             if (item != null && item.getItem() != null) {
                 return item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
             } else {
-                List<String> ret = new ArrayList<String>();
+                List<String> ret = new ArrayList<>();
                 ret.add("Unknown");
                 return ret;
             }

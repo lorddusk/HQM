@@ -19,7 +19,7 @@ public class ModItems {
         RegisterHelper.registerItem(invalidItem);
     }
 
-    public static void initRender(){
+    public static void initRender() {
         book.initModel();
         hearts.initModel();
         bags.initModel();

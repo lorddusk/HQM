@@ -1,6 +1,8 @@
 package hardcorequesting.quests;
 
 import hardcorequesting.client.ClientChange;
+import hardcorequesting.client.EditMode;
+import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
@@ -8,24 +10,24 @@ import hardcorequesting.event.EventHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.QuestDataUpdateMessage;
 import hardcorequesting.quests.data.QuestDataTask;
+import hardcorequesting.quests.reward.CommandRewardList;
+import hardcorequesting.quests.reward.ItemStackRewardList;
+import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.quests.task.*;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.*;
-import hardcorequesting.quests.reward.*;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 
 import java.awt.*;
 import java.lang.reflect.Constructor;
@@ -33,16 +35,14 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Quest
-{
+public class Quest {
     public static boolean isEditing = false;
     public static String selectedQuestId;
 
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
 
-    public static Map<String, Quest> getQuests()
-    {
+    public static Map<String, Quest> getQuests() {
         return QuestLine.getActiveQuestLine().quests;
     }
 
@@ -91,8 +91,7 @@ public class Quest
             }
 
             @Override
-            public void onClick(GuiBase gui, EntityPlayer player)
-            {
+            public void onClick(GuiBase gui, EntityPlayer player) {
                 NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<String, Integer>(getId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
             }
         });
@@ -109,7 +108,7 @@ public class Quest
             }
 
             @Override
-            public void onClick(GuiBase gui, EntityPlayer player){
+            public void onClick(GuiBase gui, EntityPlayer player) {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
@@ -236,8 +235,7 @@ public class Quest
                             QuestTask task = constructor.newInstance(this, taskType.getLangKeyName(), taskType.getLangKeyDescription());
 
                             selectedTask.getRequirements().forEach(task::addRequirement);
-                            for (QuestTask questTask : tasks)
-                            {
+                            for (QuestTask questTask : tasks) {
                                 List<QuestTask> requirements = questTask.getRequirements();
                                 for (int j = 0; j < requirements.size(); j++) {
                                     if (requirements.get(j).equals(selectedTask)) {
@@ -301,8 +299,7 @@ public class Quest
         });
     }
 
-    public Quest(String name, String description, int x, int y, boolean isBig)
-    {
+    public Quest(String name, String description, int x, int y, boolean isBig) {
         do {
             this.uuid = UUID.randomUUID().toString();
         } while (getQuests().containsKey(this.uuid));
@@ -324,8 +321,7 @@ public class Quest
         QuestLine.getActiveQuestLine().quests.put(getId(), this);
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         if (getQuestSet() != null)
             getQuestSet().removeQuest(this);
         getQuests().remove(getId());
@@ -359,13 +355,11 @@ public class Quest
         this.rewardChoices.set(rewardChoice);
     }
 
-    public String[] getCommandRewardsAsStrings()
-    {
+    public String[] getCommandRewardsAsStrings() {
         return this.commandRewardList.asStrings();
     }
 
-    public void setCommandRewards(String[] commands)
-    {
+    public void setCommandRewards(String[] commands) {
         this.commandRewardList.set(commands);
     }
 
@@ -411,8 +405,7 @@ public class Quest
         if (lookForId(id, false) || lookForId(id, true)) return;
 
         Quest quest = QuestLine.getActiveQuestLine().quests.get(id);
-        if (quest != null)
-        {
+        if (quest != null) {
             requirement.add(quest.getId());
             quest.reversedRequirement.add(this.getId());
             SaveHelper.add(SaveHelper.EditType.REQUIREMENT_CHANGE);
@@ -475,8 +468,7 @@ public class Quest
         return QuestingData.getQuestingData(uuid).getQuestData(getId());
     }
 
-    public void setQuestData(EntityPlayer player, QuestData data)
-    {
+    public void setQuestData(EntityPlayer player, QuestData data) {
         QuestingData.getQuestingData(player).setQuestData(getId(), data);
     }
 
@@ -644,8 +636,7 @@ public class Quest
         return data != null && data.completed;
     }
 
-    public List<Quest> getRequirements()
-    {
+    public List<Quest> getRequirements() {
         return QuestLine.getActiveQuestLine().quests.values().stream()
                 .filter(quest -> requirement.contains(quest.getId()))
                 .collect(Collectors.toList());
@@ -1253,13 +1244,10 @@ public class Quest
         NetworkManager.sendToPlayer(update, player);
     }
 
-    public void claimReward(EntityPlayer player, int selectedReward)
-    {
-        if (hasReward(player))
-        {
+    public void claimReward(EntityPlayer player, int selectedReward) {
+        if (hasReward(player)) {
             boolean sentInfo = false;
-            if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty()))
-            {
+            if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
                 List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
                     for (ItemStack itemStack : rewards.toArray()) {

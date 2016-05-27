@@ -10,8 +10,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class RegisterHelper
-{
+public class RegisterHelper {
     public static void registerBlock(Block block) {
         GameRegistry.register(block);
     }
@@ -31,7 +30,6 @@ public class RegisterHelper
             throw new RuntimeException(e);
         }
     }
-
 
 
     public static void registerItem(Item item) {

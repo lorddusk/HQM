@@ -1,32 +1,35 @@
 package hardcorequesting.client.interfaces;
 
-import hardcorequesting.client.interfaces.edit.*;
-import hardcorequesting.death.DeathStats;
-import hardcorequesting.team.PlayerEntry;
-import hardcorequesting.team.Team;
-import hardcorequesting.util.OPBookHelper;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.EditButton;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.KeyboardHandler;
+import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
+import hardcorequesting.death.DeathStats;
 import hardcorequesting.items.ModItems;
-import hardcorequesting.quests.*;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestSet;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.Team;
+import hardcorequesting.util.OPBookHelper;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -361,8 +364,7 @@ public class GuiQuestBook extends GuiBase {
         SoundHandler.stopLoreMusic();
     }
 
-    public static void displayGui(EntityPlayer player, boolean isOpBook)
-    {
+    public static void displayGui(EntityPlayer player, boolean isOpBook) {
         if (player != null)
             if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook))
                 Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
@@ -938,8 +940,7 @@ public class GuiQuestBook extends GuiBase {
         return player;
     }
 
-    public void save()
-    {
+    public void save() {
         // TODO send message to server with updated quests
         QuestLine.saveAll();
         SaveHelper.onSave();

@@ -2,12 +2,12 @@ package hardcorequesting.commands;
 
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.Lang;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.QuestAdapter;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -60,7 +60,7 @@ public class CommandLoad extends CommandBase {
         try {
             if (sender instanceof EntityPlayer)
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
-                QuestSet set = SaveHandler.loadQuestSet(file);
+            QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
                 sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
             } else {

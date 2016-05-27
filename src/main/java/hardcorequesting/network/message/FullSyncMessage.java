@@ -14,22 +14,21 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FullSyncMessage implements IMessage
-{
+public class FullSyncMessage implements IMessage {
     private boolean local, questing, hardcore;
     private String timestamp, reputations, bags, teams, data;
     private String[] questsSets, questSetNames;
 
-    public FullSyncMessage() {}
-    public FullSyncMessage(boolean local)
-    {
+    public FullSyncMessage() {
+    }
+
+    public FullSyncMessage(boolean local) {
         this.local = local;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
     }
 
-    public FullSyncMessage(String timestamp)
-    {
+    public FullSyncMessage(String timestamp) {
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
         this.reputations = SaveHandler.saveReputations();
@@ -44,8 +43,7 @@ public class FullSyncMessage implements IMessage
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
-    {
+    public void fromBytes(ByteBuf buf) {
         this.local = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
@@ -61,8 +59,7 @@ public class FullSyncMessage implements IMessage
         size = buf.readInt();
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             int ssize = buf.readInt();
             this.questSetNames[i] = new String(buf.readBytes(ssize).array());
             ssize = buf.readInt();
@@ -72,8 +69,7 @@ public class FullSyncMessage implements IMessage
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
-    {
+    public void toBytes(ByteBuf buf) {
         buf.writeBoolean(this.local);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
@@ -87,8 +83,7 @@ public class FullSyncMessage implements IMessage
         buf.writeInt(this.data.getBytes().length);
         buf.writeBytes(this.data.getBytes());
         buf.writeInt(this.questsSets.length);
-        for (int i = 0; i < this.questsSets.length; i++)
-        {
+        for (int i = 0; i < this.questsSets.length; i++) {
             buf.writeInt(this.questSetNames[i].getBytes().length);
             buf.writeBytes(this.questSetNames[i].getBytes());
             buf.writeInt(this.questsSets[i].getBytes().length);
@@ -96,27 +91,34 @@ public class FullSyncMessage implements IMessage
         }
     }
 
-    public static class Handler implements IMessageHandler<FullSyncMessage, IMessage>
-    {
+    public static class Handler implements IMessageHandler<FullSyncMessage, IMessage> {
         @Override
-        public IMessage onMessage(FullSyncMessage message, MessageContext ctx)
-        {
-            try
-            {
-                if (!message.local)
-                {
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("reputations"))) { out.print(message.reputations); }
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("bags")))  { out.print(message.bags); }
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("teams")))  { out.print(message.teams); }
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data")))  { out.print(message.data); }
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state")))  { out.print(SaveHandler.saveQuestingState(message.questing, message.hardcore)); }
+        public IMessage onMessage(FullSyncMessage message, MessageContext ctx) {
+            try {
+                if (!message.local) {
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("reputations"))) {
+                        out.print(message.reputations);
+                    }
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("bags"))) {
+                        out.print(message.bags);
+                    }
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("teams"))) {
+                        out.print(message.teams);
+                    }
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data"))) {
+                        out.print(message.data);
+                    }
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {
+                        out.print(SaveHandler.saveQuestingState(message.questing, message.hardcore));
+                    }
                     SaveHandler.removeQuestSetFiles(SaveHandler.getRemoteFolder());
                     for (int i = 0; i < message.questsSets.length; i++)
-                        try (PrintWriter out = new PrintWriter(new File(SaveHandler.getRemoteFolder(), message.questSetNames[i])))  { out.print(message.questsSets[i]); }
+                        try (PrintWriter out = new PrintWriter(new File(SaveHandler.getRemoteFolder(), message.questSetNames[i]))) {
+                            out.print(message.questsSets[i]);
+                        }
                 }
                 QuestLine.receiveServerSync(message.local);
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return null;

@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.util.Translator;
 
 public enum TriggerType {
     NONE("none", false, false) {

@@ -3,15 +3,16 @@ package hardcorequesting.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.quests.task.*;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.util.SaveHelper;
 import hardcorequesting.quests.*;
+import hardcorequesting.quests.reward.ReputationReward;
+import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
-import hardcorequesting.quests.reward.ReputationReward;
+import hardcorequesting.util.SaveHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -205,7 +206,7 @@ public class QuestAdapter {
         }
 
         private void writeStringArray(JsonWriter out, String[] list, String name) throws IOException {
-            if(list != null) {
+            if (list != null) {
                 out.name(name).beginArray();
                 for (String s : list) {
                     if (s != null) {
@@ -298,9 +299,9 @@ public class QuestAdapter {
                         in.endArray();
                         break;
                     case REWARDS_COMMAND:
-                            List<String> commands = new ArrayList<>();
-                            readStringArray(commands, in);
-                            QUEST.setCommandRewards(commands.toArray(new String[commands.size()]));
+                        List<String> commands = new ArrayList<>();
+                        readStringArray(commands, in);
+                        QUEST.setCommandRewards(commands.toArray(new String[commands.size()]));
                         break;
                     default:
                         QuestLine.getActiveQuestLine().quests.remove(QUEST.getId());
@@ -517,10 +518,10 @@ public class QuestAdapter {
         }
         for (Map.Entry<ReputationReward, String> entry : reputationRewardMapping.entrySet()) {
             String rep = entry.getValue();
-                Reputation reputation = Reputation.getReputations().get(rep);
-                if (reputation == null)
-                    throw new IOException("Failed to load reputation " + rep);
-                entry.getKey().setReward(reputation);
+            Reputation reputation = Reputation.getReputations().get(rep);
+            if (reputation == null)
+                throw new IOException("Failed to load reputation " + rep);
+            entry.getKey().setReward(reputation);
         }
         for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
             List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();

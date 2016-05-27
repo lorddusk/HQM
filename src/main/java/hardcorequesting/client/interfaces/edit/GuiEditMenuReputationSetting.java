@@ -1,12 +1,12 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;

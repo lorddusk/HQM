@@ -6,16 +6,13 @@ import com.google.gson.stream.JsonWriter;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.QuestingData;
-import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QuestingAdapter
-{
-    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>()
-    {
+public class QuestingAdapter {
+    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>() {
         public static final String TEAM = "team";
         public static final String LIVES = "lives";
         public static final String UUID = "uuid";
@@ -27,8 +24,7 @@ public class QuestingAdapter
         public static final String DEATHS = "deaths";
 
         @Override
-        public void write(JsonWriter out, QuestingData value) throws IOException
-        {
+        public void write(JsonWriter out, QuestingData value) throws IOException {
             out.beginObject();
             out.name(UUID).value(value.getUuid());
             out.name(NAME).value(value.getName());
@@ -48,8 +44,7 @@ public class QuestingAdapter
         }
 
         @Override
-        public QuestingData read(JsonReader in) throws IOException
-        {
+        public QuestingData read(JsonReader in) throws IOException {
             boolean playerLore = false, receivedBook = false;
             String uuid = null, selectedQuest = null;
             int lives = 0, team = -1;
@@ -57,10 +52,8 @@ public class QuestingAdapter
             DeathStats deathStats = null;
 
             in.beginObject();
-            while (in.hasNext())
-            {
-                switch (in.nextName())
-                {
+            while (in.hasNext()) {
+                switch (in.nextName()) {
                     case UUID:
                         uuid = in.nextString();
                         break;

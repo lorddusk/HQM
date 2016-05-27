@@ -1,11 +1,11 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
@@ -23,8 +23,8 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         this.edited = new boolean[this.commands.length];
         this.id = -1;
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
-            if (this.commands.length > 0){
-                this.id = this.commands.length-1;
+            if (this.commands.length > 0) {
+                this.id = this.commands.length - 1;
                 this.text.setTextAndCursor(gui, this.commands[this.id]);
             }
         }
@@ -45,10 +45,9 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
             SaveHelper.add(SaveHelper.EditType.COMMAND_ADD);
         }
         if (this.commands != null) {
-            for (int i = this.commands.length-1; i >= 0; i--) {
+            for (int i = this.commands.length - 1; i >= 0; i--) {
                 if (edited[i]) {
-                    if(commands[i].isEmpty())
-                    {
+                    if (commands[i].isEmpty()) {
                         quest.removeCommand(i);
                         SaveHelper.add(SaveHelper.EditType.COMMAND_REMOVE);
                     } else {
@@ -69,11 +68,11 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
                 if (this.commands[i].isEmpty()) {
                     drawStringTrimmed(gui, Translator.translate("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
                 } else {
-                    drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i]? 0xFF4500 : 0x000000);
+                    drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i] ? 0xFF4500 : 0x000000);
                 }
             }
         }
-        if(this.added != null && !this.added.isEmpty()) {
+        if (this.added != null && !this.added.isEmpty()) {
             drawStringTrimmed(gui, this.added, 190, 65 + (i * 10), 0x447449);
         }
     }
@@ -84,16 +83,16 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
-                if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i+1) * 10)) {
+                if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
                     if (this.commands[i].isEmpty()) {
-                    drawStringTrimmed(gui, Translator.translate("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xF76767);
+                        drawStringTrimmed(gui, Translator.translate("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xF76767);
                     } else {
-                        drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i]? 0xF9AB7A : 0x969696);
+                        drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i] ? 0xF9AB7A : 0x969696);
                     }
                 }
             }
         }
-        if(this.added != null && !this.added.isEmpty()) {
+        if (this.added != null && !this.added.isEmpty()) {
             drawStringTrimmed(gui, this.added, 190, 65 + (i * 10), 0x5A9B60);
         }
     }
@@ -118,7 +117,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
                 }
             }
         }
-        if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i+1) * 10)) {
+        if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
             if (this.id == -1) return;
             if (this.commands != null) this.commands[this.id] = this.text.getText();
             this.id = -1;
@@ -126,7 +125,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         }
     }
 
-    private void drawStringTrimmed(GuiBase gui, String s, int x, int y, int colour){
+    private void drawStringTrimmed(GuiBase gui, String s, int x, int y, int colour) {
         int maxLength = Math.min(25, s.length());
         gui.drawString(s.substring(0, maxLength) + (maxLength < s.length() ? "..." : ""), x, y, colour);
     }

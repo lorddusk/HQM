@@ -1,9 +1,9 @@
 package hardcorequesting.client.interfaces.edit;
 
-import hardcorequesting.util.SaveHelper;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {

@@ -16,8 +16,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
             player.getServer().getCommandManager().executeCommand(player.getServer(), commandString.replaceAll("@p", player.getDisplayNameString()));
         }
 
-        public String asString()
-        {
+        public String asString() {
             return this.commandString;
         }
     }
@@ -26,8 +25,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         super(command);
     }
 
-    public void execute(EntityPlayer player)
-    {
+    public void execute(EntityPlayer player) {
         getReward().execute(player);
     }
 }

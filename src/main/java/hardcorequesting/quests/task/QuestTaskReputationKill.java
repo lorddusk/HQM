@@ -1,12 +1,12 @@
 package hardcorequesting.quests.task;
 
-import hardcorequesting.event.EventHandler;
-import hardcorequesting.util.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskReputationKill;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -58,8 +58,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
 
     @Override
-    public void onUpdate(EntityPlayer player)
-    {
+    public void onUpdate(EntityPlayer player) {
 
     }
 

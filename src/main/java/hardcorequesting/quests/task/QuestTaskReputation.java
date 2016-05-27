@@ -1,18 +1,18 @@
 package hardcorequesting.quests.task;
 
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.data.QuestDataTask;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.SaveHelper;
 import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationSetting;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationSetting;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
+import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
 

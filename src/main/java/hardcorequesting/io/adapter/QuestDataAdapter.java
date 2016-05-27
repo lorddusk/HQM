@@ -8,10 +8,8 @@ import hardcorequesting.quests.data.QuestDataTask;
 
 import java.io.IOException;
 
-public class QuestDataAdapter
-{
-    public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<QuestData>()
-    {
+public class QuestDataAdapter {
+    public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<QuestData>() {
         public static final String PLAYERS = "players";
         public static final String REWARDS = "rewards";
         public static final String COMPLETED = "completed";
@@ -22,8 +20,7 @@ public class QuestDataAdapter
         public static final String TIME = "time";
 
         @Override
-        public void write(JsonWriter out, QuestData value) throws IOException
-        {
+        public void write(JsonWriter out, QuestData value) throws IOException {
             out.beginObject();
             out.name(PLAYERS).value(value.reward.length);
             out.name(REWARDS).beginArray();
@@ -43,15 +40,12 @@ public class QuestDataAdapter
         }
 
         @Override
-        public QuestData read(JsonReader in) throws IOException
-        {
+        public QuestData read(JsonReader in) throws IOException {
             QuestData data = new QuestData(1);
             in.beginObject();
             int i;
-            while (in.hasNext())
-            {
-                switch (in.nextName())
-                {
+            while (in.hasNext()) {
+                switch (in.nextName()) {
                     case PLAYERS:
                         data = new QuestData(in.nextInt());
                         break;
