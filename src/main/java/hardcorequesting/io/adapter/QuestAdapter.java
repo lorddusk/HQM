@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 public class QuestAdapter {
     public static Quest QUEST;
+    private static Map<String, Quest> nameToQuestMap = new HashMap<>();
     private static List<ReputationBar> reputationBarList = new ArrayList<>();
     private static Map<Quest, List<String>> requirementMapping = new HashMap<>();
     private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
@@ -140,8 +141,8 @@ public class QuestAdapter {
             if (value.getIcon() != null) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ICON), value.getIcon());
             }
-            writeQuestList(out, value.getRequirements(), value.getQuestSet(), PREREQUISITES);
-            writeQuestList(out, value.getOptionLinks(), value.getQuestSet(), OPTIONLINKS);
+            writeQuestList(out, value.getRequirements(), PREREQUISITES);
+            writeQuestList(out, value.getOptionLinks(), OPTIONLINKS);
             if (value.getRepeatInfo().getType() != RepeatType.NONE) {
                 REPEAT_INFO_ADAPTER.write(out.name(REPEAT), value.getRepeatInfo());
             }
@@ -176,18 +177,11 @@ public class QuestAdapter {
             out.endObject();
         }
 
-        private String getQuestSaveString(Quest quest, QuestSet set) {
-            if (quest.getQuestSet() == set)
-                return quest.getId();
-            else
-                return "{" + quest.getQuestSet().getName() + "}[" + quest.getId() + "]";
-        }
-
-        private void writeQuestList(JsonWriter out, List<Quest> quests, QuestSet set, String name) throws IOException {
+        private void writeQuestList(JsonWriter out, List<Quest> quests, String name) throws IOException {
             if (!quests.isEmpty()) {
                 out.name(name).beginArray();
                 for (Quest quest : quests) {
-                    out.value(getQuestSaveString(quest, set));
+                    out.value(quest.getId());
                 }
                 out.endArray();
             }
@@ -222,11 +216,13 @@ public class QuestAdapter {
             QUEST = new Quest("Unnamed", "Unnamed quest", 0, 0, false);
             List<String> requirement = new ArrayList<>(), options = new ArrayList<>();
             List<String> prerequisites = new ArrayList<>(), optionLinks = new ArrayList<>();
+            boolean hasUuid = false;
             in.beginObject();
             while (in.hasNext()) {
                 switch (in.nextName().toLowerCase()) {
                     case UUID:
                         QUEST.setId(in.nextString());
+                        hasUuid = true;
                         break;
                     case NAME:
                         QUEST.setName(in.nextString());
@@ -310,6 +306,8 @@ public class QuestAdapter {
             }
             in.endObject();
             if (!QUEST.getId().isEmpty()) {
+                if (!hasUuid)
+                    nameToQuestMap.put(QUEST.getName(), QUEST);
                 optionalAdd(requirementMapping, requirement);
                 optionalAdd(optionMapping, options);
                 optionalAdd(prerequisiteMapping, prerequisites);
@@ -435,11 +433,11 @@ public class QuestAdapter {
                 }
                 for (Map.Entry<Quest, List<String>> entry : requirementMapping.entrySet()) {
                     for (String i : entry.getValue())
-                        entry.getKey().addRequirement(i);
+                        entry.getKey().addRequirement(getUuid(i));
                 }
                 for (Map.Entry<Quest, List<String>> entry : optionMapping.entrySet()) {
                     for (String i : entry.getValue())
-                        entry.getKey().addOptionLink(i);
+                        entry.getKey().addOptionLink(getUuid(i));
                 }
                 for (ReputationBar reputationBar : reputationBarList) {
                     for (ReputationBar r : new ArrayList<>(set.getReputationBars())) {
@@ -499,19 +497,17 @@ public class QuestAdapter {
         }
     };
 
-    private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
-
     public static void postLoad() throws IOException {
         for (Map.Entry<Quest, List<String>> entry : prerequisiteMapping.entrySet()) {
             for (String link : entry.getValue()) {
-                Quest quest = getQuest(link, entry.getKey().getQuestSet());
+                Quest quest = getQuest(link);
                 if (quest != null)
                     entry.getKey().addRequirement(quest.getId());
             }
         }
         for (Map.Entry<Quest, List<String>> entry : optionLinkMapping.entrySet()) {
             for (String link : entry.getValue()) {
-                Quest quest = getQuest(link, entry.getKey().getQuestSet());
+                Quest quest = getQuest(link);
                 if (quest != null)
                     entry.getKey().addOptionLink(quest.getId());
             }
@@ -535,21 +531,18 @@ public class QuestAdapter {
         }
     }
 
-    private static Quest getQuest(String setQuestString, QuestSet defaultSet) {
-        QuestSet set = defaultSet;
-        String quest = setQuestString;
-        Matcher matcher = OTHER_QUEST_SET.matcher(setQuestString);
+    private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
+
+    private static Quest getQuest(String questString) {
+        String questId = questString;
+        Matcher matcher = OTHER_QUEST_SET.matcher(questString);
         if (matcher.find()) {
-            for (QuestSet questSet : Quest.getQuestSets()) {
-                if (questSet.getName().equalsIgnoreCase(matcher.group(1))) {
-                    set = questSet;
-                    break;
-                }
-            }
-            quest = matcher.group(2);
+            questId = matcher.group(2);
         }
-        if (set != null)
-            return set.getQuests().get(quest);
-        return null;
+        return Quest.getQuest(getUuid(questId));
+    }
+
+    private static String getUuid(String id) {
+        return nameToQuestMap.containsKey(id) ? nameToQuestMap.get(id).getId() : id;
     }
 }

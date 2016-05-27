@@ -4,6 +4,7 @@ import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.io.SaveHandler;
+import hardcorequesting.io.adapter.QuestAdapter;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.util.OPBookHelper;
@@ -73,6 +74,7 @@ public class QuestSet {
     public static void loadAll() {
         try {
             SaveHandler.loadAllQuestSets(SaveHandler.getLocalFolder());
+            QuestAdapter.postLoad();
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
         }

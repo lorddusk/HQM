@@ -51,7 +51,7 @@ public class CommandHandler extends CommandBase {
     public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1) {
             String subCommand = args[0];
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             for (ISubCommand command : commands.values()) {
                 if (command.isVisible(sender) && command.getCommandName().startsWith(subCommand))
                     result.add(command.getCommandName());
@@ -60,7 +60,7 @@ public class CommandHandler extends CommandBase {
         } else if (commands.containsKey(args[0]) && commands.get(args[0]).isVisible(sender)) {
             return commands.get(args[0]).addTabCompletionOptions(sender, Arrays.copyOfRange(args, 1, args.length));
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

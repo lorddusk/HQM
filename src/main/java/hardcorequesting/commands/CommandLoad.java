@@ -50,7 +50,7 @@ public class CommandLoad extends CommandBase {
     }
 
     private File[] getPossibleFiles(FileFilter filter) {
-        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles").listFiles(filter);
+        return SaveHandler.getExportFolder().listFiles(filter);
     }
 
     private void loadSet(ICommandSender sender, File file) throws CommandException {

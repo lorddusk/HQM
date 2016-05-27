@@ -67,6 +67,10 @@ public class SaveHandler {
         return file;
     }
 
+    public static File getExportFolder() {
+        return new File(HardcoreQuesting.configDir, "exports");
+    }
+
     public static File getLocalFolder() {
         return new File(QuestLine.getActiveQuestLine().mainPath);
     }
