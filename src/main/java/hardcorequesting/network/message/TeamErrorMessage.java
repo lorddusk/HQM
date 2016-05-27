@@ -2,6 +2,7 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.team.TeamError;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -29,8 +30,12 @@ public class TeamErrorMessage implements IMessage {
     public static class Handler implements IMessageHandler<TeamErrorMessage, IMessage> {
         @Override
         public IMessage onMessage(TeamErrorMessage message, MessageContext ctx) {
-            TeamError.latestError = message.error;
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
             return null;
+        }
+
+        private void handle(TeamErrorMessage message, MessageContext ctx) {
+            TeamError.latestError = message.error;
         }
     }
 }

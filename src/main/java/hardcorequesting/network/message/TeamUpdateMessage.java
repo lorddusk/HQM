@@ -3,11 +3,12 @@ package hardcorequesting.network.message;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class TeamUpdateMessage implements IMessage, IMessageHandler<TeamUpdateMessage, IMessage> {
+public class TeamUpdateMessage implements IMessage {
     private TeamUpdateType type;
     private String data;
 
@@ -33,9 +34,15 @@ public class TeamUpdateMessage implements IMessage, IMessageHandler<TeamUpdateMe
         buf.writeBytes(this.data.getBytes());
     }
 
-    @Override
-    public IMessage onMessage(TeamUpdateMessage message, MessageContext ctx) {
-        message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().playerEntity).getTeam(), message.data);
-        return null;
+    public static class Handler implements IMessageHandler<TeamUpdateMessage, IMessage> {
+        @Override
+        public IMessage onMessage(TeamUpdateMessage message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+            return null;
+        }
+
+        private void handle(TeamUpdateMessage message, MessageContext ctx) {
+            message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().playerEntity).getTeam(), message.data);
+        }
     }
 }

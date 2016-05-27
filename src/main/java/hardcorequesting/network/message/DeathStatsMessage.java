@@ -3,6 +3,7 @@ package hardcorequesting.network.message;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -10,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMessage, IMessage> {
+public class DeathStatsMessage implements IMessage {
     private boolean local;
     private String timestamp, deaths;
 
@@ -42,17 +43,23 @@ public class DeathStatsMessage implements IMessage, IMessageHandler<DeathStatsMe
         buf.writeBytes(this.deaths.getBytes());
     }
 
-    @Override
-    public IMessage onMessage(DeathStatsMessage message, MessageContext ctx) {
-        try {
-            if (!message.local)
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
-                    out.print(message.deaths);
-                }
-            DeathStats.loadAll(true);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static class Handler implements IMessageHandler<DeathStatsMessage, IMessage> {
+        @Override
+        public IMessage onMessage(DeathStatsMessage message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+            return null;
         }
-        return null;
+
+        private void handle(DeathStatsMessage message, MessageContext ctx) {
+            try {
+                if (!message.local)
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
+                        out.print(message.deaths);
+                    }
+                DeathStats.loadAll(true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

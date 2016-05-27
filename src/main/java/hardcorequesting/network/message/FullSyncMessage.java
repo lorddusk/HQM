@@ -4,6 +4,7 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -94,6 +95,11 @@ public class FullSyncMessage implements IMessage {
     public static class Handler implements IMessageHandler<FullSyncMessage, IMessage> {
         @Override
         public IMessage onMessage(FullSyncMessage message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+            return null;
+        }
+
+        private void handle(FullSyncMessage message, MessageContext ctx) {
             try {
                 if (!message.local) {
                     try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("reputations"))) {
@@ -121,7 +127,6 @@ public class FullSyncMessage implements IMessage {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return null;
         }
     }
 }

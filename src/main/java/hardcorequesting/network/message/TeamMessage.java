@@ -2,6 +2,7 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.team.TeamAction;
 import io.netty.buffer.ByteBuf;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -35,8 +36,12 @@ public class TeamMessage implements IMessage {
     public static class Handler implements IMessageHandler<TeamMessage, IMessage> {
         @Override
         public IMessage onMessage(TeamMessage message, MessageContext ctx) {
-            message.action.process(ctx.getServerHandler().playerEntity, message.data);
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
+        }
+
+        private void handle(TeamMessage message, MessageContext ctx) {
+            message.action.process(ctx.getServerHandler().playerEntity, message.data);
         }
     }
 }

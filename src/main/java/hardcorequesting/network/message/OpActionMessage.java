@@ -3,6 +3,7 @@ package hardcorequesting.network.message;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.util.OPBookHelper;
 import io.netty.buffer.ByteBuf;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -36,8 +37,12 @@ public class OpActionMessage implements IMessage {
     public static class Handler implements IMessageHandler<OpActionMessage, IMessage> {
         @Override
         public IMessage onMessage(OpActionMessage message, MessageContext ctx) {
-            message.action.process(HardcoreQuesting.proxy.getPlayer(ctx), message.data);
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
+        }
+
+        private void handle(OpActionMessage message, MessageContext ctx) {
+            message.action.process(HardcoreQuesting.proxy.getPlayer(ctx), message.data);
         }
     }
 }

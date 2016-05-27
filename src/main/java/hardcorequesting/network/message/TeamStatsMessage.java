@@ -3,6 +3,7 @@ package hardcorequesting.network.message;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -55,11 +56,15 @@ public class TeamStatsMessage implements IMessage {
     public static class Handler implements IMessageHandler<TeamStatsMessage, IMessage> {
         @Override
         public IMessage onMessage(TeamStatsMessage message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+            return null;
+        }
+
+        private void handle(TeamStatsMessage message, MessageContext ctx) {
             if (message.stats.size() == 1)
                 TeamStats.updateTeam(message.stats.get(0));
             else
                 TeamStats.updateTeams(message.stats);
-            return null;
         }
     }
 }

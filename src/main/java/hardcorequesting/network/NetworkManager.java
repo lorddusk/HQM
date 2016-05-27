@@ -3,6 +3,7 @@ package hardcorequesting.network;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.ModInformation;
 import hardcorequesting.io.adapter.BlockSyncMessage;
+import hardcorequesting.io.adapter.BlockSyncMessageClient;
 import hardcorequesting.network.message.*;
 import hardcorequesting.tileentity.IBlockSync;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,8 +27,10 @@ public class NetworkManager {
         WRAPPER.registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamErrorMessage.Handler.class, TeamErrorMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(QuestDataUpdateMessage.Handler.class, QuestDataUpdateMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(DeathStatsMessage.Handler.class, DeathStatsMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(TeamUpdateMessage.Handler.class, TeamUpdateMessage.class, id++, Side.CLIENT);
 
-        WRAPPER.registerMessage(BlockSyncMessage.Handler.class, BlockSyncMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(BlockSyncMessageClient.Handler.class, BlockSyncMessageClient.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(BlockSyncMessage.Handler.class, BlockSyncMessage.class, id++, Side.SERVER);
 
         WRAPPER.registerMessage(TeamMessage.Handler.class, TeamMessage.class, id++, Side.SERVER);
@@ -74,12 +77,15 @@ public class NetworkManager {
             return;
         }
 
-        IMessage message = new BlockSyncMessage(block, type, data.toString());
-        if (!onServer)
-            sendToServer(message);
-        else if (player != null && player instanceof EntityPlayerMP)
-            sendToPlayer(message, (EntityPlayerMP) player);
-        else
-            sendToPlayersAround(message, block, IBlockSync.BLOCK_UPDATE_RANGE);
+        if (!onServer) {
+            sendToServer(new BlockSyncMessageClient(block, type, data.toString()));
+        } else {
+            IMessage message = new BlockSyncMessage(block, type, data.toString());
+            if (player instanceof EntityPlayerMP) {
+                sendToPlayer(message, (EntityPlayerMP) player);
+            } else {
+                sendToPlayersAround(message, block, IBlockSync.BLOCK_UPDATE_RANGE);
+            }
+        }
     }
 }
