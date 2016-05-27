@@ -251,7 +251,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
         if (playerName != null) {
@@ -259,6 +259,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             compound.setString(NBT_QUEST, selectedQuest);
             compound.setByte(NBT_TASK, (byte) selectedTask);
         }
+        return compound;
     }
 
     public String getPlayer() {
