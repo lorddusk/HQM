@@ -237,7 +237,7 @@ public class QuestingData {
         MinecraftServer mcServer = playerEntity.getServer();
 
         if (mcServer.isSinglePlayer() && playerEntity.getName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
+            ((EntityPlayerMP) playerEntity).connection.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
             mcServer.getActiveAnvilConverter().flushCache();
@@ -258,7 +258,7 @@ public class QuestingData {
             mcServer.getPlayerList().getBannedPlayers().addEntry(userlistbansentry);
 
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((EntityPlayerMP) playerEntity).playerNetServerHandler.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
+            ((EntityPlayerMP) playerEntity).connection.kickPlayerFromServer(Translator.translate("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
         }
 

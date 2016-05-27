@@ -110,9 +110,10 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         writeContentToNBT(compound);
+        return compound;
     }
 
     @Override
