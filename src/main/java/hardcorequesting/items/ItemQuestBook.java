@@ -52,7 +52,7 @@ public class ItemQuestBook extends Item {
         if (itemStack.getItemDamage() == 1) {
             NBTTagCompound compound = itemStack.getTagCompound();
             if (compound != null && compound.hasKey(NBT_PLAYER))
-                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", QuestingData.getPlayer(compound.getString(NBT_PLAYER)).getDisplayName()));
+                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", QuestingData.getPlayer(compound.getString(NBT_PLAYER)).getDisplayNameString()));
             else
                 tooltip.add(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid"));
         }
