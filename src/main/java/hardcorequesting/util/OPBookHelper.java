@@ -70,7 +70,7 @@ public final class OPBookHelper {
                 if (quest != null)
                     writer.name(QUEST).value(quest.getId());
                 if (subject != null)
-                    writer.name(SUBJECT).value(subject.getUniqueID().toString());
+                    writer.name(SUBJECT).value(subject.getPersistentID().toString());
                 writer.endObject();
                 writer.close();
             } catch (IOException ignored) {

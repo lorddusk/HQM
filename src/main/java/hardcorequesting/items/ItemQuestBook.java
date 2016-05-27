@@ -51,8 +51,10 @@ public class ItemQuestBook extends Item {
     public void addInformation(ItemStack itemStack, EntityPlayer player, List tooltip, boolean extraInfo) {
         if (itemStack.getItemDamage() == 1) {
             NBTTagCompound compound = itemStack.getTagCompound();
-            if (compound != null && compound.hasKey(NBT_PLAYER))
-                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", QuestingData.getPlayer(compound.getString(NBT_PLAYER)).getDisplayNameString()));
+            if (compound != null && compound.hasKey(NBT_PLAYER)) {
+                EntityPlayer useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
+                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getDisplayNameString()));
+            }
             else
                 tooltip.add(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid"));
         }
@@ -103,7 +105,7 @@ public class ItemQuestBook extends Item {
     public static ItemStack getOPBook(EntityPlayer player) {
         ItemStack itemStack = new ItemStack(ModItems.book, 1, 1);
         itemStack.setTagCompound(new NBTTagCompound());
-        itemStack.getTagCompound().setString(NBT_PLAYER, player.getUniqueID().toString());
+        itemStack.getTagCompound().setString(NBT_PLAYER, player.getPersistentID().toString());
         return itemStack;
     }
 }

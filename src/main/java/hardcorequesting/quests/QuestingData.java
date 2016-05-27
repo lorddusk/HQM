@@ -388,7 +388,7 @@ public class QuestingData {
     }
 
     public static String getUserUUID(EntityPlayer player) {
-        return player.getGameProfile().getId().toString();
+        return player.getPersistentID().toString();
     }
 
     public static QuestingData getQuestingData(String uuid) {
