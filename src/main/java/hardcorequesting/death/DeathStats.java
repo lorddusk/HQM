@@ -6,6 +6,7 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -44,7 +45,11 @@ public class DeathStats {
         if (Minecraft.getMinecraft().theWorld != null) {
             try {
                 UUID uuid = UUID.fromString(this.uuid);
-                return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(uuid).getDisplayNameString();
+                EntityPlayer player = Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(uuid);
+                if (player == null) {
+                    return "<invalid>";
+                }
+                return player.getDisplayNameString();
             } catch (IllegalArgumentException ignored) {
             }
         }
