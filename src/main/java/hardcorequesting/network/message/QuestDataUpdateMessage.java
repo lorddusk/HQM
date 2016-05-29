@@ -30,6 +30,7 @@ public class QuestDataUpdateMessage implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        this.players = buf.readInt();
         int size = buf.readInt();
         this.id = new String(buf.readBytes(size).array());
         size = buf.readInt();
@@ -38,6 +39,7 @@ public class QuestDataUpdateMessage implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeInt(this.players);
         buf.writeInt(this.id.getBytes().length);
         buf.writeBytes(this.id.getBytes());
         buf.writeInt(this.data.getBytes().length);

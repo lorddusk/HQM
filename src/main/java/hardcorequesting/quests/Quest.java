@@ -1310,7 +1310,6 @@ public class Quest {
                     addItems(player, itemsToAdd);
                     player.inventory.markDirty();
                     QuestData data = getQuestData(player);
-                    data.claimed = true;
                     Team team = QuestingData.getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
                         for (int i = 0; i < data.reward.length; i++) {
