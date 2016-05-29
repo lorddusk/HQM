@@ -33,7 +33,9 @@ public class TeamStatsMessage implements IMessage {
         stats = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             int ssize = buf.readInt();
-            String name = new String(buf.readBytes(ssize).array());
+            String name = null;
+            if (ssize != -1)
+                name = new String(buf.readBytes(ssize).array());
             int players = buf.readInt();
             int lives = buf.readInt();
             float progress = buf.readFloat();
@@ -45,8 +47,10 @@ public class TeamStatsMessage implements IMessage {
     public void toBytes(ByteBuf buf) {
         buf.writeInt(stats.size());
         for (TeamStats teamStats : stats) {
-            buf.writeInt(teamStats.getName().getBytes().length);
-            buf.writeBytes(teamStats.getName().getBytes());
+            if (teamStats.getName() != null) {
+                buf.writeInt(teamStats.getName().getBytes().length);
+                buf.writeBytes(teamStats.getName().getBytes());
+            } else buf.writeInt(-1);
             buf.writeInt(teamStats.getPlayers());
             buf.writeInt(teamStats.getLives());
             buf.writeFloat(teamStats.getProgress());

@@ -28,10 +28,9 @@ public class Team {
     private Map<String, QuestData> questData;
     private int clientTeamLives = -1;
 
-    public Team(String player) {
-        if (player != null) {
-            players.add(new PlayerEntry(player, true, true));
-        }
+    public Team(String playerUuid) {
+        if (playerUuid != null)
+            players.add(new PlayerEntry(playerUuid, true, true));
         createQuestData();
         createReputation();
         this.invites = new ArrayList<>();
@@ -123,12 +122,12 @@ public class Team {
         removePlayer(QuestingData.getUserUUID(player));
     }
 
-    public void removePlayer(String playerName) {
+    public void removePlayer(String uuid) {
         int id = 0;
         for (PlayerEntry player : players) {
             if (player.isInTeam()) {
-                if (player.getUUID().equals(playerName)) {
-                    Team leaveTeam = new Team(playerName);
+                if (player.getUUID().equals(uuid)) {
+                    Team leaveTeam = new Team(uuid);
                     leaveTeam.getPlayers().get(0).setBookOpen(player.isBookOpen());
                     for (String i : questData.keySet()) {
                         QuestData leaveData = leaveTeam.questData.get(i);
@@ -165,7 +164,7 @@ public class Team {
                         }
                     }
 
-                    QuestingData.getQuestingData(playerName).setTeam(leaveTeam);
+                    QuestingData.getQuestingData(uuid).setTeam(leaveTeam);
                     break;
                 }
                 id++;

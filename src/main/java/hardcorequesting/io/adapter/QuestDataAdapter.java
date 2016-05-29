@@ -70,6 +70,7 @@ public class QuestDataAdapter {
                         break;
                     case TASKS_SIZE:
                         data.tasks = new QuestDataTask[in.nextInt()];
+                        break;
                     case TASKS:
                         in.beginArray();
                         i = 0;

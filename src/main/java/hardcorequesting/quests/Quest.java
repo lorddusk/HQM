@@ -1255,9 +1255,8 @@ public class Quest {
                     }
                 }
                 if (!rewardChoices.isEmpty()) {
-                    int id = selectedReward;
-                    if (id >= 0 && id < rewardChoices.size()) {
-                        items.add(rewardChoices.getReward(id).copy());
+                    if (selectedReward >= 0 && selectedReward < rewardChoices.size()) {
+                        items.add(rewardChoices.getReward(selectedReward).copy());
                     } else {
                         return;
                     }
