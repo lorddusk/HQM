@@ -28,9 +28,18 @@ public class QuestDataTaskReputationKill extends QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskReputationKill taskData = new QuestDataTaskReputationKill();
         try {
-            taskData.completed = in.nextBoolean();
-            taskData.kills = in.nextInt();
-            return taskData;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case QuestDataTask.COMPLETED:
+                        taskData.completed = in.nextBoolean();
+                        break;
+                    case KILLS:
+                        taskData.kills = in.nextInt();
+                        break;
+                    default:
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return taskData;

@@ -32,13 +32,26 @@ public class QuestDataTaskLocation extends QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskLocation taskData = new QuestDataTaskLocation();
         try {
-            taskData.completed = in.nextBoolean();
-            int count = in.nextInt();
-            taskData.visited = new boolean[count];
-            in.beginArray();
-            for (int i = 0; i < count; i++)
-                taskData.visited[i] = in.nextBoolean();
-            in.endArray();
+            int count = 0;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case QuestDataTask.COMPLETED:
+                        taskData.completed = in.nextBoolean();
+                        break;
+                    case COUNT:
+                        count = in.nextInt();
+                        taskData.visited = new boolean[count];
+                        break;
+                    case VISITED:
+                        in.beginArray();
+                        for (int i = 0; i < count; i++)
+                            taskData.visited[i] = in.nextBoolean();
+                        in.endArray();
+                        break;
+                    default:
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return taskData;

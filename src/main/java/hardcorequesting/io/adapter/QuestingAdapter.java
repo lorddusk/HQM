@@ -2,10 +2,12 @@ package hardcorequesting.io.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.Team;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,7 +31,11 @@ public class QuestingAdapter {
             out.name(UUID).value(value.getUuid());
             out.name(NAME).value(value.getName());
             out.name(LIVES).value(value.getRawLives());
-            out.name(TEAM).value(value.getTeam().getId());
+            out.name(TEAM);
+            if (value.getTeam().getId() == -1)
+                TeamAdapter.TEAM_ADAPTER.write(out, value.getTeam());
+            else
+                out.value(value.getTeam().getId());
             out.name(SELECTED_QUEST).value(value.selectedQuest);
             out.name(PLAYER_LORE).value(value.playedLore);
             out.name(RECEIVED_BOOK).value(value.receivedBook);
@@ -47,7 +53,8 @@ public class QuestingAdapter {
         public QuestingData read(JsonReader in) throws IOException {
             boolean playerLore = false, receivedBook = false;
             String uuid = null, selectedQuest = null;
-            int lives = 0, team = -1;
+            int lives = 0, teamId = -1;
+            Team team = null;
             Map<String, GroupData> data = new HashMap<>();
             DeathStats deathStats = null;
 
@@ -64,7 +71,10 @@ public class QuestingAdapter {
                         lives = in.nextInt();
                         break;
                     case TEAM:
-                        team = in.nextInt();
+                        if (in.peek() == JsonToken.NUMBER)
+                            teamId = in.nextInt();
+                        else
+                            team = TeamAdapter.TEAM_ADAPTER.read(in);
                         break;
                     case SELECTED_QUEST:
                         selectedQuest = in.nextString();
@@ -89,10 +99,12 @@ public class QuestingAdapter {
             }
             in.endObject();
 
-            QuestingData questingData = new QuestingData(uuid, lives, team, data, deathStats);
+            QuestingData questingData = new QuestingData(uuid, lives, teamId, data, deathStats);
             questingData.playedLore = playerLore;
             questingData.receivedBook = receivedBook;
             questingData.selectedQuest = selectedQuest;
+            if (teamId == -1)
+                questingData.setTeam(team);
             return questingData;
         }
     };

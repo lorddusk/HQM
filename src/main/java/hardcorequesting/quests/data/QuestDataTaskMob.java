@@ -32,13 +32,26 @@ public class QuestDataTaskMob extends QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskMob taskData = new QuestDataTaskMob();
         try {
-            taskData.completed = in.nextBoolean();
-            int count = in.nextInt();
-            taskData.killed = new int[count];
-            in.beginArray();
-            for (int i = 0; i < count; i++)
-                taskData.killed[i] = in.nextInt();
-            in.endArray();
+            int count = 0;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case QuestDataTask.COMPLETED:
+                        taskData.completed = in.nextBoolean();
+                        break;
+                    case COUNT:
+                        count = in.nextInt();
+                        taskData.killed = new int[count];
+                        break;
+                    case KILLED:
+                        in.beginArray();
+                        for (int i = 0; i < count; i++)
+                            taskData.killed[i] = in.nextInt();
+                        in.endArray();
+                        break;
+                    default:
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return taskData;

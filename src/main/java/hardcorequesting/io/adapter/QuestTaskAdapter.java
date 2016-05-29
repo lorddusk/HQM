@@ -407,7 +407,7 @@ public class QuestTaskAdapter {
         public QuestDataTask read(JsonReader in) throws IOException {
             in.beginObject();
             QuestDataTask dataTask = null;
-            if (in.hasNext())
+            if (in.hasNext() && in.nextName().equals(TYPE))
                 dataTask = QuestDataType.valueOf(in.nextString()).construct(in);
             in.endObject();
             return dataTask; // should never be null

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class QuestDataTask {
     public boolean completed;
-    private static final String COMPLETED = "completed";
+    protected static final String COMPLETED = "completed";
 
     public QuestDataTask(QuestTask task) {
     }
@@ -26,7 +26,13 @@ public class QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTask data = new QuestDataTask();
         try {
-            data.completed = in.nextBoolean();
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case COMPLETED:
+                        data.completed = in.nextBoolean();
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return data;

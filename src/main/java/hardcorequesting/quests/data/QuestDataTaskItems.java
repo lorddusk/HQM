@@ -32,13 +32,26 @@ public class QuestDataTaskItems extends QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskItems taskData = new QuestDataTaskItems();
         try {
-            taskData.completed = in.nextBoolean();
-            int count = in.nextInt();
-            taskData.progress = new int[count];
-            in.beginArray();
-            for (int i = 0; i < count; i++)
-                taskData.progress[i] = in.nextInt();
-            in.endArray();
+            int count = 0;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case QuestDataTask.COMPLETED:
+                        taskData.completed = in.nextBoolean();
+                        break;
+                    case COUNT:
+                         count = in.nextInt();
+                        taskData.progress = new int[count];
+                    break;
+                    case PROGRESS:
+                        in.beginArray();
+                        for (int i = 0; i < count; i++)
+                            taskData.progress[i] = in.nextInt();
+                        in.endArray();
+                    break;
+                    default:
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return taskData;

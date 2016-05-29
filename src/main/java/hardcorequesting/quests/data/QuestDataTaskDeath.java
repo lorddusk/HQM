@@ -28,9 +28,18 @@ public class QuestDataTaskDeath extends QuestDataTask {
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskDeath taskData = new QuestDataTaskDeath();
         try {
-            taskData.completed = in.nextBoolean();
-            taskData.deaths = in.nextInt();
-            return taskData;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case QuestDataTask.COMPLETED:
+                        taskData.completed = in.nextBoolean();
+                        break;
+                    case DEATHS:
+                        taskData.deaths = in.nextInt();
+                        break;
+                    default:
+                        break;
+                }
+            }
         } catch (IOException ignored) {
         }
         return taskData;

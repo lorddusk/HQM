@@ -34,7 +34,8 @@ public class QuestDataAdapter {
             out.name(TASKS_SIZE).value(value.tasks.length);
             out.name(TASKS).beginArray();
             for (QuestDataTask task : value.tasks)
-                QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
+                if(task != null)
+                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
             out.endArray();
             out.endObject();
         }
