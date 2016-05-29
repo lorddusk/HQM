@@ -1,11 +1,13 @@
 package hardcorequesting.quests;
 
+import com.mojang.authlib.GameProfile;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathStats;
+import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.team.PlayerEntry;
@@ -18,6 +20,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListBansEntry;
 import net.minecraft.util.text.TextComponentString;
@@ -308,18 +311,19 @@ public class QuestingData {
         hardcoreActive = false;
     }
 
-    public static void activateQuest() {
+    public static void activateQuest(boolean giveBooks) {
         if (!questActive) {
             questActive = true;
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
-                if (name != null) {
-                    EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(name);
-                    if (player != null) {
-                        spawnBook(player);
+            if (giveBooks) {
+                for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllProfiles()) {
+                    if (profile != null) {
+                        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(profile.getId());
+                        if (player != null) {
+                            spawnBook(player);
+                        }
                     }
                 }
             }
-
         }
     }
 
@@ -416,6 +420,11 @@ public class QuestingData {
     public static void spawnBook(EntityPlayer player) {
         if (!Quest.isEditing && !player.worldObj.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
+            NBTTagCompound hqmTag = new NBTTagCompound();
+            if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
+                hqmTag = player.getEntityData().getCompoundTag(PlayerTracker.HQ_TAG);
+            hqmTag.setBoolean(PlayerTracker.RECEIVED_BOOK, true);
+            player.getEntityData().setTag(PlayerTracker.HQ_TAG, hqmTag);
             ItemStack diary = new ItemStack(ModItems.book);
             if (!player.inventory.addItemStackToInventory(diary)) {
                 spawnItemAtPlayer(player, diary);

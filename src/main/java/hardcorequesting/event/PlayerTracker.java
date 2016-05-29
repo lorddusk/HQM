@@ -25,6 +25,8 @@ public class PlayerTracker {
         return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
     }
 
+    public static final String HQ_TAG = "HardcoreQuesting";
+    public static final String RECEIVED_BOOK = "questBook";
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -41,12 +43,12 @@ public class PlayerTracker {
             player.addChatMessage(new TextComponentTranslation("hqm.message.noHardcore"));
 
         NBTTagCompound tags = player.getEntityData();
-        if (tags.hasKey("HardcoreQuesting")) {
-            if (tags.getCompoundTag("HardcoreQuesting").getBoolean("questBook")) {
+        if (tags.hasKey(HQ_TAG)) {
+            if (tags.getCompoundTag(HQ_TAG).getBoolean(RECEIVED_BOOK)) {
                 QuestingData.getQuestingData(player).receivedBook = true;
             }
-            if (QuestingData.isQuestActive()) {
-                tags.removeTag("HardcoreQuesting");
+            if (!QuestingData.isQuestActive()) {
+                tags.removeTag(HQ_TAG);
             }
         }
         QuestingData.spawnBook(player);

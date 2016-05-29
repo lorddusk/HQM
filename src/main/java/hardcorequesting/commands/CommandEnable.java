@@ -18,7 +18,7 @@ public class CommandEnable extends CommandBase {
             sendChat(sender, QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore");
         sendChat(sender, QuestingData.isQuestActive() ? "hqm.message.questAlreadyActivated" : "hqm.message.questActivated");
         QuestingData.activateHardcore();
-        QuestingData.activateQuest();
+        QuestingData.activateQuest(true);
         if (QuestingData.isHardcoreActive() && sender instanceof EntityPlayer)
             currentLives((EntityPlayer) sender);
     }

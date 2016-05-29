@@ -266,7 +266,7 @@ public class SaveHandler {
             FileReader reader = new FileReader(file);
             JsonObject object = parser.parse(reader).getAsJsonObject();
             QuestingData.deactivate();
-            if (object.get(QUESTING).getAsBoolean()) QuestingData.activateQuest();
+            if (object.get(QUESTING).getAsBoolean()) QuestingData.activateQuest(false);
             if (object.get(HARDCORE).getAsBoolean()) QuestingData.activateHardcore();
             reader.close();
         }
