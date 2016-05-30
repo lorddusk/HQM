@@ -58,6 +58,8 @@ public class FullSyncMessage implements IMessage {
         size = buf.readInt();
         this.data = new String(buf.readBytes(size).array());
         size = buf.readInt();
+        this.setOrder = new String(buf.readBytes(size).array());
+        size = buf.readInt();
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
         for (int i = 0; i < size; i++) {
@@ -83,6 +85,8 @@ public class FullSyncMessage implements IMessage {
         buf.writeBytes(this.teams.getBytes());
         buf.writeInt(this.data.getBytes().length);
         buf.writeBytes(this.data.getBytes());
+        buf.writeInt(this.setOrder.getBytes().length);
+        buf.writeBytes(this.setOrder.getBytes());
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
             buf.writeInt(this.questSetNames[i].getBytes().length);
@@ -116,6 +120,9 @@ public class FullSyncMessage implements IMessage {
                     }
                     try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {
                         out.print(SaveHandler.saveQuestingState(message.questing, message.hardcore));
+                    }
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("sets"))) {
+                        out.print(message.setOrder);
                     }
                     SaveHandler.removeQuestSetFiles(SaveHandler.getRemoteFolder());
                     for (int i = 0; i < message.questsSets.length; i++)
