@@ -21,10 +21,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QuestSet {
     private String name;
@@ -75,6 +72,7 @@ public class QuestSet {
         try {
             SaveHandler.loadAllQuestSets(SaveHandler.getLocalFolder());
             QuestAdapter.postLoad();
+            orderAll();
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
         }
@@ -85,6 +83,30 @@ public class QuestSet {
             SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
+        }
+    }
+
+    public static void orderAll() {
+        try {
+            final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getLocalFile("sets"));
+            if (!order.isEmpty()) {
+                Quest.getQuestSets().sort(new Comparator<QuestSet>() {
+                    @Override
+                    public int compare(QuestSet s1, QuestSet s2) {
+                        if (s1.equals(s2)) return 0;
+                        int is1 = order.indexOf(s1.getName());
+                        int is2 = order.indexOf(s2.getName());
+                        if (is1 == -1) {
+                            return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
+                        }
+                        if (is2 == -1) return -1;
+                        if (is1 == is2) return 0;
+                        return is1 < is2 ? -1 : 1;
+                    }
+                });
+            }
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed ordering quest sets");
         }
     }
 

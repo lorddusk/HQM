@@ -43,6 +43,10 @@ public class CommandSave extends CommandBase {
                 } catch (CommandException ignored) {
                 }
             }
+            try {
+                SaveHandler.saveQuestSetList(Quest.getQuestSets(), SaveHandler.getExportFile("sets"));
+            } catch (IOException ignored) {
+            }
         } else if (arguments.length == 1 && arguments[0].equals("bags")) {
             save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
             }.getType(), "bags");

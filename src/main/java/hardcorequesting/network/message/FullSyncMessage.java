@@ -17,7 +17,7 @@ import java.util.List;
 
 public class FullSyncMessage implements IMessage {
     private boolean local, questing, hardcore;
-    private String timestamp, reputations, bags, teams, data;
+    private String timestamp, reputations, bags, teams, data, setOrder;
     private String[] questsSets, questSetNames;
 
     public FullSyncMessage() {
@@ -38,7 +38,7 @@ public class FullSyncMessage implements IMessage {
         this.data = SaveHandler.saveQuestingData();
         List<String> names = new ArrayList<>();
         List<String> questSets = new ArrayList<>();
-        SaveHandler.saveAllQuestSets(names, questSets);
+        this.setOrder = SaveHandler.saveAllQuestSets(names, questSets);
         this.questSetNames = names.toArray(new String[names.size()]);
         this.questsSets = questSets.toArray(new String[questSets.size()]);
     }

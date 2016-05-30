@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class SaveHandler {
     public static final Gson GSON = new GsonBuilder()
@@ -39,6 +40,7 @@ public class SaveHandler {
     public static final Pattern TEAMS = Pattern.compile("^teams\\.json$", Pattern.CASE_INSENSITIVE);
     public static final Pattern STATE = Pattern.compile("^state\\.json$", Pattern.CASE_INSENSITIVE);
     public static final Pattern DATA = Pattern.compile("^data\\.json$", Pattern.CASE_INSENSITIVE);
+    public static final Pattern SETS = Pattern.compile("^sets\\.json$", Pattern.CASE_INSENSITIVE);
     public static final FileFilter QUEST_SET_FILTER =
             pathname -> JSON.matcher(pathname.getName()).find()
                     && !REPUTATIONS.matcher(pathname.getName()).find()
@@ -46,6 +48,7 @@ public class SaveHandler {
                     && !TEAMS.matcher(pathname.getName()).find()
                     && !STATE.matcher(pathname.getName()).find()
                     && !DATA.matcher(pathname.getName()).find()
+                    && !SETS.matcher(pathname.getName()).find()
                     && !DEATHS.matcher(pathname.getName()).find();
 
     public static File getExportFile(String name) {
@@ -92,15 +95,42 @@ public class SaveHandler {
 
     public static void saveAllQuestSets(File folder) throws IOException {
         removeQuestSetFiles(folder);
+        saveQuestSetList(Quest.getQuestSets(), new File(folder, "sets.json"));
         for (QuestSet set : Quest.getQuestSets())
             saveQuestSet(set, new File(folder, set.getFilename() + ".json"));
     }
 
-    public static void saveAllQuestSets(List<String> names, List<String> questSets) {
+    public static String saveAllQuestSets(List<String> names, List<String> questSets) {
         for (QuestSet set : Quest.getQuestSets()) {
             names.add(set.getFilename() + ".json");
             questSets.add(saveQuestSet(set));
         }
+        return saveQuestSetList(Quest.getQuestSets());
+    }
+
+    public static void saveQuestSetList(List<QuestSet> sets, File file) throws IOException {
+        if (!file.exists()) file.createNewFile();
+        FileWriter fileWriter = new FileWriter(file);
+        JsonWriter writer = new JsonWriter(fileWriter);
+        writer.beginArray();
+        for (QuestSet set : sets)
+            writer.value(set.getName());
+        writer.endArray();
+        writer.close();
+    }
+
+    public static String saveQuestSetList(List<QuestSet> sets) {
+        StringWriter stringWriter = new StringWriter();
+        try {
+            JsonWriter writer = new JsonWriter(stringWriter);
+            writer.beginArray();
+            for (QuestSet set : sets)
+                writer.value(set.getName());
+            writer.endArray();
+            writer.close();
+        } catch (IOException ignored) {
+        }
+        return stringWriter.toString();
     }
 
     public static void saveQuestSet(QuestSet set, File file) throws IOException {
@@ -111,6 +141,16 @@ public class SaveHandler {
     public static String saveQuestSet(QuestSet set) {
         return save(set, new TypeToken<QuestSet>() {
         }.getType());
+    }
+
+    public static List<String> loadQuestSetOrder(File file) throws IOException {
+        List<String> order = new ArrayList<>();
+        if (!file.exists()) return order;
+        JsonParser parser = new JsonParser();
+        JsonArray array = parser.parse(new FileReader(file)).getAsJsonArray();
+        for (JsonElement elem : array)
+            order.add(elem.getAsString());
+        return order;
     }
 
     public static void loadAllQuestSets(File folder) throws IOException {
