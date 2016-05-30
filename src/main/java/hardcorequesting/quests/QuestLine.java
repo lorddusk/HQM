@@ -3,6 +3,7 @@ package hardcorequesting.quests;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.network.NetworkManager;
@@ -110,6 +111,8 @@ public class QuestLine {
         QuestSet.loadAll();
         QuestingData.loadQuestingData();
         SaveHelper.onLoad();
+        if (isClient)
+            GuiEditMenuItem.Search.initItems();
     }
 
     public static void init(String path, boolean isClient) {
