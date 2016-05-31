@@ -359,6 +359,7 @@ public class QuestAdapter {
         private final String DESCRIPTION = "description";
         private final String QUESTS = "quests";
         private final String REPUTATION_BAR = "reputationBar";
+        private final String REPUTATION_BAR_OLD = "reputation";
 
         @Override
         public void write(JsonWriter out, QuestSet value) throws IOException {
@@ -403,7 +404,7 @@ public class QuestAdapter {
                         }
                     }
                     in.endArray();
-                } else if (next.equalsIgnoreCase(REPUTATION_BAR)) {
+                } else if (next.equalsIgnoreCase(REPUTATION_BAR) || next.equalsIgnoreCase(REPUTATION_BAR_OLD)) {
                     in.beginArray();
                     while (in.hasNext()) {
                         reputationBarList.add(REPUTATION_BAR_ADAPTER.read(in));
