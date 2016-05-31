@@ -1532,7 +1532,7 @@ public class Quest {
     }
 
     public boolean hasSet(QuestSet selectedSet) {
-        return set.equals(selectedSet);
+        return set != null && set.equals(selectedSet);
     }
 
     public void mergeProgress(String playerName, QuestData own, QuestData other) {
