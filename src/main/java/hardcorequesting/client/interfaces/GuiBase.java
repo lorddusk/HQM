@@ -125,6 +125,7 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawMouseOver(List<String> str, int x, int y) {
+        float oldZ = this.zLevel;
         GlStateManager.disableDepth();
 
         int w = 0;
@@ -178,7 +179,7 @@ public class GuiBase extends GuiScreen {
             y += 10;
         }
 
-        this.zLevel = 0.0F;
+        this.zLevel = oldZ;
         GlStateManager.enableDepth();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
@@ -297,13 +298,14 @@ public class GuiBase extends GuiScreen {
         GlStateManager.enableColorMaterial();
         GlStateManager.enableLighting();
 
+        float oldZ = this.zLevel;
         setZLevel(4f);
         try {
             // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
             itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
             // }
         } finally {
-            setZLevel(0f);
+            setZLevel(oldZ);
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableLighting();
