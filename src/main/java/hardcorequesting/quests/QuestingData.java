@@ -83,7 +83,7 @@ public class QuestingData {
         this.lives = lives;
         if (teamId > -1 && teamId < QuestingData.getTeams().size())
             this.team = QuestingData.getTeams().get(teamId);
-        else team = new Team(uuid);
+        if (team == null) team = new Team(uuid);
         createGroupData();
         this.groupData.putAll(groupData);
         if (deathStat == null) this.deathStat = new DeathStats(uuid);
@@ -451,6 +451,7 @@ public class QuestingData {
     }
 
     public void setTeam(Team team) {
+        if (team == null) team = new Team(uuid);
         this.team = team;
     }
 
