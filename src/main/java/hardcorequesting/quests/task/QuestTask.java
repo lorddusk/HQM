@@ -102,7 +102,7 @@ public abstract class QuestTask {
     }
 
     public QuestDataTask validateData(QuestDataTask data) {
-        if (data.getClass() != getDataType()) {
+        if (data == null || data.getClass() != getDataType()) {
             return newQuestData();
         }
 
