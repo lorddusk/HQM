@@ -26,8 +26,15 @@ public class WorldEventListener {
     @SubscribeEvent
     public void onSave(WorldEvent.Save event) {
         if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0) {
-            WorldServer world = (WorldServer) event.getWorld();
             QuestLine.saveAll();
+        }
+    }
+
+    @SubscribeEvent
+    public void onCreate(WorldEvent.CreateSpawnPosition event) {
+        if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0) {
+            WorldServer world = (WorldServer) event.getWorld();
+            QuestLine.copyDefaults(getWorldPath(world));
         }
     }
 

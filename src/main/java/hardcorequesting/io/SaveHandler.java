@@ -14,6 +14,9 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
+import net.minecraftforge.fml.common.FMLLog;
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -51,27 +54,36 @@ public class SaveHandler {
                     && !SETS.matcher(pathname.getName()).find()
                     && !DEATHS.matcher(pathname.getName()).find();
 
-    public static File getExportFile(String name) {
-        File file = new File(new File(HardcoreQuesting.configDir, "exports"), name + ".json");
+    public static final String EXPORTS = "exports";
+    public static final String REMOTE = "remote";
+    public static final String DEFAULT = "default";
+
+    public static File getExportFile(String name) throws IOException {
+        File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
-    public static File getLocalFile(String name) {
-        return new File(QuestLine.getActiveQuestLine().mainPath, name + ".json");
+    public static File getLocalFile(String name) throws IOException {
+        File file = new File(QuestLine.getActiveQuestLine().mainPath, name + ".json");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        return file;
     }
 
     public static File getRemoteFile(String name) throws IOException {
-        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath, "remote"), name + ".json");
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        }
+        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath, REMOTE), name + ".json");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        return file;
+    }
+
+    public static File getDefaultFile(String name) throws IOException {
+        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name + ".json");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getExportFolder() {
-        return new File(HardcoreQuesting.configDir, "exports");
+        return new File(HardcoreQuesting.configDir, EXPORTS);
     }
 
     public static File getLocalFolder() {
@@ -79,7 +91,19 @@ public class SaveHandler {
     }
 
     public static File getRemoteFolder() {
-        return new File(QuestLine.getActiveQuestLine().mainPath, "remote");
+        return new File(QuestLine.getActiveQuestLine().mainPath, REMOTE);
+    }
+
+    public static File getDefaultFolder() {
+        return new File(HardcoreQuesting.configDir, DEFAULT);
+    }
+
+    public static void copyFolder(File from, File to) {
+        try {
+            FileUtils.copyDirectory(from, to);
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Couldn't copy default files");
+        }
     }
 
     public static void removeFile(File file) {

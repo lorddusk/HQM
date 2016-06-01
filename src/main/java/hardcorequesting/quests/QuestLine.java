@@ -6,6 +6,7 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.death.DeathStats;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.network.message.FullSyncMessage;
@@ -89,6 +90,12 @@ public class QuestLine {
         if (!pathFile.exists()) pathFile.mkdirs();
         world = new QuestLine();
         init(path, isClient);
+    }
+
+    public static void copyDefaults(File worldPath) {
+        File path = new File(worldPath, "hqm");
+        if (!path.exists()) path.mkdirs();
+        SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
     }
 
     public static void saveAll() {

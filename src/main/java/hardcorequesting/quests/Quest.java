@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 public class Quest {
     public static boolean isEditing = false;
+    public static boolean saveDefault = true;
     public static String selectedQuestId;
 
     public static QuestTicker clientTicker;

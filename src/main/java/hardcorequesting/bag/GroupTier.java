@@ -6,6 +6,7 @@ import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.io.SaveHandler;
+import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
@@ -66,6 +67,7 @@ public class GroupTier {
     public static void saveAll() {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
+            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
