@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Arrays;
+
 public class QuestTaskItemsDetect extends QuestTaskItems {
     public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -84,6 +86,8 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
         boolean updated = false;
 
+        if (data.progress.length < items.length)
+            data.progress = Arrays.copyOf(data.progress, items.length);
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
             if (!item.hasItem || item.required == data.progress[i]) {
