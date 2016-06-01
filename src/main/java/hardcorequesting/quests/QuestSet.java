@@ -81,6 +81,7 @@ public class QuestSet {
     public static void saveAll() {
         try {
             SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
+            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
         }

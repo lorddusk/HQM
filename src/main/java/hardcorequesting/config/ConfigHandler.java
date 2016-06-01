@@ -25,6 +25,7 @@ public class ConfigHandler {
 
     public static void loadSyncConfig() {
         Quest.isEditing = syncConfig.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
+        Quest.saveDefault = syncConfig.get(Configuration.CATEGORY_GENERAL, SAVE_DEFAULT_KEY, SAVE_DEFAULT_DEFAULT, SAVE_DEFAULT_COMMENT).getBoolean(SAVE_DEFAULT_DEFAULT);
         if (HardcoreQuesting.proxy.isClient()) {
             if (KEYMAP_DEFAULT == null) {
                 KEYMAP_DEFAULT = KeyboardHandler.getDefault();
@@ -39,6 +40,10 @@ public class ConfigHandler {
     private static final String EDITOR_KEY = "UseEditor";
     private static final boolean EDITOR_DEFAULT = false;
     private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
+
+    private static final String SAVE_DEFAULT_KEY = "SaveDefault";
+    private static final boolean SAVE_DEFAULT_DEFAULT = true;
+    private static final String SAVE_DEFAULT_COMMENT = "This will save quests in an general map used upon world creation";
 
     private static final String KEYMAP_KEY = "KeyMap";
     private static String[] KEYMAP_DEFAULT = null;

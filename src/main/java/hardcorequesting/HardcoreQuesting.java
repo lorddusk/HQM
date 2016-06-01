@@ -6,6 +6,7 @@ import hardcorequesting.config.ConfigHandler;
 import hardcorequesting.event.PlayerDeathEventListener;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.event.WorldEventListener;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.proxies.CommonProxy;
@@ -48,7 +49,7 @@ public class HardcoreQuesting {
         configDir = new File(path);
         ConfigHandler.initModConfig(path);
         ConfigHandler.initEditConfig(path);
-        QuestLine.init(path + File.separator + "remote", event.getSide().isClient()); // Init Quest line within config folder used for server connections
+        QuestLine.init(path + File.separator + SaveHandler.REMOTE, event.getSide().isClient()); // Init Quest line within config folder used for server connections
 
         proxy.init();
         proxy.initSounds(path);

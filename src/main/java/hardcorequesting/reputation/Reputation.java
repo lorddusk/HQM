@@ -611,6 +611,7 @@ public class Reputation {
     public static void saveAll() {
         try {
             SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
+            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
         }
