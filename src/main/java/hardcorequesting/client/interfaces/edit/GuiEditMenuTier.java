@@ -14,10 +14,10 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private boolean clicked;
 
-    public GuiEditMenuTier(GuiQuestBook gui, EntityPlayer player, final GroupTier tier) {
+    public GuiEditMenuTier(GuiQuestBook gui, EntityPlayer player, GroupTier original) {
         super(gui, player, true);
-        this.original = tier;
-        this.tier = tier.copy();
+        this.original = original;
+        this.tier = original.copy();
         this.textBoxes = new TextBoxGroup();
 
         BagTier[] values = BagTier.values();
