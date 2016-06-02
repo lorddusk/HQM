@@ -33,7 +33,7 @@ dependencies {
     deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
 }
 
-version = "1.9.4-5.0.0beta2"
+version = "1.9.4-5.0.0beta3"
 group = "hardcorequesting"
 archivesBaseName = "HQM-New Heights"
 
