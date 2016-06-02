@@ -235,9 +235,10 @@ public class Group {
     @SideOnly(Side.CLIENT)
     public void draw(GuiQuestBook gui, int x, int y) {
         gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
-        List<ItemStack> items = this.getItems();
+        List<ItemStack> items = new ArrayList<>(this.getItems());
+        items.add(null);
         for (int i = 0; i < items.size(); i++) {
-            ItemStack itemStack = i < items.size() ? items.get(i) : null;
+            ItemStack itemStack = items.get(i);
 
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
@@ -268,7 +269,8 @@ public class Group {
 
     @SideOnly(Side.CLIENT)
     public void mouseClicked(GuiQuestBook gui, int x, int y) {
-        List<ItemStack> items = this.getItems();
+        List<ItemStack> items = new ArrayList<>(this.getItems());
+        items.add(null);
         for (int i = 0; i < items.size(); i++) {
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
