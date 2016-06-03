@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.EditButton;
@@ -8,6 +9,7 @@ import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.death.DeathStats;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
@@ -635,7 +637,7 @@ public class GuiQuestBook extends GuiBase {
             drawCenteredString(Translator.translate("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
         }
         if (QuestLine.getActiveQuestLine().front == null && QuestLine.getActiveQuestLine().mainPath != null) {
-            File file = new File(QuestLine.getActiveQuestLine().mainPath + "front.png");
+            File file = new File(HardcoreQuesting.configDir, "front.png");
             if (file.exists()) {
                 try {
                     BufferedImage img = ImageIO.read(file);
