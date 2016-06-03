@@ -16,14 +16,17 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestLine {
     public QuestLine() {
@@ -31,11 +34,11 @@ public class QuestLine {
     }
 
     public List<QuestSet> questSets;
-    public HashMap<String, Quest> quests;
+    public Map<String, Quest> quests;
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
     public final List<GroupTier> tiers = new ArrayList<>();
-    public final Map<String, Group> groups = new HashMap<>();
+    public final Map<String, Group> groups = new ConcurrentHashMap<>();
     public String mainPath;
     @SideOnly(Side.CLIENT)
     public ResourceLocation front;
@@ -61,7 +64,7 @@ public class QuestLine {
             reset();
             server = new QuestLine();
             server.mainPath = config.mainPath;
-            server.quests = new HashMap<>();
+            server.quests = new ConcurrentHashMap<>();
             server.questSets = new ArrayList<>();
         }
         loadAll(true);
@@ -98,8 +101,28 @@ public class QuestLine {
         SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
     }
 
+    public static void saveDescription() {
+        try {
+            SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
+            if (Quest.saveDefault)
+                SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+        }
+    }
+
+    public static void loadDescription() {
+        try {
+            QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getLocalFile("description.txt"));
+            QuestLine.getActiveQuestLine().cachedMainDescription = null;
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+        }
+    }
+
     public static void saveAll() {
         QuestingData.saveState();
+        QuestLine.saveDescription();
         DeathStats.saveAll();
         Reputation.saveAll();
         GroupTier.saveAll();
@@ -111,6 +134,7 @@ public class QuestLine {
 
     public static void loadAll(boolean isClient) {
         QuestingData.loadState();
+        QuestLine.loadDescription();
         DeathStats.loadAll(isClient);
         Reputation.loadAll();
         GroupTier.loadAll();
@@ -124,7 +148,7 @@ public class QuestLine {
 
     public static void init(String path, boolean isClient) {
         QuestLine.getActiveQuestLine().mainPath = path;
-        QuestLine.getActiveQuestLine().quests = new HashMap<>();
+        QuestLine.getActiveQuestLine().quests = new ConcurrentHashMap<>();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
 
         loadAll(isClient);

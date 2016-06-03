@@ -20,10 +20,11 @@ import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class SaveHandler {
     public static final Gson GSON = new GsonBuilder()
@@ -59,25 +60,25 @@ public class SaveHandler {
     public static final String DEFAULT = "default";
 
     public static File getExportFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(QuestLine.getActiveQuestLine().mainPath, name + ".json");
+        File file = new File(QuestLine.getActiveQuestLine().mainPath, name.endsWith(".txt") ? name :  name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getRemoteFile(String name) throws IOException {
-        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath, REMOTE), name + ".json");
+        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath, REMOTE), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getDefaultFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
@@ -334,5 +335,15 @@ public class SaveHandler {
             if (object.get(HARDCORE).getAsBoolean()) QuestingData.activateHardcore();
             reader.close();
         }
+    }
+
+    public static void saveDescription(File file, String description) throws IOException {
+        FileWriter writer = new FileWriter(file);
+        writer.write(description);
+        writer.close();
+    }
+
+    public static String loadDescription(File file) throws IOException {
+        return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
     }
 }

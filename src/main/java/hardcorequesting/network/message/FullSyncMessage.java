@@ -17,7 +17,7 @@ import java.util.List;
 
 public class FullSyncMessage implements IMessage {
     private boolean local, questing, hardcore;
-    private String timestamp, reputations, bags, teams, data, setOrder;
+    private String timestamp, reputations, bags, teams, data, setOrder, mainDesc;
     private String[] questsSets, questSetNames;
 
     public FullSyncMessage() {
@@ -30,6 +30,7 @@ public class FullSyncMessage implements IMessage {
     }
 
     public FullSyncMessage(String timestamp) {
+        this.mainDesc = QuestLine.getActiveQuestLine().mainDescription;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
         this.reputations = SaveHandler.saveReputations();
@@ -50,6 +51,8 @@ public class FullSyncMessage implements IMessage {
         this.hardcore = buf.readBoolean();
         if (local) return;
         int size = buf.readInt();
+        this.mainDesc = new String(buf.readBytes(size).array());
+        size = buf.readInt();
         this.reputations = new String(buf.readBytes(size).array());
         size = buf.readInt();
         this.bags = new String(buf.readBytes(size).array());
@@ -77,7 +80,9 @@ public class FullSyncMessage implements IMessage {
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         if (this.local) return;
-        buf.writeInt(this.reputations.getBytes().length);
+        buf.writeInt(this.mainDesc.getBytes().length);
+        buf.writeBytes(this.mainDesc.getBytes());
+        buf.writeInt(this.bags.getBytes().length);
         buf.writeBytes(this.reputations.getBytes());
         buf.writeInt(this.bags.getBytes().length);
         buf.writeBytes(this.bags.getBytes());
@@ -106,6 +111,9 @@ public class FullSyncMessage implements IMessage {
         private void handle(FullSyncMessage message, MessageContext ctx) {
             try {
                 if (!message.local) {
+                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("description.txt"))) {
+                        out.print(message.mainDesc);
+                    }
                     try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("reputations"))) {
                         out.print(message.reputations);
                     }
