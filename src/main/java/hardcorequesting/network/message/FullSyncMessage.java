@@ -82,7 +82,7 @@ public class FullSyncMessage implements IMessage {
         if (this.local) return;
         buf.writeInt(this.mainDesc.getBytes().length);
         buf.writeBytes(this.mainDesc.getBytes());
-        buf.writeInt(this.bags.getBytes().length);
+        buf.writeInt(this.reputations.getBytes().length);
         buf.writeBytes(this.reputations.getBytes());
         buf.writeInt(this.bags.getBytes().length);
         buf.writeBytes(this.bags.getBytes());
