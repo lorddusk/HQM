@@ -175,7 +175,7 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return !QuestingData.getQuestingData(player).selectedQuest.equals(getId()) || QuestingData.getQuestingData(player).selectedTask != selectedTask.getId();
+                return QuestingData.getQuestingData(player).selectedQuest.equals(getId()) && QuestingData.getQuestingData(player).selectedTask == selectedTask.getId();
             }
 
             @Override

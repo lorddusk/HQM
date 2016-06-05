@@ -30,7 +30,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         if (doFill) {
             QuestTask task = getCurrentTask();
             if (task != null && task instanceof QuestTaskItemsConsume) {
-                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                     modifiedSyncTimer = SYNC_TIME;
                 }
             }
@@ -91,7 +91,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public void setInventorySlotContents(int i, ItemStack itemstack) {
         QuestTask task = getCurrentTask();
         if (task != null && task instanceof QuestTaskItemsConsume) {
-            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                 modifiedSyncTimer = SYNC_TIME;
             }
         }
@@ -109,7 +109,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         if (!worldObj.isRemote) {
             QuestTask task = getCurrentTask();
             if (task != null) {
-                EntityPlayer player = QuestingData.getPlayerFromUsername(playerName);
+                EntityPlayer player = QuestingData.getPlayerFromUsername(playerUuid);
                 if (player != null) {
                     task.getParent().sendUpdatedDataToTeam(player);
                 }
@@ -123,14 +123,14 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             QuestTask task = getCurrentTask();
             boolean state = false;
             if (task != null) {
-                EntityPlayer player = QuestingData.getPlayerFromUsername(playerName);
+                EntityPlayer player = QuestingData.getPlayer(playerUuid);
                 if (player != null) {
                     state = !task.isCompleted(player);
                 }
             }
             boolean oldState = getBlockMetadata() == 1;
             if (state != oldState) {
-                if (state) {
+                if (state) { // TODO add the actual states (meta 1 == has active quest set) / (meta 0 == no or completed quest set)
                     worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
                 } else {
                     worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
@@ -140,7 +140,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     public QuestTask getCurrentTask() {
-        if (playerName != null && selectedQuest != null) {
+        if (playerUuid != null && selectedQuest != null) {
             Quest quest = Quest.getQuest(selectedQuest);
             if (quest != null && selectedTask >= 0 && selectedTask < quest.getTasks().size()) {
                 return quest.getTasks().get(selectedTask);
@@ -215,7 +215,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
     }
 
-    private String playerName;
+    private String playerUuid;
     public String selectedQuest;
     public int selectedTask;
 
@@ -225,7 +225,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             doSync();
         }
 
-        playerName = QuestingData.getUserUUID(player);
+        playerUuid = QuestingData.getUserUUID(player);
         QuestingData data = QuestingData.getQuestingData(player);
         selectedQuest = data.selectedQuest;
         selectedTask = data.selectedTask;
@@ -242,11 +242,11 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         super.readFromNBT(compound);
 
         if (compound.hasKey(NBT_PLAYER_NAME)) {
-            playerName = compound.getString(NBT_PLAYER_NAME);
+            playerUuid = compound.getString(NBT_PLAYER_NAME);
             selectedQuest = compound.getString(NBT_QUEST);
             selectedTask = compound.getByte(NBT_TASK);
         } else {
-            playerName = null;
+            playerUuid = null;
         }
     }
 
@@ -254,8 +254,8 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
-        if (playerName != null) {
-            compound.setString(NBT_PLAYER_NAME, playerName);
+        if (playerUuid != null) {
+            compound.setString(NBT_PLAYER_NAME, playerUuid);
             compound.setString(NBT_QUEST, selectedQuest);
             compound.setByte(NBT_TASK, (byte) selectedTask);
         }
@@ -263,6 +263,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     public String getPlayer() {
-        return playerName;
+        return playerUuid;
     }
 }

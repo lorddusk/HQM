@@ -74,7 +74,7 @@ public class BlockDelivery extends BlockContainer {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null && te instanceof TileEntityBarrel) {
-                        if (((TileEntityBarrel) te).getCurrentTask() != null && te.getBlockMetadata() == 1)
+                        if (((TileEntityBarrel) te).getCurrentTask() != null/* && te.getBlockMetadata() == 1*/) // TODO: uncomment once states (with meta) are in
                             player.addChatComponentMessage(new TextComponentTranslation("tile.hqm:item_barrel.boundTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
                             player.addChatComponentMessage(new TextComponentTranslation("tile.hqm:item_barrel.nonBound"));
