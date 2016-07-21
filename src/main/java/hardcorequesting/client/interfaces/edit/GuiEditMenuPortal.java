@@ -126,6 +126,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
         portal.sendToServer();
     }
 
+    @Override
     public boolean doesRequiredDoublePage() {
         return false;
     }

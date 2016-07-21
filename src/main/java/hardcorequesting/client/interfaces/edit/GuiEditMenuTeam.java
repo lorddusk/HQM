@@ -7,8 +7,8 @@ import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamError;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -284,7 +284,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);
         }
@@ -368,7 +368,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             gui.drawRect(INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             gui.drawRect(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
 

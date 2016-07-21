@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ public abstract class LargeButton {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.color(1F, 1F, 1F);
+            GL11.glColor3f(1F, 1F, 1F);
             boolean enabled = isEnabled(gui, player);
             gui.drawRect(x, y, BUTTON_SRC_X + (enabled && inButtonBounds(gui, mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
             gui.drawCenteredString(getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);

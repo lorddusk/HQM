@@ -1,5 +1,7 @@
 package hardcorequesting.bag;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
@@ -12,12 +14,10 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -183,11 +183,11 @@ public class Group {
             if (inBounds) {
                 color &= 0xFFFFFF;
                 color |= 0xBB << 24;
-                GlStateManager.enableBlend();
+                GL11.glEnable(GL11.GL_BLEND);
             }
             gui.drawString(str, GuiQuestBook.TIERS_X, yPos, color);
             if (inBounds) {
-                GlStateManager.disableBlend();
+                GL11.glDisable(GL11.GL_BLEND);
             }
 
             for (int j = 0; j < BagTier.values().length; j++) {
@@ -211,7 +211,7 @@ public class Group {
             boolean selected = group == gui.modifyingGroup;
             if (inBounds || selected) {
                 color &= 0xFFFFFF;
-                GlStateManager.enableBlend();
+                GL11.glEnable(GL11.GL_BLEND);
 
                 if (selected) {
                     color |= 0x50 << 24;
@@ -222,7 +222,7 @@ public class Group {
 
             gui.drawString(str, GuiQuestBook.GROUPS_X, yPos, color);
             if (inBounds || selected) {
-                GlStateManager.disableBlend();
+                GL11.glDisable(GL11.GL_BLEND);
             }
 
             gui.drawString(Translator.translate("hqm.questBook.items", group.getItems().size()),

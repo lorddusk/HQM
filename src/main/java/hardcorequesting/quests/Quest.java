@@ -1,5 +1,8 @@
 package hardcorequesting.quests;
 
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
@@ -19,15 +22,12 @@ import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import hardcorequesting.util.Tuple;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Tuple;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.lang.reflect.Constructor;
@@ -842,7 +842,7 @@ public class Quest {
         for (LargeButton button : buttons) {
             button.draw(gui, player, mX, mY);
         }
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor3f(1F, 1F, 1F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);

@@ -1,5 +1,7 @@
 package hardcorequesting.items;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.ModInformation;
 import hardcorequesting.bag.BagTier;
@@ -8,20 +10,12 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.NetworkManager;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +28,10 @@ public class ItemBag extends Item {
     public ItemBag() {
         super();
         this.setHasSubtypes(true);
-        this.setMaxDamage(0);
+        this.setMaxDurability(0);
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
-        this.setRegistryName(ItemInfo.BAG_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + ItemInfo.BAG_UNLOCALIZED_NAME, "inventory"));
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -53,7 +39,7 @@ public class ItemBag extends Item {
     public void addInformation(ItemStack itemstack, EntityPlayer player, List tooltip, boolean extraInfo) {
         super.addInformation(itemstack, player, tooltip, extraInfo);
 
-        int dmg = itemstack.getItemDamage();
+        int dmg = itemstack.getMetadata();
         if (dmg >= 0 && dmg < BagTier.values().length) {
             BagTier tier = BagTier.values()[dmg];
             tooltip.add(tier.getColor() + tier.getName());
@@ -71,9 +57,9 @@ public class ItemBag extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+    public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
         if (!world.isRemote) {
-            int dmg = item.getItemDamage();
+            int dmg = item.getMetadata();
             if (dmg >= 0 && dmg < BagTier.values().length) {
                 int totalWeight = 0;
                 for (Group group : Group.getGroups().values()) {
@@ -90,7 +76,7 @@ public class ItemBag extends Item {
                                 group.open(player);
                                 player.inventory.markDirty();
                                 openClientInterface(player, group.getId(), dmg);
-                                world.playSound(player, player.getPosition(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
+                                SoundHandler.play(Sounds.BAG, player);
                                 break;
                             } else {
                                 rng -= weight;
@@ -106,7 +92,7 @@ public class ItemBag extends Item {
             //}
         }
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, item);
+        return item;
     }
 
     private void openClientInterface(EntityPlayer player, String id, int bag) {

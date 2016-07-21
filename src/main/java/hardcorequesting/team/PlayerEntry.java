@@ -2,13 +2,15 @@ package hardcorequesting.team;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import cpw.mods.fml.server.FMLServerHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.server.FMLServerHandler;
+import net.minecraft.server.management.ServerConfigurationManager;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class PlayerEntry {
     private String uuid;
@@ -33,7 +35,7 @@ public class PlayerEntry {
 
     @SideOnly(Side.CLIENT)
     public String getDisplayName() {
-        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
+        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getCommandSenderName();
     }
 
     public boolean isInTeam() {
@@ -116,6 +118,13 @@ public class PlayerEntry {
 
     @SideOnly(Side.SERVER)
     public EntityPlayerMP getPlayerMP() {
-        return FMLServerHandler.instance().getServer().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(this.uuid));
+        ServerConfigurationManager configurationManager = FMLServerHandler.instance().getServer().getConfigurationManager();
+        UUID uuidToFind = java.util.UUID.fromString(this.uuid);
+        for (String userName : configurationManager.getAllUsernames()) {
+            EntityPlayerMP playerByUsername = configurationManager.getPlayerByUsername(userName);
+            if(playerByUsername.getUniqueID().equals(uuidToFind))
+                return playerByUsername;
+        }
+        return null;
     }
 }

@@ -1,5 +1,8 @@
 package hardcorequesting.quests;
 
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
@@ -11,11 +14,7 @@ import hardcorequesting.util.OPBookHelper;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -313,9 +312,9 @@ public class QuestSet {
         for (Quest quest : getQuests().values()) {
             if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
-                GlStateManager.pushMatrix();
-                GlStateManager.enableBlend();
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GL11.glPushMatrix();
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getColorFilter(player, gui.getTick()));
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
                 gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
@@ -329,7 +328,7 @@ public class QuestSet {
                 }
 
                 gui.drawItem(quest.getIcon(), iconX, iconY, true);
-                GlStateManager.popMatrix();
+                GL11.glPopMatrix();
                 //ResourceHelper.bindResource(QUEST_ICONS);
                 //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
             }

@@ -1,5 +1,7 @@
 package hardcorequesting.event;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.QuestLine;
@@ -8,11 +10,9 @@ import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 public class PlayerTracker {
 
@@ -40,7 +40,7 @@ public class PlayerTracker {
         if (QuestingData.isHardcoreActive())
             sendLoginMessage(player);
         else if (ModConfig.NO_HARDCORE_MESSAGE)
-            player.addChatMessage(new TextComponentTranslation("hqm.message.noHardcore"));
+            player.addChatMessage(new ChatComponentTranslation("hqm.message.noHardcore"));
 
         NBTTagCompound tags = player.getEntityData();
         if (tags.hasKey(HQ_TAG)) {
@@ -56,7 +56,7 @@ public class PlayerTracker {
 
 
     private void sendLoginMessage(EntityPlayer player) {
-        player.addChatMessage(new TextComponentString(
+        player.addChatMessage(new ChatComponentText(
                 Translator.translate("hqm.message.hardcore") + " "
                         + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
         ));

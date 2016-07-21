@@ -1,5 +1,8 @@
 package hardcorequesting.death;
 
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
@@ -7,9 +10,6 @@ import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class DeathStats {
                 if (player == null) {
                     return "<invalid>";
                 }
-                return player.getDisplayNameString();
+                return player.getCommandSenderName();
             } catch (IllegalArgumentException ignored) {
             }
         }

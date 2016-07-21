@@ -1,23 +1,20 @@
 package hardcorequesting.util;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class RegisterHelper {
     public static void registerBlock(Block block) {
-        GameRegistry.register(block);
+        GameRegistry.registerBlock(block, block.getUnlocalizedName());
     }
 
     public static void registerBlock(Block block, Class<? extends ItemBlock> blockClass) {
-        GameRegistry.register(block);
-        GameRegistry.register(createItemBlock(block, blockClass), block.getRegistryName());
+        GameRegistry.registerBlock(block, block.getUnlocalizedName());
     }
 
     private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
@@ -33,16 +30,9 @@ public class RegisterHelper {
 
 
     public static void registerItem(Item item) {
-        GameRegistry.register(item);
+        GameRegistry.registerItem(item, item.getUnlocalizedName());
     }
 
-    public static void registerItemRenderer(Item item) {
-        ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-    }
-
-    public static void registerBlockRenderer(Block block) {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
-    }
 
 
 }

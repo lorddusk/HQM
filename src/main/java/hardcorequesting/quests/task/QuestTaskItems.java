@@ -1,5 +1,7 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -12,12 +14,10 @@ import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
 
@@ -215,11 +215,10 @@ public abstract class QuestTaskItems extends QuestTask {
             }
 
             String str = (getProgress(player, i) * 100 / item.required) + "%";
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 200);// magic z value to write over item render
+            GL11.glTranslatef(0, 0, 200);// magic z value to write over item render
             float textSize = 0.8F;
             gui.drawStringWithShadow(str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
-            GlStateManager.popMatrix();
+            GL11.glPopMatrix();
         }
 
         for (int i = 0; i < items.length; i++) {

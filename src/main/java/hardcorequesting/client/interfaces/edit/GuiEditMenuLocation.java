@@ -109,7 +109,7 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
                 location.setX((int) player.posX);
                 location.setY((int) player.posY);
                 location.setZ((int) player.posZ);
-                location.setDimension(player.worldObj.provider.getDimension());
+                location.setDimension(player.worldObj.provider.dimensionId);
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
                     textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
                 }

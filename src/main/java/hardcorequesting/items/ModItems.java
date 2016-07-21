@@ -1,10 +1,10 @@
 package hardcorequesting.items;
 
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import hardcorequesting.util.RegisterHelper;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
     public static ItemQuestBook book = new ItemQuestBook();
@@ -19,17 +19,9 @@ public class ModItems {
         RegisterHelper.registerItem(invalidItem);
     }
 
-    public static void initRender() {
-        book.initModel();
-        hearts.initModel();
-        bags.initModel();
-        invalidItem.initModel();
-    }
-
-
     public static void registerRecipes() {
         //Questing Book
-        GameRegistry.addShapelessRecipe(new ItemStack(ModItems.book), Items.BOOK, Items.STRING);
+        GameRegistry.addShapelessRecipe(new ItemStack(ModItems.book), Items.book, Items.string);
 
         //Hearts
         //1-1-1-1

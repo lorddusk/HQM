@@ -1,5 +1,11 @@
 package hardcorequesting;
 
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
@@ -14,21 +20,13 @@ import hardcorequesting.quests.QuestLine;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 import java.io.File;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
 public class HardcoreQuesting {
 
-    @Instance(ModInformation.ID)
+    @Mod.Instance(ModInformation.ID)
     public static HardcoreQuesting instance;
 
     @SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
@@ -41,7 +39,7 @@ public class HardcoreQuesting {
 
     private static EntityPlayer commandUser;
 
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         new hardcorequesting.event.EventHandler();
 
@@ -61,7 +59,7 @@ public class HardcoreQuesting {
         proxy.initRenderers();
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void load(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(instance);
 
@@ -77,7 +75,7 @@ public class HardcoreQuesting {
         FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
     }
 
-    @EventHandler
+    @Mod.EventHandler
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(CommandHandler.instance);
     }

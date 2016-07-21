@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.common.FMLLog;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.death.DeathStats;
@@ -14,7 +15,6 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
-import net.minecraftforge.fml.common.FMLLog;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.Level;
 

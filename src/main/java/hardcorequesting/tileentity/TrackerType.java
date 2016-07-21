@@ -1,13 +1,13 @@
 package hardcorequesting.tileentity;
 
 import com.mojang.authlib.GameProfile;
+import cpw.mods.fml.common.FMLCommonHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public enum TrackerType {
     TEAM("team") {
@@ -80,10 +80,10 @@ public enum TrackerType {
         public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
             double closest = 0;
             EntityPlayer closestPlayer = null;
-            for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllProfiles()) {
+            for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllProfiles()) {
                 EntityPlayer player = QuestingData.getPlayer(profile.getId());
                 if (player != null) {
-                    double distance = player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
+                    double distance = player.getDistanceSq(tracker.xCoord + 0.5, tracker.yCoord + 0.5, tracker.zCoord + 0.5);
                     if (closestPlayer == null || distance < closest) {
                         closest = distance;
                         closestPlayer = player;
@@ -101,7 +101,7 @@ public enum TrackerType {
 
 
     private static boolean isPlayerWithinRadius(TileEntityTracker tracker, EntityPlayer player, int radius) {
-        return player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
+        return player.getDistanceSq(tracker.xCoord + 0.5, tracker.yCoord + 0.5, tracker.zCoord + 0.5) < radius * radius;
     }
 
     private static boolean isValid(boolean valid, Team team, TileEntityTracker tracker, int radius) {

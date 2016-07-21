@@ -5,8 +5,8 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.TextBoxGroup;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import org.lwjgl.opengl.GL11;
 
 public abstract class GuiEditMenuExtended extends GuiEditMenu {
 
@@ -105,7 +105,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         if (isArrowVisible()) {
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);

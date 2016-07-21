@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -9,7 +10,6 @@ import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -20,7 +20,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -301,7 +301,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         textBoxes.draw(gui);
 
         if (usePrecision()) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
@@ -484,7 +484,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
             clear();
             if (searchItems.isEmpty()) {
                 List<ItemStack> stacks = new ArrayList<>();
-                for (Item item : Item.REGISTRY) {
+                for (Object itemObject : Item.itemRegistry) {
+                    Item item = (Item) itemObject;
                     //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
                     //                    {
                     //                        ItemBlock itemBlock = (ItemBlock)item;

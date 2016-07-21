@@ -1,5 +1,7 @@
 package hardcorequesting.event;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.items.ModItems;
@@ -12,8 +14,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Iterator;
 
@@ -25,31 +25,31 @@ public class PlayerDeathEventListener {
 
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
+        if (event.entityLiving instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) event.entityLiving;
             QuestingData.getQuestingData(player).die(player);
-            DeathType.onDeath(player, event.getSource());
+            DeathType.onDeath(player, event.source);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerDropItemsOnDeath(PlayerDropsEvent event) {
-        if (event.getEntityPlayer() == null
-                || event.getEntityPlayer() instanceof FakePlayer
+        if (event.entityLiving == null
+                || event.entityPlayer instanceof FakePlayer
                 || event.isCanceled()
-                || event.getEntityPlayer().worldObj.getGameRules().getBoolean("keepInventory")
+                || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }
 
         ItemStack bookStack = new ItemStack(ModItems.book);
 
-        Iterator<EntityItem> iter = event.getDrops().iterator();
+        Iterator<EntityItem> iter = event.drops.iterator();
         while (iter.hasNext()) {
             EntityItem entityItem = iter.next();
             ItemStack itemStack = entityItem.getEntityItem();
             if (itemStack != null && itemStack.isItemEqual(bookStack)) {
-                event.getEntityPlayer().inventory.addItemStackToInventory(itemStack);
+                event.entityPlayer.inventory.addItemStackToInventory(itemStack);
                 iter.remove();
             }
         }
@@ -57,24 +57,24 @@ public class PlayerDeathEventListener {
 
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.Clone event) {
-        if (event.getEntityPlayer() == null
-                || event.getEntityPlayer() instanceof FakePlayer
-                || !event.isWasDeath()
+        if (event.entityPlayer == null
+                || event.entityPlayer instanceof FakePlayer
+                || !event.wasDeath
                 || event.isCanceled()
-                || event.getEntityPlayer().worldObj.getGameRules().getBoolean("keepInventory")
+                || event.entityPlayer.worldObj.getGameRules().getGameRuleBooleanValue("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }
 
-        if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
+        if (event.original.inventory.hasItemStack(new ItemStack(ModItems.book))) {
             ItemStack bookStack = new ItemStack(ModItems.book);
-            for (ItemStack itemStack : event.getOriginal().inventory.mainInventory) {
+            for (ItemStack itemStack : event.original.inventory.mainInventory) {
                 if (itemStack.isItemEqual(bookStack)) {
                     bookStack = itemStack.copy(); // Copy the actual stack
                     break;
                 }
             }
-            event.getEntityPlayer().inventory.addItemStackToInventory(bookStack);
+            event.entityPlayer.inventory.addItemStackToInventory(bookStack);
         }
     }
 }

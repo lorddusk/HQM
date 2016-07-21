@@ -1,5 +1,7 @@
 package hardcorequesting.proxies;
 
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.Side;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
@@ -8,8 +10,6 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
 
 
 public class ClientProxy extends CommonProxy {
@@ -27,9 +27,7 @@ public class ClientProxy extends CommonProxy {
 
         //MinecraftForge.EVENT_BUS.register(new GUIOverlay(Minecraft.getMinecraft()));
         //MinecraftForge.EVENT_BUS.register(new BlockHighlightRemover());
-        ModItems.initRender();
         ModBlocks.initRender();
-        Sounds.initSounds();
     }
 
     @Override

@@ -1,22 +1,22 @@
 package hardcorequesting.client.sounds;
 
 import com.google.common.collect.Lists;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.ModInformation;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.Sound;
+import net.minecraft.client.audio.SoundCategory;
 import net.minecraft.client.audio.SoundList;
 import net.minecraft.client.resources.FallbackResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -44,18 +44,18 @@ public class SoundHandler {
 
                 // Add resource pack to discover lore
                 Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
-                FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hardcorequesting");
+                FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hqm");
                 resourceManager.addResourcePack(new LoreResourcePack(new File(path)));
 
                 // Add lore file to sound handler
                 net.minecraft.client.audio.SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
 
-                Sound entry = new Sound(LABEL + number, 1.0f, 1.0f, 0, Sound.Type.SOUND_EVENT, true);
-                SoundList list = new SoundList(Lists.newArrayList(entry), true, "sub");
-//                list.setSoundCategory(SoundCategory.MASTER);
+                SoundList list = new SoundList();
+                list.setSoundCategory(SoundCategory.MASTER);
 
-//                entry.setSoundEntryName(LABEL + number);
-//                list.getSoundList().add(entry);
+                SoundList.SoundEntry entry = new SoundList.SoundEntry();
+                entry.setSoundEntryName(LABEL + number);
+                list.getSoundList().add(entry);
 
                 Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[]{"loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
                 if (method == null || handler == null) {
@@ -67,10 +67,10 @@ public class SoundHandler {
                     loreNumber = number;
                     paths.add(path);
                     return true;
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }

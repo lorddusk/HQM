@@ -3,6 +3,7 @@ package hardcorequesting.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.*;
 import hardcorequesting.quests.reward.ReputationReward;
@@ -12,7 +13,6 @@ import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;

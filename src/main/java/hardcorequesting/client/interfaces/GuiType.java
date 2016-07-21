@@ -5,12 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import hardcorequesting.network.message.OpenGuiMessage;
 import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.tileentity.TrackerType;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -30,7 +29,9 @@ public enum GuiType {
         }
     },
     TRACKER {
-        private static final String BLOCK_POS = "blockPos";
+        private static final String BLOCK_POS_X = "blockPos_x";
+        private static final String BLOCK_POS_Y = "blockPos_y";
+        private static final String BLOCK_POS_Z = "blockPos_z";
         private static final String QUEST = "quest";
         private static final String RADIUS = "radius";
         private static final String TYPE = "trackerType";
@@ -42,10 +43,12 @@ public enum GuiType {
             try {
                 JsonWriter writer = new JsonWriter(stringWriter);
                 writer.beginObject();
-                writer.name(BLOCK_POS).value(data[0]);
-                writer.name(QUEST).value(data[1]);
-                writer.name(RADIUS).value(data[2]);
-                writer.name(TYPE).value(data[3]);
+                writer.name(BLOCK_POS_X).value(data[0]);
+                writer.name(BLOCK_POS_Y).value(data[1]);
+                writer.name(BLOCK_POS_Z).value(data[2]);
+                writer.name(QUEST).value(data[3]);
+                writer.name(RADIUS).value(data[4]);
+                writer.name(TYPE).value(data[5]);
                 writer.endObject();
             } catch (IOException ignored) {
             }
@@ -57,12 +60,14 @@ public enum GuiType {
         public void open(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
+            int x = root.get(BLOCK_POS_X).getAsInt();
+            int y = root.get(BLOCK_POS_Y).getAsInt();
+            int z = root.get(BLOCK_POS_Z).getAsInt();
             JsonElement quest = root.get(QUEST);
             String questId = quest.isJsonNull() ? null : root.getAsString();
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
-            TileEntityTracker.openInterface(player, pos, questId, radius, type);
+            TileEntityTracker.openInterface(player, x, y, z, questId, radius, type);
         }
     },
     BOOK {

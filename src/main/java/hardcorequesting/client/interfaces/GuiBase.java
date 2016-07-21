@@ -1,16 +1,17 @@
 package hardcorequesting.client.interfaces;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,13 +109,12 @@ public class GuiBase extends GuiScreen {
                 break;
         }
 
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer worldRenderer = tessellator.getBuffer();
-        worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos((double) (x + 0), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
-        worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]).endVertex();
-        worldRenderer.pos((double) (x + targetW), (double) (y + 0), (double) this.zLevel).tex(pt3[0], pt3[1]).endVertex();
-        worldRenderer.pos((double) (x + 0), (double) (y + 0), (double) this.zLevel).tex(pt4[0], pt4[1]).endVertex();
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV((double) (x + 0), (double) (y + targetH), (double) this.zLevel, pt1[0], pt1[1]);
+        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + targetH), (double) this.zLevel, pt2[0], pt2[1]);
+        tessellator.addVertexWithUV((double) (x + targetW), (double) (y + 0), (double) this.zLevel, pt3[0], pt3[1]);
+        tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) this.zLevel, pt4[0], pt4[1]);
         tessellator.draw();
     }
 
@@ -126,7 +126,7 @@ public class GuiBase extends GuiScreen {
 
     public void drawMouseOver(List<String> str, int x, int y) {
         float oldZ = this.zLevel;
-        GlStateManager.disableDepth();
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
 
         int w = 0;
 
@@ -180,12 +180,12 @@ public class GuiBase extends GuiScreen {
         }
 
         this.zLevel = oldZ;
-        GlStateManager.enableDepth();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glColor4f(1F, 1F, 1F, 1F);
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
-        GlStateManager.disableTexture2D();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
         applyColor(color);
 
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -196,7 +196,7 @@ public class GuiBase extends GuiScreen {
         GL11.glVertex3f(x2, y2, 0);
         GL11.glEnd();
 
-        GlStateManager.enableTexture2D();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
     public void applyColor(int color) {
@@ -205,17 +205,17 @@ public class GuiBase extends GuiScreen {
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
 
-        GlStateManager.color(r, g, b, a);
+        GL11.glColor4f(r, g, b, a);
     }
 
 
-    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
+    protected static RenderItem itemRenderer = new RenderItem();
     //protected static RenderBlocks blockRenderer = new RenderBlocks();
 
-    public void drawIcon(ItemStack item, int x, int y) {
-        itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
-        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
-    }
+    //public void drawIcon(ItemStack item, int x, int y) {
+    //    itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
+    //    //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
+    //}
 
 //TODO Fix Fluid drawing
 //    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
@@ -256,7 +256,7 @@ public class GuiBase extends GuiScreen {
     public static final int ITEM_SIZE = 18;
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1F, 1F, 1F, 1F);
 
         ResourceHelper.bindResource(MAP_TEXTURE);
 
@@ -271,10 +271,10 @@ public class GuiBase extends GuiScreen {
 
         if (item != null && item.getItem() != null) {
             drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
+            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + +top + 1, "");
         }
-        GlStateManager.disableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glColor3f(1F, 1F, 1F);
     }
 
 
@@ -283,37 +283,37 @@ public class GuiBase extends GuiScreen {
         for (int i = 0; i < colorComponents.length; i++) {
             colorComponents[i] = ((color & (255 << (i * 8))) >> (i * 8)) / 255F;
         }
-        GlStateManager.color(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
+        GL11.glColor4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
 
 
     public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
         if (itemstack == null || itemstack.getItem() == null) return;
 
-        GlStateManager.pushMatrix();
+        GL11.glPushMatrix();
 
         RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.disableLighting();
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableColorMaterial();
-        GlStateManager.enableLighting();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+        GL11.glEnable(GL11.GL_LIGHTING);
 
         float oldZ = this.zLevel;
         setZLevel(4f);
         try {
             // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-            itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
+            itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
             // }
         } finally {
             setZLevel(oldZ);
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.disableLighting();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.enableAlpha();
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
         }
 
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
 
     public float getZLevel() {
@@ -344,19 +344,19 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawString(String str, int x, int y, float mult, int color) {
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(mult, mult, 1F);
+        GL11.glPushMatrix();
+        GL11.glScalef(mult, mult, 1F);
         fontRendererObj.drawString(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
 
     public void drawStringWithShadow(String str, int x, int y, float mult, int color) {
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(mult, mult, 1F);
+        GL11.glPushMatrix();
+        GL11.glScalef(mult, mult, 1F);
         fontRendererObj.drawStringWithShadow(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
 
     public boolean inBounds(int x, int y, int w, int h, int mX, int mY) {
@@ -364,15 +364,15 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawCursor(int x, int y, int z, float size, int color) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0, 0, z);
+        GL11.glPushMatrix();
+        GL11.glTranslatef(0, 0, z);
         x += left;
         y += top;
-        GlStateManager.translate(x, y, 0);
-        GlStateManager.scale(size, size, 0);
-        GlStateManager.translate(-x, -y, 0);
+        GL11.glTranslatef(x, y, 0);
+        GL11.glScalef(size, size, 0);
+        GL11.glTranslatef(-x, -y, 0);
         Gui.drawRect(x, y + 1, x + 1, y + 10, color);
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
 
     public void drawString(List<String> str, int x, int y, float mult, int color) {
@@ -380,15 +380,15 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawString(List<String> str, int start, int length, int x, int y, float mult, int color) {
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(mult, mult, 1F);
+        GL11.glPushMatrix();
+        GL11.glScalef(mult, mult, 1F);
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
             fontRendererObj.drawString(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
             y += fontRendererObj.FONT_HEIGHT;
         }
-        GlStateManager.popMatrix();
+        GL11.glPopMatrix();
     }
 
     public void drawCenteredString(String str, int x, int y, float mult, int width, int height, int color) {

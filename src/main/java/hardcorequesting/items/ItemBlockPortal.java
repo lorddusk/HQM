@@ -1,5 +1,7 @@
 package hardcorequesting.items;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.PortalType;
@@ -10,8 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -83,6 +83,6 @@ public class ItemBlockPortal extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
-        return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
+        return super.getUnlocalizedName(itemStack) + "_" + itemStack.getMetadata();
     }
 }

@@ -1,17 +1,19 @@
 package hardcorequesting.client.interfaces.edit;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskMob;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
@@ -60,10 +62,10 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         rawMobs = new ArrayList<String>();
         mobs = new ArrayList<String>();
 
-        for (Object obj : EntityList.CLASS_TO_NAME.keySet()) {
+        for (Object obj : EntityList.classToStringMapping.keySet()) {
             Class clazz = (Class) obj;
             if (EntityLivingBase.class.isAssignableFrom(clazz)) {
-                rawMobs.add(EntityList.CLASS_TO_NAME.get(clazz));
+                rawMobs.add((String) EntityList.classToStringMapping.get(clazz));
             }
         }
 
@@ -92,7 +94,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         super.draw(gui, mX, mY);
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         scrollBar.draw(gui);
 
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
@@ -170,11 +172,12 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     public void save(GuiBase gui) {
         mob.setCount(Math.max(1, mob.getCount()));
 
-        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
-            EntityList.EntityEggInfo info = EntityList.ENTITY_EGGS.get(mob.getMob());
+        //TODO can prob be cleaned up 1.7.10
+        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.spawn_egg) && mob.getMob() != null) {
+            HashMap ids = ReflectionHelper.getPrivateValue(EntityList.class, null, 4);
+            EntityList.EntityEggInfo info = (EntityList.EntityEggInfo) EntityList.entityEggs.get(ids.get(mob.getMob()));
             if (info != null) {
-                int id = EntityList.getIDFromString(mob.getMob());
-                mob.setIcon(new ItemStack(Items.SPAWN_EGG, 1, id));
+                mob.setIcon(new ItemStack(Items.spawn_egg, 1, info.spawnedID));
             }
         }
 

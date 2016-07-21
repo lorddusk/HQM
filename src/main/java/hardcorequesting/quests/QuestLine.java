@@ -1,5 +1,8 @@
 package hardcorequesting.quests;
 
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -15,10 +18,8 @@ import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -77,8 +78,9 @@ public class QuestLine {
     }
 
     public static void sendServerSync(EntityPlayer player) {
+        MinecraftServer server = MinecraftServer.getServer();
         if (player instanceof EntityPlayerMP) {
-            if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
+            if (player.getCommandSenderName().equals(server.getServerOwner())) // Integrated server
                 NetworkManager.sendToPlayer(new FullSyncMessage(true), (EntityPlayerMP) player);
             else {
                 NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), (EntityPlayerMP) player);

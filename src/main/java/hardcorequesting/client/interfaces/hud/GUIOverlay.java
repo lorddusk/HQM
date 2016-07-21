@@ -1,15 +1,14 @@
 package hardcorequesting.client.interfaces.hud;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -25,18 +24,18 @@ public class GUIOverlay extends Gui {
 
     @SubscribeEvent
     public void onRenderExperienceBar(RenderGameOverlayEvent event) {
-        if (event.isCancelable() || event.getType() != ElementType.EXPERIENCE) {
+        if (event.isCancelable() || event.type != ElementType.EXPERIENCE) {
             return;
         }
 
         int xPos = ModConfig.OVERLAY_XPOS;
         int yPos = ModConfig.OVERLAY_YPOS;
-        GlStateManager.enableBlend();
-        GlStateManager.disableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.disableAlpha();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(false);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glDisable(GL11.GL_ALPHA_TEST);
         //String s = " Lives: " + QuestingData.getQuestingData(mc.thePlayer).getLives();
         String s = " Lives: " + getLives();
         String d = " Deaths: " + getDeaths();
@@ -48,9 +47,9 @@ public class GUIOverlay extends Gui {
             } else {
                 this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xffffff);
             }
-            GlStateManager.disableBlend();
-            GlStateManager.enableDepth();
-            GlStateManager.depthMask(true);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthMask(true);
         } else {
             this.mc.fontRendererObj.drawString(d, xPos + 1, yPos, 0xffffff);
         }

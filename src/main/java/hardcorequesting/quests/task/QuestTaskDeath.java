@@ -1,5 +1,7 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.event.EventHandler;
@@ -10,9 +12,6 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
 
 public class QuestTaskDeath extends QuestTask {
     private int deaths;
@@ -26,8 +25,8 @@ public class QuestTaskDeath extends QuestTask {
 
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayerMP) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (event.entityLiving instanceof EntityPlayerMP) {
+            EntityPlayer player = (EntityPlayer) event.entityLiving;
             if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
                 QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData(player);
                 if (deathData.deaths < deaths) {

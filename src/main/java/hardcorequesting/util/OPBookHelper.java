@@ -3,13 +3,13 @@ package hardcorequesting.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.OpActionMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;

@@ -1,6 +1,10 @@
 package hardcorequesting.network;
 
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.relauncher.Side;
 import hardcorequesting.ModInformation;
 import hardcorequesting.network.message.BlockSyncMessage;
 import hardcorequesting.network.message.BlockSyncMessageClient;
@@ -9,10 +13,6 @@ import hardcorequesting.tileentity.IBlockSync;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -56,10 +56,10 @@ public class NetworkManager {
 
     public static NetworkRegistry.TargetPoint asTarget(TileEntity te, double radius) {
         return new NetworkRegistry.TargetPoint(
-                te.getWorld().provider.getDimension(),
-                te.getPos().getX(),
-                te.getPos().getY(),
-                te.getPos().getZ(),
+                te.getWorld().provider.dimensionId,
+                te.xCoord,
+                te.yCoord,
+                te.zCoord,
                 radius
         );
     }

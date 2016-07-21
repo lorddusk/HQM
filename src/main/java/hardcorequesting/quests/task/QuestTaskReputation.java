@@ -1,5 +1,7 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -11,8 +13,6 @@ import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
 

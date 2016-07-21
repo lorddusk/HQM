@@ -1,5 +1,7 @@
 package hardcorequesting.reputation;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -9,8 +11,6 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
 
@@ -149,6 +149,7 @@ public class ReputationBar {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
         }
 
+        @Override
         @SideOnly(Side.CLIENT)
         public void onClick(GuiBase guiB, int mX, int mY, int b) {
             super.onClick(guiB, mX, mY, b);

@@ -1,5 +1,7 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -17,8 +19,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
 
@@ -31,11 +31,11 @@ public class QuestTaskMob extends QuestTask {
     }
 
     public static EntityPlayer getKiller(LivingDeathEvent event) {
-        if (event.getEntityLiving() != null && !event.getEntityLiving().worldObj.isRemote && event.getSource() != null) {
-            if (event.getSource().getSourceOfDamage() != null && event.getSource().getSourceOfDamage() instanceof EntityPlayer) {
-                return (EntityPlayer) event.getSource().getSourceOfDamage();
-            } else if (event.getEntityLiving().getCommandSenderEntity() instanceof EntityPlayer) {
-                return (EntityPlayer) event.getEntityLiving().getCommandSenderEntity();
+        if (event.entityLiving != null && !event.entityLiving.worldObj.isRemote && event.source != null) {
+            if (event.source.getSourceOfDamage() != null && event.source.getSourceOfDamage() instanceof EntityPlayer) {
+                return (EntityPlayer) event.source.getSourceOfDamage();
+            } else if (event.entityLiving.func_94060_bK() instanceof EntityPlayer) {
+                return (EntityPlayer) event.entityLiving.func_94060_bK();
             }
         }
 
@@ -51,15 +51,15 @@ public class QuestTaskMob extends QuestTask {
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
                 if (mob.count > ((QuestDataTaskMob) getData(player)).killed[i]) {
-                    Class clazz = (Class) EntityList.NAME_TO_CLASS.get(mob.mob);
+                    Class clazz = (Class) EntityList.stringToClassMapping.get(mob.mob);
                     if (clazz != null) {
                         if (mob.isExact()) {
-                            if (clazz.equals(event.getEntityLiving().getClass())) {
+                            if (clazz.equals(event.entityLiving.getClass())) {
                                 ((QuestDataTaskMob) getData(player)).killed[i]++;
                                 updated = true;
                             }
                         } else {
-                            if (clazz.isAssignableFrom(event.getEntityLiving().getClass())) {
+                            if (clazz.isAssignableFrom(event.entityLiving.getClass())) {
                                 ((QuestDataTaskMob) getData(player)).killed[i]++;
                                 updated = true;
                             }

@@ -1,5 +1,6 @@
 package hardcorequesting.blocks;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -10,7 +11,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModBlocks {
     public static Block itemBarrel = new BlockDelivery().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
@@ -24,9 +24,6 @@ public class ModBlocks {
     }
 
     public static void initRender() {
-        RegisterHelper.registerBlockRenderer(itemBarrel);
-        RegisterHelper.registerBlockRenderer(itemTracker);
-        RegisterHelper.registerBlockRenderer(itemPortal);
     }
 
     public static void registerTileEntities() {
@@ -40,7 +37,7 @@ public class ModBlocks {
                 "wgw",
                 "gqg",
                 "wgw",
-                'w', Blocks.PLANKS, 'q', ModItems.book.setContainerItem(ModItems.book), 'g', Blocks.GLASS);
+                'w', Blocks.planks, 'q', ModItems.book.setContainerItem(ModItems.book), 'g', Blocks.glass);
     }
 
 

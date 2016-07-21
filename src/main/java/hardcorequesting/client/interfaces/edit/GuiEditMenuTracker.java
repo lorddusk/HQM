@@ -65,6 +65,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
         tracker.sendToServer();
     }
 
+    @Override
     public boolean doesRequiredDoublePage() {
         return false;
     }

@@ -1,5 +1,7 @@
 package hardcorequesting.team;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
@@ -11,8 +13,6 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -279,7 +279,7 @@ public class Team {
         }
 
         //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
+        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
             Team team = QuestingData.getQuestingData(username).getTeam();
             PlayerEntry entry = team.getEntry(username);
             if (entry != null) {

@@ -118,8 +118,7 @@ public class GuiReward extends GuiBase {
         for (Reward reward : rewards) {
             try {
                 drawItem(reward.item, reward.x, reward.y, true);
-                //itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), reward.item, reward.x + left + 1, reward.y + top + 1);
-                itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, reward.item, (reward.x + left + 1), (reward.y + top + 1), "");
+                itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), reward.item, reward.x + left + 1, reward.y + top + 1);
             } catch (Throwable ignored) {
             }
         }

@@ -1,10 +1,10 @@
 package hardcorequesting.client.interfaces;
 
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class GuiWrapperEditMenu extends GuiBase {
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
+    public void handleMouseInput() {
         super.handleMouseInput();
 
         if (editMenu != null) {
@@ -109,7 +109,7 @@ public class GuiWrapperEditMenu extends GuiBase {
     }
 
     @Override
-    protected void keyTyped(char c, int k) throws IOException {
+    protected void keyTyped(char c, int k) {
         super.keyTyped(c, k);
 
         if (editMenu != null) {

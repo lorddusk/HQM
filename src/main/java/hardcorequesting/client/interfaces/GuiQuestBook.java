@@ -1,5 +1,7 @@
 package hardcorequesting.client.interfaces;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
@@ -25,15 +27,13 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -524,13 +524,13 @@ public class GuiQuestBook extends GuiBase {
             }
 
             if (currentMode == EditMode.DELETE) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(0, 0, 200);
+                GL11.glPushMatrix();
+                GL11.glTranslatef(0, 0, 200);
                 drawCenteredString(Translator.translate("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 drawCenteredString(Translator.translate("hqm.questBook.deleteOnClick"), 0, fontRendererObj.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 applyColor(0xFFFFFFFF);
                 ResourceHelper.bindResource(MAP_TEXTURE);
-                GlStateManager.popMatrix();
+                GL11.glPopMatrix();
             }
 
         } else {
@@ -571,7 +571,7 @@ public class GuiQuestBook extends GuiBase {
                 drawString(GuiColor.RED + Translator.translate("hqm.questBook.deadOut"), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             int lives = QuestingData.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {
@@ -659,7 +659,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
+    public void handleMouseInput() {
         super.handleMouseInput();
 
         int x = (Mouse.getEventX() * this.width / this.mc.displayWidth) - left;
@@ -680,7 +680,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    protected void keyTyped(char c, int k) throws IOException {
+    protected void keyTyped(char c, int k) {
         super.keyTyped(c, k);
         if (editMenu != null) {
             editMenu.onKeyTyped(this, c, k);
@@ -696,7 +696,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     @Override
-    protected void mouseClicked(int x0, int y0, int button) throws IOException {
+    protected void mouseClicked(int x0, int y0, int button) {
         super.mouseClicked(x0, y0, button);
 
         int x = x0 - left;

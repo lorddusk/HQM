@@ -1,11 +1,11 @@
 package hardcorequesting.items;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.util.RegisterHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 //import net.minecraft.client.renderer.texture.IIconRegister;
 
@@ -18,7 +18,6 @@ public class ItemInvalid extends Item {
         super();
         this.setMaxStackSize(1);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
-        this.setRegistryName(ItemInfo.INVALID_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.INVALID_UNLOCALIZED_NAME);
     }
 
@@ -27,8 +26,4 @@ public class ItemInvalid extends Item {
         return super.getUnlocalizedName(itemStack);
     }
 
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        RegisterHelper.registerItemRenderer(this);
-    }
 }

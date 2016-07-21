@@ -11,18 +11,16 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler, ITickable {
+public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler {
 
     @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
         if (resource == null) {
             return 0;
         }
@@ -40,27 +38,27 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
         return null;
     }
 
     @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
         return null;
     }
 
     @Override
-    public boolean canFill(EnumFacing from, Fluid fluid) {
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
         return true;
     }
 
     @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid) {
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
         return false;
     }
 
     @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from) {
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
         return new FluidTankInfo[0];
     }
 
@@ -80,7 +78,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
+    public ItemStack getStackInSlotOnClosing(int index) {
         return null;
     }
 
@@ -98,7 +96,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void update() {
+    public void updateEntity() {
         if (modifiedSyncTimer > 0 && --modifiedSyncTimer == 0) {
             doSync();
             updateState();
@@ -129,12 +127,13 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
                 }
             }
             boolean oldState = getBlockMetadata() == 1;
-            if (state != oldState) {
+            if (state != oldState) {/*
                 if (state) { // TODO add the actual states (meta 1 == has active quest set) / (meta 0 == no or completed quest set)
                     worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
                 } else {
                     worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
-                }
+                }*/
+                worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, state ? 1 : 0, 3);
             }
         }
     }
@@ -156,18 +155,13 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 //    }
 
     @Override
-    public String getName() {
+    public String getInventoryName() {
         return null;
     }
 
     @Override
-    public boolean hasCustomName() {
+    public boolean isCustomInventoryName() {
         return false;
-    }
-
-    @Override
-    public ITextComponent getDisplayName() {
-        return null;
     }
 
     @Override
@@ -181,38 +175,18 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
+    public void openChest() {
 
     }
 
     @Override
-    public void closeInventory(EntityPlayer player) {
+    public void closeChest() {
 
     }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
         return true;
-    }
-
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-    public void clear() {
-
     }
 
     private String playerUuid;
@@ -251,7 +225,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
         if (playerUuid != null) {
@@ -259,7 +233,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             compound.setString(NBT_QUEST, selectedQuest);
             compound.setByte(NBT_TASK, (byte) selectedTask);
         }
-        return compound;
     }
 
     public String getPlayer() {

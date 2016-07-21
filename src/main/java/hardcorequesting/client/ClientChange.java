@@ -3,6 +3,7 @@ package hardcorequesting.client;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.message.ClientUpdateMessage;
@@ -11,10 +12,8 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.tileentity.TrackerType;
+import hardcorequesting.util.Tuple;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Tuple;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -101,13 +100,19 @@ public enum ClientChange {
         private static final String BLOCK_POS = "blockPos";
         private static final String RADIUS = "radius";
         private static final String TYPE = "trackerType";
+        private static final String POS_X = "pos_x";
+        private static final String POS_Y = "pos_y";
+        private static final String POS_Z = "pos_z";
+
 
         @Override
         public IMessage build(TileEntityTracker data) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(BLOCK_POS).value(data.getPos().toLong());
+            writer.name(POS_X).value(data.xCoord);
+            writer.name(POS_Y).value(data.yCoord);
+            writer.name(POS_Z).value(data.zCoord);
             writer.name(RADIUS).value(data.getRadius());
             writer.name(TYPE).value(data.getType().ordinal());
             writer.endObject();
@@ -118,10 +123,13 @@ public enum ClientChange {
         public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
+            //BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
+            int x = root.get(POS_X).getAsInt();
+            int y = root.get(POS_Y).getAsInt();
+            int z = root.get(POS_Z).getAsInt();
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
-            TileEntityTracker.saveToServer(player, pos, radius, type);
+            TileEntityTracker.saveToServer(player, x, y, z, radius, type);
         }
     }),
     SOUND(new ClientUpdater<Sounds>() {

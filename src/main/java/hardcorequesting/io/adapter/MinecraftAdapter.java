@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -12,8 +11,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.IOException;
 
@@ -33,11 +30,11 @@ public class MinecraftAdapter {
                 out.nullValue();
                 return;
             }
-            String id = value.getItem().getRegistryName().toString();
+            String id = Item.itemRegistry.getNameForObject(value.getItem());
             out.beginObject();
             out.name(ID).value(id);
-            if (value.getItemDamage() != 0) {
-                out.name(DAMAGE).value(value.getItemDamage());
+            if (value.getMetadata() != 0) {
+                out.name(DAMAGE).value(value.getMetadata());
             }
             if (value.stackSize != 1) {
                 out.name(STACK_SIZE).value(value.stackSize);
@@ -71,7 +68,7 @@ public class MinecraftAdapter {
             }
             in.endObject();
 
-            Item item = Item.getByNameOrId(id);
+            Item item = (Item) Item.itemRegistry.getObject(id);
             if (item == null) {
                 return null;
             }
@@ -90,7 +87,7 @@ public class MinecraftAdapter {
         @Override
         public NBTTagCompound read(JsonReader in) throws IOException {
             try {
-                NBTBase nbtBase = JsonToNBT.getTagFromJson(in.nextString());
+                NBTBase nbtBase = JsonToNBT.func_150315_a(in.nextString());
                 if (nbtBase instanceof NBTTagCompound) {
                     return (NBTTagCompound) nbtBase;
                 }

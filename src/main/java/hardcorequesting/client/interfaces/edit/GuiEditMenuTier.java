@@ -5,8 +5,8 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import org.lwjgl.opengl.GL11;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     private GroupTier tier;
@@ -82,7 +82,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
 
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 

@@ -12,7 +12,7 @@ public class CommandEnable extends CommandBase {
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments) {
         QuestingData.disableVanillaHardcore(sender);
-        if (sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
+        if (sender.getEntityWorld().getWorldInfo().isHardcoreModeEnabled())
             sendChat(sender, "hqm.message.vanillaHardcoreOn");
         else
             sendChat(sender, QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore");

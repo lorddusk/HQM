@@ -1,71 +1,105 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'idea'
-
-repositories {
-    maven {
-        name = "forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-    maven {
-        name = "progwml6"
-        url =  "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "mobiusstrip"
-        url = "http://mobiusstrip.eu/maven"
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }
 
-dependencies {
-    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
-}
-
-version = "1.9.4-5.0.0beta3"
-group = "hardcorequesting"
-archivesBaseName = "HQM-New Heights"
+apply plugin: 'forge'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+version = "1.9.4-5.0.0beta3"
+group = "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "HQM-New Heights"
+
 minecraft {
-    version = "1.9.4-12.17.0.1909-1.9.4"
-    mappings = "snapshot_20160518"
-    runDir = "run"
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "eclipse/assets"
+	mappings = "snapshot_20140925"
 
-    useDepAts = true
-
+    //replacing stuff in code.
     replace "@VERSION@", project.version
     replaceIn "ModInformation.java"
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+def root = project.projectDir.parentFile
+sourceSets {
+    main {
+        java {
+            srcDir new File(root, "src")
+        }
+        resources {
+            srcDir new File(root, "resources")
+        }
     }
-
-    from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
-
-    // Move access transformers to META-INF
-    rename '(.+_at.cfg)', 'META-INF/$1'
 }
+
+processResources
+        {
+            inputs.property "version", project.version
+            inputs.property "mcversion", project.minecraft.version
+
+            // replace stuff in text files, not binary ones.
+            from(sourceSets.main.resources.srcDirs) {
+                include '**/*.info'
+                expand 'version': project.version, 'mcversion': project.minecraft.version
+            }
+
+            // copy everything else, thats not text
+            from(sourceSets.main.resources.srcDirs) {
+                exclude '**/*.info'
+            }
+        }
 
 jar {
-    destinationDir = file (rootProject.getRootDir().getPath() + '/output')
+    exclude "**/*.psd"
 }
+
+repositories {
+    maven { // The repo from which to get waila
+        name "Mobius Repo"
+        url "http://mobiusstrip.eu/maven"
+    }
+    maven { // the repo from which to get NEI and stuff
+        name 'CB Repo'
+        url "http://chickenbones.net/maven/"
+    }
+}
+
+dependencies {
+    compile "mcp.mobius.waila:Waila:1.5.10_1.7.10"
+}
+
+task copyChicken(type: Copy, dependsOn: "extractUserDev") {
+    from { configurations.compile }
+    include "**/*Chicken*.jar", "**/*NotEnoughItems*.jar"
+    exclude "**/CodeChickenLib*" // because CCC downloads it anyways.. -_-
+    into file("eclipse/assets/mods") // paralell to the assets dir
+
+    mustRunAfter "deobfBinJar"
+    mustRunAfter "repackMinecraft"
+}
+//tasks.setupDevWorkspace.dependsOn copyChicken
+//tasks.setupDecompWorkspace.dependsOn copyChicken
+
+def libDir = './build/libs'
+
+task deobfJar(type: Jar) {
+    description = 'Creates a jar file containing the non-obfuscated class files'
+    classifier = 'deobf'
+    destinationDir = file(libDir)
+    from sourceSets.main.output.classesDir
+}
+tasks.build.dependsOn deobfJar

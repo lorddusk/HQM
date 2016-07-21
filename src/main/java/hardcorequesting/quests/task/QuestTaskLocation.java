@@ -1,5 +1,8 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -16,9 +19,6 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
 
@@ -55,7 +55,7 @@ public class QuestTaskLocation extends QuestTask {
 
                 for (int i = 0; i < locations.length; ++i) {
                     Location location = this.locations[i];
-                    if (!visited[i] && player.worldObj.provider.getDimension() == location.dimension) {
+                    if (!visited[i] && player.worldObj.provider.dimensionId == location.dimension) {
                         int current = (int) player.getDistanceSq((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
@@ -275,8 +275,7 @@ public class QuestTaskLocation extends QuestTask {
                 if (location.radius >= 0) {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
-
-                if (player.worldObj.provider.getDimension() == location.dimension) {
+                if (player.worldObj.provider.dimensionId == location.dimension) {
                     if (location.radius >= 0) {
                         String str;
                         int distance = (int) player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);

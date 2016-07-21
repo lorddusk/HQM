@@ -1,10 +1,11 @@
 package hardcorequesting.util;
 
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
+
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 
 import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
@@ -14,7 +15,7 @@ public class Translator {
     private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)\\]\\]");
 
     public static String translate(String id) {
-        return I18n.translateToLocal(id).replace("\\n", "\n");
+        return I18n.format(id).replace("\\n", "\n");
     }
 
     public static String translate(String id, Object... args) {
@@ -25,17 +26,17 @@ public class Translator {
         return format(translate(id), plural, args);
     }
 
-    public static ITextComponent translateToIChatComponent(String id, Object... args) {
-        return translateToIChatComponent(TextFormatting.WHITE, id, args);
+    public static IChatComponent translateToIChatComponent(String id, Object... args) {
+        return translateToIChatComponent(EnumChatFormatting.WHITE, id, args);
     }
 
-    public static ITextComponent translateToIChatComponent(TextFormatting colour, String id, Object... args) {
+    public static IChatComponent translateToIChatComponent(EnumChatFormatting colour, String id, Object... args) {
         return translateToIChatComponent(colour, false, id, args);
     }
 
-    public static ITextComponent translateToIChatComponent(TextFormatting colour, boolean plural, String id, Object... args) {
-        ITextComponent iChatComponent = new TextComponentString(Translator.translate(plural, id, args));
-        iChatComponent.getStyle().setColor(colour);
+    public static IChatComponent translateToIChatComponent(EnumChatFormatting colour, boolean plural, String id, Object... args) {
+        IChatComponent iChatComponent = new ChatComponentText(Translator.translate(plural, id, args));
+        iChatComponent.getChatStyle().setColor(colour);
         return iChatComponent;
     }
 

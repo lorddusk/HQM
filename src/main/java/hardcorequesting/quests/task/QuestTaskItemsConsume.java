@@ -1,13 +1,13 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskItemsConsume extends QuestTaskItems {
     public QuestTaskItemsConsume(Quest parent, String description, String longDescription) {

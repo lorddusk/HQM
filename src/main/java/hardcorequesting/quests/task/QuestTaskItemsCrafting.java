@@ -1,5 +1,8 @@
 package hardcorequesting.quests.task;
 
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;
@@ -7,9 +10,6 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskItemsCrafting extends QuestTaskItems {
     public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {

@@ -1,5 +1,8 @@
 package hardcorequesting.config;
 
+import cpw.mods.fml.client.config.IConfigElement;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.ModInformation;
 import hardcorequesting.items.ItemBag;
 import hardcorequesting.quests.QuestLine;
@@ -7,9 +10,6 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.RewardSetting;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.config.IConfigElement;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ public class ModConfig {
 
     @SubscribeEvent
     public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equalsIgnoreCase(ModInformation.ID))
+        if (event.modID.equalsIgnoreCase(ModInformation.ID))
             loadConfig();
     }
 

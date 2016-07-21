@@ -9,7 +9,6 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
 
@@ -38,7 +37,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+    public boolean canCommandSenderUseCommand(ICommandSender sender) {
         return true;
     }
 
@@ -48,7 +47,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
             String subCommand = args[0];
             List<String> result = new ArrayList<>();
@@ -69,7 +68,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             args = new String[]{"help"};
         }
@@ -96,7 +95,7 @@ public class CommandHandler extends CommandBase {
 
 
     public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
-        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
+        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username.getName());
     }
 
     public static ISubCommand getCommand(String commandName) {

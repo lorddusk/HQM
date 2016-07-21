@@ -1,5 +1,7 @@
 package hardcorequesting.client.interfaces.edit;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -8,10 +10,8 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiEditMenuDeath extends GuiEditMenu {
@@ -95,7 +95,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;

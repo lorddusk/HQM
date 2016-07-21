@@ -50,7 +50,7 @@ public class OreDictionaryHelper {
     private static List<ItemStack> stripWildcardDamage(List<ItemStack> list) {
         List<ItemStack> result = new ArrayList<>(list.size());
         for (ItemStack itemStack : list)
-            result.add(new ItemStack(itemStack.getItem(), itemStack.stackSize, itemStack.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 0 : itemStack.getItemDamage()));
+            result.add(new ItemStack(itemStack.getItem(), itemStack.stackSize, itemStack.getMetadata() == OreDictionary.WILDCARD_VALUE ? 0 : itemStack.getMetadata()));
         return result;
     }
 }
