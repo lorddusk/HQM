@@ -12,6 +12,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.StatCollector;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,7 +100,7 @@ public class CommandSave extends CommandBase {
     private static void save(ICommandSender sender, Object object, Type type, String name) throws CommandException {
         try {
             File file = SaveHandler.save(SaveHandler.getExportFile(name), object, type);
-            sender.addChatMessage(new ChatComponentText(I18n.format(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
+            sender.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
         } catch (IOException e) {
             throw new CommandException(Lang.SAVE_FAILED, name);
         }

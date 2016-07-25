@@ -10,6 +10,7 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.NetworkManager;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -32,6 +33,17 @@ public class ItemBag extends Item {
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister register) {
+        pickIcons(register);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void pickIcons(IIconRegister register) {
+        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
     }
 
     @SuppressWarnings("unchecked")

@@ -9,11 +9,13 @@ import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -29,7 +31,27 @@ public class ItemQuestBook extends Item {
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
+    @SideOnly(Side.CLIENT)
+    private IIcon opIcon;
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister register) {
+        pickIcons(register);
+
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void pickIcons(IIconRegister register) {
+        itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_ICON);
+        opIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BOOK_OP_ICON);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamage(int dmg) {
+        return dmg == 1 ? opIcon : itemIcon;
+    }
 
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
@@ -91,7 +113,7 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack itemStack) {
+    public boolean hasEffect(ItemStack itemStack, int pass) {
         return itemStack.getMetadata() == 1;
     }
 

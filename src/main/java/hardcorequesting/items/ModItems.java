@@ -13,10 +13,10 @@ public class ModItems {
     public static ItemInvalid invalidItem = new ItemInvalid();
 
     public static void init() {
-        RegisterHelper.registerItem(book);
-        RegisterHelper.registerItem(hearts);
-        RegisterHelper.registerItem(bags);
-        RegisterHelper.registerItem(invalidItem);
+        GameRegistry.registerItem(book, ItemInfo.BOOK_UNLOCALIZED_NAME);
+        GameRegistry.registerItem(hearts, ItemInfo.HEART_UNLOCALIZED_NAME);
+        GameRegistry.registerItem(bags, ItemInfo.BAG_UNLOCALIZED_NAME);
+        GameRegistry.registerItem(invalidItem, ItemInfo.INVALID_UNLOCALIZED_NAME);
     }
 
     public static void registerRecipes() {

@@ -18,9 +18,9 @@ public class ModBlocks {
     public static Block itemPortal = new BlockPortal().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
 
     public static void init() {
-        RegisterHelper.registerBlock(itemBarrel, ItemBlock.class);
-        RegisterHelper.registerBlock(itemTracker, ItemBlock.class);
-        RegisterHelper.registerBlock(itemPortal, ItemBlockPortal.class);
+        GameRegistry.registerBlock(itemBarrel, BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
+        GameRegistry.registerBlock(itemTracker, BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
+        GameRegistry.registerBlock(itemPortal, BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
     }
 
     public static void initRender() {

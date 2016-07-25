@@ -20,9 +20,11 @@ apply plugin: 'forge'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = "1.9.4-5.0.0beta3"
+version = "1.7.10-5.0.0beta3"
 group = "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "HQM-New Heights"
+
+idea { module { inheritOutputDirs = true } }
 
 minecraft {
     version = "1.7.10-10.13.4.1614-1.7.10"

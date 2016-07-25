@@ -1,5 +1,7 @@
 package hardcorequesting.blocks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
@@ -7,13 +9,13 @@ import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.util.Translator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
-
 
 public class BlockTracker extends BlockContainer {
 
@@ -22,6 +24,29 @@ public class BlockTracker extends BlockContainer {
         setUnlocalizedName(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private IIcon activeIcon;
+    @SideOnly(Side.CLIENT)
+    private IIcon emptyIcon;
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister icon) {
+        pickIcons(icon);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void pickIcons(IIconRegister icon) {
+        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
+        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(int side, int meta) {
+        return side == 0 || side == 1 ? emptyIcon : activeIcon;
     }
 
     @Override
@@ -73,13 +98,14 @@ public class BlockTracker extends BlockContainer {
         return true;
     }
 
-//    @Override
-//    public int isProvidingStrongPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-//        return state.getBlock().getMetaFromState(state);
-//    }
-//
-//    @Override
-//    public int isProvidingWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-//        return state.getBlock().getMetaFromState(state);
-//    }
+    @Override
+    public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side) {
+        return world.getBlockMetadata(x, y, z);
+    }
+
+    @Override
+    public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+        return world.getBlockMetadata(x, y, z);
+    }
+
 }

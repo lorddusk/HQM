@@ -14,7 +14,7 @@ public class RegisterHelper {
     }
 
     public static void registerBlock(Block block, Class<? extends ItemBlock> blockClass) {
-        GameRegistry.registerBlock(block, block.getUnlocalizedName());
+        GameRegistry.registerBlock(block, block.getUnlocalizedName().substring(5));
     }
 
     private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
@@ -30,7 +30,7 @@ public class RegisterHelper {
 
 
     public static void registerItem(Item item) {
-        GameRegistry.registerItem(item, item.getUnlocalizedName());
+        GameRegistry.registerItem(item, item.getUnlocalizedName().substring(5));
     }
 
 

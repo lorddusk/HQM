@@ -10,21 +10,21 @@ import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.List;
 
 import static hardcorequesting.items.ItemInfo.HEART_ICONS;
-
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
 
 public class ItemHeart extends Item {
 
@@ -35,6 +35,29 @@ public class ItemHeart extends Item {
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.HEART_UNLOCALIZED_NAME);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private IIcon[] icons;
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister icon) {
+        pickIcon(icon);
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void pickIcon(IIconRegister icon) {
+        icons = new IIcon[ItemInfo.HEART_ICONS.length];
+
+        for (int i = 0; i < icons.length; i++)
+            icons[i] = icon.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.HEART_ICONS[i]);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamage(int par1) {
+        return icons[par1];
     }
 
     @Override
@@ -59,27 +82,27 @@ public class ItemHeart extends Item {
 
             if (item.getMetadata() == 3) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.noHardcoreYet"));
                 } else if (QuestingData.getQuestingData(player).getRawLives() < ModConfig.MAXLIVES) {
                     QuestingData.getQuestingData(player).addLives(player, 1);
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.addOne"));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.addOne"));
                     int lives = QuestingData.getQuestingData(player).getLives();
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveRemaining", lives));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.haveRemaining", lives));
                     SoundHandler.play(Sounds.LIFE, player);
                     if (!player.capabilities.isCreativeMode) {
                         --item.stackSize;
 
                     }
                 } else {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.haveMaxLives"));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.haveMaxLives"));
                 }
             }
             if (item.getMetadata() == 4) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noHardcoreYet"));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.noHardcoreYet"));
                 } else {
                     SoundHandler.play(Sounds.ROTTEN, player);
-                    player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.eatRottenHearth"));
+                    player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.eatRottenHearth"));
                     QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
 
@@ -111,7 +134,7 @@ public class ItemHeart extends Item {
                     int rot = tagCompound.getInteger("RotTime");
                     int maxRot = tagCompound.getInteger("MaxRot");
                     float percentage = (float) ((rot * 100) / maxRot);
-                    tooltip.add(Translator.translate("item.hqm:hearts_heart.freshness", percentage));
+                    tooltip.add(new ChatComponentTranslation("item.hqm:hearts_heart.freshness", percentage));
                 }
             }
         }
@@ -121,7 +144,7 @@ public class ItemHeart extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack item) {
+    public boolean hasEffect(ItemStack item, int pass) {
         return item.getMetadata() == 3 || item.getMetadata() == 4;
     }
 

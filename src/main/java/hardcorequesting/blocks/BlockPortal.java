@@ -62,6 +62,7 @@ public class BlockPortal extends BlockContainer {
         pickIcons(icon);
     }
 
+    @SideOnly(Side.CLIENT)
     private void pickIcons(IIconRegister icon) {
         blockIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_ICON);
         emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_EMPTY_ICON);
@@ -70,7 +71,6 @@ public class BlockPortal extends BlockContainer {
         magicIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_MAGIC_ICON);
         transparentIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_TRANSPARENT_ICON);
     }
-
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
@@ -117,7 +117,6 @@ public class BlockPortal extends BlockContainer {
         return false;
     }
 
-
     @Override
     public boolean isOpaqueCube() {
         return false;
@@ -142,7 +141,7 @@ public class BlockPortal extends BlockContainer {
         return getIcon(side, 0);
     }
 
-
+    @SideOnly(Side.CLIENT)
     private IIcon getPresetIcon(PortalType preset, int side) {
         return preset == PortalType.TECH ? side == 0 || side == 1 ? techEmptyIcon : techIcon : magicIcon;
     }
