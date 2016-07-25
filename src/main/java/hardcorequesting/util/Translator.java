@@ -6,6 +6,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.StatCollector;
 
 import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
@@ -15,7 +16,7 @@ public class Translator {
     private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)\\]\\]");
 
     public static String translate(String id) {
-        return I18n.format(id).replace("\\n", "\n");
+        return StatCollector.translateToLocal(id).replace("\\n", "\n");
     }
 
     public static String translate(String id, Object... args) {
