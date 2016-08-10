@@ -1,43 +1,44 @@
 package hardcorequesting.quests;
 
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.OPBookHelper;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Translator;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
-import hardcorequesting.network.DataBitHelper;
+import hardcorequesting.client.interfaces.edit.*;
+import hardcorequesting.io.SaveHandler;
+import hardcorequesting.io.adapter.QuestAdapter;
+import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.reputation.ReputationBar;
+import hardcorequesting.util.OPBookHelper;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 public class QuestSet {
     private String name;
     private String description;
     private List<String> cachedDescription;
-    private List<Quest> quests;
+    private Map<String, Quest> quests;
     private List<ReputationBar> reputationBars;
     private int id;
-
 
     public QuestSet(String name, String description) {
         this.name = name;
         this.description = description;
-        this.quests = new ArrayList<Quest>();
+        this.quests = new HashMap<>();
         this.reputationBars = new ArrayList<>();
         this.id = Quest.getQuestSets().size();
     }
 
-    public List<Quest> getQuests() {
+    public Map<String, Quest> getQuests() {
         return quests;
     }
 
@@ -58,8 +59,55 @@ public class QuestSet {
         return name;
     }
 
+    public String getFilename() {
+        return name.replaceAll(" ", "_");
+    }
+
     public String getName(int i) {
         return (i + 1) + ". " + name;
+    }
+
+    public static void loadAll() {
+        try {
+            SaveHandler.loadAllQuestSets(SaveHandler.getLocalFolder());
+            QuestAdapter.postLoad();
+            orderAll();
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
+        }
+    }
+
+    public static void saveAll() {
+        try {
+            SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
+            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
+        }
+    }
+
+    public static void orderAll() {
+        try {
+            final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getLocalFile("sets"));
+            if (!order.isEmpty()) {
+                Quest.getQuestSets().sort(new Comparator<QuestSet>() {
+                    @Override
+                    public int compare(QuestSet s1, QuestSet s2) {
+                        if (s1.equals(s2)) return 0;
+                        int is1 = order.indexOf(s1.getName());
+                        int is2 = order.indexOf(s2.getName());
+                        if (is1 == -1) {
+                            return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
+                        }
+                        if (is2 == -1) return -1;
+                        if (is1 == is2) return 0;
+                        return is1 < is2 ? -1 : 1;
+                    }
+                });
+            }
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed ordering quest sets");
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -72,13 +120,13 @@ public class QuestSet {
     }
 
     public boolean isEnabled(EntityPlayer player) {
-        return isEnabled(player, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+        return isEnabled(player, new HashMap<>(), new HashMap<>());
     }
 
     private boolean isEnabled(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         if (quests.isEmpty()) return false;
 
-        for (Quest quest : quests) {
+        for (Quest quest : quests.values()) {
             if (quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
                 return true;
             }
@@ -90,7 +138,7 @@ public class QuestSet {
     public boolean isCompleted(EntityPlayer player) {
         if (quests.isEmpty()) return false;
 
-        for (Quest quest : quests) {
+        for (Quest quest : quests.values()) {
             if (!quest.isCompleted(player)) {
                 return false;
             }
@@ -100,11 +148,11 @@ public class QuestSet {
     }
 
     public void removeQuest(Quest quest) {
-        quests.remove(quest);
+        quests.remove(quest.getId());
     }
 
     public void addQuest(Quest quest) {
-        quests.add(quest);
+        quests.put(quest.getId(), quest);
     }
 
     public void removeRepBar(ReputationBar repBar) {
@@ -118,12 +166,12 @@ public class QuestSet {
     }
 
     public int getCompletedCount(EntityPlayer player) {
-        return getCompletedCount(player, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+        return getCompletedCount(player, new HashMap<>(), new HashMap<>());
     }
 
     private int getCompletedCount(EntityPlayer player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         int count = 0;
-        for (Quest quest : quests) {
+        for (Quest quest : quests.values()) {
             if (quest.isCompleted(player) && quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
                 count++;
             }
@@ -165,8 +213,8 @@ public class QuestSet {
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
 
-        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
-        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
 
@@ -178,7 +226,7 @@ public class QuestSet {
 
             boolean completed = true;
             int unclaimed = 0;
-            for (Quest quest : questSet.getQuests()) {
+            for (Quest quest : questSet.getQuests().values()) {
                 if (completed && !quest.isCompleted(player) && quest.isLinkFree(player, isLinkFreeCache)) {
                     completed = false;
                 }
@@ -229,12 +277,12 @@ public class QuestSet {
             bar.draw(gui, x, y, player);
         }
 
-        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
-        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
 
-        for (Quest child : getQuests()) {
+        for (Quest child : getQuests().values()) {
             if (Quest.isEditing || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                for (Quest parent : child.getRequirement()) {
+                for (Quest parent : child.getRequirements()) {
                     if (Quest.isEditing || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
                             int color = Quest.isEditing && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
@@ -248,7 +296,7 @@ public class QuestSet {
             }
         }
         if (Quest.isEditing) {
-            for (Quest child : getQuests()) {
+            for (Quest child : getQuests().values()) {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
                         int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
@@ -261,7 +309,7 @@ public class QuestSet {
             }
         }
 
-        for (Quest quest : getQuests()) {
+        for (Quest quest : getQuests().values()) {
             if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
                 GL11.glPushMatrix();
@@ -287,7 +335,7 @@ public class QuestSet {
         }
 
 
-        for (Quest quest : getQuests()) {
+        for (Quest quest : getQuests().values()) {
             boolean editing = Quest.isEditing && !GuiScreen.isCtrlKeyDown();
             if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                 boolean shouldDrawText = false;
@@ -310,8 +358,8 @@ public class QuestSet {
                     int totalCompletedCount = 0;
                     int parentCount = 0;
                     int completed = 0;
-                    List<Quest> externalQuests = new ArrayList<Quest>();
-                    for (Quest parent : quest.getRequirement()) {
+                    List<Quest> externalQuests = new ArrayList<>();
+                    for (Quest parent : quest.getRequirements()) {
                         totalParentCount++;
                         boolean isCompleted = parent.isCompleted(player);
                         if (isCompleted) {
@@ -332,7 +380,7 @@ public class QuestSet {
 
                         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
                             txt += " [" + Translator.translate("hqm.questBook.holding", "R") + "]";
-                            for (Quest parent : quest.getRequirement()) {
+                            for (Quest parent : quest.getRequirements()) {
                                 txt += "\n" + GuiColor.GRAY + parent.getName();
                                 if (parent.isCompleted(player)) {
                                     txt += " " + GuiColor.WHITE + " [" + Translator.translate("hqm.questBook.completed") + "]";
@@ -343,7 +391,7 @@ public class QuestSet {
                         }
                     }
 
-                    int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirement().size() - quest.getParentRequirementCount()) : 0;
+                    int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
                     if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
                         txt += "\n" + GuiColor.PINK + Translator.translate(totalParentCount != 1, "hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), totalParentCount);
                         shouldDrawText = true;
@@ -365,9 +413,9 @@ public class QuestSet {
                     if (editing && quest.getUseModifiedParentRequirement()) {
                         txt += "\n" + GuiColor.MAGENTA;
                         int amount = quest.getParentRequirementCount();
-                        if (amount < quest.getRequirement().size()) {
+                        if (amount < quest.getRequirements().size()) {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqOnly", amount);
-                        } else if (amount > quest.getRequirement().size()) {
+                        } else if (amount > quest.getRequirements().size()) {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqMore", amount);
                         } else {
                             txt += Translator.translate(amount != 1, "hqm.questBook.reqAll", amount);
@@ -426,7 +474,7 @@ public class QuestSet {
                             String invisibilityMessage;
                             if (quest.isLinkFree(player, isLinkFreeCache)) {
                                 boolean parentInvisible = false;
-                                for (Quest parent : quest.getRequirement()) {
+                                for (Quest parent : quest.getRequirements()) {
                                     if (!parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                                         parentInvisible = true;
                                         break;
@@ -468,12 +516,12 @@ public class QuestSet {
                         }
 
 
-                        List<Integer> ids = new ArrayList<Integer>();
+                        List<String> ids = new ArrayList<>();
                         for (Quest option : quest.getOptionLinks()) {
-                            ids.add((int) option.getId());
+                            ids.add(option.getId());
                         }
                         for (Quest option : quest.getReversedOptionLinks()) {
-                            int id = option.getId();
+                            String id = option.getId();
                             if (!ids.contains(id)) {
                                 ids.add(id);
                             }
@@ -484,7 +532,7 @@ public class QuestSet {
 
                             if (Keyboard.isKeyDown(Keyboard.KEY_O)) {
                                 txt += " [" + Translator.translate("hqm.questBook.holding", "O") + "]";
-                                for (int id : ids) {
+                                for (String id : ids) {
                                     Quest option = Quest.getQuest(id);
                                     txt += "\n" + GuiColor.BLUE + option.getName();
                                     if (!option.hasSameSetAs(quest)) {
@@ -548,7 +596,7 @@ public class QuestSet {
 
     @SideOnly(Side.CLIENT)
     public static void drawQuestInfo(GuiQuestBook gui, QuestSet set, int x, int y) {
-        drawQuestInfo(gui, set, x, y, new HashMap<Quest, Boolean>(), new HashMap<Quest, Boolean>());
+        drawQuestInfo(gui, set, x, y, new HashMap<>(), new HashMap<>());
     }
 
     @SideOnly(Side.CLIENT)
@@ -561,7 +609,7 @@ public class QuestSet {
 
         EntityPlayer player = gui.getPlayer();
 
-        for (Quest quest : Quest.getQuests()) {
+        for (Quest quest : Quest.getQuests().values()) {
             if (set == null || quest.hasSet(set)) {
                 realTotal++;
                 if (quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
@@ -579,7 +627,7 @@ public class QuestSet {
             }
         }
 
-        List<String> info = new ArrayList<String>();
+        List<String> info = new ArrayList<>();
         info.add(GuiColor.GRAY.toString() + Translator.translate(total != 1, "hqm.questBook.totalQuests", total));
         info.add(GuiColor.CYAN.toString() + Translator.translate(enabled != 1, "hqm.questBook.unlockedQuests", enabled));
         info.add(GuiColor.GREEN.toString() + Translator.translate(completed != 1, "hqm.questBook.completedQuests", completed));
@@ -598,8 +646,8 @@ public class QuestSet {
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
 
-        HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
-        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
 
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
@@ -647,11 +695,8 @@ public class QuestSet {
         if (Quest.isEditing && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {
             switch (gui.getCurrentMode()) {
                 case CREATE:
-                    if (x > 0 && Quest.size() < DataBitHelper.QUESTS.getMaximum()) {
-                        int i = 0;
-                        for (Quest quest : this.getQuests())
-                            if (quest.getName().startsWith("Unnamed")) i++;
-                        Quest newQuest = new Quest(Quest.size(), "Unnamed" + (i == 0 ? "" : i), "Unnamed quest", 0, 0, false);
+                    if (x > 0) {
+                        Quest newQuest = new Quest("Unnamed", "Unnamed quest", 0, 0, false);
                         newQuest.setGuiCenterX(x);
                         newQuest.setGuiCenterY(y);
                         newQuest.setQuestSet(this);
@@ -665,9 +710,9 @@ public class QuestSet {
                     break;
             }
         } else {
-            HashMap<Quest, Boolean> isVisibleCache = new HashMap<Quest, Boolean>();
-            HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<Quest, Boolean>();
-            for (Quest quest : this.getQuests()) {
+            HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
+            HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
+            for (Quest quest : this.getQuests().values()) {
                 if ((Quest.isEditing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                     if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
                         switch (gui.getCurrentMode()) {
@@ -747,7 +792,7 @@ public class QuestSet {
         }
 
         if (Quest.isEditing)
-            for (ReputationBar reputationBar : new ArrayList<ReputationBar>(this.getReputationBars()))
+            for (ReputationBar reputationBar : new ArrayList<>(this.getReputationBars()))
                 reputationBar.mouseClicked(gui, x, y);
     }
 }

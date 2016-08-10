@@ -30,7 +30,7 @@ public class ItemBlockPortal extends ItemBlock {
             if (itemStack != null && itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("Portal")) {
                 NBTTagCompound compound = itemStack.getTagCompound().getCompoundTag("Portal");
                 if (compound.hasKey(TileEntityPortal.NBT_QUEST)) {
-                    Quest quest = Quest.getQuest(compound.getShort(TileEntityPortal.NBT_QUEST));
+                    Quest quest = Quest.getQuest(compound.getString(TileEntityPortal.NBT_QUEST));
                     if (quest != null) {
                         lst.add(GuiColor.GREEN + "Quest: " + quest.getName());
                     } else {
@@ -83,6 +83,6 @@ public class ItemBlockPortal extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
-        return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
+        return super.getUnlocalizedName(itemStack) + "_" + itemStack.getMetadata();
     }
 }

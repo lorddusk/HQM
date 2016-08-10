@@ -1,10 +1,12 @@
 package hardcorequesting.tileentity;
 
+import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.FMLCommonHandler;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Team;
-import hardcorequesting.Translator;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.PlayerEntry;
+import hardcorequesting.team.Team;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public enum TrackerType {
@@ -33,11 +35,11 @@ public enum TrackerType {
             for (Team team : QuestingData.getAllTeams()) {
                 if (team.getQuestData(quest.getId()).completed) {
 
-                    for (Team.PlayerEntry entry : team.getPlayers()) {
+                    for (PlayerEntry entry : team.getPlayers()) {
                         if (entry.isInTeam()) {
                             boolean valid = radius == 0;
                             if (!valid) {
-                                EntityPlayer player = QuestingData.getPlayer(entry.getName());
+                                EntityPlayer player = QuestingData.getPlayer(entry.getUUID());
                                 if (player != null && isPlayerWithinRadius(tracker, player, radius)) {
                                     valid = true;
                                 }
@@ -78,8 +80,8 @@ public enum TrackerType {
         public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
             double closest = 0;
             EntityPlayer closestPlayer = null;
-            for (String name : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllUsernames()) {
-                EntityPlayer player = QuestingData.getPlayer(name);
+            for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getAllProfiles()) {
+                EntityPlayer player = QuestingData.getPlayer(profile.getId());
                 if (player != null) {
                     double distance = player.getDistanceSq(tracker.xCoord + 0.5, tracker.yCoord + 0.5, tracker.zCoord + 0.5);
                     if (closestPlayer == null || distance < closest) {
@@ -104,9 +106,9 @@ public enum TrackerType {
 
     private static boolean isValid(boolean valid, Team team, TileEntityTracker tracker, int radius) {
         if (!valid) {
-            for (Team.PlayerEntry entry : team.getPlayers()) {
+            for (PlayerEntry entry : team.getPlayers()) {
                 if (entry.isInTeam()) {
-                    EntityPlayer player = QuestingData.getPlayer(entry.getName());
+                    EntityPlayer player = QuestingData.getPlayer(entry.getUUID());
                     if (player != null && isPlayerWithinRadius(tracker, player, radius))
                         return true;
                 }

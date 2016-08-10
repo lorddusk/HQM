@@ -98,7 +98,7 @@ public class TextBoxLogic {
     }
 
 
-    protected void textChanged(GuiBase gui) {
+    public void textChanged(GuiBase gui) {
         lines = gui.getLinesFromText(text, mult, width);
     }
 

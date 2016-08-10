@@ -6,7 +6,7 @@ import net.minecraft.util.ResourceLocation;
 public abstract class ResourceHelper {
 
     public static ResourceLocation getResource(String name) {
-        return new ResourceLocation("hqm", "textures/gui/" + name + ".png");
+        return new ResourceLocation("hardcorequesting", "textures/gui/" + name + ".png");
     }
 
     public static void bindResource(ResourceLocation resource) {

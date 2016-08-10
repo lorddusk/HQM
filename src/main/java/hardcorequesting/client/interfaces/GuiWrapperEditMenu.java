@@ -3,9 +3,11 @@ package hardcorequesting.client.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
+
+import java.io.IOException;
 
 @SideOnly(Side.CLIENT)
 public class GuiWrapperEditMenu extends GuiBase {
@@ -82,7 +84,7 @@ public class GuiWrapperEditMenu extends GuiBase {
     }
 
     @Override
-    protected void mouseMovedOrUp(int mX0, int mY0, int b) {
+    protected void mouseReleased(int mX0, int mY0, int b) {
         int mX = mX0 - left;
         int mY = mY0 - top;
 

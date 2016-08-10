@@ -3,9 +3,12 @@ package hardcorequesting.items;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.util.RegisterHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+
+//import net.minecraft.client.renderer.texture.IIconRegister;
 
 /**
  * Created by Tim on 5/10/2015.
@@ -24,10 +27,10 @@ public class ItemInvalid extends Item {
         return super.getUnlocalizedName(itemStack);
     }
 
-
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) {
         itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.INVALID_ICON);
     }
+
 }

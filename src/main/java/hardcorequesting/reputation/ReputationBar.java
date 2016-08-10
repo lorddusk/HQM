@@ -2,40 +2,31 @@ package hardcorequesting.reputation;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.FileVersion;
-import hardcorequesting.SaveHelper;
-import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiEditMenu;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
-import hardcorequesting.network.DataBitHelper;
+import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.util.List;
+
 public class ReputationBar {
-    private int repId, x, y, questSet;
+    private String repId;
+    private int x, y, questSet;
 
     public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet) {
         this(reputation.getId(), x, y, questSet.getId());
     }
 
-    public ReputationBar(int repId, int x, int y, int questSet) {
+    public ReputationBar(String repId, int x, int y, int questSet) {
         this.repId = repId;
         this.x = x;
         this.y = y;
         this.questSet = questSet;
-    }
-
-    private static final int posBits = 9, posBitMask = 511;
-
-    public ReputationBar(FileVersion version, int data) {
-        int questSetSize = DataBitHelper.QUEST_SETS.getBitCount(version);
-        this.repId = data >> questSetSize + posBits * 2;
-        this.x = (data >> questSetSize + posBits) & posBitMask;
-        this.y = (data >> questSetSize) & posBitMask;
-        this.questSet = data & ((1 << questSetSize + 1) - 1);
     }
 
     public void moveTo(int x, int y) {
@@ -51,13 +42,13 @@ public class ReputationBar {
         return y;
     }
 
-    public int getRepId() {
+    public String getRepId() {
         return repId;
     }
 
     public int save() {
-        int questSetSize = DataBitHelper.QUEST_SETS.getBitCount();
-        return this.repId << questSetSize + 18 | this.x << questSetSize + 9 | this.y << questSetSize | this.questSet;
+        //TODO
+        return -1;
     }
 
     public QuestSet getQuestSet() {
@@ -134,7 +125,7 @@ public class ReputationBar {
 
         public EditGui(GuiBase guiBase, EntityPlayer player, int x, int y, int selectedSet) {
             super(guiBase, player);
-            this.bar = new ReputationBar(-1, x, y, selectedSet);
+            this.bar = new ReputationBar(null, x, y, selectedSet);
             this.isNew = true;
         }
 
@@ -142,34 +133,37 @@ public class ReputationBar {
         @SideOnly(Side.CLIENT)
         public void draw(GuiBase guiB, int mX, int mY) {
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputationList().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputationList().size());
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());
+            List<Reputation> reputationList = Reputation.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = Reputation.REPUTATION_LIST_X;
                 int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;
-                String str = Reputation.getReputationList().get(i).getName();
+                String str = reputationList.get(i).getName();
 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY);
-                boolean selected = Reputation.getReputationList().get(i).equals(Reputation.getReputation(bar.repId));
+                boolean selected = reputationList.get(i).equals(Reputation.getReputation(bar.repId));
 
                 gui.drawString(str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
         }
 
+        @Override
         @SideOnly(Side.CLIENT)
         public void onClick(GuiBase guiB, int mX, int mY, int b) {
             super.onClick(guiB, mX, mY, b);
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputationList().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputationList().size());
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());
+            List<Reputation> reputationList = Reputation.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = Reputation.REPUTATION_LIST_X;
                 int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;
-                String str = Reputation.getReputationList().get(i).getName();
+                String str = reputationList.get(i).getName();
 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY)) {
-                    bar.repId = Reputation.getReputationList().get(i).getId();
+                    bar.repId = reputationList.get(i).getId();
                     save(guiB);
                     close(guiB);
                 }
@@ -177,7 +171,7 @@ public class ReputationBar {
         }
 
         @Override
-        protected void save(GuiBase gui) {
+        public void save(GuiBase gui) {
             if (isNew) {
                 Quest.getQuestSets().get(bar.questSet).addRepBar(bar);
                 SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_ADD);

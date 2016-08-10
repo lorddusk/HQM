@@ -1,15 +1,12 @@
 package hardcorequesting.client.interfaces.hud;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import hardcorequesting.DeathStats;
-import hardcorequesting.QuestingData;
 import hardcorequesting.config.ModConfig;
+import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import org.lwjgl.opengl.GL11;
@@ -46,24 +43,24 @@ public class GUIOverlay extends Gui {
 
         if (QuestingData.isHardcoreActive()) {
             if (getLives() <= 2) {
-                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xf50505);
+                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xf50505);
             } else {
-                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xffffff);
+                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xffffff);
             }
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
             GL11.glDepthMask(true);
         } else {
-            this.mc.fontRenderer.drawString(d, xPos + 1, yPos, 0xffffff);
+            this.mc.fontRendererObj.drawString(d, xPos + 1, yPos, 0xffffff);
         }
     }
 
     public int getLives() {
-        return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getLives();
+        return QuestingData.getQuestingData(mc.thePlayer).getLives();
     }
 
     public int getDeaths() {
-        return QuestingData.getQuestingData(mc.thePlayer.getGameProfile().getName()).getDeathStat().getTotalDeaths();
+        return QuestingData.getQuestingData(mc.thePlayer).getDeathStat().getTotalDeaths();
     }
 
 }

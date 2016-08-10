@@ -1,7 +1,9 @@
 package hardcorequesting.proxies;
 
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class CommonProxy {
 
@@ -25,4 +27,7 @@ public class CommonProxy {
         return true;
     }
 
+    public EntityPlayer getPlayer(MessageContext ctx) {
+        return ctx.getServerHandler().playerEntity;
+    }
 }

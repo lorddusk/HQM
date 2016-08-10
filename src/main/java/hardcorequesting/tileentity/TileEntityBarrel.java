@@ -1,11 +1,11 @@
 package hardcorequesting.tileentity;
 
-import hardcorequesting.QuestingData;
-import hardcorequesting.blocks.BlockInfo;
+import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestDataTaskItems;
-import hardcorequesting.quests.QuestTask;
-import hardcorequesting.quests.QuestTaskItemsConsume;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.data.QuestDataTaskItems;
+import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskItemsConsume;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -28,7 +28,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         if (doFill) {
             QuestTask task = getCurrentTask();
             if (task != null && task instanceof QuestTaskItemsConsume) {
-                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                     modifiedSyncTimer = SYNC_TIME;
                 }
             }
@@ -78,7 +78,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public ItemStack getStackInSlotOnClosing(int i) {
+    public ItemStack getStackInSlotOnClosing(int index) {
         return null;
     }
 
@@ -89,7 +89,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public void setInventorySlotContents(int i, ItemStack itemstack) {
         QuestTask task = getCurrentTask();
         if (task != null && task instanceof QuestTaskItemsConsume) {
-            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerName), playerName) && modifiedSyncTimer <= 0) {
+            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                 modifiedSyncTimer = SYNC_TIME;
             }
         }
@@ -107,7 +107,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         if (!worldObj.isRemote) {
             QuestTask task = getCurrentTask();
             if (task != null) {
-                EntityPlayer player = QuestingData.getPlayer(playerName);
+                EntityPlayer player = QuestingData.getPlayerFromUsername(playerUuid);
                 if (player != null) {
                     task.getParent().sendUpdatedDataToTeam(player);
                 }
@@ -121,20 +121,25 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             QuestTask task = getCurrentTask();
             boolean state = false;
             if (task != null) {
-                EntityPlayer player = QuestingData.getPlayer(playerName);
+                EntityPlayer player = QuestingData.getPlayer(playerUuid);
                 if (player != null) {
                     state = !task.isCompleted(player);
                 }
             }
             boolean oldState = getBlockMetadata() == 1;
-            if (state != oldState) {
+            if (state != oldState) {/*
+                if (state) { // TODO add the actual states (meta 1 == has active quest set) / (meta 0 == no or completed quest set)
+                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                } else {
+                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                }*/
                 worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, state ? 1 : 0, 3);
             }
         }
     }
 
     public QuestTask getCurrentTask() {
-        if (playerName != null && selectedQuest >= 0 && selectedQuest < Quest.size()) {
+        if (playerUuid != null && selectedQuest != null) {
             Quest quest = Quest.getQuest(selectedQuest);
             if (quest != null && selectedTask >= 0 && selectedTask < quest.getTasks().size()) {
                 return quest.getTasks().get(selectedTask);
@@ -144,13 +149,18 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return null;
     }
 
+//    @Override
+//    public String getInventoryName() {
+//        return BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME;
+//    }
+
     @Override
     public String getInventoryName() {
-        return BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME;
+        return null;
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
+    public boolean isCustomInventoryName() {
         return false;
     }
 
@@ -165,12 +175,12 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public void openInventory() {
+    public void openChest() {
 
     }
 
     @Override
-    public void closeInventory() {
+    public void closeChest() {
 
     }
 
@@ -179,9 +189,8 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return true;
     }
 
-
-    private String playerName;
-    public int selectedQuest;
+    private String playerUuid;
+    public String selectedQuest;
     public int selectedTask;
 
     public void storeSettings(EntityPlayer player) {
@@ -190,7 +199,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             doSync();
         }
 
-        playerName = QuestingData.getUserName(player);
+        playerUuid = QuestingData.getUserUUID(player);
         QuestingData data = QuestingData.getQuestingData(player);
         selectedQuest = data.selectedQuest;
         selectedTask = data.selectedTask;
@@ -207,11 +216,11 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         super.readFromNBT(compound);
 
         if (compound.hasKey(NBT_PLAYER_NAME)) {
-            playerName = compound.getString(NBT_PLAYER_NAME);
-            selectedQuest = compound.getShort(NBT_QUEST);
+            playerUuid = compound.getString(NBT_PLAYER_NAME);
+            selectedQuest = compound.getString(NBT_QUEST);
             selectedTask = compound.getByte(NBT_TASK);
         } else {
-            playerName = null;
+            playerUuid = null;
         }
     }
 
@@ -219,14 +228,14 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public void writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
-        if (playerName != null) {
-            compound.setString(NBT_PLAYER_NAME, playerName);
-            compound.setShort(NBT_QUEST, (short) selectedQuest);
+        if (playerUuid != null) {
+            compound.setString(NBT_PLAYER_NAME, playerUuid);
+            compound.setString(NBT_QUEST, selectedQuest);
             compound.setByte(NBT_TASK, (byte) selectedTask);
         }
     }
 
     public String getPlayer() {
-        return playerName;
+        return playerUuid;
     }
 }

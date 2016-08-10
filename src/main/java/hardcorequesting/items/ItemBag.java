@@ -3,23 +3,24 @@ package hardcorequesting.items;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.ModInformation;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
+import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.config.ModConfig;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataWriter;
-import hardcorequesting.network.PacketHandler;
-import hardcorequesting.network.PacketId;
+import hardcorequesting.network.NetworkManager;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class ItemBag extends Item {
@@ -28,17 +29,19 @@ public class ItemBag extends Item {
     public ItemBag() {
         super();
         this.setHasSubtypes(true);
-        this.setMaxDamage(0);
+        this.setMaxDurability(0);
         this.setMaxStackSize(64);
         this.setCreativeTab(HardcoreQuesting.HQMTab);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) {
         pickIcons(register);
     }
 
+    @SideOnly(Side.CLIENT)
     private void pickIcons(IIconRegister register) {
         itemIcon = register.registerIcon(ItemInfo.TEXTURE_LOCATION + ":" + ItemInfo.BAG_ICON);
     }
@@ -48,13 +51,15 @@ public class ItemBag extends Item {
     public void addInformation(ItemStack itemstack, EntityPlayer player, List tooltip, boolean extraInfo) {
         super.addInformation(itemstack, player, tooltip, extraInfo);
 
-        int dmg = itemstack.getItemDamage();
+        int dmg = itemstack.getMetadata();
         if (dmg >= 0 && dmg < BagTier.values().length) {
             BagTier tier = BagTier.values()[dmg];
             tooltip.add(tier.getColor() + tier.getName());
         }
     }
 
+
+    @Override
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tabs, List stackList) {
@@ -66,26 +71,24 @@ public class ItemBag extends Item {
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
         if (!world.isRemote) {
-            int dmg = item.getItemDamage();
+            int dmg = item.getMetadata();
             if (dmg >= 0 && dmg < BagTier.values().length) {
                 int totalWeight = 0;
-                for (Group group : Group.getGroups()) {
+                for (Group group : Group.getGroups().values()) {
                     if (group.isValid(player)) {
                         totalWeight += group.getTier().getWeights()[dmg];
                     }
                 }
                 if (totalWeight > 0) {
                     int rng = (int) (Math.random() * totalWeight);
-                    List<Group> groups = Group.getGroups();
-                    for (int i = 0; i < groups.size(); i++) {
-                        Group group = groups.get(i);
+                    for (Group group : Group.getGroups().values()) {
                         if (group.isValid(player)) {
                             int weight = group.getTier().getWeights()[dmg];
                             if (rng < weight) {
                                 group.open(player);
                                 player.inventory.markDirty();
-                                openClientInterface(player, i, dmg);
-                                world.playSoundAtEntity(player, Sounds.BAG.getSound(), 1, 1);
+                                openClientInterface(player, group.getId(), dmg);
+                                SoundHandler.play(Sounds.BAG, player);
                                 break;
                             } else {
                                 rng -= weight;
@@ -104,19 +107,16 @@ public class ItemBag extends Item {
         return item;
     }
 
-    private void openClientInterface(EntityPlayer player, int id, int bag) {
-        DataWriter dw = PacketHandler.getWriter(PacketId.BAG_INTERFACE);
-        dw.writeData(id, DataBitHelper.GROUP_COUNT);
-        dw.writeData(bag, DataBitHelper.BAG_TIER);
-        for (Group group : Group.getGroups()) {
-            if (group.getLimit() != 0) {
-                dw.writeData(group.getRetrievalCount(player), DataBitHelper.LIMIT);
-            }
-        }
-
-        if (ItemBag.displayGui) {
-            PacketHandler.sendToRawPlayer(player, dw);
-        }
+    private void openClientInterface(EntityPlayer player, String id, int bag) {
+        List<String> data = new ArrayList<>();
+        data.add(id);
+        data.add("" + bag);
+        data.addAll(Group.getGroups().values().stream()
+                .filter(group -> group.getLimit() != 0)
+                .map(group -> group.getRetrievalCount(player) + "")
+                .collect(Collectors.toList()));
+        if (ItemBag.displayGui && player instanceof EntityPlayerMP)
+            NetworkManager.sendToPlayer(GuiType.BAG.build(data.toArray(new String[data.size()])), (EntityPlayerMP) player);
         SoundHandler.play(Sounds.BAG, player);
     }
 }

@@ -1,8 +1,8 @@
 package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
-import hardcorequesting.OreDictionaryHelper;
-import hardcorequesting.Translator;
+import hardcorequesting.util.OreDictionaryHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
@@ -14,13 +14,13 @@ public abstract class ItemPrecision {
     public static final ItemPrecision PRECISE = new ItemPrecision("precise") {
         @Override
         protected boolean same(ItemStack item1, ItemStack item2) {
-            return item1.getItem() == item2.getItem() && item1.getItemDamage() == item2.getItemDamage() && ItemStack.areItemStackTagsEqual(item1, item2);
+            return item1.getItem() == item2.getItem() && item1.getMetadata() == item2.getMetadata() && ItemStack.areItemStackTagsEqual(item1, item2);
         }
     };
     public static final ItemPrecision NBT_FUZZY = new ItemPrecision("nbtFuzzy") {
         @Override
         protected boolean same(ItemStack item1, ItemStack item2) {
-            return item1.getItem() == item2.getItem() && item1.getItemDamage() == item2.getItemDamage();
+            return item1.getItem() == item2.getItem() && item1.getMetadata() == item2.getMetadata();
         }
     };
     public static final ItemPrecision FUZZY = new ItemPrecision("fuzzy", true) {

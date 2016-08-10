@@ -3,11 +3,11 @@ package hardcorequesting.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityPortal;
+import hardcorequesting.util.Translator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
@@ -26,11 +27,14 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+//import net.minecraft.client.renderer.texture.IIconRegister;
+//import net.minecraft.util.IIcon;
+
 
 public class BlockPortal extends BlockContainer {
     public BlockPortal() {
         super(Material.wood);
-        setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
+        setUnlocalizedName(BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
     }
@@ -54,10 +58,11 @@ public class BlockPortal extends BlockContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister icon) {
+    public void registerIcons(IIconRegister icon) {
         pickIcons(icon);
     }
 
+    @SideOnly(Side.CLIENT)
     private void pickIcons(IIconRegister icon) {
         blockIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_ICON);
         emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_PORTAL_EMPTY_ICON);
@@ -68,7 +73,7 @@ public class BlockPortal extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         if (player != null && Quest.isEditing) {
             if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
@@ -95,13 +100,12 @@ public class BlockPortal extends BlockContainer {
     }
 
     @Override
-    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB box, List lst, Entity entity) {
+    public void addCollisionBoxesToList(World world, int x, int y, int z, AxisAlignedBB entityBox, List collidingBoxes, Entity entity) {
         TileEntity te = world.getTileEntity(x, y, z);
         if (entity instanceof EntityPlayer && te instanceof TileEntityPortal && !((TileEntityPortal) te).hasCollision((EntityPlayer) entity))
             return;
-        super.addCollisionBoxesToList(world, x, y, z, box, lst, entity);
+        super.addCollisionBoxesToList(world, x, y, z, entityBox, collidingBoxes, entity);
     }
-
 
     @Override
     public boolean renderAsNormalBlock() {
@@ -112,7 +116,6 @@ public class BlockPortal extends BlockContainer {
     public boolean isBlockNormalCube() {
         return false;
     }
-
 
     @Override
     public boolean isOpaqueCube() {
@@ -138,7 +141,7 @@ public class BlockPortal extends BlockContainer {
         return getIcon(side, 0);
     }
 
-
+    @SideOnly(Side.CLIENT)
     private IIcon getPresetIcon(PortalType preset, int side) {
         return preset == PortalType.TECH ? side == 0 || side == 1 ? techEmptyIcon : techIcon : magicIcon;
     }
@@ -150,6 +153,7 @@ public class BlockPortal extends BlockContainer {
             return getPresetIcon(meta == 1 ? PortalType.TECH : PortalType.MAGIC, side);
         return side == 0 || side == 1 ? emptyIcon : blockIcon;
     }
+
 
     @Override
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z, EntityPlayer player) {

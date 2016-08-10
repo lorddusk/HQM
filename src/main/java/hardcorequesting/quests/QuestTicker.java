@@ -1,21 +1,15 @@
 package hardcorequesting.quests;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import hardcorequesting.network.DataBitHelper;
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
-
-import java.util.EnumSet;
-
+import net.minecraftforge.common.MinecraftForge;
 
 public class QuestTicker {
     private int hours;
     private int ticks;
 
     public QuestTicker(boolean isClient) {
-        FMLCommonHandler.instance().bus().register(this);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
@@ -34,7 +28,7 @@ public class QuestTicker {
             ticks = 0;
             hours++;
             if (!isClient) {
-                for (Quest quest : Quest.getQuests()) {
+                for (Quest quest : Quest.getQuests().values()) {
                     int total = quest.getRepeatInfo().getDays() * 24 + quest.getRepeatInfo().getHours();
                     if (quest.getRepeatInfo().getType() == RepeatType.INTERVAL) {
                         if (total != 0 && hours % total == 0) {
@@ -51,15 +45,5 @@ public class QuestTicker {
 
     public int getHours() {
         return hours;
-    }
-
-    public void save(DataWriter dw) {
-        dw.writeData(ticks, DataBitHelper.TICKS);
-        dw.writeData(hours, DataBitHelper.HOURS);
-    }
-
-    public void load(DataReader dr) {
-        ticks = dr.readData(DataBitHelper.TICKS);
-        hours = dr.readData(DataBitHelper.HOURS);
     }
 }

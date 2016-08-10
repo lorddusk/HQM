@@ -2,20 +2,14 @@ package hardcorequesting.client.interfaces;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -131,6 +125,7 @@ public class GuiBase extends GuiScreen {
     }
 
     public void drawMouseOver(List<String> str, int x, int y) {
+        float oldZ = this.zLevel;
         GL11.glDisable(GL11.GL_DEPTH_TEST);
 
         int w = 0;
@@ -184,10 +179,9 @@ public class GuiBase extends GuiScreen {
             y += 10;
         }
 
-        this.zLevel = 0.0F;
+        this.zLevel = oldZ;
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glColor4f(1F, 1F, 1F, 1F);
-
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
@@ -201,7 +195,6 @@ public class GuiBase extends GuiScreen {
         GL11.glVertex3f(x1, y1, 0);
         GL11.glVertex3f(x2, y2, 0);
         GL11.glEnd();
-
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
@@ -217,50 +210,53 @@ public class GuiBase extends GuiScreen {
 
 
     protected static RenderItem itemRenderer = new RenderItem();
-    protected static RenderBlocks blockRenderer = new RenderBlocks();
+    //protected static RenderBlocks blockRenderer = new RenderBlocks();
 
-    public void drawIcon(IIcon icon, int x, int y) {
-        drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
-    }
+    //public void drawIcon(ItemStack item, int x, int y) {
+    //    itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
+    //    //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
+    //}
 
-    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
-        drawItemBackground(x, y, mX, mY, false);
-        if (fluid != null) {
-            drawFluid(fluid, x + 1, y + 1);
-        }
-    }
-
-    public void drawFluid(Fluid fluid, int x, int y) {
-        IIcon icon = fluid.getIcon();
-
-        if (icon == null) {
-            if (FluidRegistry.WATER.equals(fluid)) {
-                icon = Blocks.water.getIcon(0, 0);
-            } else if (FluidRegistry.LAVA.equals(fluid)) {
-                icon = Blocks.water.getIcon(0, 0);
-            }
-        }
-
-        if (icon != null) {
-            GL11.glColor4f(1F, 1F, 1F, 1F);
-
-            ResourceHelper.bindResource(MAP_TEXTURE);
-
-            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
-
-            ResourceHelper.bindResource(TERRAIN);
-            setColor(fluid.getColor());
-            drawIcon(icon, x, y);
-
-            GL11.glColor4f(1F, 1F, 1F, 1F);
-        }
-    }
+//TODO Fix Fluid drawing
+//    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
+//        drawItemBackground(x, y, mX, mY, false);
+//        if (fluid != null) {
+//            drawFluid(fluid, x + 1, y + 1);
+//        }
+//    }
+//
+//    public void drawFluid(Fluid fluid, int x, int y) {
+//        //IIcon icon = fluid.getIcon();
+//        Item item = null;
+//
+//        if (icon == null) {
+//            if (FluidRegistry.WATER.equals(fluid)) {
+//                icon = Blocks.water.getIcon(0, 0);
+//            } else if (FluidRegistry.LAVA.equals(fluid)) {
+//                icon = Blocks.water.getIcon(0, 0);
+//            }
+//        }
+//
+//        if (icon != null) {
+//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+//
+//            ResourceHelper.bindResource(MAP_TEXTURE);
+//
+//            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
+//
+//            ResourceHelper.bindResource(TERRAIN);
+//            setColor(fluid.getColor());
+//            drawIcon(icon, x, y);
+//
+//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+//        }
+//    }
 
     protected static final int ITEM_SRC_Y = 235;
     public static final int ITEM_SIZE = 18;
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
-        GL11.glColor3f(1F, 1F, 1F);
+        GL11.glColor4f(1F, 1F, 1F, 1F);
 
         ResourceHelper.bindResource(MAP_TEXTURE);
 
@@ -275,7 +271,7 @@ public class GuiBase extends GuiScreen {
 
         if (item != null && item.getItem() != null) {
             drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + +top + 1);
+            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, Minecraft.getMinecraft().getTextureManager(), item, x + left + 1, y + +top + 1, "");
         }
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glColor3f(1F, 1F, 1F);
@@ -302,13 +298,14 @@ public class GuiBase extends GuiScreen {
         GL11.glEnable(GL11.GL_COLOR_MATERIAL);
         GL11.glEnable(GL11.GL_LIGHTING);
 
+        float oldZ = this.zLevel;
         setZLevel(4f);
         try {
-            if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-                itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
-            }
+            // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
+            itemRenderer.renderItemAndEffectIntoGUI(fontRendererObj, this.mc.getTextureManager(), itemstack, x + left, y + top);
+            // }
         } finally {
-            setZLevel(0f);
+            setZLevel(oldZ);
 
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glDisable(GL11.GL_LIGHTING);

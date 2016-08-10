@@ -1,12 +1,15 @@
 package hardcorequesting.proxies;
 
-import hardcorequesting.BlockHighlightRemover;
-import hardcorequesting.client.interfaces.hud.GUIOverlay;
+import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import cpw.mods.fml.relauncher.Side;
+import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.client.sounds.SoundHandler;
+import hardcorequesting.client.sounds.Sounds;
+import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.entity.player.EntityPlayer;
 
 
 public class ClientProxy extends CommonProxy {
@@ -22,9 +25,9 @@ public class ClientProxy extends CommonProxy {
     public void initRenderers() {
         //init the rendering stuff
 
-
         //MinecraftForge.EVENT_BUS.register(new GUIOverlay(Minecraft.getMinecraft()));
-        new BlockHighlightRemover();
+        //MinecraftForge.EVENT_BUS.register(new BlockHighlightRemover());
+        ModBlocks.initRender();
     }
 
     @Override
@@ -41,5 +44,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public boolean isServer() {
         return false;
+    }
+
+    @Override
+    public EntityPlayer getPlayer(MessageContext ctx) {
+        return ctx.side == Side.CLIENT ? Minecraft.getMinecraft().thePlayer : super.getPlayer(ctx);
     }
 }

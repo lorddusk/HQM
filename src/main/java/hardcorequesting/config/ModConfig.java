@@ -4,17 +4,16 @@ import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import hardcorequesting.ModInformation;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Team;
 import hardcorequesting.items.ItemBag;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.RewardSetting;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
 
 public class ModConfig {
     private static final String CATEGORY_GENERAL = "General";
@@ -127,7 +126,7 @@ public class ModConfig {
 
         QuestingData.autoQuestActivate = config.get(CATEGORY_GENERAL, AUTO_QUEST_KEY, AUTO_QUEST_DEFAULT, AUTO_QUEST_COMMENT).getBoolean(AUTO_QUEST_DEFAULT);
 
-        Team.RewardSetting.isAllModeEnabled = config.get(CATEGORY_GENERAL, MULTI_REWARD_KEY, MULTI_REWARD_DEFAULT, MULTI_REWARD_COMMENT).getBoolean(MULTI_REWARD_DEFAULT);
+        RewardSetting.isAllModeEnabled = config.get(CATEGORY_GENERAL, MULTI_REWARD_KEY, MULTI_REWARD_DEFAULT, MULTI_REWARD_COMMENT).getBoolean(MULTI_REWARD_DEFAULT);
 
         ItemBag.displayGui = config.get(CATEGORY_GENERAL, REWARD_KEY, REWARD_DEFAULT, REWARD_COMMENT).getBoolean(REWARD_DEFAULT);
 

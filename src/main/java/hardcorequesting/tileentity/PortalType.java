@@ -1,6 +1,6 @@
 package hardcorequesting.tileentity;
 
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 
 public enum PortalType {
     TECH("tech", true),

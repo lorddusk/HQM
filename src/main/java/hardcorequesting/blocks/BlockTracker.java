@@ -3,27 +3,25 @@ package hardcorequesting.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Translator;
-import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityTracker;
+import hardcorequesting.util.Translator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-
 
 public class BlockTracker extends BlockContainer {
 
     public BlockTracker() {
         super(Material.wood);
-        setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
+        setUnlocalizedName(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(10f);
     }
@@ -35,10 +33,11 @@ public class BlockTracker extends BlockContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister icon) {
+    public void registerIcons(IIconRegister icon) {
         pickIcons(icon);
     }
 
+    @SideOnly(Side.CLIENT)
     private void pickIcons(IIconRegister icon) {
         activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON);
         emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.QUEST_TRACKER_ICON_EMPTY);
@@ -56,7 +55,7 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9) {
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         if (player != null) {
             if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
@@ -64,7 +63,6 @@ public class BlockTracker extends BlockContainer {
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
                             player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
-                            ;
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {
@@ -109,4 +107,5 @@ public class BlockTracker extends BlockContainer {
     public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side) {
         return world.getBlockMetadata(x, y, z);
     }
+
 }

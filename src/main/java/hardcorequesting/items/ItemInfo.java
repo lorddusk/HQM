@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
 public abstract class ItemInfo {
-    public static final String TEXTURE_LOCATION = "hqm";
+    public static final String TEXTURE_LOCATION = "hardcorequesting";
     public static final String LOCALIZATION_START = "hqm:";
     //--Information for the Questing Book
 
@@ -14,7 +14,7 @@ public abstract class ItemInfo {
     public static final String[] HEART_ICONS = {"quarterheart", "halfheart", "threequarts", "heart", "rottenheart"};
 
     //--Information for the Bags
-    public static final Object BAG_ICON = "lootbag";
+    public static final String BAG_ICON = "lootbag";
     public static final String BAG_UNLOCALIZED_NAME = "bags";
 
 

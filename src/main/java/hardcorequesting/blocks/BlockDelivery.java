@@ -3,15 +3,16 @@ package hardcorequesting.blocks;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Translator;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TileEntityBarrel;
+import hardcorequesting.util.Translator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -20,7 +21,7 @@ public class BlockDelivery extends BlockContainer {
 
     public BlockDelivery() {
         super(Material.wood);
-        setBlockName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
+        setUnlocalizedName(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(1f);
     }
@@ -32,10 +33,11 @@ public class BlockDelivery extends BlockContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister icon) {
+    public void registerIcons(IIconRegister icon) {
         pickIcons(icon);
     }
 
+    @SideOnly(Side.CLIENT)
     public void pickIcons(IIconRegister icon) {
         activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON);
         emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON_EMPTY);
@@ -64,8 +66,7 @@ public class BlockDelivery extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9) {
-
+    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
         if (player != null) {
             if (player.inventory.getCurrentItem() == null) {
                 if (!world.isRemote) {
@@ -85,9 +86,9 @@ public class BlockDelivery extends BlockContainer {
                         ((TileEntityBarrel) te).storeSettings(player);
 
                         if (((TileEntityBarrel) te).getCurrentTask() != null)
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
+                            player.addChatComponentMessage(new ChatComponentTranslation("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
+                            player.addChatComponentMessage(new ChatComponentTranslation("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;
@@ -97,12 +98,12 @@ public class BlockDelivery extends BlockContainer {
         return false;
     }
 
-
+    @Override
     public boolean hasComparatorInputOverride() {
         return true;
     }
 
-
+    @Override
     public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
         return world.getBlockMetadata(x, y, z) == 1 ? 15 : 0;
     }

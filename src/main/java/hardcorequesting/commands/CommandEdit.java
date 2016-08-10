@@ -1,7 +1,7 @@
 package hardcorequesting.commands;
 
-import hardcorequesting.QuestingData;
 import hardcorequesting.items.ItemQuestBook;
+import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -14,10 +14,10 @@ public class CommandEdit extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) {
         if (sender instanceof EntityPlayer && isPlayerOp(sender)) {
             EntityPlayer player = (EntityPlayer) sender;
-
-            String name = arguments.length == 1 ? arguments[0] : QuestingData.getUserName(player);
-            if (QuestingData.hasData(name)) {
-                player.inventory.addItemStackToInventory(ItemQuestBook.getOPBook(name));
+            if (arguments.length == 1)
+                player = sender.getEntityWorld().getPlayerEntityByName(arguments[0]);
+            if (QuestingData.hasData(player)) {
+                player.inventory.addItemStackToInventory(ItemQuestBook.getOPBook(player));
             } else {
                 sendChat(player, "hqm.message.noPlayer");
             }

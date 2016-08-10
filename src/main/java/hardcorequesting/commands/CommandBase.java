@@ -1,34 +1,17 @@
 package hardcorequesting.commands;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.QuestingData;
-import hardcorequesting.Translator;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.parsing.BagAdapter;
-import hardcorequesting.parsing.QuestAdapter;
-import hardcorequesting.parsing.ReputationAdapter;
-import hardcorequesting.quests.QuestSet;
-import hardcorequesting.reputation.Reputation;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class CommandBase implements ISubCommand {
-    protected static Gson GSON;
 
-    static {
-        GSON = new GsonBuilder().registerTypeAdapter(Reputation.getReputationList().getClass(), ReputationAdapter.REPUTATION_ADAPTER).registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER).registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
-                .setPrettyPrinting().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES).create();
-    }
 
     private String name;
     private List<String> subCommands = new ArrayList<>();
@@ -70,10 +53,6 @@ public abstract class CommandBase implements ISubCommand {
     @Override
     public int[] getSyntaxOptions(ICommandSender sender) {
         return new int[]{0};
-    }
-
-    public static File getFile(String name) {
-        return new File(HardcoreQuesting.configDir + File.separator + "QuestFiles" + File.separator, name + ".json");
     }
 
     public String getCombinedArgs(String[] args) {

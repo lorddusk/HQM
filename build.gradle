@@ -17,16 +17,19 @@ buildscript {
 
 apply plugin: 'forge'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-version = "4.4.4"
+version = "1.7.10-5.0.0beta3"
 group = "hardcorequesting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "HQM-The Journey"
+archivesBaseName = "HQM-New Heights"
+
+idea { module { inheritOutputDirs = true } }
 
 minecraft {
-    version = "10.13.4.1448-1.7.10"
+    version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse/assets"
+	mappings = "snapshot_20140925"
 
     //replacing stuff in code.
     replace "@VERSION@", project.version

@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
-import hardcorequesting.Translator;
 import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public enum RepeatType {

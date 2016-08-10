@@ -2,8 +2,10 @@ package hardcorequesting.commands;
 
 import com.mojang.authlib.GameProfile;
 import hardcorequesting.Lang;
-import net.minecraft.command.*;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.CommandNotFoundException;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
@@ -45,11 +47,10 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked")
-    public List addTabCompletionOptions(ICommandSender sender, String[] args) {
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
             String subCommand = args[0];
-            List result = new ArrayList();
+            List<String> result = new ArrayList<>();
             for (ISubCommand command : commands.values()) {
                 if (command.isVisible(sender) && command.getCommandName().startsWith(subCommand))
                     result.add(command.getCommandName());
@@ -58,7 +59,7 @@ public class CommandHandler extends CommandBase {
         } else if (commands.containsKey(args[0]) && commands.get(args[0]).isVisible(sender)) {
             return commands.get(args[0]).addTabCompletionOptions(sender, Arrays.copyOfRange(args, 1, args.length));
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -67,7 +68,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length < 1) {
             args = new String[]{"help"};
         }
@@ -87,25 +88,14 @@ public class CommandHandler extends CommandBase {
         if (sender instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) sender;
             GameProfile username = player.getGameProfile();
-            return isCommandsAllowedOrOwner(username);
+            return isCommandsAllowedOrOwner(sender, username);
         } else
             return true;
     }
 
 
-    public static boolean isCommandsAllowedOrOwner(GameProfile username) {
-        return MinecraftServer.getServer().getConfigurationManager().func_152596_g(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username);
-    }
-
-    @Override
-    public int compareTo(Object obj) {
-        {
-            if (obj instanceof ICommand) {
-                return this.compareTo((ICommand) obj);
-            } else {
-                return 0;
-            }
-        }
+    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
+        return MinecraftServer.getServer().getConfigurationManager().canSendCommands(username) || MinecraftServer.getServer().isSinglePlayer() && MinecraftServer.getServer().getServerOwner().equals(username.getName());
     }
 
     public static ISubCommand getCommand(String commandName) {

@@ -6,7 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.BlockPortal;
 import hardcorequesting.blocks.ModBlocks;
-import hardcorequesting.quests.QuestTask;
+import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityBarrel;
 import hardcorequesting.tileentity.TileEntityPortal;
@@ -16,7 +16,6 @@ import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -87,12 +86,6 @@ public class Provider implements IWailaDataProvider {
         }
         return currenttip;
     }
-
-    @SideOnly(Side.CLIENT)
-    private boolean isShiftDown() {
-        return GuiScreen.isShiftKeyDown();
-    }
-
 
     @Override
     public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {

@@ -1,14 +1,17 @@
 package hardcorequesting.tileentity;
 
 
-import hardcorequesting.network.DataReader;
-import hardcorequesting.network.DataWriter;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.io.IOException;
+
 public interface IBlockSync {
-    public void writeData(DataWriter dw, EntityPlayer player, boolean onServer, int id);
+    double BLOCK_UPDATE_RANGE = 128;
+    int BLOCK_UPDATE_BUFFER_DISTANCE = 5;
 
-    public void readData(DataReader dr, EntityPlayer player, boolean onServer, int id);
+    void writeData(EntityPlayer player, boolean onServer, int type, JsonWriter writer) throws IOException;
 
-    public int infoBitLength();
+    void readData(EntityPlayer player, boolean onServer, int type, JsonObject data);
 }

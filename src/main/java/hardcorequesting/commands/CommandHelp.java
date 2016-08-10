@@ -1,7 +1,7 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.Lang;
-import hardcorequesting.Translator;
+import hardcorequesting.util.Translator;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
 import net.minecraft.command.ICommandSender;
@@ -28,7 +28,7 @@ public class CommandHelp extends CommandBase {
     }
 
     @Override
-    public void handleCommand(ICommandSender sender, String[] arguments) {
+    public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         switch (arguments.length) {
             case 0:
                 StringBuilder output = new StringBuilder(Translator.translate(Lang.HELP_START) + " ");
