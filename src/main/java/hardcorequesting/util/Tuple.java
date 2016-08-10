@@ -15,7 +15,7 @@ public class Tuple<X, Y> {
     }
 
     public Y getSecond() {
-        return this.getSecond();
+        return this.second
     }
 
 }
