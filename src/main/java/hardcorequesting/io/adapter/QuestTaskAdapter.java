@@ -213,7 +213,31 @@ public class QuestTaskAdapter {
 
         @Override
         public QuestTaskReputation.ReputationSetting read(JsonReader in) throws IOException {
-            return null;
+            in.beginObject();
+            Reputation reputation = null;
+            ReputationMarker lower = null, upper = null;
+            boolean inverted = false;
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case REPUTATION:
+                        reputation = Reputation.getReputation(in.nextString());
+                        break;
+                    case LOWER:
+                        if (reputation != null)
+                            lower = reputation.getMarker(in.nextInt());
+                        break;
+                    case UPPER:
+                        if (reputation != null)
+                            upper = reputation.getMarker(in.nextInt());
+                        break;
+                    case INVERTED:
+                        inverted = in.nextBoolean();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
         }
     };
 
