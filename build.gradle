@@ -33,7 +33,7 @@ dependencies {
     runtime "mezz.jei:jei_1.10.2:3.7.7.233"
 }
 
-version = "1.10.2-5.0.0beta3"
+version = "1.10.2-5.0.0beta4"
 group = "hardcorequesting"
 archivesBaseName = "HQM-New Heights"
 
