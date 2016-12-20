@@ -15,6 +15,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -137,7 +138,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 items[id].hasItem = true;
                 items[id].fluid = null;
                 ItemStack itemStack = item.getItem().copy();
-                itemStack.stackSize = 1;
+                itemStack.setCount(1);
                 items[id].item = itemStack;
             } else {
                 GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
@@ -300,7 +301,7 @@ public abstract class QuestTaskItems extends QuestTask {
     protected abstract GuiEditMenuItem.Type getMenuTypeId();
 
 
-    public boolean increaseItems(ItemStack[] itemsToConsume, QuestDataTaskItems data, String uuid) {
+    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, String uuid) {
         if (!parent.isAvailable(uuid)) return false;
 
 
@@ -312,14 +313,14 @@ public abstract class QuestTaskItems extends QuestTask {
                 continue;
             }
 
-            for (int j = 0; j < itemsToConsume.length; j++) {
-                ItemStack itemStack = itemsToConsume[j];
+            for (int j = 0; j < itemsToConsume.size(); j++) {
+                ItemStack itemStack = itemsToConsume.get(j);
                 if (item.precision.areItemsSame(itemStack, item.item)) {
-                    int amount = Math.min(itemStack.stackSize, item.required - data.progress[i]);
+                    int amount = Math.min(itemStack.getCount(), item.required - data.progress[i]);
                     if (amount > 0) {
-                        itemStack.stackSize -= amount;
-                        if (itemStack.stackSize == 0) {
-                            itemsToConsume[j] = null;
+                        itemStack.shrink(amount);
+                        if (itemStack.getCount() == 0) {
+                            itemsToConsume.set(i, ItemStack.EMPTY);
                         }
                         data.progress[i] += amount;
                         updated = true;

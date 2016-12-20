@@ -42,10 +42,10 @@ public class DeathStats {
 
     @SideOnly(Side.CLIENT)
     public String getName() {
-        if (Minecraft.getMinecraft().theWorld != null) {
+        if (Minecraft.getMinecraft().world != null) {
             try {
                 UUID uuid = UUID.fromString(this.uuid);
-                EntityPlayer player = Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(uuid);
+                EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByUUID(uuid);
                 if (player == null) {
                     return "<invalid>";
                 }

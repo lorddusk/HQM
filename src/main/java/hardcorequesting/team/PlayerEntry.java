@@ -33,7 +33,7 @@ public class PlayerEntry {
 
     @SideOnly(Side.CLIENT)
     public String getDisplayName() {
-        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
+        return Minecraft.getMinecraft().world.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
     }
 
     public boolean isInTeam() {

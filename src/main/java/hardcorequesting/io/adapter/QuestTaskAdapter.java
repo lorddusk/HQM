@@ -57,7 +57,7 @@ public class QuestTaskAdapter {
         @Override
         public QuestTaskItems.ItemRequirement read(JsonReader in) throws IOException {
             in.beginObject();
-            ItemStack item = null;
+            ItemStack item = ItemStack.EMPTY;
             Fluid fluid = null;
             int required = 1;
             ItemPrecision precision = ItemPrecision.PRECISE;

@@ -11,10 +11,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class CommandHandler extends CommandBase {
-    public static Map<String, ISubCommand> commands = new LinkedHashMap<String, ISubCommand>();
+    public static Map<String, ISubCommand> commands = new LinkedHashMap<>();
     public static CommandHandler instance = new CommandHandler();
 
     static {
@@ -43,12 +44,7 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public String getCommandName() {
-        return "hqm";
-    }
-
-    @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1) {
             String subCommand = args[0];
             List<String> result = new ArrayList<>();
@@ -64,8 +60,13 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "/" + getCommandName() + " help";
+    public String getName(){
+        return "hqm";
+    }
+
+    @Override
+    public String getUsage(ICommandSender sender){
+        return "/" + getName() + " help";
     }
 
     @Override
@@ -75,7 +76,7 @@ public class CommandHandler extends CommandBase {
         }
         ISubCommand command = commands.get(args[0]);
         if (command != null) {
-            if (command.isVisible(sender) && (sender.canCommandSenderUseCommand(command.getPermissionLevel(), getCommandName() + " " + command.getCommandName())
+            if (command.isVisible(sender) && (sender.canUseCommand(command.getPermissionLevel(), getName() + " " + command.getCommandName())
                     || (sender instanceof EntityPlayerMP && command.getPermissionLevel() <= 0))) {
                 command.handleCommand(sender, Arrays.copyOfRange(args, 1, args.length));
                 return;

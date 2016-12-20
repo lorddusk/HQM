@@ -18,7 +18,7 @@ public abstract class ItemInfo {
     public static final String BAG_UNLOCALIZED_NAME = "bags";
 
 
-    public static final String INVALID_UNLOCALIZED_NAME = "hqmInvalidItem";
+    public static final String INVALID_UNLOCALIZED_NAME = "hqm_invalid_item";
     public static final String INVALID_ICON = "hqmInvalidItem";
 
 

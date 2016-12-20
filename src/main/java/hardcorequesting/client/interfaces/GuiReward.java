@@ -75,7 +75,7 @@ public class GuiReward extends GuiBase {
             for (int j = 0; j < itemsInLine; j++) {
                 int x = (TEXTURE_WIDTH - (itemsInLine * ITEM_SIZE + (itemsInLine - 1) * ITEM_MARGIN)) / 2 + j * (ITEM_SIZE + ITEM_MARGIN);
                 ItemStack item = group.getItems().get(i * ITEMS_PER_LINE + j);
-                if (item != null && item.getItem() != null) {
+                if (item != ItemStack.EMPTY && item.getItem() != null) {
                     rewards.add(new Reward(item, x, y));
                 }
             }
@@ -128,11 +128,11 @@ public class GuiReward extends GuiBase {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {
                     if (GuiScreen.isShiftKeyDown()) {
-                        drawMouseOver(reward.item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), mX0, mY0);
+                        drawMouseOver(reward.item.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), mX0, mY0);
                     } else {
                         List<String> str = new ArrayList<String>();
                         try {
-                            List info = reward.item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                            List info = reward.item.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                             if (info.size() > 0) {
                                 str.add((String) info.get(0));
                                 if (info.size() > 1) {

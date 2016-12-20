@@ -29,11 +29,11 @@ repositories {
 }
 
 dependencies {
-    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    runtime "mezz.jei:jei_1.10.2:3.7.7.233"
+    compileOnly "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
+    runtime "mezz.jei:jei_1.11:4.1.1.207"
 }
 
-version = "1.10.2-5.0.0beta4"
+version = "1.11-5.0.0beta5"
 group = "hardcorequesting"
 archivesBaseName = "HQM-New Heights"
 
@@ -41,8 +41,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.10.2-12.18.1.2011"
-    mappings = "snapshot_20160518"
+    version = "1.11-13.19.1.2195"
+    mappings = "snapshot_20161220"
     runDir = "run"
 
     useDepAts = true

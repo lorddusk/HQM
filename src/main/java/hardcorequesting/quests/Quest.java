@@ -983,7 +983,7 @@ public class Quest {
                         List<String> str = new ArrayList<String>();
                         try {
                             if (isEditing && !GuiQuestBook.isCtrlKeyDown()) {
-                                str = rewards[i].getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                                str = rewards[i].getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
                                 str.add("");
                                 str.add(GuiColor.GRAY + Translator.translate("hqm.quest.crtlNonEditor"));
                             } else {
@@ -1030,7 +1030,7 @@ public class Quest {
                         selectedReward = i;
                     }
                 } else if (isEditing && gui.getCurrentMode() == EditMode.ITEM) {
-                    gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].stackSize, ItemPrecision.PRECISE));
+                    gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
                 } else if (isEditing && gui.getCurrentMode() == EditMode.DELETE && rewards[i] != null) {
                     ItemStack[] newRewards;
                     if (rawRewards.length == 1) {
@@ -1268,7 +1268,7 @@ public class Quest {
                     boolean added = false;
                     for (ItemStack itemStack : itemsToAdd) {
                         if (item.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(item, itemStack)) {
-                            itemStack.stackSize += item.stackSize;
+                            itemStack.grow(item.getCount());
                             added = true;
                             break;
                         }
@@ -1283,14 +1283,15 @@ public class Quest {
                 for (ItemStack itemStack : itemsToAdd) {
                     itemsToCheck.add(itemStack.copy());
                 }
-                for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+                for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
                     for (ItemStack itemStack : itemsToCheck) {
-                        if (itemStack.stackSize > 0) {
-                            if (player.inventory.mainInventory[i] == null) {
-                                itemStack.stackSize -= itemStack.getMaxStackSize();
+                        if (itemStack.getCount() > 0) {
+                            ItemStack stack = player.inventory.mainInventory.get(i);
+                            if (stack == ItemStack.EMPTY) {
+                                itemStack.shrink(itemStack.getMaxStackSize());
                                 break;
-                            } else if (player.inventory.mainInventory[i].isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, player.inventory.mainInventory[i])) {
-                                itemStack.stackSize -= itemStack.getMaxStackSize() - player.inventory.mainInventory[i].stackSize;
+                            } else if (stack.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, stack)) {
+                                itemStack.shrink(itemStack.getMaxStackSize() - stack.getCount());
                                 break;
                             }
                         }
@@ -1301,7 +1302,7 @@ public class Quest {
 
                 boolean valid = true;
                 for (ItemStack itemStack : itemsToCheck) {
-                    if (itemStack.stackSize > 0) {
+                    if (itemStack.getCount() > 0) {
                         valid = false;
                         break;
                     }
@@ -1350,26 +1351,27 @@ public class Quest {
     }
 
     public static void addItems(EntityPlayer player, List<ItemStack> itemsToAdd) {
-        for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+        for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
             Iterator<ItemStack> iterator = itemsToAdd.iterator();
             while (iterator.hasNext()) {
                 ItemStack itemStack = iterator.next();
+                ItemStack stack = player.inventory.mainInventory.get(i);
 
-                if (player.inventory.mainInventory[i] == null) {
-                    int amount = Math.min(itemStack.getMaxStackSize(), itemStack.stackSize);
+                if (stack == ItemStack.EMPTY) {
+                    int amount = Math.min(itemStack.getMaxStackSize(), itemStack.getCount());
                     ItemStack copy = itemStack.copy();
-                    copy.stackSize = amount;
-                    player.inventory.mainInventory[i] = copy;
-                    itemStack.stackSize -= amount;
-                    if (itemStack.stackSize <= 0) {
+                    copy.setCount(amount);
+                    player.inventory.mainInventory.set(i, copy);
+                    itemStack.shrink(amount);
+                    if (itemStack.getCount() <= 0) {
                         iterator.remove();
                     }
                     break;
-                } else if (player.inventory.mainInventory[i].isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, player.inventory.mainInventory[i])) {
-                    int amount = Math.min(itemStack.getMaxStackSize() - player.inventory.mainInventory[i].stackSize, itemStack.stackSize);
-                    player.inventory.mainInventory[i].stackSize += amount;
-                    itemStack.stackSize -= amount;
-                    if (itemStack.stackSize <= 0) {
+                } else if (stack.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, stack)) {
+                    int amount = Math.min(itemStack.getMaxStackSize() - stack.getCount(), itemStack.getCount());
+                    stack.grow(amount);
+                    itemStack.shrink(amount);
+                    if (itemStack.getCount() <= 0) {
                         iterator.remove();
                     }
                     break;
@@ -1408,7 +1410,7 @@ public class Quest {
             if (element instanceof GuiEditMenuItem.ElementItem) {
                 ItemStack itemStack = ((GuiEditMenuItem.ElementItem) element).getItem();
                 if (itemStack != null) {
-                    itemStack.stackSize = Math.min(127, element.getAmount());
+                    itemStack.setCount(Math.min(127, element.getAmount()));
                     setReward(itemStack, id, type == GuiEditMenuItem.Type.REWARD);
                 }
             }
@@ -1497,7 +1499,7 @@ public class Quest {
     public void setIcon(ItemStack icon) {
         this.icon = icon;
         if (icon != null) {
-            icon.stackSize = 1;
+            icon.setCount(1);
         }
     }
 

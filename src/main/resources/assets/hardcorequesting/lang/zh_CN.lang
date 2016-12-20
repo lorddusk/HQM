@@ -82,7 +82,7 @@ item.hqm:hearts_heart.freshness=当前新鲜度：%s%%
 item.hqm:hearts_rottenheart.name=腐烂红心
 item.hqm:hearts_rottenheart.tooltip=已经腐烂的心。请勿食用。
 item.hqm:bags.name=奖励袋子
-item.hqm:hqmInvalidItem.name=无效物品
+item.hqm:hqm_invalid_item.name=无效物品
 
 # ======================================
 #			    QUESTS

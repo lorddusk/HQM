@@ -279,7 +279,7 @@ public class Team {
         }
 
         //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
+        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerNames()) {
             Team team = QuestingData.getQuestingData(username).getTeam();
             PlayerEntry entry = team.getEntry(username);
             if (entry != null) {

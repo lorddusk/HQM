@@ -11,17 +11,19 @@ import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.QuestLine;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.File;
 
@@ -82,6 +84,28 @@ public class HardcoreQuesting {
         event.registerServerCommand(CommandHandler.instance);
     }
 
+    @EventHandler
+    public void missingMappings(FMLMissingMappingsEvent event){
+        for(FMLMissingMappingsEvent.MissingMapping mapping : event.get()){
+            ResourceLocation loc = mapping.resourceLocation;
+            if(loc.getResourceDomain().equals("HardcoreQuesting")){
+                if(mapping.type.equals(GameRegistry.Type.BLOCK)){
+                    Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
+                    if(block != null){
+                        mapping.remap(block);
+                    }
+                } else {
+                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
+                    if(item != null){
+                        mapping.remap(item);
+                    }
+                }
+            }
+            if(mapping.resourceLocation.getResourcePath().toLowerCase().equals("hqminvaliditem")){
+                mapping.remap(ModItems.invalidItem);
+            }
+        }
+    }
 
     public static EntityPlayer getPlayer() {
         return commandUser;

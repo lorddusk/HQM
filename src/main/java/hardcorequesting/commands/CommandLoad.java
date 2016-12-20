@@ -63,7 +63,7 @@ public class CommandLoad extends CommandBase {
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
             QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
-                sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
+                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
             } else {
                 throw new CommandException(Lang.LOAD_FAILED);
             }
@@ -85,7 +85,7 @@ public class CommandLoad extends CommandBase {
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
                     Reputation.addReputation(reputation);
-                    sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
+                    sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
                 } else {
                     throw new CommandException(Lang.LOAD_FAILED);
                 }
@@ -107,7 +107,7 @@ public class CommandLoad extends CommandBase {
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
-                sender.addChatMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Bags")));
+                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Bags")));
             } else {
                 throw new CommandException(Lang.LOAD_FAILED);
             }

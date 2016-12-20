@@ -12,7 +12,6 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -44,12 +43,12 @@ public class Provider implements IWailaDataProvider {
                         return portal.getItem();
                     }
                 } else {
-                    return new ItemStack((Block) null);
+                    return ItemStack.EMPTY;
                 }
             }
         }
 
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class Provider implements IWailaDataProvider {
 
     @SideOnly(Side.CLIENT)
     private EntityPlayer getPlayer() {
-        return Minecraft.getMinecraft().thePlayer;
+        return Minecraft.getMinecraft().player;
     }
 
     @Override

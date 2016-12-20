@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
@@ -12,8 +11,6 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.io.IOException;
 
@@ -29,7 +26,7 @@ public class MinecraftAdapter {
 
         @Override
         public void write(JsonWriter out, ItemStack value) throws IOException {
-            if (value == null || value.getItem() == null) {
+            if (value == ItemStack.EMPTY || value.getItem() == null) {
                 out.nullValue();
                 return;
             }
@@ -39,8 +36,8 @@ public class MinecraftAdapter {
             if (value.getItemDamage() != 0) {
                 out.name(DAMAGE).value(value.getItemDamage());
             }
-            if (value.stackSize != 1) {
-                out.name(STACK_SIZE).value(value.stackSize);
+            if (value.getCount() != 1) {
+                out.name(STACK_SIZE).value(value.getCount());
             }
             if (value.hasTagCompound() && !value.getTagCompound().hasNoTags()) {
                 NBT_TAG_COMPOUND.write(out.name(NBT), value.getTagCompound());

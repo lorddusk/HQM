@@ -103,7 +103,6 @@ public class EventHandler {
         return registeredTasks[type.ordinal()];
     }
 
-
     public static class BookOpeningEvent {
         private String playerName;
         private boolean isOpBook;

@@ -39,11 +39,11 @@ public class CommandHelp extends CommandBase {
                 }
 
                 for (int i = 0; i < commands.size() - 1; i++) {
-                    output.append("/").append(CommandHandler.instance.getCommandName()).append(" ").append(YELLOW).append(commands.get(i)).append(WHITE).append(", ");
+                    output.append("/").append(CommandHandler.instance.getName()).append(" ").append(YELLOW).append(commands.get(i)).append(WHITE).append(", ");
                 }
                 output.delete(output.length() - 2, output.length());
-                output.append(" and /").append(CommandHandler.instance.getCommandName()).append(" ").append(YELLOW).append(commands.get(commands.size() - 1)).append(WHITE).append(".");
-                sender.addChatMessage(new TextComponentString(output.toString()));
+                output.append(" and /").append(CommandHandler.instance.getName()).append(" ").append(YELLOW).append(commands.get(commands.size() - 1)).append(WHITE).append(".");
+                sender.sendMessage(new TextComponentString(output.toString()));
                 break;
             case 1:
                 String commandName = arguments[0];
@@ -54,7 +54,7 @@ public class CommandHelp extends CommandBase {
                 ISubCommand command = CommandHandler.getCommand(commandName);
                 if (command.isVisible(sender)) {
                     for (int i : command.getSyntaxOptions(sender))
-                        sender.addChatMessage(new TextComponentString(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
+                        sender.sendMessage(new TextComponentString(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
                                 + WHITE + " - " + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.INFO_SUFFIX + i)));
                 } else {
                     throw new CommandException(Lang.NO_PERMISSION);
@@ -69,7 +69,7 @@ public class CommandHelp extends CommandBase {
     @SuppressWarnings(value = "unchecked")
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
-            return CommandHandler.instance.getTabCompletionOptions(sender.getServer(), sender, new String[]{args[1]}, new BlockPos(0, 0, 0));
+            return CommandHandler.instance.getTabCompletions(sender.getServer(), sender, new String[]{args[1]}, new BlockPos(0, 0, 0));
         }
         return null;
     }

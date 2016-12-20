@@ -37,7 +37,7 @@ public class PlayerDeathEventListener {
         if (event.getEntityPlayer() == null
                 || event.getEntityPlayer() instanceof FakePlayer
                 || event.isCanceled()
-                || event.getEntityPlayer().worldObj.getGameRules().getBoolean("keepInventory")
+                || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }
@@ -61,7 +61,7 @@ public class PlayerDeathEventListener {
                 || event.getEntityPlayer() instanceof FakePlayer
                 || !event.isWasDeath()
                 || event.isCanceled()
-                || event.getEntityPlayer().worldObj.getGameRules().getBoolean("keepInventory")
+                || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
                 || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
             return;
         }

@@ -65,18 +65,18 @@ public class TileEntityTracker extends TileEntity implements ITickable {
             questId = null;
         }
 
-        if (!worldObj.isRemote && delay++ == 20) {
+        if (!world.isRemote && delay++ == 20) {
             if (quest != null && Quest.getQuest(quest.getId()) == null) {
                 quest = null;
             }
-            int oldMeta = worldObj.getBlockState(pos).getBlock().getMetaFromState(ModBlocks.itemTracker.getDefaultState());
+            int oldMeta = world.getBlockState(pos).getBlock().getMetaFromState(ModBlocks.itemTracker.getDefaultState());
             int meta = 0;
             if (quest != null) {
                 meta = type.getMeta(this, quest, radius);
             }
 
             if (oldMeta != meta) {
-                worldObj.setBlockState(pos, ModBlocks.itemTracker.getDefaultState(), 3);
+                world.setBlockState(pos, ModBlocks.itemTracker.getDefaultState(), 3);
                 notifyUpdate(pos.getX(), pos.getY(), pos.getZ(), 2);
             }
 
@@ -86,7 +86,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
 
     private void notifyUpdate(int x, int y, int z, int i) {
         if (i == 2 || x != pos.getX() || y != pos.getY() || z != pos.getZ()) {
-            worldObj.notifyNeighborsOfStateChange(pos, getBlockType());
+            world.notifyNeighborsOfStateChange(pos, getBlockType(), false);
 
             if (i > 0) {
                 notifyUpdate(x - 1, y, z, i - 1);
@@ -144,7 +144,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
 
     @SideOnly(Side.CLIENT)
     public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type) {
-        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        TileEntityTracker tracker = getTracker(player.world, pos);
         if (tracker != null) {
             tracker.questId = questId;
             tracker.quest = null;
@@ -162,7 +162,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     }
 
     public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
-        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        TileEntityTracker tracker = getTracker(player.world, pos);
         if (Quest.isEditing && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;

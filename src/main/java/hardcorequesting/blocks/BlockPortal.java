@@ -70,17 +70,17 @@ public class BlockPortal extends BlockContainer {
 
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null && Quest.isEditing) {
-            if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
+            if (player.inventory.getCurrentItem() != ItemStack.EMPTY && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null && te instanceof TileEntityPortal) {
                         ((TileEntityPortal) te).setCurrentQuest();
                         if (((TileEntityPortal) te).getCurrentQuest() != null)
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_portal_0.bindTo", ((TileEntityPortal) te).getCurrentQuest().getName()));
+                            player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_portal_0.bindTo", ((TileEntityPortal) te).getCurrentQuest().getName()));
                         else
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
+                            player.sendMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;
@@ -164,7 +164,7 @@ public class BlockPortal extends BlockContainer {
         if (te != null && te instanceof TileEntityPortal) {
             TileEntityPortal portal = (TileEntityPortal) te;
             ItemStack itemStack = super.getPickBlock(state, target, world, pos, player);
-            if (itemStack != null) {
+            if (itemStack != ItemStack.EMPTY) {
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
                 if (tagCompound == null) {
                     tagCompound = new NBTTagCompound();
