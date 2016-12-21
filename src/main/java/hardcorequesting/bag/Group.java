@@ -93,9 +93,9 @@ public class Group {
 
         Quest.addItems(player, itemsToAdd);
 
-        itemsToAdd.stream().filter(item -> item.stackSize > 0).forEach(item -> {
-            EntityItem entityItem = new EntityItem(player.worldObj, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
-            player.worldObj.spawnEntityInWorld(entityItem);
+        itemsToAdd.stream().filter(item -> item.getCount() > 0).forEach(item -> {
+            EntityItem entityItem = new EntityItem(player.getEntityWorld(), player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, item);
+            player.getEntityWorld().spawnEntity(entityItem);
         });
     }
 
@@ -255,7 +255,7 @@ public class Group {
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
                 if (itemStack != null && itemStack.getItem() != null) {
                     try {
-                        gui.drawMouseOver(itemStack.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), x + gui.getLeft(), y + gui.getTop());
+                        gui.drawMouseOver(itemStack.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), x + gui.getLeft(), y + gui.getTop());
                     } catch (Exception ignored) {
                     }
                 }
@@ -270,18 +270,18 @@ public class Group {
     @SideOnly(Side.CLIENT)
     public void mouseClicked(GuiQuestBook gui, int x, int y) {
         List<ItemStack> items = new ArrayList<>(this.getItems());
-        items.add(null);
+        items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
 
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
                 if (gui.getCurrentMode() == EditMode.ITEM) {
-                    ItemStack itemStack = i < items.size() ? items.get(i) : null;
+                    ItemStack itemStack = i < items.size() ? items.get(i) : ItemStack.EMPTY;
                     int amount;
-                    if (itemStack != null) {
+                    if (itemStack != ItemStack.EMPTY) {
                         itemStack = itemStack.copy();
-                        amount = itemStack.stackSize;
+                        amount = itemStack.getCount();
                     } else {
                         amount = 1;
                     }

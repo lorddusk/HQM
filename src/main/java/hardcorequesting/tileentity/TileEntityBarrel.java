@@ -13,60 +13,40 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidHandler;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+
+import javax.annotation.Nullable;
 
 public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler, ITickable {
 
     @Override
-    public int fill(EnumFacing from, FluidStack resource, boolean doFill) {
-        if (resource == null) {
-            return 0;
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
+        return this.getCapability(capability, facing) != null;
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
+        if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
+            return (T) this;
         }
-
-        if (doFill) {
-            QuestTask task = getCurrentTask();
-            if (task != null && task instanceof QuestTaskItemsConsume) {
-                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
-                    modifiedSyncTimer = SYNC_TIME;
-                }
-            }
-        }
-
-        return resource.amount;
-    }
-
-    @Override
-    public FluidStack drain(EnumFacing from, FluidStack resource, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public FluidStack drain(EnumFacing from, int maxDrain, boolean doDrain) {
-        return null;
-    }
-
-    @Override
-    public boolean canFill(EnumFacing from, Fluid fluid) {
-        return true;
-    }
-
-    @Override
-    public boolean canDrain(EnumFacing from, Fluid fluid) {
-        return false;
-    }
-
-    @Override
-    public FluidTankInfo[] getTankInfo(EnumFacing from) {
-        return new FluidTankInfo[0];
+        return super.getCapability(capability, facing);
     }
 
     @Override
     public int getSizeInventory() {
         return 1;
+    }
+
+    @Override
+    public boolean isEmpty(){
+        return false;
     }
 
     @Override
@@ -91,7 +71,9 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public void setInventorySlotContents(int i, ItemStack itemstack) {
         QuestTask task = getCurrentTask();
         if (task != null && task instanceof QuestTaskItemsConsume) {
-            if (((QuestTaskItemsConsume) task).increaseItems(new ItemStack[]{itemstack}, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
+            NonNullList<ItemStack> list = NonNullList.create();
+            list.add(itemstack);
+            if (((QuestTaskItemsConsume) task).increaseItems(list, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                 modifiedSyncTimer = SYNC_TIME;
             }
         }
@@ -106,7 +88,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     private void doSync() {
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
             QuestTask task = getCurrentTask();
             if (task != null) {
                 EntityPlayer player = QuestingData.getPlayerFromUsername(playerUuid);
@@ -119,7 +101,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     private void updateState() {
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
             QuestTask task = getCurrentTask();
             boolean state = false;
             if (task != null) {
@@ -131,9 +113,9 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             boolean oldState = getBlockMetadata() == 1;
             if (state != oldState) {
                 if (state) { // TODO add the actual states (meta 1 == has active quest set) / (meta 0 == no or completed quest set)
-                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                    world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
                 } else {
-                    worldObj.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                    world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
                 }
             }
         }
@@ -176,7 +158,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
+    public boolean isUsableByPlayer(EntityPlayer entityplayer) {
         return true;
     }
 
@@ -264,5 +246,40 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
     public String getPlayer() {
         return playerUuid;
+    }
+
+    @Override
+    public IFluidTankProperties[] getTankProperties(){
+        return new IFluidTankProperties[0];
+    }
+
+    @Override
+    public int fill(FluidStack resource, boolean doFill){
+        if (resource == null) {
+            return 0;
+        }
+
+        if (doFill) {
+            QuestTask task = getCurrentTask();
+            if (task != null && task instanceof QuestTaskItemsConsume) {
+                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
+                    modifiedSyncTimer = SYNC_TIME;
+                }
+            }
+        }
+
+        return resource.amount;
+    }
+
+    @Nullable
+    @Override
+    public FluidStack drain(FluidStack resource, boolean doDrain){
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public FluidStack drain(int maxDrain, boolean doDrain){
+        return null;
     }
 }

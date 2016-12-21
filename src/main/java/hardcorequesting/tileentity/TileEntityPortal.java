@@ -158,7 +158,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     @Override
     public void update() {
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
             if (quest == null && questId != null) {
                 quest = Quest.getQuest(questId);
                 questId = null;
@@ -240,13 +240,13 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     @SideOnly(Side.CLIENT)
     private void keepClientDataUpdated() {
-        double distance = Minecraft.getMinecraft().thePlayer.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+        double distance = Minecraft.getMinecraft().player.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
         if (distance > Math.pow(BLOCK_UPDATE_RANGE, 2)) {
             hasUpdatedData = false;
         } else if (!hasUpdatedData && distance < Math.pow(BLOCK_UPDATE_RANGE - BLOCK_UPDATE_BUFFER_DISTANCE, 2)) {
             hasUpdatedData = true;
-            NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().thePlayer, 0);
+            NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().player, 0);
         }
     }
 
@@ -338,8 +338,8 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     players.clear();
                     for (JsonElement p : data.get(PLAYERS).getAsJsonArray())
                         players.add(p.getAsString());
-                    IBlockState state = worldObj.getBlockState(pos);
-                    worldObj.notifyBlockUpdate(pos, state, state, 3);
+                    IBlockState state = world.getBlockState(pos);
+                    world.notifyBlockUpdate(pos, state, state, 3);
                 }
                 break;
             case 1:
@@ -352,7 +352,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                                 int dmg = data.get(ITEM_DAMAGE).getAsInt();
                                 item = new ItemStack(Item.REGISTRY.getObject(new ResourceLocation(itemId)), 1, dmg);
                             } else {
-                                item = null;
+                                item = ItemStack.EMPTY;
                             }
                         }
 
@@ -382,7 +382,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     @SideOnly(Side.CLIENT)
     public void sendToServer() {
-        NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().thePlayer, 1);
+        NetworkManager.sendBlockUpdate(this, Minecraft.getMinecraft().player, 1);
     }
 
     public ItemStack getItem() {
@@ -400,7 +400,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
         NBTTagCompound compound = new NBTTagCompound();
         this.writeToNBT(compound);
         portal.readFromNBT(compound);
-        portal.worldObj = this.worldObj;
+        portal.world = this.world;
 
         return portal;
     }

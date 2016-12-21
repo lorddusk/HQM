@@ -14,12 +14,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
@@ -88,7 +90,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         @Override
         public List<String> getName(GuiBase gui) {
             if (item != null && item.getItem() != null) {
-                return item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                return item.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
             } else {
                 List<String> ret = new ArrayList<>();
                 ret.add("Unknown");
@@ -98,13 +100,13 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public int getAmount() {
-            return item == null ? 0 : item.stackSize;
+            return item == null ? 0 : item.getCount();
         }
 
         @Override
         public void setAmount(int val) {
             if (item != null) {
-                item.stackSize = val;
+                item.setCount(val);
             }
         }
 
@@ -210,13 +212,13 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         playerItems = new ArrayList<>();
         searchItems = new ArrayList<>();
-        IInventory inventory = Minecraft.getMinecraft().thePlayer.inventory;
+        IInventory inventory = Minecraft.getMinecraft().player.inventory;
         int itemLength = inventory.getSizeInventory();
         for (int i = 0; i < itemLength; i++) {
             ItemStack item = inventory.getStackInSlot(i);
-            if (item != null) {
+            if (item != ItemStack.EMPTY) {
                 item = item.copy();
-                item.stackSize = 1;
+                item.setCount(1);
                 boolean exists = false;
                 for (Element other : playerItems) {
                     if (ItemStack.areItemStacksEqual(item, (ItemStack) other.getItem())) {
@@ -235,12 +237,15 @@ public class GuiEditMenuItem extends GuiEditMenu {
             int end = playerItems.size();
             for (int i = 0; i < end; i++) {
                 Element item = playerItems.get(i);
-                FluidStack fluidStack = FluidContainerRegistry.getFluidForFilledItem((ItemStack) item.getItem());
-                if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
-                    fluids.add(fluidStack.getFluid().getName());
-                    playerItems.add(new ElementFluid(fluidStack.getFluid()));
-                    if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
-                        break;
+                ItemStack stack = (ItemStack) item.getItem();
+                if(stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)){
+                    FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
+                    if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
+                        fluids.add(fluidStack.getFluid().getName());
+                        playerItems.add(new ElementFluid(fluidStack.getFluid()));
+                        if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
+                            break;
+                        }
                     }
                 }
             }
@@ -483,7 +488,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public static void initItems() {
             clear();
             if (searchItems.isEmpty()) {
-                List<ItemStack> stacks = new ArrayList<>();
+                NonNullList<ItemStack> stacks = NonNullList.create();
                 for (Item item : Item.REGISTRY) {
                     //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
                     //                    {
@@ -496,7 +501,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     } catch (Exception ignore) {
                     }
                 }
-                EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+                EntityPlayer player = Minecraft.getMinecraft().player;
                 for (ItemStack stack : stacks) {
                     try {
                         List tooltipList = stack.getTooltip(player, false);

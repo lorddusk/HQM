@@ -57,11 +57,11 @@ public class GUIOverlay extends Gui {
     }
 
     public int getLives() {
-        return QuestingData.getQuestingData(mc.thePlayer).getLives();
+        return QuestingData.getQuestingData(mc.player).getLives();
     }
 
     public int getDeaths() {
-        return QuestingData.getQuestingData(mc.thePlayer).getDeathStat().getTotalDeaths();
+        return QuestingData.getQuestingData(mc.player).getDeathStat().getTotalDeaths();
     }
 
 }

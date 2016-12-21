@@ -54,7 +54,7 @@ public class BlockSyncMessage implements IMessage {
         private void handle(BlockSyncMessage message, MessageContext ctx) {
             EntityPlayer player = HardcoreQuesting.proxy.getPlayer(ctx);
             if (player == null) return;
-            TileEntity te = player.worldObj.getTileEntity(BlockPos.fromLong(message.pos));
+            TileEntity te = player.world.getTileEntity(BlockPos.fromLong(message.pos));
             JsonObject data = new JsonParser().parse(message.data).getAsJsonObject();
             if (te != null && te instanceof IBlockSync)
                 ((IBlockSync) te).readData(player, ctx.side == Side.SERVER, message.type, data);

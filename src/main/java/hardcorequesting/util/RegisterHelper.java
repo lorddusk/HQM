@@ -11,6 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public class RegisterHelper {
+
     public static void registerBlock(Block block) {
         GameRegistry.register(block);
     }

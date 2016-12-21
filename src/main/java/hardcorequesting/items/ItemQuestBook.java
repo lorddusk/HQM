@@ -65,14 +65,14 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote && player instanceof EntityPlayerMP) {
-
+            ItemStack stack = player.getHeldItem(hand);
             if (!QuestingData.isQuestActive()) {
-                player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noQuestYet"));
+                player.sendMessage(Translator.translateToIChatComponent("hqm.message.noQuestYet"));
             } else {
-                if (item.getItemDamage() == 1) {
-                    NBTTagCompound compound = item.getTagCompound();
+                if (stack.getItemDamage() == 1) {
+                    NBTTagCompound compound = stack.getTagCompound();
                     if (compound != null && compound.hasKey(NBT_PLAYER)) {
                         String uuidS = compound.getString(NBT_PLAYER);
                         UUID uuid;
@@ -80,7 +80,7 @@ public class ItemQuestBook extends Item {
                             uuid = UUID.fromString(uuidS);
                         } catch (IllegalArgumentException e) {
                             compound.removeTag(NBT_PLAYER);
-                            return new ActionResult<>(EnumActionResult.FAIL, item);
+                            return new ActionResult<>(EnumActionResult.FAIL, stack);
                         }
                         if (QuestingData.hasData(uuid) && CommandHandler.isOwnerOrOp(player)) {
                             EntityPlayer subject = QuestingData.getPlayer(uuid);
@@ -88,7 +88,7 @@ public class ItemQuestBook extends Item {
                                 NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.TRUE.toString()), (EntityPlayerMP) subject);
                             //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                         } else {
-                            player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
+                            player.sendMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
                         }
                     }
                 } else {
@@ -97,8 +97,7 @@ public class ItemQuestBook extends Item {
             }
 
         }
-
-        return new ActionResult<>(EnumActionResult.SUCCESS, item);
+        return super.onItemRightClick(world, player, hand);
     }
 
     @Override

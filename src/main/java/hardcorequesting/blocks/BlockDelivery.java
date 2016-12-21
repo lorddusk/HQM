@@ -68,16 +68,16 @@ public class BlockDelivery extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null) {
-            if (player.inventory.getCurrentItem() == null) {
+            if (player.inventory.getCurrentItem() == ItemStack.EMPTY) {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null && te instanceof TileEntityBarrel) {
                         if (((TileEntityBarrel) te).getCurrentTask() != null/* && te.getBlockMetadata() == 1*/) // TODO: uncomment once states (with meta) are in
-                            player.addChatComponentMessage(new TextComponentTranslation("tile.hqm:item_barrel.boundTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
+                            player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrel.boundTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
-                            player.addChatComponentMessage(new TextComponentTranslation("tile.hqm:item_barrel.nonBound"));
+                            player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrel.nonBound"));
                     }
                 }
                 return true;
@@ -88,9 +88,9 @@ public class BlockDelivery extends BlockContainer {
                         ((TileEntityBarrel) te).storeSettings(player);
 
                         if (((TileEntityBarrel) te).getCurrentTask() != null)
-                            player.addChatComponentMessage(new TextComponentTranslation("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
+                            player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
-                            player.addChatComponentMessage(new TextComponentTranslation("hqm.message.noTaskSelected"));
+                            player.sendMessage(new TextComponentTranslation("hqm.message.noTaskSelected"));
                     }
                 }
                 return true;

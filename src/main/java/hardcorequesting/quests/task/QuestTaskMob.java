@@ -16,6 +16,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,7 +32,7 @@ public class QuestTaskMob extends QuestTask {
     }
 
     public static EntityPlayer getKiller(LivingDeathEvent event) {
-        if (event.getEntityLiving() != null && !event.getEntityLiving().worldObj.isRemote && event.getSource() != null) {
+        if (event.getEntityLiving() != null && !event.getEntityLiving().getEntityWorld().isRemote && event.getSource() != null) {
             if (event.getSource().getSourceOfDamage() != null && event.getSource().getSourceOfDamage() instanceof EntityPlayer) {
                 return (EntityPlayer) event.getSource().getSourceOfDamage();
             } else if (event.getEntityLiving().getCommandSenderEntity() instanceof EntityPlayer) {
@@ -51,7 +52,7 @@ public class QuestTaskMob extends QuestTask {
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
                 if (mob.count > ((QuestDataTaskMob) getData(player)).killed[i]) {
-                    Class clazz = (Class) EntityList.NAME_TO_CLASS.get(mob.mob);
+                    Class clazz = EntityList.getClass(new ResourceLocation(mob.mob));
                     if (clazz != null) {
                         if (mob.isExact()) {
                             if (clazz.equals(event.getEntityLiving().getClass())) {

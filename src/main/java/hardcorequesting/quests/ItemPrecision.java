@@ -4,10 +4,9 @@ import com.google.common.collect.ImmutableList;
 import hardcorequesting.util.OreDictionaryHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class ItemPrecision {
@@ -31,7 +30,7 @@ public abstract class ItemPrecision {
 
         @Override
         public ItemStack[] getPermutations(ItemStack stack) {
-            List<ItemStack> items = new ArrayList<>();
+            NonNullList<ItemStack> items = NonNullList.create();
             stack.getItem().getSubItems(stack.getItem(), null, items);
             return items.toArray(new ItemStack[items.size()]);
         }

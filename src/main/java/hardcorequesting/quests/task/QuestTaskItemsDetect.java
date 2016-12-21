@@ -8,6 +8,7 @@ import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,32 +56,32 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     public void onCrafting(EntityPlayer player, ItemStack item, IInventory craftMatrix) {
         if (player != null) {
             item = item.copy();
-            if (item.stackSize == 0) {
-                item.stackSize = 1;
+            if (item.getCount() == 0) {
+                item.setCount(1);
             }
             countItems(player, item);
         }
     }
 
     private void countItems(EntityPlayer player, ItemStack item) {
-        if (player.worldObj.isRemote) return;
+        if (player.world.isRemote) return;
 
-        ItemStack[] items;
+        NonNullList<ItemStack> items;
         if (item == null) {
             items = player.inventory.mainInventory;
         } else {
-            items = new ItemStack[player.inventory.mainInventory.length + 1];
-            ItemStack[] mainInventory = player.inventory.mainInventory;
-            for (int i = 0; i < mainInventory.length; i++) {
-                items[i] = mainInventory[i];
+            items = NonNullList.create();
+            NonNullList<ItemStack> mainInventory = player.inventory.mainInventory;
+            for (int i = 0; i < mainInventory.size(); i++) {
+                items.set(i, mainInventory.get(i));
             }
-            items[items.length - 1] = item;
+            items.set(items.size() -1, item);
         }
         countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
     }
 
 
-    public void countItems(ItemStack[] itemsToCount, QuestDataTaskItems data, String playerName) {
+    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String playerName) {
         if (!parent.isAvailable(playerName)) return;
 
 
@@ -96,7 +97,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
             for (ItemStack itemStack : itemsToCount) {
                 if (item.getPrecision().areItemsSame(itemStack, item.getItem())) {
-                    int amount = Math.min(itemStack.stackSize, item.required - data.progress[i]);
+                    int amount = Math.min(itemStack.getCount(), item.required - data.progress[i]);
                     data.progress[i] += amount;
                     updated = true;
                 }

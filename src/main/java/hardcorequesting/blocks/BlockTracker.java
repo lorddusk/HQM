@@ -36,20 +36,20 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null) {
-            if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
+            if (player.inventory.getCurrentItem() != ItemStack.EMPTY && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) te).setCurrentQuest();
                             if (((TileEntityTracker) te).getCurrentQuest() != null) {
-                                player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) te).getCurrentQuest().getName()));
+                                player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) te).getCurrentQuest().getName()));
                             } else {
-                                player.addChatMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
+                                player.sendMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                             }
                         }
 
@@ -61,7 +61,7 @@ public class BlockTracker extends BlockContainer {
                     TileEntity te = world.getTileEntity(pos);
                     if (te != null && te instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) te).openInterface(player);
                         }

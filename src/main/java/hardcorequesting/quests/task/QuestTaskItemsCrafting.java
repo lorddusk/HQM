@@ -7,6 +7,7 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,15 +35,17 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
     }
 
     private void create(EntityPlayer player, ItemStack item) {
-        if (!player.worldObj.isRemote) {
+        if (!player.getEntityWorld().isRemote) {
             if (item != null) {
                 //no need for the quest to be active
                 //if (parent.isVisible(player) && parent.isEnabled(player) && isVisible(player)) {
                 item = item.copy();
-                if (item.stackSize == 0) {
-                    item.stackSize = 1;
+                if (item.getCount() == 0) {
+                    item.setCount(1);
                 }
-                increaseItems(new ItemStack[]{item}, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
+                NonNullList<ItemStack> list = NonNullList.create();
+                list.add(item);
+                increaseItems(list, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
                 //}
             }
         }

@@ -94,7 +94,7 @@ public abstract class QuestTaskReputation extends QuestTask {
         if (settings.length > 0) {
 
             QuestDataTask data = getData(player);
-            if (!data.completed && !player.worldObj.isRemote) {
+            if (!data.completed && !player.getEntityWorld().isRemote) {
                 String name = QuestingData.getUserUUID(player);
                 for (ReputationSetting setting : settings) {
                     if (!setting.isValid(name)) {
