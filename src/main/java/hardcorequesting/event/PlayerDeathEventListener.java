@@ -12,14 +12,16 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Iterator;
 
+@Mod.EventBusSubscriber
 public class PlayerDeathEventListener {
 
-    public PlayerDeathEventListener() {
+    public PlayerDeathEventListener(){
         MinecraftForge.EVENT_BUS.register(this);
     }
 

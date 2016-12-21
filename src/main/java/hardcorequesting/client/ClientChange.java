@@ -69,7 +69,6 @@ public enum ClientChange {
             int task = root.get(TASK).getAsInt();
             if (quest != null && task > -1 && task < quest.getTasks().size())
                 quest.getTasks().get(task).onUpdate(player);
-            quest.getTasks().get(task).onUpdate(player);
         }
     }),
     CLAIM_QUEST(new ClientUpdater<Tuple<String, Integer>>() {

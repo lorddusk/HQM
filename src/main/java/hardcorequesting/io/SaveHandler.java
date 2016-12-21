@@ -121,8 +121,11 @@ public class SaveHandler {
     public static void saveAllQuestSets(File folder) throws IOException {
         removeQuestSetFiles(folder);
         saveQuestSetList(Quest.getQuestSets(), new File(folder, "sets.json"));
-        for (QuestSet set : Quest.getQuestSets())
+        List<QuestSet> setsToSave = new ArrayList<>(); // possible fix for #251
+        setsToSave.addAll(Quest.getQuestSets());
+        for (QuestSet set : setsToSave){
             saveQuestSet(set, new File(folder, set.getFilename() + ".json"));
+        }
     }
 
     public static String saveAllQuestSets(List<String> names, List<String> questSets) {

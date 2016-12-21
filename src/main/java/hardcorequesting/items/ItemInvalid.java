@@ -7,8 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-//import net.minecraft.client.renderer.texture.IIconRegister;
-
 /**
  * Created by Tim on 5/10/2015.
  */

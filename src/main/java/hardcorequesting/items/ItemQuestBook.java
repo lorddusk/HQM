@@ -34,8 +34,6 @@ public class ItemQuestBook extends Item {
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
-
-
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
         return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();

@@ -132,11 +132,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return null;
     }
 
-//    @Override
-//    public String getInventoryName() {
-//        return BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME;
-//    }
-
     @Override
     public String getName() {
         return null;

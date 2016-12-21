@@ -20,10 +20,10 @@ public abstract class GuiEditMenu {
     protected List<CheckBox> checkboxes;
 
     protected GuiEditMenu(final GuiBase gui, EntityPlayer player) {
-        buttons = new ArrayList<LargeButton>();
+        buttons = new ArrayList<>();
         this.player = player;
 
-        checkboxes = new ArrayList<CheckBox>();
+        checkboxes = new ArrayList<>();
     }
 
     protected GuiEditMenu(final GuiBase gui, EntityPlayer player, boolean isControlOnFirstPage) {

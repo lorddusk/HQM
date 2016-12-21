@@ -7,10 +7,10 @@ import hardcorequesting.tileentity.TileEntityPortal;
 import hardcorequesting.tileentity.TileEntityTracker;
 import hardcorequesting.util.RegisterHelper;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class ModBlocks {
     public static Block itemBarrel = new BlockDelivery().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
@@ -36,11 +36,11 @@ public class ModBlocks {
     }
 
     public static void registerRecipes() {
-        GameRegistry.addRecipe(new ItemStack(ModBlocks.itemBarrel),
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.itemBarrel),
                 "wgw",
                 "gqg",
                 "wgw",
-                'w', Blocks.PLANKS, 'q', ModItems.book.setContainerItem(ModItems.book), 'g', Blocks.GLASS);
+                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlass"));
     }
 
 

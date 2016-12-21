@@ -25,9 +25,9 @@ public class ItemBlockPortal extends ItemBlock {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List lst, boolean useExtraInfo) {
+    public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> lst, boolean useExtraInfo) {
         try {
-            if (itemStack != null && itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("Portal")) {
+            if (itemStack != ItemStack.EMPTY && itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("Portal")) {
                 NBTTagCompound compound = itemStack.getTagCompound().getCompoundTag("Portal");
                 if (compound.hasKey(TileEntityPortal.NBT_QUEST)) {
                     Quest quest = Quest.getQuest(compound.getString(TileEntityPortal.NBT_QUEST));

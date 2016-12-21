@@ -304,22 +304,25 @@ public abstract class QuestTaskItems extends QuestTask {
     public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, String uuid) {
         if (!parent.isAvailable(uuid)) return false;
 
-
         boolean updated = false;
 
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
-            if (!item.hasItem || item.required == data.progress[i]) {
-                continue;
+            if(i < data.progress.length){ // possible fix for #233
+                if (!item.hasItem || item.required == data.progress[i]) {
+                    continue;
+                }
+            } else {
+                data.progress = Arrays.copyOf(data.progress, i);
             }
 
-            for (int j = 0; j < itemsToConsume.size(); j++) {
-                ItemStack itemStack = itemsToConsume.get(j);
-                if (item.precision.areItemsSame(itemStack, item.item)) {
-                    int amount = Math.min(itemStack.getCount(), item.required - data.progress[i]);
+
+            for (ItemStack stack : itemsToConsume) {
+                if (item.precision.areItemsSame(stack, item.item)) {
+                    int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
                     if (amount > 0) {
-                        itemStack.shrink(amount);
-                        if (itemStack.getCount() == 0) {
+                        stack.shrink(amount);
+                        if (stack.getCount() == 0) {
                             itemsToConsume.set(i, ItemStack.EMPTY);
                         }
                         data.progress[i] += amount;
@@ -328,7 +331,6 @@ public abstract class QuestTaskItems extends QuestTask {
                 }
             }
         }
-
 
         if (updated) {
             doCompletionCheck(data, uuid);
