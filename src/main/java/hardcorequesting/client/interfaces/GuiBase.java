@@ -24,7 +24,6 @@ public class GuiBase extends GuiScreen {
     }
 
     public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
-    protected static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
     public void drawRect(int x, int y, int u, int v, int w, int h) {
         drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
@@ -42,10 +41,10 @@ public class GuiBase extends GuiScreen {
         float fw = 0.00390625F;
         float fy = 0.00390625F;
 
-        double a = (double) ((float) (u + 0) * fw);
+        double a = (double) ((float) (u) * fw);
         double b = (double) ((float) (u + w) * fw);
         double c = (double) ((float) (v + h) * fy);
-        double d = (double) ((float) (v + 0) * fy);
+        double d = (double) ((float) (v) * fy);
 
         double[] ptA = new double[]{a, c};
         double[] ptB = new double[]{b, c};
@@ -111,10 +110,10 @@ public class GuiBase extends GuiScreen {
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer worldRenderer = tessellator.getBuffer();
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos((double) (x + 0), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
+        worldRenderer.pos((double) (x), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
         worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]).endVertex();
-        worldRenderer.pos((double) (x + targetW), (double) (y + 0), (double) this.zLevel).tex(pt3[0], pt3[1]).endVertex();
-        worldRenderer.pos((double) (x + 0), (double) (y + 0), (double) this.zLevel).tex(pt4[0], pt4[1]).endVertex();
+        worldRenderer.pos((double) (x + targetW), (double) (y), (double) this.zLevel).tex(pt3[0], pt3[1]).endVertex();
+        worldRenderer.pos((double) (x), (double) (y), (double) this.zLevel).tex(pt4[0], pt4[1]).endVertex();
         tessellator.draw();
     }
 
@@ -210,7 +209,6 @@ public class GuiBase extends GuiScreen {
 
 
     protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
-    //protected static RenderBlocks blockRenderer = new RenderBlocks();
 
     public void drawIcon(ItemStack item, int x, int y) {
         itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
@@ -288,7 +286,7 @@ public class GuiBase extends GuiScreen {
 
 
     public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
-        if (itemstack == null || itemstack.getItem() == null) return;
+        if (itemstack == ItemStack.EMPTY || itemstack.getItem() == null) return;
 
         GlStateManager.pushMatrix();
 

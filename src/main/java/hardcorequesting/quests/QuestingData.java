@@ -62,9 +62,14 @@ public class QuestingData {
 
     public String getName() {
         if (name == null) {
-            EntityPlayer player = QuestingData.getPlayer(uuid);
-            if (player != null)
-                name = player.getDisplayNameString();
+            try{ // possible fix for #238
+                EntityPlayer player = QuestingData.getPlayer(uuid);
+                if (player != null)
+                    name = player.getDisplayNameString();
+            } catch(IllegalArgumentException e){
+                e.printStackTrace();
+                return uuid != null ? uuid : "";
+            }
         }
         return name;
     }

@@ -2,16 +2,16 @@ package hardcorequesting.event;
 
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.File;
 
+@Mod.EventBusSubscriber
 public class WorldEventListener {
 
-    public WorldEventListener() {
-        MinecraftForge.EVENT_BUS.register(this);
+    public WorldEventListener(){
     }
 
     @SubscribeEvent

@@ -30,9 +30,6 @@ import java.util.List;
 
 import static hardcorequesting.items.ItemInfo.HEART_ICONS;
 
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
-
 public class ItemHeart extends Item {
 
     public ItemHeart() {
@@ -111,7 +108,7 @@ public class ItemHeart extends Item {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack item, EntityPlayer player, List tooltip, boolean extraInfo) {
+    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean extraInfo) {
         super.addInformation(item, player, tooltip, extraInfo);
 
         if (item.getItemDamage() == 3) {

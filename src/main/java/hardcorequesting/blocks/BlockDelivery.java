@@ -17,9 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
-
 public class BlockDelivery extends BlockContainer {
 
     public BlockDelivery() {
@@ -28,39 +25,6 @@ public class BlockDelivery extends BlockContainer {
         setCreativeTab(HardcoreQuesting.HQMTab);
         setHardness(1f);
     }
-
-//    @SideOnly(Side.CLIENT)
-//    private IIcon activeIcon;
-//    @SideOnly(Side.CLIENT)
-//    private IIcon emptyIcon;
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public void registerBlockIcons(IIconRegister icon) {
-//        pickIcons(icon);
-//    }
-//
-//    public void pickIcons(IIconRegister icon) {
-//        activeIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON);
-//        emptyIcon = icon.registerIcon(BlockInfo.TEXTURE_LOCATION + ":" + BlockInfo.ITEMBARREL_ICON_EMPTY);
-//    }
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public IIcon getIcon(int side, int meta) {
-//        return getIconFromSideAndMeta(side, 1); //pretend we have meta data 1 (it being active)
-//    }
-//
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-//        return getIconFromSideAndMeta(side, world.getBlockMetadata(x, y, z));
-//    }
-//
-//    @SideOnly(Side.CLIENT)
-//    private IIcon getIconFromSideAndMeta(int side, int meta) {
-//        return side == 0 || side == 1 || meta == 0 ? emptyIcon : activeIcon;
-//    }
 
     @Override
     public TileEntity createNewTileEntity(World world, int i) {

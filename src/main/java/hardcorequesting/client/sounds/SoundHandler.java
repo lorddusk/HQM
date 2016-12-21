@@ -67,10 +67,7 @@ public class SoundHandler {
                     loreNumber = number;
                     paths.add(path);
                     return true;
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException | IllegalAccessException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }

@@ -65,7 +65,7 @@ public class Provider implements IWailaDataProvider {
     @Override
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         if (config.getConfig(IS_REMOTE_AVAILABLE)) {
-            if (itemStack != null && itemStack.getItem() == Item.getItemFromBlock(accessor.getBlock())) {
+            if (itemStack != ItemStack.EMPTY && itemStack.getItem() == Item.getItemFromBlock(accessor.getBlock())) {
                 TileEntity te = accessor.getTileEntity();
                 if (te != null) {
                     if (te instanceof TileEntityBarrel) {
