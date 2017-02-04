@@ -62,7 +62,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputations().get(0), 0));
+                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputationList().get(0), 0));
             }
         });
 
@@ -132,7 +132,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
 
     private boolean isValid() {
-        return !Reputation.getReputations().isEmpty();
+        return !Reputation.getReputationList().isEmpty();
     }
 
     @Override
@@ -143,15 +143,15 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (selectedReward != null && selectedReward.getReward() != null) {
-            for (int i = 0; i < Reputation.getReputations().size(); i++) {
-                if (Reputation.getReputations().get(i).equals(selectedReward.getReward())) {
+            for (int i = 0; i < Reputation.getReputationList().size(); i++) {
+                if (Reputation.getReputationList().get(i).equals(selectedReward.getReward())) {
                     int id = i + (left ? -1 : 1);
                     if (id < 0) {
-                        id = Reputation.getReputations().size() - 1;
-                    } else if (id >= Reputation.getReputations().size()) {
+                        id = Reputation.getReputationList().size() - 1;
+                    } else if (id >= Reputation.getReputationList().size()) {
                         id = 0;
                     }
-                    selectedReward.setReward(Reputation.getReputations().get(id));
+                    selectedReward.setReward(Reputation.getReputationList().get(id));
                     break;
                 }
             }

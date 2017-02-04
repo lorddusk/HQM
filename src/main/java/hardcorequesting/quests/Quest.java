@@ -74,7 +74,7 @@ public class Quest {
     private int x;
     private int y;
     private boolean isBig;
-    private ItemStack icon;
+    private ItemStack icon= ItemStack.EMPTY;
     private QuestSet set;
     private int selectedReward = -1;
     private final List<LargeButton> buttons = new ArrayList<>();

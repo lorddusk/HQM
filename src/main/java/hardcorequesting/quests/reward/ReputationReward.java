@@ -20,16 +20,18 @@ public class ReputationReward extends QuestReward<Reputation> {
     }
 
     public String getLabel() {
-        String result = reward.getName() + ": ";
+        if(reward != null){
+            String result = reward.getName() + ": ";
 
-        if (value != 0) {
-            result += value > 0 ? GuiColor.GREEN : GuiColor.RED;
+            if (value != 0) {
+                result += value > 0 ? GuiColor.GREEN : GuiColor.RED;
+            }
+            if (value > 0) {
+                result += "+";
+            }
+            result += value;
+            return result;
         }
-        if (value > 0) {
-            result += "+";
-        }
-        result += value;
-
-        return result;
+        return "";
     }
 }

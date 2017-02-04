@@ -40,7 +40,7 @@ public class ModBlocks {
                 "wgw",
                 "gqg",
                 "wgw",
-                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlass"));
+                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlassColorless"));
     }
 
 

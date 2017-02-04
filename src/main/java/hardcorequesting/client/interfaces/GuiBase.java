@@ -286,32 +286,32 @@ public class GuiBase extends GuiScreen {
 
 
     public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
-        if (itemstack == ItemStack.EMPTY || itemstack.getItem() == null) return;
+        if (!itemstack.isEmpty()){
+            GlStateManager.pushMatrix();
 
-        GlStateManager.pushMatrix();
-
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.disableLighting();
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableColorMaterial();
-        GlStateManager.enableLighting();
-
-        float oldZ = this.zLevel;
-        setZLevel(4f);
-        try {
-            // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-            itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
-            // }
-        } finally {
-            setZLevel(oldZ);
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.disableLighting();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.enableAlpha();
-        }
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.enableColorMaterial();
+            GlStateManager.enableLighting();
 
-        GlStateManager.popMatrix();
+            float oldZ = this.zLevel;
+            setZLevel(4f);
+            try {
+                // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
+                itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
+                // }
+            } finally {
+                setZLevel(oldZ);
+
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.disableLighting();
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.enableAlpha();
+            }
+
+            GlStateManager.popMatrix();
+        }
     }
 
     public float getZLevel() {
