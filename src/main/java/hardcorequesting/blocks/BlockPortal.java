@@ -66,11 +66,11 @@ public class BlockPortal extends BlockContainer {
     }
 
     @Override
-    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity) {
+    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity, boolean b) {
         TileEntity te = world.getTileEntity(pos);
         if (entity instanceof EntityPlayer && te instanceof TileEntityPortal && !((TileEntityPortal) te).hasCollision((EntityPlayer) entity))
             return;
-        super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity);
+        super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity, b);
     }
 
     @Override

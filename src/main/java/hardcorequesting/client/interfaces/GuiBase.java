@@ -130,7 +130,7 @@ public class GuiBase extends GuiScreen {
         int w = 0;
 
         for (String line : str) {
-            int l = fontRendererObj.getStringWidth(line);
+            int l = fontRenderer.getStringWidth(line);
 
             if (l > w) {
                 w = l;
@@ -169,7 +169,7 @@ public class GuiBase extends GuiScreen {
 
         for (int i = 0; i < str.size(); i++) {
             String line = str.get(i);
-            fontRendererObj.drawStringWithShadow(line, x, y, -1);
+            fontRenderer.drawStringWithShadow(line, x, y, -1);
 
             if (i == 0) {
                 y += 2;
@@ -211,7 +211,7 @@ public class GuiBase extends GuiScreen {
     protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
 
     public void drawIcon(ItemStack item, int x, int y) {
-        itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
+        itemRenderer.renderItemOverlayIntoGUI(fontRenderer, item, x, y, null);
         //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
 
@@ -269,7 +269,7 @@ public class GuiBase extends GuiScreen {
 
         if (item != null && item.getItem() != null) {
             drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
+            itemRenderer.renderItemOverlayIntoGUI(fontRenderer, item, x + left + 1, y + +top + 1, "");
         }
         GlStateManager.disableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -333,7 +333,7 @@ public class GuiBase extends GuiScreen {
 
 
     public int getStringWidth(String txt) {
-        return fontRendererObj.getStringWidth(txt);
+        return fontRenderer.getStringWidth(txt);
     }
 
 
@@ -344,7 +344,7 @@ public class GuiBase extends GuiScreen {
     public void drawString(String str, int x, int y, float mult, int color) {
         GlStateManager.pushMatrix();
         GlStateManager.scale(mult, mult, 1F);
-        fontRendererObj.drawString(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        fontRenderer.drawString(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
         GlStateManager.popMatrix();
     }
@@ -352,7 +352,7 @@ public class GuiBase extends GuiScreen {
     public void drawStringWithShadow(String str, int x, int y, float mult, int color) {
         GlStateManager.pushMatrix();
         GlStateManager.scale(mult, mult, 1F);
-        fontRendererObj.drawStringWithShadow(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        fontRenderer.drawStringWithShadow(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
 
         GlStateManager.popMatrix();
     }
@@ -383,14 +383,14 @@ public class GuiBase extends GuiScreen {
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
-            fontRendererObj.drawString(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-            y += fontRendererObj.FONT_HEIGHT;
+            fontRenderer.drawString(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+            y += fontRenderer.FONT_HEIGHT;
         }
         GlStateManager.popMatrix();
     }
 
     public void drawCenteredString(String str, int x, int y, float mult, int width, int height, int color) {
-        drawString(str, x + (width - (int) (fontRendererObj.getStringWidth(str) * mult)) / 2, y + (height - (int) ((fontRendererObj.FONT_HEIGHT - 2) * mult)) / 2, mult, color);
+        drawString(str, x + (width - (int) (fontRenderer.getStringWidth(str) * mult)) / 2, y + (height - (int) ((fontRenderer.FONT_HEIGHT - 2) * mult)) / 2, mult, color);
     }
 
     public List<String> getLinesFromText(String str, float mult, int width) {
@@ -420,7 +420,7 @@ public class GuiBase extends GuiScreen {
             for (int i = 0; i < words.size(); i++) {
                 String word = words.get(i);
                 String other = "";
-                while (fontRendererObj.getStringWidth(word + " ") * mult >= width) {
+                while (fontRenderer.getStringWidth(word + " ") * mult >= width) {
                     other = word.charAt(word.length() - 1) + other;
                     word = word.substring(0, word.length() - 1);
                 }
@@ -444,7 +444,7 @@ public class GuiBase extends GuiScreen {
                 } else {
                     newLine = currentLine + word;
                 }
-                if (fontRendererObj.getStringWidth(newLine) * mult < width) {
+                if (fontRenderer.getStringWidth(newLine) * mult < width) {
                     currentLine = newLine;
                 } else {
                     lst.add(currentLine);

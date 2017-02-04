@@ -42,7 +42,7 @@ public class TeamUpdateMessage implements IMessage {
         }
 
         private void handle(TeamUpdateMessage message, MessageContext ctx) {
-            message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().playerEntity).getTeam(), message.data);
+            message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().player).getTeam(), message.data);
         }
     }
 }

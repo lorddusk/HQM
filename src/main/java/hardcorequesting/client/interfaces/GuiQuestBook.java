@@ -527,7 +527,7 @@ public class GuiQuestBook extends GuiBase {
                 GlStateManager.pushMatrix();
                 GlStateManager.translate(0, 0, 200);
                 drawCenteredString(Translator.translate("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                drawCenteredString(Translator.translate("hqm.questBook.deleteOnClick"), 0, fontRendererObj.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(Translator.translate("hqm.questBook.deleteOnClick"), 0, fontRenderer.FONT_HEIGHT * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 applyColor(0xFFFFFFFF);
                 ResourceHelper.bindResource(MAP_TEXTURE);
                 GlStateManager.popMatrix();

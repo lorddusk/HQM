@@ -41,7 +41,7 @@ public class ClientUpdateMessage implements IMessage {
         }
 
         private void handle(ClientUpdateMessage message, MessageContext ctx) {
-            message.update.parse(ctx.getServerHandler().playerEntity, message.data);
+            message.update.parse(ctx.getServerHandler().player, message.data);
         }
     }
 }

@@ -44,15 +44,15 @@ public class GUIOverlay extends Gui {
 
         if (QuestingData.isHardcoreActive()) {
             if (getLives() <= 2) {
-                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xf50505);
+                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xf50505);
             } else {
-                this.mc.fontRendererObj.drawString(s, xPos + 1, yPos, 0xffffff);
+                this.mc.fontRenderer.drawString(s, xPos + 1, yPos, 0xffffff);
             }
             GlStateManager.disableBlend();
             GlStateManager.enableDepth();
             GlStateManager.depthMask(true);
         } else {
-            this.mc.fontRendererObj.drawString(d, xPos + 1, yPos, 0xffffff);
+            this.mc.fontRenderer.drawString(d, xPos + 1, yPos, 0xffffff);
         }
     }
 

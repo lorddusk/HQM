@@ -41,7 +41,7 @@ public class TeamMessage implements IMessage {
         }
 
         private void handle(TeamMessage message, MessageContext ctx) {
-            message.action.process(ctx.getServerHandler().playerEntity, message.data);
+            message.action.process(ctx.getServerHandler().player, message.data);
         }
     }
 }
