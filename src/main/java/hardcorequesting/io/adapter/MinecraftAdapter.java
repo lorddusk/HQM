@@ -26,7 +26,7 @@ public class MinecraftAdapter {
 
         @Override
         public void write(JsonWriter out, ItemStack value) throws IOException {
-            if (value == ItemStack.EMPTY || value.getItem() == null) {
+            if (value.isEmpty()) {
                 out.nullValue();
                 return;
             }

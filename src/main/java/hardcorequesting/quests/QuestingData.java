@@ -64,8 +64,11 @@ public class QuestingData {
         if (name == null) {
             try{ // possible fix for #238
                 EntityPlayer player = QuestingData.getPlayer(uuid);
-                if (player != null)
+                if (player != null){
                     name = player.getDisplayNameString();
+                } else {
+                    name = "";
+                }
             } catch(IllegalArgumentException e){
                 e.printStackTrace();
                 return uuid != null ? uuid : "";
