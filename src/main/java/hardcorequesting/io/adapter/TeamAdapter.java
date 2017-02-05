@@ -119,8 +119,20 @@ public class TeamAdapter {
                         in.beginArray();
                         while (in.hasNext()) {
                             in.beginObject();
-                            String id = in.nextString();
-                            int val = in.nextInt();
+                            String id = null;
+                            int val = 0;
+                            while(in.hasNext()){
+                                switch(in.nextName()){
+                                    case REP_ID:
+                                        id = in.nextString();
+                                        break;
+                                    case REP_VAL:
+                                        val = in.nextInt();
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
                             team.setReputation(id, val);
                             in.endObject();
                         }

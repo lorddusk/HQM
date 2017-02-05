@@ -29,7 +29,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         this.id = id;
         if (setting == null || setting.getReputation() == null) {
             if (!Reputation.getReputations().isEmpty()) {
-                reputation = Reputation.getReputations().get(0);
+                reputation = Reputation.getReputationList().get(0);
                 reputationId = 0;
             } else {
                 reputationId = -1;
@@ -144,7 +144,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             }
             lower = null;
             upper = null;
-            reputation = Reputation.getReputations().get(reputationId);
+            reputation = Reputation.getReputationList().get(reputationId);
         }
     }
 
@@ -153,7 +153,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         if (Reputation.getReputations().isEmpty()) {
             return Translator.translate("hqm.repSetting.invalid");
         } else {
-            return reputation.getName();
+            return reputation != null ? reputation.getName() : Translator.translate("hqm.repSetting.invalid");
         }
     }
 
