@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TeamErrorMessage implements IMessage {
+
     TeamError error;
 
     public TeamErrorMessage() {
@@ -28,6 +29,7 @@ public class TeamErrorMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<TeamErrorMessage, IMessage> {
+
         @Override
         public IMessage onMessage(TeamErrorMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

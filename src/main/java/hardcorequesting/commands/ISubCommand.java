@@ -6,6 +6,7 @@ import net.minecraft.command.ICommandSender;
 import java.util.List;
 
 public interface ISubCommand {
+
     int getPermissionLevel();
 
     String getCommandName();

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 
 public class ItemBag extends Item {
+
     public static boolean displayGui;
 
     public ItemBag() {
@@ -45,28 +46,6 @@ public class ItemBag extends Item {
     public void initModel() {
         for (int i = 0; i < BagTier.values().length; i++) {
             ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + ItemInfo.BAG_UNLOCALIZED_NAME, "inventory"));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void addInformation(ItemStack itemstack, EntityPlayer player, List tooltip, boolean extraInfo) {
-        super.addInformation(itemstack, player, tooltip, extraInfo);
-
-        int dmg = itemstack.getItemDamage();
-        if (dmg >= 0 && dmg < BagTier.values().length) {
-            BagTier tier = BagTier.values()[dmg];
-            tooltip.add(tier.getColor() + tier.getName());
-        }
-    }
-
-
-    @Override
-    @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> stackList) {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            stackList.add(new ItemStack(this, 1, i));
         }
     }
 
@@ -108,6 +87,27 @@ public class ItemBag extends Item {
         }
 
         return super.onItemRightClick(world, player, hand);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
+        super.addInformation(stack, player, tooltip, extraInfo);
+
+        int dmg = stack.getItemDamage();
+        if (dmg >= 0 && dmg < BagTier.values().length) {
+            BagTier tier = BagTier.values()[dmg];
+            tooltip.add(tier.getColor() + tier.getName());
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> stackList) {
+        for (int i = 0; i < BagTier.values().length; i++) {
+            stackList.add(new ItemStack(this, 1, i));
+        }
     }
 
     private void openClientInterface(EntityPlayer player, String id, int bag) {

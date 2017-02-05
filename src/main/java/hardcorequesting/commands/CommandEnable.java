@@ -5,6 +5,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class CommandEnable extends CommandBase {
+
     public CommandEnable() {
         super("enable");
     }

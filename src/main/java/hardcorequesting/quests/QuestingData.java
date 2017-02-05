@@ -36,46 +36,25 @@ import java.io.IOException;
 import java.util.*;
 
 public class QuestingData {
+
+    // private static boolean debugActive = false;
+    public static int defaultLives;
+    public static boolean autoHardcoreActivate;
+    public static boolean autoQuestActivate;
+    private static boolean hardcoreActive;
+    private static boolean questActive;
+    private static HashMap<String, QuestingData> data = new HashMap<>();
+    private static List<Team> teams = new ArrayList<>();
+    public String selectedQuest = null;
+    public int selectedTask = -1;
+    public boolean playedLore;
+    public boolean receivedBook;
     private Team team;
     private int lives;
     private String uuid;
     private String name;
     private Map<String, GroupData> groupData;
-    public String selectedQuest = null;
-    public int selectedTask = -1;
-    public boolean playedLore;
-    public boolean receivedBook;
-
     private DeathStats deathStat;
-
-    public static HashMap<String, QuestingData> getData() {
-        return data;
-    }
-
-    public DeathStats getDeathStat() {
-        return deathStat;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public String getName() {
-        if (name == null) {
-            try{ // possible fix for #238
-                EntityPlayer player = QuestingData.getPlayer(uuid);
-                if (player != null){
-                    name = player.getDisplayNameString();
-                } else {
-                    name = "";
-                }
-            } catch(IllegalArgumentException e){
-                e.printStackTrace();
-                return uuid != null ? uuid : "";
-            }
-        }
-        return name;
-    }
 
     private QuestingData(String uuid) {
         this.lives = defaultLives;
@@ -97,6 +76,228 @@ public class QuestingData {
         if (deathStat == null) this.deathStat = new DeathStats(uuid);
         else this.deathStat = deathStat;
         data.put(uuid, this);
+    }
+
+    public static HashMap<String, QuestingData> getData() {
+        return data;
+    }
+
+    //keep all the red line code in one spot
+    public static boolean isSinglePlayer() {
+        return FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer();
+    }
+
+    public static boolean isHardcoreActive() {
+        return hardcoreActive;
+    }
+
+    public static boolean isQuestActive() {
+        return questActive;
+    }
+
+    public static void activateHardcore() {
+        if (!hardcoreActive && !FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+            hardcoreActive = true;
+        }
+    }
+
+    public static void disableHardcore() {
+        hardcoreActive = false;
+    }
+
+    public static void activateQuest(boolean giveBooks) {
+        if (!questActive) {
+            questActive = true;
+            if (giveBooks) {
+                for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerProfiles()) {
+                    if (profile != null) {
+                        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(profile.getId());
+                        if (player != null) {
+                            spawnBook(player);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void deactivate() {
+        if (hardcoreActive || questActive /*|| debugActive*/) {
+            hardcoreActive = false;
+            questActive = false;
+            //debugActive = false;
+            data = new HashMap<>();
+            teams = new ArrayList<>();
+        }
+    }
+
+    public static void saveState() {
+        try {
+            SaveHandler.saveQuestingState(SaveHandler.getLocalFile("state"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to save questing state");
+        }
+    }
+
+    public static void loadState() {
+        try {
+            SaveHandler.loadQuestingState(SaveHandler.getLocalFile("state"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+        }
+    }
+
+    public static void saveQuestingData() {
+        try {
+            SaveHandler.saveQuestingData(SaveHandler.getLocalFile("data"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to save questing data");
+        }
+    }
+
+    public static void loadQuestingData() {
+        try {
+            data.clear();
+            SaveHandler.loadQuestingData(SaveHandler.getLocalFile("data")).forEach(qData -> data.put(qData.getUuid(), qData));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing data");
+        }
+    }
+
+    public static List<Team> getTeams() {
+        return teams;
+    }
+
+    public static List<Team> getAllTeams() {
+        List<Team> all = new ArrayList<>();
+        all.addAll(getTeams());
+        data.values().stream().filter(questingData -> questingData.getTeam().isSingle()).forEach(player -> all.add(player.getTeam()));
+        return all;
+    }
+
+   /* public static boolean isDebugActive() {
+        return debugActive;
+    }*/
+
+    public static QuestingData getQuestingData(EntityPlayer player) {
+        return getQuestingData(getUserUUID(player));
+    }
+
+    public static String getUserUUID(EntityPlayer player) {
+        return player.getPersistentID().toString();
+    }
+
+    /*public static void activateDebug() {
+        if(!debugActive)
+            debugActive = true;
+    }
+
+    public static void deactivateDebug() {
+        if(debugActive)
+            debugActive = false;
+    }*/
+
+    public static QuestingData getQuestingData(String uuid) {
+        if (!data.containsKey(uuid))
+            new QuestingData(uuid);
+
+        return data.get(uuid);
+    }
+
+    public static void disableVanillaHardcore(ICommandSender sender) {
+        if (sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+            sender.sendMessage(new TextComponentTranslation("hqm.message.vanillaHardcore"));
+            try {
+                ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+            }
+
+            if (!sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
+                sender.sendMessage(new TextComponentTranslation("hqm.message.vanillaHardcoreOverride"));
+            }
+        }
+    }
+
+    public static void spawnBook(EntityPlayer player) {
+        if (!Quest.isEditing && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
+            QuestingData.getQuestingData(player).receivedBook = true;
+            NBTTagCompound hqmTag = new NBTTagCompound();
+            if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
+                hqmTag = player.getEntityData().getCompoundTag(PlayerTracker.HQ_TAG);
+            hqmTag.setBoolean(PlayerTracker.RECEIVED_BOOK, true);
+            player.getEntityData().setTag(PlayerTracker.HQ_TAG, hqmTag);
+            ItemStack stack = new ItemStack(ModItems.book);
+            if (!player.inventory.addItemStackToInventory(stack)) {
+                spawnItemAtPlayer(player, stack);
+            }
+        }
+    }
+
+    private static void spawnItemAtPlayer(EntityPlayer player, ItemStack stack) {
+        EntityItem item = new EntityItem(player.world, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, stack);
+        player.world.spawnEntity(item);
+        if (!(player instanceof FakePlayer))
+            item.onCollideWithPlayer(player);
+    }
+
+    public static void addTeam(Team team) {
+        team.setId(teams.size());
+        teams.add(team);
+    }
+
+    public static EntityPlayer getPlayerFromUsername(String playerName) {
+        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
+    }
+
+    public static EntityPlayer getPlayer(String uuid) {
+        return getPlayer(UUID.fromString(uuid));
+    }
+
+    public static EntityPlayer getPlayer(UUID uuid) {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        return server == null ? null : server.getPlayerList().getPlayerByUUID(uuid);
+    }
+
+    public static void remove(EntityPlayer player) {
+        data.remove(getUserUUID(player));
+    }
+
+    public static boolean hasData(EntityPlayer player) {
+        return data.containsKey(player.getGameProfile().getId().toString());
+    }
+
+    public static boolean hasData(UUID uuid) {
+        return data.containsKey(uuid.toString());
+    }
+
+    public static boolean hasData(String uuid) {
+        return data.containsKey(uuid);
+    }
+
+    public DeathStats getDeathStat() {
+        return deathStat;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        if (name == null) {
+            try { // possible fix for #238
+                EntityPlayer player = QuestingData.getPlayer(uuid);
+                if (player != null) {
+                    name = player.getDisplayNameString();
+                } else {
+                    name = "";
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return uuid != null ? uuid : "";
+            }
+        }
+        return name;
     }
 
     private void createGroupData() {
@@ -225,7 +426,6 @@ public class QuestingData {
         removeLifeAndSendMessage(player);
     }
 
-
     /**
      * Deletes the world or bans the player from the server. This is handled on the server side
      *
@@ -276,220 +476,15 @@ public class QuestingData {
 
     }
 
-    //keep all the red line code in one spot
-    public static boolean isSinglePlayer() {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer();
-    }
-
-
-    private static boolean hardcoreActive;
-    private static boolean questActive;
-    // private static boolean debugActive = false;
-    public static int defaultLives;
-
-   /* public static boolean isDebugActive() {
-        return debugActive;
-    }*/
-
-    public static boolean isHardcoreActive() {
-        return hardcoreActive;
-    }
-
-    public static boolean isQuestActive() {
-        return questActive;
-    }
-
-    /*public static void activateDebug() {
-        if(!debugActive)
-            debugActive = true;
-    }
-
-    public static void deactivateDebug() {
-        if(debugActive)
-            debugActive = false;
-    }*/
-
-    public static void activateHardcore() {
-        if (!hardcoreActive && !FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            hardcoreActive = true;
-        }
-    }
-
-    public static void disableHardcore() {
-        hardcoreActive = false;
-    }
-
-    public static void activateQuest(boolean giveBooks) {
-        if (!questActive) {
-            questActive = true;
-            if (giveBooks) {
-                for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerProfiles()) {
-                    if (profile != null) {
-                        EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(profile.getId());
-                        if (player != null) {
-                            spawnBook(player);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static void deactivate() {
-        if (hardcoreActive || questActive /*|| debugActive*/) {
-            hardcoreActive = false;
-            questActive = false;
-            //debugActive = false;
-            data = new HashMap<>();
-            teams = new ArrayList<>();
-        }
-    }
-
-    public static void saveState() {
-        try {
-            SaveHandler.saveQuestingState(SaveHandler.getLocalFile("state"));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save questing state");
-        }
-    }
-
-    public static void loadState() {
-        try {
-            SaveHandler.loadQuestingState(SaveHandler.getLocalFile("state"));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
-        }
-    }
-
-    public static void saveQuestingData() {
-        try {
-            SaveHandler.saveQuestingData(SaveHandler.getLocalFile("data"));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save questing data");
-        }
-    }
-
-    public static void loadQuestingData() {
-        try {
-            data.clear();
-            SaveHandler.loadQuestingData(SaveHandler.getLocalFile("data")).forEach(qData -> data.put(qData.getUuid(), qData));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing data");
-        }
-    }
-
-    private static HashMap<String, QuestingData> data = new HashMap<>();
-    private static List<Team> teams = new ArrayList<>();
-    public static boolean autoHardcoreActivate;
-    public static boolean autoQuestActivate;
-
-
-    public static List<Team> getTeams() {
-        return teams;
-    }
-
-    public static List<Team> getAllTeams() {
-        List<Team> all = new ArrayList<>();
-        all.addAll(getTeams());
-        data.values().stream().filter(questingData -> questingData.getTeam().isSingle()).forEach(player -> all.add(player.getTeam()));
-        return all;
-    }
-
-    public static QuestingData getQuestingData(EntityPlayer player) {
-        return getQuestingData(getUserUUID(player));
-    }
-
-    public static String getUserUUID(EntityPlayer player) {
-        return player.getPersistentID().toString();
-    }
-
-    public static QuestingData getQuestingData(String uuid) {
-        if (!data.containsKey(uuid))
-            new QuestingData(uuid);
-
-        return data.get(uuid);
-    }
-
-    public static void disableVanillaHardcore(ICommandSender sender) {
-        if (sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            sender.sendMessage(new TextComponentTranslation("hqm.message.vanillaHardcore"));
-            try {
-                ReflectionHelper.setPrivateValue(WorldInfo.class, sender.getEntityWorld().getWorldInfo(), false, 20);
-            } catch (Throwable ex) {
-                ex.printStackTrace();
-            }
-
-            if (!sender.getServer().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-                sender.sendMessage(new TextComponentTranslation("hqm.message.vanillaHardcoreOverride"));
-            }
-        }
-    }
-
-    public static void spawnBook(EntityPlayer player) {
-        if (!Quest.isEditing && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
-            QuestingData.getQuestingData(player).receivedBook = true;
-            NBTTagCompound hqmTag = new NBTTagCompound();
-            if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
-                hqmTag = player.getEntityData().getCompoundTag(PlayerTracker.HQ_TAG);
-            hqmTag.setBoolean(PlayerTracker.RECEIVED_BOOK, true);
-            player.getEntityData().setTag(PlayerTracker.HQ_TAG, hqmTag);
-            ItemStack diary = new ItemStack(ModItems.book);
-            if (!player.inventory.addItemStackToInventory(diary)) {
-                spawnItemAtPlayer(player, diary);
-            }
-        }
-    }
-
-    private static void spawnItemAtPlayer(EntityPlayer player, ItemStack stack) {
-        EntityItem item = new EntityItem(player.world, player.posX + 0.5D, player.posY + 0.5D, player.posZ + 0.5D, stack);
-        player.world.spawnEntity(item);
-        if (!(player instanceof FakePlayer))
-            item.onCollideWithPlayer(player);
-    }
-
     public Team getTeam() {
         if (!team.isSingle() && !getTeams().isEmpty())
             team = getTeams().get(team.getId());
         return team;
     }
 
-    public static void addTeam(Team team) {
-        team.setId(teams.size());
-        teams.add(team);
-    }
-
     public void setTeam(Team team) {
         if (team == null) team = new Team(uuid);
         this.team = team;
-    }
-
-    public static EntityPlayer getPlayerFromUsername(String playerName) {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
-    }
-
-    public static EntityPlayer getPlayer(String uuid) {
-        return getPlayer(UUID.fromString(uuid));
-    }
-
-    public static EntityPlayer getPlayer(UUID uuid) {
-        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        return server == null ? null : server.getPlayerList().getPlayerByUUID(uuid);
-    }
-
-    public static void remove(EntityPlayer player) {
-        data.remove(getUserUUID(player));
-    }
-
-    public static boolean hasData(EntityPlayer player) {
-        return data.containsKey(player.getGameProfile().getId().toString());
-    }
-
-    public static boolean hasData(UUID uuid) {
-        return data.containsKey(uuid.toString());
-    }
-
-    public static boolean hasData(String uuid) {
-        return data.containsKey(uuid);
     }
 
     public Map<String, GroupData> getGroupData() {

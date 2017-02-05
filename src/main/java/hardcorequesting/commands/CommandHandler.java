@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 public class CommandHandler extends CommandBase {
+
     public static Map<String, ISubCommand> commands = new LinkedHashMap<>();
     public static CommandHandler instance = new CommandHandler();
 
@@ -36,6 +37,23 @@ public class CommandHandler extends CommandBase {
 
     public static boolean commandExists(String name) {
         return commands.containsKey(name);
+    }
+
+    public static boolean isOwnerOrOp(ICommandSender sender) {
+        if (sender instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) sender;
+            GameProfile username = player.getGameProfile();
+            return isCommandsAllowedOrOwner(sender, username);
+        } else
+            return true;
+    }
+
+    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
+        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
+    }
+
+    public static ISubCommand getCommand(String commandName) {
+        return commands.get(commandName);
     }
 
     @Override
@@ -60,12 +78,12 @@ public class CommandHandler extends CommandBase {
     }
 
     @Override
-    public String getName(){
+    public String getName() {
         return "hqm";
     }
 
     @Override
-    public String getUsage(ICommandSender sender){
+    public String getUsage(ICommandSender sender) {
         return "/" + getName() + " help";
     }
 
@@ -84,23 +102,5 @@ public class CommandHandler extends CommandBase {
             throw new CommandException(Lang.NO_PERMISSION);
         }
         throw new CommandNotFoundException(Lang.NOT_FOUND);
-    }
-
-    public static boolean isOwnerOrOp(ICommandSender sender) {
-        if (sender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) sender;
-            GameProfile username = player.getGameProfile();
-            return isCommandsAllowedOrOwner(sender, username);
-        } else
-            return true;
-    }
-
-
-    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
-        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
-    }
-
-    public static ISubCommand getCommand(String commandName) {
-        return commands.get(commandName);
     }
 }

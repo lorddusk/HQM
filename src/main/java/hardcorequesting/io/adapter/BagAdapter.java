@@ -14,6 +14,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BagAdapter {
+
+    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
+        private final String ID = "id";
+        private final String ITEMS = "items";
+        private final String NAME = "name";
+        private final String LIMIT = "limit";
+
+        @Override
+        public void write(JsonWriter out, Group value) throws IOException {
+            out.beginObject();
+            out.name(ID).value(value.getId());
+            if (value.hasName())
+                out.name(NAME).value(value.getName());
+            out.name(LIMIT).value(value.getLimit());
+            out.name(ITEMS).beginArray();
+            for (ItemStack stack : value.getItems())
+                MinecraftAdapter.ITEM_STACK.write(out, stack);
+            out.endArray();
+            out.endObject();
+        }
+
+        @Override
+        public Group read(JsonReader in) throws IOException {
+            in.beginObject();
+            String name = null, id = null;
+            int limit = 0;
+            List<ItemStack> items = new ArrayList<>();
+            while (in.hasNext()) {
+                switch (in.nextName().toLowerCase()) {
+                    case ID:
+                        id = in.nextString();
+                        break;
+                    case NAME:
+                        name = in.nextString();
+                        break;
+                    case LIMIT:
+                        limit = in.nextInt();
+                        break;
+                    case ITEMS:
+                        in.beginArray();
+                        while (in.hasNext()) {
+                            ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
+                            if (stack != null) {
+                                items.add(stack);
+                            }
+                        }
+                        in.endArray();
+                        break;
+                }
+            }
+            in.endObject();
+            Group group = new Group(id);
+            group.setName(name);
+            group.setLimit(limit);
+            group.getItems().addAll(items);
+            if (!Group.getGroups().containsKey(group.getId()))
+                Group.add(group);
+            return group;
+        }
+    };
     public static final TypeAdapter<GroupTier> GROUP_TIER_ADAPTER = new TypeAdapter<GroupTier>() {
         private final String NAME = "name";
         private final String COLOUR = "colour";
@@ -77,66 +137,6 @@ public class BagAdapter {
                 group.setTier(tier);
             }
             return tier;
-        }
-    };
-
-    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
-        private final String ID = "id";
-        private final String ITEMS = "items";
-        private final String NAME = "name";
-        private final String LIMIT = "limit";
-
-        @Override
-        public void write(JsonWriter out, Group value) throws IOException {
-            out.beginObject();
-            out.name(ID).value(value.getId());
-            if (value.hasName())
-                out.name(NAME).value(value.getName());
-            out.name(LIMIT).value(value.getLimit());
-            out.name(ITEMS).beginArray();
-            for (ItemStack stack : value.getItems())
-                MinecraftAdapter.ITEM_STACK.write(out, stack);
-            out.endArray();
-            out.endObject();
-        }
-
-        @Override
-        public Group read(JsonReader in) throws IOException {
-            in.beginObject();
-            String name = null, id = null;
-            int limit = 0;
-            List<ItemStack> items = new ArrayList<>();
-            while (in.hasNext()) {
-                switch (in.nextName().toLowerCase()) {
-                    case ID:
-                        id = in.nextString();
-                        break;
-                    case NAME:
-                        name = in.nextString();
-                        break;
-                    case LIMIT:
-                        limit = in.nextInt();
-                        break;
-                    case ITEMS:
-                        in.beginArray();
-                        while (in.hasNext()) {
-                            ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                            if (stack != null) {
-                                items.add(stack);
-                            }
-                        }
-                        in.endArray();
-                        break;
-                }
-            }
-            in.endObject();
-            Group group = new Group(id);
-            group.setName(name);
-            group.setLimit(limit);
-            group.getItems().addAll(items);
-            if (!Group.getGroups().containsKey(group.getId()))
-                Group.add(group);
-            return group;
         }
     };
 

@@ -12,8 +12,11 @@ import java.io.IOException;
 @SideOnly(Side.CLIENT)
 public class GuiWrapperEditMenu extends GuiBase {
 
+    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
+    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
+    private static final int TEXTURE_WIDTH = 170;
+    private static final int TEXTURE_HEIGHT = 234;
     private GuiEditMenu editMenu;
-
 
     @Override
     public void setEditMenu(GuiEditMenu editMenu) {
@@ -24,13 +27,6 @@ public class GuiWrapperEditMenu extends GuiBase {
             this.mc.displayGuiScreen(null);
         }
     }
-
-    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
-    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
-
-
-    private static final int TEXTURE_WIDTH = 170;
-    private static final int TEXTURE_HEIGHT = 234;
 
     @Override
     public void drawScreen(int mX0, int mY0, float f) {
@@ -64,6 +60,15 @@ public class GuiWrapperEditMenu extends GuiBase {
     }
 
     @Override
+    protected void keyTyped(char c, int k) throws IOException {
+        super.keyTyped(c, k);
+
+        if (editMenu != null) {
+            editMenu.onKeyTyped(this, c, k);
+        }
+    }
+
+    @Override
     protected void mouseClicked(int mX0, int mY0, int b) {
         int mX = mX0 - left;
         int mY = mY0 - top;
@@ -74,22 +79,22 @@ public class GuiWrapperEditMenu extends GuiBase {
     }
 
     @Override
-    protected void mouseClickMove(int mX0, int mY0, int b, long ticks) {
-        int mX = mX0 - left;
-        int mY = mY0 - top;
-
-        if (editMenu != null) {
-            editMenu.onDrag(this, mX, mY);
-        }
-    }
-
-    @Override
     protected void mouseReleased(int mX0, int mY0, int b) {
         int mX = mX0 - left;
         int mY = mY0 - top;
 
         if (editMenu != null) {
             editMenu.onRelease(this, mX, mY);
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int mX0, int mY0, int b, long ticks) {
+        int mX = mX0 - left;
+        int mY = mY0 - top;
+
+        if (editMenu != null) {
+            editMenu.onDrag(this, mX, mY);
         }
     }
 
@@ -105,15 +110,6 @@ public class GuiWrapperEditMenu extends GuiBase {
             if (scroll != 0) {
                 editMenu.onScroll(this, x, y, scroll);
             }
-        }
-    }
-
-    @Override
-    protected void keyTyped(char c, int k) throws IOException {
-        super.keyTyped(c, k);
-
-        if (editMenu != null) {
-            editMenu.onKeyTyped(this, c, k);
         }
     }
 

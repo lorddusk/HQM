@@ -25,19 +25,14 @@ import javax.annotation.Nullable;
 
 public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler, ITickable {
 
-    @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
-        return this.getCapability(capability, facing) != null;
-    }
-
-    @Nullable
-    @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
-        if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-            return (T) this;
-        }
-        return super.getCapability(capability, facing);
-    }
+    private static final int SYNC_TIME = 20;
+    private static final String NBT_PLAYER_NAME = "Player";
+    private static final String NBT_QUEST = "Quest";
+    private static final String NBT_TASK = "Task";
+    public String selectedQuest;
+    public int selectedTask;
+    private int modifiedSyncTimer;
+    private String playerUuid;
 
     @Override
     public int getSizeInventory() {
@@ -45,7 +40,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return false;
     }
 
@@ -64,19 +59,61 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return null;
     }
 
-    private static final int SYNC_TIME = 20;
-    private int modifiedSyncTimer;
-
     @Override
-    public void setInventorySlotContents(int i, ItemStack itemstack) {
+    public void setInventorySlotContents(int i, ItemStack stack) {
         QuestTask task = getCurrentTask();
         if (task != null && task instanceof QuestTaskItemsConsume) {
             NonNullList<ItemStack> list = NonNullList.create();
-            list.add(itemstack);
+            list.add(stack);
             if (((QuestTaskItemsConsume) task).increaseItems(list, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
                 modifiedSyncTimer = SYNC_TIME;
             }
         }
+    }
+
+    @Override
+    public int getInventoryStackLimit() {
+        return 64;
+    }
+
+    @Override
+    public boolean isUsableByPlayer(EntityPlayer entityplayer) {
+        return true;
+    }
+
+    @Override
+    public void openInventory(EntityPlayer player) {
+
+    }
+
+    @Override
+    public void closeInventory(EntityPlayer player) {
+
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int i, ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     @Override
@@ -142,60 +179,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return false;
     }
 
-    @Override
-    public ITextComponent getDisplayName() {
-        return null;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityplayer) {
-        return true;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer player) {
-
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer player) {
-
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-        return true;
-    }
-
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    private String playerUuid;
-    public String selectedQuest;
-    public int selectedTask;
-
     public void storeSettings(EntityPlayer player) {
         if (modifiedSyncTimer > 0) {
             modifiedSyncTimer = 0;
@@ -209,10 +192,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
         updateState();
     }
-
-    private static final String NBT_PLAYER_NAME = "Player";
-    private static final String NBT_QUEST = "Quest";
-    private static final String NBT_TASK = "Task";
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
@@ -239,17 +218,36 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
         return compound;
     }
 
+    @Override
+    public ITextComponent getDisplayName() {
+        return null;
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        return this.getCapability(capability, facing) != null;
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return (T) this;
+        }
+        return super.getCapability(capability, facing);
+    }
+
     public String getPlayer() {
         return playerUuid;
     }
 
     @Override
-    public IFluidTankProperties[] getTankProperties(){
+    public IFluidTankProperties[] getTankProperties() {
         return new IFluidTankProperties[0];
     }
 
     @Override
-    public int fill(FluidStack resource, boolean doFill){
+    public int fill(FluidStack resource, boolean doFill) {
         if (resource == null) {
             return 0;
         }
@@ -268,13 +266,13 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
     @Nullable
     @Override
-    public FluidStack drain(FluidStack resource, boolean doDrain){
+    public FluidStack drain(FluidStack resource, boolean doDrain) {
         return null;
     }
 
     @Nullable
     @Override
-    public FluidStack drain(int maxDrain, boolean doDrain){
+    public FluidStack drain(int maxDrain, boolean doDrain) {
         return null;
     }
 }

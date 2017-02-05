@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullSyncMessage implements IMessage {
+
     private boolean local, questing, hardcore;
     private String timestamp, reputations, bags, teams, data, setOrder, mainDesc;
     private String[] questsSets, questSetNames;
@@ -102,6 +103,7 @@ public class FullSyncMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<FullSyncMessage, IMessage> {
+
         @Override
         public IMessage onMessage(FullSyncMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

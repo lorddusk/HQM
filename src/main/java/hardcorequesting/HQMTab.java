@@ -7,6 +7,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class HQMTab extends CreativeTabs {
+
     public HQMTab() {
         super("hqm");
     }

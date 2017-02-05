@@ -4,6 +4,7 @@ import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.reputation.Reputation;
 
 public class ReputationReward extends QuestReward<Reputation> {
+
     private int value;
 
     public ReputationReward(Reputation reputation, int value) {
@@ -20,7 +21,7 @@ public class ReputationReward extends QuestReward<Reputation> {
     }
 
     public String getLabel() {
-        if(reward != null){
+        if (reward != null) {
             String result = reward.getName() + ": ";
 
             if (value != 0) {

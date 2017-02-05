@@ -1,6 +1,7 @@
 package hardcorequesting.items;
 
 public abstract class ItemInfo {
+
     public static final String LOCALIZATION_START = "hqm:";
     //--Information for the Questing Book
 

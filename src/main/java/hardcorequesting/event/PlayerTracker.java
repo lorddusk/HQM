@@ -18,17 +18,16 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 @Mod.EventBusSubscriber
 public class PlayerTracker {
 
+    public static final String HQ_TAG = "HardcoreQuesting";
+    public static final String RECEIVED_BOOK = "questBook";
+
     public PlayerTracker() {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-
     public int getRemainingLives(ICommandSender sender) {
         return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
     }
-
-    public static final String HQ_TAG = "HardcoreQuesting";
-    public static final String RECEIVED_BOOK = "questBook";
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {

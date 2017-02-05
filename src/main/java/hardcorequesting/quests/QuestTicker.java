@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class QuestTicker {
+
     private int hours;
     private int ticks;
 

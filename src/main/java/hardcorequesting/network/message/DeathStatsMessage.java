@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class DeathStatsMessage implements IMessage {
+
     private boolean local;
     private String timestamp, deaths;
 
@@ -44,6 +45,7 @@ public class DeathStatsMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<DeathStatsMessage, IMessage> {
+
         @Override
         public IMessage onMessage(DeathStatsMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

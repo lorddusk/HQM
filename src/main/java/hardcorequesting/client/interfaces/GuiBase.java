@@ -18,12 +18,15 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiBase extends GuiScreen {
+
+    public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
+    public static final int ITEM_SIZE = 18;
+    protected static final int ITEM_SRC_Y = 235;
+    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
     protected int left, top;
 
     public void setEditMenu(GuiEditMenu menu) {
     }
-
-    public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
 
     public void drawRect(int x, int y, int u, int v, int w, int h) {
         drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
@@ -198,23 +201,6 @@ public class GuiBase extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void applyColor(int color) {
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
-
-        GlStateManager.color(r, g, b, a);
-    }
-
-
-    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
-
-    public void drawIcon(ItemStack item, int x, int y) {
-        itemRenderer.renderItemOverlayIntoGUI(fontRenderer, item, x, y, null);
-        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
-    }
-
 //TODO Fix Fluid drawing
 //    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
 //        drawItemBackground(x, y, mX, mY, false);
@@ -224,14 +210,14 @@ public class GuiBase extends GuiScreen {
 //    }
 //
 //    public void drawFluid(Fluid fluid, int x, int y) {
-//        //IIcon icon = fluid.getIcon();
-//        Item item = null;
+//        //IIcon icon = fluid.getIconStack();
+//        Item fluidStack = null;
 //
 //        if (icon == null) {
 //            if (FluidRegistry.WATER.equals(fluid)) {
-//                icon = Blocks.water.getIcon(0, 0);
+//                icon = Blocks.water.getIconStack(0, 0);
 //            } else if (FluidRegistry.LAVA.equals(fluid)) {
-//                icon = Blocks.water.getIcon(0, 0);
+//                icon = Blocks.water.getIconStack(0, 0);
 //            }
 //        }
 //
@@ -250,8 +236,19 @@ public class GuiBase extends GuiScreen {
 //        }
 //    }
 
-    protected static final int ITEM_SRC_Y = 235;
-    public static final int ITEM_SIZE = 18;
+    public void applyColor(int color) {
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+
+        GlStateManager.color(r, g, b, a);
+    }
+
+    public void drawIcon(ItemStack stack, int x, int y) {
+        itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x, y, null);
+        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
+    }
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -264,12 +261,12 @@ public class GuiBase extends GuiScreen {
         }
     }
 
-    public void drawItem(ItemStack item, int x, int y, int mX, int mY, boolean selected) {
+    public void drawItemStack(ItemStack stack, int x, int y, int mX, int mY, boolean selected) {
         drawItemBackground(x, y, mX, mY, selected);
 
-        if (item != null && item.getItem() != null) {
-            drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRenderer, item, x + left + 1, y + +top + 1, "");
+        if (!stack.isEmpty()) {
+            drawItemStack(stack, x + 1, y + 1, true);
+            itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x + left + 1, y + +top + 1, "");
         }
         GlStateManager.disableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -285,8 +282,8 @@ public class GuiBase extends GuiScreen {
     }
 
 
-    public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
-        if (!itemstack.isEmpty()){
+    public void drawItemStack(ItemStack stack, int x, int y, boolean renderEffect) {
+        if (!stack.isEmpty()) {
             GlStateManager.pushMatrix();
 
             RenderHelper.enableGUIStandardItemLighting();
@@ -298,8 +295,8 @@ public class GuiBase extends GuiScreen {
             float oldZ = this.zLevel;
             setZLevel(4f);
             try {
-                // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-                itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
+                // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), stack, renderEffect, zLevel, x + left, y + top)) {
+                itemRenderer.renderItemAndEffectIntoGUI(stack, x + left, y + top);
                 // }
             } finally {
                 setZLevel(oldZ);

@@ -13,6 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskItemsCrafting extends QuestTaskItems {
+
     public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventHandler.Type.CRAFTING);
@@ -23,28 +24,28 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
 
     }
 
+    @Override
+    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
+        create(event.player, event.crafting);
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
         return GuiEditMenuItem.Type.CRAFTING_TASK;
     }
 
-    @Override
-    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
-        create(event.player, event.crafting);
-    }
-
-    private void create(EntityPlayer player, ItemStack item) {
+    private void create(EntityPlayer player, ItemStack stack) {
         if (!player.getEntityWorld().isRemote) {
-            if (item != null) {
+            if (!stack.isEmpty()) {
                 //no need for the quest to be active
                 //if (parent.isVisible(player) && parent.isEnabled(player) && isVisible(player)) {
-                item = item.copy();
-                if (item.getCount() == 0) {
-                    item.setCount(1);
+                stack = stack.copy();
+                if (stack.getCount() == 0) {
+                    stack.setCount(1);
                 }
                 NonNullList<ItemStack> list = NonNullList.create();
-                list.add(item);
+                list.add(stack);
                 increaseItems(list, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
                 //}
             }

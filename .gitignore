@@ -25,3 +25,4 @@ build
 eclipse
 run
 >>>>>>> First 1.8.9 build (not working yet, duh)
+/run_server/

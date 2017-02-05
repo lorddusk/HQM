@@ -7,6 +7,7 @@ import hardcorequesting.team.Team;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class QuestData {
+
     public boolean[] reward;
     public boolean completed;
     public boolean claimed;

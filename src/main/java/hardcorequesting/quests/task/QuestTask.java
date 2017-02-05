@@ -31,15 +31,15 @@ import java.util.Iterator;
 import java.util.List;
 
 public abstract class QuestTask {
-    protected Quest parent;
-    private List<QuestTask> requirements;
-    public String description;
-    private String longDescription;
-    private int id;
-    private List<String> cachedDescription;
 
     static final int START_X = 180;
     static final int START_Y = 95;
+    public String description;
+    protected Quest parent;
+    private List<QuestTask> requirements;
+    private String longDescription;
+    private int id;
+    private List<String> cachedDescription;
 
     public QuestTask(Quest parent, String description, String longDescription) {
         this.parent = parent;
@@ -47,110 +47,6 @@ public abstract class QuestTask {
         this.description = description;
         this.longDescription = longDescription;
         updateId();
-    }
-
-    public void updateId() {
-        this.id = parent.nextTaskId++;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public boolean isCompleted(EntityPlayer player) {
-        return getData(player).completed;
-    }
-
-    public boolean isCompleted(String uuid) {
-        return getData(uuid).completed;
-    }
-
-    public boolean isVisible(EntityPlayer player) {
-        Iterator itr = this.requirements.iterator();
-        QuestTask requirement;
-        do {
-            if (!itr.hasNext()) return true;
-            requirement = (QuestTask) itr.next();
-        } while (requirement.isCompleted(player) && requirement.isVisible(player));
-        return false;
-    }
-
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTask.class;
-    }
-
-    public void write(QuestDataTask task, JsonWriter out) throws IOException {
-        task.write(out);
-    }
-
-    public void read(QuestDataTask task, JsonReader in) throws IOException {
-        task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
-    }
-
-
-    public QuestDataTask getData(EntityPlayer player) {
-        return getData(QuestingData.getUserUUID(player));
-    }
-
-    public QuestDataTask getData(String uuid) {
-        if(id < 0){
-            return newQuestData(); // possible fix for #247
-        }
-        QuestData questData = QuestingData.getQuestingData(uuid).getQuestData(parent.getId());
-        if (id >= questData.tasks.length) {
-            questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
-            questData.tasks[id] = newQuestData();
-        }
-        return questData.tasks[id] = validateData(questData.tasks[id]);
-    }
-
-    public QuestDataTask validateData(QuestDataTask data) {
-        if (data == null || data.getClass() != getDataType()) {
-            return newQuestData();
-        }
-
-        return data;
-    }
-
-    private QuestDataTask newQuestData() {
-        try {
-            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[]{QuestTask.class});
-            Object obj = constructor.newInstance(this);
-            return (QuestDataTask) obj;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getLangKeyDescription() {
-        return description;
-    }
-
-    public String getDescription() {
-        return Translator.translate(description);
-    }
-
-    public String getLangKeyLongDescription() {
-        return longDescription;
-    }
-
-    public String getLongDescription() {
-        return Translator.translate(longDescription);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public List<String> getCachedLongDescription(GuiBase gui) {
-        if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.translate(longDescription), 0.7F, 130);
-        }
-
-        return cachedDescription;
-    }
-
-    public void completeTask(String playerName) {
-        getData(playerName).completed = true;
-        completeQuest(parent, playerName);
     }
 
     public static void completeQuest(Quest quest, String playerName) {
@@ -188,6 +84,114 @@ public abstract class QuestTask {
         }
     }
 
+    public void updateId() {
+        this.id = parent.nextTaskId++;
+    }
+
+    public boolean isCompleted(EntityPlayer player) {
+        return getData(player).completed;
+    }
+
+    public boolean isCompleted(String uuid) {
+        return getData(uuid).completed;
+    }
+
+    public boolean isVisible(EntityPlayer player) {
+        Iterator itr = this.requirements.iterator();
+        QuestTask requirement;
+        do {
+            if (!itr.hasNext()) return true;
+            requirement = (QuestTask) itr.next();
+        } while (requirement.isCompleted(player) && requirement.isVisible(player));
+        return false;
+    }
+
+    public Class<? extends QuestDataTask> getDataType() {
+        return QuestDataTask.class;
+    }
+
+    public void write(QuestDataTask task, JsonWriter out) throws IOException {
+        task.write(out);
+    }
+
+    public void read(QuestDataTask task, JsonReader in) throws IOException {
+        task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
+    }
+
+    public QuestDataTask getData(EntityPlayer player) {
+        return getData(QuestingData.getUserUUID(player));
+    }
+
+    public QuestDataTask getData(String uuid) {
+        if (id < 0) {
+            return newQuestData(); // possible fix for #247
+        }
+        QuestData questData = QuestingData.getQuestingData(uuid).getQuestData(parent.getId());
+        if (id >= questData.tasks.length) {
+            questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
+            questData.tasks[id] = newQuestData();
+        }
+        return questData.tasks[id] = validateData(questData.tasks[id]);
+    }
+
+    public QuestDataTask validateData(QuestDataTask data) {
+        if (data == null || data.getClass() != getDataType()) {
+            return newQuestData();
+        }
+
+        return data;
+    }
+
+    private QuestDataTask newQuestData() {
+        try {
+            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(new Class[]{QuestTask.class});
+            Object obj = constructor.newInstance(this);
+            return (QuestDataTask) obj;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getLangKeyDescription() {
+        return description;
+    }
+
+    public String getDescription() {
+        return Translator.translate(description);
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLangKeyLongDescription() {
+        return longDescription;
+    }
+
+    public String getLongDescription() {
+        return Translator.translate(longDescription);
+    }
+
+    public void setLongDescription(String longDescription) {
+        this.longDescription = longDescription;
+        cachedDescription = null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public List<String> getCachedLongDescription(GuiBase gui) {
+        if (cachedDescription == null) {
+            cachedDescription = gui.getLinesFromText(Translator.translate(longDescription), 0.7F, 130);
+        }
+
+        return cachedDescription;
+    }
+
+    public void completeTask(String playerName) {
+        getData(playerName).completed = true;
+        completeQuest(parent, playerName);
+    }
+
     @SideOnly(Side.CLIENT)
     public abstract void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY);
 
@@ -200,17 +204,12 @@ public abstract class QuestTask {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Quest getParent() {
         return parent;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setLongDescription(String longDescription) {
-        this.longDescription = longDescription;
-        cachedDescription = null;
     }
 
     public List<QuestTask> getRequirements() {

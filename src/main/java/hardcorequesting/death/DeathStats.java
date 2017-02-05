@@ -16,10 +16,27 @@ import java.io.IOException;
 import java.util.*;
 
 public class DeathStats {
+
+    private static final DeathComparator deathComparator = new DeathComparator(-1);
+    private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
     private static Map<String, DeathStats> deathMap;
     private static DeathStats[] clientDeathList;
     private static DeathStats clientBest;
     private static DeathStats clientTotal;
+
+    static {
+        for (int i = 0; i < deathTypeComparator.length; i++) {
+            deathTypeComparator[i] = new DeathComparator(i);
+        }
+    }
+
+    protected int[] deaths = new int[DeathType.values().length];
+    private String uuid;
+    private int totalDeaths = -1;
+
+    public DeathStats(String uuid) {
+        this.uuid = uuid;
+    }
 
     public static DeathStats getBest() {
         return clientBest;
@@ -29,11 +46,58 @@ public class DeathStats {
         return clientTotal;
     }
 
-    private String uuid;
-    protected int[] deaths = new int[DeathType.values().length];
+    public static List<DeathStats> getDeathStatsList() {
+        return new ArrayList<>(deathMap.values());
+    }
 
-    public DeathStats(String uuid) {
-        this.uuid = uuid;
+    public static void loadAll(boolean isClient) {
+        deathMap = new HashMap<>();
+        try {
+            for (DeathStats stats : SaveHandler.loadDeaths(SaveHandler.getLocalFile("deaths")))
+                deathMap.put(stats.uuid, stats);
+            if (isClient) updateClientDeathList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveAll() {
+        try {
+            SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed saving bags");
+        }
+    }
+
+    public static void resync() {
+        NetworkManager.sendToAllPlayers(new DeathStatsMessage("TIMESTAMP"));
+    }
+
+    private static void updateClientDeathList() {
+        clientDeathList = new DeathStats[deathMap.size()];
+        int id = 0;
+        for (DeathStats deathStats : deathMap.values()) {
+            deathStats.totalDeaths = -1;
+            clientDeathList[id++] = deathStats;
+        }
+
+        clientBest = new DeathStatsBest();
+        clientTotal = new DeathStatsTotal();
+
+        Arrays.sort(clientDeathList, deathComparator);
+    }
+
+    public static DeathStats getDeathStats(String uuid) {
+        DeathStats stats = deathMap.get(uuid);
+        if (stats == null) {
+            stats = new DeathStats(uuid);
+            deathMap.put(uuid, stats);
+        }
+        return stats;
+    }
+
+    public static DeathStats[] getDeathStats() {
+        return clientDeathList;
     }
 
     public String getUuid() {
@@ -70,8 +134,6 @@ public class DeathStats {
         if (resync) resync();
     }
 
-    private int totalDeaths = -1;
-
     public int getTotalDeaths() {
         if (totalDeaths == -1) {
             totalDeaths = 0;
@@ -82,35 +144,8 @@ public class DeathStats {
         return totalDeaths;
     }
 
-    public static List<DeathStats> getDeathStatsList() {
-        return new ArrayList<>(deathMap.values());
-    }
-
-    public static void loadAll(boolean isClient) {
-        deathMap = new HashMap<>();
-        try {
-            for (DeathStats stats : SaveHandler.loadDeaths(SaveHandler.getLocalFile("deaths")))
-                deathMap.put(stats.uuid, stats);
-            if (isClient) updateClientDeathList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void saveAll() {
-        try {
-            SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving bags");
-        }
-    }
-
     public int getDeaths(int id) {
         return deaths[id];
-    }
-
-    public static void resync() {
-        NetworkManager.sendToAllPlayers(new DeathStatsMessage("TIMESTAMP"));
     }
 
     private static class DeathComparator implements Comparator<DeathStats> {
@@ -131,43 +166,8 @@ public class DeathStats {
         }
     }
 
-    private static final DeathComparator deathComparator = new DeathComparator(-1);
-    private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
-
-    static {
-        for (int i = 0; i < deathTypeComparator.length; i++) {
-            deathTypeComparator[i] = new DeathComparator(i);
-        }
-    }
-
-    private static void updateClientDeathList() {
-        clientDeathList = new DeathStats[deathMap.size()];
-        int id = 0;
-        for (DeathStats deathStats : deathMap.values()) {
-            deathStats.totalDeaths = -1;
-            clientDeathList[id++] = deathStats;
-        }
-
-        clientBest = new DeathStatsBest();
-        clientTotal = new DeathStatsTotal();
-
-        Arrays.sort(clientDeathList, deathComparator);
-    }
-
-    public static DeathStats getDeathStats(String uuid) {
-        DeathStats stats = deathMap.get(uuid);
-        if (stats == null) {
-            stats = new DeathStats(uuid);
-            deathMap.put(uuid, stats);
-        }
-        return stats;
-    }
-
-    public static DeathStats[] getDeathStats() {
-        return clientDeathList;
-    }
-
     private static class DeathStatsBest extends DeathStats {
+
         private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
         private String[] messages = new String[DeathType.values().length];
@@ -205,17 +205,20 @@ public class DeathStats {
         }
 
         @Override
+        public String getName() {
+            return Translator.translate(getUuid());
+        }
+
+        @Override
         public String getDescription(int id) {
             return DeathType.values()[id].getName() + "\n\n" + messages[id];
         }
 
-        @Override
-        public String getName() {
-            return Translator.translate(getUuid());
-        }
+
     }
 
     private static class DeathStatsTotal extends DeathStats {
+
         private int[] count = new int[DeathType.values().length];
 
         private DeathStatsTotal() {

@@ -11,6 +11,8 @@ public enum TeamError {
     IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
     USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
 
+    //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
+    public static TeamError latestError;
     private String header;
     private String message;
 
@@ -26,9 +28,6 @@ public enum TeamError {
     public String getHeader() {
         return Translator.translate(header);
     }
-
-    //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
-    public static TeamError latestError;
 
     public void sendToClient(EntityPlayer player) {
         if (player instanceof EntityPlayerMP)

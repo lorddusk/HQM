@@ -18,29 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TeamAdapter {
+
     private static Map<Team, List<Integer>> invitesMap = new HashMap<>();
-
-    public static void clearInvitesMap() {
-        invitesMap.clear();
-    }
-
-    public static void commitInvitesMap() {
-        if (invitesMap.size() > 0) {
-            Map<Integer, Team> tempMap = new HashMap<>();
-            QuestingData.getTeams().stream().filter(team -> team != null).forEach(team -> tempMap.put(team.getId(), team));
-            for (Team team : QuestingData.getTeams()) {
-                List<Integer> invites = invitesMap.get(team);
-                if (invites != null)
-                    invites.forEach(id ->
-                    {
-                        if (tempMap.containsKey(id))
-                            team.getInvites().add(tempMap.get(id));
-                    });
-            }
-        }
-        clearInvitesMap();
-    }
-
     public static final TypeAdapter<Team> TEAM_ADAPTER = new TypeAdapter<Team>() {
         private static final String ID = "id";
         private static final String NAME = "name";
@@ -121,8 +100,8 @@ public class TeamAdapter {
                             in.beginObject();
                             String id = null;
                             int val = 0;
-                            while(in.hasNext()){
-                                switch(in.nextName()){
+                            while (in.hasNext()) {
+                                switch (in.nextName()) {
                                     case REP_ID:
                                         id = in.nextString();
                                         break;
@@ -178,4 +157,25 @@ public class TeamAdapter {
             return team;
         }
     };
+
+    public static void clearInvitesMap() {
+        invitesMap.clear();
+    }
+
+    public static void commitInvitesMap() {
+        if (invitesMap.size() > 0) {
+            Map<Integer, Team> tempMap = new HashMap<>();
+            QuestingData.getTeams().stream().filter(team -> team != null).forEach(team -> tempMap.put(team.getId(), team));
+            for (Team team : QuestingData.getTeams()) {
+                List<Integer> invites = invitesMap.get(team);
+                if (invites != null)
+                    invites.forEach(id ->
+                    {
+                        if (tempMap.containsKey(id))
+                            team.getInvites().add(tempMap.get(id));
+                    });
+            }
+        }
+        clearInvitesMap();
+    }
 }

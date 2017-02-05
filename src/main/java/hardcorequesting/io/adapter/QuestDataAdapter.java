@@ -9,6 +9,7 @@ import hardcorequesting.quests.data.QuestDataTask;
 import java.io.IOException;
 
 public class QuestDataAdapter {
+
     public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<QuestData>() {
         public static final String PLAYERS = "players";
         public static final String REWARDS = "rewards";
@@ -34,7 +35,7 @@ public class QuestDataAdapter {
             out.name(TASKS_SIZE).value(value.tasks.length);
             out.name(TASKS).beginArray();
             for (QuestDataTask task : value.tasks)
-                if(task != null)
+                if (task != null)
                     QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
             out.endArray();
             out.endObject();

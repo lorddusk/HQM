@@ -166,6 +166,7 @@ public enum ClientChange {
     }
 
     public interface ClientUpdater<T> {
+
         IMessage build(T data) throws IOException;
 
         void parse(EntityPlayer player, String data);

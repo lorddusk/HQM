@@ -4,6 +4,7 @@ package hardcorequesting.blocks;
 import hardcorequesting.ModInformation;
 
 public abstract class BlockInfo {
+
     public static final String LOCALIZATION_START = "hqm:";
     public static final String ITEMBARREL_UNLOCALIZED_NAME = "item_barrel";
     public static final String ITEMBARREL_TE_KEY = "ItemBarrel";

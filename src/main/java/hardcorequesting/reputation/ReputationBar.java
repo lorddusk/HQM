@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public class ReputationBar {
+
     private String repId;
     private int x, y, questSet;
 

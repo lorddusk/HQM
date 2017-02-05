@@ -18,6 +18,25 @@ import java.io.IOException;
  * Created by lang2 on 10/12/2015.
  */
 public class MinecraftAdapter {
+
+    public static final TypeAdapter<NBTTagCompound> NBT_TAG_COMPOUND = new TypeAdapter<NBTTagCompound>() {
+        @Override
+        public void write(JsonWriter out, NBTTagCompound value) throws IOException {
+            out.value(value.toString());
+        }
+
+        @Override
+        public NBTTagCompound read(JsonReader in) throws IOException {
+            try {
+                NBTBase nbtBase = JsonToNBT.getTagFromJson(in.nextString());
+                if (nbtBase instanceof NBTTagCompound) {
+                    return (NBTTagCompound) nbtBase;
+                }
+            } catch (Exception ignored) {
+            }
+            throw new IOException("Failed to read NBT");
+        }
+    };
     public static final TypeAdapter<ItemStack> ITEM_STACK = new TypeAdapter<ItemStack>() {
         private static final String ID = "id";
         private static final String DAMAGE = "damage";
@@ -25,22 +44,22 @@ public class MinecraftAdapter {
         private static final String NBT = "nbt";
 
         @Override
-        public void write(JsonWriter out, ItemStack value) throws IOException {
-            if (value.isEmpty()) {
+        public void write(JsonWriter out, ItemStack stack) throws IOException {
+            if (stack.isEmpty()) {
                 out.nullValue();
                 return;
             }
-            String id = value.getItem().getRegistryName().toString();
+            String id = stack.getItem().getRegistryName().toString();
             out.beginObject();
             out.name(ID).value(id);
-            if (value.getItemDamage() != 0) {
-                out.name(DAMAGE).value(value.getItemDamage());
+            if (stack.getItemDamage() != 0) {
+                out.name(DAMAGE).value(stack.getItemDamage());
             }
-            if (value.getCount() != 1) {
-                out.name(STACK_SIZE).value(value.getCount());
+            if (stack.getCount() != 1) {
+                out.name(STACK_SIZE).value(stack.getCount());
             }
-            if (value.hasTagCompound() && !value.getTagCompound().hasNoTags()) {
-                NBT_TAG_COMPOUND.write(out.name(NBT), value.getTagCompound());
+            if (stack.hasTagCompound() && !stack.getTagCompound().hasNoTags()) {
+                NBT_TAG_COMPOUND.write(out.name(NBT), stack.getTagCompound());
             }
             out.endObject();
         }
@@ -72,31 +91,11 @@ public class MinecraftAdapter {
             if (item == null) {
                 return null;
             }
-            ItemStack result = new ItemStack(item, size, damage);
-            result.setTagCompound(tag);
-            return result;
+            ItemStack stack = new ItemStack(item, size, damage);
+            stack.setTagCompound(tag);
+            return stack;
         }
     };
-
-    public static final TypeAdapter<NBTTagCompound> NBT_TAG_COMPOUND = new TypeAdapter<NBTTagCompound>() {
-        @Override
-        public void write(JsonWriter out, NBTTagCompound value) throws IOException {
-            out.value(value.toString());
-        }
-
-        @Override
-        public NBTTagCompound read(JsonReader in) throws IOException {
-            try {
-                NBTBase nbtBase = JsonToNBT.getTagFromJson(in.nextString());
-                if (nbtBase instanceof NBTTagCompound) {
-                    return (NBTTagCompound) nbtBase;
-                }
-            } catch (Exception ignored) {
-            }
-            throw new IOException("Failed to read NBT");
-        }
-    };
-
     public static final TypeAdapter<Fluid> FLUID = new TypeAdapter<Fluid>() {
         @Override
         public void write(JsonWriter out, Fluid value) throws IOException {

@@ -13,9 +13,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class ModBlocks {
+
     public static Block itemBarrel = new BlockDelivery().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
     public static Block itemTracker = new BlockTracker().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
     public static Block itemPortal = new BlockPortal().setUnlocalizedName(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
+
+    private ModBlocks() {
+    }
 
     public static void init() {
         RegisterHelper.registerBlock(itemBarrel, ItemBlock.class);
@@ -41,9 +45,5 @@ public class ModBlocks {
                 "gqg",
                 "wgw",
                 'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlassColorless"));
-    }
-
-
-    private ModBlocks() {
     }
 }

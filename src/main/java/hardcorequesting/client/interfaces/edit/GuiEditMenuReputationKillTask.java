@@ -6,6 +6,7 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
+
     private int kills;
     private QuestTaskReputationKill task;
 
@@ -17,13 +18,13 @@ public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
-            protected void setValue(int number) {
-                kills = number;
+            protected int getValue() {
+                return kills;
             }
 
             @Override
-            protected int getValue() {
-                return kills;
+            protected void setValue(int number) {
+                kills = number;
             }
         });
     }

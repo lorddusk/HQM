@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Team {
+
+    public static boolean reloadedInvites;
     private int id = -1;
     private List<PlayerEntry> players = new ArrayList<>();
     private List<Team> invites;
@@ -27,6 +29,8 @@ public class Team {
     private Map<String, Integer> reputation;
     private Map<String, QuestData> questData;
     private int clientTeamLives = -1;
+    private RewardSetting rewardSetting = RewardSetting.getDefault();
+    private LifeSetting lifeSetting = LifeSetting.SHARE;
 
     public Team(String playerUuid) {
         if (playerUuid != null)
@@ -34,6 +38,43 @@ public class Team {
         createQuestData();
         createReputation();
         this.invites = new ArrayList<>();
+    }
+
+    public static void loadAll(boolean isClient) {
+        try {
+            QuestingData.getTeams().clear();
+            TeamAdapter.clearInvitesMap();
+            List<Team> teams = SaveHandler.loadTeams(SaveHandler.getLocalFile("teams"));
+            for (int i = 0; i < teams.size(); i++)
+                QuestingData.getTeams().add(null);
+            teams.stream().filter(team -> !team.isSingle()).forEach(team -> QuestingData.getTeams().set(team.getId(), team));
+            TeamAdapter.commitInvitesMap();
+            if (isClient)
+                TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Can't load teams");
+        }
+    }
+
+    public static void saveAll() {
+        try {
+            SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed saving teams");
+        }
+    }
+
+    public static void declineAll(String playerName) {
+        for (Team team : QuestingData.getTeams()) {
+            for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
+                PlayerEntry playerEntry = iterator.next();
+                if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerName)) {
+                    iterator.remove();
+                    team.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
+                    break;
+                }
+            }
+        }
     }
 
     public void resetProgress(Quest quest) {
@@ -69,11 +110,12 @@ public class Team {
                 NetworkManager.sendToPlayer(TeamUpdateType.REPUTATION_RECEIVED.build(this, quest, reputationList), entry.getPlayerMP());
     }
 
-    private RewardSetting rewardSetting = RewardSetting.getDefault();
-    private LifeSetting lifeSetting = LifeSetting.SHARE;
-
     public RewardSetting getRewardSetting() {
         return rewardSetting;
+    }
+
+    public void setRewardSetting(RewardSetting rewardSetting) {
+        this.rewardSetting = rewardSetting;
     }
 
     public LifeSetting getLifeSetting() {
@@ -84,12 +126,12 @@ public class Team {
         this.lifeSetting = lifeSetting;
     }
 
-    public void setRewardSetting(RewardSetting rewardSetting) {
-        this.rewardSetting = rewardSetting;
-    }
-
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean isSharingLives() {
@@ -174,30 +216,6 @@ public class Team {
 
     }
 
-    public static void loadAll(boolean isClient) {
-        try {
-            QuestingData.getTeams().clear();
-            TeamAdapter.clearInvitesMap();
-            List<Team> teams = SaveHandler.loadTeams(SaveHandler.getLocalFile("teams"));
-            for (int i = 0; i < teams.size(); i++)
-                QuestingData.getTeams().add(null);
-            teams.stream().filter(team -> !team.isSingle()).forEach(team -> QuestingData.getTeams().set(team.getId(), team));
-            TeamAdapter.commitInvitesMap();
-            if (isClient)
-                TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Can't load teams");
-        }
-    }
-
-    public static void saveAll() {
-        try {
-            SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
-        } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving teams");
-        }
-    }
-
     public void refreshTeamData(TeamUpdateSize type) {
         for (PlayerEntry entry : getPlayers())
             refreshTeamData(entry, type);
@@ -238,7 +256,6 @@ public class Team {
             }
         }
     }
-
 
     public void refreshData() {
         for (PlayerEntry entry : getPlayers())
@@ -288,7 +305,6 @@ public class Team {
         }
     }
 
-
     public List<Team> getInvites() {
         return invites;
     }
@@ -333,7 +349,6 @@ public class Team {
         NetworkManager.sendToServer(new TeamMessage(TeamAction.NEXT_REWARD_SETTING, ""));
     }
 
-
     public boolean isOwner(EntityPlayer player) {
         return isOwner(QuestingData.getUserUUID(player));
     }
@@ -351,19 +366,6 @@ public class Team {
         }
 
         return null;
-    }
-
-    public static void declineAll(String playerName) {
-        for (Team team : QuestingData.getTeams()) {
-            for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
-                PlayerEntry playerEntry = iterator.next();
-                if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerName)) {
-                    iterator.remove();
-                    team.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
-                    break;
-                }
-            }
-        }
     }
 
     private void createReputation() {
@@ -413,14 +415,8 @@ public class Team {
         questData.put(id, data);
     }
 
-    public static boolean reloadedInvites;
-
     public boolean isSingle() {
         return id == -1;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

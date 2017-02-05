@@ -13,12 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
+
+    private static final int BARS_X = 20;
+    private static final int LOWER_Y = 50;
+    private static final int UPPER_Y = 90;
+    private static final int RESULT_Y = 150;
+    private static final int BAR_OFFSET_Y = 10;
     private Reputation reputation;
     private int reputationId;
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
-
     private QuestTaskReputation task;
     private int id;
 
@@ -56,6 +61,11 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
 
         checkboxes.add(new CheckBox("hqm.repSetting.invRange", 21, 124) {
             @Override
+            protected boolean isVisible() {
+                return reputation != null;
+            }
+
+            @Override
             public boolean getValue() {
                 return inverted;
             }
@@ -64,19 +74,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             public void setValue(boolean val) {
                 inverted = val;
             }
-
-            @Override
-            protected boolean isVisible() {
-                return reputation != null;
-            }
         });
     }
-
-    private static final int BARS_X = 20;
-    private static final int LOWER_Y = 50;
-    private static final int UPPER_Y = 90;
-    private static final int RESULT_Y = 150;
-    private static final int BAR_OFFSET_Y = 10;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {

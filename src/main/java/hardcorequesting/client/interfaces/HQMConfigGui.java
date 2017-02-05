@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiConfig;
 
 public class HQMConfigGui extends GuiConfig {
+
     public HQMConfigGui(GuiScreen parentScreen) {
         super(parentScreen,
                 ModConfig.getConfigElements(),

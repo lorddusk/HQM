@@ -50,22 +50,6 @@ public class ItemHeart extends Item {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack par1ItemStack) {
-        int i = MathHelper.clamp(par1ItemStack.getItemDamage(), 0, 15);
-        return super.getUnlocalizedName() + "_" + HEART_ICONS[i];
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> stackList) {
-        for (int x = 0; x < HEART_ICONS.length; x++) {
-            stackList.add(new ItemStack(this, 1, x));
-        }
-    }
-
-
-    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
             ItemStack stack = player.getHeldItem(hand);
@@ -106,46 +90,21 @@ public class ItemHeart extends Item {
         return super.onItemRightClick(world, player, hand);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack item, EntityPlayer player, List<String> tooltip, boolean extraInfo) {
-        super.addInformation(item, player, tooltip, extraInfo);
-
-        if (item.getItemDamage() == 3) {
-            tooltip.add(Translator.translate("item.hqm:hearts_heart.tooltip"));
-            if (ModConfig.ROTTIMER) {
-                NBTTagCompound tagCompound = item.getTagCompound();
-                if (tagCompound == null) {
-                    tagCompound = new NBTTagCompound();
-                    item.setTagCompound(tagCompound);
-                }
-                if (tagCompound.hasKey("RotTime")) {
-                    int rot = tagCompound.getInteger("RotTime");
-                    int maxRot = tagCompound.getInteger("MaxRot");
-                    float percentage = (float) ((rot * 100) / maxRot);
-                    tooltip.add(Translator.translate("item.hqm:hearts_heart.freshness", percentage));
-                }
-            }
-        }
-        if (item.getItemDamage() == 4) {
-            tooltip.add(Translator.translate("item.hqm:hearts_rottenheart.tooltip"));
-        }
+    public String getUnlocalizedName(ItemStack stack) {
+        int i = MathHelper.clamp(stack.getItemDamage(), 0, 15);
+        return super.getUnlocalizedName() + "_" + HEART_ICONS[i];
     }
 
     @Override
-    public boolean hasEffect(ItemStack item) {
-        return item.getItemDamage() == 3 || item.getItemDamage() == 4;
-    }
-
-    @Override
-    public void onUpdate(ItemStack itemStack, World world, Entity entity, int par4, boolean par5) {
+    public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
         if (entity instanceof EntityPlayer) {
             EntityPlayer entityPlayer = (EntityPlayer) entity;
-            if (itemStack.getItemDamage() == 3 && ModConfig.ROTTIMER) {
-                NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (stack.getItemDamage() == 3 && ModConfig.ROTTIMER) {
+                NBTTagCompound tagCompound = stack.getTagCompound();
                 if (tagCompound == null) {
                     tagCompound = new NBTTagCompound();
-                    itemStack.setTagCompound(tagCompound);
+                    stack.setTagCompound(tagCompound);
                 }
                 if (!tagCompound.hasKey("RotTime")) {
                     int rot = (ModConfig.MAXROT * 20);
@@ -154,13 +113,53 @@ public class ItemHeart extends Item {
                 } else {
                     int newRot = tagCompound.getInteger("RotTime");
                     if (newRot <= 0) {
-                        itemStack.setItemDamage(4);
+                        stack.setItemDamage(4);
                         entityPlayer.sendMessage(new TextComponentTranslation("hqm.message.hearthDecay"));
                     } else {
                         tagCompound.setInteger("RotTime", newRot - 1);
                     }
                 }
             }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean extraInfo) {
+        super.addInformation(stack, player, tooltip, extraInfo);
+
+        if (stack.getItemDamage() == 3) {
+            tooltip.add(Translator.translate("fluidStack.hqm:hearts_heart.tooltip"));
+            if (ModConfig.ROTTIMER) {
+                NBTTagCompound tagCompound = stack.getTagCompound();
+                if (tagCompound == null) {
+                    tagCompound = new NBTTagCompound();
+                    stack.setTagCompound(tagCompound);
+                }
+                if (tagCompound.hasKey("RotTime")) {
+                    int rot = tagCompound.getInteger("RotTime");
+                    int maxRot = tagCompound.getInteger("MaxRot");
+                    float percentage = (float) ((rot * 100) / maxRot);
+                    tooltip.add(Translator.translate("fluidStack.hqm:hearts_heart.freshness", percentage));
+                }
+            }
+        }
+        if (stack.getItemDamage() == 4) {
+            tooltip.add(Translator.translate("fluidStack.hqm:hearts_rottenheart.tooltip"));
+        }
+    }
+
+    @Override
+    public boolean hasEffect(ItemStack stack) {
+        return stack.getItemDamage() == 3 || stack.getItemDamage() == 4;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(Item item, CreativeTabs creativeTabs, NonNullList<ItemStack> stackList) {
+        for (int x = 0; x < HEART_ICONS.length; x++) {
+            stackList.add(new ItemStack(this, 1, x));
         }
     }
 }

@@ -21,11 +21,14 @@ import java.util.Map;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
 
+    private static final int START_X = 20;
+    private static final int START_Y = 20;
+    private static final int OFFSET_Y = 8;
+    private static final int VISIBLE_MOBS = 24;
     private QuestTaskMob task;
     private QuestTaskMob.Mob mob;
     private int id;
     private ScrollBar scrollBar;
-
     private List<String> rawMobs;
     private List<String> mobs;
 
@@ -44,13 +47,13 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
-            protected void setValue(int number) {
-                mob.setCount(number);
+            protected int getValue() {
+                return mob.getCount();
             }
 
             @Override
-            protected int getValue() {
-                return mob.getCount();
+            protected void setValue(int number) {
+                mob.setCount(number);
             }
         });
 
@@ -85,11 +88,6 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         }
     }
-
-    private static final int START_X = 20;
-    private static final int START_Y = 20;
-    private static final int OFFSET_Y = 8;
-    private static final int VISIBLE_MOBS = 24;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -174,8 +172,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     public void save(GuiBase gui) {
         mob.setCount(Math.max(1, mob.getCount()));
 
-        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
-            if (EntityList.ENTITY_EGGS.containsKey(new ResourceLocation(mob.getMob()))){
+        if ((mob.getIconStack() == null || mob.getIconStack().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
+            if (EntityList.ENTITY_EGGS.containsKey(new ResourceLocation(mob.getMob()))) {
                 ItemStack stack = new ItemStack(net.minecraft.init.Items.SPAWN_EGG);
                 ItemMonsterPlacer.applyEntityIdToItemStack(stack, new ResourceLocation(mob.getMob()));
             }

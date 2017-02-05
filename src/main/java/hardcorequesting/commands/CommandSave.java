@@ -26,6 +26,22 @@ public class CommandSave extends CommandBase {
         super("save", "all", "bags");
     }
 
+    private static boolean stringsMatch(String[] sub, String[] search) {
+        for (int i = 0; i < sub.length; i++) {
+            if (!sub[i].equalsIgnoreCase(search[i])) return false;
+        }
+        return true;
+    }
+
+    private static void save(ICommandSender sender, Object object, Type type, String name) throws CommandException {
+        try {
+            File file = SaveHandler.save(SaveHandler.getExportFile(name), object, type);
+            sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
+        } catch (IOException e) {
+            throw new CommandException(Lang.SAVE_FAILED, name);
+        }
+    }
+
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (arguments.length == 1 && arguments[0].equals("all")) {
@@ -87,22 +103,6 @@ public class CommandSave extends CommandBase {
             if (pattern.matcher(set.getName()).find()) results.add(set.getName());
         }
         return results;
-    }
-
-    private static boolean stringsMatch(String[] sub, String[] search) {
-        for (int i = 0; i < sub.length; i++) {
-            if (!sub[i].equalsIgnoreCase(search[i])) return false;
-        }
-        return true;
-    }
-
-    private static void save(ICommandSender sender, Object object, Type type, String name) throws CommandException {
-        try {
-            File file = SaveHandler.save(SaveHandler.getExportFile(name), object, type);
-            sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length()))));
-        } catch (IOException e) {
-            throw new CommandException(Lang.SAVE_FAILED, name);
-        }
     }
 
     @Override

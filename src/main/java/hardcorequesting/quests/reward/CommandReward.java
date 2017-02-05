@@ -4,6 +4,14 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class CommandReward extends QuestReward<CommandReward.Command> {
 
+    public CommandReward(Command command) {
+        super(command);
+    }
+
+    public void execute(EntityPlayer player) {
+        getReward().execute(player);
+    }
+
     public static class Command {
 
         private String commandString;
@@ -19,13 +27,5 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         public String asString() {
             return this.commandString;
         }
-    }
-
-    public CommandReward(Command command) {
-        super(command);
-    }
-
-    public void execute(EntityPlayer player) {
-        getReward().execute(player);
     }
 }

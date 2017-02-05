@@ -9,7 +9,6 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -38,16 +37,16 @@ public class BlockTracker extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (player != null) {
-            if (player.inventory.getCurrentItem() != ItemStack.EMPTY && player.inventory.getCurrentItem().getItem() == ModItems.book) {
+            if (!player.inventory.getCurrentItem().isEmpty() && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
-                    TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityTracker) {
+                    TileEntity tile = world.getTileEntity(pos);
+                    if (tile != null && tile instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
-                            ((TileEntityTracker) te).setCurrentQuest();
-                            if (((TileEntityTracker) te).getCurrentQuest() != null) {
-                                player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) te).getCurrentQuest().getName()));
+                            ((TileEntityTracker) tile).setCurrentQuest();
+                            if (((TileEntityTracker) tile).getCurrentQuest() != null) {
+                                player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) tile).getCurrentQuest().getName()));
                             } else {
                                 player.sendMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                             }
@@ -58,12 +57,12 @@ public class BlockTracker extends BlockContainer {
                 return true;
             } else {
                 if (!world.isRemote) {
-                    TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityTracker) {
+                    TileEntity tile = world.getTileEntity(pos);
+                    if (tile != null && tile instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
-                            ((TileEntityTracker) te).openInterface(player);
+                            ((TileEntityTracker) tile).openInterface(player);
                         }
                     }
                 }
@@ -75,13 +74,13 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
+    public boolean canProvidePower(IBlockState state) {
+        return true;
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
-        return true;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
 //    @Override

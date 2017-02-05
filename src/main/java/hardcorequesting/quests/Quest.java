@@ -36,21 +36,42 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Quest {
+
+    private static final int VISIBLE_DESCRIPTION_LINES = 7;
+    private static final int VISIBLE_TASKS = 3;
+    //region pixelinfo
+    private static final int START_X = 20;
+    private static final int TEXT_HEIGHT = 9;
+    private static final int TASK_LABEL_START_Y = 100;
+    private static final int TASK_MARGIN = 2;
+    private static final int TITLE_START_Y = 15;
+    private static final int DESCRIPTION_START_Y = 30;
+    private static final int TASK_DESCRIPTION_X = 180;
+    private static final int TASK_DESCRIPTION_Y = 20;
+    private static final int REWARD_STR_Y = 140;
+    private static final int REWARD_Y = 150;
+    private static final int REWARD_Y_OFFSET = 40;
+    private static final int REWARD_OFFSET = 20;
+    private static final int ITEM_SIZE = 18;
+    private static final int REPUTATION_X = 142;
+    private static final int REPUTATION_Y = 133;
+    private static final int REPUTATION_Y_LOWER = 150;
+    private static final int REPUTATION_SIZE = 16;
+    private static final int REPUTATION_SRC_X = 30;
+    private static final int REPUTATION_SRC_Y = 82;
+    private static final int MAX_REWARD_SLOTS = 7;
+    private static final int MAX_SELECT_REWARD_SLOTS = 4;
     public static boolean isEditing = false;
     public static boolean saveDefault = true;
     public static String selectedQuestId;
-
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
-
-    public static Map<String, Quest> getQuests() {
-        return QuestLine.getActiveQuestLine().quests;
-    }
-
-    public static List<QuestSet> getQuestSets() {
-        return QuestLine.getActiveQuestLine().questSets;
-    }
-
+    private final List<LargeButton> buttons = new ArrayList<>();
+    private final ScrollBar descriptionScroll;
+    private final ScrollBar taskDescriptionScroll;
+    private final ScrollBar taskScroll;
+    private final List<ScrollBar> scrollBars = new ArrayList<>();
+    public int nextTaskId;
     private String uuid;
     private String name;
     private String description;
@@ -61,7 +82,6 @@ public class Quest {
     private List<QuestTask> tasks;
     private List<String> cachedDescription;
     private List<ReputationReward> reputationRewards;
-    public int nextTaskId;
     private QuestTask selectedTask;
     private ItemStackRewardList rewards;
     private ItemStackRewardList rewardChoices;
@@ -74,10 +94,27 @@ public class Quest {
     private int x;
     private int y;
     private boolean isBig;
-    private ItemStack icon= ItemStack.EMPTY;
+    private ItemStack iconStack = ItemStack.EMPTY;
     private QuestSet set;
     private int selectedReward = -1;
-    private final List<LargeButton> buttons = new ArrayList<>();
+    private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
+        @Override
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            return parent.isCompleted(playerName);
+        }
+    };
+    private ParentEvaluator linkParentEvaluator = new ParentEvaluator() {
+        @Override
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            return parent.isLinkFree(playerName, isLinkFreeCache);
+        }
+    };
+    private ParentEvaluator visibleParentEvaluator = new ParentEvaluator() {
+        @Override
+        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            return parent.isVisible(playerName, isVisibleCache, isLinkFreeCache) || parent.isCompleted(playerName);
+        }
+    };
 
     {
         buttons.add(new LargeButton("hqm.quest.claim", 100, 190) {
@@ -271,13 +308,6 @@ public class Quest {
         }
     }
 
-    private final ScrollBar descriptionScroll;
-    private final ScrollBar taskDescriptionScroll;
-    private final ScrollBar taskScroll;
-    private final List<ScrollBar> scrollBars = new ArrayList<>();
-    private static final int VISIBLE_DESCRIPTION_LINES = 7;
-    private static final int VISIBLE_TASKS = 3;
-
     {
         scrollBars.add(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
             @Override
@@ -322,14 +352,96 @@ public class Quest {
         QuestLine.getActiveQuestLine().quests.put(getId(), this);
     }
 
-    public void setId(String id) {
-        if (getQuestSet() != null)
-            getQuestSet().removeQuest(this);
-        getQuests().remove(getId());
-        this.uuid = id;
-        getQuests().put(getId(), this);
-        if (getQuestSet() != null)
-            getQuestSet().addQuest(this);
+    public static Map<String, Quest> getQuests() {
+        return QuestLine.getActiveQuestLine().quests;
+    }
+
+    public static List<QuestSet> getQuestSets() {
+        return QuestLine.getActiveQuestLine().questSets;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static List<String> getMainDescription(GuiBase gui) {
+        if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
+            QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(QuestLine.getActiveQuestLine().mainDescription, 0.7F, 130);
+        }
+
+        return QuestLine.getActiveQuestLine().cachedMainDescription;
+    }
+
+    public static String getRawMainDescription() {
+        return QuestLine.getActiveQuestLine().mainDescription;
+    }
+
+    public static void setMainDescription(String mainDescription) {
+        QuestLine.getActiveQuestLine().mainDescription = mainDescription;
+        QuestLine.getActiveQuestLine().cachedMainDescription = null;
+    }
+
+    public static Quest getQuest(String id) {
+        return QuestLine.getActiveQuestLine().quests.get(id);
+    }
+
+    public static void addItems(EntityPlayer player, List<ItemStack> itemsToAdd) {
+        for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
+            Iterator<ItemStack> iterator = itemsToAdd.iterator();
+            while (iterator.hasNext()) {
+                ItemStack nextStack = iterator.next();
+                ItemStack stack = player.inventory.mainInventory.get(i);
+
+                if (stack.isEmpty()) {
+                    int amount = Math.min(nextStack.getMaxStackSize(), nextStack.getCount());
+                    ItemStack copyStack = nextStack.copy();
+                    copyStack.setCount(amount);
+                    player.inventory.mainInventory.set(i, copyStack);
+                    nextStack.shrink(amount);
+                    if (nextStack.getCount() <= 0) {
+                        iterator.remove();
+                    }
+                    break;
+                } else if (stack.isItemEqual(nextStack) && ItemStack.areItemStackTagsEqual(nextStack, stack)) {
+                    int amount = Math.min(nextStack.getMaxStackSize() - stack.getCount(), nextStack.getCount());
+                    stack.grow(amount);
+                    nextStack.shrink(amount);
+                    if (nextStack.getCount() <= 0) {
+                        iterator.remove();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void removeQuest(Quest quest) {
+        for (String requirement : quest.requirement) {
+            Quest.getQuest(requirement).reversedRequirement.remove(quest.getId());
+        }
+        for (String optionLink : quest.optionLinks) {
+            Quest.getQuest(optionLink).reversedOptionLinks.remove(quest.getId());
+        }
+
+        quest.tasks.forEach(QuestTask::onDelete);
+
+        quest.setQuestSet(null);
+        QuestLine.getActiveQuestLine().quests.remove(quest.getId());
+
+        for (Quest other : QuestLine.getActiveQuestLine().quests.values()) {
+            Iterator<String> iterator = other.requirement.iterator();
+            while (iterator.hasNext()) {
+                String element = iterator.next();
+                if (element.equals(quest.getId())) {
+                    iterator.remove();
+                }
+            }
+
+            iterator = other.optionLinks.iterator();
+            while (iterator.hasNext()) {
+                String element = iterator.next();
+                if (element.equals(quest.getId())) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     public void setX(int x) {
@@ -382,24 +494,6 @@ public class Quest {
 
     public void setRepeatInfo(RepeatInfo repeatInfo) {
         this.repeatInfo = repeatInfo;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static List<String> getMainDescription(GuiBase gui) {
-        if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
-            QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(QuestLine.getActiveQuestLine().mainDescription, 0.7F, 130);
-        }
-
-        return QuestLine.getActiveQuestLine().cachedMainDescription;
-    }
-
-    public static String getRawMainDescription() {
-        return QuestLine.getActiveQuestLine().mainDescription;
-    }
-
-    public static void setMainDescription(String mainDescription) {
-        QuestLine.getActiveQuestLine().mainDescription = mainDescription;
-        QuestLine.getActiveQuestLine().cachedMainDescription = null;
     }
 
     public void addRequirement(String id) {
@@ -477,8 +571,22 @@ public class Quest {
         return uuid;
     }
 
+    public void setId(String id) {
+        if (getQuestSet() != null)
+            getQuestSet().removeQuest(this);
+        getQuests().remove(getId());
+        this.uuid = id;
+        getQuests().put(getId(), this);
+        if (getQuestSet() != null)
+            getQuestSet().addQuest(this);
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isVisible(EntityPlayer player) {
@@ -564,59 +672,12 @@ public class Quest {
         return result;
     }
 
-    private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
-        @Override
-        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-            return parent.isCompleted(playerName);
-        }
-    };
-
-    private ParentEvaluator linkParentEvaluator = new ParentEvaluator() {
-        @Override
-        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-            return parent.isLinkFree(playerName, isLinkFreeCache);
-        }
-    };
-
-    private ParentEvaluator visibleParentEvaluator = new ParentEvaluator() {
-        @Override
-        protected boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-            return parent.isVisible(playerName, isVisibleCache, isLinkFreeCache) || parent.isCompleted(playerName);
-        }
-    };
-
-    public void setReputationRewards(List<ReputationReward> reputationRewards) {
-        this.reputationRewards = reputationRewards;
-    }
-
     public List<ReputationReward> getReputationRewards() {
         return reputationRewards;
     }
 
-    private abstract class ParentEvaluator {
-        protected abstract boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache);
-
-        private boolean isValid(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-            int parents = getRequirements().size();
-            int requiredAmount = useModifiedParentRequirement ? parentRequirementCount : parents;
-            if (requiredAmount > parents) {
-                return false;
-            }
-
-            int allowedUncompleted = parents - requiredAmount;
-            int uncompleted = 0;
-            for (Quest quest : getRequirements()) {
-                if (!isValid(playerName, quest, isVisibleCache, isLinkFreeCache)) {
-                    uncompleted++;
-                    if (uncompleted > allowedUncompleted) {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
+    public void setReputationRewards(List<ReputationReward> reputationRewards) {
+        this.reputationRewards = reputationRewards;
     }
 
     public boolean isAvailable(EntityPlayer player) {
@@ -672,32 +733,48 @@ public class Quest {
         return getGuiX() + getGuiW() / 2;
     }
 
+    public void setGuiCenterX(int x) {
+        this.x = x - getGuiW() / 2;
+    }
+
     public int getGuiCenterY() {
         return getGuiY() + getGuiH() / 2;
     }
 
-    public ItemStack getIcon() {
-        return icon;
+    public void setGuiCenterY(int y) {
+        this.y = y - getGuiH() / 2;
     }
+
+    public ItemStack getIconStack() {
+        return iconStack;
+    }
+
+    public void setIconStack(ItemStack iconStack) {
+        this.iconStack = iconStack;
+        if (iconStack != null) {
+            iconStack.setCount(1);
+        }
+    }
+    //endregion
 
     public boolean useBigIcon() {
         return isBig;
-    }
-
-    public void setTriggerType(TriggerType triggerType) {
-        this.triggerType = triggerType;
-    }
-
-    public void setTriggerTasks(int triggerTasks) {
-        this.triggerTasks = triggerTasks;
     }
 
     public TriggerType getTriggerType() {
         return triggerType;
     }
 
+    public void setTriggerType(TriggerType triggerType) {
+        this.triggerType = triggerType;
+    }
+
     public int getTriggerTasks() {
         return triggerTasks;
+    }
+
+    public void setTriggerTasks(int triggerTasks) {
+        this.triggerTasks = triggerTasks;
     }
 
     @SideOnly(Side.CLIENT)
@@ -755,34 +832,6 @@ public class Quest {
 
         return poly.contains(x, y);
     }
-
-
-    public static Quest getQuest(String id) {
-        return QuestLine.getActiveQuestLine().quests.get(id);
-    }
-
-    //region pixelinfo
-    private static final int START_X = 20;
-    private static final int TEXT_HEIGHT = 9;
-    private static final int TASK_LABEL_START_Y = 100;
-    private static final int TASK_MARGIN = 2;
-    private static final int TITLE_START_Y = 15;
-    private static final int DESCRIPTION_START_Y = 30;
-    private static final int TASK_DESCRIPTION_X = 180;
-    private static final int TASK_DESCRIPTION_Y = 20;
-    private static final int REWARD_STR_Y = 140;
-    private static final int REWARD_Y = 150;
-    private static final int REWARD_Y_OFFSET = 40;
-    private static final int REWARD_OFFSET = 20;
-    private static final int ITEM_SIZE = 18;
-
-    private static final int REPUTATION_X = 142;
-    private static final int REPUTATION_Y = 133;
-    private static final int REPUTATION_Y_LOWER = 150;
-    private static final int REPUTATION_SIZE = 16;
-    private static final int REPUTATION_SRC_X = 30;
-    private static final int REPUTATION_SRC_Y = 82;
-    //endregion
 
     @SideOnly(Side.CLIENT)
     private List<String> getCachedDescription(GuiBase gui) {
@@ -968,7 +1017,7 @@ public class Quest {
 
 
         for (int i = 0; i < rewards.length; i++) {
-            gui.drawItem(rewards[i], START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
+            gui.drawItemStack(rewards[i], START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
         }
     }
 
@@ -979,7 +1028,7 @@ public class Quest {
             for (int i = 0; i < rewards.length; i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (rewards[i] != null) {
-                        GuiQuestBook.setSelected(rewards[i]);
+                        GuiQuestBook.setSelectedStack(rewards[i]);
                         List<String> str = new ArrayList<String>();
                         try {
                             if (isEditing && !GuiQuestBook.isCtrlKeyDown()) {
@@ -1013,9 +1062,6 @@ public class Quest {
             return rewards;
         }
     }
-
-    private static final int MAX_REWARD_SLOTS = 7;
-    private static final int MAX_SELECT_REWARD_SLOTS = 4;
 
     @SideOnly(Side.CLIENT)
     private void handleRewardClick(GuiQuestBook gui, EntityPlayer player, ItemStack[] rawRewards, int y, boolean canSelect, int mX, int mY) {
@@ -1067,7 +1113,6 @@ public class Quest {
             }
         }
     }
-
 
     @SideOnly(Side.CLIENT)
     private int getTaskY(GuiQuestBook gui, int id) {
@@ -1251,8 +1296,8 @@ public class Quest {
             if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
                 List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
-                    for (ItemStack itemStack : rewards.toArray()) {
-                        items.add(itemStack.copy());
+                    for (ItemStack stack : rewards.toArray()) {
+                        items.add(stack.copy());
                     }
                 }
                 if (!rewardChoices.isEmpty()) {
@@ -1264,34 +1309,34 @@ public class Quest {
                 }
 
                 List<ItemStack> itemsToAdd = new ArrayList<>();
-                for (ItemStack item : items) {
+                for (ItemStack stack : items) {
                     boolean added = false;
-                    for (ItemStack itemStack : itemsToAdd) {
-                        if (item.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(item, itemStack)) {
-                            itemStack.grow(item.getCount());
+                    for (ItemStack stack1 : itemsToAdd) {
+                        if (stack.isItemEqual(stack1) && ItemStack.areItemStackTagsEqual(stack, stack1)) {
+                            stack1.grow(stack.getCount());
                             added = true;
                             break;
                         }
                     }
 
                     if (!added) {
-                        itemsToAdd.add(item.copy());
+                        itemsToAdd.add(stack.copy());
                     }
                 }
 
                 List<ItemStack> itemsToCheck = new ArrayList<>();
-                for (ItemStack itemStack : itemsToAdd) {
-                    itemsToCheck.add(itemStack.copy());
+                for (ItemStack stack : itemsToAdd) {
+                    itemsToCheck.add(stack.copy());
                 }
                 for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
-                    for (ItemStack itemStack : itemsToCheck) {
-                        if (itemStack.getCount() > 0) {
+                    for (ItemStack stack1 : itemsToCheck) {
+                        if (stack1.getCount() > 0) {
                             ItemStack stack = player.inventory.mainInventory.get(i);
                             if (stack == ItemStack.EMPTY) {
-                                itemStack.shrink(itemStack.getMaxStackSize());
+                                stack1.shrink(stack1.getMaxStackSize());
                                 break;
-                            } else if (stack.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, stack)) {
-                                itemStack.shrink(itemStack.getMaxStackSize() - stack.getCount());
+                            } else if (stack.isItemEqual(stack1) && ItemStack.areItemStackTagsEqual(stack1, stack)) {
+                                stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
                                 break;
                             }
                         }
@@ -1301,8 +1346,8 @@ public class Quest {
 
 
                 boolean valid = true;
-                for (ItemStack itemStack : itemsToCheck) {
-                    if (itemStack.getCount() > 0) {
+                for (ItemStack stack : itemsToCheck) {
+                    if (stack.getCount() > 0) {
                         valid = false;
                         break;
                     }
@@ -1350,54 +1395,12 @@ public class Quest {
         }
     }
 
-    public static void addItems(EntityPlayer player, List<ItemStack> itemsToAdd) {
-        for (int i = 0; i < player.inventory.mainInventory.size(); i++) {
-            Iterator<ItemStack> iterator = itemsToAdd.iterator();
-            while (iterator.hasNext()) {
-                ItemStack itemStack = iterator.next();
-                ItemStack stack = player.inventory.mainInventory.get(i);
-
-                if (stack == ItemStack.EMPTY) {
-                    int amount = Math.min(itemStack.getMaxStackSize(), itemStack.getCount());
-                    ItemStack copy = itemStack.copy();
-                    copy.setCount(amount);
-                    player.inventory.mainInventory.set(i, copy);
-                    itemStack.shrink(amount);
-                    if (itemStack.getCount() <= 0) {
-                        iterator.remove();
-                    }
-                    break;
-                } else if (stack.isItemEqual(itemStack) && ItemStack.areItemStackTagsEqual(itemStack, stack)) {
-                    int amount = Math.min(itemStack.getMaxStackSize() - stack.getCount(), itemStack.getCount());
-                    stack.grow(amount);
-                    itemStack.shrink(amount);
-                    if (itemStack.getCount() <= 0) {
-                        iterator.remove();
-                    }
-                    break;
-                }
-            }
-        }
-    }
-
-    public void setGuiCenterX(int x) {
-        this.x = x - getGuiW() / 2;
-    }
-
-    public void setGuiCenterY(int y) {
-        this.y = y - getGuiH() / 2;
-    }
-
     public void setBigIcon(boolean b) {
         isBig = b;
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public void setDescription(String description) {
@@ -1408,98 +1411,30 @@ public class Quest {
     public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, EntityPlayer player) {
         if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
             if (element instanceof GuiEditMenuItem.ElementItem) {
-                ItemStack itemStack = ((GuiEditMenuItem.ElementItem) element).getItem();
-                if (itemStack != null) {
-                    itemStack.setCount(Math.min(127, element.getAmount()));
-                    setReward(itemStack, id, type == GuiEditMenuItem.Type.REWARD);
+                ItemStack stack = ((GuiEditMenuItem.ElementItem) element).getFluidStack();
+                if (!stack.isEmpty()) {
+                    stack.setCount(Math.min(127, element.getAmount()));
+                    setReward(stack, id, type == GuiEditMenuItem.Type.REWARD);
                 }
             }
         } else if (selectedTask != null && selectedTask instanceof QuestTaskItems) {
             ((QuestTaskItems) selectedTask).setItem(element, id, precision);
         } else if (selectedTask != null && selectedTask instanceof QuestTaskLocation && type == GuiEditMenuItem.Type.LOCATION) {
-            ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getItem(), player);
+            ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         } else if (selectedTask != null && selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
-            ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getItem(), player);
+            ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         }
     }
 
-    private void setReward(ItemStack itemStack, int id, boolean isStandardReward) {
+    private void setReward(ItemStack stack, int id, boolean isStandardReward) {
         ItemStackRewardList rewardList = isStandardReward ? this.rewards : this.rewardChoices;
 
         if (id < rewardList.size()) {
-            rewardList.set(id, itemStack);
+            rewardList.set(id, stack);
             SaveHelper.add(SaveHelper.EditType.REWARD_CHANGE);
         } else {
             SaveHelper.add(SaveHelper.EditType.REWARD_CREATE);
-            rewardList.add(itemStack);
-        }
-    }
-
-    public enum TaskType {
-        CONSUME(QuestTaskItemsConsume.class, "consume"),
-        CRAFT(QuestTaskItemsCrafting.class, "craft"),
-        LOCATION(QuestTaskLocation.class, "location"),
-        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
-        DETECT(QuestTaskItemsDetect.class, "detect"),
-        KILL(QuestTaskMob.class, "kill"),
-        DEATH(QuestTaskDeath.class, "death"),
-        REPUTATION(QuestTaskReputationTarget.class, "reputation"),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill");
-
-        private final Class<? extends QuestTask> clazz;
-        private final String id;
-
-        TaskType(Class<? extends QuestTask> clazz, String id) {
-            this.clazz = clazz;
-            this.id = id;
-        }
-
-        public QuestTask addTask(Quest quest) {
-            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
-            try {
-                Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
-                QuestTask task = (QuestTask) ex.newInstance(quest, getName(), getDescription());
-                if (prev != null) {
-                    task.addRequirement(prev);
-                }
-                quest.getTasks().add(task);
-                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
-                return task;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        public static TaskType getType(Class<? extends QuestTask> clazz) {
-            for (TaskType type : values()) {
-                if (type.clazz == clazz) return type;
-            }
-            return CONSUME;
-        }
-
-        public String getLangKeyDescription() {
-            return "hqm.taskType." + id + ".desc";
-        }
-
-        public String getLangKeyName() {
-            return "hqm.taskType." + id + ".title";
-        }
-
-
-        public String getDescription() {
-            return Translator.translate(getLangKeyDescription());
-        }
-
-        public String getName() {
-            return Translator.translate(getLangKeyName());
-        }
-    }
-
-    public void setIcon(ItemStack icon) {
-        this.icon = icon;
-        if (icon != null) {
-            icon.setCount(1);
+            rewardList.add(stack);
         }
     }
 
@@ -1622,52 +1557,20 @@ public class Quest {
         return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedOptionLinks.contains(quest.getId())).collect(Collectors.toList());
     }
 
-    public void setUseModifiedParentRequirement(boolean useModifiedParentRequirement) {
-        this.useModifiedParentRequirement = useModifiedParentRequirement;
-    }
-
     public boolean getUseModifiedParentRequirement() {
         return useModifiedParentRequirement;
     }
 
-    public void setParentRequirementCount(int parentRequirementCount) {
-        this.parentRequirementCount = parentRequirementCount;
+    public void setUseModifiedParentRequirement(boolean useModifiedParentRequirement) {
+        this.useModifiedParentRequirement = useModifiedParentRequirement;
     }
 
     public int getParentRequirementCount() {
         return parentRequirementCount;
     }
 
-    public static void removeQuest(Quest quest) {
-        for (String requirement : quest.requirement) {
-            Quest.getQuest(requirement).reversedRequirement.remove(quest.getId());
-        }
-        for (String optionLink : quest.optionLinks) {
-            Quest.getQuest(optionLink).reversedOptionLinks.remove(quest.getId());
-        }
-
-        quest.tasks.forEach(QuestTask::onDelete);
-
-        quest.setQuestSet(null);
-        QuestLine.getActiveQuestLine().quests.remove(quest.getId());
-
-        for (Quest other : QuestLine.getActiveQuestLine().quests.values()) {
-            Iterator<String> iterator = other.requirement.iterator();
-            while (iterator.hasNext()) {
-                String element = iterator.next();
-                if (element.equals(quest.getId())) {
-                    iterator.remove();
-                }
-            }
-
-            iterator = other.optionLinks.iterator();
-            while (iterator.hasNext()) {
-                String element = iterator.next();
-                if (element.equals(quest.getId())) {
-                    iterator.remove();
-                }
-            }
-        }
+    public void setParentRequirementCount(int parentRequirementCount) {
+        this.parentRequirementCount = parentRequirementCount;
     }
 
     public QuestSet getQuestSet() {
@@ -1684,6 +1587,93 @@ public class Quest {
 
     public List<Quest> getReversedRequirement() {
         return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedRequirement.contains(quest.getId())).collect(Collectors.toList());
+    }
+
+    public enum TaskType {
+        CONSUME(QuestTaskItemsConsume.class, "consume"),
+        CRAFT(QuestTaskItemsCrafting.class, "craft"),
+        LOCATION(QuestTaskLocation.class, "location"),
+        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
+        DETECT(QuestTaskItemsDetect.class, "detect"),
+        KILL(QuestTaskMob.class, "kill"),
+        DEATH(QuestTaskDeath.class, "death"),
+        REPUTATION(QuestTaskReputationTarget.class, "reputation"),
+        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill");
+
+        private final Class<? extends QuestTask> clazz;
+        private final String id;
+
+        TaskType(Class<? extends QuestTask> clazz, String id) {
+            this.clazz = clazz;
+            this.id = id;
+        }
+
+        public static TaskType getType(Class<? extends QuestTask> clazz) {
+            for (TaskType type : values()) {
+                if (type.clazz == clazz) return type;
+            }
+            return CONSUME;
+        }
+
+        public QuestTask addTask(Quest quest) {
+            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
+            try {
+                Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
+                QuestTask task = (QuestTask) ex.newInstance(quest, getName(), getDescription());
+                if (prev != null) {
+                    task.addRequirement(prev);
+                }
+                quest.getTasks().add(task);
+                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
+                return task;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public String getLangKeyDescription() {
+            return "hqm.taskType." + id + ".desc";
+        }
+
+        public String getLangKeyName() {
+            return "hqm.taskType." + id + ".title";
+        }
+
+        public String getDescription() {
+            return Translator.translate(getLangKeyDescription());
+        }
+
+        public String getName() {
+            return Translator.translate(getLangKeyName());
+        }
+    }
+
+    private abstract class ParentEvaluator {
+
+        protected abstract boolean isValid(String playerName, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache);
+
+        private boolean isValid(String playerName, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+            int parents = getRequirements().size();
+            int requiredAmount = useModifiedParentRequirement ? parentRequirementCount : parents;
+            if (requiredAmount > parents) {
+                return false;
+            }
+
+            int allowedUncompleted = parents - requiredAmount;
+            int uncompleted = 0;
+            for (Quest quest : getRequirements()) {
+                if (!isValid(playerName, quest, isVisibleCache, isLinkFreeCache)) {
+                    uncompleted++;
+                    if (uncompleted > allowedUncompleted) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
     }
 
 }

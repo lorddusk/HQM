@@ -29,30 +29,29 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestLine {
-    public QuestLine() {
-        GroupTier.initBaseTiers(this);
-    }
 
+    public static boolean doServerSync;
+    private static QuestLine config = new QuestLine();
+    private static QuestLine server;
+    private static QuestLine world;
+    private static boolean hasLoadedMainSound;
+    public final List<GroupTier> tiers = new ArrayList<>();
+    public final Map<String, Group> groups = new ConcurrentHashMap<>();
     public List<QuestSet> questSets;
     public Map<String, Quest> quests;
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
-    public final List<GroupTier> tiers = new ArrayList<>();
-    public final Map<String, Group> groups = new ConcurrentHashMap<>();
     public String mainPath;
     @SideOnly(Side.CLIENT)
     public ResourceLocation front;
 
-    private static QuestLine config = new QuestLine();
-    private static QuestLine server;
-    private static QuestLine world;
+    public QuestLine() {
+        GroupTier.initBaseTiers(this);
+    }
 
     public static QuestLine getActiveQuestLine() {
         return server != null ? server : world != null ? world : config;
     }
-
-    private static boolean hasLoadedMainSound;
-    public static boolean doServerSync;
 
     public static void receiveServerSync(boolean local) {
         if (!hasLoadedMainSound) {

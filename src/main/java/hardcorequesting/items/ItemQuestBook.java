@@ -26,6 +26,8 @@ import java.util.UUID;
 
 public class ItemQuestBook extends Item {
 
+    private static final String NBT_PLAYER = "UseAsPlayer";
+
     public ItemQuestBook() {
         super();
         setCreativeTab(HardcoreQuesting.HQMTab);
@@ -34,32 +36,18 @@ public class ItemQuestBook extends Item {
         setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
-    @Override
-    public String getUnlocalizedName(ItemStack itemStack) {
-        return super.getUnlocalizedName(itemStack) + "_" + itemStack.getItemDamage();
+    public static ItemStack getOPBook(EntityPlayer player) {
+        ItemStack stack = new ItemStack(ModItems.book, 1, 1);
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setString(NBT_PLAYER, player.getPersistentID().toString());
+        stack.setTagCompound(nbt);
+        return stack;
     }
-
-    private static final String NBT_PLAYER = "UseAsPlayer";
 
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(this.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(this, 1, new ModelResourceLocation(this.getRegistryName(), "inventory"));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List tooltip, boolean extraInfo) {
-        if (itemStack.getItemDamage() == 1) {
-            NBTTagCompound compound = itemStack.getTagCompound();
-            if (compound != null && compound.hasKey(NBT_PLAYER)) {
-                EntityPlayer useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
-                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getDisplayNameString()));
-            }
-            else
-                tooltip.add(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid"));
-        }
     }
 
     @Override
@@ -99,14 +87,26 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack itemStack) {
-        return itemStack.getItemDamage() == 1;
+    public String getUnlocalizedName(ItemStack stack) {
+        return super.getUnlocalizedName(stack) + "_" + stack.getItemDamage();
     }
 
-    public static ItemStack getOPBook(EntityPlayer player) {
-        ItemStack itemStack = new ItemStack(ModItems.book, 1, 1);
-        itemStack.setTagCompound(new NBTTagCompound());
-        itemStack.getTagCompound().setString(NBT_PLAYER, player.getPersistentID().toString());
-        return itemStack;
+    @SuppressWarnings("unchecked")
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
+        if (stack.getItemDamage() == 1) {
+            NBTTagCompound compound = stack.getTagCompound();
+            if (compound != null && compound.hasKey(NBT_PLAYER)) {
+                EntityPlayer useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
+                tooltip.add(Translator.translate("fluidStack.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getDisplayNameString()));
+            } else
+                tooltip.add(GuiColor.RED + Translator.translate("fluidStack.hqm:quest_book_1.invalid"));
+        }
+    }
+
+    @Override
+    public boolean hasEffect(ItemStack stack) {
+        return stack.getItemDamage() == 1;
     }
 }

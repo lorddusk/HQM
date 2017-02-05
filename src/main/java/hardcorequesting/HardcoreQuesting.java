@@ -43,6 +43,14 @@ public class HardcoreQuesting {
 
     private static EntityPlayer commandUser;
 
+    public static EntityPlayer getPlayer() {
+        return commandUser;
+    }
+
+    public static void setPlayer(EntityPlayer player) {
+        commandUser = player;
+    }
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         new hardcorequesting.event.EventHandler();
@@ -85,33 +93,25 @@ public class HardcoreQuesting {
     }
 
     @EventHandler
-    public void missingMappings(FMLMissingMappingsEvent event){
-        for(FMLMissingMappingsEvent.MissingMapping mapping : event.get()){
+    public void missingMappings(FMLMissingMappingsEvent event) {
+        for (FMLMissingMappingsEvent.MissingMapping mapping : event.get()) {
             ResourceLocation loc = mapping.resourceLocation;
-            if(loc.getResourceDomain().equals("HardcoreQuesting")){
-                if(mapping.type.equals(GameRegistry.Type.BLOCK)){
+            if (loc.getResourceDomain().equals("HardcoreQuesting")) {
+                if (mapping.type.equals(GameRegistry.Type.BLOCK)) {
                     Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
-                    if(block != null){
+                    if (block != null) {
                         mapping.remap(block);
                     }
                 } else {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
-                    if(item != null){
+                    if (item != null) {
                         mapping.remap(item);
                     }
                 }
             }
-            if(mapping.resourceLocation.getResourcePath().toLowerCase().equals("hqminvaliditem")){
+            if (mapping.resourceLocation.getResourcePath().toLowerCase().equals("hqminvaliditem")) {
                 mapping.remap(ModItems.invalidItem);
             }
         }
-    }
-
-    public static EntityPlayer getPlayer() {
-        return commandUser;
-    }
-
-    public static void setPlayer(EntityPlayer player) {
-        commandUser = player;
     }
 }

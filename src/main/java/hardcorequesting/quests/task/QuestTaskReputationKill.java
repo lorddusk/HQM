@@ -13,13 +13,67 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskReputationKill extends QuestTaskReputation {
+
+    private int kills;
+
     public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 20);
 
         register(EventHandler.Type.DEATH);
     }
 
-    private int kills;
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
+        super.draw(gui, player, mX, mY);
+        int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
+        if (Quest.isEditing) {
+            gui.drawString(gui.getLinesFromText(Translator.translate(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        } else {
+            gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        }
+    }
+
+    @Override
+    public float getCompletedRatio(String uuid) {
+        return (float) ((QuestDataTaskReputationKill) getData(uuid)).kills / kills;
+    }
+
+    @Override
+    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+        ((QuestDataTaskReputationKill) own).kills = Math.max(((QuestDataTaskReputationKill) own).kills, ((QuestDataTaskReputationKill) other).kills);
+
+        if (((QuestDataTaskReputationKill) own).kills == kills) {
+            completeTask(uuid);
+        }
+    }
+
+    @Override
+    public void autoComplete(String uuid) {
+        kills = ((QuestDataTaskReputationKill) getData(uuid)).kills;
+    }
+
+    @Override
+    protected EntityPlayer getPlayerForRender(EntityPlayer player) {
+        return null;
+    }
+
+    @Override
+    public Class<? extends QuestDataTask> getDataType() {
+        return QuestDataTaskReputationKill.class;
+    }
+
+    @Override
+    public void onUpdate(EntityPlayer player) {
+
+    }
+
+    @Override
+    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+        super.copyProgress(own, other);
+
+        ((QuestDataTaskReputationKill) own).kills = ((QuestDataTaskReputationKill) other).kills;
+    }
 
     @Override
     public void onLivingDeath(LivingDeathEvent event) {
@@ -38,59 +92,6 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
                 }
             }
         }
-    }
-
-    @Override
-    protected EntityPlayer getPlayerForRender(EntityPlayer player) {
-        return null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
-        super.draw(gui, player, mX, mY);
-        int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
-        if (Quest.isEditing) {
-            gui.drawString(gui.getLinesFromText(Translator.translate(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
-        } else {
-            gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
-        }
-    }
-
-    @Override
-    public void onUpdate(EntityPlayer player) {
-
-    }
-
-    @Override
-    public float getCompletedRatio(String uuid) {
-        return (float) ((QuestDataTaskReputationKill) getData(uuid)).kills / kills;
-    }
-
-    @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
-        ((QuestDataTaskReputationKill) own).kills = Math.max(((QuestDataTaskReputationKill) own).kills, ((QuestDataTaskReputationKill) other).kills);
-
-        if (((QuestDataTaskReputationKill) own).kills == kills) {
-            completeTask(uuid);
-        }
-    }
-
-    @Override
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-
-        ((QuestDataTaskReputationKill) own).kills = ((QuestDataTaskReputationKill) other).kills;
-    }
-
-    @Override
-    public void autoComplete(String uuid) {
-        kills = ((QuestDataTaskReputationKill) getData(uuid)).kills;
-    }
-
-    @Override
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTaskReputationKill.class;
     }
 
     public int getKills() {

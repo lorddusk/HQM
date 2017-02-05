@@ -32,128 +32,6 @@ import java.util.regex.Pattern;
 
 public class GuiEditMenuItem extends GuiEditMenu {
 
-    public enum Type {
-        REWARD(false, true, false),
-        PICK_REWARD(false, true, false),
-        CONSUME_TASK(true, true, true),
-        CRAFTING_TASK(false, true, true),
-        QUEST_ICON(false, false, false),
-        BAG_ITEM(false, true, false),
-        LOCATION(false, false, false),
-        MOB(false, false, false),
-        PORTAL(false, false, false);
-
-
-        private boolean allowFluids;
-        private boolean allowAmount;
-        private boolean allowPrecision;
-
-        Type(boolean allowFluids, boolean allowAmount, boolean allowPrecision) {
-            this.allowFluids = allowFluids;
-            this.allowAmount = allowAmount;
-            this.allowPrecision = allowPrecision;
-        }
-    }
-
-
-    public static abstract class Element<T> {
-        protected Element() {
-        }
-
-        protected T item;
-
-        public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
-
-        public abstract List<String> getName(GuiBase gui);
-
-        public abstract int getAmount();
-
-        public abstract void setAmount(int val);
-
-        public T getItem() {
-            return item;
-        }
-
-        public abstract Element copy();
-    }
-
-    public static class ElementItem extends Element<ItemStack> {
-        public ElementItem(ItemStack item) {
-            this.item = item;
-        }
-
-        @Override
-        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawItem(item, x, y, mX, mY, false);
-        }
-
-        @Override
-        public List<String> getName(GuiBase gui) {
-            if (item != null && item.getItem() != null) {
-                return item.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
-            } else {
-                List<String> ret = new ArrayList<>();
-                ret.add("Unknown");
-                return ret;
-            }
-        }
-
-        @Override
-        public int getAmount() {
-            return item == null ? 0 : item.getCount();
-        }
-
-        @Override
-        public void setAmount(int val) {
-            if (item != null) {
-                item.setCount(val);
-            }
-        }
-
-        @Override
-        public Element copy() {
-            return new ElementItem(item == null ? null : item.copy());
-        }
-    }
-
-    public static class ElementFluid extends Element<Fluid> {
-        private int size;
-
-        public ElementFluid(Fluid fluid) {
-            this.item = fluid;
-        }
-
-        @Override
-        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            //Todo fix fluid drawing
-            //gui.drawFluid(item, x, y, mX, mY);
-        }
-
-        @Override
-        public List<String> getName(GuiBase gui) {
-            List<String> ret = new ArrayList<>();
-            ret.add(item.getLocalizedName(null));
-            return ret;
-        }
-
-        @Override
-        public int getAmount() {
-            return size;
-        }
-
-        @Override
-        public void setAmount(int val) {
-            size = val;
-        }
-
-        @Override
-        public Element copy() {
-            ElementFluid ret = new ElementFluid(item == null ? null : item);
-            ret.size = size;
-            return ret;
-        }
-    }
-
     private static final int ARROW_X_LEFT = 20;
     private static final int ARROW_X_RIGHT = 150;
     private static final int ARROW_Y = 40;
@@ -161,38 +39,28 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private static final int ARROW_SRC_Y = 176;
     private static final int ARROW_W = 6;
     private static final int ARROW_H = 10;
-
-    private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {
-        return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
-    }
-
-    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
-        int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
-        int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
-
-        gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
-    }
-
-    private boolean usePrecision() {
-        return type.allowPrecision && selected instanceof ElementItem;
-    }
-
+    private static final int PLAYER_X = 20;
+    private static final int PLAYER_Y = 80;
+    private static final int SEARCH_X = 180;
+    private static final int SEARCH_Y = 30;
+    private static final int SIZE = 18;
+    private static final int OFFSET = 20;
+    private static final int ITEMS_PER_LINE = 7;
+    private static final int SEARCH_LINES = 9;
+    private static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
+    private static final int PLAYER_LINES = 6;
+    public static ThreadingHandler HANDLER = new ThreadingHandler();
+    protected Element selected;
     private int id;
     private String sid;
     private Type type;
-    protected Element selected;
     private List<Element> playerItems;
     private List<Element> searchItems;
     private ItemPrecision precision;
     private boolean clicked;
+    private TextBoxGroup.TextBox amountTextBox;
+    private TextBoxGroup textBoxes;
 
-    public boolean showFluids() {
-        return type.allowFluids;
-    }
-
-    private Element getSelected() {
-        return selected;
-    }
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
         this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), null, id, type, amount, precision);
@@ -215,20 +83,20 @@ public class GuiEditMenuItem extends GuiEditMenu {
         IInventory inventory = Minecraft.getMinecraft().player.inventory;
         int itemLength = inventory.getSizeInventory();
         for (int i = 0; i < itemLength; i++) {
-            ItemStack item = inventory.getStackInSlot(i);
-            if (item != ItemStack.EMPTY) {
-                item = item.copy();
-                item.setCount(1);
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (!stack.isEmpty()) {
+                stack = stack.copy();
+                stack.setCount(1);
                 boolean exists = false;
                 for (Element other : playerItems) {
-                    if (ItemStack.areItemStacksEqual(item, (ItemStack) other.getItem())) {
+                    if (ItemStack.areItemStacksEqual(stack, (ItemStack) other.getFluidStack())) {
                         exists = true;
                         break;
                     }
                 }
 
-                if (!exists && item.getItem() != ModItems.book) {
-                    playerItems.add(new ElementItem(item));
+                if (!exists && stack.getItem() != ModItems.book) {
+                    playerItems.add(new ElementItem(stack));
                 }
             }
         }
@@ -237,8 +105,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
             int end = playerItems.size();
             for (int i = 0; i < end; i++) {
                 Element item = playerItems.get(i);
-                ItemStack stack = (ItemStack) item.getItem();
-                if(stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)){
+                ItemStack stack = (ItemStack) item.getFluidStack();
+                if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)) {
                     FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
                     if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
                         fluids.add(fluidStack.getFluid().getName());
@@ -292,6 +160,29 @@ public class GuiEditMenuItem extends GuiEditMenu {
         });
     }
 
+    private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {
+        return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
+    }
+
+    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
+        int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
+        int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
+
+        gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+    }
+
+    private boolean usePrecision() {
+        return type.allowPrecision && selected instanceof ElementItem;
+    }
+
+    public boolean showFluids() {
+        return type.allowFluids;
+    }
+
+    private Element getSelected() {
+        return selected;
+    }
+
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
@@ -317,13 +208,68 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
     }
 
-
     @Override
     public void drawMouseOver(GuiBase gui, int mX, int mY) {
         super.drawMouseOver(gui, mX, mY);
 
         drawListMouseOver(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         drawListMouseOver(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+    }
+
+    @Override
+    public void onClick(GuiBase gui, int mX, int mY, int b) {
+        super.onClick(gui, mX, mY, b);
+
+
+        clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+        clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+
+        textBoxes.onClick(gui, mX, mY);
+
+        if (usePrecision()) {
+            if (inArrowBounds(gui, mX, mY, true)) {
+                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
+                precision = precisionTypes.get((precisionTypes.indexOf(precision) + precisionTypes.size() - 1) % precisionTypes.size());
+                clicked = true;
+            } else if (inArrowBounds(gui, mX, mY, false)) {
+                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
+                precision = precisionTypes.get((precisionTypes.indexOf(precision) + 1) % precisionTypes.size());
+                clicked = true;
+            }
+        }
+    }
+
+    @Override
+    public void onKeyTyped(GuiBase gui, char c, int k) {
+        super.onKeyTyped(gui, c, k);
+
+        textBoxes.onKeyStroke(gui, c, k);
+    }
+
+    @Override
+    public void onRelease(GuiBase gui, int mX, int mY) {
+        super.onRelease(gui, mX, mY);
+        clicked = false;
+    }
+
+    @Override
+    public void save(GuiBase gui) {
+        if (type == Type.BAG_ITEM) {
+            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && selected.getFluidStack() != null) {
+                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getFluidStack());
+            }
+        } else if (type == Type.QUEST_ICON) {
+            if (Quest.getQuest(sid) != null && selected instanceof ElementItem) {
+                try {
+                    Quest.getQuest(sid).setIconStack((ItemStack) selected.getFluidStack());
+                } catch (Exception e) {
+                    System.out.println("Tell LordDusk that he found the issue.");
+                }
+                SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+            }
+        } else {
+            GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
+        }
     }
 
     private void drawList(GuiBase gui, int x, int y, List<Element> items, int mX, int mY) {
@@ -373,78 +319,132 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
     }
 
-    private static final int PLAYER_X = 20;
-    private static final int PLAYER_Y = 80;
-    private static final int SEARCH_X = 180;
-    private static final int SEARCH_Y = 30;
-    private static final int SIZE = 18;
-    private static final int OFFSET = 20;
-    private static final int ITEMS_PER_LINE = 7;
-    private static final int SEARCH_LINES = 9;
-    private static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
-    private static final int PLAYER_LINES = 6;
-
-    @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public enum Type {
+        REWARD(false, true, false),
+        PICK_REWARD(false, true, false),
+        CONSUME_TASK(true, true, true),
+        CRAFTING_TASK(false, true, true),
+        QUEST_ICON(false, false, false),
+        BAG_ITEM(false, true, false),
+        LOCATION(false, false, false),
+        MOB(false, false, false),
+        PORTAL(false, false, false);
 
 
-        clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
-        clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+        private boolean allowFluids;
+        private boolean allowAmount;
+        private boolean allowPrecision;
 
-        textBoxes.onClick(gui, mX, mY);
-
-        if (usePrecision()) {
-            if (inArrowBounds(gui, mX, mY, true)) {
-                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
-                precision = precisionTypes.get((precisionTypes.indexOf(precision) + precisionTypes.size() - 1) % precisionTypes.size());
-                clicked = true;
-            } else if (inArrowBounds(gui, mX, mY, false)) {
-                List<ItemPrecision> precisionTypes = ItemPrecision.getPrecisionTypes();
-                precision = precisionTypes.get((precisionTypes.indexOf(precision) + 1) % precisionTypes.size());
-                clicked = true;
-            }
+        Type(boolean allowFluids, boolean allowAmount, boolean allowPrecision) {
+            this.allowFluids = allowFluids;
+            this.allowAmount = allowAmount;
+            this.allowPrecision = allowPrecision;
         }
     }
 
-    @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
-        clicked = false;
+    public static abstract class Element<T> {
+
+        protected T fluidStack;
+
+        protected Element() {
+        }
+
+        public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
+
+        public abstract List<String> getName(GuiBase gui);
+
+        public abstract int getAmount();
+
+        public abstract void setAmount(int val);
+
+        public T getFluidStack() {
+            return fluidStack;
+        }
+
+        public abstract Element copy();
     }
 
-    @Override
-    public void onKeyTyped(GuiBase gui, char c, int k) {
-        super.onKeyTyped(gui, c, k);
+    public static class ElementItem extends Element<ItemStack> {
 
-        textBoxes.onKeyStroke(gui, c, k);
-    }
+        public ElementItem(ItemStack stack) {
+            this.fluidStack = stack;
+        }
 
-    @Override
-    public void save(GuiBase gui) {
-        if (type == Type.BAG_ITEM) {
-            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && selected.getItem() != null) {
-                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getItem());
+        @Override
+        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
+            gui.drawItemStack(fluidStack, x, y, mX, mY, false);
+        }
+
+        @Override
+        public List<String> getName(GuiBase gui) {
+            if (!fluidStack.isEmpty()) {
+                return fluidStack.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+            } else {
+                List<String> ret = new ArrayList<>();
+                ret.add("Unknown");
+                return ret;
             }
-        } else if (type == Type.QUEST_ICON) {
-            if (Quest.getQuest(sid) != null && selected instanceof ElementItem) {
-                try {
-                    Quest.getQuest(sid).setIcon((ItemStack) selected.getItem());
-                } catch (Exception e) {
-                    System.out.println("Tell LordDusk that he found the issue.");
-                }
-                SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+        }
+
+        @Override
+        public int getAmount() {
+            return fluidStack.isEmpty() ? 0 : fluidStack.getCount();
+        }
+
+        @Override
+        public void setAmount(int val) {
+            if (!fluidStack.isEmpty()) {
+                fluidStack.setCount(val);
             }
-        } else {
-            GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
+        }
+
+        @Override
+        public Element copy() {
+            return new ElementItem(fluidStack.isEmpty() ? null : fluidStack.copy());
         }
     }
 
-    private TextBoxGroup.TextBox amountTextBox;
-    private TextBoxGroup textBoxes;
+    public static class ElementFluid extends Element<Fluid> {
 
+        private int size;
+
+        public ElementFluid(Fluid fluid) {
+            this.fluidStack = fluid;
+        }
+
+        @Override
+        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
+            //Todo fix fluid drawing
+            //gui.drawFluid(fluidStack, x, y, mX, mY);
+        }
+
+        @Override
+        public List<String> getName(GuiBase gui) {
+            List<String> ret = new ArrayList<>();
+            ret.add(fluidStack.getLocalizedName(null));
+            return ret;
+        }
+
+        @Override
+        public int getAmount() {
+            return size;
+        }
+
+        @Override
+        public void setAmount(int val) {
+            size = val;
+        }
+
+        @Override
+        public Element copy() {
+            ElementFluid ret = new ElementFluid(fluidStack == null ? null : fluidStack);
+            ret.size = size;
+            return ret;
+        }
+    }
 
     public static class Search implements Runnable {
+
         public static List<SearchEntry> searchItems = new ArrayList<>();
         public static List<SearchEntry> searchFluids = new ArrayList<>();
 
@@ -459,28 +459,6 @@ public class GuiEditMenuItem extends GuiEditMenu {
             startTime = System.currentTimeMillis();
         }
 
-        @Override
-        public void run() {
-            elements = new ArrayList<>();
-            Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
-            boolean advanced = Minecraft.getMinecraft().gameSettings.advancedItemTooltips;
-            for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
-                SearchEntry entry = searchItems.get(i);
-                entry.search(pattern, elements, advanced);
-            }
-            if (menu.showFluids()) {
-                for (int i = 0; i < searchFluids.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
-                    SearchEntry entry = searchFluids.get(i);
-                    entry.search(pattern, elements, advanced);
-                }
-            }
-            setResult(this.menu, this);
-        }
-
-        public boolean isNewerThan(Search search) {
-            return startTime > search.startTime;
-        }
-
         public static void setResult(GuiEditMenuItem menu, Search search) {
             ThreadingHandler.handle(menu, search);
         }
@@ -490,9 +468,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
             if (searchItems.isEmpty()) {
                 NonNullList<ItemStack> stacks = NonNullList.create();
                 for (Item item : Item.REGISTRY) {
-                    //                    if (HardcoreFixes.hideFluidBlocks && item instanceof ItemBlock)
+                    //                    if (HardcoreFixes.hideFluidBlocks && fluidStack instanceof ItemBlock)
                     //                    {
-                    //                        ItemBlock itemBlock = (ItemBlock)item;
+                    //                        ItemBlock itemBlock = (ItemBlock)fluidStack;
                     //                        if (itemBlock.field_150939_a == Blocks.lava || itemBlock.field_150939_a == Blocks.water || itemBlock.field_150939_a instanceof BlockLiquid || itemBlock.field_150939_a instanceof IFluidBlock)
                     //                            continue;
                     //                    }
@@ -532,7 +510,30 @@ public class GuiEditMenuItem extends GuiEditMenu {
             searchItems.clear();
         }
 
+        @Override
+        public void run() {
+            elements = new ArrayList<>();
+            Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
+            boolean advanced = Minecraft.getMinecraft().gameSettings.advancedItemTooltips;
+            for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
+                SearchEntry entry = searchItems.get(i);
+                entry.search(pattern, elements, advanced);
+            }
+            if (menu.showFluids()) {
+                for (int i = 0; i < searchFluids.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
+                    SearchEntry entry = searchFluids.get(i);
+                    entry.search(pattern, elements, advanced);
+                }
+            }
+            setResult(this.menu, this);
+        }
+
+        public boolean isNewerThan(Search search) {
+            return startTime > search.startTime;
+        }
+
         public static class SearchEntry {
+
             private String toolTip;
             private String advToolTip;
             private GuiEditMenuItem.Element element;
@@ -551,13 +552,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
     }
 
-    public static ThreadingHandler HANDLER = new ThreadingHandler();
-
     public static class ThreadingHandler {
+
         private Map<GuiEditMenuItem, Search> handle = new LinkedHashMap<>();
 
         private ThreadingHandler() {
             MinecraftForge.EVENT_BUS.register(this);
+        }
+
+        private static void handle(GuiEditMenuItem menu, Search search) {
+            if (!HANDLER.handle.containsKey(menu) || search.isNewerThan(HANDLER.handle.get(menu)))
+                HANDLER.handle.put(menu, search);
         }
 
         @SubscribeEvent
@@ -568,11 +573,6 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 }
                 handle.clear();
             }
-        }
-
-        private static void handle(GuiEditMenuItem menu, Search search) {
-            if (!HANDLER.handle.containsKey(menu) || search.isNewerThan(HANDLER.handle.get(menu)))
-                HANDLER.handle.put(menu, search);
         }
     }
 }

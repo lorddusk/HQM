@@ -60,12 +60,13 @@ public class TextBoxGroup {
     }
 
     public static class TextBox extends TextBoxLogic {
+
+        private static final int WIDTH = 60;
+        protected int offsetY = 3;
         private int x;
         private int y;
-        protected int offsetY = 3;
         private int start;
         private String visibleText;
-        private static final int WIDTH = 60;
         private boolean scrollable;
 
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
@@ -93,6 +94,14 @@ public class TextBoxGroup {
             return true;
         }
 
+        @SideOnly(Side.CLIENT)
+        @Override
+        public void textChanged(GuiBase gui) {
+            super.textChanged(gui);
+            if (scrollable) {
+                updateVisible(gui);
+            }
+        }
 
         @SideOnly(Side.CLIENT)
         @Override
@@ -105,15 +114,6 @@ public class TextBoxGroup {
                 }
             } else {
                 super.recalculateCursor(gui);
-            }
-        }
-
-        @SideOnly(Side.CLIENT)
-        @Override
-        public void textChanged(GuiBase gui) {
-            super.textChanged(gui);
-            if (scrollable) {
-                updateVisible(gui);
             }
         }
 

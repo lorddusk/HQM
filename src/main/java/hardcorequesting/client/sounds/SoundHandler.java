@@ -26,11 +26,16 @@ import java.util.List;
 import java.util.Map;
 
 public class SoundHandler {
+
+    private static final String LABEL = "lore";
+    private static List<String> paths = new ArrayList<>();
+    private static int loreNumber;
+    private static boolean loreMusic = false;
+    @SideOnly(Side.CLIENT)
+    private static ISound loreSound;
+
     private SoundHandler() {
     }
-
-    private static List<String> paths = new ArrayList<>();
-    private static final String LABEL = "lore";
 
     @SideOnly(Side.CLIENT)
     public static boolean loadLoreReading(String path) {
@@ -79,11 +84,6 @@ public class SoundHandler {
         }
         return false;
     }
-
-    private static int loreNumber;
-    private static boolean loreMusic = false;
-    @SideOnly(Side.CLIENT)
-    private static ISound loreSound;
 
     @SideOnly(Side.CLIENT)
     public static void playLoreMusic() {

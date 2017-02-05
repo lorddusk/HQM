@@ -17,6 +17,7 @@ import java.util.List;
 @Mod.EventBusSubscriber
 public class EventHandler {
 
+    private static EventHandler instance;
     private List<QuestTask>[] registeredTasks;
 
     public EventHandler() {
@@ -26,6 +27,10 @@ public class EventHandler {
         }
         MinecraftForge.EVENT_BUS.register(this);
         instance = this;
+    }
+
+    public static EventHandler instance() {
+        return instance;
     }
 
     public void clear() {
@@ -44,12 +49,6 @@ public class EventHandler {
         for (List<QuestTask> registeredTask : registeredTasks) {
             registeredTask.remove(task);
         }
-    }
-
-    private static EventHandler instance;
-
-    public static EventHandler instance() {
-        return instance;
     }
 
     @SubscribeEvent
@@ -103,7 +102,18 @@ public class EventHandler {
         return registeredTasks[type.ordinal()];
     }
 
+    public enum Type {
+        SERVER,
+        PLAYER,
+        DEATH,
+        CRAFTING,
+        PICK_UP,
+        OPEN_BOOK,
+        REPUTATION_CHANGE,
+    }
+
     public static class BookOpeningEvent {
+
         private String playerName;
         private boolean isOpBook;
         private boolean isRealName;
@@ -132,6 +142,7 @@ public class EventHandler {
     }
 
     public static class ReputationEvent {
+
         private EntityPlayer player;
 
 
@@ -142,16 +153,6 @@ public class EventHandler {
         public EntityPlayer getPlayer() {
             return player;
         }
-    }
-
-    public enum Type {
-        SERVER,
-        PLAYER,
-        DEATH,
-        CRAFTING,
-        PICK_UP,
-        OPEN_BOOK,
-        REPUTATION_CHANGE,
     }
 
 }

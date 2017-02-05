@@ -6,6 +6,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class CommandEdit extends CommandBase {
+
     public CommandEdit() {
         super("edit");
     }

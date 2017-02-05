@@ -10,9 +10,10 @@ import hardcorequesting.quests.task.QuestTaskMob;
 import java.io.IOException;
 
 public class QuestDataTaskMob extends QuestDataTask {
-    public int[] killed;
+
     private static final String COUNT = "count";
     private static final String KILLED = "killed";
+    public int[] killed;
 
     public QuestDataTaskMob(QuestTask task) {
         super(task);
@@ -22,11 +23,6 @@ public class QuestDataTaskMob extends QuestDataTask {
     protected QuestDataTaskMob() {
         super();
         this.killed = new int[0];
-    }
-
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.MOB;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -55,6 +51,11 @@ public class QuestDataTaskMob extends QuestDataTask {
         } catch (IOException ignored) {
         }
         return taskData;
+    }
+
+    @Override
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.MOB;
     }
 
     @Override

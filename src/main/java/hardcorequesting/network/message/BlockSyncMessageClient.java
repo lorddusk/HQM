@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class BlockSyncMessageClient implements IMessage {
+
     private long pos;
     private int type;
     private String data;
@@ -45,6 +46,7 @@ public class BlockSyncMessageClient implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<BlockSyncMessageClient, IMessage> {
+
         @Override
         public IMessage onMessage(BlockSyncMessageClient message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

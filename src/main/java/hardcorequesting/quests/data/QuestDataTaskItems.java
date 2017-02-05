@@ -10,9 +10,10 @@ import hardcorequesting.quests.task.QuestTaskItems;
 import java.io.IOException;
 
 public class QuestDataTaskItems extends QuestDataTask {
-    public int[] progress;
+
     private static final String COUNT = "count";
     private static final String PROGRESS = "progress";
+    public int[] progress;
 
     public QuestDataTaskItems(QuestTask task) {
         super(task);
@@ -22,11 +23,6 @@ public class QuestDataTaskItems extends QuestDataTask {
     protected QuestDataTaskItems() {
         super();
         this.progress = new int[0];
-    }
-
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.ITEMS;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -39,15 +35,15 @@ public class QuestDataTaskItems extends QuestDataTask {
                         taskData.completed = in.nextBoolean();
                         break;
                     case COUNT:
-                         count = in.nextInt();
+                        count = in.nextInt();
                         taskData.progress = new int[count];
-                    break;
+                        break;
                     case PROGRESS:
                         in.beginArray();
                         for (int i = 0; i < count; i++)
                             taskData.progress[i] = in.nextInt();
                         in.endArray();
-                    break;
+                        break;
                     default:
                         break;
                 }
@@ -55,6 +51,11 @@ public class QuestDataTaskItems extends QuestDataTask {
         } catch (IOException ignored) {
         }
         return taskData;
+    }
+
+    @Override
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.ITEMS;
     }
 
     @Override

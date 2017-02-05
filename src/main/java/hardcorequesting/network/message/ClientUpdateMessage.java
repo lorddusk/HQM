@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ClientUpdateMessage implements IMessage {
+
     private ClientChange update;
     private String data;
 
@@ -34,6 +35,7 @@ public class ClientUpdateMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<ClientUpdateMessage, IMessage> {
+
         @Override
         public IMessage onMessage(ClientUpdateMessage message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));

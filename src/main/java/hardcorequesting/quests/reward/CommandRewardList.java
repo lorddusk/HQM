@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandRewardList extends QuestRewardList<CommandReward.Command> {
+
     public void executeAll(EntityPlayer player) {
         for (QuestReward<CommandReward.Command> reward : list)
             reward.getReward().execute(player);

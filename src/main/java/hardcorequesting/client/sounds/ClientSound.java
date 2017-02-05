@@ -8,6 +8,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientSound extends PositionedSound {
+
     public ClientSound(ResourceLocation resource, float volume, float pitch) {
         super(resource, SoundCategory.BLOCKS);
         this.volume = volume;

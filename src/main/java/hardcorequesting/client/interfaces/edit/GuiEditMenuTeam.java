@@ -15,7 +15,31 @@ import java.util.List;
 
 public class GuiEditMenuTeam extends GuiEditMenu {
 
+    private static final int TEXT_HEIGHT = 9;
+    private static final int TITLE_X = 20;
+    private static final int TITLE_Y = 20;
+    private static final int PLAYER_X = 25;
+    private static final int PLAYER_Y = 32;
+    private static final int PLAYER_SPACING = 11;
+    private static final int VISIBLE_INVITES = 16;
+    private static final int VISIBLE_MEMBERS = 16;
+    private static final int INFO_BOX_X = 180;
+    private static final int INFO_BOX_SIZE = 16;
+    private static final int INFO_BOX_TEXT_OFFSET_X = 20;
+    private static final int INFO_BOX_TEXT_OFFSET_Y = 6;
+    private static final int INFO_BOX_SRC_X = 240;
+    private static final int INFO_BOX_SRC_Y = 224;
+    private static final int REWARD_SETTING_Y = 20;
     private GuiEditMenuTeam self = this;
+    private ScrollBar memberScroll;
+    private ScrollBar inviteScroll;
+    private List<ScrollBar> scrollBars;
+    private LargeButton inviteButton;
+    private Team inviteTeam;
+    private TextBoxGroup textBoxes;
+    private TextBoxGroup.TextBox teamName;
+    private TextBoxGroup.TextBox inviteName;
+    private PlayerEntry selectedEntry;
 
     public GuiEditMenuTeam(GuiQuestBook gui, EntityPlayer player) {
         super(gui, player);
@@ -214,42 +238,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         });
     }
 
-
-    private class TextBoxName extends TextBoxGroup.TextBox {
-
-        public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
-            super(gui, str, x, y, true);
-            setMult(0.7F);
-            offsetY = 5;
-        }
-    }
-
-    private static final int TEXT_HEIGHT = 9;
-    private static final int TITLE_X = 20;
-    private static final int TITLE_Y = 20;
-    private static final int PLAYER_X = 25;
-    private static final int PLAYER_Y = 32;
-    private static final int PLAYER_SPACING = 11;
-    private static final int VISIBLE_INVITES = 16;
-    private static final int VISIBLE_MEMBERS = 16;
-    private static final int INFO_BOX_X = 180;
-    private static final int INFO_BOX_SIZE = 16;
-    private static final int INFO_BOX_TEXT_OFFSET_X = 20;
-    private static final int INFO_BOX_TEXT_OFFSET_Y = 6;
-    private static final int INFO_BOX_SRC_X = 240;
-    private static final int INFO_BOX_SRC_Y = 224;
-    private static final int REWARD_SETTING_Y = 20;
-
-    private ScrollBar memberScroll;
-    private ScrollBar inviteScroll;
-    private List<ScrollBar> scrollBars;
-    private LargeButton inviteButton;
-    private Team inviteTeam;
-    private TextBoxGroup textBoxes;
-    private TextBoxGroup.TextBox teamName;
-    private TextBoxGroup.TextBox inviteName;
-    private PlayerEntry selectedEntry;
-
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
 
@@ -407,16 +395,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         }
     }
 
-    private int getInfoY() {
-        if (inviteTeam != null) {
-            return 80;
-        } else if (getEntry(getTeam()).isOwner()) {
-            return selectedEntry != null ? 80 : 50;
-        } else {
-            return 20;
-        }
-    }
-
     @Override
     public void onClick(GuiBase gui, int mX, int mY, int b) {
         super.onClick(gui, mX, mY, b);
@@ -470,11 +448,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
 
     @Override
-    public void save(GuiBase gui) {
-
-    }
-
-    @Override
     public void onDrag(GuiBase gui, int mX, int mY) {
         super.onDrag(gui, mX, mY);
 
@@ -501,12 +474,36 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         }
     }
 
+    @Override
+    public void save(GuiBase gui) {
+
+    }
+
+    private int getInfoY() {
+        if (inviteTeam != null) {
+            return 80;
+        } else if (getEntry(getTeam()).isOwner()) {
+            return selectedEntry != null ? 80 : 50;
+        } else {
+            return 20;
+        }
+    }
+
     private Team getTeam() {
         return QuestingData.getQuestingData(player).getTeam();
     }
 
     private PlayerEntry getEntry(Team team) {
         return team.getEntry(QuestingData.getUserUUID(player));
+    }
+
+    private class TextBoxName extends TextBoxGroup.TextBox {
+
+        public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
+            super(gui, str, x, y, true);
+            setMult(0.7F);
+            offsetY = 5;
+        }
     }
 
 

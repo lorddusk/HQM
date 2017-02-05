@@ -9,6 +9,7 @@ import hardcorequesting.death.DeathType;
 import java.io.IOException;
 
 public class DeathAdapter {
+
     public static final TypeAdapter<DeathStats> DEATH_STATS_ADAPTER = new TypeAdapter<DeathStats>() {
         @Override
         public void write(JsonWriter out, DeathStats value) throws IOException {

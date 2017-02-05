@@ -10,9 +10,10 @@ import hardcorequesting.quests.task.QuestTaskLocation;
 import java.io.IOException;
 
 public class QuestDataTaskLocation extends QuestDataTask {
-    public boolean[] visited;
+
     private static final String COUNT = "count";
     private static final String VISITED = "visited";
+    public boolean[] visited;
 
     public QuestDataTaskLocation(QuestTask task) {
         super(task);
@@ -22,11 +23,6 @@ public class QuestDataTaskLocation extends QuestDataTask {
     protected QuestDataTaskLocation() {
         super();
         this.visited = new boolean[0];
-    }
-
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.LOCATION;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -55,6 +51,11 @@ public class QuestDataTaskLocation extends QuestDataTask {
         } catch (IOException ignored) {
         }
         return taskData;
+    }
+
+    @Override
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.LOCATION;
     }
 
     @Override

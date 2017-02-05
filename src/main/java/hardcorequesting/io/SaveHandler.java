@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class SaveHandler {
+
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Reputation.class, ReputationAdapter.REPUTATION_ADAPTER)
             .registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER)
@@ -58,6 +59,8 @@ public class SaveHandler {
     public static final String EXPORTS = "exports";
     public static final String REMOTE = "remote";
     public static final String DEFAULT = "default";
+    private static final String QUESTING = "questing";
+    private static final String HARDCORE = "hardcore";
 
     public static File getExportFile(String name) throws IOException {
         File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name.endsWith(".txt") ? name : name + ".json");
@@ -66,7 +69,7 @@ public class SaveHandler {
     }
 
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(QuestLine.getActiveQuestLine().mainPath, name.endsWith(".txt") ? name :  name + ".json");
+        File file = new File(QuestLine.getActiveQuestLine().mainPath, name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
@@ -123,7 +126,7 @@ public class SaveHandler {
         saveQuestSetList(Quest.getQuestSets(), new File(folder, "sets.json"));
         List<QuestSet> setsToSave = new ArrayList<>(); // possible fix for #251
         setsToSave.addAll(Quest.getQuestSets());
-        for (QuestSet set : setsToSave){
+        for (QuestSet set : setsToSave) {
             saveQuestSet(set, new File(folder, set.getFilename() + ".json"));
         }
     }
@@ -302,9 +305,6 @@ public class SaveHandler {
     public static String save(Object object, Type type) {
         return SaveHandler.GSON.toJson(object, type);
     }
-
-    private static final String QUESTING = "questing";
-    private static final String HARDCORE = "hardcore";
 
     public static void saveQuestingState(File file) throws IOException {
         if (!file.exists()) file.createNewFile();

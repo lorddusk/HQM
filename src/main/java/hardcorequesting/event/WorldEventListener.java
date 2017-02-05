@@ -11,7 +11,7 @@ import java.io.File;
 @Mod.EventBusSubscriber
 public class WorldEventListener {
 
-    public WorldEventListener(){
+    public WorldEventListener() {
     }
 
     @SubscribeEvent

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TeamStatsMessage implements IMessage {
+
     private List<TeamStats> stats;
 
     public TeamStatsMessage() {
@@ -58,6 +59,7 @@ public class TeamStatsMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<TeamStatsMessage, IMessage> {
+
         @Override
         public IMessage onMessage(TeamStatsMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

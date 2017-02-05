@@ -2,6 +2,7 @@ package hardcorequesting.reputation;
 
 
 public class ReputationMarker implements Comparable<ReputationMarker> {
+
     private String name;
     private int value;
     private boolean neutral;

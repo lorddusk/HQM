@@ -7,6 +7,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTracker extends GuiEditMenuExtended {
+
     private TileEntityTracker tracker;
 
     public GuiEditMenuTracker(GuiBase gui, EntityPlayer player, final TileEntityTracker tracker) {
@@ -16,8 +17,10 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTracker.radius.title") {
             @Override
-            protected void setValue(int number) {
-                tracker.setRadius(number);
+            protected void draw(GuiBase gui, boolean selected) {
+                super.draw(gui, selected);
+
+                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
 
             @Override
@@ -26,10 +29,8 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
             }
 
             @Override
-            protected void draw(GuiBase gui, boolean selected) {
-                super.draw(gui, selected);
-
-                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+            protected void setValue(int number) {
+                tracker.setRadius(number);
             }
         });
     }

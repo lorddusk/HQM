@@ -15,28 +15,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiEditMenuDeath extends GuiEditMenu {
-    private String selectedUuid;
-    private boolean showTotal;
-    private boolean showBest;
-
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, EntityPlayer player) {
-        super(guiQuestBook, player);
-
-        selectedUuid = QuestingData.getUserUUID(player);
-
-        scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return DeathStats.getDeathStats().length > VISIBLE_PLAYERS;
-            }
-        };
-    }
-
 
     private static final int PLAYER_INFO_X = 180;
     private static final int PLAYER_INFO_Y = 20;
     private static final int PLAYER_TOTAL_DEATHS_Y = 12;
-
     private static final int BACKGROUND_SIZE = 22;
     private static final int ICON_OFFSET = 1;
     private static final int BACKGROUND_SRC_X = 234;
@@ -50,22 +32,34 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private static final int TYPE_SPACING_Y = 30;
     private static final int TEXT_OFFSET_X = 28;
     private static final int TEXT_OFFSET_Y = 7;
-
     private static final int PLAYERS_X = 20;
     private static final int PLAYERS_Y = 20;
     private static final int PLAYERS_SPACING = 20;
     private static final int DEATHS_RIGHT = 140;
-
     private static final String BEST_LABEL = "hqm.deathMenu.showWorst";
     private static final String TOTAL_LABEL = "hqm.deathMenu.showTotal";
     private static final int BEST_X = 185;
     private static final int TOTAL_X = 255;
     private static final int LABEL_Y = 210;
-
-    private ScrollBar scrollBar;
     private static final int VISIBLE_PLAYERS = 10;
-
     private static final float[] DIGIT_TEXT_SIZE = {1F, 1F, 0.8F, 0.6F, 0.4F};
+    private String selectedUuid;
+    private boolean showTotal;
+    private boolean showBest;
+    private ScrollBar scrollBar;
+
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, EntityPlayer player) {
+        super(guiQuestBook, player);
+
+        selectedUuid = QuestingData.getUserUUID(player);
+
+        scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return DeathStats.getDeathStats().length > VISIBLE_PLAYERS;
+            }
+        };
+    }
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -124,18 +118,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
 
     }
 
-    private DeathStats getStats() {
-        if (showBest) {
-            return DeathStats.getBest();
-        } else if (showTotal) {
-            return DeathStats.getTotal();
-        } else if (selectedUuid != null) {
-            return DeathStats.getDeathStats(selectedUuid);
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public void drawMouseOver(GuiBase gui, int mX, int mY) {
         super.drawMouseOver(gui, mX, mY);
@@ -153,10 +135,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 }
             }
         }
-    }
-
-    private int getColor(boolean selected, boolean inBounds) {
-        return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
     }
 
     @Override
@@ -192,7 +170,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         }
     }
 
-
     @Override
     public void onDrag(GuiBase gui, int mX, int mY) {
         scrollBar.onDrag(gui, mX, mY);
@@ -211,6 +188,22 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     @Override
     public void save(GuiBase gui) {
 
+    }
+
+    private DeathStats getStats() {
+        if (showBest) {
+            return DeathStats.getBest();
+        } else if (showTotal) {
+            return DeathStats.getTotal();
+        } else if (selectedUuid != null) {
+            return DeathStats.getDeathStats(selectedUuid);
+        } else {
+            return null;
+        }
+    }
+
+    private int getColor(boolean selected, boolean inBounds) {
+        return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
     }
 
 
