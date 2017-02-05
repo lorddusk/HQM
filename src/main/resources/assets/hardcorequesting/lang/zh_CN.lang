@@ -26,6 +26,7 @@ hqm.message.questActivated=任务模式已开启，祝玩得愉快！
 hqm.message.questHardcore=极限模式已开启，祝玩得愉快！
 hqm.message.questAlreadyActivated=任务模式早已开启。
 hqm.message.hardcoreAlreadyActivated=极限模式早已开启。
+hqm.message.hardcoreDisabled=极限模式已禁用。
 hqm.message.noQuestYet=任务模式还未开启，请使用'/hqm quest'命令开启。
 hqm.message.noHardcoreYet=极限模式还未开启，请使用'/hqm hardcore'命令开启。
 hqm.message.positiveNumbers=请使用正数。
@@ -82,7 +83,7 @@ item.hqm:hearts_heart.freshness=当前新鲜度：%s%%
 item.hqm:hearts_rottenheart.name=腐烂红心
 item.hqm:hearts_rottenheart.tooltip=已经腐烂的心。请勿食用。
 item.hqm:bags.name=奖励袋子
-item.hqm:hqm_invalid_item.name=无效物品
+item.hqm:hqmInvalidItem.name=无效物品
 
 # ======================================
 #			    QUESTS
@@ -300,6 +301,10 @@ hqm.editMode.repBarCreate.title=添加声望条
 hqm.editMode.repBarCreate.desc=点击并新建一个新的声望条。
 hqm.editMode.repBarChange.title=编辑声望条
 hqm.editMode.repBarChange.desc=点击设定已有声望条的具体属性。
+hqm.editMode.commandCreate.title=添加一个新命令
+hqm.editMode.commandCreate.desc=添加一个任务要求执行的新命令。\n@p将被玩家的名称替代。
+hqm.editMode.commandChange.title=修改命令
+hqm.editMode.commandChange.desc=修改存在的命令。\n@p将被玩家的名称替代。
 
 # ======================================
 #				COMMAND
@@ -520,6 +525,7 @@ hqm.questBook.completeTask=点击完成任务目标
 hqm.questBook.warning=警告！！！
 hqm.questBook.deleteOnClick=你现在点击的任何东西都将会被删除！
 hqm.questBook.goBack=返回
+hqm.questBook.backToMenu=返回菜单
 hqm.questBook.rightClick=你可以右击任何地方。
 hqm.questBook.totalQuests=合计%s个任务
 hqm.questBook.unlockedQuests=%s个任务已解锁
@@ -664,3 +670,4 @@ hqm.editType.repReward=声望奖励
 hqm.editType.kills=击杀数
 hqm.editType.repBar=声望条
 hqm.editType.betweenSets=任务章节之间
+hqm.editType.command=命令
