@@ -251,7 +251,11 @@ public class QuestingData {
     }
 
     public static EntityPlayer getPlayer(String uuid) {
-        return getPlayer(UUID.fromString(uuid));
+        try {
+            return getPlayer(UUID.fromString(uuid));
+        } catch (IllegalArgumentException e){
+            return getPlayerFromUsername(uuid);
+        }
     }
 
     public static EntityPlayer getPlayer(UUID uuid) {

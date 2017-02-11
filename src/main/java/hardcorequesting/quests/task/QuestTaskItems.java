@@ -382,7 +382,7 @@ public abstract class QuestTaskItems extends QuestTask {
             if (permutations == null && precision.hasPermutations())
                 setPermutations();
             if (permutations == null || permutations.length < 2)
-                return stack;
+                return stack != null ? stack : ItemStack.EMPTY;
             int ticks = (int) (System.currentTimeMillis() / 1000);
             if (cycleAt == -1)
                 cycleAt = ticks + CYCLE_TIME;

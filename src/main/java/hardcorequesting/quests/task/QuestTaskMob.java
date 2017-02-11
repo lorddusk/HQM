@@ -21,6 +21,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 public class QuestTaskMob extends QuestTask {
@@ -64,6 +65,7 @@ public class QuestTaskMob extends QuestTask {
     }
 
     public void setIcon(int id, ItemStack stack, EntityPlayer player) {
+        System.out.println(stack);
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
 
         mobs[id].iconStack = stack;
@@ -261,7 +263,7 @@ public class QuestTaskMob extends QuestTask {
 
     public class Mob {
 
-        private ItemStack iconStack;
+        private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
         private String mob;
         private int count = 1;
@@ -269,7 +271,7 @@ public class QuestTaskMob extends QuestTask {
 
         public Mob copy() {
             Mob other = new Mob();
-            other.iconStack = iconStack == null ? null : iconStack.copy();
+            other.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
             other.name = name;
             other.mob = mob;
             other.count = count;
@@ -282,7 +284,7 @@ public class QuestTaskMob extends QuestTask {
             return iconStack;
         }
 
-        public void setIconStack(ItemStack iconStack) {
+        public void setIconStack(@Nonnull ItemStack iconStack) {
             this.iconStack = iconStack;
         }
 

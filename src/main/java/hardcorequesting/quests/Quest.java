@@ -1055,9 +1055,11 @@ public class Quest {
 
     private ItemStack[] getEditFriendlyRewards(ItemStack[] rewards, int max) {
         if (rewards == null) {
-            return new ItemStack[1];
+            return new ItemStack[]{ItemStack.EMPTY};
         } else if (isEditing && rewards.length < max) {
-            return Arrays.copyOf(rewards, rewards.length + 1);
+            ItemStack[] ret = Arrays.copyOf(rewards, rewards.length + 1);
+            ret[ret.length - 1] = ItemStack.EMPTY;
+            return ret;
         } else {
             return rewards;
         }

@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 public class QuestTaskLocation extends QuestTask {
@@ -304,7 +305,7 @@ public class QuestTaskLocation extends QuestTask {
 
     public static class Location {
 
-        private ItemStack iconStack;
+        private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
         private int x;
         private int y;
@@ -315,7 +316,7 @@ public class QuestTaskLocation extends QuestTask {
 
         private Location copy() {
             Location location = new Location();
-            location.iconStack = iconStack == null ? null : iconStack.copy();
+            location.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
             location.name = name;
             location.x = x;
             location.y = y;
@@ -331,7 +332,7 @@ public class QuestTaskLocation extends QuestTask {
             return iconStack;
         }
 
-        public void setIconStack(ItemStack iconStack) {
+        public void setIconStack(@Nonnull ItemStack iconStack) {
             this.iconStack = iconStack;
         }
 

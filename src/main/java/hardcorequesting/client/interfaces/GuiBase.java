@@ -12,6 +12,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -266,10 +267,10 @@ public class GuiBase extends GuiScreen {
 
         if (!stack.isEmpty()) {
             drawItemStack(stack, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x + left + 1, y + +top + 1, "");
+            //itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x + left + 1, y + +top + 1, "");
         }
-        GlStateManager.disableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        //GlStateManager.disableLighting();
+        //GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
 
@@ -282,33 +283,24 @@ public class GuiBase extends GuiScreen {
     }
 
 
-    public void drawItemStack(ItemStack stack, int x, int y, boolean renderEffect) {
-        if (!stack.isEmpty()) {
-            GlStateManager.pushMatrix();
+    public void drawItemStack(@Nonnull ItemStack stack, int x, int y, boolean renderEffect) {
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.translate(getLeft() + x, getTop() + y, 0);
 
-            RenderHelper.enableGUIStandardItemLighting();
-            GlStateManager.disableLighting();
-            GlStateManager.enableRescaleNormal();
-            GlStateManager.enableColorMaterial();
-            GlStateManager.enableLighting();
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean flagBefore = mc.fontRenderer.getUnicodeFlag();
+        mc.fontRenderer.setUnicodeFlag(false);
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(stack, 0, 0);
+        Minecraft.getMinecraft().getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, 0, 0, null);
+        mc.fontRenderer.setUnicodeFlag(flagBefore);
 
-            float oldZ = this.zLevel;
-            setZLevel(4f);
-            try {
-                // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), stack, renderEffect, zLevel, x + left, y + top)) {
-                itemRenderer.renderItemAndEffectIntoGUI(stack, x + left, y + top);
-                // }
-            } finally {
-                setZLevel(oldZ);
-
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                GlStateManager.disableLighting();
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                GlStateManager.enableAlpha();
-            }
-
-            GlStateManager.popMatrix();
-        }
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.popMatrix();
     }
 
     public float getZLevel() {
