@@ -268,10 +268,10 @@ public class Reputation {
         }
     }
 
-    public static void loadAll() {
+    public static void loadAll(boolean remote) {
         reputationMap.clear();
         try {
-            SaveHandler.loadReputations(SaveHandler.getLocalFile("reputations")).forEach(Reputation::addReputation);
+            SaveHandler.loadReputations(SaveHandler.getFile("reputations", remote)).forEach(Reputation::addReputation);
         } catch (IOException ignored) {
             FMLLog.log("HQM", Level.INFO, "Failed loading reputations");
         }
@@ -280,8 +280,6 @@ public class Reputation {
     public static void saveAll() {
         try {
             SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
-            if (Quest.isEditing && Quest.saveDefault)
-                SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
         }

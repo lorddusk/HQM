@@ -58,7 +58,7 @@ public class DeathStatsMessage implements IMessage {
                     try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
                         out.print(message.deaths);
                     }
-                DeathStats.loadAll(true);
+                DeathStats.loadAll(true, true);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -43,11 +43,11 @@ public class QuestSet {
         this.id = Quest.getQuestSets().size();
     }
 
-    public static void loadAll() {
+    public static void loadAll(boolean remote) {
         try {
-            SaveHandler.loadAllQuestSets(SaveHandler.getLocalFolder());
+            SaveHandler.loadAllQuestSets(SaveHandler.getFolder(remote));
             QuestAdapter.postLoad();
-            orderAll();
+            orderAll(remote);
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
         }
@@ -56,15 +56,14 @@ public class QuestSet {
     public static void saveAll() {
         try {
             SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
-            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
         }
     }
 
-    public static void orderAll() {
+    public static void orderAll(boolean remote) {
         try {
-            final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getLocalFile("sets"));
+            final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getFile("sets", remote));
             if (!order.isEmpty()) {
                 Quest.getQuestSets().sort(new Comparator<QuestSet>() {
                     @Override

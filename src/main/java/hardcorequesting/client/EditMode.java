@@ -9,7 +9,7 @@ public enum EditMode {
     REQUIREMENT("req"),
     SIZE("size"),
     RENAME("rename"),
-    ITEM("fluidStack"),
+    ITEM("item"),
     TASK("task"),
     DELETE("delete"),
     SWAP("swap"),

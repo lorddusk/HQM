@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
 
@@ -41,6 +42,8 @@ public class HardcoreQuesting {
 
     public static File configDir;
 
+    public static Side loadingSide;
+
     private static EntityPlayer commandUser;
 
     public static EntityPlayer getPlayer() {
@@ -53,13 +56,14 @@ public class HardcoreQuesting {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        loadingSide = event.getSide();
         new hardcorequesting.event.EventHandler();
 
         path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + ModInformation.CONFIG_LOC_NAME.toLowerCase() + File.separator;
         configDir = new File(path);
         ConfigHandler.initModConfig(path);
         ConfigHandler.initEditConfig(path);
-        QuestLine.init(path + File.separator + SaveHandler.REMOTE, event.getSide().isClient()); // Init Quest line within config folder used for server connections
+        QuestLine.init(path, event.getSide().isClient()); // Init Quest line within config folder used for server connections
 
         proxy.init();
         proxy.initSounds(path);

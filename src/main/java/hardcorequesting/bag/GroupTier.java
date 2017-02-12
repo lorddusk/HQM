@@ -38,17 +38,16 @@ public class GroupTier {
     public static void saveAll() {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
-            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
 
-    public static void loadAll() {
+    public static void loadAll(boolean remote) {
         try {
             Group.getGroups().clear();
             GroupTier.getTiers().clear();
-            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getLocalFile("bags")));
+            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getFile("bags", remote)));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }

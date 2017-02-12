@@ -50,10 +50,10 @@ public class DeathStats {
         return new ArrayList<>(deathMap.values());
     }
 
-    public static void loadAll(boolean isClient) {
+    public static void loadAll(boolean isClient, boolean remote) {
         deathMap = new HashMap<>();
         try {
-            for (DeathStats stats : SaveHandler.loadDeaths(SaveHandler.getLocalFile("deaths")))
+            for (DeathStats stats : SaveHandler.loadDeaths(SaveHandler.getFile("deaths", remote)))
                 deathMap.put(stats.uuid, stats);
             if (isClient) updateClientDeathList();
         } catch (IOException e) {

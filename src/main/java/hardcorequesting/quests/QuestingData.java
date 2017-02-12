@@ -139,9 +139,9 @@ public class QuestingData {
         }
     }
 
-    public static void loadState() {
+    public static void loadState(boolean remote) {
         try {
-            SaveHandler.loadQuestingState(SaveHandler.getLocalFile("state"));
+            SaveHandler.loadQuestingState(SaveHandler.getFile("state", remote));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
         }
@@ -155,10 +155,10 @@ public class QuestingData {
         }
     }
 
-    public static void loadQuestingData() {
+    public static void loadQuestingData(boolean remote) {
         try {
             data.clear();
-            SaveHandler.loadQuestingData(SaveHandler.getLocalFile("data")).forEach(qData -> data.put(qData.getUuid(), qData));
+            SaveHandler.loadQuestingData(SaveHandler.getFile("data", remote)).forEach(qData -> data.put(qData.getUuid(), qData));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing data");
         }

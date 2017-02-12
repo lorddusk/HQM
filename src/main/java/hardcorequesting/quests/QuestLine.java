@@ -1,5 +1,6 @@
 package hardcorequesting.quests;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -16,6 +17,7 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -53,7 +55,7 @@ public class QuestLine {
         return server != null ? server : world != null ? world : config;
     }
 
-    public static void receiveServerSync(boolean local) {
+    public static void receiveServerSync(boolean local, boolean remote) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
@@ -66,7 +68,7 @@ public class QuestLine {
             server.quests = new ConcurrentHashMap<>();
             server.questSets = new ArrayList<>();
         }
-        loadAll(true);
+        loadAll(true, remote);
         SoundHandler.loadLoreReading(getActiveQuestLine().mainPath);
     }
 
@@ -78,9 +80,9 @@ public class QuestLine {
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
-                NetworkManager.sendToPlayer(new FullSyncMessage(true), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new FullSyncMessage(true, false), (EntityPlayerMP) player);
             else {
-                NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new FullSyncMessage(HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
                 NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
             }
         }
@@ -94,25 +96,17 @@ public class QuestLine {
         init(path, isClient);
     }
 
-    public static void copyDefaults(File worldPath) {
-        File path = new File(worldPath, "hqm");
-        if (!path.exists()) path.mkdirs();
-        SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
-    }
-
     public static void saveDescription() {
         try {
             SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
-            if (Quest.saveDefault)
-                SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
         }
     }
 
-    public static void loadDescription() {
+    public static void loadDescription(boolean remote) {
         try {
-            QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getLocalFile("description.txt"));
+            QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
             QuestLine.getActiveQuestLine().cachedMainDescription = null;
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
@@ -131,15 +125,15 @@ public class QuestLine {
         SaveHelper.onSave();
     }
 
-    public static void loadAll(boolean isClient) {
-        QuestingData.loadState();
-        QuestLine.loadDescription();
-        DeathStats.loadAll(isClient);
-        Reputation.loadAll();
-        GroupTier.loadAll();
-        Team.loadAll(isClient);
-        QuestSet.loadAll();
-        QuestingData.loadQuestingData();
+    public static void loadAll(boolean isClient, boolean remote) {
+        QuestingData.loadState(remote);
+        QuestLine.loadDescription(remote);
+        DeathStats.loadAll(isClient, remote);
+        Reputation.loadAll(remote);
+        GroupTier.loadAll(remote);
+        Team.loadAll(isClient, remote);
+        QuestSet.loadAll(remote);
+        QuestingData.loadQuestingData(remote);
         SaveHelper.onLoad();
         if (isClient)
             GuiEditMenuItem.Search.initItems();
@@ -150,6 +144,6 @@ public class QuestLine {
         QuestLine.getActiveQuestLine().quests = new ConcurrentHashMap<>();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
 
-        loadAll(isClient);
+        loadAll(isClient, false);
     }
 }

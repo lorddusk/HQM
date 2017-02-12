@@ -40,11 +40,11 @@ public class Team {
         this.invites = new ArrayList<>();
     }
 
-    public static void loadAll(boolean isClient) {
+    public static void loadAll(boolean isClient, boolean remote) {
         try {
             QuestingData.getTeams().clear();
             TeamAdapter.clearInvitesMap();
-            List<Team> teams = SaveHandler.loadTeams(SaveHandler.getLocalFile("teams"));
+            List<Team> teams = SaveHandler.loadTeams(SaveHandler.getFile("teams", remote));
             for (int i = 0; i < teams.size(); i++)
                 QuestingData.getTeams().add(null);
             teams.stream().filter(team -> !team.isSingle()).forEach(team -> QuestingData.getTeams().set(team.getId(), team));
@@ -260,7 +260,7 @@ public class Team {
     public void refreshData() {
         for (PlayerEntry entry : getPlayers())
             if (entry.shouldRefreshData())
-                NetworkManager.sendToPlayer(new FullSyncMessage("TIMESTAMP"), entry.getPlayerMP());
+                NetworkManager.sendToPlayer(new FullSyncMessage(true), entry.getPlayerMP());
     }
 
     public void clearProgress() {
