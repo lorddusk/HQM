@@ -1,12 +1,17 @@
 package hardcorequesting.config;
 
+import com.google.common.collect.Lists;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.quests.Quest;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.FMLLog;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class ConfigHandler {
 
@@ -21,12 +26,24 @@ public class ConfigHandler {
     public static Configuration syncConfig;
     private static String[] KEYMAP_DEFAULT = null;
 
+    private static List<String> readMeText = Lists.newArrayList("How to copy quests to a server:",
+            "In HQM for 1.11.2 the file copying to a server works again. Copy the hqm/quests to the server side config hqm/quests.",
+            "There is a config option to automatically sync the server quests to the client.");
+
     public static void initModConfig(String configPath) {
         ModConfig.init(new File(configPath + "hqmconfig.cfg"));
         MinecraftForge.EVENT_BUS.register(new ModConfig());
     }
 
     public static void initEditConfig(String configPath) {
+        if(new File(configPath, "default").exists()){
+            FMLLog.warning("[HQM] Detected old HQM quest files! These aren't fully compatible with the newer versions. To disable this message, delete the 'default' folder.");
+        }
+        try {
+            FileUtils.writeLines(new File(configPath, "ReadMe.txt"), readMeText);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (syncConfig == null) {
             syncConfig = new Configuration(new File(configPath + "editmode.cfg"));
             loadSyncConfig();
