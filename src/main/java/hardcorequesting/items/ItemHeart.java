@@ -129,7 +129,7 @@ public class ItemHeart extends Item {
         super.addInformation(stack, player, tooltip, extraInfo);
 
         if (stack.getItemDamage() == 3) {
-            tooltip.add(Translator.translate("fluidStack.hqm:hearts_heart.tooltip"));
+            tooltip.add(Translator.translate("item.hqm:hearts_heart.tooltip"));
             if (ModConfig.ROTTIMER) {
                 NBTTagCompound tagCompound = stack.getTagCompound();
                 if (tagCompound == null) {
@@ -140,12 +140,12 @@ public class ItemHeart extends Item {
                     int rot = tagCompound.getInteger("RotTime");
                     int maxRot = tagCompound.getInteger("MaxRot");
                     float percentage = (float) ((rot * 100) / maxRot);
-                    tooltip.add(Translator.translate("fluidStack.hqm:hearts_heart.freshness", percentage));
+                    tooltip.add(Translator.translate("item.hqm:hearts_heart.freshness", percentage));
                 }
             }
         }
         if (stack.getItemDamage() == 4) {
-            tooltip.add(Translator.translate("fluidStack.hqm:hearts_rottenheart.tooltip"));
+            tooltip.add(Translator.translate("item.hqm:hearts_rottenheart.tooltip"));
         }
     }
 

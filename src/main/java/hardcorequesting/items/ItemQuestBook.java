@@ -99,9 +99,9 @@ public class ItemQuestBook extends Item {
             NBTTagCompound compound = stack.getTagCompound();
             if (compound != null && compound.hasKey(NBT_PLAYER)) {
                 EntityPlayer useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
-                tooltip.add(Translator.translate("fluidStack.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getDisplayNameString()));
+                tooltip.add(Translator.translate("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getDisplayNameString()));
             } else
-                tooltip.add(GuiColor.RED + Translator.translate("fluidStack.hqm:quest_book_1.invalid"));
+                tooltip.add(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid"));
         }
     }
 
