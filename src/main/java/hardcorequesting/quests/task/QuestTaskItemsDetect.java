@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.google.common.collect.Lists;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
 
@@ -49,7 +51,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
     @Override
     public void onUpdate(EntityPlayer player) {
-        countItems(player, null);
+        countItems(player, ItemStack.EMPTY);
     }
 
     @Override
@@ -67,7 +69,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     @Override
     public void onOpenBook(EventHandler.BookOpeningEvent event) {
         if (event.isRealName()) {
-            countItems(event.getPlayer(), null);
+            countItems(event.getPlayer(), ItemStack.EMPTY);
         }
     }
 
@@ -96,6 +98,16 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
             items.set(items.size() - 1, stack);
         }
         countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
+
+        /* TODO check if this fixes the crash of #230
+        if(!player.getEntityWorld().isRemote){
+            NonNullList<ItemStack> items = NonNullList.withSize(player.inventory.mainInventory.size() + 1, ItemStack.EMPTY);
+            Collections.copy(items, player.inventory.mainInventory);
+            if(!stack.isEmpty()){
+                items.set(items.size() - 1, stack);
+            }
+            countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
+        }*/
     }
 
     public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String playerName) {
