@@ -195,8 +195,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
 
-        System.out.println(compound);
-
         if (compound.hasKey(NBT_PLAYER_NAME)) {
             playerUuid = compound.getString(NBT_PLAYER_NAME);
             selectedQuest = compound.getString(NBT_QUEST);
