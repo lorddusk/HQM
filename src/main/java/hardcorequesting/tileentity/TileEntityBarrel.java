@@ -1,5 +1,6 @@
 package hardcorequesting.tileentity;
 
+import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
@@ -46,17 +47,17 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
     @Override
     public ItemStack getStackInSlot(int i) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack decrStackSize(int i, int j) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeStackFromSlot(int index) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -140,19 +141,16 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     private void updateState() {
         if (!world.isRemote) {
             QuestTask task = getCurrentTask();
-            boolean state = false;
             if (task != null) {
                 EntityPlayer player = QuestingData.getPlayer(playerUuid);
                 if (player != null) {
-                    state = !task.isCompleted(player);
-                }
-            }
-            boolean oldState = getBlockMetadata() == 1;
-            if (state != oldState) {
-                if (state) { // TODO add the actual states (meta 1 == has active quest set) / (meta 0 == no or completed quest set)
-                    world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
-                } else {
-                    world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                    if(task.isCompleted(player)){
+                        world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
+                    } else {
+                        if(!world.getBlockState(pos).getValue(BlockDelivery.BOUND)){
+                            world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState().withProperty(BlockDelivery.BOUND, true), 3);
+                        }
+                    }
                 }
             }
         }
@@ -196,6 +194,8 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
+
+        System.out.println(compound);
 
         if (compound.hasKey(NBT_PLAYER_NAME)) {
             playerUuid = compound.getString(NBT_PLAYER_NAME);
