@@ -12,19 +12,22 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiBase extends GuiScreen {
+
+    public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
+    public static final int ITEM_SIZE = 18;
+    protected static final int ITEM_SRC_Y = 235;
+    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
     protected int left, top;
 
     public void setEditMenu(GuiEditMenu menu) {
     }
-
-    public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
-    protected static final ResourceLocation TERRAIN = new ResourceLocation("textures/atlas/blocks.png");
 
     public void drawRect(int x, int y, int u, int v, int w, int h) {
         drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
@@ -42,10 +45,10 @@ public class GuiBase extends GuiScreen {
         float fw = 0.00390625F;
         float fy = 0.00390625F;
 
-        double a = (double) ((float) (u + 0) * fw);
+        double a = (double) ((float) (u) * fw);
         double b = (double) ((float) (u + w) * fw);
         double c = (double) ((float) (v + h) * fy);
-        double d = (double) ((float) (v + 0) * fy);
+        double d = (double) ((float) (v) * fy);
 
         double[] ptA = new double[]{a, c};
         double[] ptB = new double[]{b, c};
@@ -111,10 +114,10 @@ public class GuiBase extends GuiScreen {
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer worldRenderer = tessellator.getBuffer();
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldRenderer.pos((double) (x + 0), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
+        worldRenderer.pos((double) (x), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
         worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]).endVertex();
-        worldRenderer.pos((double) (x + targetW), (double) (y + 0), (double) this.zLevel).tex(pt3[0], pt3[1]).endVertex();
-        worldRenderer.pos((double) (x + 0), (double) (y + 0), (double) this.zLevel).tex(pt4[0], pt4[1]).endVertex();
+        worldRenderer.pos((double) (x + targetW), (double) (y), (double) this.zLevel).tex(pt3[0], pt3[1]).endVertex();
+        worldRenderer.pos((double) (x), (double) (y), (double) this.zLevel).tex(pt4[0], pt4[1]).endVertex();
         tessellator.draw();
     }
 
@@ -199,24 +202,6 @@ public class GuiBase extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-    public void applyColor(int color) {
-        float a = (float) (color >> 24 & 255) / 255.0F;
-        float r = (float) (color >> 16 & 255) / 255.0F;
-        float g = (float) (color >> 8 & 255) / 255.0F;
-        float b = (float) (color & 255) / 255.0F;
-
-        GlStateManager.color(r, g, b, a);
-    }
-
-
-    protected static RenderItem itemRenderer = Minecraft.getMinecraft().getRenderItem();
-    //protected static RenderBlocks blockRenderer = new RenderBlocks();
-
-    public void drawIcon(ItemStack item, int x, int y) {
-        itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x, y, null);
-        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
-    }
-
 //TODO Fix Fluid drawing
 //    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
 //        drawItemBackground(x, y, mX, mY, false);
@@ -226,14 +211,14 @@ public class GuiBase extends GuiScreen {
 //    }
 //
 //    public void drawFluid(Fluid fluid, int x, int y) {
-//        //IIcon icon = fluid.getIcon();
-//        Item item = null;
+//        //IIcon icon = fluid.getIconStack();
+//        Item fluidStack = null;
 //
 //        if (icon == null) {
 //            if (FluidRegistry.WATER.equals(fluid)) {
-//                icon = Blocks.water.getIcon(0, 0);
+//                icon = Blocks.water.getIconStack(0, 0);
 //            } else if (FluidRegistry.LAVA.equals(fluid)) {
-//                icon = Blocks.water.getIcon(0, 0);
+//                icon = Blocks.water.getIconStack(0, 0);
 //            }
 //        }
 //
@@ -252,8 +237,19 @@ public class GuiBase extends GuiScreen {
 //        }
 //    }
 
-    protected static final int ITEM_SRC_Y = 235;
-    public static final int ITEM_SIZE = 18;
+    public void applyColor(int color) {
+        float a = (float) (color >> 24 & 255) / 255.0F;
+        float r = (float) (color >> 16 & 255) / 255.0F;
+        float g = (float) (color >> 8 & 255) / 255.0F;
+        float b = (float) (color & 255) / 255.0F;
+
+        GlStateManager.color(r, g, b, a);
+    }
+
+    public void drawIcon(ItemStack stack, int x, int y) {
+        itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, stack, x, y, null);
+        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
+    }
 
     protected void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -266,15 +262,15 @@ public class GuiBase extends GuiScreen {
         }
     }
 
-    public void drawItem(ItemStack item, int x, int y, int mX, int mY, boolean selected) {
+    public void drawItemStack(ItemStack stack, int x, int y, int mX, int mY, boolean selected) {
         drawItemBackground(x, y, mX, mY, selected);
 
-        if (item != null && item.getItem() != null) {
-            drawItem(item, x + 1, y + 1, true);
-            itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, item, x + left + 1, y + +top + 1, "");
+        if (stack != null) {
+            drawItemStack(stack, x + 1, y + 1, true);
+            //itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x + left + 1, y + +top + 1, "");
         }
-        GlStateManager.disableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        //GlStateManager.disableLighting();
+        //GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
 
@@ -287,32 +283,23 @@ public class GuiBase extends GuiScreen {
     }
 
 
-    public void drawItem(ItemStack itemstack, int x, int y, boolean renderEffect) {
-        if (itemstack == null || itemstack.getItem() == null) return;
-
+    public void drawItemStack(ItemStack stack, int x, int y, boolean renderEffect) {
         GlStateManager.pushMatrix();
-
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
         GlStateManager.enableRescaleNormal();
-        GlStateManager.enableColorMaterial();
-        GlStateManager.enableLighting();
+        GlStateManager.translate(getLeft() + x, getTop() + y, 0);
 
-        float oldZ = this.zLevel;
-        setZLevel(4f);
-        try {
-            // if (!ForgeHooksClient.renderInventoryItem(blockRenderer, this.mc.getTextureManager(), itemstack, renderEffect, zLevel, x + left, y + top)) {
-            itemRenderer.renderItemAndEffectIntoGUI(itemstack, x + left, y + top);
-            // }
-        } finally {
-            setZLevel(oldZ);
+        Minecraft mc = Minecraft.getMinecraft();
+        boolean flagBefore = mc.fontRendererObj.getUnicodeFlag();
+        mc.fontRendererObj.setUnicodeFlag(false);
+        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(stack, 0, 0);
+        Minecraft.getMinecraft().getRenderItem().renderItemOverlayIntoGUI(mc.fontRendererObj, stack, 0, 0, null);
+        mc.fontRendererObj.setUnicodeFlag(flagBefore);
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.disableLighting();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.enableAlpha();
-        }
-
+        RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 

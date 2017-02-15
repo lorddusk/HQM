@@ -7,16 +7,17 @@ public enum RewardSetting {
     ANY("hqm.team.anyReward.title", "hqm.team.anyReward.desc"),
     RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");
 
-    public static RewardSetting getDefault() {
-        return isAllModeEnabled ? ALL : ANY;
-    }
-
+    public static boolean isAllModeEnabled;
     private String title;
     private String description;
 
     RewardSetting(String title, String description) {
         this.title = title;
         this.description = description;
+    }
+
+    public static RewardSetting getDefault() {
+        return isAllModeEnabled ? ALL : ANY;
     }
 
     public String getTitle() {
@@ -26,6 +27,4 @@ public enum RewardSetting {
     public String getDescription() {
         return Translator.translate(description);
     }
-
-    public static boolean isAllModeEnabled;
 }

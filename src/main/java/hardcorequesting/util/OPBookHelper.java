@@ -15,11 +15,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public final class OPBookHelper {
+
     private OPBookHelper() {
     }
 
     public static void reverseQuestCompletion(Quest quest, EntityPlayer subject) {
         NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, subject));
+    }
+
+    public static void reset(EntityPlayer player) {
+        NetworkManager.sendToServer(OpAction.RESET.build(null, player));
     }
 
     public enum OpAction {
@@ -45,20 +50,8 @@ public final class OPBookHelper {
             }
         };
 
-        public abstract void process(String data);
-
-        public IMessage build(Quest quest, EntityPlayer subject) {
-            return new OpActionMessage(this, toJson(quest, subject));
-        }
-
-        public void process(EntityPlayer player, String data) {
-            if (CommandHandler.isOwnerOrOp(player))
-                process(data);
-        }
-
         private static final String QUEST = "quest";
         private static final String SUBJECT = "subject";
-
         protected Quest quest;
         protected EntityPlayer subject;
 
@@ -78,6 +71,17 @@ public final class OPBookHelper {
             return stringWriter.toString();
         }
 
+        public abstract void process(String data);
+
+        public IMessage build(Quest quest, EntityPlayer subject) {
+            return new OpActionMessage(this, toJson(quest, subject));
+        }
+
+        public void process(EntityPlayer player, String data) {
+            if (CommandHandler.isOwnerOrOp(player))
+                process(data);
+        }
+
         protected void fromJson(String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
@@ -86,9 +90,5 @@ public final class OPBookHelper {
             if (root.has(SUBJECT))
                 subject = QuestingData.getPlayer(root.get(SUBJECT).getAsString());
         }
-    }
-
-    public static void reset(EntityPlayer player) {
-        NetworkManager.sendToServer(OpAction.RESET.build(null, player));
     }
 }

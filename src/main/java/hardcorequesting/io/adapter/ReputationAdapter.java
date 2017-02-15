@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReputationAdapter {
+
     private static final TypeAdapter<ReputationMarker> REPUTATION_MARKER_ADAPTER = new TypeAdapter<ReputationMarker>() {
         private static final String NAME = "name";
         private static final String VALUE = "value";

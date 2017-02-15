@@ -4,6 +4,7 @@ package hardcorequesting.quests;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class RepeatInfo {
+
     private int days;
     private int hours;
     private RepeatType type;

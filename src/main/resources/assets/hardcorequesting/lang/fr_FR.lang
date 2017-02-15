@@ -81,7 +81,7 @@ item.hqm:hearts_heart.freshness=Fraicheur actuelle : %s %%
 item.hqm:hearts_rottenheart.name=Coeur pourri
 item.hqm:hearts_rottenheart.tooltip=Coeur pourri. Ne pas avaler
 item.hqm:bags.name=Sac de récompense
-item.hqm:hqmInvalidItem.name=Élément non valide
+item.hqm:hqm_invalid_item.name=Élément non valide
 
 # ======================================
 #			    QUESTS

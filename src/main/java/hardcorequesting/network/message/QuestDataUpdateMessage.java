@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.io.IOException;
 
 public class QuestDataUpdateMessage implements IMessage {
+
     private String id, data;
     private int players;
 
@@ -47,6 +48,7 @@ public class QuestDataUpdateMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<QuestDataUpdateMessage, IMessage> {
+
         @Override
         public IMessage onMessage(QuestDataUpdateMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

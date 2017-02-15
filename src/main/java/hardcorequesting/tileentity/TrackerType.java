@@ -81,6 +81,7 @@ public enum TrackerType {
             double closest = 0;
             EntityPlayer closestPlayer = null;
             for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllProfiles()) {
+//            for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerProfiles()) {
                 EntityPlayer player = QuestingData.getPlayer(profile.getId());
                 if (player != null) {
                     double distance = player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
@@ -100,6 +101,12 @@ public enum TrackerType {
     };
 
 
+    private String id;
+
+    TrackerType(String name) {
+        this.id = name;
+    }
+
     private static boolean isPlayerWithinRadius(TileEntityTracker tracker, EntityPlayer player, int radius) {
         return player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
     }
@@ -115,12 +122,6 @@ public enum TrackerType {
             }
         }
         return valid;
-    }
-
-    private String id;
-
-    TrackerType(String name) {
-        this.id = name;
     }
 
     public String getName() {

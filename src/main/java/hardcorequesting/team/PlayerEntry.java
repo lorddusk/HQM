@@ -11,6 +11,11 @@ import net.minecraftforge.fml.server.FMLServerHandler;
 import java.io.IOException;
 
 public class PlayerEntry {
+
+    private static final String UUID = "uuid";
+    private static final String OWNER = "owner";
+    private static final String BOOK = "bookOpen";
+    private static final String IN_TEAM = "inTeam";
     private String uuid;
     private boolean inTeam;
     private boolean owner;
@@ -25,64 +30,6 @@ public class PlayerEntry {
         this.inTeam = inTeam;
         this.owner = owner;
         this.bookOpen = false;
-    }
-
-    public String getUUID() {
-        return uuid;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public String getDisplayName() {
-        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
-    }
-
-    public boolean isInTeam() {
-        return inTeam;
-    }
-
-    public boolean isOwner() {
-        return owner;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PlayerEntry entry = (PlayerEntry) o;
-
-        return uuid != null ? uuid.equals(entry.uuid) : entry.uuid == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
-    }
-
-    public boolean shouldRefreshData() {
-        return bookOpen;
-    }
-
-    public boolean isBookOpen() {
-        return bookOpen;
-    }
-
-    public void setBookOpen(boolean bookOpen) {
-        this.bookOpen = bookOpen;
-    }
-
-    private static final String UUID = "uuid";
-    private static final String OWNER = "owner";
-    private static final String BOOK = "bookOpen";
-    private static final String IN_TEAM = "inTeam";
-
-    public void write(JsonWriter out) throws IOException {
-        out.beginObject();
-        out.name(UUID).value(uuid);
-        out.name(OWNER).value(owner);
-        out.name(BOOK).value(bookOpen);
-        out.name(IN_TEAM).value(inTeam);
-        out.endObject();
     }
 
     public static PlayerEntry read(JsonReader in) throws IOException {
@@ -110,8 +57,61 @@ public class PlayerEntry {
         return playerEntry;
     }
 
+    public String getUUID() {
+        return uuid;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public String getDisplayName() {
+        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
+    }
+
+    public boolean isInTeam() {
+        return inTeam;
+    }
+
     public void setInTeam(boolean inTeam) {
         this.inTeam = inTeam;
+    }
+
+    public boolean isOwner() {
+        return owner;
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PlayerEntry entry = (PlayerEntry) o;
+
+        return uuid != null ? uuid.equals(entry.uuid) : entry.uuid == null;
+    }
+
+    public boolean shouldRefreshData() {
+        return bookOpen;
+    }
+
+    public boolean isBookOpen() {
+        return bookOpen;
+    }
+
+    public void setBookOpen(boolean bookOpen) {
+        this.bookOpen = bookOpen;
+    }
+
+    public void write(JsonWriter out) throws IOException {
+        out.beginObject();
+        out.name(UUID).value(uuid);
+        out.name(OWNER).value(owner);
+        out.name(BOOK).value(bookOpen);
+        out.name(IN_TEAM).value(inTeam);
+        out.endObject();
     }
 
     @SideOnly(Side.SERVER)

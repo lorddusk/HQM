@@ -9,6 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public abstract class LargeButton {
+
     private static final int BUTTON_SRC_X = 54;
     private static final int BUTTON_SRC_Y = 235;
     private static final int BUTTON_WIDTH = 57;
@@ -18,6 +19,7 @@ public abstract class LargeButton {
     private String description;
     private int x;
     private int y;
+    private List<String> lines;
 
     public LargeButton(String name, int x, int y) {
         this.name = name;
@@ -44,7 +46,6 @@ public abstract class LargeButton {
     @SideOnly(Side.CLIENT)
     public abstract void onClick(GuiBase gui, EntityPlayer player);
 
-
     @SideOnly(Side.CLIENT)
     public void draw(GuiBase gui, EntityPlayer player, int mX, int mY) {
         if (isVisible(gui, player)) {
@@ -57,9 +58,6 @@ public abstract class LargeButton {
             gui.drawCenteredString(getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
         }
     }
-
-
-    private List<String> lines;
 
     @SideOnly(Side.CLIENT)
     public void drawMouseOver(GuiBase gui, EntityPlayer player, int mX, int mY) {

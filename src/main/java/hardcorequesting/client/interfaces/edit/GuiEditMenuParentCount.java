@@ -7,6 +7,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuParentCount extends GuiEditMenuExtended {
+
     private boolean useModifiedParentRequirement;
     private int parentRequirementCount;
     private String id;
@@ -25,13 +26,13 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.parentCount.count") {
             @Override
-            protected void setValue(int number) {
-                parentRequirementCount = number;
+            protected int getValue() {
+                return parentRequirementCount;
             }
 
             @Override
-            protected int getValue() {
-                return parentRequirementCount;
+            protected void setValue(int number) {
+                parentRequirementCount = number;
             }
 
             @Override

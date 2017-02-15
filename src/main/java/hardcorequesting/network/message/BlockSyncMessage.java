@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class BlockSyncMessage implements IMessage {
+
     private long pos;
     private int type;
     private String data;
@@ -45,6 +46,7 @@ public class BlockSyncMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<BlockSyncMessage, IMessage> {
+
         @Override
         public IMessage onMessage(BlockSyncMessage message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));

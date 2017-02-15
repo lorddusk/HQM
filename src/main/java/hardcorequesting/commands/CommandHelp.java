@@ -29,6 +29,20 @@ public class CommandHelp extends CommandBase {
     }
 
     @Override
+    @SuppressWarnings(value = "unchecked")
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return CommandHandler.instance.getTabCompletionOptions(sender.getServer(), sender, new String[]{args[1]}, new BlockPos(0, 0, 0));
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isVisible(ICommandSender sender) {
+        return true;
+    }
+
+    @Override
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         switch (arguments.length) {
             case 0:
@@ -63,20 +77,6 @@ public class CommandHelp extends CommandBase {
             default:
                 throw new WrongUsageException(Lang.COMMAND_PREFIX + getCommandName() + Lang.SYNTAX_SUFFIX);
         }
-    }
-
-    @Override
-    @SuppressWarnings(value = "unchecked")
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
-        if (args.length == 1) {
-            return CommandHandler.instance.getTabCompletionOptions(sender.getServer(), sender, new String[]{args[1]}, new BlockPos(0, 0, 0));
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isVisible(ICommandSender sender) {
-        return true;
     }
 
 }

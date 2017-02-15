@@ -23,14 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QuestAdapter {
-    public static Quest QUEST;
-    private static Map<String, Quest> nameToQuestMap = new HashMap<>();
-    private static List<ReputationBar> reputationBarList = new ArrayList<>();
-    private static Map<Quest, List<String>> requirementMapping = new HashMap<>();
-    private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
-    private static Map<Quest, List<String>> optionMapping = new HashMap<>();
-    private static Map<Quest, List<String>> optionLinkMapping = new HashMap<>();
-    private static Map<ReputationReward, String> reputationRewardMapping = new HashMap<>();
 
     private static final TypeAdapter<RepeatInfo> REPEAT_INFO_ADAPTER = new TypeAdapter<RepeatInfo>() {
         private final String TYPE = "type";
@@ -69,7 +61,52 @@ public class QuestAdapter {
             return new RepeatInfo(type, days, hours);
         }
     };
+    private static final TypeAdapter<ReputationBar> REPUTATION_BAR_ADAPTER = new TypeAdapter<ReputationBar>() {
+        private final String X = "x";
+        private final String Y = "y";
+        private final String REPUTATION_ID = "reputationId";
 
+        @Override
+        public void write(JsonWriter out, ReputationBar value) throws IOException {
+            out.beginObject();
+            out.name(REPUTATION_ID).value(value.getRepId());
+            out.name(X).value(value.getX());
+            out.name(Y).value(value.getY());
+            out.endObject();
+        }
+
+        @Override
+        public ReputationBar read(JsonReader in) throws IOException {
+            String id = null;
+            int x, y;
+            x = y = -1;
+            in.beginObject();
+            while (in.hasNext()) {
+                switch (in.nextName()) {
+                    case X:
+                        x = in.nextInt();
+                        break;
+                    case Y:
+                        y = in.nextInt();
+                        break;
+                    case REPUTATION_ID:
+                        id = in.nextString();
+                        break;
+                }
+            }
+            in.endObject();
+            return new ReputationBar(id, x, y, -1);
+        }
+    };
+    private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
+    public static Quest QUEST;
+    private static Map<String, Quest> nameToQuestMap = new HashMap<>();
+    private static List<ReputationBar> reputationBarList = new ArrayList<>();
+    private static Map<Quest, List<String>> requirementMapping = new HashMap<>();
+    private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
+    private static Map<Quest, List<String>> optionMapping = new HashMap<>();
+    private static Map<Quest, List<String>> optionLinkMapping = new HashMap<>();
+    private static Map<ReputationReward, String> reputationRewardMapping = new HashMap<>();
     private static final TypeAdapter<ReputationReward> REPUTATION_REWARD_ADAPTER = new TypeAdapter<ReputationReward>() {
         private final String REPUTATION = "reputation";
         private final String VALUE = "value";
@@ -103,7 +140,6 @@ public class QuestAdapter {
             return result;
         }
     };
-
     public static final TypeAdapter<Quest> QUEST_ADAPTER = new TypeAdapter<Quest>() {
         private final String UUID = "uuid";
         private final String NAME = "name";
@@ -126,6 +162,28 @@ public class QuestAdapter {
         private final String REWARDS_REPUTATION = "reputationrewards";
         private final String REWARDS_COMMAND = "commandrewards";
 
+        private void writeQuestList(JsonWriter out, List<Quest> quests, String name) throws IOException {
+            if (!quests.isEmpty()) {
+                out.name(name).beginArray();
+                for (Quest quest : quests) {
+                    out.value(quest.getId());
+                }
+                out.endArray();
+            }
+        }
+
+        private void writeItemStackArray(JsonWriter out, ItemStack[] stacks, String name) throws IOException {
+            if (stacks != null) {
+                out.name(name).beginArray();
+                for (ItemStack stack : stacks) {
+                    if (stack != null) {
+                        MinecraftAdapter.ITEM_STACK.write(out, stack);
+                    }
+                }
+                out.endArray();
+            }
+        }
+
         @Override
         public void write(JsonWriter out, Quest value) throws IOException {
             out.beginObject();
@@ -138,8 +196,8 @@ public class QuestAdapter {
             if (value.useBigIcon()) {
                 out.name(BIG_ICON).value(true);
             }
-            if (value.getIcon() != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), value.getIcon());
+            if (value.getIconStack() != null) {
+                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), value.getIconStack());
             }
             writeQuestList(out, value.getRequirements(), PREREQUISITES);
             writeQuestList(out, value.getOptionLinks(), OPTIONLINKS);
@@ -177,28 +235,6 @@ public class QuestAdapter {
             out.endObject();
         }
 
-        private void writeQuestList(JsonWriter out, List<Quest> quests, String name) throws IOException {
-            if (!quests.isEmpty()) {
-                out.name(name).beginArray();
-                for (Quest quest : quests) {
-                    out.value(quest.getId());
-                }
-                out.endArray();
-            }
-        }
-
-        private void writeItemStackArray(JsonWriter out, ItemStack[] stacks, String name) throws IOException {
-            if (stacks != null) {
-                out.name(name).beginArray();
-                for (ItemStack stack : stacks) {
-                    if (stack != null) {
-                        MinecraftAdapter.ITEM_STACK.write(out, stack);
-                    }
-                }
-                out.endArray();
-            }
-        }
-
         private void writeStringArray(JsonWriter out, String[] list, String name) throws IOException {
             if (list != null) {
                 out.name(name).beginArray();
@@ -209,6 +245,32 @@ public class QuestAdapter {
                 }
                 out.endArray();
             }
+        }
+
+        private <T> void optionalAdd(Map<Quest, List<T>> map, List<T> list) {
+            if (!list.isEmpty()) {
+                map.put(QUEST, list);
+            }
+        }
+
+        private void readStringArray(List<String> list, JsonReader in) throws IOException {
+            in.beginArray();
+            while (in.hasNext()) {
+                list.add(in.nextString());
+            }
+            in.endArray();
+        }
+
+        private ItemStack[] readItemStackArray(JsonReader in) throws IOException {
+            List<ItemStack> stacks = new ArrayList<>();
+            in.beginArray();
+            while (in.hasNext()) {
+                ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
+                if (stack != null)
+                    stacks.add(stack);
+            }
+            in.endArray();
+            return stacks.toArray(new ItemStack[stacks.size()]);
         }
 
         @Override
@@ -246,7 +308,7 @@ public class QuestAdapter {
                         QUEST.setBigIcon(in.nextBoolean());
                         break;
                     case ICON:
-                        QUEST.setIcon(MinecraftAdapter.ITEM_STACK.read(in));
+                        QUEST.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
                         break;
                     case REQUIREMENTS:
                         readStringArray(requirement, in);
@@ -327,39 +389,21 @@ public class QuestAdapter {
             return null;
         }
 
-        private <T> void optionalAdd(Map<Quest, List<T>> map, List<T> list) {
-            if (!list.isEmpty()) {
-                map.put(QUEST, list);
-            }
-        }
 
-        private void readStringArray(List<String> list, JsonReader in) throws IOException {
-            in.beginArray();
-            while (in.hasNext()) {
-                list.add(in.nextString());
-            }
-            in.endArray();
-        }
-
-        private ItemStack[] readItemStackArray(JsonReader in) throws IOException {
-            List<ItemStack> stacks = new ArrayList<>();
-            in.beginArray();
-            while (in.hasNext()) {
-                ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                if (stack != null)
-                    stacks.add(stack);
-            }
-            in.endArray();
-            return stacks.toArray(new ItemStack[stacks.size()]);
-        }
     };
-
     public static final TypeAdapter<QuestSet> QUEST_SET_ADAPTER = new TypeAdapter<QuestSet>() {
         private final String NAME = "name";
         private final String DESCRIPTION = "description";
         private final String QUESTS = "quests";
         private final String REPUTATION_BAR = "reputationBar";
         private final String REPUTATION_BAR_OLD = "reputation";
+
+        private QuestSet removeQuestsRaw(List<Quest> quests) {
+            for (Quest quest : quests) {
+                QuestLine.getActiveQuestLine().quests.remove(quest.getId());
+            }
+            return null;
+        }
 
         @Override
         public void write(JsonWriter out, QuestSet value) throws IOException {
@@ -450,50 +494,7 @@ public class QuestAdapter {
             return removeQuestsRaw(quests);
         }
 
-        private QuestSet removeQuestsRaw(List<Quest> quests) {
-            for (Quest quest : quests) {
-                QuestLine.getActiveQuestLine().quests.remove(quest.getId());
-            }
-            return null;
-        }
-    };
 
-    private static final TypeAdapter<ReputationBar> REPUTATION_BAR_ADAPTER = new TypeAdapter<ReputationBar>() {
-        private final String X = "x";
-        private final String Y = "y";
-        private final String REPUTATION_ID = "reputationId";
-
-        @Override
-        public void write(JsonWriter out, ReputationBar value) throws IOException {
-            out.beginObject();
-            out.name(REPUTATION_ID).value(value.getRepId());
-            out.name(X).value(value.getX());
-            out.name(Y).value(value.getY());
-            out.endObject();
-        }
-
-        @Override
-        public ReputationBar read(JsonReader in) throws IOException {
-            String id = null;
-            int x, y;
-            x = y = -1;
-            in.beginObject();
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case X:
-                        x = in.nextInt();
-                        break;
-                    case Y:
-                        y = in.nextInt();
-                        break;
-                    case REPUTATION_ID:
-                        id = in.nextString();
-                        break;
-                }
-            }
-            in.endObject();
-            return new ReputationBar(id, x, y, -1);
-        }
     };
 
     public static void postLoad() throws IOException {
@@ -534,8 +535,6 @@ public class QuestAdapter {
         QuestTaskAdapter.taskReputationListMap.clear();
         nameToQuestMap.clear();
     }
-
-    private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
 
     private static Quest getQuest(String questString) {
         String questId = questString;

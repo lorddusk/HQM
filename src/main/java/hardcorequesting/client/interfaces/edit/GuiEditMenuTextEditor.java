@@ -24,7 +24,20 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiEditMenuTextEditor extends GuiEditMenu {
 
     private static final int TEXT_HEIGHT = 9;
+    private static final int START_X = 20;
+    private static final int START_Y = 20;
+    private static final int LINES_PER_PAGE = 21;
     protected TextBoxLogic text;
+    private Quest quest;
+    private QuestTask task;
+    private QuestSet questSet;
+    private Group group;
+    private GroupTier groupTier;
+    private Reputation reputation;
+    private ReputationMarker reputationMarker;
+    private int location = -1;
+    private int mob = -1;
+    private boolean isName;
 
     protected GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
         super(gui, player, false);
@@ -99,17 +112,6 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         });
     }
 
-    private Quest quest;
-    private QuestTask task;
-    private QuestSet questSet;
-    private Group group;
-    private GroupTier groupTier;
-    private Reputation reputation;
-    private ReputationMarker reputationMarker;
-    private int location = -1;
-    private int mob = -1;
-    private boolean isName;
-
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTask task, boolean isName) {
         this(gui, player, isName ? task.getDescription() : task.getLongDescription(), isName);
         this.task = task;
@@ -125,6 +127,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.questSet = questSet;
     }
 
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player) {
         this(gui, player, Quest.getRawMainDescription(), false);
     }
@@ -134,11 +137,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.group = group;
     }
 
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, GroupTier groupTier) {
         this(gui, player, groupTier.getName(), true);
         this.groupTier = groupTier;
     }
-
 
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskLocation task, int id, QuestTaskLocation.Location location) {
         this(gui, player, location.getName(), true);
@@ -151,11 +154,6 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.task = task;
         this.mob = id;
     }
-
-
-    private static final int START_X = 20;
-    private static final int START_Y = 20;
-    private static final int LINES_PER_PAGE = 21;
 
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, Reputation reputation) {
         this(gui, player, reputation.getName(), true);

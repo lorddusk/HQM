@@ -11,22 +11,23 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ItemPrecision {
+
     public static final ItemPrecision PRECISE = new ItemPrecision("precise") {
         @Override
-        protected boolean same(ItemStack item1, ItemStack item2) {
-            return item1.getItem() == item2.getItem() && item1.getItemDamage() == item2.getItemDamage() && ItemStack.areItemStackTagsEqual(item1, item2);
+        protected boolean same(ItemStack stack1, ItemStack stack2) {
+            return stack1.getItem() == stack2.getItem() && stack1.getItemDamage() == stack2.getItemDamage() && ItemStack.areItemStackTagsEqual(stack1, stack2);
         }
     };
     public static final ItemPrecision NBT_FUZZY = new ItemPrecision("nbtFuzzy") {
         @Override
-        protected boolean same(ItemStack item1, ItemStack item2) {
-            return item1.getItem() == item2.getItem() && item1.getItemDamage() == item2.getItemDamage();
+        protected boolean same(ItemStack stack1, ItemStack stack2) {
+            return stack1.getItem() == stack2.getItem() && stack1.getItemDamage() == stack2.getItemDamage();
         }
     };
     public static final ItemPrecision FUZZY = new ItemPrecision("fuzzy", true) {
         @Override
-        protected boolean same(ItemStack item1, ItemStack item2) {
-            return item1.getItem() == item2.getItem();
+        protected boolean same(ItemStack stack1, ItemStack stack2) {
+            return stack1.getItem() == stack2.getItem();
         }
 
         @Override
@@ -38,8 +39,8 @@ public abstract class ItemPrecision {
     };
     public static final ItemPrecision ORE_DICTIONARY = new ItemPrecision("oreDict", true) {
         @Override
-        protected boolean same(ItemStack item1, ItemStack item2) {
-            return OreDictionaryHelper.match(item1, item2) || PRECISE.same(item1, item2);
+        protected boolean same(ItemStack stack1, ItemStack stack2) {
+            return OreDictionaryHelper.match(stack1, stack2) || PRECISE.same(stack1, stack2);
         }
 
         @Override
@@ -47,49 +48,6 @@ public abstract class ItemPrecision {
             return OreDictionaryHelper.getPermutations(stack);
         }
     };
-
-    private String tag;
-
-    public ItemPrecision(String tag) {
-        this.tag = tag;
-    }
-
-    public ItemPrecision(String tag, boolean hasPermutations) {
-        this(tag);
-        this.hasPermutations = hasPermutations;
-    }
-
-    protected abstract boolean same(ItemStack item1, ItemStack item2);
-
-    public final boolean areItemsSame(ItemStack item1, ItemStack item2) {
-        return item1 == null && item2 == null || item1 != null && item2 != null && same(item1, item2);
-    }
-
-    @Override
-    public String toString() {
-        return tag;
-    }
-
-    public String getLocalizationTag() {
-        return "hqm.precision." + tag;
-    }
-
-    public String getName() {
-        return Translator.translate(getLocalizationTag());
-    }
-
-    protected boolean hasPermutations = false;
-
-    public boolean hasPermutations() {
-        return hasPermutations;
-    }
-
-    public ItemStack[] getPermutations(ItemStack stack) {
-        return new ItemStack[0];
-    }
-
-    // Registry things
-
     private static final LinkedHashMap<String, ItemPrecision> precisionTypes;
 
     static {
@@ -100,6 +58,18 @@ public abstract class ItemPrecision {
         registerPrecisionType("NBT_FUZZY", NBT_FUZZY);
         registerPrecisionType("FUZZY", FUZZY);
         registerPrecisionType("ORE_DICTIONARY", ORE_DICTIONARY);
+    }
+
+    protected boolean hasPermutations = false;
+    private String tag;
+
+    public ItemPrecision(String tag) {
+        this.tag = tag;
+    }
+
+    public ItemPrecision(String tag, boolean hasPermutations) {
+        this(tag);
+        this.hasPermutations = hasPermutations;
     }
 
     public static boolean registerPrecisionType(String uniqueID, ItemPrecision p) {
@@ -120,8 +90,6 @@ public abstract class ItemPrecision {
     public static ItemPrecision getPrecisionType(String uniqueID) {
         return precisionTypes.containsKey(uniqueID) ? precisionTypes.get(uniqueID) : PRECISE;
     }
-
-    // For backwards compatibility
 
     public static ItemPrecision getOldPrecisionType(int ordinal) {
         switch (ordinal) {
@@ -147,5 +115,36 @@ public abstract class ItemPrecision {
             }
         }
         return "PRECISE";
+    }
+
+    // Registry things
+
+    protected abstract boolean same(ItemStack stack1, ItemStack stack2);
+
+    public final boolean areItemsSame(ItemStack stack1, ItemStack stack2) {
+        return stack1 == null && stack2 == null || stack1 != null && stack2 != null && same(stack1, stack2);
+    }
+
+    @Override
+    public String toString() {
+        return tag;
+    }
+
+    public String getLocalizationTag() {
+        return "hqm.precision." + tag;
+    }
+
+    public String getName() {
+        return Translator.translate(getLocalizationTag());
+    }
+
+    // For backwards compatibility
+
+    public boolean hasPermutations() {
+        return hasPermutations;
+    }
+
+    public ItemStack[] getPermutations(ItemStack stack) {
+        return new ItemStack[0];
     }
 }

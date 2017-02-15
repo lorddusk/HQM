@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
+
     public static ItemQuestBook book = new ItemQuestBook();
     public static ItemHeart hearts = new ItemHeart();
     public static ItemBag bags = new ItemBag();

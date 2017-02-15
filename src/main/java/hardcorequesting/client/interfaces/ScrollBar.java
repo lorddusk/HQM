@@ -85,10 +85,6 @@ public class ScrollBar {
         return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
     }
 
-    public void resetScroll() {
-        scroll = 0;
-    }
-
     private void setScroll(int newScroll) {
         int old = scroll;
         scroll = newScroll;
@@ -100,6 +96,10 @@ public class ScrollBar {
         if (scroll != old) {
             onUpdate();
         }
+    }
+
+    public void resetScroll() {
+        scroll = 0;
     }
 
     public void onScroll(GuiBase gui, int mX, int mY, int scroll) {

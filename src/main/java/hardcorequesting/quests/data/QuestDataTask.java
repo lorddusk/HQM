@@ -9,18 +9,15 @@ import hardcorequesting.quests.task.QuestTask;
 import java.io.IOException;
 
 public class QuestDataTask {
-    public boolean completed;
+
     protected static final String COMPLETED = "completed";
+    public boolean completed;
 
     public QuestDataTask(QuestTask task) {
     }
 
     protected QuestDataTask() {
 
-    }
-
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.GENERIC;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -36,6 +33,10 @@ public class QuestDataTask {
         } catch (IOException ignored) {
         }
         return data;
+    }
+
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.GENERIC;
     }
 
     public void write(JsonWriter out) throws IOException {

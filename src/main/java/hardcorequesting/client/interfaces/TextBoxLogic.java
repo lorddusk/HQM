@@ -8,35 +8,19 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class TextBoxLogic {
+
     private static final int TEXT_HEIGHT = 9;
-    private String text;
-    private List<String> lines;
     protected int cursor;
     protected int cursorPositionX;
+    protected boolean updatedCursor;
+    private String text;
+    private List<String> lines;
     private int cursorPositionY;
     private boolean multiLine;
     private int width;
-    protected boolean updatedCursor;
     private float mult = 1F;
     private int maxLength = Integer.MAX_VALUE;
     private int cursorLine;
-
-    public int getCursorLine(GuiBase gui) {
-        recalculateCursor(gui);
-        return cursorLine;
-    }
-
-    public void setMaxLength(int maxLength) {
-        this.maxLength = maxLength;
-    }
-
-    public void setMult(float mult) {
-        this.mult = mult;
-    }
-
-    public float getMult() {
-        return mult;
-    }
 
     public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine) {
         this.width = width;
@@ -48,6 +32,23 @@ public class TextBoxLogic {
         }
         textChanged(gui);
         resetCursor();
+    }
+
+    public int getCursorLine(GuiBase gui) {
+        recalculateCursor(gui);
+        return cursorLine;
+    }
+
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    public float getMult() {
+        return mult;
+    }
+
+    public void setMult(float mult) {
+        this.mult = mult;
     }
 
     @SideOnly(Side.CLIENT)

@@ -11,22 +11,23 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
+@Mod.EventBusSubscriber
 public class PlayerTracker {
+
+    public static final String HQ_TAG = "HardcoreQuesting";
+    public static final String RECEIVED_BOOK = "questBook";
 
     public PlayerTracker() {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-
     public int getRemainingLives(ICommandSender sender) {
         return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
     }
-
-    public static final String HQ_TAG = "HardcoreQuesting";
-    public static final String RECEIVED_BOOK = "questBook";
 
     @SubscribeEvent
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -40,7 +41,7 @@ public class PlayerTracker {
         if (QuestingData.isHardcoreActive())
             sendLoginMessage(player);
         else if (ModConfig.NO_HARDCORE_MESSAGE)
-            player.addChatMessage(new TextComponentTranslation("hqm.message.noHardcore"));
+            player.addChatComponentMessage(new TextComponentTranslation("hqm.message.noHardcore"));
 
         NBTTagCompound tags = player.getEntityData();
         if (tags.hasKey(HQ_TAG)) {
@@ -56,7 +57,7 @@ public class PlayerTracker {
 
 
     private void sendLoginMessage(EntityPlayer player) {
-        player.addChatMessage(new TextComponentString(
+        player.addChatComponentMessage(new TextComponentString(
                 Translator.translate("hqm.message.hardcore") + " "
                         + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
         ));

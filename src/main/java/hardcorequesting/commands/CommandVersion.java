@@ -5,6 +5,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 
 public class CommandVersion extends CommandBase {
+
     public CommandVersion() {
         super("version");
         permissionLevel = 0;

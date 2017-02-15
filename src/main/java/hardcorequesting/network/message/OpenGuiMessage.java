@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class OpenGuiMessage implements IMessage {
+
     private String data;
     private GuiType gui;
 
@@ -38,6 +39,7 @@ public class OpenGuiMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<OpenGuiMessage, IMessage> {
+
         @Override
         public IMessage onMessage(OpenGuiMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

@@ -9,8 +9,9 @@ import hardcorequesting.quests.task.QuestTask;
 import java.io.IOException;
 
 public class QuestDataTaskDeath extends QuestDataTask {
-    public int deaths;
+
     private static final String DEATHS = "deaths";
+    public int deaths;
 
     public QuestDataTaskDeath(QuestTask task) {
         super(task);
@@ -18,11 +19,6 @@ public class QuestDataTaskDeath extends QuestDataTask {
 
     protected QuestDataTaskDeath() {
         super();
-    }
-
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.DEATH;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -43,6 +39,11 @@ public class QuestDataTaskDeath extends QuestDataTask {
         } catch (IOException ignored) {
         }
         return taskData;
+    }
+
+    @Override
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.DEATH;
     }
 
     @Override

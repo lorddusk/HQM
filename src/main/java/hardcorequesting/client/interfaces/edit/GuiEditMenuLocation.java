@@ -75,13 +75,13 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumberNegative(gui, 4, "hqm.locationMenu.radius") {
             @Override
-            protected void setValue(int number) {
-                location.setRadius(number);
+            protected int getValue() {
+                return location.getRadius();
             }
 
             @Override
-            protected int getValue() {
-                return location.getRadius();
+            protected void setValue(int number) {
+                location.setRadius(number);
             }
 
             @Override
@@ -136,6 +136,11 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         return location.getVisible().getDescription();
     }
 
+    @Override
+    public void save(GuiBase gui) {
+        task.setLocation(id, location, player);
+    }
+
     private abstract class TextBoxNumberNegative extends GuiEditMenuExtended.TextBoxNumber {
 
         public TextBoxNumberNegative(GuiQuestBook gui, int id, String title) {
@@ -146,11 +151,5 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         protected boolean isNegativeAllowed() {
             return true;
         }
-    }
-
-
-    @Override
-    public void save(GuiBase gui) {
-        task.setLocation(id, location, player);
     }
 }

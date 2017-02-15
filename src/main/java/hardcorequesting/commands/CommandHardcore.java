@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.util.List;
 
 public class CommandHardcore extends CommandBase {
+
     public CommandHardcore() {
         super("hardcore");
     }

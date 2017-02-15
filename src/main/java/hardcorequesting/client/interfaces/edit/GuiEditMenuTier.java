@@ -9,6 +9,22 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTier extends GuiEditMenu {
+
+    private static final int ARROW_X_LEFT = 20;
+    private static final int ARROW_X_RIGHT = 150;
+    private static final int ARROW_Y = 40;
+    private static final int ARROW_SRC_X = 244;
+    private static final int ARROW_SRC_Y = 176;
+    private static final int ARROW_W = 6;
+    private static final int ARROW_H = 10;
+    private static final int TIERS_TEXT_X = 20;
+    private static final int TIERS_TEXT_Y = 20;
+    private static final int TIERS_WEIGHTS_X = 30;
+    private static final int TIERS_WEIGHTS_Y = 80;
+    private static final int TIERS_WEIGHTS_SPACING = 15;
+    private static final int TIERS_TEXT_BOX_X = 65;
+    private static final int TIERS_TEXT_BOX_Y = -2;
+    private static final int TIERS_WEIGHTS_TEXT_Y = 65;
     private GroupTier tier;
     private GroupTier original;
     private TextBoxGroup textBoxes;
@@ -47,24 +63,6 @@ public class GuiEditMenuTier extends GuiEditMenu {
             });
         }
     }
-
-    private static final int ARROW_X_LEFT = 20;
-    private static final int ARROW_X_RIGHT = 150;
-    private static final int ARROW_Y = 40;
-    private static final int ARROW_SRC_X = 244;
-    private static final int ARROW_SRC_Y = 176;
-    private static final int ARROW_W = 6;
-    private static final int ARROW_H = 10;
-
-    private static final int TIERS_TEXT_X = 20;
-    private static final int TIERS_TEXT_Y = 20;
-    private static final int TIERS_WEIGHTS_X = 30;
-    private static final int TIERS_WEIGHTS_Y = 80;
-    private static final int TIERS_WEIGHTS_SPACING = 15;
-    private static final int TIERS_TEXT_BOX_X = 65;
-    private static final int TIERS_TEXT_BOX_Y = -2;
-    private static final int TIERS_WEIGHTS_TEXT_Y = 65;
-
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -108,6 +106,25 @@ public class GuiEditMenuTier extends GuiEditMenu {
         textBoxes.onClick(gui, mX, mY);
     }
 
+    @Override
+    public void onKeyTyped(GuiBase gui, char c, int k) {
+        super.onKeyTyped(gui, c, k);
+
+        textBoxes.onKeyStroke(gui, c, k);
+    }
+
+    @Override
+    public void onRelease(GuiBase gui, int mX, int mY) {
+        super.onRelease(gui, mX, mY);
+        clicked = false;
+    }
+
+    @Override
+    public void save(GuiBase gui) {
+        original.load(tier);
+        SaveHelper.add(SaveHelper.EditType.TIER_CHANGE);
+    }
+
     private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {
         return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
     }
@@ -117,24 +134,5 @@ public class GuiEditMenuTier extends GuiEditMenu {
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
 
         gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
-    }
-
-    @Override
-    public void onKeyTyped(GuiBase gui, char c, int k) {
-        super.onKeyTyped(gui, c, k);
-
-        textBoxes.onKeyStroke(gui, c, k);
-    }
-
-    @Override
-    public void save(GuiBase gui) {
-        original.load(tier);
-        SaveHelper.add(SaveHelper.EditType.TIER_CHANGE);
-    }
-
-    @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
-        clicked = false;
     }
 }

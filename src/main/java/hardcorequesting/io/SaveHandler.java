@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class SaveHandler {
+
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Reputation.class, ReputationAdapter.REPUTATION_ADAPTER)
             .registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER)
@@ -57,7 +58,9 @@ public class SaveHandler {
 
     public static final String EXPORTS = "exports";
     public static final String REMOTE = "remote";
-    public static final String DEFAULT = "default";
+    public static final String QUESTS = "quests";
+    private static final String QUESTING = "questing";
+    private static final String HARDCORE = "hardcore";
 
     public static File getExportFile(String name) throws IOException {
         File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name.endsWith(".txt") ? name : name + ".json");
@@ -66,21 +69,19 @@ public class SaveHandler {
     }
 
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(QuestLine.getActiveQuestLine().mainPath, name.endsWith(".txt") ? name :  name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir, QUESTS), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getRemoteFile(String name) throws IOException {
-        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath, REMOTE), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir, REMOTE), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
-    public static File getDefaultFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name.endsWith(".txt") ? name : name + ".json");
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return file;
+    public static File getFile(String name, boolean remote) throws IOException{
+        return remote ? getRemoteFile(name) : getLocalFile(name);
     }
 
     public static File getExportFolder() {
@@ -88,15 +89,15 @@ public class SaveHandler {
     }
 
     public static File getLocalFolder() {
-        return new File(QuestLine.getActiveQuestLine().mainPath);
+        return new File(HardcoreQuesting.configDir, QUESTS);
     }
 
     public static File getRemoteFolder() {
-        return new File(QuestLine.getActiveQuestLine().mainPath, REMOTE);
+        return new File(HardcoreQuesting.configDir, REMOTE);
     }
 
-    public static File getDefaultFolder() {
-        return new File(HardcoreQuesting.configDir, DEFAULT);
+    public static File getFolder(boolean remote){
+        return remote ? getRemoteFolder() : getLocalFolder();
     }
 
     public static void copyFolder(File from, File to) {
@@ -121,8 +122,11 @@ public class SaveHandler {
     public static void saveAllQuestSets(File folder) throws IOException {
         removeQuestSetFiles(folder);
         saveQuestSetList(Quest.getQuestSets(), new File(folder, "sets.json"));
-        for (QuestSet set : Quest.getQuestSets())
+        List<QuestSet> setsToSave = new ArrayList<>(); // possible fix for #251
+        setsToSave.addAll(Quest.getQuestSets());
+        for (QuestSet set : setsToSave) {
             saveQuestSet(set, new File(folder, set.getFilename() + ".json"));
+        }
     }
 
     public static String saveAllQuestSets(List<String> names, List<String> questSets) {
@@ -299,9 +303,6 @@ public class SaveHandler {
     public static String save(Object object, Type type) {
         return SaveHandler.GSON.toJson(object, type);
     }
-
-    private static final String QUESTING = "questing";
-    private static final String HARDCORE = "hardcore";
 
     public static void saveQuestingState(File file) throws IOException {
         if (!file.exists()) file.createNewFile();

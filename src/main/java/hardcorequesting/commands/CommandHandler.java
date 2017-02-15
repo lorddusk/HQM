@@ -11,10 +11,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class CommandHandler extends CommandBase {
-    public static Map<String, ISubCommand> commands = new LinkedHashMap<String, ISubCommand>();
+
+    public static Map<String, ISubCommand> commands = new LinkedHashMap<>();
     public static CommandHandler instance = new CommandHandler();
 
     static {
@@ -37,18 +39,30 @@ public class CommandHandler extends CommandBase {
         return commands.containsKey(name);
     }
 
+    public static boolean isOwnerOrOp(ICommandSender sender) {
+        if (sender instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) sender;
+            GameProfile username = player.getGameProfile();
+            return isCommandsAllowedOrOwner(sender, username);
+        } else
+            return true;
+    }
+
+    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
+        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
+    }
+
+    public static ISubCommand getCommand(String commandName) {
+        return commands.get(commandName);
+    }
+
     @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
         return true;
     }
 
     @Override
-    public String getCommandName() {
-        return "hqm";
-    }
-
-    @Override
-    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
         if (args.length == 1) {
             String subCommand = args[0];
             List<String> result = new ArrayList<>();
@@ -61,6 +75,11 @@ public class CommandHandler extends CommandBase {
             return commands.get(args[0]).addTabCompletionOptions(sender, Arrays.copyOfRange(args, 1, args.length));
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public String getCommandName() {
+        return "hqm";
     }
 
     @Override
@@ -83,23 +102,5 @@ public class CommandHandler extends CommandBase {
             throw new CommandException(Lang.NO_PERMISSION);
         }
         throw new CommandNotFoundException(Lang.NOT_FOUND);
-    }
-
-    public static boolean isOwnerOrOp(ICommandSender sender) {
-        if (sender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) sender;
-            GameProfile username = player.getGameProfile();
-            return isCommandsAllowedOrOwner(sender, username);
-        } else
-            return true;
-    }
-
-
-    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
-        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
-    }
-
-    public static ISubCommand getCommand(String commandName) {
-        return commands.get(commandName);
     }
 }

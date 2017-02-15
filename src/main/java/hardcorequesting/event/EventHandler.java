@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -13,8 +14,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+@Mod.EventBusSubscriber
 public class EventHandler {
 
+    private static EventHandler instance;
     private List<QuestTask>[] registeredTasks;
 
     public EventHandler() {
@@ -22,10 +25,12 @@ public class EventHandler {
         for (int i = 0; i < registeredTasks.length; i++) {
             registeredTasks[i] = new ArrayList<>();
         }
-
-        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(this);
         instance = this;
+    }
+
+    public static EventHandler instance() {
+        return instance;
     }
 
     public void clear() {
@@ -46,12 +51,6 @@ public class EventHandler {
         }
     }
 
-    private static EventHandler instance;
-
-    public static EventHandler instance() {
-        return instance;
-    }
-
     @SubscribeEvent
     public void onEvent(TickEvent.ServerTickEvent event) {
         for (QuestTask task : getTasks(Type.SERVER)) {
@@ -70,6 +69,13 @@ public class EventHandler {
     public void onEvent(LivingDeathEvent event) {
         for (QuestTask task : getTasks(Type.DEATH)) {
             task.onLivingDeath(event);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEvent(PlayerEvent.PlayerLoggedInEvent event) {
+        if(QuestingData.autoQuestActivate) {
+            QuestingData.activateQuest(true);
         }
     }
 
@@ -103,8 +109,18 @@ public class EventHandler {
         return registeredTasks[type.ordinal()];
     }
 
+    public enum Type {
+        SERVER,
+        PLAYER,
+        DEATH,
+        CRAFTING,
+        PICK_UP,
+        OPEN_BOOK,
+        REPUTATION_CHANGE,
+    }
 
     public static class BookOpeningEvent {
+
         private String playerName;
         private boolean isOpBook;
         private boolean isRealName;
@@ -133,6 +149,7 @@ public class EventHandler {
     }
 
     public static class ReputationEvent {
+
         private EntityPlayer player;
 
 
@@ -143,16 +160,6 @@ public class EventHandler {
         public EntityPlayer getPlayer() {
             return player;
         }
-    }
-
-    public enum Type {
-        SERVER,
-        PLAYER,
-        DEATH,
-        CRAFTING,
-        PICK_UP,
-        OPEN_BOOK,
-        REPUTATION_CHANGE,
     }
 
 }

@@ -105,10 +105,6 @@ public enum DeathType {
         this.name = name;
     }
 
-    public void onDeath(EntityPlayer player) {
-        QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
-    }
-
     public static void onDeath(EntityPlayer player, DamageSource source) {
         if (source != null && source.getDamageType() != null) {
             for (DeathType deathType : values()) {
@@ -121,6 +117,10 @@ public enum DeathType {
             OTHER.onDeath(player);
         }
 
+    }
+
+    public void onDeath(EntityPlayer player) {
+        QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
     }
 
     //is only accurate if called in the values() order

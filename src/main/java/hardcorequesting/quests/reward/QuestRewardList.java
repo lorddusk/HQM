@@ -3,6 +3,7 @@ package hardcorequesting.quests.reward;
 import java.util.*;
 
 public class QuestRewardList<T> implements List<QuestReward<T>> {
+
     protected List<QuestReward<T>> list;
 
     public QuestRewardList() {
@@ -18,11 +19,6 @@ public class QuestRewardList<T> implements List<QuestReward<T>> {
         QuestReward<T> qReward = get(index);
         if (qReward != null)
             qReward.setReward(reward);
-    }
-
-    @Override
-    public Object[] toArray() {
-        return list.toArray();
     }
 
     //region List implementation
@@ -44,6 +40,11 @@ public class QuestRewardList<T> implements List<QuestReward<T>> {
     @Override
     public Iterator<QuestReward<T>> iterator() {
         return list.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return list.toArray();
     }
 
     @Override

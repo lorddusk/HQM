@@ -1,5 +1,12 @@
 {
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all",
+    "transform": "forge:default-block",
+    "textures" : { "all" : "hardcorequesting:blocks/hqm_quest_portal"}
+  },
   "variants": {
-    "normal": { "model": "hardcorequesting:quest_portal" }
+    "normal": [{}],
+    "inventory": [{}]
   }
 }

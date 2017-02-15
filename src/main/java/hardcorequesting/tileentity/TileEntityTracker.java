@@ -22,25 +22,40 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityTracker extends TileEntity implements ITickable {
 
 
+    private static final String NBT_QUEST = "Quest";
+    private static final String NBT_RADIUS = "Radius";
+    private static final String NBT_TYPE = "TrackerType";
     private Quest quest;
     private String questId;
     private int radius;
     private TrackerType type = TrackerType.TEAM;
+    private int delay = 0;
 
-    private static final String NBT_QUEST = "Quest";
-    private static final String NBT_RADIUS = "Radius";
-    private static final String NBT_TYPE = "TrackerType";
+    private static TileEntityTracker getTracker(World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        return (te instanceof TileEntityTracker) ? (TileEntityTracker) te : null;
+    }
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
-
-        if (quest != null) {
-            compound.setString(NBT_QUEST, quest.getId());
+    @SideOnly(Side.CLIENT)
+    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type) {
+        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        if (tracker != null) {
+            tracker.questId = questId;
+            tracker.quest = null;
+            tracker.radius = radius;
+            tracker.type = type;
+            GuiBase gui = new GuiWrapperEditMenu();
+            gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
+            Minecraft.getMinecraft().displayGuiScreen(gui);
         }
-        compound.setInteger(NBT_RADIUS, radius);
-        compound.setByte(NBT_TYPE, (byte) type.ordinal());
-        return compound;
+    }
+
+    public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
+        TileEntityTracker tracker = getTracker(player.worldObj, pos);
+        if (Quest.isEditing && tracker != null) {
+            tracker.radius = radius;
+            tracker.type = type;
+        }
     }
 
     @Override
@@ -56,7 +71,17 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         type = TrackerType.values()[compound.getByte(NBT_TYPE)];
     }
 
-    private int delay = 0;
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
+
+        if (quest != null) {
+            compound.setString(NBT_QUEST, quest.getId());
+        }
+        compound.setInteger(NBT_RADIUS, radius);
+        compound.setByte(NBT_TYPE, (byte) type.ordinal());
+        return compound;
+    }
 
     @Override
     public void update() {
@@ -137,35 +162,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         return data;
     }
 
-    private static TileEntityTracker getTracker(World world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
-        return (te instanceof TileEntityTracker) ? (TileEntityTracker) te : null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type) {
-        TileEntityTracker tracker = getTracker(player.worldObj, pos);
-        if (tracker != null) {
-            tracker.questId = questId;
-            tracker.quest = null;
-            tracker.radius = radius;
-            tracker.type = type;
-            GuiBase gui = new GuiWrapperEditMenu();
-            gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
-            Minecraft.getMinecraft().displayGuiScreen(gui);
-        }
-    }
-
-
     public void sendToServer() {
         NetworkManager.sendToServer(ClientChange.TRACKER_UPDATE.build(this));
-    }
-
-    public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
-        TileEntityTracker tracker = getTracker(player.worldObj, pos);
-        if (Quest.isEditing && tracker != null) {
-            tracker.radius = radius;
-            tracker.type = type;
-        }
     }
 }

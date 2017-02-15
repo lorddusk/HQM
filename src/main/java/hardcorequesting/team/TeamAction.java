@@ -199,13 +199,13 @@ public enum TeamAction {
         }
     };
 
+    private static Team getTeam(EntityPlayer player) {
+        return QuestingData.getQuestingData(player).getTeam();
+    }
+
     public void process(EntityPlayer player, String data) {
         process(getTeam(player), player, data);
     }
 
     public abstract void process(Team team, EntityPlayer player, String data);
-
-    private static Team getTeam(EntityPlayer player) {
-        return QuestingData.getQuestingData(player).getTeam();
-    }
 }

@@ -22,24 +22,43 @@ import java.util.function.Function;
 import static hardcorequesting.io.adapter.QuestAdapter.QUEST;
 
 public class QuestTaskAdapter {
-    public static QuestTask TASK;
-    protected static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
 
+    public static final TypeAdapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new TypeAdapter<QuestDataTask>() {
+        private static final String TYPE = "type";
+
+        @Override
+        public void write(JsonWriter out, QuestDataTask value) throws IOException {
+            out.beginObject();
+            out.name(TYPE).value(String.valueOf(value.getDataType()));
+            value.write(out);
+            out.endObject();
+        }
+
+        @Override
+        public QuestDataTask read(JsonReader in) throws IOException {
+            in.beginObject();
+            QuestDataTask dataTask = null;
+            if (in.hasNext() && in.nextName().equals(TYPE))
+                dataTask = QuestDataType.valueOf(in.nextString()).construct(in);
+            in.endObject();
+            return dataTask; // should never be null
+        }
+    };
     protected static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
-        private final String ITEM = "item";
+        private final String ITEM = "fluidStack";
         private final String FLUID = "fluid";
         private final String REQUIRED = "required";
         private final String PRECISION = "precision";
 
         @Override
         public void write(JsonWriter out, QuestTaskItems.ItemRequirement value) throws IOException {
-            ItemStack item = value.getItem();
+            ItemStack stack = value.getStack();
             Fluid fluid = value.fluid;
             int required = value.required;
             ItemPrecision precision = value.getPrecision();
             out.beginObject();
-            if (item != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), item);
+            if (stack != null) {
+                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack);
             } else if (fluid != null) {
                 MinecraftAdapter.FLUID.write(out.name(FLUID), fluid);
             } else {
@@ -57,14 +76,14 @@ public class QuestTaskAdapter {
         @Override
         public QuestTaskItems.ItemRequirement read(JsonReader in) throws IOException {
             in.beginObject();
-            ItemStack item = null;
+            ItemStack stack = null;
             Fluid fluid = null;
             int required = 1;
             ItemPrecision precision = ItemPrecision.PRECISE;
             while (in.hasNext()) {
                 String next = in.nextName();
                 if (next.equalsIgnoreCase(ITEM)) {
-                    item = MinecraftAdapter.ITEM_STACK.read(in);
+                    stack = MinecraftAdapter.ITEM_STACK.read(in);
                 } else if (next.equalsIgnoreCase(FLUID)) {
                     fluid = MinecraftAdapter.FLUID.read(in);
                 } else if (next.equalsIgnoreCase(REQUIRED)) {
@@ -78,8 +97,8 @@ public class QuestTaskAdapter {
             }
             in.endObject();
             QuestTaskItems.ItemRequirement result = null;
-            if (item != null) {
-                result = new QuestTaskItems.ItemRequirement(item, required);
+            if (stack != null) {
+                result = new QuestTaskItems.ItemRequirement(stack, required);
             } else if (fluid != null) {
                 result = new QuestTaskItems.ItemRequirement(fluid, required);
             } else {
@@ -89,7 +108,6 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-
     protected static final TypeAdapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new TypeAdapter<QuestTaskLocation.Location>() {
         private final String X = "x";
         private final String Y = "y";
@@ -104,7 +122,7 @@ public class QuestTaskAdapter {
         public void write(JsonWriter out, QuestTaskLocation.Location value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIcon();
+            ItemStack stack = value.getIconStack();
             if (stack != null) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
             }
@@ -137,7 +155,7 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    result.setIcon(MinecraftAdapter.ITEM_STACK.read(in));
+                    result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
                 } else if (name.equalsIgnoreCase(VISIBLE)) {
                     result.setVisible(QuestTaskLocation.Visibility.valueOf(in.nextString()));
                 }
@@ -146,51 +164,6 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-
-    protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
-        private final String KILLS = "kills";
-        private final String EXACT = "exact";
-        private final String MOB = "mob";
-        private final String ICON = "icon";
-        private final String NAME = "name";
-
-        @Override
-        public void write(JsonWriter out, QuestTaskMob.Mob value) throws IOException {
-            out.beginObject();
-            out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIcon();
-            if (stack != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
-            }
-            out.name(MOB).value(value.getMob());
-            out.name(KILLS).value(value.getCount());
-            out.name(EXACT).value(value.isExact());
-            out.endObject();
-        }
-
-        @Override
-        public QuestTaskMob.Mob read(JsonReader in) throws IOException {
-            in.beginObject();
-            QuestTaskMob.Mob result = ((QuestTaskMob) TASK).new Mob();
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(NAME)) {
-                    result.setName(in.nextString());
-                } else if (name.equalsIgnoreCase(ICON)) {
-                    result.setIcon(MinecraftAdapter.ITEM_STACK.read(in));
-                } else if (name.equalsIgnoreCase(MOB)) {
-                    result.setMob(in.nextString());
-                } else if (name.equalsIgnoreCase(EXACT)) {
-                    result.setExact(in.nextBoolean());
-                } else if (name.equalsIgnoreCase(KILLS)) {
-                    result.setCount(in.nextInt());
-                }
-            }
-            in.endObject();
-            return result;
-        }
-    };
-
     protected static final TypeAdapter<QuestTaskReputation.ReputationSetting> REPUTATION_TASK_ADAPTER = new TypeAdapter<QuestTaskReputation.ReputationSetting>() {
         private final String REPUTATION = "reputation";
         private final String LOWER = "lower";
@@ -240,7 +213,51 @@ public class QuestTaskAdapter {
             return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
         }
     };
+    public static QuestTask TASK;
+    protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
+        private final String KILLS = "kills";
+        private final String EXACT = "exact";
+        private final String MOB = "mob";
+        private final String ICON = "icon";
+        private final String NAME = "name";
 
+        @Override
+        public void write(JsonWriter out, QuestTaskMob.Mob value) throws IOException {
+            out.beginObject();
+            out.name(NAME).value(value.getName());
+            ItemStack stack = value.getIconStack();
+            if (stack != null) {
+                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
+            }
+            out.name(MOB).value(value.getMob());
+            out.name(KILLS).value(value.getCount());
+            out.name(EXACT).value(value.isExact());
+            out.endObject();
+        }
+
+        @Override
+        public QuestTaskMob.Mob read(JsonReader in) throws IOException {
+            in.beginObject();
+            QuestTaskMob.Mob result = ((QuestTaskMob) TASK).new Mob();
+            while (in.hasNext()) {
+                String name = in.nextName();
+                if (name.equalsIgnoreCase(NAME)) {
+                    result.setName(in.nextString());
+                } else if (name.equalsIgnoreCase(ICON)) {
+                    result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                } else if (name.equalsIgnoreCase(MOB)) {
+                    result.setMob(in.nextString());
+                } else if (name.equalsIgnoreCase(EXACT)) {
+                    result.setExact(in.nextBoolean());
+                } else if (name.equalsIgnoreCase(KILLS)) {
+                    result.setCount(in.nextInt());
+                }
+            }
+            in.endObject();
+            return result;
+        }
+    };
+    protected static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
     protected static final TypeAdapter<QuestTask> TASK_ADAPTER = new TypeAdapter<QuestTask>() {
         private final String TYPE = "type";
         private final String DESCRIPTION = "description";
@@ -363,10 +380,34 @@ public class QuestTaskAdapter {
         }
     };
 
+    public enum QuestDataType {
+        GENERIC(QuestDataTask::construct),
+        DEATH(QuestDataTaskDeath::construct),
+        ITEMS(QuestDataTaskItems::construct),
+        LOCATION(QuestDataTaskLocation::construct),
+        MOB(QuestDataTaskMob::construct),
+        REPUTATION_KILL(QuestDataTaskReputationKill::construct);
+
+        private Function<JsonReader, QuestDataTask> func;
+
+        QuestDataType(Function<JsonReader, QuestDataTask> func) {
+            this.func = func;
+        }
+
+        public QuestDataTask construct(JsonReader in) {
+            return func.apply(in);
+        }
+    }
+
     protected static class ReputationSettingConstructor {
-        private int upper, lower;
+
+        private static final String REPUTATION = "reputation";
+        private static final String LOWER = "lower";
+        private static final String UPPER = "upper";
+        private static final String INVERTED = "inverted";
         String reputation;
         boolean inverted;
+        private int upper, lower;
 
         private ReputationSettingConstructor(String reputation, int lower, int upper, boolean inverted) {
             this.reputation = reputation;
@@ -374,24 +415,6 @@ public class QuestTaskAdapter {
             this.upper = upper;
             this.inverted = inverted;
         }
-
-        public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
-            Reputation reputation = Reputation.getReputations().get(this.reputation);
-            if (reputation != null) {
-                ReputationMarker lower = null, upper = null;
-                if (this.lower >= 0 && this.lower < reputation.getMarkerCount())
-                    lower = reputation.getMarker(this.lower);
-                if (this.upper >= 0 && this.upper < reputation.getMarkerCount())
-                    upper = reputation.getMarker(this.lower);
-                return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
-            }
-            return null;
-        }
-
-        private static final String REPUTATION = "reputation";
-        private static final String LOWER = "lower";
-        private static final String UPPER = "upper";
-        private static final String INVERTED = "inverted";
 
         public static ReputationSettingConstructor read(JsonReader in) throws IOException {
             in.beginObject();
@@ -414,46 +437,18 @@ public class QuestTaskAdapter {
             if (reputation == null) return null;
             return new ReputationSettingConstructor(reputation, low, high, inverted);
         }
-    }
 
-    public static final TypeAdapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new TypeAdapter<QuestDataTask>() {
-        private static final String TYPE = "type";
-
-        @Override
-        public void write(JsonWriter out, QuestDataTask value) throws IOException {
-            out.beginObject();
-            out.name(TYPE).value(String.valueOf(value.getDataType()));
-            value.write(out);
-            out.endObject();
-        }
-
-        @Override
-        public QuestDataTask read(JsonReader in) throws IOException {
-            in.beginObject();
-            QuestDataTask dataTask = null;
-            if (in.hasNext() && in.nextName().equals(TYPE))
-                dataTask = QuestDataType.valueOf(in.nextString()).construct(in);
-            in.endObject();
-            return dataTask; // should never be null
-        }
-    };
-
-    public enum QuestDataType {
-        GENERIC(QuestDataTask::construct),
-        DEATH(QuestDataTaskDeath::construct),
-        ITEMS(QuestDataTaskItems::construct),
-        LOCATION(QuestDataTaskLocation::construct),
-        MOB(QuestDataTaskMob::construct),
-        REPUTATION_KILL(QuestDataTaskReputationKill::construct);
-
-        private Function<JsonReader, QuestDataTask> func;
-
-        QuestDataType(Function<JsonReader, QuestDataTask> func) {
-            this.func = func;
-        }
-
-        public QuestDataTask construct(JsonReader in) {
-            return func.apply(in);
+        public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
+            Reputation reputation = Reputation.getReputations().get(this.reputation);
+            if (reputation != null) {
+                ReputationMarker lower = null, upper = null;
+                if (this.lower >= 0 && this.lower < reputation.getMarkerCount())
+                    lower = reputation.getMarker(this.lower);
+                if (this.upper >= 0 && this.upper < reputation.getMarkerCount())
+                    upper = reputation.getMarker(this.lower);
+                return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
+            }
+            return null;
         }
     }
 }

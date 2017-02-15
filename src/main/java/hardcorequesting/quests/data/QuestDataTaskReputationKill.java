@@ -9,8 +9,9 @@ import hardcorequesting.quests.task.QuestTask;
 import java.io.IOException;
 
 public class QuestDataTaskReputationKill extends QuestDataTask {
-    public int kills;
+
     private static final String KILLS = "kills";
+    public int kills;
 
     public QuestDataTaskReputationKill(QuestTask task) {
         super(task);
@@ -18,11 +19,6 @@ public class QuestDataTaskReputationKill extends QuestDataTask {
 
     protected QuestDataTaskReputationKill() {
         super();
-    }
-
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.REPUTATION_KILL;
     }
 
     public static QuestDataTask construct(JsonReader in) {
@@ -43,6 +39,11 @@ public class QuestDataTaskReputationKill extends QuestDataTask {
         } catch (IOException ignored) {
         }
         return taskData;
+    }
+
+    @Override
+    public QuestTaskAdapter.QuestDataType getDataType() {
+        return QuestTaskAdapter.QuestDataType.REPUTATION_KILL;
     }
 
     @Override

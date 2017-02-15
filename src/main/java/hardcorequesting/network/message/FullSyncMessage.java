@@ -16,20 +16,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullSyncMessage implements IMessage {
-    private boolean local, questing, hardcore;
+
+    private boolean local, questing, hardcore, serverWorld;
     private String timestamp, reputations, bags, teams, data, setOrder, mainDesc;
     private String[] questsSets, questSetNames;
 
     public FullSyncMessage() {
     }
 
-    public FullSyncMessage(boolean local) {
+    public FullSyncMessage(boolean local, boolean serverWorld) {
         this.local = local;
+        this.serverWorld = serverWorld;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
     }
 
-    public FullSyncMessage(String timestamp) {
+    public FullSyncMessage(boolean serverWorld) {
+        this.serverWorld = serverWorld;
         this.mainDesc = QuestLine.getActiveQuestLine().mainDescription;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
@@ -47,6 +50,7 @@ public class FullSyncMessage implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         this.local = buf.readBoolean();
+        this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         if (local) return;
@@ -77,6 +81,7 @@ public class FullSyncMessage implements IMessage {
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeBoolean(this.local);
+        buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         if (this.local) return;
@@ -102,6 +107,7 @@ public class FullSyncMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<FullSyncMessage, IMessage> {
+
         @Override
         public IMessage onMessage(FullSyncMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
@@ -138,7 +144,7 @@ public class FullSyncMessage implements IMessage {
                             out.print(message.questsSets[i]);
                         }
                 }
-                QuestLine.receiveServerSync(message.local);
+                QuestLine.receiveServerSync(message.local, message.serverWorld);
             } catch (IOException e) {
                 e.printStackTrace();
             }

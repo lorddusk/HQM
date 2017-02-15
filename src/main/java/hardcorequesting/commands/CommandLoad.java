@@ -37,7 +37,7 @@ public class CommandLoad extends CommandBase {
                     loadSet(sender, file);
                 }
                 QuestAdapter.postLoad();
-                QuestSet.orderAll();
+                QuestSet.orderAll(HardcoreQuesting.loadingSide.isServer());
             } else if (arguments.length == 1 && arguments[0].equals("bags")) {
                 loadBags(sender, SaveHandler.getExportFile("bags"));
             } else if (arguments.length > 0) {

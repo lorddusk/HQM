@@ -28,8 +28,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.List;
 
 public class Provider implements IWailaDataProvider {
+
     private static final String MOD_NAME = "HQM";
     private static final String IS_REMOTE_AVAILABLE = MOD_NAME + ".showQDS";
+
+    public static void callbackRegister(IWailaRegistrar registrar) {
+        Provider instance = new Provider();
+        registrar.registerStackProvider(instance, BlockPortal.class);
+        registrar.registerBodyProvider(instance, BlockDelivery.class);
+        registrar.registerNBTProvider(instance, BlockDelivery.class);
+        registrar.addConfigRemote(MOD_NAME, IS_REMOTE_AVAILABLE, "Show QDS data");
+    }
 
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
@@ -41,7 +50,7 @@ public class Provider implements IWailaDataProvider {
                     if (portal.getType().isPreset()) {
                         return new ItemStack(ModBlocks.itemPortal, 1, portal.getType() == PortalType.TECH ? 1 : 2);
                     } else {
-                        return portal.getItem();
+                        return portal.getStack();
                     }
                 } else {
                     return new ItemStack((Block) null);
@@ -53,20 +62,15 @@ public class Provider implements IWailaDataProvider {
     }
 
     @Override
-    public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaHead(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
 
         return currenttip;
     }
 
-    @SideOnly(Side.CLIENT)
-    private EntityPlayer getPlayer() {
-        return Minecraft.getMinecraft().thePlayer;
-    }
-
     @Override
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaBody(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         if (config.getConfig(IS_REMOTE_AVAILABLE)) {
-            if (itemStack != null && itemStack.getItem() == Item.getItemFromBlock(accessor.getBlock())) {
+            if (stack != null && stack.getItem() == Item.getItemFromBlock(accessor.getBlock())) {
                 TileEntity te = accessor.getTileEntity();
                 if (te != null) {
                     if (te instanceof TileEntityBarrel) {
@@ -89,7 +93,7 @@ public class Provider implements IWailaDataProvider {
     }
 
     @Override
-    public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaTail(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
     }
 
@@ -98,11 +102,8 @@ public class Provider implements IWailaDataProvider {
         return tag;
     }
 
-    public static void callbackRegister(IWailaRegistrar registrar) {
-        Provider instance = new Provider();
-        registrar.registerStackProvider(instance, BlockPortal.class);
-        registrar.registerBodyProvider(instance, BlockDelivery.class);
-        registrar.registerNBTProvider(instance, BlockDelivery.class);
-        registrar.addConfigRemote(MOD_NAME, IS_REMOTE_AVAILABLE, "Show QDS data");
+    @SideOnly(Side.CLIENT)
+    private EntityPlayer getPlayer() {
+        return Minecraft.getMinecraft().thePlayer;
     }
 }

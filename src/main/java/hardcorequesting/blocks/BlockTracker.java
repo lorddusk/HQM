@@ -40,16 +40,16 @@ public class BlockTracker extends BlockContainer {
         if (player != null) {
             if (player.inventory.getCurrentItem() != null && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
-                    TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityTracker) {
+                    TileEntity tile = world.getTileEntity(pos);
+                    if (tile != null && tile instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
-                            ((TileEntityTracker) te).setCurrentQuest();
-                            if (((TileEntityTracker) te).getCurrentQuest() != null) {
-                                player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) te).getCurrentQuest().getName()));
+                            ((TileEntityTracker) tile).setCurrentQuest();
+                            if (((TileEntityTracker) tile).getCurrentQuest() != null) {
+                                player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TileEntityTracker) tile).getCurrentQuest().getName()));
                             } else {
-                                player.addChatMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
+                                player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
                             }
                         }
 
@@ -58,12 +58,12 @@ public class BlockTracker extends BlockContainer {
                 return true;
             } else {
                 if (!world.isRemote) {
-                    TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityTracker) {
+                    TileEntity tile = world.getTileEntity(pos);
+                    if (tile != null && tile instanceof TileEntityTracker) {
                         if (!Quest.isEditing) {
-                            player.addChatMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.addChatComponentMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
-                            ((TileEntityTracker) te).openInterface(player);
+                            ((TileEntityTracker) tile).openInterface(player);
                         }
                     }
                 }
@@ -75,13 +75,13 @@ public class BlockTracker extends BlockContainer {
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
+    public boolean canProvidePower(IBlockState state) {
+        return true;
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
-        return true;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
 //    @Override

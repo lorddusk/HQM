@@ -8,19 +8,25 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
 
+    private static final int START_X = 20;
+    private static final int START_Y = 20;
+    private static final int OFFSET_Y = 8;
+    private static final int VISIBLE_MOBS = 24;
     private QuestTaskMob task;
     private QuestTaskMob.Mob mob;
     private int id;
     private ScrollBar scrollBar;
-
     private List<String> rawMobs;
     private List<String> mobs;
 
@@ -39,13 +45,13 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
-            protected void setValue(int number) {
-                mob.setCount(number);
+            protected int getValue() {
+                return mob.getCount();
             }
 
             @Override
-            protected int getValue() {
-                return mob.getCount();
+            protected void setValue(int number) {
+                mob.setCount(number);
             }
         });
 
@@ -57,8 +63,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         });
 
-        rawMobs = new ArrayList<String>();
-        mobs = new ArrayList<String>();
+        rawMobs = new ArrayList<>();
+        mobs = new ArrayList<>();
 
         for (Object obj : EntityList.CLASS_TO_NAME.keySet()) {
             Class clazz = (Class) obj;
@@ -81,11 +87,6 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         }
     }
-
-    private static final int START_X = 20;
-    private static final int START_Y = 20;
-    private static final int OFFSET_Y = 8;
-    private static final int VISIBLE_MOBS = 24;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -170,11 +171,11 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     public void save(GuiBase gui) {
         mob.setCount(Math.max(1, mob.getCount()));
 
-        if ((mob.getIcon() == null || mob.getIcon().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
+        if ((mob.getIconStack() == null || mob.getIconStack().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
             EntityList.EntityEggInfo info = EntityList.ENTITY_EGGS.get(mob.getMob());
             if (info != null) {
                 int id = EntityList.getIDFromString(mob.getMob());
-                mob.setIcon(new ItemStack(Items.SPAWN_EGG, 1, id));
+                mob.setIconStack(new ItemStack(Items.SPAWN_EGG, 1, id));
             }
         }
 

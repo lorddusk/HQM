@@ -4,6 +4,7 @@ import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.ICommandSender;
 
 public class CommandQuest extends CommandBase {
+
     public CommandQuest() {
         super("quest");
     }

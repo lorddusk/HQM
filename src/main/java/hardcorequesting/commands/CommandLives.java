@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import java.util.List;
 
 public class CommandLives extends CommandBase {
+
     private static String ADD = "add";
     private static String REMOVE = "remove";
 
@@ -22,16 +23,21 @@ public class CommandLives extends CommandBase {
     }
 
     @Override
-    public boolean isVisible(ICommandSender sender) {
-        return true;
-    }
-
-    @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (isPlayerOp(sender))
             return super.addTabCompletionOptions(sender, args);
         else
             return null;
+    }
+
+    @Override
+    public boolean isVisible(ICommandSender sender) {
+        return true;
+    }
+
+    @Override
+    public int[] getSyntaxOptions(ICommandSender sender) {
+        return isPlayerOp(sender) ? new int[]{0, 1, 2, 3} : super.getSyntaxOptions(sender);
     }
 
     @Override
@@ -123,11 +129,6 @@ public class CommandLives extends CommandBase {
                 }
             }
         }
-    }
-
-    @Override
-    public int[] getSyntaxOptions(ICommandSender sender) {
-        return isPlayerOp(sender) ? new int[]{0, 1, 2, 3} : super.getSyntaxOptions(sender);
     }
 
     private void removeLives(EntityPlayer player, int amount) {

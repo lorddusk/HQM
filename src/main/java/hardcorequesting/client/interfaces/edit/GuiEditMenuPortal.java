@@ -9,13 +9,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 public class GuiEditMenuPortal extends GuiEditMenuExtended {
-    private TileEntityPortal portal;
-    private GuiEditMenuPortal self = this;
-
 
     private static final int CHECK_BOX_X = 20;
     private static final int CHECK_BOX_Y = 110;
     private static final int CHECK_BOX_OFFSET = 12;
+    private TileEntityPortal portal;
+    private GuiEditMenuPortal self = this;
 
     public GuiEditMenuPortal(GuiBase gui, EntityPlayer player, TileEntityPortal portal) {
         super(gui, player, true, 20, 30, 20, 130);
@@ -36,7 +35,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                gui.setEditMenu(new GuiEditMenuItemPortal(gui, self, player, self.portal.getItem()));
+                gui.setEditMenu(new GuiEditMenuItemPortal(gui, self, player, self.portal.getStack()));
             }
         });
 
@@ -96,7 +95,7 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
 
         gui.drawCenteredString(portal.getCurrentQuest() != null ? portal.getCurrentQuest().getName() : Translator.translate("hqm.portalMenu.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
         if (!portal.getType().isPreset()) {
-            gui.drawItem(portal.getItem(), 20, 80, mX, mY, false);
+            gui.drawItemStack(portal.getStack(), 20, 80, mX, mY, false);
         }
 
     }
@@ -130,8 +129,8 @@ public class GuiEditMenuPortal extends GuiEditMenuExtended {
         return false;
     }
 
-    public void setItem(ItemStack item) {
-        portal.setItem(item);
+    public void setItem(ItemStack stack) {
+        portal.setStack(stack);
     }
 
 

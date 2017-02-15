@@ -13,9 +13,9 @@ import java.util.List;
 public abstract class CommandBase implements ISubCommand {
 
 
+    protected int permissionLevel = 3;
     private String name;
     private List<String> subCommands = new ArrayList<>();
-    protected int permissionLevel = 3;
 
     public CommandBase(String name, String... subCommands) {
         this.name = name;
@@ -23,13 +23,13 @@ public abstract class CommandBase implements ISubCommand {
     }
 
     @Override
-    public String getCommandName() {
-        return name;
+    public int getPermissionLevel() {
+        return permissionLevel;
     }
 
     @Override
-    public int getPermissionLevel() {
-        return permissionLevel;
+    public String getCommandName() {
+        return name;
     }
 
     @Override

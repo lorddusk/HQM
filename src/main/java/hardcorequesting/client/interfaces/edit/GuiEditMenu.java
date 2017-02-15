@@ -14,16 +14,20 @@ import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiEditMenu {
+
+    private static final int CHECK_BOX_SRC_X = 192;
+    private static final int CHECK_BOX_SRC_Y = 102;
+    private static final int CHECK_BOX_SIZE = 7;
     protected List<LargeButton> buttons;
-    private boolean hasButtons;
     protected EntityPlayer player;
     protected List<CheckBox> checkboxes;
+    private boolean hasButtons;
 
     protected GuiEditMenu(final GuiBase gui, EntityPlayer player) {
-        buttons = new ArrayList<LargeButton>();
+        buttons = new ArrayList<>();
         this.player = player;
 
-        checkboxes = new ArrayList<CheckBox>();
+        checkboxes = new ArrayList<>();
     }
 
     protected GuiEditMenu(final GuiBase gui, EntityPlayer player, boolean isControlOnFirstPage) {
@@ -135,11 +139,8 @@ public abstract class GuiEditMenu {
         return hasButtons;
     }
 
-    private static final int CHECK_BOX_SRC_X = 192;
-    private static final int CHECK_BOX_SRC_Y = 102;
-    private static final int CHECK_BOX_SIZE = 7;
-
     public abstract class CheckBox {
+
         private int x;
         private int y;
         private String name;

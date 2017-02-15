@@ -15,7 +15,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 
 
 public class ItemBag extends Item {
+
     public static boolean displayGui;
 
     public ItemBag() {
@@ -48,32 +48,11 @@ public class ItemBag extends Item {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack itemstack, EntityPlayer player, List tooltip, boolean extraInfo) {
-        super.addInformation(itemstack, player, tooltip, extraInfo);
-
-        int dmg = itemstack.getItemDamage();
-        if (dmg >= 0 && dmg < BagTier.values().length) {
-            BagTier tier = BagTier.values()[dmg];
-            tooltip.add(tier.getColor() + tier.getName());
-        }
-    }
-
-
-    @Override
-    @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, List stackList) {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            stackList.add(new ItemStack(this, 1, i));
-        }
-    }
-
-    @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack item, World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
         if (!world.isRemote) {
-            int dmg = item.getItemDamage();
+            stack = player.getHeldItem(hand);
+            int dmg = stack.getItemDamage();
             if (dmg >= 0 && dmg < BagTier.values().length) {
                 int totalWeight = 0;
                 for (Group group : Group.getGroups().values()) {
@@ -102,11 +81,32 @@ public class ItemBag extends Item {
 
             //doing this makes sure the inventory is updated on the client, and the creative mode thingy is already handled by the calling code
             //if(!player.capabilities.isCreativeMode) {
-            --item.stackSize;
+            stack.stackSize = stack.stackSize - 1;
             //}
         }
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, item);
+        return super.onItemRightClick(stack, world, player, hand);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
+        super.addInformation(stack, player, tooltip, extraInfo);
+
+        int dmg = stack.getItemDamage();
+        if (dmg >= 0 && dmg < BagTier.values().length) {
+            BagTier tier = BagTier.values()[dmg];
+            tooltip.add(tier.getColor() + tier.getName());
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(Item item, CreativeTabs tabs, List<ItemStack> stackList) {
+        for (int i = 0; i < BagTier.values().length; i++) {
+            stackList.add(new ItemStack(this, 1, i));
+        }
     }
 
     private void openClientInterface(EntityPlayer player, String id, int bag) {

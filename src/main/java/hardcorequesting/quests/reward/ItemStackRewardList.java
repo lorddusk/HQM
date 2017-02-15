@@ -28,10 +28,13 @@ public class ItemStackRewardList extends QuestRewardList<ItemStack> {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public ItemStack[] toArray() {
+    public ItemStack[] toArray() { // TODO change every ItemStack[] to NonNullList<ItemStack>
         List<ItemStack> result = new ArrayList<>();
-        for (QuestReward<ItemStack> reward : list)
-            result.add(reward.getReward());
+        for (QuestReward<ItemStack> reward : list){
+            if(reward.getReward() != null){
+                result.add(reward.getReward());
+            }
+        }
         return result.isEmpty() ? null : result.toArray(new ItemStack[result.size()]);
     }
 }

@@ -45,6 +45,14 @@ public enum RepeatType {
         }
     };
 
+    private String id;
+    private boolean useTime;
+
+    RepeatType(String id, boolean useTime) {
+        this.id = id;
+        this.useTime = useTime;
+    }
+
     private static String formatRemainingTime(Quest quest, EntityPlayer player, int days, int hours) {
         if (!quest.getQuestData(player).available) {
             int total = days * 24 + hours;
@@ -101,11 +109,6 @@ public enum RepeatType {
         return str;
     }
 
-    RepeatType(String id, boolean useTime) {
-        this.id = id;
-        this.useTime = useTime;
-    }
-
     public String getName() {
         return Translator.translate("hqm.repeat." + id + ".title");
     }
@@ -117,10 +120,6 @@ public enum RepeatType {
     public boolean isUseTime() {
         return useTime;
     }
-
-    private String id;
-    private boolean useTime;
-
 
     public String getMessage(Quest quest, EntityPlayer player, int days, int hours) {
         return GuiColor.YELLOW + Translator.translate("hqm.repeat.repeatable") + "\n";

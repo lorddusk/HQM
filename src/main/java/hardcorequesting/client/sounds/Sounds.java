@@ -15,9 +15,12 @@ public enum Sounds {
     DEATH("ban"),
     ROTTEN("rotten");
 
+    private static Map<Sounds, SoundEvent> sounds = new HashMap<>();
     private String sound;
 
-    private static Map<Sounds, SoundEvent> sounds = new HashMap<>();
+    Sounds(String sound) {
+        this.sound = sound;
+    }
 
     public static void initSounds() {
         for (Sounds sound : Sounds.values()) {
@@ -30,10 +33,6 @@ public enum Sounds {
         SoundEvent event = new SoundEvent(sound).setRegistryName(sound);
         SoundEvent.REGISTRY.register(-1, sound, event);
         return event;
-    }
-
-    Sounds(String sound) {
-        this.sound = sound;
     }
 
     public String getSoundName() {

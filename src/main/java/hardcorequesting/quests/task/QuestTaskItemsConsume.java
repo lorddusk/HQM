@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class QuestTaskItemsConsume extends QuestTaskItems {
+
     public QuestTaskItemsConsume(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }

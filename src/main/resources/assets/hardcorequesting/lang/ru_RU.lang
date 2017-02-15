@@ -81,7 +81,7 @@ item.hqm:hearts_heart.freshness=Текущая свежесть : %s %%
 item.hqm:hearts_rottenheart.name=Гнилое сердце
 item.hqm:hearts_rottenheart.tooltip=Гнилое сердце. Не ешьте его
 item.hqm:bags.name=Мешочек с наградой
-item.hqm:hqmInvalidItem.name=Недействительный предмет
+item.hqm:hqm_invalid_item.name=Недействительный предмет
 
 # ======================================
 #			    QUESTS

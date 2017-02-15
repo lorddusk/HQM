@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TeamMessage implements IMessage {
+
     private TeamAction action;
     private String data;
 
@@ -34,6 +35,7 @@ public class TeamMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<TeamMessage, IMessage> {
+
         @Override
         public IMessage onMessage(TeamMessage message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));

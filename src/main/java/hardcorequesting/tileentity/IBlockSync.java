@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.io.IOException;
 
 public interface IBlockSync {
+
     double BLOCK_UPDATE_RANGE = 128;
     int BLOCK_UPDATE_BUFFER_DISTANCE = 5;
 

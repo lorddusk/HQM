@@ -8,20 +8,11 @@ import java.io.*;
 import java.util.Set;
 
 public class LoreResourcePack extends AbstractResourcePack {
+
     private static final Set domains = Sets.newHashSet("hardcorequesting");
 
     public LoreResourcePack(File folder) {
         super(folder);
-    }
-
-    @Override
-    protected InputStream getInputStreamByName(String name) throws IOException {
-        return new BufferedInputStream(new FileInputStream(new File(this.resourcePackFile, "lore.ogg")));
-    }
-
-    @Override
-    protected boolean hasResourceName(String name) {
-        return name.contains("lore") && name.endsWith(".ogg") && new File(this.resourcePackFile, "lore.ogg").isFile();
     }
 
     @Override
@@ -32,6 +23,16 @@ public class LoreResourcePack extends AbstractResourcePack {
     @Override
     public boolean resourceExists(ResourceLocation resource) {
         return hasResourceName(resource.getResourcePath().replace("sounds/", ""));
+    }
+
+    @Override
+    protected InputStream getInputStreamByName(String name) throws IOException {
+        return new BufferedInputStream(new FileInputStream(new File(this.resourcePackFile, "lore.ogg")));
+    }
+
+    @Override
+    protected boolean hasResourceName(String name) {
+        return name.contains("lore") && name.endsWith(".ogg") && new File(this.resourcePackFile, "lore.ogg").isFile();
     }
 
     @Override

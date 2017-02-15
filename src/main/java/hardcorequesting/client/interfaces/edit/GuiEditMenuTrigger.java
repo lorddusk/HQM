@@ -8,6 +8,7 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuTrigger extends GuiEditMenuExtended {
+
     private TriggerType type;
     private int triggerTasks;
     private String id;
@@ -21,13 +22,13 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTrigger.taskCount") {
             @Override
-            protected void setValue(int number) {
-                triggerTasks = number;
+            protected int getValue() {
+                return triggerTasks;
             }
 
             @Override
-            protected int getValue() {
-                return triggerTasks;
+            protected void setValue(int number) {
+                triggerTasks = number;
             }
 
             @Override

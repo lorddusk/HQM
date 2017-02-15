@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TeamUpdateMessage implements IMessage {
+
     private TeamUpdateType type;
     private String data;
 
@@ -35,6 +36,7 @@ public class TeamUpdateMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<TeamUpdateMessage, IMessage> {
+
         @Override
         public IMessage onMessage(TeamUpdateMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));

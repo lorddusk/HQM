@@ -83,7 +83,7 @@ item.hqm:hearts_heart.freshness=Current freshness : %s %%
 item.hqm:hearts_rottenheart.name=Rotten heart
 item.hqm:hearts_rottenheart.tooltip=Rotten Heart. Do Not Eat
 item.hqm:bags.name=Reward Bag
-item.hqm:hqmInvalidItem.name=Invalid Item
+item.hqm:hqm_invalid_item.name=Invalid Item
 
 # ======================================
 #			    QUESTS

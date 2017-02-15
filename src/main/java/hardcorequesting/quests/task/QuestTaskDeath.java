@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 
 public class QuestTaskDeath extends QuestTask {
+
     private int deaths;
 
 
@@ -25,22 +26,8 @@ public class QuestTaskDeath extends QuestTask {
     }
 
     @Override
-    public void onLivingDeath(LivingDeathEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayerMP) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-            if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
-                QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData(player);
-                if (deathData.deaths < deaths) {
-                    deathData.deaths += 1;
-
-                    if (deathData.deaths == deaths) {
-                        completeTask(player.getGameProfile().getName());
-                    }
-
-                    parent.sendUpdatedDataToTeam(player);
-                }
-            }
-        }
+    public Class<? extends QuestDataTask> getDataType() {
+        return QuestDataTaskDeath.class;
     }
 
     @SideOnly(Side.CLIENT)
@@ -76,6 +63,11 @@ public class QuestTaskDeath extends QuestTask {
     }
 
     @Override
+    public void autoComplete(String uuid) {
+        deaths = ((QuestDataTaskDeath) getData(uuid)).deaths;
+    }
+
+    @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
 
@@ -83,13 +75,22 @@ public class QuestTaskDeath extends QuestTask {
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        deaths = ((QuestDataTaskDeath) getData(uuid)).deaths;
-    }
+    public void onLivingDeath(LivingDeathEvent event) {
+        if (event.getEntityLiving() instanceof EntityPlayerMP) {
+            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+            if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
+                QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData(player);
+                if (deathData.deaths < deaths) {
+                    deathData.deaths += 1;
 
-    @Override
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTaskDeath.class;
+                    if (deathData.deaths == deaths) {
+                        completeTask(player.getGameProfile().getName());
+                    }
+
+                    parent.sendUpdatedDataToTeam(player);
+                }
+            }
+        }
     }
 
     public int getDeaths() {

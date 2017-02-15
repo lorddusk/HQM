@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupTier {
+
     private String name;
     private GuiColor color;
     private int[] weights;
@@ -30,54 +31,23 @@ public class GroupTier {
         this.weights = Arrays.copyOf(weights, weights.length);
     }
 
-    public String getName() {
-        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
-    }
-
-    public GuiColor getColor() {
-        return color;
-    }
-
-    public int[] getWeights() {
-        return weights;
-    }
-
     public static List<GroupTier> getTiers() {
         return QuestLine.getActiveQuestLine().tiers;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public GroupTier copy() {
-        return new GroupTier(getName(), getColor(), getWeights());
-    }
-
-    public void load(GroupTier tier) {
-        this.name = tier.name;
-        this.color = tier.color;
-        this.weights = Arrays.copyOf(tier.weights, tier.weights.length);
-    }
-
-    public void setColor(GuiColor color) {
-        this.color = color;
     }
 
     public static void saveAll() {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
-            if (Quest.isEditing && Quest.saveDefault) SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
     }
 
-    public static void loadAll() {
+    public static void loadAll(boolean remote) {
         try {
             Group.getGroups().clear();
             GroupTier.getTiers().clear();
-            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getLocalFile("bags")));
+            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getFile("bags", remote)));
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save bags");
         }
@@ -131,5 +101,35 @@ public class GroupTier {
         questLine.tiers.add(new GroupTier("Uncommon", GuiColor.BLUE, 5, 10, 15, 20, 25));
         questLine.tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
         questLine.tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
+    }
+
+    public String getName() {
+        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public GuiColor getColor() {
+        return color;
+    }
+
+    public void setColor(GuiColor color) {
+        this.color = color;
+    }
+
+    public int[] getWeights() {
+        return weights;
+    }
+
+    public GroupTier copy() {
+        return new GroupTier(getName(), getColor(), getWeights());
+    }
+
+    public void load(GroupTier tier) {
+        this.name = tier.name;
+        this.color = tier.color;
+        this.weights = Arrays.copyOf(tier.weights, tier.weights.length);
     }
 }

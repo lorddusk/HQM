@@ -31,6 +31,24 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     }
 
     @Override
+    public void draw(GuiBase gui, int mX, int mY) {
+        super.draw(gui, mX, mY);
+        int i = 0;
+        if (this.commands != null && this.commands.length > 0) {
+            for (; i < this.commands.length; i++) {
+                if (this.commands[i].isEmpty()) {
+                    drawStringTrimmed(gui, Translator.translate("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
+                } else {
+                    drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i] ? 0xFF4500 : 0x000000);
+                }
+            }
+        }
+        if (this.added != null && !this.added.isEmpty()) {
+            drawStringTrimmed(gui, this.added, 190, 65 + (i * 10), 0x447449);
+        }
+    }
+
+    @Override
     public void save(GuiBase gui) {
         if (this.id < 0) this.added = this.text.getText();
         else if (this.commands != null) {
@@ -56,24 +74,6 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
                     }
                 }
             }
-        }
-    }
-
-    @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
-        int i = 0;
-        if (this.commands != null && this.commands.length > 0) {
-            for (; i < this.commands.length; i++) {
-                if (this.commands[i].isEmpty()) {
-                    drawStringTrimmed(gui, Translator.translate("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
-                } else {
-                    drawStringTrimmed(gui, this.commands[i], 190, 65 + (i * 10), edited[i] ? 0xFF4500 : 0x000000);
-                }
-            }
-        }
-        if (this.added != null && !this.added.isEmpty()) {
-            drawStringTrimmed(gui, this.added, 190, 65 + (i * 10), 0x447449);
         }
     }
 

@@ -14,8 +14,13 @@ import java.util.List;
 
 public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
+    private static final int START_X = 20;
+    private static final int START_Y = 50;
+    private static final int ERROR_Y = 20;
+    private static final int OFFSET = 15;
     private List<ReputationReward> rewards;
     private ReputationReward selectedReward;
+    private List<String> error;
 
     public GuiEditMenuReputationReward(GuiBase gui, EntityPlayer player, List<ReputationReward> rewards) {
         super(gui, player, true, 185, 25, 185, 55);
@@ -29,16 +34,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repReward.value") {
             @Override
-            protected int getValue() {
-                return selectedReward.getValue();
-            }
-
-            @Override
-            protected void setValue(int number) {
-                selectedReward.setValue(number);
-            }
-
-            @Override
             protected boolean isVisible() {
                 return selectedReward != null;
             }
@@ -46,6 +41,16 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;
+            }
+
+            @Override
+            protected int getValue() {
+                return selectedReward.getValue();
+            }
+
+            @Override
+            protected void setValue(int number) {
+                selectedReward.setValue(number);
             }
         });
 
@@ -62,7 +67,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputations().get(0), 0));
+                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputationList().get(0), 0));
             }
         });
 
@@ -84,13 +89,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         });
     }
-
-    private static final int START_X = 20;
-    private static final int START_Y = 50;
-    private static final int ERROR_Y = 20;
-    private static final int OFFSET = 15;
-
-    private List<String> error;
 
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
@@ -131,10 +129,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         }
     }
 
-    private boolean isValid() {
-        return !Reputation.getReputations().isEmpty();
-    }
-
     @Override
     protected boolean isArrowVisible() {
         return isValid() && selectedReward != null;
@@ -143,15 +137,15 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (selectedReward != null && selectedReward.getReward() != null) {
-            for (int i = 0; i < Reputation.getReputations().size(); i++) {
-                if (Reputation.getReputations().get(i).equals(selectedReward.getReward())) {
+            for (int i = 0; i < Reputation.getReputationList().size(); i++) {
+                if (Reputation.getReputationList().get(i).equals(selectedReward.getReward())) {
                     int id = i + (left ? -1 : 1);
                     if (id < 0) {
-                        id = Reputation.getReputations().size() - 1;
-                    } else if (id >= Reputation.getReputations().size()) {
+                        id = Reputation.getReputationList().size() - 1;
+                    } else if (id >= Reputation.getReputationList().size()) {
                         id = 0;
                     }
-                    selectedReward.setReward(Reputation.getReputations().get(id));
+                    selectedReward.setReward(Reputation.getReputationList().get(id));
                     break;
                 }
             }
@@ -166,6 +160,10 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     @Override
     protected String getArrowDescription() {
         return null;
+    }
+
+    private boolean isValid() {
+        return !Reputation.getReputationList().isEmpty();
     }
 
     @Override

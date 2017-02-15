@@ -19,58 +19,17 @@ import java.util.Arrays;
 public abstract class QuestTaskReputation extends QuestTask {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
 
+    private static final int OFFSET_Y = 27;
+    private final int startOffsetY;
     private ReputationSetting[] settings = new ReputationSetting[0];
+
+    public QuestTaskReputation(Quest parent, String description, String longDescription, int startOffsetY) {
+        super(parent, description, longDescription);
+        this.startOffsetY = startOffsetY;
+    }
 
     public ReputationSetting[] getSettings() {
         return settings;
-    }
-
-
-    public static class ReputationSetting {
-        private Reputation reputation;
-        private ReputationMarker lower;
-        private ReputationMarker upper;
-        private boolean inverted;
-
-        public ReputationSetting(Reputation reputation, ReputationMarker lower, ReputationMarker upper, boolean inverted) {
-            this.reputation = reputation;
-            this.lower = lower;
-            this.upper = upper;
-            this.inverted = inverted;
-        }
-
-        public Reputation getReputation() {
-            return reputation;
-        }
-
-        public ReputationMarker getLower() {
-            return lower;
-        }
-
-        public ReputationMarker getUpper() {
-            return upper;
-        }
-
-        public boolean isInverted() {
-            return inverted;
-        }
-
-        public boolean isValid(String uuid) {
-            if (getReputation() == null || !getReputation().isValid()) {
-                return false;
-            }
-            ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(uuid));
-
-            return ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
-        }
-
-        public void setLower(ReputationMarker lower) {
-            this.lower = lower;
-        }
-
-        public void setUpper(ReputationMarker upper) {
-            this.upper = upper;
-        }
     }
 
     public void setSetting(int id, ReputationSetting setting) {
@@ -84,17 +43,11 @@ public abstract class QuestTaskReputation extends QuestTask {
         settings[id] = setting;
     }
 
-    public QuestTaskReputation(Quest parent, String description, String longDescription, int startOffsetY) {
-        super(parent, description, longDescription);
-        this.startOffsetY = startOffsetY;
-    }
-
-
     protected boolean isPlayerInRange(EntityPlayer player) {
         if (settings.length > 0) {
 
             QuestDataTask data = getData(player);
-            if (!data.completed && !player.worldObj.isRemote) {
+            if (!data.completed && !player.getEntityWorld().isRemote) {
                 String name = QuestingData.getUserUUID(player);
                 for (ReputationSetting setting : settings) {
                     if (!setting.isValid(name)) {
@@ -107,9 +60,6 @@ public abstract class QuestTaskReputation extends QuestTask {
         }
         return false;
     }
-
-    private static final int OFFSET_Y = 27;
-    private final int startOffsetY;
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -133,12 +83,6 @@ public abstract class QuestTaskReputation extends QuestTask {
         }
     }
 
-
-    protected EntityPlayer getPlayerForRender(EntityPlayer player) {
-        return player;
-    }
-
-
     @Override
     @SideOnly(Side.CLIENT)
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
@@ -156,18 +100,6 @@ public abstract class QuestTaskReputation extends QuestTask {
                 }
             }
         }
-    }
-
-    public void removeSetting(int i) {
-        int id = 0;
-        ReputationSetting[] settings = new ReputationSetting[this.settings.length - 1];
-        for (int j = 0; j < this.settings.length; j++) {
-            if (j != i) {
-                settings[id] = this.settings[j];
-                id++;
-            }
-        }
-        this.settings = settings;
     }
 
     @Override
@@ -197,5 +129,69 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Override
     public void autoComplete(String uuid) {
         getData(uuid).completed = true;
+    }
+
+    protected EntityPlayer getPlayerForRender(EntityPlayer player) {
+        return player;
+    }
+
+    public void removeSetting(int i) {
+        int id = 0;
+        ReputationSetting[] settings = new ReputationSetting[this.settings.length - 1];
+        for (int j = 0; j < this.settings.length; j++) {
+            if (j != i) {
+                settings[id] = this.settings[j];
+                id++;
+            }
+        }
+        this.settings = settings;
+    }
+
+    public static class ReputationSetting {
+
+        private Reputation reputation;
+        private ReputationMarker lower;
+        private ReputationMarker upper;
+        private boolean inverted;
+
+        public ReputationSetting(Reputation reputation, ReputationMarker lower, ReputationMarker upper, boolean inverted) {
+            this.reputation = reputation;
+            this.lower = lower;
+            this.upper = upper;
+            this.inverted = inverted;
+        }
+
+        public Reputation getReputation() {
+            return reputation;
+        }
+
+        public ReputationMarker getLower() {
+            return lower;
+        }
+
+        public void setLower(ReputationMarker lower) {
+            this.lower = lower;
+        }
+
+        public ReputationMarker getUpper() {
+            return upper;
+        }
+
+        public void setUpper(ReputationMarker upper) {
+            this.upper = upper;
+        }
+
+        public boolean isInverted() {
+            return inverted;
+        }
+
+        public boolean isValid(String uuid) {
+            if (getReputation() == null || !getReputation().isValid()) {
+                return false;
+            }
+            ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(uuid));
+
+            return ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
+        }
     }
 }

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class QuestingAdapter {
+
     public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>() {
         public static final String TEAM = "team";
         public static final String LIVES = "lives";

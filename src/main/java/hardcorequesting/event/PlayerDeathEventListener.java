@@ -12,11 +12,13 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.Iterator;
 
+@Mod.EventBusSubscriber
 public class PlayerDeathEventListener {
 
     public PlayerDeathEventListener() {
@@ -42,14 +44,12 @@ public class PlayerDeathEventListener {
             return;
         }
 
-        ItemStack bookStack = new ItemStack(ModItems.book);
-
         Iterator<EntityItem> iter = event.getDrops().iterator();
         while (iter.hasNext()) {
             EntityItem entityItem = iter.next();
-            ItemStack itemStack = entityItem.getEntityItem();
-            if (itemStack != null && itemStack.isItemEqual(bookStack)) {
-                event.getEntityPlayer().inventory.addItemStackToInventory(itemStack);
+            ItemStack stack = entityItem.getEntityItem();
+            if (stack != null && stack.getItem().equals(ModItems.book)) {
+                event.getEntityPlayer().inventory.addItemStackToInventory(stack);
                 iter.remove();
             }
         }
@@ -68,9 +68,9 @@ public class PlayerDeathEventListener {
 
         if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
             ItemStack bookStack = new ItemStack(ModItems.book);
-            for (ItemStack itemStack : event.getOriginal().inventory.mainInventory) {
-                if (itemStack.isItemEqual(bookStack)) {
-                    bookStack = itemStack.copy(); // Copy the actual stack
+            for (ItemStack stack : event.getOriginal().inventory.mainInventory) {
+                if (stack.isItemEqual(bookStack)) {
+                    bookStack = stack.copy(); // Copy the actual stack
                     break;
                 }
             }

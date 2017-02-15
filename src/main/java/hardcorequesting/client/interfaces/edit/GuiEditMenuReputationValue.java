@@ -7,6 +7,7 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
+
     private ReputationMarker marker;
     private int value;
 
@@ -18,8 +19,8 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
 
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repValue.tierValue") {
             @Override
-            protected void setValue(int number) {
-                value = number;
+            protected boolean isNegativeAllowed() {
+                return true;
             }
 
             @Override
@@ -28,8 +29,8 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
             }
 
             @Override
-            protected boolean isNegativeAllowed() {
-                return true;
+            protected void setValue(int number) {
+                value = number;
             }
         });
     }

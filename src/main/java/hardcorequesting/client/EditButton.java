@@ -20,15 +20,6 @@ public class EditButton {
     private EditMode mode;
     private List<String> text;
 
-    public static EditButton[] createButtons(GuiQuestBook gui, EditMode... modes) {
-        EditButton[] ret = new EditButton[modes.length];
-        for (int i = 0; i < modes.length; i++) {
-            EditMode mode = modes[i];
-            ret[i] = new EditButton(gui, mode, i);
-        }
-        return ret;
-    }
-
     public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id) {
         this.guiQuestBook = guiQuestBook;
         this.mode = mode;
@@ -38,6 +29,15 @@ public class EditButton {
 
         this.x = -38 + x * 20;
         this.y = 5 + y * 20;
+    }
+
+    public static EditButton[] createButtons(GuiQuestBook gui, EditMode... modes) {
+        EditButton[] ret = new EditButton[modes.length];
+        for (int i = 0; i < modes.length; i++) {
+            EditMode mode = modes[i];
+            ret[i] = new EditButton(gui, mode, i);
+        }
+        return ret;
     }
 
     public void draw(int mX, int mY) {
