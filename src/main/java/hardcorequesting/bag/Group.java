@@ -268,7 +268,7 @@ public class Group {
     public void draw(GuiQuestBook gui, int x, int y) {
         gui.drawString(this.getName(), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(this.getItems());
-        items.add(null);
+        items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
 
