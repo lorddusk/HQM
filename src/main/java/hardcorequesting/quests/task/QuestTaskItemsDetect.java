@@ -84,22 +84,6 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
 
     private void countItems(EntityPlayer player, ItemStack stack) {
-        if (player.world.isRemote) return;
-
-        NonNullList<ItemStack> items;
-        if (stack.isEmpty()) {
-            items = player.inventory.mainInventory;
-        } else {
-            items = NonNullList.create();
-            NonNullList<ItemStack> mainInventory = player.inventory.mainInventory;
-            for (int i = 0; i < mainInventory.size(); i++) {
-                items.set(i, mainInventory.get(i));
-            }
-            items.set(items.size() - 1, stack);
-        }
-        countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
-
-        /* TODO check if this fixes the crash of #230
         if(!player.getEntityWorld().isRemote){
             NonNullList<ItemStack> items = NonNullList.withSize(player.inventory.mainInventory.size() + 1, ItemStack.EMPTY);
             Collections.copy(items, player.inventory.mainInventory);
@@ -107,7 +91,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
                 items.set(items.size() - 1, stack);
             }
             countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
-        }*/
+        }
     }
 
     public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String playerName) {
