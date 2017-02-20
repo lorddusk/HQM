@@ -1,6 +1,5 @@
 package hardcorequesting.quests.task;
 
-import com.google.common.collect.Lists;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;

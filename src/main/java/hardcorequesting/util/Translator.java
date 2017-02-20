@@ -16,6 +16,7 @@ public class Translator {
 
     public static String translate(String id) {
         return I18n.translateToLocal(id).replace("\\n", "\n");
+        //return I18n.format(id).replace("\\n", "\n");
     }
 
     public static String translate(String id, Object... args) {
