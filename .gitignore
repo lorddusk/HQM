@@ -10,10 +10,7 @@ bin
 out
 *.ipr
 *.iws
-<<<<<<< 12488db5d2107dcfb62a75647f87884c2020a197
 /bin/
-.idea
-=======
 *.iml
 .idea
 

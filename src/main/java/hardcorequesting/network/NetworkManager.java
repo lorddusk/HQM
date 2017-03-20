@@ -24,13 +24,13 @@ public class NetworkManager {
         WRAPPER.registerMessage(OpenGuiMessage.Handler.class, OpenGuiMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(CloseBookMessage.Handler.class, CloseBookMessage.class, id++, Side.CLIENT);
 
-
         WRAPPER.registerMessage(FullSyncMessage.Handler.class, FullSyncMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamErrorMessage.Handler.class, TeamErrorMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(QuestDataUpdateMessage.Handler.class, QuestDataUpdateMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(DeathStatsMessage.Handler.class, DeathStatsMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamUpdateMessage.Handler.class, TeamUpdateMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(SoundMessage.Handler.class, SoundMessage.class, id++, Side.CLIENT);
 
         WRAPPER.registerMessage(BlockSyncMessageClient.Handler.class, BlockSyncMessageClient.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(BlockSyncMessage.Handler.class, BlockSyncMessage.class, id++, Side.SERVER);
