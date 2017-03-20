@@ -10,6 +10,8 @@ import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.items.ModItems;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.CloseBookMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestSet;
@@ -699,6 +701,7 @@ public class GuiQuestBook extends GuiBase {
 
     @Override
     public void onGuiClosed() {
+        NetworkManager.sendToServer(new CloseBookMessage(player.getUniqueID().toString()));
         Keyboard.enableRepeatEvents(true);
         SoundHandler.stopLoreMusic();
     }

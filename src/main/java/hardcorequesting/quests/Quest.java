@@ -1276,9 +1276,7 @@ public class Quest {
 
     public void sendUpdatedDataToTeam(Team team) {
         for (PlayerEntry entry : team.getPlayers()) {
-            if (entry.shouldRefreshData()) {
-                sendUpdatedData(entry.getPlayerMP());
-            }
+            sendUpdatedData(entry.getPlayerMP());
         }
     }
 

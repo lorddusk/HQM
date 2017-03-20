@@ -22,6 +22,9 @@ public class NetworkManager {
 
     public static void init() {
         WRAPPER.registerMessage(OpenGuiMessage.Handler.class, OpenGuiMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(CloseBookMessage.Handler.class, CloseBookMessage.class, id++, Side.CLIENT);
+
+
         WRAPPER.registerMessage(FullSyncMessage.Handler.class, FullSyncMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamErrorMessage.Handler.class, TeamErrorMessage.class, id++, Side.CLIENT);

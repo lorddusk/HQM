@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "hardcorequesting:blocks/hqmQuestPortal"
+    "all": "hardcorequesting:blocks/hqm_quest_portal"
   }
 }
