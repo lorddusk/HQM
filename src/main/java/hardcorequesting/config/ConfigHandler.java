@@ -21,6 +21,9 @@ public class ConfigHandler {
     private static final String SAVE_DEFAULT_KEY = "SaveDefault";
     private static final boolean SAVE_DEFAULT_DEFAULT = true;
     private static final String SAVE_DEFAULT_COMMENT = "This will save quests in an general map used upon world creation";
+    private static final String USE_DEFAULT_KEY = "UseDefault";
+    private static final boolean USE_DEFAULT_DEFAULT = true;
+    private static final String USE_DEFAULT_COMMENT = "Upon world load quests will be reloaded from the default";
     private static final String KEYMAP_KEY = "KeyMap";
     private static final String KEYMAP_COMMENT = "Hotkeys used in the book, one entry per line(Format: [key]:[mode]";
     public static Configuration syncConfig;
@@ -53,6 +56,7 @@ public class ConfigHandler {
     public static void loadSyncConfig() {
         Quest.isEditing = syncConfig.get(Configuration.CATEGORY_GENERAL, EDITOR_KEY, EDITOR_DEFAULT, EDITOR_COMMENT).getBoolean(EDITOR_DEFAULT);
         Quest.saveDefault = syncConfig.get(Configuration.CATEGORY_GENERAL, SAVE_DEFAULT_KEY, SAVE_DEFAULT_DEFAULT, SAVE_DEFAULT_COMMENT).getBoolean(SAVE_DEFAULT_DEFAULT);
+        Quest.useDefault = syncConfig.get(Configuration.CATEGORY_GENERAL, USE_DEFAULT_KEY, USE_DEFAULT_DEFAULT, USE_DEFAULT_COMMENT).getBoolean(USE_DEFAULT_DEFAULT);
         if (HardcoreQuesting.proxy.isClient()) {
             if (KEYMAP_DEFAULT == null) {
                 KEYMAP_DEFAULT = KeyboardHandler.getDefault();

@@ -58,7 +58,7 @@ public class SaveHandler {
 
     public static final String EXPORTS = "exports";
     public static final String REMOTE = "remote";
-    public static final String QUESTS = "quests";
+    public static final String DEFAULT = "default";
     private static final String QUESTING = "questing";
     private static final String HARDCORE = "hardcore";
 
@@ -69,7 +69,7 @@ public class SaveHandler {
     }
 
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, QUESTS), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
@@ -89,11 +89,15 @@ public class SaveHandler {
     }
 
     public static File getLocalFolder() {
-        return new File(HardcoreQuesting.configDir, QUESTS);
+        return new File(QuestLine.getActiveQuestLine().mainPath);
     }
 
     public static File getRemoteFolder() {
         return new File(HardcoreQuesting.configDir, REMOTE);
+    }
+
+    public static File getDefaultFolder() {
+        return new File(HardcoreQuesting.configDir, DEFAULT);
     }
 
     public static File getFolder(boolean remote){
@@ -332,8 +336,8 @@ public class SaveHandler {
             FileReader reader = new FileReader(file);
             JsonObject object = parser.parse(reader).getAsJsonObject();
             QuestingData.deactivate();
-            if (object.get(QUESTING).getAsBoolean()) QuestingData.activateQuest(false);
-            if (object.get(HARDCORE).getAsBoolean()) QuestingData.activateHardcore();
+            if (object.get(QUESTING).getAsBoolean() || QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
+            if (object.get(HARDCORE).getAsBoolean()  || QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
             reader.close();
         }
     }

@@ -89,8 +89,8 @@ public class QuestLine {
     }
 
     public static void loadWorldData(File worldPath, boolean isClient) {
-        String path = new File(worldPath, "hqm").getAbsolutePath() + File.separator;
-        File pathFile = new File(path);
+        File pathFile = new File(worldPath, "hqm");
+        String path = pathFile.getAbsolutePath() + File.separator;
         if (!pathFile.exists()) pathFile.mkdirs();
         world = new QuestLine();
         init(path, isClient);
@@ -145,5 +145,11 @@ public class QuestLine {
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
 
         loadAll(isClient, false);
+    }
+
+    public static void copyDefaults(File worldPath) {
+        File path = new File(worldPath, "hqm");
+        if (!path.exists()) path.mkdirs();
+        SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
     }
 }

@@ -332,7 +332,7 @@ public class QuestTaskLocation extends QuestTask {
             return iconStack;
         }
 
-        public void setIconStack(@Nonnull ItemStack iconStack) {
+        public void setIconStack(ItemStack iconStack) {
             this.iconStack = iconStack;
         }
 

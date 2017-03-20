@@ -63,6 +63,7 @@ public class Quest {
     private static final int MAX_SELECT_REWARD_SLOTS = 4;
     public static boolean isEditing = false;
     public static boolean saveDefault = true;
+    public static boolean useDefault = true;
     public static String selectedQuestId;
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;

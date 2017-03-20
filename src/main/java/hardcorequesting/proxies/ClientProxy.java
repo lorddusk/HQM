@@ -14,11 +14,10 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class ClientProxy extends CommonProxy {
 
-    public SoundHandler soundHandler;
-
     @Override
     public void initSounds(String path) {
         //init all the sounds
+        Sounds.initSounds();
     }
 
     @Override
@@ -29,7 +28,6 @@ public class ClientProxy extends CommonProxy {
         //MinecraftForge.EVENT_BUS.register(new BlockHighlightRemover());
         ModItems.initRender();
         ModBlocks.initRender();
-        Sounds.initSounds();
     }
 
     @Override

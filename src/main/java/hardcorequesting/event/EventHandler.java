@@ -74,8 +74,8 @@ public class EventHandler {
 
     @SubscribeEvent
     public void onEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        if(QuestingData.autoQuestActivate) {
-            QuestingData.activateQuest(true);
+        if(QuestingData.isQuestActive()) {
+            QuestingData.spawnBook(event.player);
         }
     }
 
