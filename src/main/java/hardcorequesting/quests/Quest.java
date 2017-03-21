@@ -1259,7 +1259,7 @@ public class Quest {
         return true;
     }
 
-    public void preRead(int players, QuestData data) {
+    public void initRewards(int players, QuestData data) {
         data.reward = new boolean[players];
     }
 

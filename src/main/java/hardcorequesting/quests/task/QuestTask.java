@@ -3,10 +3,13 @@ package hardcorequesting.quests.task;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
+import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
@@ -16,6 +19,7 @@ import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -81,6 +85,12 @@ public abstract class QuestTask {
 
         if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
             quest.reset(playerName);
+        }
+
+        EntityPlayer player = QuestingData.getPlayer(playerName);
+        if (player instanceof EntityPlayerMP && !quest.hasReward(player)) {
+            // when there is no reward and it just completes the quest play the music
+            NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (EntityPlayerMP) player);
         }
     }
 

@@ -269,7 +269,7 @@ public class Team {
         int playerCount = getPlayerCount();
         for (Quest quest : Quest.getQuests().values()) {
             if (quest != null && questData.get(quest.getId()) != null) {
-                quest.preRead(playerCount, questData.get(quest.getId()));
+                quest.initRewards(playerCount, questData.get(quest.getId()));
             }
         }
         refreshData();

@@ -60,7 +60,6 @@ public class QuestDataUpdateMessage implements IMessage {
                 QuestData data = QuestDataAdapter.QUEST_DATA_ADAPTER.fromJson(message.data);
                 Quest quest = Quest.getQuest(message.id);
                 if (quest != null) {
-                    quest.preRead(message.players, data);
                     quest.setQuestData(HardcoreQuesting.proxy.getPlayer(ctx), data);
                 }
             } catch (IOException ignored) {
