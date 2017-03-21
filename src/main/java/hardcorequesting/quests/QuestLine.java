@@ -6,6 +6,7 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.sounds.SoundHandler;
+import hardcorequesting.config.ConfigHandler;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
@@ -104,6 +105,14 @@ public class QuestLine {
         }
     }
 
+    public static void saveDescriptionDefault() {
+        try {
+            SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+        }
+    }
+
     public static void loadDescription(boolean remote) {
         try {
             QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
@@ -122,6 +131,12 @@ public class QuestLine {
         QuestSet.saveAll();
         Team.saveAll();
         QuestingData.saveQuestingData();
+        if (Quest.saveDefault) { // Save the needed defaults
+            QuestLine.saveDescriptionDefault();
+            Reputation.saveAllDefault();
+            GroupTier.saveAllDefault();
+            QuestSet.saveAllDefault();
+        }
         SaveHelper.onSave();
     }
 

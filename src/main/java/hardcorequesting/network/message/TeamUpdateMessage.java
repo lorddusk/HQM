@@ -1,9 +1,11 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -44,7 +46,8 @@ public class TeamUpdateMessage implements IMessage {
         }
 
         private void handle(TeamUpdateMessage message, MessageContext ctx) {
-            message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().playerEntity).getTeam(), message.data);
+            EntityPlayer player = HardcoreQuesting.proxy.getPlayer(ctx);
+            message.type.update(QuestingData.getQuestingData(player).getTeam(), message.data);
         }
     }
 }

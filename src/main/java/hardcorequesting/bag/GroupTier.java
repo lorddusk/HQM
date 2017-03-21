@@ -43,6 +43,14 @@ public class GroupTier {
         }
     }
 
+    public static void saveAllDefault() {
+        try {
+            SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
+        }
+    }
+
     public static void loadAll(boolean remote) {
         try {
             Group.getGroups().clear();

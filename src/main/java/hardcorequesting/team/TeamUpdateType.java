@@ -8,7 +8,9 @@ import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.message.TeamUpdateMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
+import scala.Int;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -90,6 +92,78 @@ public enum TeamUpdateType {
             }
 
             return new TeamUpdateMessage(this, out.toString());
+        }
+    },
+    CREATE_TEAM {
+        @Override
+        public void update(Team team, String data) {
+            try {
+                Team newTeam = TeamAdapter.TEAM_ADAPTER.fromJson(data);
+                QuestingData.getTeams().add(newTeam);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public TeamUpdateMessage build(Team team, Object... data) {
+            try {
+                return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    },
+    JOIN_TEAM {
+        @Override
+        public void update(Team team, String data) {
+            String uuid = data.substring(0, 36);
+            String teamJson = data.substring(36);
+            try {
+                QuestingData.getQuestingData(uuid).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public TeamUpdateMessage build(Team team, Object... data) {
+            try {
+                return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson(team));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    },
+    LEAVE_TEAM {
+        @Override
+        public void update(Team team, String data) {
+            QuestingData.getQuestingData(data).setTeam(new Team(data));
+        }
+
+        @Override
+        public TeamUpdateMessage build(Team team, Object... data) {
+            return new TeamUpdateMessage(this, data[0].toString());
+        }
+    },
+    REMOVE_TEAM {
+        @Override
+        public void update(Team clientTeam, String data) {
+            int id = Integer.parseInt(data);
+            List<Team> teams = QuestingData.getTeams();
+            teams.remove(id);
+
+            for (int i = id; i < teams.size(); i++) {
+                Team team = teams.get(i);
+                team.setId(team.getId()-1);
+            }
+        }
+
+        @Override
+        public TeamUpdateMessage build(Team team, Object... data) {
+            return new TeamUpdateMessage(this, "" + team.getId());
         }
     };
 

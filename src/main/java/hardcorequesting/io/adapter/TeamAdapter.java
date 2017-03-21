@@ -80,7 +80,12 @@ public class TeamAdapter {
                         team.setId(in.nextInt());
                         break;
                     case NAME:
-                        team.setName(in.nextString());
+                        if (team.getId() == -1) {
+                            in.nextNull();
+                            team.setName(null);
+                        } else {
+                            team.setName(in.nextString());
+                        }
                         break;
                     case LIFE_SETTING:
                         team.setLifeSetting(LifeSetting.valueOf(in.nextString()));

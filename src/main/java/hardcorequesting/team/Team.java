@@ -79,6 +79,7 @@ public class Team {
 
     public void resetProgress(Quest quest) {
         questData.put(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
+        refreshData();
     }
 
     public Map<String, QuestData> getQuestData() {
@@ -207,6 +208,9 @@ public class Team {
                     }
 
                     QuestingData.getQuestingData(uuid).setTeam(leaveTeam);
+                    refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                    leaveTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                    NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID()), player.getPlayerMP());
                     break;
                 }
                 id++;
@@ -222,29 +226,22 @@ public class Team {
     }
 
     private void refreshTeamData(PlayerEntry entry, TeamUpdateSize type) {
-        Team team = this;
         boolean valid = false;
         switch (type) {
             case ALL:
-                if (entry.shouldRefreshData()) {
-                    valid = true;
-                    break; //the break is here on purpose
-                }
-            case ONLY_INVITES:
-                //refresh that team instead
-                team = QuestingData.getQuestingData(entry.getUUID()).getTeam();
-                valid = !entry.isInTeam() && team.getEntry(entry.getUUID()).shouldRefreshData();
+                valid = entry.shouldRefreshData();
                 break;
             case ONLY_MEMBERS:
-                valid = entry.shouldRefreshData();
+                valid = entry.shouldRefreshData() && entry.isInTeam();
                 break;
             case ONLY_OWNER:
                 valid = entry.shouldRefreshData() && entry.isOwner();
                 break;
         }
 
-        if (valid)
+        if (valid) {
             NetworkManager.sendToPlayer(TeamUpdateType.FULL.build(this), entry.getPlayerMP());
+        }
     }
 
     public void refreshTeamLives() {
@@ -283,9 +280,7 @@ public class Team {
             } else {
                 players.remove(i);
             }
-            QuestingData.getQuestingData(player.getUUID()).getTeam().refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
         }
-
 
         List<Team> teams = QuestingData.getTeams();
         teams.remove(id);
@@ -295,12 +290,14 @@ public class Team {
             team.id--;
         }
 
-        //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getAllUsernames()) {
-            Team team = QuestingData.getQuestingData(username).getTeam();
-            PlayerEntry entry = team.getEntry(username);
+        NetworkManager.sendToAllPlayers(TeamUpdateType.REMOVE_TEAM.build(this));
+
+        //refresh all clients with open books
+        for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerList()) {
+            Team team = QuestingData.getQuestingData(player).getTeam();
+            PlayerEntry entry = team.getEntry(player.getUniqueID().toString());
             if (entry != null) {
-                team.refreshTeamData(entry, TeamUpdateSize.ONLY_MEMBERS);
+                team.refreshTeamData(entry, TeamUpdateSize.ALL);
             }
         }
     }
@@ -353,14 +350,14 @@ public class Team {
         return isOwner(QuestingData.getUserUUID(player));
     }
 
-    public boolean isOwner(String playerName) {
-        PlayerEntry entry = getEntry(playerName);
+    public boolean isOwner(String uuid) {
+        PlayerEntry entry = getEntry(uuid);
         return entry != null && entry.isOwner();
     }
 
-    public PlayerEntry getEntry(String playerName) {
+    public PlayerEntry getEntry(String uuid) {
         for (PlayerEntry playerEntry : getPlayers()) {
-            if (playerEntry.getUUID().equals(playerName)) {
+            if (playerEntry.getUUID().equals(uuid)) {
                 return playerEntry;
             }
         }

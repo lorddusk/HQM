@@ -80,6 +80,12 @@ public class SaveHandler {
         return file;
     }
 
+    public static File getDefaultFile(String name) throws IOException {
+        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name.endsWith(".txt") ? name : name + ".json");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        return file;
+    }
+
     public static File getFile(String name, boolean remote) throws IOException{
         return remote ? getRemoteFile(name) : getLocalFile(name);
     }
