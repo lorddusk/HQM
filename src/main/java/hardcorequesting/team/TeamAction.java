@@ -60,6 +60,8 @@ public enum TeamAction {
                     team.getPlayers().add(entry);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
                     QuestingData.getQuestingData(entry.getUUID()).getTeam().refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
+                    QuestingData.getQuestingData(entry.getUUID()).getTeam().getInvites().add(team);
+                    NetworkManager.sendToPlayer(TeamUpdateType.INVITE.build(team), entry.getPlayerMP());
                 }
             }
         }

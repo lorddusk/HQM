@@ -44,7 +44,7 @@ public class ModConfig {
     private static final String MULTI_REWARD_COMMENT = "Allow every single player in a party to claim the reward for a quest. Setting this to false will give the party one set of rewards to share.";
     private static final String SYNC_KEY = "ServerSync";
     private static final boolean SYNC_DEFAULT = false;
-    private static final String SYNC_COMMENT = "If this is set to true, the server will send the quests to clients connecting to it.";
+    private static final String SYNC_COMMENT = "If this is set to true, the server will send the quests to clients connecting to it. BROKEN DO NOT ACTIVATE";
     private static final String REWARD_KEY = "RewardInterface";
     private static final boolean REWARD_DEFAULT = true;
     private static final String REWARD_COMMENT = "Display an interface with the contents of the reward bag when you open it.";

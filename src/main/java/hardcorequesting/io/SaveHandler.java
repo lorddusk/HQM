@@ -36,7 +36,8 @@ public class SaveHandler {
             .registerTypeAdapter(Team.class, TeamAdapter.TEAM_ADAPTER)
             .registerTypeAdapter(QuestingData.class, QuestingAdapter.QUESTING_DATA_ADAPTER)
             .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
-            .setPrettyPrinting().create();
+            //.setPrettyPrinting() // TODO: make this dynamic
+            .create();
 
     public static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
     public static final Pattern BAGS = Pattern.compile("^bags\\.json$", Pattern.CASE_INSENSITIVE);

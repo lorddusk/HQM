@@ -5,6 +5,7 @@ import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.network.message.TeamMessage;
+import hardcorequesting.network.message.TeamUpdateMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
@@ -210,7 +211,7 @@ public class Team {
                     QuestingData.getQuestingData(uuid).setTeam(leaveTeam);
                     refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
                     leaveTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
-                    NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID()), player.getPlayerMP());
+                    NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID(), leaveTeam), player.getPlayerMP());
                     break;
                 }
                 id++;
@@ -256,8 +257,7 @@ public class Team {
 
     public void refreshData() {
         for (PlayerEntry entry : getPlayers())
-            if (entry.shouldRefreshData())
-                NetworkManager.sendToPlayer(new FullSyncMessage(true), entry.getPlayerMP());
+            refreshTeamData(entry, TeamUpdateSize.ALL);
     }
 
     public void clearProgress() {

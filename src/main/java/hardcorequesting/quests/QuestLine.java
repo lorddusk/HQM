@@ -6,11 +6,11 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.sounds.SoundHandler;
-import hardcorequesting.config.ConfigHandler;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
+import hardcorequesting.network.message.SmallSyncMessage;
 import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
@@ -18,7 +18,6 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -81,10 +80,13 @@ public class QuestLine {
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
-                NetworkManager.sendToPlayer(new FullSyncMessage(true, false), (EntityPlayerMP) player);
-            else {
+                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
+            else if (QuestLine.doServerSync) {
+                // TODO: split in messages or write fragmenting
                 NetworkManager.sendToPlayer(new FullSyncMessage(HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
                 NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
+            } else {
+                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
             }
         }
     }

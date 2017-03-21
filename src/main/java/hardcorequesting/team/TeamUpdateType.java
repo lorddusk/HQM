@@ -140,12 +140,23 @@ public enum TeamUpdateType {
     LEAVE_TEAM {
         @Override
         public void update(Team team, String data) {
-            QuestingData.getQuestingData(data).setTeam(new Team(data));
+            String uuid = data.substring(0, 36);
+            String teamJson = data.substring(36);
+            try {
+                QuestingData.getQuestingData(uuid).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            return new TeamUpdateMessage(this, data[0].toString());
+            try {
+                return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson((Team) data[1]));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     },
     REMOVE_TEAM {
@@ -164,6 +175,28 @@ public enum TeamUpdateType {
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, "" + team.getId());
+        }
+    },
+    INVITE {
+        @Override
+        public void update(Team clientTeam, String data) {
+            try {
+                Team team = TeamAdapter.TEAM_ADAPTER.fromJson(data);
+                QuestingData.getTeams().set(team.getId(), team);
+                clientTeam.getInvites().add(team);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public TeamUpdateMessage build(Team team, Object... data) {
+            try {
+                return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     };
 
