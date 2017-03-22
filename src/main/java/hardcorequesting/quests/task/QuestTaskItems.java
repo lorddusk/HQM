@@ -91,10 +91,10 @@ public abstract class QuestTaskItems extends QuestTask {
         ((QuestDataTaskItems) getData(playerName)).progress[id] = 0;
     }
 
-    protected void completeTask(String playerName, int id, int count) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerName);
+    protected void completeTask(String uuid, int id, int count) {
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(uuid);
         data.progress[id] = count;
-        doCompletionCheck(data, playerName);
+        doCompletionCheck(data, uuid);
     }
 
     private void setPositions(ItemRequirement[] items) {

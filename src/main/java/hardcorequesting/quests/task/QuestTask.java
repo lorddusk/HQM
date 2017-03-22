@@ -29,10 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class QuestTask {
 
@@ -195,6 +192,10 @@ public abstract class QuestTask {
         }
 
         return cachedDescription;
+    }
+
+    public void completeTask(UUID uuid) {
+        completeTask(uuid.toString());
     }
 
     public void completeTask(String playerName) {

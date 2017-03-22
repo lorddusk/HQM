@@ -252,7 +252,7 @@ public class QuestTaskMob extends QuestTask {
                 }
 
                 if (done) {
-                    completeTask(player.getGameProfile().getName());
+                    completeTask(player.getUniqueID());
                 }
 
                 parent.sendUpdatedDataToTeam(player);
