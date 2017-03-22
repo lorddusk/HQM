@@ -78,10 +78,9 @@ public enum TeamAction {
                         if (entry.isInTeam()) {
                             id++;
                         } else if (entry.getUUID().equals(QuestingData.getUserUUID(player))) {
-                            entry.setBookOpen(team.getPlayers().get(0).isBookOpen());
+                            entry.setBookOpen(true);
                             entry.setInTeam(true);
                             QuestingData.getQuestingData(entry.getUUID()).setTeam(inviteTeam);
-                            team.setId(inviteTeam.getId());
 
                             for (String quest : inviteTeam.getQuestData().keySet()) {
                                 QuestData joinData = team.getQuestData().get(quest);
@@ -119,14 +118,14 @@ public enum TeamAction {
                                     } else {
                                         targetValue = teamValue;
                                     }
-                                    team.setReputation(reputation, targetValue);
+                                    inviteTeam.setReputation(reputation, targetValue);
                                 }
                             }
 
                             inviteTeam.refreshData();
                             inviteTeam.refreshTeamData(TeamUpdateSize.ALL);
                             Team.declineAll(QuestingData.getUserUUID(player));
-                            TeamStats.refreshTeam(team);
+                            TeamStats.refreshTeam(inviteTeam);
                             NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, entry.getUUID()), entry.getPlayerMP());
                             break;
                         }
@@ -151,8 +150,8 @@ public enum TeamAction {
     },
     KICK {
         @Override
-        public void process(Team team, EntityPlayer player, String playerNameToRemove) {
-            EntityPlayer playerToRemove = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerNameToRemove);
+        public void process(Team team, EntityPlayer player, String toRemovePlayerUuid) {
+            EntityPlayer playerToRemove = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(toRemovePlayerUuid));
             if (!team.isSingle() && team.isOwner(player) && playerToRemove != null) {
                 PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUniqueID().toString());
                 if (!entryToRemove.isOwner()) {

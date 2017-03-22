@@ -55,7 +55,7 @@ public class QuestDataAdapter {
                         in.beginArray();
                         i = 0;
                         while (in.hasNext() && i < data.reward.length)
-                            data.reward[i] = in.nextBoolean();
+                            data.reward[i++] = in.nextBoolean();
                         in.endArray();
                         break;
                     case COMPLETED:
@@ -77,7 +77,7 @@ public class QuestDataAdapter {
                         in.beginArray();
                         i = 0;
                         while (in.hasNext() && i < data.tasks.length)
-                            data.tasks[i] = QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in);
+                            data.tasks[i++] = QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in);
                         in.endArray();
                         break;
                     default:
