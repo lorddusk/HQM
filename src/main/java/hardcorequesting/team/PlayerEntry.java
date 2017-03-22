@@ -93,10 +93,6 @@ public class PlayerEntry {
         return uuid != null ? uuid.equals(entry.uuid) : entry.uuid == null;
     }
 
-    public boolean shouldRefreshData() {
-        return bookOpen;
-    }
-
     public boolean isBookOpen() {
         return bookOpen;
     }

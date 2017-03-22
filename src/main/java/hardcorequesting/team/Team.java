@@ -108,7 +108,7 @@ public class Team {
             setReputation(reputationReward.getReward(), getReputation(reputationReward.getReward()) + reputationReward.getValue());
 
         for (PlayerEntry entry : getPlayers())
-            if (entry.shouldRefreshData() && entry.isInTeam())
+            if (entry.isInTeam())
                 NetworkManager.sendToPlayer(TeamUpdateType.REPUTATION_RECEIVED.build(this, quest, reputationList), entry.getPlayerMP());
     }
 
@@ -172,7 +172,6 @@ public class Team {
             if (player.isInTeam()) {
                 if (player.getUUID().equals(uuid)) {
                     Team leaveTeam = new Team(uuid);
-                    leaveTeam.getPlayers().get(0).setBookOpen(player.isBookOpen());
                     for (String i : questData.keySet()) {
                         QuestData leaveData = leaveTeam.questData.get(i);
                         QuestData data = questData.get(i);
@@ -230,13 +229,13 @@ public class Team {
         boolean valid = false;
         switch (type) {
             case ALL:
-                valid = entry.shouldRefreshData();
+                valid = true;
                 break;
             case ONLY_MEMBERS:
-                valid = entry.shouldRefreshData() && entry.isInTeam();
+                valid = entry.isInTeam();
                 break;
             case ONLY_OWNER:
-                valid = entry.shouldRefreshData() && entry.isOwner();
+                valid = entry.isOwner();
                 break;
         }
 
@@ -248,9 +247,7 @@ public class Team {
     public void refreshTeamLives() {
         if (!isSingle() && isSharingLives()) {
             for (PlayerEntry entry : getPlayers()) {
-                if (entry.shouldRefreshData()) {
-                    NetworkManager.sendToPlayer(TeamUpdateType.LIVES.build(this), entry.getPlayerMP());
-                }
+                NetworkManager.sendToPlayer(TeamUpdateType.LIVES.build(this), entry.getPlayerMP());
             }
         }
     }

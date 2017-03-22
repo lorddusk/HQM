@@ -1282,6 +1282,7 @@ public class Quest {
     }
 
     private void sendUpdatedData(EntityPlayerMP player) {
+        if (player == null) return; // Don't send to nobody you silly goose
         IMessage update = new QuestDataUpdateMessage(
                 getId(),
                 QuestingData.getQuestingData(player).getTeam().getPlayerCount(),

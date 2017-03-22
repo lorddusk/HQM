@@ -22,7 +22,7 @@ public class QuestData {
 
     public boolean getReward(EntityPlayer player) {
         int id = getId(player);
-        return !(id >= 0 && id < reward.length) || reward[id];
+        return (id >= 0 && id < reward.length) && reward[id];
     }
 
     public void claimReward(EntityPlayer player) {
