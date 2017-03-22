@@ -63,7 +63,7 @@ public class HardcoreQuesting {
         configDir = new File(path);
         ConfigHandler.initModConfig(path);
         ConfigHandler.initEditConfig(path);
-        QuestLine.init(SaveHandler.getRemoteFolder().getAbsolutePath(), event.getSide().isClient());
+        QuestLine.init(SaveHandler.getRemoteFolder().getAbsolutePath());
 
         proxy.init();
         proxy.initSounds(path);

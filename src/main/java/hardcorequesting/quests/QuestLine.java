@@ -156,11 +156,14 @@ public class QuestLine {
             GuiEditMenuItem.Search.initItems();
     }
 
-    public static void init(String path, boolean isClient) {
+    public static void init(String path) {
         QuestLine.getActiveQuestLine().mainPath = path;
         QuestLine.getActiveQuestLine().quests = new ConcurrentHashMap<>();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
+    }
 
+    public static void init(String path, boolean isClient) {
+        init(path);
         loadAll(isClient, false);
     }
 
