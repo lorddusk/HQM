@@ -1,5 +1,7 @@
 package hardcorequesting.death;
 
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.QuestDataUpdateMessage;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.EntityLiving;

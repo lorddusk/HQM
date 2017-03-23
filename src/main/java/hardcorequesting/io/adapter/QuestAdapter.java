@@ -377,8 +377,6 @@ public class QuestAdapter {
                 try {
                     if (HardcoreQuesting.getPlayer() != null) {
                         QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
-                    } else {
-                        QUEST.addTaskData(QUEST.getQuestData("lorddusk"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
