@@ -14,10 +14,16 @@ import java.io.PrintWriter;
 
 public class SmallSyncMessage implements IMessage {
 
-    private boolean questing, hardcore;
+    private boolean local, serverWorld, questing, hardcore;
     private String teams, data;
 
     public SmallSyncMessage() {
+
+    }
+
+    public SmallSyncMessage(boolean local, boolean serverWorld) {
+        this.local = local;
+        this.serverWorld = serverWorld;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
         this.teams = SaveHandler.saveTeams();
@@ -26,6 +32,8 @@ public class SmallSyncMessage implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        this.local = buf.readBoolean();
+        this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         int size = buf.readInt();
@@ -36,6 +44,8 @@ public class SmallSyncMessage implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
+        buf.writeBoolean(this.local);
+        buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         buf.writeInt(this.teams.getBytes().length);
@@ -67,7 +77,7 @@ public class SmallSyncMessage implements IMessage {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            QuestLine.receiveServerSync(false, true);
+            QuestLine.receiveServerSync(message.local, message.serverWorld);
         }
     }
 }

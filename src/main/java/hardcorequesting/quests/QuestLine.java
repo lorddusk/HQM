@@ -80,13 +80,13 @@ public class QuestLine {
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
-                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new SmallSyncMessage(true, false), (EntityPlayerMP) player);
             else if (QuestLine.doServerSync) {
                 // TODO: split in messages or write fragmenting
-                NetworkManager.sendToPlayer(new FullSyncMessage(HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new FullSyncMessage(false, HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
                 NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
             } else {
-                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new SmallSyncMessage(false, HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
             }
         }
     }
