@@ -133,7 +133,7 @@ public class QuestLine {
         QuestSet.saveAll();
         Team.saveAll();
         QuestingData.saveQuestingData();
-        if (Quest.saveDefault) { // Save the needed defaults
+        if (Quest.saveDefault && Quest.isEditing) { // Save the needed defaults during edit mode
             QuestLine.saveDescriptionDefault();
             Reputation.saveAllDefault();
             GroupTier.saveAllDefault();
