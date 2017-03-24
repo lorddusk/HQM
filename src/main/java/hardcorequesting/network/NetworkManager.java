@@ -33,6 +33,7 @@ public class NetworkManager {
         WRAPPER.registerMessage(DeathStatsMessage.Handler.class, DeathStatsMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(TeamUpdateMessage.Handler.class, TeamUpdateMessage.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(SoundMessage.Handler.class, SoundMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(LivesUpdate.Handler.class, LivesUpdate.class, id++, Side.CLIENT);
 
         WRAPPER.registerMessage(BlockSyncMessageClient.Handler.class, BlockSyncMessageClient.class, id++, Side.CLIENT);
         WRAPPER.registerMessage(BlockSyncMessage.Handler.class, BlockSyncMessage.class, id++, Side.SERVER);

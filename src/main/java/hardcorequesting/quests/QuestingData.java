@@ -10,6 +10,8 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.LivesUpdate;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
@@ -326,6 +328,10 @@ public class QuestingData {
         return lives;
     }
 
+    public void setRawLives(int lives) {
+        this.lives = lives;
+    }
+
     public QuestData getQuestData(String id) {
         return getTeam().getQuestData(id);
     }
@@ -410,6 +416,9 @@ public class QuestingData {
             this.lives = getRawLives() - amount;
         }
 
+        if (player instanceof EntityPlayerMP) {
+            NetworkManager.sendToPlayer(new LivesUpdate(this.uuid, this.lives), (EntityPlayerMP) player);
+        }
         getTeam().refreshTeamLives();
         try {
             if (getLives() < getLivesToStayAlive()) {

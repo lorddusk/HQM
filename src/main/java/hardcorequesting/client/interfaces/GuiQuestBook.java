@@ -736,7 +736,7 @@ public class GuiQuestBook extends GuiBase {
             }
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            int lives = DeathStats.getDeathStats(QuestingData.getUserUUID(player)).getTotalDeaths();
+            int lives = QuestingData.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X;
