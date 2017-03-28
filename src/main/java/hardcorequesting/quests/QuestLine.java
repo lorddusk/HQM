@@ -18,6 +18,7 @@ import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -79,15 +80,16 @@ public class QuestLine {
 
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
-            if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
-                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
+            boolean side = HardcoreQuesting.loadingSide.isServer();
+            if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
+                NetworkManager.sendToPlayer(new SmallSyncMessage(true, false), (EntityPlayerMP) player);
             else if (QuestLine.doServerSync) {
                 // TODO: split in messages or write fragmenting
-                NetworkManager.sendToPlayer(new FullSyncMessage(HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
-                NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new FullSyncMessage(false, side), (EntityPlayerMP) player);
             } else {
-                NetworkManager.sendToPlayer(new SmallSyncMessage(), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new SmallSyncMessage(false, side), (EntityPlayerMP) player);
             }
+            NetworkManager.sendToPlayer(new DeathStatsMessage(side), (EntityPlayerMP) player);
         }
     }
 

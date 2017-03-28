@@ -4,9 +4,11 @@ import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
+import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -14,6 +16,7 @@ import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeathStats {
 
@@ -47,7 +50,7 @@ public class DeathStats {
     }
 
     public static List<DeathStats> getDeathStatsList() {
-        return new ArrayList<>(deathMap.values());
+        return QuestingData.getData().values().stream().map(QuestingData::getDeathStat).collect(Collectors.toList());
     }
 
     public static void loadAll(boolean isClient, boolean remote) {
@@ -70,7 +73,7 @@ public class DeathStats {
     }
 
     public static void resync() {
-        NetworkManager.sendToAllPlayers(new DeathStatsMessage("TIMESTAMP"));
+        NetworkManager.sendToAllPlayers(new DeathStatsMessage(FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()));
     }
 
     private static void updateClientDeathList() {
@@ -89,11 +92,7 @@ public class DeathStats {
 
     public static DeathStats getDeathStats(String uuid) {
         DeathStats stats = deathMap.get(uuid);
-        if (stats == null) {
-            stats = new DeathStats(uuid);
-            deathMap.put(uuid, stats);
-        }
-        return stats;
+        return stats == null ? new DeathStats(uuid) : stats;
     }
 
     public static DeathStats[] getDeathStats() {
@@ -126,11 +125,13 @@ public class DeathStats {
 
     public void increaseDeath(int id) {
         deaths[id]++;
+        totalDeaths = -1;
         resync();
     }
 
     public void increaseDeath(int id, int count, boolean resync) {
         deaths[id] += count;
+        totalDeaths = -1;
         if (resync) resync();
     }
 
