@@ -471,10 +471,10 @@ public class QuestingData {
 
             mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectoryName());
             mcServer.initiateShutdown();*/
-            // @todo: is this correct?
-            mcServer.getActiveAnvilConverter().flushCache();
-            mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectory().getName());
-            mcServer.initiateShutdown();
+            // @todo: is this correct? lets fucking not delete the world
+            //mcServer.getActiveAnvilConverter().flushCache();
+            //mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectory().getName());
+            //mcServer.initiateShutdown();
 //            mcServer.deleteWorldAndStopServer();
 
         } else {
