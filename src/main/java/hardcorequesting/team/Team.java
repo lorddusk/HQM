@@ -3,15 +3,14 @@ package hardcorequesting.team;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
-import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.network.message.TeamMessage;
-import hardcorequesting.network.message.TeamUpdateMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
@@ -432,5 +431,11 @@ public class Team {
         this.lifeSetting = team.lifeSetting;
         this.rewardSetting = team.rewardSetting;
         this.players = team.players;
+    }
+
+    public static String saveTeam(EntityPlayer entity) {
+        Team team = QuestingData.getQuestingData(entity).getTeam();
+        if (team.isSingle()) return ""; // return an empty string when the team is single
+        return SaveHandler.saveTeam(team);
     }
 }

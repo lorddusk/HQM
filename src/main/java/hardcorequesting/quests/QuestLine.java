@@ -10,8 +10,8 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
-import hardcorequesting.network.message.SmallSyncMessage;
-import hardcorequesting.network.message.FullSyncMessage;
+import hardcorequesting.network.message.PlayerDataSyncMessage;
+import hardcorequesting.network.message.QuestLineSyncMessage;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
@@ -80,16 +80,16 @@ public class QuestLine {
 
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
+            EntityPlayerMP playerMP = (EntityPlayerMP) player;
             boolean side = HardcoreQuesting.loadingSide.isServer();
             if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
-                NetworkManager.sendToPlayer(new SmallSyncMessage(true, false), (EntityPlayerMP) player);
-            else if (QuestLine.doServerSync) {
-                // TODO: split in messages or write fragmenting
-                NetworkManager.sendToPlayer(new FullSyncMessage(false, side), (EntityPlayerMP) player);
-            } else {
-                NetworkManager.sendToPlayer(new SmallSyncMessage(false, side), (EntityPlayerMP) player);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
+            else {
+                if (QuestLine.doServerSync) // Send actual data to player on server sync
+                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(), playerMP);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, side, player), playerMP);
             }
-            NetworkManager.sendToPlayer(new DeathStatsMessage(side), (EntityPlayerMP) player);
+            NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
         }
     }
 

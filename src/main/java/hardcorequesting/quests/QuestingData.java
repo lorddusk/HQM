@@ -157,6 +157,10 @@ public class QuestingData {
         }
     }
 
+    public static String saveQuestingData(EntityPlayer entity) {
+        return SaveHandler.saveQuestingData(QuestingData.getQuestingData(entity));
+    }
+
     public static void loadQuestingData(boolean remote) {
         try {
             data.clear();

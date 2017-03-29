@@ -237,6 +237,11 @@ public class SaveHandler {
         }.getType());
     }
 
+    public static String saveTeam(Team team) {
+        return save(team, new TypeToken<Team>(){
+        }.getType());
+    }
+
     public static List<Team> loadTeams(File file) throws IOException {
         if (!file.exists()) return new ArrayList<>();
         JsonReader reader = new JsonReader(new FileReader(file));
@@ -291,6 +296,11 @@ public class SaveHandler {
 
     public static String saveQuestingData() {
         return save(QuestingData.getData().values(), new TypeToken<List<QuestingData>>() {
+        }.getType());
+    }
+
+    public static String saveQuestingData(QuestingData questingData) {
+        return save(questingData, new TypeToken<QuestingData>() {
         }.getType());
     }
 
