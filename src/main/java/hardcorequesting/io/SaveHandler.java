@@ -354,8 +354,11 @@ public class SaveHandler {
             JsonObject object = parser.parse(reader).getAsJsonObject();
             QuestingData.deactivate();
             if (object.get(QUESTING).getAsBoolean() || QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
-            if (object.get(HARDCORE).getAsBoolean()  || QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
+            if (object.get(HARDCORE).getAsBoolean() || QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
             reader.close();
+        } else { // when there is no file use the defaults anyway
+            if (QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
+            if (QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
         }
     }
 
