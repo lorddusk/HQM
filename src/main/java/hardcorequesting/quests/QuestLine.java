@@ -76,6 +76,7 @@ public class QuestLine {
     public static void reset() {
         server = null;
         world = null;
+        SaveHandler.clearRemoteFolder();
     }
 
     public static void sendServerSync(EntityPlayer player) {

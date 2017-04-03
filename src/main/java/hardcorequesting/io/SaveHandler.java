@@ -119,6 +119,13 @@ public class SaveHandler {
         }
     }
 
+    public static void clearRemoteFolder() {
+        if (getRemoteFolder().exists()) {
+            getRemoteFolder().delete();
+            getRemoteFolder().mkdirs();
+        }
+    }
+
     public static void removeFile(File file) {
         if (!file.exists()) return;
         file.delete();
