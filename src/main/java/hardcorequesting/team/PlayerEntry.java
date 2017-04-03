@@ -3,12 +3,14 @@ package hardcorequesting.team;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class PlayerEntry {
 
@@ -20,12 +22,14 @@ public class PlayerEntry {
     private boolean inTeam;
     private boolean owner;
     private boolean bookOpen;
+    private String playername;
 
     private PlayerEntry() {
-
+        this.playername = null;
     }
 
     public PlayerEntry(String uuid, boolean inTeam, boolean owner) {
+        this();
         this.uuid = uuid;
         this.inTeam = inTeam;
         this.owner = owner;
@@ -63,7 +67,11 @@ public class PlayerEntry {
 
     @SideOnly(Side.CLIENT)
     public String getDisplayName() {
-        return Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid)).getDisplayNameString();
+        if (playername == null) {
+            EntityPlayer entry = Minecraft.getMinecraft().theWorld.getPlayerEntityByUUID(java.util.UUID.fromString(uuid));
+            playername = entry == null ? null : entry.getDisplayNameString();
+        }
+        return playername;
     }
 
     public boolean isInTeam() {
