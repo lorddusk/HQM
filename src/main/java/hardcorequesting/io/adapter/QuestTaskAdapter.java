@@ -45,7 +45,7 @@ public class QuestTaskAdapter {
         }
     };
     protected static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
-        private final String ITEM = "fluidStack";
+        private final String ITEM = "item";
         private final String FLUID = "fluid";
         private final String REQUIRED = "required";
         private final String PRECISION = "precision";

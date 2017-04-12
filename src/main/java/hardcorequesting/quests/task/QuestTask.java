@@ -3,10 +3,13 @@ package hardcorequesting.quests.task;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
+import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
@@ -16,6 +19,7 @@ import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -25,10 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class QuestTask {
 
@@ -49,14 +50,14 @@ public abstract class QuestTask {
         updateId();
     }
 
-    public static void completeQuest(Quest quest, String playerName) {
-        if (!quest.isEnabled(playerName) || !quest.isAvailable(playerName)) return;
+    public static void completeQuest(Quest quest, String playerUuid) {
+        if (!quest.isEnabled(playerUuid) || !quest.isAvailable(playerUuid)) return;
         for (QuestTask questTask : quest.getTasks()) {
-            if (!questTask.getData(playerName).completed) {
+            if (!questTask.getData(playerUuid).completed) {
                 return;
             }
         }
-        QuestData data = quest.getQuestData(playerName);
+        QuestData data = quest.getQuestData(playerUuid);
 
         data.completed = true;
         data.claimed = false;
@@ -64,7 +65,7 @@ public abstract class QuestTask {
         data.time = Quest.serverTicker.getHours();
 
 
-        if (QuestingData.getQuestingData(playerName).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
+        if (QuestingData.getQuestingData(playerUuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
             int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
         } else {
@@ -72,15 +73,22 @@ public abstract class QuestTask {
                 data.reward[i] = true;
             }
         }
-        TeamStats.refreshTeam(QuestingData.getQuestingData(playerName).getTeam());
+        quest.sendUpdatedDataToTeam(playerUuid);
+        TeamStats.refreshTeam(QuestingData.getQuestingData(playerUuid).getTeam());
 
         for (Quest child : quest.getReversedRequirement()) {
-            completeQuest(child, playerName);
-            child.sendUpdatedDataToTeam(playerName);
+            completeQuest(child, playerUuid);
+            child.sendUpdatedDataToTeam(playerUuid);
         }
 
         if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
-            quest.reset(playerName);
+            quest.reset(playerUuid);
+        }
+
+        EntityPlayer player = QuestingData.getPlayer(playerUuid);
+        if (player instanceof EntityPlayerMP && !quest.hasReward(player)) {
+            // when there is no reward and it just completes the quest play the music
+            NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (EntityPlayerMP) player);
         }
     }
 
@@ -185,6 +193,10 @@ public abstract class QuestTask {
         }
 
         return cachedDescription;
+    }
+
+    public void completeTask(UUID uuid) {
+        completeTask(uuid.toString());
     }
 
     public void completeTask(String playerName) {

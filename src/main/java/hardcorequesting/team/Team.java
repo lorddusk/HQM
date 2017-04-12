@@ -3,7 +3,6 @@ package hardcorequesting.team;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
-import hardcorequesting.network.message.FullSyncMessage;
 import hardcorequesting.network.message.TeamMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
@@ -11,6 +10,7 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
@@ -79,6 +79,7 @@ public class Team {
 
     public void resetProgress(Quest quest) {
         questData.put(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
+        refreshData();
     }
 
     public Map<String, QuestData> getQuestData() {
@@ -106,7 +107,7 @@ public class Team {
             setReputation(reputationReward.getReward(), getReputation(reputationReward.getReward()) + reputationReward.getValue());
 
         for (PlayerEntry entry : getPlayers())
-            if (entry.shouldRefreshData() && entry.isInTeam())
+            if (entry.isInTeam())
                 NetworkManager.sendToPlayer(TeamUpdateType.REPUTATION_RECEIVED.build(this, quest, reputationList), entry.getPlayerMP());
     }
 
@@ -170,7 +171,6 @@ public class Team {
             if (player.isInTeam()) {
                 if (player.getUUID().equals(uuid)) {
                     Team leaveTeam = new Team(uuid);
-                    leaveTeam.getPlayers().get(0).setBookOpen(player.isBookOpen());
                     for (String i : questData.keySet()) {
                         QuestData leaveData = leaveTeam.questData.get(i);
                         QuestData data = questData.get(i);
@@ -207,6 +207,9 @@ public class Team {
                     }
 
                     QuestingData.getQuestingData(uuid).setTeam(leaveTeam);
+                    refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                    leaveTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                    NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID(), leaveTeam), player.getPlayerMP());
                     break;
                 }
                 id++;
@@ -222,45 +225,35 @@ public class Team {
     }
 
     private void refreshTeamData(PlayerEntry entry, TeamUpdateSize type) {
-        Team team = this;
         boolean valid = false;
         switch (type) {
             case ALL:
-                if (entry.shouldRefreshData()) {
-                    valid = true;
-                    break; //the break is here on purpose
-                }
-            case ONLY_INVITES:
-                //refresh that team instead
-                team = QuestingData.getQuestingData(entry.getUUID()).getTeam();
-                valid = !entry.isInTeam() && team.getEntry(entry.getUUID()).shouldRefreshData();
+                valid = true;
                 break;
             case ONLY_MEMBERS:
-                valid = entry.shouldRefreshData();
+                valid = entry.isInTeam();
                 break;
             case ONLY_OWNER:
-                valid = entry.shouldRefreshData() && entry.isOwner();
+                valid = entry.isOwner();
                 break;
         }
 
-        if (valid)
+        if (valid) {
             NetworkManager.sendToPlayer(TeamUpdateType.FULL.build(this), entry.getPlayerMP());
+        }
     }
 
     public void refreshTeamLives() {
         if (!isSingle() && isSharingLives()) {
             for (PlayerEntry entry : getPlayers()) {
-                if (entry.shouldRefreshData()) {
-                    NetworkManager.sendToPlayer(TeamUpdateType.LIVES.build(this), entry.getPlayerMP());
-                }
+                NetworkManager.sendToPlayer(TeamUpdateType.LIVES.build(this), entry.getPlayerMP());
             }
         }
     }
 
     public void refreshData() {
         for (PlayerEntry entry : getPlayers())
-            if (entry.shouldRefreshData())
-                NetworkManager.sendToPlayer(new FullSyncMessage(true), entry.getPlayerMP());
+            refreshTeamData(entry, TeamUpdateSize.ALL);
     }
 
     public void clearProgress() {
@@ -269,7 +262,7 @@ public class Team {
         int playerCount = getPlayerCount();
         for (Quest quest : Quest.getQuests().values()) {
             if (quest != null && questData.get(quest.getId()) != null) {
-                quest.preRead(playerCount, questData.get(quest.getId()));
+                quest.initRewards(playerCount, questData.get(quest.getId()));
             }
         }
         refreshData();
@@ -283,9 +276,7 @@ public class Team {
             } else {
                 players.remove(i);
             }
-            QuestingData.getQuestingData(player.getUUID()).getTeam().refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
         }
-
 
         List<Team> teams = QuestingData.getTeams();
         teams.remove(id);
@@ -295,12 +286,14 @@ public class Team {
             team.id--;
         }
 
-        //refresh all clients with open books,
-        for (String username : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerNames()) {
-            Team team = QuestingData.getQuestingData(username).getTeam();
-            PlayerEntry entry = team.getEntry(username);
+        NetworkManager.sendToAllPlayers(TeamUpdateType.REMOVE_TEAM.build(this));
+
+        //refresh all clients with open books
+        for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
+            Team team = QuestingData.getQuestingData(player).getTeam();
+            PlayerEntry entry = team.getEntry(player.getUniqueID().toString());
             if (entry != null) {
-                team.refreshTeamData(entry, TeamUpdateSize.ONLY_MEMBERS);
+                team.refreshTeamData(entry, TeamUpdateSize.ALL);
             }
         }
     }
@@ -353,14 +346,14 @@ public class Team {
         return isOwner(QuestingData.getUserUUID(player));
     }
 
-    public boolean isOwner(String playerName) {
-        PlayerEntry entry = getEntry(playerName);
+    public boolean isOwner(String uuid) {
+        PlayerEntry entry = getEntry(uuid);
         return entry != null && entry.isOwner();
     }
 
-    public PlayerEntry getEntry(String playerName) {
+    public PlayerEntry getEntry(String uuid) {
         for (PlayerEntry playerEntry : getPlayers()) {
-            if (playerEntry.getUUID().equals(playerName)) {
+            if (playerEntry.getUUID().equals(uuid)) {
                 return playerEntry;
             }
         }
@@ -438,5 +431,11 @@ public class Team {
         this.lifeSetting = team.lifeSetting;
         this.rewardSetting = team.rewardSetting;
         this.players = team.players;
+    }
+
+    public static String saveTeam(EntityPlayer entity) {
+        Team team = QuestingData.getQuestingData(entity).getTeam();
+        if (team.isSingle()) return ""; // return an empty string when the team is single
+        return SaveHandler.saveTeam(team);
     }
 }

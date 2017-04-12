@@ -33,7 +33,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
 
     @Override
-    protected void doCompletionCheck(QuestDataTaskItems data, String playerName) {
+    protected void doCompletionCheck(QuestDataTaskItems data, String uuid) {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
@@ -44,9 +44,9 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
 
         if (isDone) {
-            completeTask(playerName);
+            completeTask(uuid);
         }
-        parent.sendUpdatedDataToTeam(playerName);
+        parent.sendUpdatedDataToTeam(uuid);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
     }
 
-    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String playerName) {
-        if (!parent.isAvailable(playerName)) return;
+    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String uuid) {
+        if (!parent.isAvailable(uuid)) return;
 
 
         boolean updated = false;
@@ -119,7 +119,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
 
         if (updated) {
-            doCompletionCheck(data, playerName);
+            doCompletionCheck(data, uuid);
         }
     }
 

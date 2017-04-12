@@ -70,7 +70,7 @@ public class QuestTaskLocation extends QuestTask {
 
                 if (updated) {
                     if (all) {
-                        completeTask(player.getGameProfile().getName());
+                        completeTask(player.getUniqueID());
                     }
                     parent.sendUpdatedDataToTeam(player);
                 }

@@ -15,7 +15,7 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
     private void checkReputation(EntityPlayer player) {
         if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !this.isCompleted(player)) {
             if (isPlayerInRange(player)) {
-                completeTask(player.getGameProfile().getName());
+                completeTask(player.getUniqueID());
                 parent.sendUpdatedDataToTeam(player);
             }
 

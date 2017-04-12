@@ -1,28 +1,9 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
-
-# idea
-out
-*.ipr
-*.iws
-<<<<<<< 12488db5d2107dcfb62a75647f87884c2020a197
-/bin/
-.idea
-=======
-*.iml
-.idea
-
-# gradle
-build
-.gradle
-
-# other
-eclipse
-run
->>>>>>> First 1.8.9 build (not working yet, duh)
-/run_server/
+# Created by .ignore support plugin (hsz.mobi)
+/build/
+/HQM.ipr
+/run/
+/HQM.iws
+/out/
+/HQM.iml
+/.gradle/
+/output/

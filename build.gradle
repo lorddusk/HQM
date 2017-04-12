@@ -15,34 +15,34 @@ apply plugin: 'idea'
 
 repositories {
     maven {
-        name = "forge"
+        name = "Forge"
         url = "http://files.minecraftforge.net/maven"
     }
     maven {
-        name = "progwml6"
+        name = "JEI"
         url =  "http://dvs1.progwml6.com/files/maven"
     }
     maven {
-        name = "mobiusstrip"
-        url = "http://mobiusstrip.eu/maven"
+        name = "HWYLA"
+        url = "http://tehnut.info/maven"
     }
 }
 
 dependencies {
-    compileOnly "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
-    runtime "mezz.jei:jei_1.11.2:4.2.4.229"
+    deobfCompile "mcp.mobius.waila:Hwyla:" + project.hwyla_version
+    runtime "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
 }
 
-version = "1.11.2-5.1.0alpha2"
-group = "hardcorequesting"
-archivesBaseName = "HQM-New Heights"
+version = project.version
+group = project.group
+archivesBaseName = project.archives_base_name
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.11.2-13.20.0.2226"
-    mappings = "snapshot_20170204"
+    version = project.minecraft_version + "-" + project.forge_version
+    mappings = project.forge_mappings
     runDir = "run"
 
     useDepAts = true

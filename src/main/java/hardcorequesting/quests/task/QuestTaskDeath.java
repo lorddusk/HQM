@@ -84,7 +84,7 @@ public class QuestTaskDeath extends QuestTask {
                     deathData.deaths += 1;
 
                     if (deathData.deaths == deaths) {
-                        completeTask(player.getGameProfile().getName());
+                        completeTask(player.getUniqueID());
                     }
 
                     parent.sendUpdatedDataToTeam(player);

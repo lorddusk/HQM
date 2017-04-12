@@ -63,6 +63,7 @@ public class Quest {
     private static final int MAX_SELECT_REWARD_SLOTS = 4;
     public static boolean isEditing = false;
     public static boolean saveDefault = true;
+    public static boolean useDefault = true;
     public static String selectedQuestId;
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
@@ -1259,7 +1260,7 @@ public class Quest {
         return true;
     }
 
-    public void preRead(int players, QuestData data) {
+    public void initRewards(int players, QuestData data) {
         data.reward = new boolean[players];
     }
 
@@ -1277,13 +1278,12 @@ public class Quest {
 
     public void sendUpdatedDataToTeam(Team team) {
         for (PlayerEntry entry : team.getPlayers()) {
-            if (entry.shouldRefreshData()) {
-                sendUpdatedData(entry.getPlayerMP());
-            }
+            sendUpdatedData(entry.getPlayerMP());
         }
     }
 
     private void sendUpdatedData(EntityPlayerMP player) {
+        if (player == null) return; // Don't send to nobody you silly goose
         IMessage update = new QuestDataUpdateMessage(
                 getId(),
                 QuestingData.getQuestingData(player).getTeam().getPlayerCount(),

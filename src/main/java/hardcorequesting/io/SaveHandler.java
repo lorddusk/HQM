@@ -36,7 +36,8 @@ public class SaveHandler {
             .registerTypeAdapter(Team.class, TeamAdapter.TEAM_ADAPTER)
             .registerTypeAdapter(QuestingData.class, QuestingAdapter.QUESTING_DATA_ADAPTER)
             .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
-            .setPrettyPrinting().create();
+            //.setPrettyPrinting() // TODO: make this dynamic
+            .create();
 
     public static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
     public static final Pattern BAGS = Pattern.compile("^bags\\.json$", Pattern.CASE_INSENSITIVE);
@@ -58,7 +59,7 @@ public class SaveHandler {
 
     public static final String EXPORTS = "exports";
     public static final String REMOTE = "remote";
-    public static final String QUESTS = "quests";
+    public static final String DEFAULT = "default";
     private static final String QUESTING = "questing";
     private static final String HARDCORE = "hardcore";
 
@@ -69,13 +70,19 @@ public class SaveHandler {
     }
 
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, QUESTS), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
 
     public static File getRemoteFile(String name) throws IOException {
         File file = new File(new File(HardcoreQuesting.configDir, REMOTE), name.endsWith(".txt") ? name : name + ".json");
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        return file;
+    }
+
+    public static File getDefaultFile(String name) throws IOException {
+        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
@@ -89,11 +96,15 @@ public class SaveHandler {
     }
 
     public static File getLocalFolder() {
-        return new File(HardcoreQuesting.configDir, QUESTS);
+        return new File(QuestLine.getActiveQuestLine().mainPath);
     }
 
     public static File getRemoteFolder() {
         return new File(HardcoreQuesting.configDir, REMOTE);
+    }
+
+    public static File getDefaultFolder() {
+        return new File(HardcoreQuesting.configDir, DEFAULT);
     }
 
     public static File getFolder(boolean remote){
@@ -105,6 +116,13 @@ public class SaveHandler {
             FileUtils.copyDirectory(from, to);
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Couldn't copy default files");
+        }
+    }
+
+    public static void clearRemoteFolder() {
+        if (getRemoteFolder().exists()) {
+            getRemoteFolder().delete();
+            getRemoteFolder().mkdirs();
         }
     }
 
@@ -226,6 +244,11 @@ public class SaveHandler {
         }.getType());
     }
 
+    public static String saveTeam(Team team) {
+        return save(team, new TypeToken<Team>(){
+        }.getType());
+    }
+
     public static List<Team> loadTeams(File file) throws IOException {
         if (!file.exists()) return new ArrayList<>();
         JsonReader reader = new JsonReader(new FileReader(file));
@@ -283,6 +306,11 @@ public class SaveHandler {
         }.getType());
     }
 
+    public static String saveQuestingData(QuestingData questingData) {
+        return save(questingData, new TypeToken<QuestingData>() {
+        }.getType());
+    }
+
     public static List<QuestingData> loadQuestingData(File file) throws IOException {
         if (!file.exists()) return new ArrayList<>();
         JsonReader reader = new JsonReader(new FileReader(file));
@@ -332,9 +360,12 @@ public class SaveHandler {
             FileReader reader = new FileReader(file);
             JsonObject object = parser.parse(reader).getAsJsonObject();
             QuestingData.deactivate();
-            if (object.get(QUESTING).getAsBoolean()) QuestingData.activateQuest(false);
-            if (object.get(HARDCORE).getAsBoolean()) QuestingData.activateHardcore();
+            if (object.get(QUESTING).getAsBoolean() || QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
+            if (object.get(HARDCORE).getAsBoolean() || QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
             reader.close();
+        } else { // when there is no file use the defaults anyway
+            if (QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
+            if (QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
         }
     }
 

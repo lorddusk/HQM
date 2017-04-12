@@ -69,7 +69,7 @@ public class PlayerDeathEventListener {
         if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
             ItemStack bookStack = new ItemStack(ModItems.book);
             for (ItemStack stack : event.getOriginal().inventory.mainInventory) {
-                if (stack.isItemEqual(bookStack)) {
+                if (bookStack.isItemEqual(stack)) {
                     bookStack = stack.copy(); // Copy the actual stack
                     break;
                 }

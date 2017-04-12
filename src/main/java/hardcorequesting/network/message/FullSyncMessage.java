@@ -31,6 +31,7 @@ public class FullSyncMessage implements IMessage {
         this.hardcore = QuestingData.isHardcoreActive();
     }
 
+    // TODO: this can't be one packet
     public FullSyncMessage(boolean serverWorld) {
         this.serverWorld = serverWorld;
         this.mainDesc = QuestLine.getActiveQuestLine().mainDescription;

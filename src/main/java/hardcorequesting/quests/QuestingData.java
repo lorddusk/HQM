@@ -10,6 +10,8 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
+import hardcorequesting.network.NetworkManager;
+import hardcorequesting.network.message.LivesUpdate;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
@@ -153,6 +155,10 @@ public class QuestingData {
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to save questing data");
         }
+    }
+
+    public static String saveQuestingData(EntityPlayer entity) {
+        return SaveHandler.saveQuestingData(QuestingData.getQuestingData(entity));
     }
 
     public static void loadQuestingData(boolean remote) {
@@ -326,6 +332,10 @@ public class QuestingData {
         return lives;
     }
 
+    public void setRawLives(int lives) {
+        this.lives = lives;
+    }
+
     public QuestData getQuestData(String id) {
         return getTeam().getQuestData(id);
     }
@@ -410,6 +420,9 @@ public class QuestingData {
             this.lives = getRawLives() - amount;
         }
 
+        if (player instanceof EntityPlayerMP) {
+            NetworkManager.sendToPlayer(new LivesUpdate(this.uuid, this.lives), (EntityPlayerMP) player);
+        }
         getTeam().refreshTeamLives();
         try {
             if (getLives() < getLivesToStayAlive()) {
@@ -458,10 +471,10 @@ public class QuestingData {
 
             mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectoryName());
             mcServer.initiateShutdown();*/
-            // @todo: is this correct?
-            mcServer.getActiveAnvilConverter().flushCache();
-            mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worlds[0].getSaveHandler().getWorldDirectory().getName());
-            mcServer.initiateShutdown();
+            // @todo: is this correct? lets fucking not delete the world
+            //mcServer.getActiveAnvilConverter().flushCache();
+            //mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectory().getName());
+            //mcServer.initiateShutdown();
 //            mcServer.deleteWorldAndStopServer();
 
         } else {

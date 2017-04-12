@@ -285,6 +285,14 @@ public class Reputation {
         }
     }
 
+    public static void saveAllDefault() {
+        try {
+            SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
+        }
+    }
+
     public String getId() {
         return uuid;
     }

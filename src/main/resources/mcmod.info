@@ -1,20 +1,16 @@
 [
-{
-  "modid": "HardcoreQuesting",
-  "name": "Hardcore Questing Mode",
-  "description": "This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "http://hardcorequest.com/",
-  "updateUrl": "",
-  "authorList": [
-"Vswe",
-"Lorddusk",
-"Newcastlegeek"
-],
-  "credits": "",
-  "logoFile": "assets/hardcorequesting/hqmlogo.png",
-  "screenshots": [],
-  "dependencies": []
-}
+  {
+    "modid": "hardcorequesting",
+    "name": "Hardcore Questing Mode",
+    "description": "This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://minecraft.curseforge.com/projects/hardcore-questing-mode",
+    "updateUrl": "",
+    "authorList": ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp"],
+    "credits": "",
+    "logoFile": "assets/hardcorequesting/hqmlogo.png",
+    "screenshots": [],
+    "dependencies": []
+  }
 ]

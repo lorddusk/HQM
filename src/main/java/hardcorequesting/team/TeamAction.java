@@ -1,10 +1,13 @@
 package hardcorequesting.team;
 
+import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public enum TeamAction {
     CREATE {
@@ -29,14 +32,19 @@ public enum TeamAction {
 
                 Team.declineAll(QuestingData.getUserUUID(player));
                 TeamStats.refreshTeam(team);
+                NetworkManager.sendToAllPlayers(TeamUpdateType.CREATE_TEAM.build(team));
+                if (player instanceof EntityPlayerMP) {
+                    NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(team, player.getUniqueID().toString()), (EntityPlayerMP) player);
+                }
             }
         }
     },
     INVITE {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
-            if (!team.isSingle() && team.isOwner(player)) {
-                PlayerEntry entry = new PlayerEntry(data, false, false);
+        public void process(Team team, EntityPlayer player, String playerName) {
+            EntityPlayer invitee = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
+            if (!team.isSingle() && team.isOwner(player) && invitee != null) {
+                PlayerEntry entry = new PlayerEntry(invitee.getUniqueID().toString(), false, false);
 
                 if (!QuestingData.hasData(entry.getUUID())) {
                     TeamError.INVALID_PLAYER.sendToClient(player);
@@ -52,6 +60,8 @@ public enum TeamAction {
                     team.getPlayers().add(entry);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
                     QuestingData.getQuestingData(entry.getUUID()).getTeam().refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
+                    QuestingData.getQuestingData(entry.getUUID()).getTeam().getInvites().add(team);
+                    NetworkManager.sendToPlayer(TeamUpdateType.INVITE.build(team), entry.getPlayerMP());
                 }
             }
         }
@@ -68,7 +78,7 @@ public enum TeamAction {
                         if (entry.isInTeam()) {
                             id++;
                         } else if (entry.getUUID().equals(QuestingData.getUserUUID(player))) {
-                            entry.setBookOpen(team.getPlayers().get(0).isBookOpen());
+                            entry.setBookOpen(true);
                             entry.setInTeam(true);
                             QuestingData.getQuestingData(entry.getUUID()).setTeam(inviteTeam);
                             team.setId(inviteTeam.getId());
@@ -109,14 +119,15 @@ public enum TeamAction {
                                     } else {
                                         targetValue = teamValue;
                                     }
-                                    team.setReputation(reputation, targetValue);
+                                    inviteTeam.setReputation(reputation, targetValue);
                                 }
                             }
 
                             inviteTeam.refreshData();
                             inviteTeam.refreshTeamData(TeamUpdateSize.ALL);
                             Team.declineAll(QuestingData.getUserUUID(player));
-                            TeamStats.refreshTeam(team);
+                            TeamStats.refreshTeam(inviteTeam);
+                            NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, entry.getUUID()), entry.getPlayerMP());
                             break;
                         }
                     }
@@ -140,9 +151,10 @@ public enum TeamAction {
     },
     KICK {
         @Override
-        public void process(Team team, EntityPlayer player, String playerToRemove) {
-            if (!team.isSingle() && team.isOwner(player)) {
-                PlayerEntry entryToRemove = team.getEntry(playerToRemove);
+        public void process(Team team, EntityPlayer player, String toRemovePlayerUuid) {
+            EntityPlayer playerToRemove = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(toRemovePlayerUuid));
+            if (!team.isSingle() && team.isOwner(player) && playerToRemove != null) {
+                PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUniqueID().toString());
                 if (!entryToRemove.isOwner()) {
                     if (entryToRemove.isInTeam()) {
                         team.removePlayer(playerToRemove);

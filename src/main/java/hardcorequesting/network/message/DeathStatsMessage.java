@@ -14,17 +14,14 @@ import java.io.PrintWriter;
 public class DeathStatsMessage implements IMessage {
 
     private boolean local;
-    private String timestamp, deaths;
+    private String deaths;
 
     public DeathStatsMessage() {
     }
 
     public DeathStatsMessage(boolean local) {
         this.local = local;
-    }
-
-    public DeathStatsMessage(String timestamp) {
-        this.timestamp = timestamp;
+        if (local) DeathStats.saveAll();
         this.deaths = SaveHandler.saveDeaths();
     }
 
@@ -53,15 +50,14 @@ public class DeathStatsMessage implements IMessage {
         }
 
         private void handle(DeathStatsMessage message, MessageContext ctx) {
-            try {
-                if (!message.local)
-                    try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
-                        out.print(message.deaths);
-                    }
-                DeathStats.loadAll(true, true);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (!message.local) {
+                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
+                    out.print(message.deaths);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            DeathStats.loadAll(true, !message.local);
         }
     }
 }

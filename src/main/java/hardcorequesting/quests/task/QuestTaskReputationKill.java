@@ -85,7 +85,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
                     killData.kills += 1;
 
                     if (killData.kills == kills) {
-                        completeTask(killer.getGameProfile().getName());
+                        completeTask(killer.getUniqueID());
                     }
 
                     parent.sendUpdatedDataToTeam(killer);

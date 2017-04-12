@@ -10,14 +10,15 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
-import hardcorequesting.network.message.FullSyncMessage;
+import hardcorequesting.network.message.PlayerDataSyncMessage;
+import hardcorequesting.network.message.QuestLineSyncMessage;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -79,18 +80,22 @@ public class QuestLine {
 
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
-            if (player.getName().equals(player.getServer().getServerOwner())) // Integrated server
-                NetworkManager.sendToPlayer(new FullSyncMessage(true, false), (EntityPlayerMP) player);
+            EntityPlayerMP playerMP = (EntityPlayerMP) player;
+            boolean side = HardcoreQuesting.loadingSide.isServer();
+            if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
             else {
-                NetworkManager.sendToPlayer(new FullSyncMessage(HardcoreQuesting.loadingSide.isServer()), (EntityPlayerMP) player);
-                NetworkManager.sendToPlayer(new DeathStatsMessage("TIMESTAMP"), (EntityPlayerMP) player);
+                if (QuestLine.doServerSync) // Send actual data to player on server sync
+                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(), playerMP);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, side, player), playerMP);
             }
+            NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
         }
     }
 
     public static void loadWorldData(File worldPath, boolean isClient) {
-        String path = new File(worldPath, "hqm").getAbsolutePath() + File.separator;
-        File pathFile = new File(path);
+        File pathFile = new File(worldPath, "hqm");
+        String path = pathFile.getAbsolutePath() + File.separator;
         if (!pathFile.exists()) pathFile.mkdirs();
         world = new QuestLine();
         init(path, isClient);
@@ -99,6 +104,14 @@ public class QuestLine {
     public static void saveDescription() {
         try {
             SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+        }
+    }
+
+    public static void saveDescriptionDefault() {
+        try {
+            SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
             FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
         }
@@ -122,6 +135,12 @@ public class QuestLine {
         QuestSet.saveAll();
         Team.saveAll();
         QuestingData.saveQuestingData();
+        if (Quest.saveDefault && Quest.isEditing) { // Save the needed defaults during edit mode
+            QuestLine.saveDescriptionDefault();
+            Reputation.saveAllDefault();
+            GroupTier.saveAllDefault();
+            QuestSet.saveAllDefault();
+        }
         SaveHelper.onSave();
     }
 
@@ -139,11 +158,20 @@ public class QuestLine {
             GuiEditMenuItem.Search.initItems();
     }
 
-    public static void init(String path, boolean isClient) {
+    public static void init(String path) {
         QuestLine.getActiveQuestLine().mainPath = path;
         QuestLine.getActiveQuestLine().quests = new ConcurrentHashMap<>();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
+    }
 
+    public static void init(String path, boolean isClient) {
+        init(path);
         loadAll(isClient, false);
+    }
+
+    public static void copyDefaults(File worldPath) {
+        File path = new File(worldPath, "hqm");
+        if (!path.exists()) path.mkdirs();
+        SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
     }
 }

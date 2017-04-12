@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -49,7 +50,7 @@ public class CommandHandler extends CommandBase {
     }
 
     public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
-        return sender.getServer().getPlayerList().canSendCommands(username) || sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName());
+        return sender.getServer().getPlayerList().canSendCommands(username) || (sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName()));
     }
 
     public static ISubCommand getCommand(String commandName) {

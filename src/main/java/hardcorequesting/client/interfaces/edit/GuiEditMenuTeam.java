@@ -92,6 +92,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
                 inviteTeam.accept();
+                inviteTeam = null;
             }
         });
 

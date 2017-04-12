@@ -61,6 +61,14 @@ public class QuestSet {
         }
     }
 
+    public static void saveAllDefault() {
+        try {
+            SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
+        } catch (IOException e) {
+            FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
+        }
+    }
+
     public static void orderAll(boolean remote) {
         try {
             final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getFile("sets", remote));

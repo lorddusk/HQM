@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonWriter;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.message.ClientUpdateMessage;
+import hardcorequesting.network.message.SoundMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
@@ -126,7 +127,7 @@ public enum ClientChange {
     SOUND(new ClientUpdater<Sounds>() {
         @Override
         public IMessage build(Sounds data) throws IOException {
-            return new ClientUpdateMessage(SOUND, data.ordinal() + "");
+            return new SoundMessage(SOUND, data.ordinal() + "");
         }
 
         @Override
@@ -137,7 +138,7 @@ public enum ClientChange {
     LORE(new ClientUpdater() {
         @Override
         public IMessage build(Object data) throws IOException {
-            return new ClientUpdateMessage(LORE, "nothing");
+            return new SoundMessage(LORE, "nothing");
         }
 
         @Override
