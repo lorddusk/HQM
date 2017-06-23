@@ -25,6 +25,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Tuple;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -1277,8 +1278,10 @@ public class Quest {
     }
 
     public void sendUpdatedDataToTeam(Team team) {
-        for (PlayerEntry entry : team.getPlayers()) {
-            sendUpdatedData(entry.getPlayerMP());
+        if (FMLCommonHandler.instance().getSide().isServer()) {
+            for (PlayerEntry entry : team.getPlayers()) {
+                sendUpdatedData(entry.getPlayerMP());
+            }
         }
     }
 
