@@ -46,7 +46,7 @@ public class CommandSave extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         if (arguments.length == 1 && arguments[0].equals("all")) {
             try {
-                save(sender, Reputation.getReputations(), new TypeToken<List<Reputation>>() {
+                save(sender, Reputation.getReputations().values(), new TypeToken<List<Reputation>>() {
                 }.getType(), "reputations");
                 save(sender, GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
                 }.getType(), "bags");
