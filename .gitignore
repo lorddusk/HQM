@@ -7,3 +7,8 @@
 /HQM.iml
 /.gradle/
 /output/
+bin/
+
+.classpath
+.project
+.settings/org.eclipse.core.resources.prefs

@@ -1,5 +1,16 @@
 package hardcorequesting.death;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.Level;
+
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
@@ -12,11 +23,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.Level;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DeathStats {
 

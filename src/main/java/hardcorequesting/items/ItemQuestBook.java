@@ -1,5 +1,8 @@
 package hardcorequesting.items;
 
+import java.util.List;
+import java.util.UUID;
+
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiType;
@@ -7,7 +10,7 @@ import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -17,12 +20,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
-import java.util.UUID;
 
 public class ItemQuestBook extends Item {
 
@@ -42,12 +41,6 @@ public class ItemQuestBook extends Item {
         nbt.setString(NBT_PLAYER, player.getPersistentID().toString());
         stack.setTagCompound(nbt);
         return stack;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(this.getRegistryName(), "inventory"));
-        ModelLoader.setCustomModelResourceLocation(this, 1, new ModelResourceLocation(this.getRegistryName(), "inventory"));
     }
 
     @Override
@@ -94,10 +87,9 @@ public class ItemQuestBook extends Item {
         return super.getUnlocalizedName(stack) + "_" + stack.getItemDamage();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if (stack.getItemDamage() == 1) {
             NBTTagCompound compound = stack.getTagCompound();
             if (compound != null && compound.hasKey(NBT_PLAYER)) {

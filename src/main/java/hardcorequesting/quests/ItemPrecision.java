@@ -32,7 +32,7 @@ public abstract class ItemPrecision {
         @Override
         public ItemStack[] getPermutations(ItemStack stack) {
             NonNullList<ItemStack> items = NonNullList.create();
-            stack.getItem().getSubItems(stack.getItem(), null, items);
+            stack.getItem().getSubItems(null, items);
             return items.toArray(new ItemStack[items.size()]);
         }
     };

@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -48,7 +48,7 @@ minecraft {
     useDepAts = true
 
     replace "@VERSION@", project.version
-    replaceIn "ModInformation.java"
+    replaceIn "src/main/java/hardcorequesting/ModInformation.java"
 }
 
 processResources {

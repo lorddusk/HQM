@@ -1,19 +1,24 @@
 package hardcorequesting.util;
 
 
+import java.util.IllegalFormatException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 
-import java.util.IllegalFormatException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Translator {
 
     private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)\\]\\]");
 
+    public static TextComponentString translateComponent(String id)
+    {
+        return new TextComponentString(translate(id));
+    }
+    
     public static String translate(String id) {
         return I18n.translateToLocal(id).replace("\\n", "\n");
     }

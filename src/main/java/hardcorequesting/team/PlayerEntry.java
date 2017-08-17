@@ -1,16 +1,17 @@
 package hardcorequesting.team;
 
+import java.io.IOException;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.io.IOException;
-import java.util.UUID;
 
 public class PlayerEntry {
 
@@ -118,7 +119,6 @@ public class PlayerEntry {
         out.endObject();
     }
 
-    @SideOnly(Side.SERVER)
     public EntityPlayerMP getPlayerMP() {
         return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(this.uuid));
     }

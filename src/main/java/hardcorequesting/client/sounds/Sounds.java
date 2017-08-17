@@ -1,12 +1,17 @@
 package hardcorequesting.client.sounds;
 
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
 import hardcorequesting.ModInformation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-
-import java.util.HashMap;
-import java.util.Map;
+import net.minecraftforge.event.RegistryEvent;
 
 public enum Sounds {
     COMPLETE("complete"),
@@ -17,6 +22,8 @@ public enum Sounds {
 
     private static Map<Sounds, SoundEvent> sounds = new HashMap<>();
     private String sound;
+    
+    static Set<SoundEvent> registeredSounds = Sets.newHashSet();
 
     Sounds(String sound) {
         this.sound = sound;
@@ -31,7 +38,7 @@ public enum Sounds {
 
     private static SoundEvent registerSound(ResourceLocation sound) {
         SoundEvent event = new SoundEvent(sound).setRegistryName(sound);
-        SoundEvent.REGISTRY.register(-1, sound, event);
+        registeredSounds.add(event);
         return event;
     }
 
@@ -41,5 +48,13 @@ public enum Sounds {
 
     public SoundEvent getSound() {
         return sounds.get(this);
+    }
+    
+    public static void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+        Iterator<SoundEvent> s = registeredSounds.iterator();
+
+        while (s.hasNext()) {
+            event.getRegistry().register(s.next());
+        }
     }
 }

@@ -112,7 +112,7 @@ public class GuiBase extends GuiScreen {
         }
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer worldRenderer = tessellator.getBuffer();
+        BufferBuilder worldRenderer = tessellator.getBuffer();
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
         worldRenderer.pos((double) (x), (double) (y + targetH), (double) this.zLevel).tex(pt1[0], pt1[1]).endVertex();
         worldRenderer.pos((double) (x + targetW), (double) (y + targetH), (double) this.zLevel).tex(pt2[0], pt2[1]).endVertex();

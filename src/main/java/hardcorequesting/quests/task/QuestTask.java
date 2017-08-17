@@ -105,7 +105,7 @@ public abstract class QuestTask {
     }
 
     public boolean isVisible(EntityPlayer player) {
-        Iterator itr = this.requirements.iterator();
+        Iterator<QuestTask> itr = this.requirements.iterator();
         QuestTask requirement;
         do {
             if (!itr.hasNext()) return true;

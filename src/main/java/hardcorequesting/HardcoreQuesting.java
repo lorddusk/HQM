@@ -1,32 +1,36 @@
 package hardcorequesting;
 
+import java.io.File;
+
 import hardcorequesting.blocks.ModBlocks;
+import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
 import hardcorequesting.event.PlayerDeathEventListener;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.event.WorldEventListener;
-import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.util.RegisterHelper;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-
-import java.io.File;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory")
 public class HardcoreQuesting {
@@ -72,18 +76,18 @@ public class HardcoreQuesting {
         ModBlocks.registerTileEntities();
 
         ModItems.init();
-        proxy.initRenderers();
+        
+        MinecraftForge.EVENT_BUS.register(instance);
     }
 
     @EventHandler
     public void load(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(instance);
-
         new WorldEventListener();
         new PlayerDeathEventListener();
         new PlayerTracker();
 
         NetworkManager.init();
+        proxy.initRenderers();
 
         ModItems.registerRecipes();
         ModBlocks.registerRecipes();
@@ -95,27 +99,19 @@ public class HardcoreQuesting {
     public void serverStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(CommandHandler.instance);
     }
+    
+    @SubscribeEvent
+    public void registerBlocks(RegistryEvent.Register<Block> event) {
+        RegisterHelper.registerBlocks(event);
+    }
 
-    @EventHandler
-    public void missingMappings(FMLMissingMappingsEvent event) {
-        for (FMLMissingMappingsEvent.MissingMapping mapping : event.get()) {
-            ResourceLocation loc = mapping.resourceLocation;
-            if (loc.getResourceDomain().equals("HardcoreQuesting")) {
-                if (mapping.type.equals(GameRegistry.Type.BLOCK)) {
-                    Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
-                    if (block != null) {
-                        mapping.remap(block);
-                    }
-                } else {
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation("hardcorequesting", loc.getResourcePath()));
-                    if (item != null) {
-                        mapping.remap(item);
-                    }
-                }
-            }
-            if (mapping.resourceLocation.getResourcePath().toLowerCase().equals("hqminvaliditem")) {
-                mapping.remap(ModItems.invalidItem);
-            }
-        }
+    @SubscribeEvent
+    public void registerItems(RegistryEvent.Register<Item> event) {
+        RegisterHelper.registerItems(event);
+    }
+    
+    @SubscribeEvent
+    public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
+        Sounds.registerSounds(event);
     }
 }
