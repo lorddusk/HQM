@@ -1,14 +1,17 @@
 package hardcorequesting.items;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.ModInformation;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.NetworkManager;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,13 +22,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class ItemBag extends Item {
@@ -40,13 +38,6 @@ public class ItemBag extends Item {
         this.setCreativeTab(HardcoreQuesting.HQMTab);
         this.setRegistryName(ItemInfo.BAG_UNLOCALIZED_NAME);
         this.setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BAG_UNLOCALIZED_NAME);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            ModelLoader.setCustomModelResourceLocation(this, i, new ModelResourceLocation(ModInformation.ASSET_PREFIX + ":" + ItemInfo.BAG_UNLOCALIZED_NAME, "inventory"));
-        }
     }
 
     @Override
@@ -89,10 +80,9 @@ public class ItemBag extends Item {
         return super.onItemRightClick(world, player, hand);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean extraInfo) {
-        super.addInformation(stack, player, tooltip, extraInfo);
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
 
         int dmg = stack.getItemDamage();
         if (dmg >= 0 && dmg < BagTier.values().length) {
@@ -102,9 +92,8 @@ public class ItemBag extends Item {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
-    public void getSubItems(Item item, CreativeTabs tabs, NonNullList<ItemStack> stackList) {
+    public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> stackList) {
         for (int i = 0; i < BagTier.values().length; i++) {
             stackList.add(new ItemStack(this, 1, i));
         }

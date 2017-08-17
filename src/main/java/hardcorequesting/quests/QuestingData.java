@@ -1,6 +1,17 @@
 package hardcorequesting.quests;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.logging.log4j.Level;
+
 import com.mojang.authlib.GameProfile;
+
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -32,10 +43,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import org.apache.logging.log4j.Level;
-
-import java.io.IOException;
-import java.util.*;
 
 public class QuestingData {
 
@@ -464,7 +471,7 @@ public class QuestingData {
         MinecraftServer mcServer = playerEntity.getServer();
 
         if (mcServer.isSinglePlayer() && playerEntity.getName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translate("hqm.message.gameOver"));
+            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
             mcServer.getActiveAnvilConverter().flushCache();
@@ -485,7 +492,7 @@ public class QuestingData {
             mcServer.getPlayerList().getBannedPlayers().addEntry(userlistbansentry);
 
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translate("hqm.message.gameOver"));
+            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
         }
 

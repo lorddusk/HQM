@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -33,16 +34,14 @@ public class BlockSyncMessage implements IMessage {
     public void fromBytes(ByteBuf buf) {
         this.pos = buf.readLong();
         this.type = buf.readInt();
-        int size = buf.readInt();
-        this.data = new String(buf.readBytes(size).array());
+        this.data = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeLong(this.pos);
         buf.writeInt(this.type);
-        buf.writeInt(this.data.getBytes().length);
-        buf.writeBytes(this.data.getBytes());
+        ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<BlockSyncMessage, IMessage> {

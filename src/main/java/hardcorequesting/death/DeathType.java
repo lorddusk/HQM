@@ -1,7 +1,5 @@
 package hardcorequesting.death;
 
-import hardcorequesting.network.NetworkManager;
-import hardcorequesting.network.message.QuestDataUpdateMessage;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.EntityLiving;
@@ -73,13 +71,13 @@ public enum DeathType {
     MONSTER("monsters") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getDamageType().equals("mob") || source.getEntity() instanceof EntityLiving;
+            return source.getDamageType().equals("mob") || source.getTrueSource() instanceof EntityLiving;
         }
     },
     PLAYER("otherPlayers") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getDamageType().equals("player") || source.getEntity() instanceof EntityPlayer;
+            return source.getDamageType().equals("player") || source.getTrueSource() instanceof EntityPlayer;
         }
     },
     MAGIC("magic") {

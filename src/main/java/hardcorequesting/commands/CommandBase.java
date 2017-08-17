@@ -1,14 +1,14 @@
 package hardcorequesting.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextComponentString;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public abstract class CommandBase implements ISubCommand {
 
@@ -68,7 +68,7 @@ public abstract class CommandBase implements ISubCommand {
     }
 
     protected void sendChat(ICommandSender sender, boolean plural, String key, Object... args) {
-        sender.sendMessage(new TextComponentString(Translator.translate(plural, key, args)));
+        sender.sendMessage(new TextComponentTranslation(Translator.translate(plural, key, args)));
     }
 
     protected boolean isPlayerOp(ICommandSender sender) {

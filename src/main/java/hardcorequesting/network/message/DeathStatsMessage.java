@@ -4,6 +4,7 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -29,16 +30,14 @@ public class DeathStatsMessage implements IMessage {
     public void fromBytes(ByteBuf buf) {
         this.local = buf.readBoolean();
         if (this.local) return;
-        int size = buf.readInt();
-        this.deaths = new String(buf.readBytes(size).array());
+        deaths = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeBoolean(this.local);
         if (local) return;
-        buf.writeInt(this.deaths.getBytes().length);
-        buf.writeBytes(this.deaths.getBytes());
+        ByteBufUtils.writeUTF8String(buf, deaths);
     }
 
     public static class Handler implements IMessageHandler<DeathStatsMessage, IMessage> {

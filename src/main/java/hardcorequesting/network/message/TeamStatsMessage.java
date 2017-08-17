@@ -4,6 +4,7 @@ import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -33,10 +34,10 @@ public class TeamStatsMessage implements IMessage {
         int size = buf.readInt();
         stats = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            int ssize = buf.readInt();
-            String name = null;
-            if (ssize != -1)
-                name = new String(buf.readBytes(ssize).array());
+            String name = ByteBufUtils.readUTF8String(buf);
+            if(name == "NULL")
+                name = null;
+            
             int players = buf.readInt();
             int lives = buf.readInt();
             float progress = buf.readFloat();
@@ -49,9 +50,10 @@ public class TeamStatsMessage implements IMessage {
         buf.writeInt(stats.size());
         for (TeamStats teamStats : stats) {
             if (teamStats.getName() != null) {
-                buf.writeInt(teamStats.getName().getBytes().length);
-                buf.writeBytes(teamStats.getName().getBytes());
-            } else buf.writeInt(-1);
+                ByteBufUtils.writeUTF8String(buf, teamStats.getName());
+            }
+            else
+                ByteBufUtils.writeUTF8String(buf, "NULL");
             buf.writeInt(teamStats.getPlayers());
             buf.writeInt(teamStats.getLives());
             buf.writeFloat(teamStats.getProgress());

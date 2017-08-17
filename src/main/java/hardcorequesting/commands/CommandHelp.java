@@ -1,5 +1,8 @@
 package hardcorequesting.commands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import hardcorequesting.Lang;
 import hardcorequesting.util.Translator;
 import net.minecraft.command.CommandException;
@@ -7,10 +10,7 @@ import net.minecraft.command.CommandNotFoundException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.util.text.TextComponentTranslation;
 
 public class CommandHelp extends CommandBase {
 
@@ -29,7 +29,6 @@ public class CommandHelp extends CommandBase {
     }
 
     @Override
-    @SuppressWarnings(value = "unchecked")
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
             return CommandHandler.instance.getTabCompletions(sender.getServer(), sender, new String[]{args[1]}, new BlockPos(0, 0, 0));
@@ -57,7 +56,7 @@ public class CommandHelp extends CommandBase {
                 }
                 output.delete(output.length() - 2, output.length());
                 output.append(" and /").append(CommandHandler.instance.getName()).append(" ").append(YELLOW).append(commands.get(commands.size() - 1)).append(WHITE).append(".");
-                sender.sendMessage(new TextComponentString(output.toString()));
+                sender.sendMessage(new TextComponentTranslation(output.toString()));
                 break;
             case 1:
                 String commandName = arguments[0];
@@ -68,7 +67,7 @@ public class CommandHelp extends CommandBase {
                 ISubCommand command = CommandHandler.getCommand(commandName);
                 if (command.isVisible(sender)) {
                     for (int i : command.getSyntaxOptions(sender))
-                        sender.sendMessage(new TextComponentString(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
+                        sender.sendMessage(new TextComponentTranslation(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
                                 + WHITE + " - " + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.INFO_SUFFIX + i)));
                 } else {
                     throw new CommandException(Lang.NO_PERMISSION);

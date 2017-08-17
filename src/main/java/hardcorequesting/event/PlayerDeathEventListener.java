@@ -47,7 +47,7 @@ public class PlayerDeathEventListener {
         Iterator<EntityItem> iter = event.getDrops().iterator();
         while (iter.hasNext()) {
             EntityItem entityItem = iter.next();
-            ItemStack stack = entityItem.getEntityItem();
+            ItemStack stack = entityItem.getItem();
             if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
                 event.getEntityPlayer().inventory.addItemStackToInventory(stack);
                 iter.remove();

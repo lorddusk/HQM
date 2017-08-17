@@ -48,7 +48,7 @@ public class SoundHandler {
                 int number = paths.size();
 
                 // Add resource pack to discover lore
-                Map resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
+                Map<?, ?> resourceManagers = ReflectionHelper.getPrivateValue(SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), 2);
                 FallbackResourceManager resourceManager = (FallbackResourceManager) resourceManagers.get("hardcorequesting");
                 resourceManager.addResourcePack(new LoreResourcePack(new File(path)));
 
@@ -62,7 +62,7 @@ public class SoundHandler {
 //                entry.setSoundEntryName(LABEL + number);
 //                list.getSoundList().add(entry);
 
-                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, handler, new String[]{"loadSoundResource", "func_147693_a", "a"}, ResourceLocation.class, SoundList.class);
+                Method method = ReflectionHelper.findMethod(net.minecraft.client.audio.SoundHandler.class, "loadSoundResource", "func_147693_a", ResourceLocation.class, SoundList.class);
                 if (method == null || handler == null) {
                     return false;
                 }

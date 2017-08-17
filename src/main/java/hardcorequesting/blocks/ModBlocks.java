@@ -1,5 +1,6 @@
 package hardcorequesting.blocks;
 
+import hardcorequesting.crafting.Recipes;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -10,7 +11,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class ModBlocks {
 
@@ -27,12 +27,6 @@ public class ModBlocks {
         RegisterHelper.registerBlock(itemPortal, ItemBlockPortal.class);
     }
 
-    public static void initRender() {
-        RegisterHelper.registerBlockRenderer(itemBarrel);
-        RegisterHelper.registerBlockRenderer(itemTracker);
-        RegisterHelper.registerBlockRenderer(itemPortal);
-    }
-
     public static void registerTileEntities() {
         GameRegistry.registerTileEntity(TileEntityBarrel.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.ITEMBARREL_TE_KEY);
         GameRegistry.registerTileEntity(TileEntityTracker.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.QUEST_TRACKER_TE_KEY);
@@ -40,10 +34,10 @@ public class ModBlocks {
     }
 
     public static void registerRecipes() {
-        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ModBlocks.itemBarrel),
+        Recipes.addShapedRecipe(new ItemStack(ModBlocks.itemBarrel),
                 "wgw",
                 "gqg",
                 "wgw",
-                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlassColorless"));
+                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlassColorless");
     }
 }

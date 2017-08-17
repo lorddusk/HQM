@@ -10,90 +10,90 @@
 #				GENERAL
 # ======================================
 itemGroup.hqm=Hardcore Questing Mode
-hqm.message.noHardcore=Режим "Хардкорных квестов" на этом сервере выключен.
-hqm.message.hardcore=Режим "Хардкорных квестов" на этом сервере в данный момент включен!
-hqm.message.livesLeft=Осталось жизней: %s
-hqm.message.lostLife=Вы только что потеряли жизнь. Осталось жизней: %s
-hqm.message.lostTeamLife=%s только что потерял жизнь команды %s. Осталось жизней: %s
-hqm.message.andBanned=и теперь заблокирован
-hqm.message.gameOver=У вас закончились жизни. Игра окончена, да, игра окончена!
-hqm.message.vanillaHardcore=Хардкор режим не работает со встроенным хардкор режимом. Попробуйте отключить его...
-hqm.message.vanillaHardcoreOn=Встроенный хардкор режим уже включен. Не удалось включить хардкор режим.
-hqm.message.vanillaHardcoreOverride=Встроенный хардкор режим выключен. Пожалуйста, перезапустите свой мир.
-hqm.message.noPlayer=Данный игрок не существует.
-hqm.message.questActivated=Режим квестов включен. Наслаждайтесь!
-hqm.message.questHardcore=Хардкорный режим включен. Наслаждайтесь!
-hqm.message.questAlreadyActivated=Режим квестов уже включен.
-hqm.message.hardcoreAlreadyActivated=Хардкорный режим уже включен.
-hqm.message.noQuestYet=Режим квестов ещё не включен. Используйте команду '/hqm quest', чтобы включить его.
-hqm.message.noHardcoreYet=Хардкорный режим ещё не включен. Используйте команду '/hqm hardcore', чтобы включить его.
-hqm.message.positiveNumbers=Пожалуйста, используйте только положительные числа.
-hqm.message.posNumberAndPlayer=Пожалуйста, используйте только положительные числа и / или правильное имя игрока.
-hqm.message.cantRemoveLives=Ваше текущее количество жизней %s, Вы не можете убрать так много жизней.
-hqm.message.removeLives=Вы убрали %s жизней(-и) из вашего запаса жизней.
-hqm.message.removeLivesFrom=Вы забрали %s жизней(-и) у %s.
-hqm.message.removeLivesBy=У Вас забрал %s жизней(-и) игрок %s
-hqm.message.cantAddLives=Вы не можете забрать больше чем %s жизней(-и).
-hqm.message.addLives=Вы добавили %s жизней(-и) к вашему запасу жизней.
-hqm.message.addLivesTo=Вы добавили %s жизней(-и) игроку %s.
-hqm.message.addLivesBy=Вам добавил %s жизней(-и) игрок %s
-hqm.message.cantGiveMoreLives=Вы не можете добавить больше чем %s жизней(-и).
-hqm.message.haveMaxLives=У Вас максимальное количество жизней.
+hqm.message.noHardcore=Ð ÐµÐ¶Ð¸Ð¼ "Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€Ð½Ñ‹Ñ… ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð²" Ð½Ð° Ñ�Ñ‚Ð¾Ð¼ Ñ�ÐµÑ€Ð²ÐµÑ€Ðµ Ð²Ñ‹ÐºÐ»ÑŽÑ‡ÐµÐ½.
+hqm.message.hardcore=Ð ÐµÐ¶Ð¸Ð¼ "Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€Ð½Ñ‹Ñ… ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð²" Ð½Ð° Ñ�Ñ‚Ð¾Ð¼ Ñ�ÐµÑ€Ð²ÐµÑ€Ðµ Ð² Ð´Ð°Ð½Ð½Ñ‹Ð¹ Ð¼Ð¾Ð¼ÐµÐ½Ñ‚ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½!
+hqm.message.livesLeft=ÐžÑ�Ñ‚Ð°Ð»Ð¾Ñ�ÑŒ Ð¶Ð¸Ð·Ð½ÐµÐ¹: %s
+hqm.message.lostLife=Ð’Ñ‹ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ‡Ñ‚Ð¾ Ð¿Ð¾Ñ‚ÐµÑ€Ñ�Ð»Ð¸ Ð¶Ð¸Ð·Ð½ÑŒ. ÐžÑ�Ñ‚Ð°Ð»Ð¾Ñ�ÑŒ Ð¶Ð¸Ð·Ð½ÐµÐ¹: %s
+hqm.message.lostTeamLife=%s Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ‡Ñ‚Ð¾ Ð¿Ð¾Ñ‚ÐµÑ€Ñ�Ð» Ð¶Ð¸Ð·Ð½ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ %s. ÐžÑ�Ñ‚Ð°Ð»Ð¾Ñ�ÑŒ Ð¶Ð¸Ð·Ð½ÐµÐ¹: %s
+hqm.message.andBanned=Ð¸ Ñ‚ÐµÐ¿ÐµÑ€ÑŒ Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½
+hqm.message.gameOver=Ð£ Ð²Ð°Ñ� Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð¸Ñ�ÑŒ Ð¶Ð¸Ð·Ð½Ð¸. Ð˜Ð³Ñ€Ð° Ð¾ÐºÐ¾Ð½Ñ‡ÐµÐ½Ð°, Ð´Ð°, Ð¸Ð³Ñ€Ð° Ð¾ÐºÐ¾Ð½Ñ‡ÐµÐ½Ð°!
+hqm.message.vanillaHardcore=Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€ Ñ€ÐµÐ¶Ð¸Ð¼ Ð½Ðµ Ñ€Ð°Ð±Ð¾Ñ‚Ð°ÐµÑ‚ Ñ�Ð¾ Ð²Ñ�Ñ‚Ñ€Ð¾ÐµÐ½Ð½Ñ‹Ð¼ Ñ…Ð°Ñ€Ð´ÐºÐ¾Ñ€ Ñ€ÐµÐ¶Ð¸Ð¼Ð¾Ð¼. ÐŸÐ¾Ð¿Ñ€Ð¾Ð±ÑƒÐ¹Ñ‚Ðµ Ð¾Ñ‚ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ ÐµÐ³Ð¾...
+hqm.message.vanillaHardcoreOn=Ð’Ñ�Ñ‚Ñ€Ð¾ÐµÐ½Ð½Ñ‹Ð¹ Ñ…Ð°Ñ€Ð´ÐºÐ¾Ñ€ Ñ€ÐµÐ¶Ð¸Ð¼ ÑƒÐ¶Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½. Ð�Ðµ ÑƒÐ´Ð°Ð»Ð¾Ñ�ÑŒ Ð²ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ Ñ…Ð°Ñ€Ð´ÐºÐ¾Ñ€ Ñ€ÐµÐ¶Ð¸Ð¼.
+hqm.message.vanillaHardcoreOverride=Ð’Ñ�Ñ‚Ñ€Ð¾ÐµÐ½Ð½Ñ‹Ð¹ Ñ…Ð°Ñ€Ð´ÐºÐ¾Ñ€ Ñ€ÐµÐ¶Ð¸Ð¼ Ð²Ñ‹ÐºÐ»ÑŽÑ‡ÐµÐ½. ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹Ñ�Ñ‚Ð°, Ð¿ÐµÑ€ÐµÐ·Ð°Ð¿ÑƒÑ�Ñ‚Ð¸Ñ‚Ðµ Ñ�Ð²Ð¾Ð¹ Ð¼Ð¸Ñ€.
+hqm.message.noPlayer=Ð”Ð°Ð½Ð½Ñ‹Ð¹ Ð¸Ð³Ñ€Ð¾Ðº Ð½Ðµ Ñ�ÑƒÑ‰ÐµÑ�Ñ‚Ð²ÑƒÐµÑ‚.
+hqm.message.questActivated=Ð ÐµÐ¶Ð¸Ð¼ ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð² Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½. Ð�Ð°Ñ�Ð»Ð°Ð¶Ð´Ð°Ð¹Ñ‚ÐµÑ�ÑŒ!
+hqm.message.questHardcore=Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€Ð½Ñ‹Ð¹ Ñ€ÐµÐ¶Ð¸Ð¼ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½. Ð�Ð°Ñ�Ð»Ð°Ð¶Ð´Ð°Ð¹Ñ‚ÐµÑ�ÑŒ!
+hqm.message.questAlreadyActivated=Ð ÐµÐ¶Ð¸Ð¼ ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð² ÑƒÐ¶Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½.
+hqm.message.hardcoreAlreadyActivated=Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€Ð½Ñ‹Ð¹ Ñ€ÐµÐ¶Ð¸Ð¼ ÑƒÐ¶Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½.
+hqm.message.noQuestYet=Ð ÐµÐ¶Ð¸Ð¼ ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð² ÐµÑ‰Ñ‘ Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½. Ð˜Ñ�Ð¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ '/hqm quest', Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð²ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ ÐµÐ³Ð¾.
+hqm.message.noHardcoreYet=Ð¥Ð°Ñ€Ð´ÐºÐ¾Ñ€Ð½Ñ‹Ð¹ Ñ€ÐµÐ¶Ð¸Ð¼ ÐµÑ‰Ñ‘ Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡ÐµÐ½. Ð˜Ñ�Ð¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ '/hqm hardcore', Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð²ÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ ÐµÐ³Ð¾.
+hqm.message.positiveNumbers=ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹Ñ�Ñ‚Ð°, Ð¸Ñ�Ð¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ðµ Ñ‡Ð¸Ñ�Ð»Ð°.
+hqm.message.posNumberAndPlayer=ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹Ñ�Ñ‚Ð°, Ð¸Ñ�Ð¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ðµ Ñ‡Ð¸Ñ�Ð»Ð° Ð¸ / Ð¸Ð»Ð¸ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ð¾Ðµ Ð¸Ð¼Ñ� Ð¸Ð³Ñ€Ð¾ÐºÐ°.
+hqm.message.cantRemoveLives=Ð’Ð°ÑˆÐµ Ñ‚ÐµÐºÑƒÑ‰ÐµÐµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑ�Ñ‚Ð²Ð¾ Ð¶Ð¸Ð·Ð½ÐµÐ¹ %s, Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ ÑƒÐ±Ñ€Ð°Ñ‚ÑŒ Ñ‚Ð°Ðº Ð¼Ð½Ð¾Ð³Ð¾ Ð¶Ð¸Ð·Ð½ÐµÐ¹.
+hqm.message.removeLives=Ð’Ñ‹ ÑƒÐ±Ñ€Ð°Ð»Ð¸ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ð¸Ð· Ð²Ð°ÑˆÐµÐ³Ð¾ Ð·Ð°Ð¿Ð°Ñ�Ð° Ð¶Ð¸Ð·Ð½ÐµÐ¹.
+hqm.message.removeLivesFrom=Ð’Ñ‹ Ð·Ð°Ð±Ñ€Ð°Ð»Ð¸ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ñƒ %s.
+hqm.message.removeLivesBy=Ð£ Ð’Ð°Ñ� Ð·Ð°Ð±Ñ€Ð°Ð» %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ð¸Ð³Ñ€Ð¾Ðº %s
+hqm.message.cantAddLives=Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ Ð·Ð°Ð±Ñ€Ð°Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ‡ÐµÐ¼ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸).
+hqm.message.addLives=Ð’Ñ‹ Ð´Ð¾Ð±Ð°Ð²Ð¸Ð»Ð¸ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ðº Ð²Ð°ÑˆÐµÐ¼Ñƒ Ð·Ð°Ð¿Ð°Ñ�Ñƒ Ð¶Ð¸Ð·Ð½ÐµÐ¹.
+hqm.message.addLivesTo=Ð’Ñ‹ Ð´Ð¾Ð±Ð°Ð²Ð¸Ð»Ð¸ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ð¸Ð³Ñ€Ð¾ÐºÑƒ %s.
+hqm.message.addLivesBy=Ð’Ð°Ð¼ Ð´Ð¾Ð±Ð°Ð²Ð¸Ð» %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸) Ð¸Ð³Ñ€Ð¾Ðº %s
+hqm.message.cantGiveMoreLives=Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ Ñ‡ÐµÐ¼ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸).
+hqm.message.haveMaxLives=Ð£ Ð’Ð°Ñ� Ð¼Ð°ÐºÑ�Ð¸Ð¼Ð°Ð»ÑŒÐ½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑ�Ñ‚Ð²Ð¾ Ð¶Ð¸Ð·Ð½ÐµÐ¹.
 hqm.massage.setLivesInstead=Setting %s to %s lives instead.
-hqm.massage.setLivesBy=Ваши жизни изменены на %s игроком %s
-hqm.message.haveRemaining=У Вас осталось %s
-hqm.message.hasLivesRemaining=У %s осталось %s жизней(-и)
-hqm.message.version=Hardcore Questing Mode - Версия : %s
-hqm.message.addOne=Вы добавили 1 сердце себе.
-hqm.message.eatRottenHearth=Почему Вы съели гнилое сердце?
-hqm.message.hearthDecay=Одно или несколько ваших сердец превратились в гнилые.
-hqm.message.alreadyEditing=Другой Оператор уже просматривает квесты этого игрока.
-hqm.message.bookNoPermission=У Вас нет прав на использование этой книги.
-hqm.message.noTaskSelected=Вы ещё не выбрали задания.
+hqm.massage.setLivesBy=Ð’Ð°ÑˆÐ¸ Ð¶Ð¸Ð·Ð½Ð¸ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ñ‹ Ð½Ð° %s Ð¸Ð³Ñ€Ð¾ÐºÐ¾Ð¼ %s
+hqm.message.haveRemaining=Ð£ Ð’Ð°Ñ� Ð¾Ñ�Ñ‚Ð°Ð»Ð¾Ñ�ÑŒ %s
+hqm.message.hasLivesRemaining=Ð£ %s Ð¾Ñ�Ñ‚Ð°Ð»Ð¾Ñ�ÑŒ %s Ð¶Ð¸Ð·Ð½ÐµÐ¹(-Ð¸)
+hqm.message.version=Hardcore Questing Mode - Ð’ÐµÑ€Ñ�Ð¸Ñ� : %s
+hqm.message.addOne=Ð’Ñ‹ Ð´Ð¾Ð±Ð°Ð²Ð¸Ð»Ð¸ 1 Ñ�ÐµÑ€Ð´Ñ†Ðµ Ñ�ÐµÐ±Ðµ.
+hqm.message.eatRottenHearth=ÐŸÐ¾Ñ‡ÐµÐ¼Ñƒ Ð’Ñ‹ Ñ�ÑŠÐµÐ»Ð¸ Ð³Ð½Ð¸Ð»Ð¾Ðµ Ñ�ÐµÑ€Ð´Ñ†Ðµ?
+hqm.message.hearthDecay=ÐžÐ´Ð½Ð¾ Ð¸Ð»Ð¸ Ð½ÐµÑ�ÐºÐ¾Ð»ÑŒÐºÐ¾ Ð²Ð°ÑˆÐ¸Ñ… Ñ�ÐµÑ€Ð´ÐµÑ† Ð¿Ñ€ÐµÐ²Ñ€Ð°Ñ‚Ð¸Ð»Ð¸Ñ�ÑŒ Ð² Ð³Ð½Ð¸Ð»Ñ‹Ðµ.
+hqm.message.alreadyEditing=Ð”Ñ€ÑƒÐ³Ð¾Ð¹ ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€ ÑƒÐ¶Ðµ Ð¿Ñ€Ð¾Ñ�Ð¼Ð°Ñ‚Ñ€Ð¸Ð²Ð°ÐµÑ‚ ÐºÐ²ÐµÑ�Ñ‚Ñ‹ Ñ�Ñ‚Ð¾Ð³Ð¾ Ð¸Ð³Ñ€Ð¾ÐºÐ°.
+hqm.message.bookNoPermission=Ð£ Ð’Ð°Ñ� Ð½ÐµÑ‚ Ð¿Ñ€Ð°Ð² Ð½Ð° Ð¸Ñ�Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ Ñ�Ñ‚Ð¾Ð¹ ÐºÐ½Ð¸Ð³Ð¸.
+hqm.message.noTaskSelected=Ð’Ñ‹ ÐµÑ‰Ñ‘ Ð½Ðµ Ð²Ñ‹Ð±Ñ€Ð°Ð»Ð¸ Ð·Ð°Ð´Ð°Ð½Ð¸Ñ�.
 
 # ======================================
 #				BLOCKS
 # ======================================
-tile.hqm:item_barrel.name=Система выдачи квестов
-tile.hqm:item_barrel.nonBound=Вы не привязали квест к СВК
-tile.hqm:item_barrel.boundTo=СВК привязана к '%s'
-tile.hqm:item_barrel.bindTo=Вы привязали '%s' к СВК
-tile.hqm:quest_tracker.name=Система отслеживания квестов
-tile.hqm:quest_tracker.offLimit=Вы не в режиме редактирования. У этого блока есть ограничения.
+tile.hqm:item_barrel.name=Ð¡Ð¸Ñ�Ñ‚ÐµÐ¼Ð° Ð²Ñ‹Ð´Ð°Ñ‡Ð¸ ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð²
+tile.hqm:item_barrel.nonBound=Ð’Ñ‹ Ð½Ðµ Ð¿Ñ€Ð¸Ð²Ñ�Ð·Ð°Ð»Ð¸ ÐºÐ²ÐµÑ�Ñ‚ Ðº Ð¡Ð’Ðš
+tile.hqm:item_barrel.boundTo=Ð¡Ð’Ðš Ð¿Ñ€Ð¸Ð²Ñ�Ð·Ð°Ð½Ð° Ðº '%s'
+tile.hqm:item_barrel.bindTo=Ð’Ñ‹ Ð¿Ñ€Ð¸Ð²Ñ�Ð·Ð°Ð»Ð¸ '%s' Ðº Ð¡Ð’Ðš
+tile.hqm:quest_tracker.name=Ð¡Ð¸Ñ�Ñ‚ÐµÐ¼Ð° Ð¾Ñ‚Ñ�Ð»ÐµÐ¶Ð¸Ð²Ð°Ð½Ð¸Ñ� ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð²
+tile.hqm:quest_tracker.offLimit=Ð’Ñ‹ Ð½Ðµ Ð² Ñ€ÐµÐ¶Ð¸Ð¼Ðµ Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ�. Ð£ Ñ�Ñ‚Ð¾Ð³Ð¾ Ð±Ð»Ð¾ÐºÐ° ÐµÑ�Ñ‚ÑŒ Ð¾Ð³Ñ€Ð°Ð½Ð¸Ñ‡ÐµÐ½Ð¸Ñ�.
 tile.hqm:quest_portal_0.name=Quest Gate System
-tile.hqm:quest_portal_0.bindTo=Вы привязали '%s' к QGS
-tile.hqm:quest_portal_1.name=Прочная стена
-tile.hqm:quest_portal_2.name=Магический барьер
+tile.hqm:quest_portal_0.bindTo=Ð’Ñ‹ Ð¿Ñ€Ð¸Ð²Ñ�Ð·Ð°Ð»Ð¸ '%s' Ðº QGS
+tile.hqm:quest_portal_1.name=ÐŸÑ€Ð¾Ñ‡Ð½Ð°Ñ� Ñ�Ñ‚ÐµÐ½Ð°
+tile.hqm:quest_portal_2.name=ÐœÐ°Ð³Ð¸Ñ‡ÐµÑ�ÐºÐ¸Ð¹ Ð±Ð°Ñ€ÑŒÐµÑ€
 
 # ======================================
 #				ITEMS
 # ======================================
-item.hqm:quest_book_0.name=Книга квестов
-item.hqm:quest_book_1.name=Книга квестов - Издание для Операторов
+item.hqm:quest_book_0.name=ÐšÐ½Ð¸Ð³Ð° ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð²
+item.hqm:quest_book_1.name=ÐšÐ½Ð¸Ð³Ð° ÐºÐ²ÐµÑ�Ñ‚Ð¾Ð² - Ð˜Ð·Ð´Ð°Ð½Ð¸Ðµ Ð´Ð»Ñ� ÐžÐ¿ÐµÑ€Ð°Ñ‚Ð¾Ñ€Ð¾Ð²
 item.hqm:quest_book_1.useAs=Use book as: %s
-item.hqm:quest_book_1.invalid=Недействительный блок!
-item.hqm:hearts_quarterheart.name=Четверть сердца
-item.hqm:hearts_halfheart.name=Пол сердца
-item.hqm:hearts_threequarts.name=Три четверти сердца
-item.hqm:hearts_heart.name=Полное сердце
-item.hqm:hearts_heart.tooltip=Употребите, чтобы получить дополнительную жизнь
-item.hqm:hearts_heart.freshness=Текущая свежесть : %s %%
-item.hqm:hearts_rottenheart.name=Гнилое сердце
-item.hqm:hearts_rottenheart.tooltip=Гнилое сердце. Не ешьте его
-item.hqm:bags.name=Мешочек с наградой
-item.hqm:hqm_invalid_item.name=Недействительный предмет
+item.hqm:quest_book_1.invalid=Ð�ÐµÐ´ÐµÐ¹Ñ�Ñ‚Ð²Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ Ð±Ð»Ð¾Ðº!
+item.hqm:quarterheart.name=Ð§ÐµÑ‚Ð²ÐµÑ€Ñ‚ÑŒ Ñ�ÐµÑ€Ð´Ñ†Ð°
+item.hqm:halfheart.name=ÐŸÐ¾Ð» Ñ�ÐµÑ€Ð´Ñ†Ð°
+item.hqm:threequarts.name=Ð¢Ñ€Ð¸ Ñ‡ÐµÑ‚Ð²ÐµÑ€Ñ‚Ð¸ Ñ�ÐµÑ€Ð´Ñ†Ð°
+item.hqm:heart.name=ÐŸÐ¾Ð»Ð½Ð¾Ðµ Ñ�ÐµÑ€Ð´Ñ†Ðµ
+item.hqm:hearts_heart.tooltip=Ð£Ð¿Ð¾Ñ‚Ñ€ÐµÐ±Ð¸Ñ‚Ðµ, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½ÑƒÑŽ Ð¶Ð¸Ð·Ð½ÑŒ
+item.hqm:hearts_heart.freshness=Ð¢ÐµÐºÑƒÑ‰Ð°Ñ� Ñ�Ð²ÐµÐ¶ÐµÑ�Ñ‚ÑŒ : %s %%
+item.hqm:rottenheart.name=Ð“Ð½Ð¸Ð»Ð¾Ðµ Ñ�ÐµÑ€Ð´Ñ†Ðµ
+item.hqm:hearts_rottenheart.tooltip=Ð“Ð½Ð¸Ð»Ð¾Ðµ Ñ�ÐµÑ€Ð´Ñ†Ðµ. Ð�Ðµ ÐµÑˆÑŒÑ‚Ðµ ÐµÐ³Ð¾
+item.hqm:bags.name=ÐœÐµÑˆÐ¾Ñ‡ÐµÐº Ñ� Ð½Ð°Ð³Ñ€Ð°Ð´Ð¾Ð¹
+item.hqm:hqm_invalid_item.name=Ð�ÐµÐ´ÐµÐ¹Ñ�Ñ‚Ð²Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ñ‹Ð¹ Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚
 
 # ======================================
 #			    QUESTS
 # ======================================
-hqm.quest.claim=Получить награду
-hqm.quest.manualSubmit=Ручная отправка
-hqm.quest.manualDetect=Ручное обнаружение
-hqm.quest.requirement=Требование
-hqm.quest.selectTask=Выбрать задание
-hqm.quest.rewards=Награды
-hqm.quest.pickOne=Выберите одну
-hqm.quest.pickOneReward=Выберите одну награду
+hqm.quest.claim=ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð½Ð°Ð³Ñ€Ð°Ð´Ñƒ
+hqm.quest.manualSubmit=Ð ÑƒÑ‡Ð½Ð°Ñ� Ð¾Ñ‚Ð¿Ñ€Ð°Ð²ÐºÐ°
+hqm.quest.manualDetect=Ð ÑƒÑ‡Ð½Ð¾Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð¸Ðµ
+hqm.quest.requirement=Ð¢Ñ€ÐµÐ±Ð¾Ð²Ð°Ð½Ð¸Ðµ
+hqm.quest.selectTask=Ð’Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð·Ð°Ð´Ð°Ð½Ð¸Ðµ
+hqm.quest.rewards=Ð�Ð°Ð³Ñ€Ð°Ð´Ñ‹
+hqm.quest.pickOne=Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð¾Ð´Ð½Ñƒ
+hqm.quest.pickOneReward=Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð¾Ð´Ð½Ñƒ Ð½Ð°Ð³Ñ€Ð°Ð´Ñƒ
 hqm.quest.itemTaskChangeTo=Click on the item task type you want to change to.
 hqm.quest.itemTaskTypeOnly=You can only change the type of item tasks.
 hqm.quest.itemTaskTypeChange=Select an item task you want to change the type of.
@@ -101,18 +101,18 @@ hqm.quest.createTasks=Create tasks of different types by using the buttons below
 hqm.quest.partyRepReward=The party will receive this reputation when the first member claims their reward.
 hqm.quest.partyRepRewardClaimed=The party has already received this reputation.
 hqm.quest.crtlNonEditor=Hold Ctrl to see this as a non-editor.
-hqm.quest.selected=Выбрано
+hqm.quest.selected=Ð’Ñ‹Ð±Ñ€Ð°Ð½Ð¾
 
 # ======================================
 #				BAGS
 # ======================================
-hqm.bag.basic=Обычная
-hqm.bag.good=Хорошая
-hqm.bag.greater=Лучшая
-hqm.bag.epic=Эпичная
-hqm.bag.legendary=Легендарная
-hqm.bag.group=Группа: %s
-hqm.bag.unknown=Неизвестная
+hqm.bag.basic=ÐžÐ±Ñ‹Ñ‡Ð½Ð°Ñ�
+hqm.bag.good=Ð¥Ð¾Ñ€Ð¾ÑˆÐ°Ñ�
+hqm.bag.greater=Ð›ÑƒÑ‡ÑˆÐ°Ñ�
+hqm.bag.epic=Ð­Ð¿Ð¸Ñ‡Ð½Ð°Ñ�
+hqm.bag.legendary=Ð›ÐµÐ³ÐµÐ½Ð´Ð°Ñ€Ð½Ð°Ñ�
+hqm.bag.group=Ð“Ñ€ÑƒÐ¿Ð¿Ð°: %s
+hqm.bag.unknown=Ð�ÐµÐ¸Ð·Ð²ÐµÑ�Ñ‚Ð½Ð°Ñ�
 
 # ======================================
 #			TEAM SETTINGS
@@ -352,8 +352,8 @@ hqm.rewardGui.shiftInfo=Hold shift for more info
 # ======================================
 #			EDIT MENU
 # ======================================
-hqm.edit.ok=Ок
-hqm.edit.cancel=Отмена
+hqm.edit.ok=ÐžÐº
+hqm.edit.cancel=ÐžÑ‚Ð¼ÐµÐ½Ð°
 
 # ======================================
 #			DEATH MENU
@@ -523,9 +523,9 @@ hqm.questBook.inclInvisiQuests=%s quests(s) including invisible ones
 #			    TEAM LIST
 # ======================================
 hqm.teamList.done=%s%% done
-hqm.teamList.players=Игроки: %s
-hqm.teamList.lives=Жизни: %s
-hqm.teamList.page=Страница: %s
+hqm.teamList.players=Ð˜Ð³Ñ€Ð¾ÐºÐ¸: %s
+hqm.teamList.lives=Ð–Ð¸Ð·Ð½Ð¸: %s
+hqm.teamList.page=Ð¡Ñ‚Ñ€Ð°Ð½Ð¸Ñ†Ð°: %s
 
 # ======================================
 #			LOCATION MENU
@@ -577,10 +577,10 @@ hqm.parentCount.reqCount.desc=For this quest to unlock the player will have to c
 # ======================================
 #			TEXT EDITOR
 # ======================================
-hqm.textEditor.copyAll=Копировать всё
-hqm.textEditor.paste=Вставить
-hqm.textEditor.clear=Вырезать
-hqm.textEditor.clearPaste=Вырезать и вставить
+hqm.textEditor.copyAll=ÐšÐ¾Ð¿Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð²Ñ�Ñ‘
+hqm.textEditor.paste=Ð’Ñ�Ñ‚Ð°Ð²Ð¸Ñ‚ÑŒ
+hqm.textEditor.clear=Ð’Ñ‹Ñ€ÐµÐ·Ð°Ñ‚ÑŒ
+hqm.textEditor.clearPaste=Ð’Ñ‹Ñ€ÐµÐ·Ð°Ñ‚ÑŒ Ð¸ Ð²Ñ�Ñ‚Ð°Ð²Ð¸Ñ‚ÑŒ
 hqm.textEditor.unnamed=Unnamed
 
 # ======================================
