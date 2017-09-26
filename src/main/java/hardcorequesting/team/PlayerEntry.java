@@ -118,8 +118,9 @@ public class PlayerEntry {
         out.name(IN_TEAM).value(inTeam);
         out.endObject();
     }
-
+    
     public EntityPlayerMP getPlayerMP() {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(this.uuid));
+    		return FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER ?
+    				FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(this.uuid)) : null;
     }
 }
