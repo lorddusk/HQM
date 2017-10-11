@@ -1,5 +1,6 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
 import io.netty.buffer.ByteBuf;
@@ -48,7 +49,7 @@ public class TeamUpdateMessage implements IMessage {
         }
 
         private void handle(TeamUpdateMessage message, MessageContext ctx) {
-            message.type.update(QuestingData.getQuestingData(ctx.getServerHandler().player).getTeam(), message.data);
+            message.type.update(QuestingData.getQuestingData(HardcoreQuesting.proxy.getPlayer(ctx)).getTeam(), message.data);
         }
     }
 }
