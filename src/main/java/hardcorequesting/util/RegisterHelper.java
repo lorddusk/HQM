@@ -1,24 +1,28 @@
 package hardcorequesting.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.Set;
+
+import com.google.common.collect.Sets;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraftforge.event.RegistryEvent;
 
 public class RegisterHelper {
-
+    static Set<Block> blocks = Sets.newHashSet();
+    static Set<Item> items = Sets.newHashSet();
+    
     public static void registerBlock(Block block) {
-        GameRegistry.register(block);
+        blocks.add(block);
     }
 
     public static void registerBlock(Block block, Class<? extends ItemBlock> blockClass) {
-        GameRegistry.register(block);
-        GameRegistry.register(createItemBlock(block, blockClass), block.getRegistryName());
+        blocks.add(block);
+        items.add(createItemBlock(block, blockClass));
     }
 
     private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
@@ -26,7 +30,10 @@ public class RegisterHelper {
             Class<?>[] ctorArgClasses = new Class<?>[1];
             ctorArgClasses[0] = Block.class;
             Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
-            return itemCtor.newInstance(block);
+            
+            ItemBlock itemblock = itemCtor.newInstance(block);
+            itemblock.setRegistryName(block.getRegistryName());
+            return itemblock;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
@@ -34,16 +41,22 @@ public class RegisterHelper {
 
 
     public static void registerItem(Item item) {
-        GameRegistry.register(item);
+        items.add(item);
     }
 
-    public static void registerItemRenderer(Item item) {
-        ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        Iterator<Block> b = blocks.iterator();
+
+        while (b.hasNext()) {
+            event.getRegistry().register(b.next());
+        }
     }
 
-    public static void registerBlockRenderer(Block block) {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+    public static void registerItems(RegistryEvent.Register<Item> event) {
+        Iterator<Item> i = items.iterator();
+
+        while (i.hasNext()) {
+            event.getRegistry().register(i.next());
+        }
     }
-
-
 }

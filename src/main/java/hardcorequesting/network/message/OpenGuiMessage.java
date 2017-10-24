@@ -4,6 +4,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiType;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -26,16 +27,14 @@ public class OpenGuiMessage implements IMessage {
     public void fromBytes(ByteBuf buf) {
         this.gui = GuiType.values()[buf.readInt()];
         if (this.gui == GuiType.NONE) return;
-        int size = buf.readInt();
-        this.data = new String(buf.readBytes(size).array());
+        data = ByteBufUtils.readUTF8String(buf);        
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(this.gui.ordinal());
         if (this.gui == GuiType.NONE) return;
-        buf.writeInt(this.data.getBytes().length);
-        buf.writeBytes(this.data.getBytes());
+        ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<OpenGuiMessage, IMessage> {

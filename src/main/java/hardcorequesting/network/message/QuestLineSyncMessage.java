@@ -1,19 +1,19 @@
 package hardcorequesting.network.message;
 
-import hardcorequesting.io.SaveHandler;
-import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestingData;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import hardcorequesting.io.SaveHandler;
+import hardcorequesting.quests.QuestLine;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class QuestLineSyncMessage implements IMessage {
 
@@ -33,42 +33,31 @@ public class QuestLineSyncMessage implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
+        mainDesc = ByteBufUtils.readUTF8String(buf);
+        reputations = ByteBufUtils.readUTF8String(buf);
+        bags = ByteBufUtils.readUTF8String(buf);
+        setOrder = ByteBufUtils.readUTF8String(buf);
+
         int size = buf.readInt();
-        this.mainDesc = new String(buf.readBytes(size).array());
-        size = buf.readInt();
-        this.reputations = new String(buf.readBytes(size).array());
-        size = buf.readInt();
-        this.bags = new String(buf.readBytes(size).array());
-        size = buf.readInt();
-        this.setOrder = new String(buf.readBytes(size).array());
-        size = buf.readInt();
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
         for (int i = 0; i < size; i++) {
-            int ssize = buf.readInt();
-            this.questSetNames[i] = new String(buf.readBytes(ssize).array());
-            ssize = buf.readInt();
-            this.questsSets[i] = new String(buf.readBytes(ssize).array());
+            questSetNames[i] = ByteBufUtils.readUTF8String(buf);
+            questsSets[i] = ByteBufUtils.readUTF8String(buf);
         }
-
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(this.mainDesc.getBytes().length);
-        buf.writeBytes(this.mainDesc.getBytes());
-        buf.writeInt(this.reputations.getBytes().length);
-        buf.writeBytes(this.reputations.getBytes());
-        buf.writeInt(this.bags.getBytes().length);
-        buf.writeBytes(this.bags.getBytes());
-        buf.writeInt(this.setOrder.getBytes().length);
-        buf.writeBytes(this.setOrder.getBytes());
+        ByteBufUtils.writeUTF8String(buf, mainDesc);
+        ByteBufUtils.writeUTF8String(buf, reputations);
+        ByteBufUtils.writeUTF8String(buf, bags);
+        ByteBufUtils.writeUTF8String(buf, setOrder);
+        
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
-            buf.writeInt(this.questSetNames[i].getBytes().length);
-            buf.writeBytes(this.questSetNames[i].getBytes());
-            buf.writeInt(this.questsSets[i].getBytes().length);
-            buf.writeBytes(this.questsSets[i].getBytes());
+            ByteBufUtils.writeUTF8String(buf, questSetNames[i]);
+            ByteBufUtils.writeUTF8String(buf, questsSets[i]);
         }
     }
 

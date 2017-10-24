@@ -7,6 +7,7 @@ import hardcorequesting.team.Team;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -38,10 +39,8 @@ public class PlayerDataSyncMessage implements IMessage {
         this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
-        int size = buf.readInt();
-        this.team = new String(buf.readBytes(size).array());
-        size = buf.readInt();
-        this.data = new String(buf.readBytes(size).array());
+        this.team = ByteBufUtils.readUTF8String(buf);
+        this.data = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
@@ -50,10 +49,8 @@ public class PlayerDataSyncMessage implements IMessage {
         buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
-        buf.writeInt(this.team.getBytes().length);
-        buf.writeBytes(this.team.getBytes());
-        buf.writeInt(this.data.getBytes().length);
-        buf.writeBytes(this.data.getBytes());
+        ByteBufUtils.writeUTF8String(buf, team);
+        ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {

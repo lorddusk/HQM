@@ -1,9 +1,29 @@
 package hardcorequesting.quests;
 
+import java.awt.Polygon;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.*;
-import hardcorequesting.client.interfaces.edit.*;
+import hardcorequesting.client.interfaces.GuiBase;
+import hardcorequesting.client.interfaces.GuiColor;
+import hardcorequesting.client.interfaces.GuiQuestBook;
+import hardcorequesting.client.interfaces.LargeButton;
+import hardcorequesting.client.interfaces.ResourceHelper;
+import hardcorequesting.client.interfaces.ScrollBar;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuDeathTask;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationKillTask;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationReward;
+import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.event.EventHandler;
@@ -13,11 +33,22 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.reward.CommandRewardList;
 import hardcorequesting.quests.reward.ItemStackRewardList;
 import hardcorequesting.quests.reward.ReputationReward;
-import hardcorequesting.quests.task.*;
+import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskDeath;
+import hardcorequesting.quests.task.QuestTaskItems;
+import hardcorequesting.quests.task.QuestTaskItemsConsume;
+import hardcorequesting.quests.task.QuestTaskItemsConsumeQDS;
+import hardcorequesting.quests.task.QuestTaskItemsCrafting;
+import hardcorequesting.quests.task.QuestTaskItemsDetect;
+import hardcorequesting.quests.task.QuestTaskLocation;
+import hardcorequesting.quests.task.QuestTaskMob;
+import hardcorequesting.quests.task.QuestTaskReputationKill;
+import hardcorequesting.quests.task.QuestTaskReputationTarget;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.TooltipFlag;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -28,12 +59,6 @@ import net.minecraft.util.Tuple;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.awt.*;
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Quest {
 
@@ -1022,7 +1047,6 @@ public class Quest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     private void drawRewardMouseOver(GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
         if (rewards != null) {
@@ -1033,7 +1057,7 @@ public class Quest {
                         List<String> str = new ArrayList<String>();
                         try {
                             if (isEditing && !GuiQuestBook.isCtrlKeyDown()) {
-                                str = rewards[i].getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                                str = rewards[i].getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
                                 str.add("");
                                 str.add(GuiColor.GRAY + Translator.translate("hqm.quest.crtlNonEditor"));
                             } else {
@@ -1248,7 +1272,7 @@ public class Quest {
         data.tasks = new QuestDataTask[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
             try {
-                Constructor constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
+                Constructor<? extends QuestDataTask> constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
                 Object obj = constructor.newInstance(tasks.get(i));
                 data.tasks[i] = (QuestDataTask) obj;
             } catch (Exception ex) {
@@ -1410,6 +1434,7 @@ public class Quest {
         cachedDescription = null;
     }
 
+    @SuppressWarnings("rawtypes")
     public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, EntityPlayer player) {
         if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
             if (element instanceof GuiEditMenuItem.ElementItem) {
@@ -1620,7 +1645,7 @@ public class Quest {
         public QuestTask addTask(Quest quest) {
             QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
             try {
-                Constructor ex = clazz.getConstructor(Quest.class, String.class, String.class);
+                Constructor<? extends QuestTask> ex = clazz.getConstructor(Quest.class, String.class, String.class);
                 QuestTask task = (QuestTask) ex.newInstance(quest, getName(), getDescription());
                 if (prev != null) {
                     task.addRequirement(prev);

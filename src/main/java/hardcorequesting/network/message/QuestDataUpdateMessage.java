@@ -6,6 +6,7 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -21,30 +22,23 @@ public class QuestDataUpdateMessage implements IMessage {
     }
 
     public QuestDataUpdateMessage(String id, int players, QuestData data) {
-        try {
-            this.id = id;
-            this.data = QuestDataAdapter.QUEST_DATA_ADAPTER.toJson(data);
-            this.players = players;
-        } catch (IOException ignored) {
-        }
+        this.id = id;
+        this.data = QuestDataAdapter.QUEST_DATA_ADAPTER.toJson(data);
+        this.players = players;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
         this.players = buf.readInt();
-        int size = buf.readInt();
-        this.id = new String(buf.readBytes(size).array());
-        size = buf.readInt();
-        this.data = new String(buf.readBytes(size).array());
+        this.id = ByteBufUtils.readUTF8String(buf);
+        this.data = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(this.players);
-        buf.writeInt(this.id.getBytes().length);
-        buf.writeBytes(this.id.getBytes());
-        buf.writeInt(this.data.getBytes().length);
-        buf.writeBytes(this.data.getBytes());
+        ByteBufUtils.writeUTF8String(buf, id);
+        ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<QuestDataUpdateMessage, IMessage> {

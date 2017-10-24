@@ -4,6 +4,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.ClientChange;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -24,15 +25,13 @@ public class SoundMessage implements IMessage {
     @Override
     public void fromBytes(ByteBuf buf) {
         this.update = ClientChange.values()[buf.readInt()];
-        int size = buf.readInt();
-        this.data = new String(buf.readBytes(size).array());
+        this.data = ByteBufUtils.readUTF8String(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(this.update.ordinal());
-        buf.writeInt(this.data.getBytes().length);
-        buf.writeBytes(this.data.getBytes());
+        ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<SoundMessage, IMessage> {

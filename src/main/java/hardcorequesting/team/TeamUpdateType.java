@@ -28,11 +28,7 @@ public enum TeamUpdateType {
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            try {
-                return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
-            } catch (IOException ignored) {
-            }
-            return null;
+            return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     },
     LIVES {
@@ -106,12 +102,7 @@ public enum TeamUpdateType {
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            try {
-                return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     },
     JOIN_TEAM {
@@ -128,12 +119,7 @@ public enum TeamUpdateType {
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            try {
-                return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson(team));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     },
     LEAVE_TEAM {
@@ -150,12 +136,7 @@ public enum TeamUpdateType {
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            try {
-                return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson((Team) data[1]));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson((Team) data[1]));
         }
     },
     REMOVE_TEAM {
@@ -190,12 +171,7 @@ public enum TeamUpdateType {
 
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
-            try {
-                return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     };
 

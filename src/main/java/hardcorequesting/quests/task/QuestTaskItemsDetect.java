@@ -1,6 +1,8 @@
 package hardcorequesting.quests.task;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.Collections;
+
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventHandler;
 import hardcorequesting.quests.Quest;
@@ -14,9 +16,6 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
 
@@ -61,9 +60,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
     @Override
     public void onItemPickUp(EntityItemPickupEvent event) {
-        if (event.getEntityPlayer().inventory.inventoryChanged) {
-            countItems(event.getEntityPlayer(), event.getItem().getEntityItem());
-        }
+        countItems(event.getEntityPlayer(), event.getItem().getItem());
     }
 
     @Override

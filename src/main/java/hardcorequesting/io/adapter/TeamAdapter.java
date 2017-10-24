@@ -36,6 +36,9 @@ public class TeamAdapter {
 
         @Override
         public void write(JsonWriter out, Team value) throws IOException {
+        		if(value == null)
+        			return;
+        	
             out.beginObject();
             out.name(ID).value(value.getId());
             out.name(NAME).value(value.getName());

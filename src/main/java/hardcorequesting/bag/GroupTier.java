@@ -1,23 +1,23 @@
 package hardcorequesting.bag;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.logging.log4j.Level;
+
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.io.SaveHandler;
-import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.Level;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class GroupTier {
 

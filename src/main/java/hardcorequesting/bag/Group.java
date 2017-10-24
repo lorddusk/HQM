@@ -1,5 +1,12 @@
 package hardcorequesting.bag;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
@@ -10,6 +17,7 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.TooltipFlag;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -18,9 +26,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class Group {
 
@@ -287,7 +292,7 @@ public class Group {
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
                 if (!stack.isEmpty()) {
                     try {
-                        gui.drawMouseOver(stack.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips), x + gui.getLeft(), y + gui.getTop());
+                        gui.drawMouseOver(stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips)), x + gui.getLeft(), y + gui.getTop());
                     } catch (Exception ignored) {
                     }
                 }

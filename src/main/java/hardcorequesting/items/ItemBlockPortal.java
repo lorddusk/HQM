@@ -1,20 +1,21 @@
 package hardcorequesting.items;
 
+import java.util.List;
+
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityPortal;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import java.util.List;
 
 
 public class ItemBlockPortal extends ItemBlock {
@@ -36,7 +37,7 @@ public class ItemBlockPortal extends ItemBlock {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List<String> tooltip, boolean useExtraInfo) {
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         try {
             if (!stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey("Portal", Constants.NBT.TAG_COMPOUND)) {
                 NBTTagCompound compound = stack.getTagCompound().getCompoundTag("Portal");
