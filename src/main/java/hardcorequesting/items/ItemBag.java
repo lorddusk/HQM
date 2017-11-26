@@ -94,8 +94,10 @@ public class ItemBag extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> stackList) {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            stackList.add(new ItemStack(this, 1, i));
+        if (isInCreativeTab(tabs)) {
+            for (int i = 0; i < BagTier.values().length; i++) {
+                stackList.add(new ItemStack(this, 1, i));
+            }
         }
     }
 
