@@ -3,7 +3,7 @@
     "category": "master",
     "sounds": [
       {
-        "name": "hardcorequesting:complete",
+        "name": "hqm:complete",
         "stream": false
       }
     ]
@@ -12,7 +12,7 @@
     "category": "master",
     "sounds": [
       {
-        "name": "hardcorequesting:addlife",
+        "name": "hqm:addlife",
         "stream": false
       }
     ]
@@ -21,7 +21,7 @@
     "category": "master",
     "sounds": [
       {
-        "name": "hardcorequesting:addlife",
+        "name": "hqm:addlife",
         "stream": false
       }
     ]
@@ -30,7 +30,7 @@
     "category": "master",
     "sounds": [
       {
-        "name": "hardcorequesting:reward",
+        "name": "hqm:reward",
         "stream": false
       }
     ]
@@ -39,7 +39,7 @@
     "category": "master",
     "sounds": [
       {
-        "name": "hardcorequesting:boom",
+        "name": "hqm:boom",
         "stream": false
       }
     ]

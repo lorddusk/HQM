@@ -1,6 +1,6 @@
 [
   {
-    "modid": "hardcorequesting",
+    "modid": "hqm",
     "name": "Hardcore Questing Mode",
     "description": "This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.",
     "version": "${version}",
@@ -9,7 +9,7 @@
     "updateUrl": "",
     "authorList": ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp", "ArclightTW"],
     "credits": "",
-    "logoFile": "assets/hardcorequesting/hqmlogo.png",
+    "logoFile": "assets/hqm/logo.png",
     "screenshots": [],
     "dependencies": []
   }

@@ -10,60 +10,44 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'idea'
-
-repositories {
-    maven {
-        name = "Forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-    maven {
-        name = "JEI"
-        url =  "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "HWYLA"
-        url = "http://tehnut.info/maven"
-    }
-}
-
-dependencies {
-    deobfCompile "mcp.mobius.waila:Hwyla:" + project.hwyla_version
-    runtime "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
-}
+apply plugin: 'java'
 
 version = "${version}"
 group = "${group}"
 archivesBaseName = "${archives_base_name}"
 
 sourceCompatibility = targetCompatibility = 1.8
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
 
 minecraft {
     version = "${minecraft_version}-${forge_version}"
     mappings = "${forge_mappings}"
     runDir = "run"
-
     useDepAts = true
-
     replace "@VERSION@", "${version}"
-    replaceIn "src/main/java/hardcorequesting/ModInformation.java"
+    replaceIn "src/main/java/hqm/HQM.java"
+}
+
+repositories {
+    mavenCentral()
+    maven { // JEI
+        url = "http://dvs1.progwml6.com/files/maven"
+    }
+}
+
+dependencies {
+    runtime "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
 }
 
 processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
-
     from(sourceSets.main.resources.srcDirs) {
         include '**/*.info'
         expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-
     from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
-
-    // Move access transformers to META-INF
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
