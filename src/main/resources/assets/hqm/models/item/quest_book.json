@@ -1,6 +1,6 @@
 {
-  "parent":"hardcorequesting:item/base_item",
+  "parent":"hqm:item/base_item",
   "textures": {
-    "layer0":"hardcorequesting:items/hqm_quest_book"
+    "layer0":"hqm:items/quest_book"
   }
 }
