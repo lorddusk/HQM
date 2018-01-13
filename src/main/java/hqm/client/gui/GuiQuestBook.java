@@ -67,8 +67,8 @@ public class GuiQuestBook extends GuiScreen {
         GlStateManager.popMatrix();
         GlStateManager.pushMatrix();
         this.renderer.forEach(renderer1 -> {
-            renderer1.draw(this, this.guiLeft + PAGE_START_X, this.guiTop + PAGE_START_Y, mouseX, mouseY, IPage.Side.LEFT);
-            renderer1.draw(this, this.guiLeft + PAGE_START_X + PAGE_SECOND_OFFSET + PAGE_WIDTH, this.guiTop + PAGE_START_Y, mouseX, mouseY, IPage.Side.RIGHT);
+            renderer1.draw(this, this.guiLeft + PAGE_START_X, this.guiTop + PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, IPage.Side.LEFT);
+            renderer1.draw(this, this.guiLeft + PAGE_START_X + PAGE_SECOND_OFFSET + PAGE_WIDTH, this.guiTop + PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, IPage.Side.RIGHT);
         });
         GlStateManager.popMatrix();
     }
@@ -80,12 +80,12 @@ public class GuiQuestBook extends GuiScreen {
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClick(this, finalLeft, top, mouseX, mouseY, mouseButton, IPage.Side.LEFT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClick(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, mouseButton, IPage.Side.LEFT));
         }
         left += PAGE_SECOND_OFFSET + PAGE_WIDTH;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClick(this, finalLeft, top, mouseX, mouseY, mouseButton, IPage.Side.RIGHT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClick(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, mouseButton, IPage.Side.RIGHT));
         }
         this.lastX = mouseX;
         this.lastY = mouseY;
@@ -98,12 +98,12 @@ public class GuiQuestBook extends GuiScreen {
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseRelease(this, finalLeft, top, mouseX, mouseY, mouseButton, IPage.Side.LEFT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseRelease(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, mouseButton, IPage.Side.LEFT));
         }
         left += PAGE_SECOND_OFFSET + PAGE_WIDTH;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseRelease(this, finalLeft, top, mouseX, mouseY, mouseButton, IPage.Side.RIGHT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseRelease(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, mouseButton, IPage.Side.RIGHT));
         }
         this.lastX = 0;
         this.lastY = 0;
@@ -116,12 +116,12 @@ public class GuiQuestBook extends GuiScreen {
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick, IPage.Side.LEFT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick, IPage.Side.LEFT));
         }
         left += PAGE_SECOND_OFFSET + PAGE_WIDTH;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick,  IPage.Side.RIGHT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick,  IPage.Side.RIGHT));
         }
         this.lastX = mouseX;
         this.lastY = mouseY;
@@ -138,13 +138,18 @@ public class GuiQuestBook extends GuiScreen {
             int top = this.guiTop + PAGE_START_Y;
             if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
                 int finalLeft = left;
-                this.renderer.forEach(renderer1 -> renderer1.mouseScroll(this, finalLeft, top, mouseX, mouseY, scroll, IPage.Side.LEFT));
+                this.renderer.forEach(renderer1 -> renderer1.mouseScroll(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, scroll, IPage.Side.LEFT));
             }
             left += PAGE_SECOND_OFFSET + PAGE_WIDTH;
             if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
                 int finalLeft = left;
-                this.renderer.forEach(renderer1 -> renderer1.mouseScroll(this, finalLeft, top, mouseX, mouseY, scroll,  IPage.Side.RIGHT));
+                this.renderer.forEach(renderer1 -> renderer1.mouseScroll(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, scroll,  IPage.Side.RIGHT));
             }
         }
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
     }
 }

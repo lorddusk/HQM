@@ -12,4 +12,6 @@ public class HQM {
     public static final String MODNAME = "HardcoreQuestingMode";
     public static final String MODVERSION = "@VERSION@";
 
+    public static boolean editMode = true;
+
 }

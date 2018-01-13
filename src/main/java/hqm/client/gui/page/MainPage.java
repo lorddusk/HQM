@@ -23,27 +23,27 @@ public class MainPage implements IPage{
     public void init(GuiQuestBook gui) {
         gui.addRenderer(new IRenderer() {
             @Override
-            public void draw(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, Side side) {
+            public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, Side side) {
 
             }
 
             @Override
-            public void mouseClick(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int mouseButton, Side side) {
+            public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, Side side) {
                 System.out.println("Click: " + mouseX + " " + mouseY + " " + side);
             }
 
             @Override
-            public void mouseRelease(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int mouseButton, Side side) {
+            public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, Side side) {
                 System.out.println("Release: " + mouseX + " " + mouseY + " " + side);
             }
 
             @Override
-            public void mouseClickMove(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, Side side) {
+            public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, Side side) {
                 System.out.println("Move: " + mouseX + " " + mouseY + " " + lastMouseX + " " + lastMouseY + " " + side);
             }
 
             @Override
-            public void mouseScroll(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int scroll, Side side) {
+            public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, Side side) {
                 System.out.println("Scroll: " + mouseX + " " + mouseY + " " + scroll + " " + side);
             }
         });

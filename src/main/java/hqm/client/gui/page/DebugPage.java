@@ -1,13 +1,18 @@
 package hqm.client.gui.page;
 
+import com.google.common.collect.Lists;
 import hqm.HQM;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
+import hqm.client.gui.component.ComponentScrollBar;
+import hqm.client.gui.component.ComponentTextArea;
+import hqm.client.gui.component.ComponentTextField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * @author canitzp
@@ -23,27 +28,28 @@ public class DebugPage implements IPage {
 
     @Override
     public void init(GuiQuestBook gui) {
+        gui.addRenderer(new ComponentTextField(false));
         gui.addRenderer(new IRenderer() {
             @Override
-            public void draw(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, Side side) {}
+            public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, Side side) {}
 
             @Override
-            public void mouseClick(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int mouseButton, Side side) {
+            public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, Side side) {
                 lastClick = String.format("Mouse Click: x=%d, y=%d, button=%d, side=%s", mouseX, mouseY, mouseButton, side);
             }
 
             @Override
-            public void mouseRelease(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int mouseButton, Side side) {
+            public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, Side side) {
                 lastRelease = String.format("Mouse Release: x=%d, y=%d, button=%d, side=%s", mouseX, mouseY, mouseButton, side);
             }
 
             @Override
-            public void mouseClickMove(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, Side side) {
+            public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, Side side) {
                 lastClickMove = String.format("Mouse Move: x=%d, y=%d, lastX=%d, lastY=%d, button=%d, lenght=%d side=%s", mouseX, mouseY, lastMouseX, lastMouseY, mouseButton, ticks, side);
             }
 
             @Override
-            public void mouseScroll(GuiQuestBook gui, int left, int top, int mouseX, int mouseY, int scroll, Side side) {
+            public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, Side side) {
                 lastScroll = String.format("Mouse Scroll: x=%d, y=%d, scroll=%d, side=%s", mouseX, mouseY, scroll, side);
             }
         });
@@ -51,7 +57,7 @@ public class DebugPage implements IPage {
 
     @Override
     public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
-        Gui.drawRect(pageLeft, pageTop, pageLeft + GuiQuestBook.PAGE_WIDTH, pageTop + GuiQuestBook.PAGE_HEIGHT, 0xFF008000);
+        //Gui.drawRect(pageLeft, pageTop, pageLeft + GuiQuestBook.PAGE_WIDTH, pageTop + GuiQuestBook.PAGE_HEIGHT, 0xFF008000);
         GlStateManager.pushMatrix();
         GlStateManager.scale(0.9F, 0.9F, 1);
         FontRenderer font = gui.mc.fontRenderer;
