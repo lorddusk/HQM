@@ -51,3 +51,9 @@ processResources {
     from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
+
+idea {
+    module {
+        inheritOutputDirs = true
+    }
+}

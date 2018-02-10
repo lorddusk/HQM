@@ -46,8 +46,8 @@ public class GuiQuestBook extends GuiScreen {
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
         if(this.currentPage == null){
-            //this.setPage(new MainPage());
-            this.setPage(new DebugPage());
+            this.setPage(new MainPage());
+            //this.setPage(new DebugPage());
         }
         this.currentPage.init(this);
     }
