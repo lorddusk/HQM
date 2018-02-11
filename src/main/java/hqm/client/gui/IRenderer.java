@@ -20,8 +20,4 @@ public interface IRenderer {
 
     default void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, IPage.Side side){}
 
-    default int getHeight(GuiQuestBook gui, int width, int height, IPage.Side side){
-        return height;
-    }
-
 }

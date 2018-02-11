@@ -5,6 +5,7 @@ import hqm.client.gui.GuiQuestBook;
 import hqm.quest.Questbook;
 import hqm.quest.SaveHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author canitzp
@@ -33,9 +37,29 @@ public class ItemQuestBook extends ItemBase<ItemQuestBook> {
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if(world.isRemote){
-            Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook());
+            ItemStack stack = player.getHeldItem(hand);
+            if(stack.hasTagCompound()){
+                UUID uuid = stack.getTagCompound().getUniqueId("QuestbookId");
+                if(SaveHandler.QUEST_DATA.containsKey(uuid)){
+                    Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(uuid, player));
+                }
+            }
         }
         return EnumActionResult.SUCCESS;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if(stack.hasTagCompound()){
+            UUID uuid = stack.getTagCompound().getUniqueId("QuestbookId");
+            if(SaveHandler.QUEST_DATA.containsKey(uuid)){
+                Questbook questbook = SaveHandler.QUEST_DATA.get(uuid);
+                tooltip.addAll(questbook.getTooltip());
+                if(flagIn.isAdvanced()){
+                    tooltip.add("Questbook ID: " + uuid);
+                }
+            }
+        }
     }
 
     @Override

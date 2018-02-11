@@ -1,0 +1,49 @@
+{
+  "name": "questline1",
+  "index": 0,
+  "desc": [],
+  "quests": [
+    {
+      "name": "quest1",
+      "id": "uniqueId",
+      "parent": "uniqueId from parent or empty",
+      "posX": 0,
+      "posY": 0,
+      "icon": {
+        "item": "minecraft:apple",
+        "amount": 1,
+        "meta": 0,
+        "nbt": {}
+      },
+      "desc": [],
+      "tasks": [
+        {
+          "class": "hqm.quest.task.IHaveNoIdea",
+          "id": "uniqueId",
+          "nbt": {}
+        }
+      ]
+    },
+    {
+      "name": "quest2",
+      "id": "uniqueId",
+      "parent": "uniqueId from parent or empty",
+      "posX": 0,
+      "posY": 0,
+      "icon": {
+        "item": "minecraft:ingot_gold",
+        "amount": 1,
+        "meta": 0,
+        "nbt": {}
+      },
+      "desc": [],
+      "tasks": [
+        {
+          "class": "hqm.quest.task.IHaveNoIdea2",
+          "id": "uniqueId",
+          "nbt": {}
+        }
+      ]
+    }
+  ]
+}

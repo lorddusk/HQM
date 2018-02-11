@@ -1,6 +1,8 @@
 package hqm.quest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author canitzp
@@ -33,6 +35,18 @@ public class QuestLine {
 
     public List<Quest> getQuests() {
         return quests;
+    }
+
+    public List<Quest> getUnlocked(Team team){
+        return this.quests.stream().filter(quest -> quest.parentId == null || team.hasParentSolved(quest)).collect(Collectors.toList());
+    }
+
+    public List<Quest> getCompleted(Team team){
+        return this.quests.stream().filter(quest -> quest.parentId == null || team.hasSolved(quest)).collect(Collectors.toList());
+    }
+
+    public List<Quest> getUnlockedUncopleted(Team team){
+        return getUnlocked(team).stream().filter(quest -> !team.hasSolved(quest)).collect(Collectors.toList());
     }
 
 }

@@ -57,7 +57,7 @@ public class DebugPage implements IPage {
 
     @Override
     public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
-        //Gui.drawRect(pageLeft, pageTop, pageLeft + GuiQuestBook.PAGE_WIDTH, pageTop + GuiQuestBook.PAGE_HEIGHT, 0xFF008000);
+        Gui.drawRect(pageLeft, pageTop, pageLeft + GuiQuestBook.PAGE_WIDTH, pageTop + GuiQuestBook.PAGE_HEIGHT, 0xFF008000);
         GlStateManager.pushMatrix();
         GlStateManager.scale(0.9F, 0.9F, 1);
         FontRenderer font = gui.mc.fontRenderer;

@@ -6,16 +6,14 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hqm.quest.Quest;
-import hqm.quest.QuestLine;
-import hqm.quest.Questbook;
+import hqm.quest.*;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,29 +25,14 @@ public class HQMJson {
 
     public static final TypeAdapter<Questbook> QUESTBOOK = new TypeAdapter<Questbook>() {
         @Override
-        public void write(JsonWriter out, Questbook value) throws IOException {
-            out.beginObject();
-            out.name("name").value(value.getName());
-            out.name("uuid").value(value.getId().toString());
-            out.name("icon").value(value.getImage().toString());
-            out.name("desc").beginArray();
-            for(String line : value.getDescription()){
-                out.value(line);
-            }
-            out.endArray();
-            out.name("dim").beginArray();
-            for(int dim : value.getDimensions()){
-                out.value(dim);
-            }
-            out.endArray();
-            out.endObject();
-        }
+        public void write(JsonWriter out, Questbook value) {} // We don't write anything
 
         @Override
         public Questbook read(JsonReader in) throws IOException {
             String name = null;
             UUID id = null;
             List<String> desc = new ArrayList<>();
+            List<String> tooltip = new ArrayList<>();
             List<Integer> dims = new ArrayList<>();
             ResourceLocation icon = null;
             in.beginObject();
@@ -80,6 +63,14 @@ public class HQMJson {
                         in.endArray();
                         break;
                     }
+                    case "tooltip": {
+                        in.beginArray();
+                        while (in.hasNext()){
+                            tooltip.add(in.nextString());
+                        }
+                        in.endArray();
+                        break;
+                    }
                     case "dim": {
                         in.beginArray();
                         while (in.hasNext()){
@@ -91,30 +82,13 @@ public class HQMJson {
                 }
             }
             in.endObject();
-            return new Questbook(name, id, desc, icon, dims);
+            return new Questbook(name, id, desc, tooltip, icon, dims);
         }
     };
 
     public static final TypeAdapter<QuestLine> QUEST_LINE = new TypeAdapter<QuestLine>() {
         @Override
-        public void write(JsonWriter out, QuestLine value) throws IOException {
-            out.beginObject();
-            out.name("name").value(value.getName());
-            out.name("index").value(value.getIndex());
-            out.endArray();
-            out.name("desc").beginArray();
-            for(String dim : value.getDescription()){
-                out.value(dim);
-            }
-            out.endArray();
-            out.endArray();
-            out.name("quests").beginArray();
-            for(Quest quest : value.getQuests()){
-                // TODO write quest
-            }
-            out.endArray();
-            out.endObject();
-        }
+        public void write(JsonWriter out, QuestLine value) {} // We don't write anything
 
         @Override
         public QuestLine read(JsonReader in) throws IOException {
@@ -143,7 +117,7 @@ public class HQMJson {
                     case "quests": {
                         in.beginArray();
                         while (in.hasNext()){
-                            quests.add(null); // TODO read quests
+                            quests.add(gson.fromJson(in, Quest.class));
                         }
                         in.endArray();
                         break;
@@ -157,21 +131,79 @@ public class HQMJson {
 
     public static final TypeAdapter<Quest> QUEST = new TypeAdapter<Quest>() {
         @Override
-        public void write(JsonWriter out, Quest value) throws IOException {
-            // We don't write anything
-        }
+        public void write(JsonWriter out, Quest value) {} // We don't write anything
 
         @Override
         public Quest read(JsonReader in) throws IOException {
-            return null;
+            String name = null;
+            UUID id = null, parentId = null;
+            int posX = 0, posY = 0;
+            ItemStack stack = ItemStack.EMPTY;
+            List<String> desc = new ArrayList<>();
+            List<ITask> tasks = new ArrayList<>();
+            in.beginObject();
+            while (in.hasNext()) {
+                switch (in.nextName().toLowerCase()) {
+                    case "name": {
+                        name = in.nextString();
+                        break;
+                    }
+                    case "id": {
+                        try {
+                            id = UUID.fromString(in.nextString());
+                            break;
+                        } catch (IllegalArgumentException e){
+                            System.out.println("Can't read quests! " + e.getMessage());
+                            return null;
+                        }
+                    }
+                    case "parent": {
+                        try {
+                            parentId = UUID.fromString(in.nextString());
+                            break;
+                        } catch (IllegalArgumentException e){
+                            System.out.println("Can't read quests! " + e.getMessage());
+                            return null;
+                        }
+                    }
+                    case "posX": {
+                        posX = in.nextInt();
+                        break;
+                    }
+                    case "posY": {
+                        posY = in.nextInt();
+                        break;
+                    }
+                    case "icon": {
+                        stack = gson.fromJson(in, ItemStack.class);
+                        break;
+                    }
+                    case "desc": {
+                        in.beginArray();
+                        while (in.hasNext()){
+                            desc.add(in.nextString());
+                        }
+                        in.endArray();
+                        break;
+                    }
+                    case "tasks": {
+                        in.beginArray();
+                        while (in.hasNext()){
+                            tasks.add(gson.fromJson(in, ITask.class));
+                        }
+                        in.endArray();
+                        break;
+                    }
+                }
+            }
+            in.endObject();
+            return new Quest(name, id, parentId, posX, posY, stack, desc, tasks);
         }
     };
 
     public static final TypeAdapter<NBTTagCompound> NBT_TAG_COMPOUND = new TypeAdapter<NBTTagCompound>() {
         @Override
-        public void write(JsonWriter out, NBTTagCompound value) throws IOException {
-            // We don't write anything
-        }
+        public void write(JsonWriter out, NBTTagCompound value) {} // We don't write anything
 
         @Override
         public NBTTagCompound read(JsonReader in) throws IOException {
@@ -226,10 +258,202 @@ public class HQMJson {
         }
     };
 
+    public static final TypeAdapter<TeamList> TEAMLIST = new TypeAdapter<TeamList>() {
+        @Override
+        public void write(JsonWriter out, TeamList value) throws IOException{
+            out.beginObject();
+            for(Team team : value.getTeams()){
+                out.name(team.name).beginObject();
+                out.name("color").value(team.color);
+                out.name("lives").value(team.lives);
+                out.name("member").beginArray();
+                for(UUID memberId : team.teamMembers){
+                    out.value(memberId.toString());
+                }
+                out.endArray();
+                out.name("tasks").beginArray();
+                for(UUID taskId : team.currentlyFinishedTasks){
+                    out.value(taskId.toString());
+                }
+                out.endArray();
+                out.name("quests").beginArray();
+                for(UUID questId : team.finishedQuests){
+                    out.value(questId.toString());
+                }
+                out.endArray();
+                out.endObject();
+            }
+            out.endObject();
+        }
+
+        @SuppressWarnings("Duplicates")
+        @Override
+        public TeamList read(JsonReader in) throws IOException {
+            TeamList teamList = new TeamList(new ArrayList<>());
+            in.beginObject();
+            while (in.hasNext()){
+                String teamName = in.nextName();
+                int color = 0, lives = 0;
+                List<UUID> member = new ArrayList<>();
+                List<UUID> tasks = new ArrayList<>();
+                List<UUID> quests = new ArrayList<>();
+                in.beginObject();
+                while (in.hasNext()){
+                    switch (in.nextName().toLowerCase()){
+                        case "color": {
+                            color = in.nextInt();
+                            break;
+                        }
+                        case "lives": {
+                            lives = in.nextInt();
+                            break;
+                        }
+                        case "member": {
+                            try {
+                                in.beginArray();
+                                while (in.hasNext()){
+                                    member.add(UUID.fromString(in.nextString()));
+                                }
+                                in.endArray();
+                                break;
+                            } catch (IllegalArgumentException e){
+                                System.out.println("Can't read Team data file! " + e.getMessage());
+                                return null;
+                            }
+                        }
+                        case "tasks": {
+                            try {
+                                in.beginArray();
+                                while (in.hasNext()){
+                                    tasks.add(UUID.fromString(in.nextString()));
+                                }
+                                in.endArray();
+                                break;
+                            } catch (IllegalArgumentException e){
+                                System.out.println("Can't read Team data file! " + e.getMessage());
+                                return null;
+                            }
+                        }
+                        case "quests": {
+                            try {
+                                in.beginArray();
+                                while (in.hasNext()){
+                                    quests.add(UUID.fromString(in.nextString()));
+                                }
+                                in.endArray();
+                                break;
+                            } catch (IllegalArgumentException e){
+                                System.out.println("Can't read Team data file! " + e.getMessage());
+                                return null;
+                            }
+                        }
+                    }
+                }
+                in.endObject();
+                teamList.addTeam(new Team(teamName, color, lives, member).setLists(tasks, quests));
+            }
+            in.endObject();
+            return teamList;
+        }
+    };
+
+    public static final TypeAdapter<ItemStack> ITEMSTACK = new TypeAdapter<ItemStack>() {
+        @Override
+        public void write(JsonWriter out, ItemStack value) {}
+
+        @Override
+        public ItemStack read(JsonReader in) throws IOException {
+            Item item = null;
+            int meta = 0;
+            int amount = 1;
+            NBTTagCompound nbt = new NBTTagCompound();
+            in.beginObject();
+            while (in.hasNext()){
+                switch (in.nextName().toLowerCase()){
+                    case "item": {
+                        item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(in.nextString()));
+                        break;
+                    }
+                    case "meta": {
+                        meta = in.nextInt();
+                        break;
+                    }
+                    case "amount": {
+                        amount = in.nextInt();
+                        break;
+                    }
+                    case "nbt": {
+                        nbt = gson.fromJson(in, NBTTagCompound.class);
+                        break;
+                    }
+                }
+            }
+            in.endObject();
+            if(item != null){
+                ItemStack stack = new ItemStack(item, amount, meta);
+                stack.setTagCompound(nbt);
+                return stack;
+            }
+            return null;
+        }
+    };
+
+    public static final TypeAdapter<ITask> ITASK = new TypeAdapter<ITask>() {
+        @Override
+        public void write(JsonWriter out, ITask value) {}
+
+        @Override
+        public ITask read(JsonReader in) throws IOException {
+            String className = null;
+            UUID id = null;
+            NBTTagCompound nbt = new NBTTagCompound();
+            in.beginObject();
+            while (in.hasNext()){
+                switch (in.nextName().toLowerCase()){
+                    case "class": {
+                        className = in.nextString();
+                        break;
+                    }
+                    case "id": {
+                        try {
+                            id = UUID.fromString(in.nextString());
+                            break;
+                        } catch (IllegalArgumentException e){
+                            System.out.println("Can't read task! " + e.getMessage());
+                            return null;
+                        }
+                    }
+                    case "nbt": {
+                        nbt = gson.fromJson(in, NBTTagCompound.class);
+                        break;
+                    }
+                }
+            }
+            in.endObject();
+            if(className != null && id != null){
+                try {
+                    Class<?> taskClass = Class.forName(className);
+                    if(ITask.class.isAssignableFrom(taskClass)){
+                        ITask task = (ITask) taskClass.newInstance();
+                        task.init(nbt);
+                        return task;
+                    }
+                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("Can't read task!");
+            return null;
+        }
+    };
+
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Questbook.class, QUESTBOOK)
             .registerTypeAdapter(QuestLine.class, QUEST_LINE)
             .registerTypeAdapter(NBTTagCompound.class, NBT_TAG_COMPOUND)
+            .registerTypeAdapter(TeamList.class, TEAMLIST)
+            .registerTypeAdapter(ItemStack.class, ITEMSTACK)
+            .registerTypeAdapter(ITask.class, ITASK)
             .setPrettyPrinting()
             .create();
 
@@ -243,6 +467,16 @@ public class HQMJson {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void writeToFile(File file, Object object){
+        try {
+            FileWriter writer = new FileWriter(file);
+            gson.toJson(object, writer);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

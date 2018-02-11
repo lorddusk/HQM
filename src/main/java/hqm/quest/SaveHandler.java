@@ -36,10 +36,27 @@ public class SaveHandler {
                     hqmWorldFolder.mkdir();
                     return; // There is no point of reading the content, if we created the folder one line above
                 }
+                readQuestbooks(hqmWorldFolder).forEach(questbook -> QUEST_DATA.put(questbook.getId(), questbook));
+            } else {
+                System.out.println("F*** there is something really wrong with this world save folder finding reflection");
+            }
+        }
+    }
 
-                System.out.println(HQMJson.readFromFile(new File(hqmWorldFolder, "test.json"), NBTTagCompound.class));
-
-                //readQuestbooks(hqmWorldFolder).forEach(questbook -> QUEST_DATA.put(questbook.getId(), questbook));
+    @SubscribeEvent
+    public static void onWorldSave(WorldEvent.Save event){
+        if(!event.getWorld().isRemote){
+            File worldSave = getWorldSaveFolder(event.getWorld());
+            if(worldSave != null){
+                File hqmWorldFolder = new File(worldSave, "hqm");
+                if(hqmWorldFolder.exists()){
+                    for(Questbook questbook : QUEST_DATA.values()){
+                        File questbookFolder = new File(hqmWorldFolder, questbook.getId().toString());
+                        if(questbookFolder.exists()){
+                            saveTeams(questbook, questbookFolder);
+                        }
+                    }
+                }
             } else {
                 System.out.println("F*** there is something really wrong with this world save folder finding reflection");
             }
@@ -58,6 +75,7 @@ public class SaveHandler {
                         File questbookFolder = new File(hqmWorldFolder, questbook.getId().toString());
                         if(questbookFolder.exists()){
                             readQuestLine(questbook, questbookFolder);
+                            readTeams(questbook, questbookFolder);
                         } else {
                             questbookFolder.mkdir();
                         }
@@ -71,7 +89,7 @@ public class SaveHandler {
     }
 
     public static void readQuestLine(Questbook questbook, File questbookFolder){
-        File[] questLineJsons = questbookFolder.listFiles((dir, name) -> name.endsWith(".json"));
+        File[] questLineJsons = questbookFolder.listFiles((dir, name) -> name.endsWith(".json") && name.length() >= 30);
         if(questLineJsons != null){
             for(File questLineJson : questLineJsons){
                 try {
@@ -83,6 +101,35 @@ public class SaveHandler {
                     System.out.println("Can't read QuestLine for " + questbook + " from file " + questLineJson + ". " + e.getMessage());
                 }
             }
+        }
+    }
+
+    public static void readTeams(Questbook questbook, File questbookFolder){
+        File teamJson = new File(questbookFolder, "teams.json");
+        if(teamJson.exists()){
+            try {
+                TeamList teamList = HQMJson.readFromFile(teamJson, TeamList.class);
+                if(teamList != null && teamList.getTeams() != null){
+                    teamList.getTeams().forEach(questbook::addTeam);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+                System.out.println("Can't read teams file for " + questbook + ". " + e.getMessage());
+            }
+        }
+    }
+
+    public static void saveTeams(Questbook questbook, File questbookFolder){
+        File teamJson = new File(questbookFolder, "teams.json");
+        if(teamJson.exists()){
+            teamJson.delete();
+        }
+        try {
+            teamJson.createNewFile();
+            HQMJson.writeToFile(teamJson, new TeamList(questbook.getTeams()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Can't write team.json. " + e.getMessage());
         }
     }
 
