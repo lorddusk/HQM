@@ -6,6 +6,7 @@ import hqm.client.gui.IRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class ComponentSingleText implements IRenderer {
     private int color = 0x000000, line = 0;
     private float scale = 1.0F, lastScale = 1.0F;
     private final IPage.Side side;
+    private final List<String> hoveringText = new ArrayList<>();
 
     public ComponentSingleText(String text, IPage.Side side) {
         this.text = text;
@@ -51,8 +53,18 @@ public class ComponentSingleText implements IRenderer {
         return this;
     }
 
+    public ComponentSingleText setHoveringText(List<String> hov){
+        this.hoveringText.clear();
+        this.hoveringText.addAll(hov);
+        return this;
+    }
+
     public float getScale() {
         return scale;
+    }
+
+    public int getWidth(){
+        return Math.round(Minecraft.getMinecraft().fontRenderer.getStringWidth(this.text) * this.getScale());
     }
 
     @Override
@@ -60,10 +72,20 @@ public class ComponentSingleText implements IRenderer {
         if(this.side == side){
             FontRenderer font = gui.mc.fontRenderer;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(left, top + this.line * (font.FONT_HEIGHT * this.lastScale), 0);
+            GlStateManager.disableLighting();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.translate(left, top, 0);
             GlStateManager.scale(scale, scale, 1);
             font.drawString(this.text, 0, 0, this.color);
             GlStateManager.popMatrix();
+            if(!this.hoveringText.isEmpty()){
+                int strWidth = font.getStringWidth(this.text);
+                if(mouseX >= left && mouseX <= left + strWidth && mouseY >= top && mouseY <= top + font.FONT_HEIGHT){
+                    GlStateManager.pushMatrix();
+                    gui.drawHoveringText(this.hoveringText, mouseX, mouseY);
+                    GlStateManager.popMatrix();
+                }
+            }
         }
     }
 }

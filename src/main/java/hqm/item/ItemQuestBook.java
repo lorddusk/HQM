@@ -41,7 +41,13 @@ public class ItemQuestBook extends ItemBase<ItemQuestBook> {
             if(stack.hasTagCompound()){
                 UUID uuid = stack.getTagCompound().getUniqueId("QuestbookId");
                 if(SaveHandler.QUEST_DATA.containsKey(uuid)){
-                    Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(uuid, player));
+                    GuiQuestBook gui = new GuiQuestBook(uuid, player, stack);
+                    Minecraft.getMinecraft().displayGuiScreen(gui);
+                    try {
+                        gui.tryToLoadPage(stack);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -51,12 +57,16 @@ public class ItemQuestBook extends ItemBase<ItemQuestBook> {
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if(stack.hasTagCompound()){
-            UUID uuid = stack.getTagCompound().getUniqueId("QuestbookId");
+            NBTTagCompound nbt = stack.getTagCompound();
+            UUID uuid = nbt.getUniqueId("QuestbookId");
             if(SaveHandler.QUEST_DATA.containsKey(uuid)){
                 Questbook questbook = SaveHandler.QUEST_DATA.get(uuid);
                 tooltip.addAll(questbook.getTooltip());
                 if(flagIn.isAdvanced()){
                     tooltip.add("Questbook ID: " + uuid);
+                    if(nbt.hasKey("PageClass", Constants.NBT.TAG_STRING)){
+                        tooltip.add("Current Page: " + nbt.getString("PageClass"));
+                    }
                 }
             }
         }

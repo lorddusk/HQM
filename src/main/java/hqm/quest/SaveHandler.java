@@ -2,6 +2,7 @@ package hqm.quest;
 
 import hqm.HQM;
 import hqm.HQMJson;
+import hqm.debug.DebugQuestbook;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
@@ -25,6 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SaveHandler {
 
     public static final Map<UUID, Questbook> QUEST_DATA = new ConcurrentHashMap<>();
+
+    static {
+        DebugQuestbook debugQuestbook = new DebugQuestbook();
+        QUEST_DATA.put(debugQuestbook.getId(), debugQuestbook);
+    }
 
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event){

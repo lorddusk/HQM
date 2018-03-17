@@ -34,13 +34,14 @@ public class ComponentTextArea implements IRenderer {
     public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
         if(side == this.side){
             List<ComponentSingleText> text1 = this.text;
-            float lastScale = 1.0F;
+            int completeHeight = 0;
             for (int i = 0; i < text1.size(); i++) {
                 ComponentSingleText text = text1.get(i);
                 text.setLine(i);
-                text.setLastScale(lastScale);
-                text.draw(gui, left, top, width, height, mouseX, mouseY, side);
-                lastScale = text.getScale();
+                GlStateManager.pushMatrix();
+                text.draw(gui, left, top + completeHeight, width, height, mouseX, mouseY, side);
+                GlStateManager.popMatrix();
+                completeHeight += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * text.getScale();
             }
         }
     }

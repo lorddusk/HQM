@@ -1,8 +1,10 @@
 package hqm.client.gui;
 
 import hqm.HQM;
-import hqm.client.gui.page.DebugPage;
 import hqm.client.gui.page.MainPage;
+import hqm.net.HQMPacket;
+import hqm.net.NetActions;
+import hqm.net.Networker;
 import hqm.quest.Questbook;
 import hqm.quest.SaveHandler;
 import hqm.quest.Team;
@@ -10,12 +12,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,13 +36,18 @@ public class GuiQuestBook extends GuiScreen {
     private final UUID questbookId;
     public int guiLeft, guiTop, xSize = 340, ySize = 234;
     private int lastX, lastY;
-    private IPage currentPage, backButtonPage, rewindButtonPage;
+    private ArrayDeque<IPage> lastPages = new ArrayDeque<>();
+    private IPage currentPage, rewindButtonPage;
     private List<IRenderer> renderer = new CopyOnWriteArrayList<>();
     private Team team;
+    private ItemStack book;
+    private EntityPlayer player;
 
-    public GuiQuestBook(UUID questbookId, EntityPlayer player){
+    public GuiQuestBook(UUID questbookId, EntityPlayer player, ItemStack book){
         this.questbookId = questbookId;
         this.team = this.getQuestbook().getTeam(player);
+        this.book = book;
+        this.player = player;
     }
 
     public Questbook getQuestbook(){
@@ -53,12 +62,25 @@ public class GuiQuestBook extends GuiScreen {
         return team;
     }
 
-    public void tryToLoadPage(NBTTagCompound nbt){
-        // TODO load the current page from the item stack nbt. pages does have identifier to use
+    public void tryToLoadPage(ItemStack stack) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if(!stack.isEmpty() && stack.hasTagCompound()){
+            String clazz = stack.getTagCompound().getString("PageClass");
+            if(!clazz.isEmpty()){
+                Class c = Class.forName(clazz);
+                if(c != null && IPage.class.isAssignableFrom(c)){
+                    this.setPage((IPage) c.newInstance(), false);
+                }
+            }
+        }
     }
 
-    public void setPage(IPage page){
-        this.backButtonPage = this.currentPage;
+    public void setPage(IPage page, boolean addToLastPageIndex){
+        if(addToLastPageIndex && this.currentPage != null){
+            this.lastPages.addFirst(this.currentPage);
+        }
+        if(this.rewindButtonPage == page){
+            this.lastPages.clear();
+        }
         this.currentPage = page;
         this.renderer.clear();
         this.currentPage.init(this);
@@ -81,10 +103,8 @@ public class GuiQuestBook extends GuiScreen {
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
         if(this.currentPage == null){
-            this.setPage(new MainPage());
-            //this.setPage(new DebugPage());
+            this.setPage(new MainPage(), false);
         }
-        this.currentPage.init(this);
     }
 
     @Override
@@ -106,11 +126,11 @@ public class GuiQuestBook extends GuiScreen {
             renderer1.draw(this, this.guiLeft + PAGE_START_X + PAGE_SECOND_OFFSET + PAGE_WIDTH, this.guiTop + PAGE_START_Y, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, IPage.Side.RIGHT);
         });
         GlStateManager.popMatrix();
-        if(this.backButtonPage != null || this.rewindButtonPage != null){
+        if(!this.lastPages.isEmpty() || this.rewindButtonPage != null){
             GlStateManager.pushMatrix();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.bindTexture(QUESTMAP);
-            if(this.backButtonPage != null){
+            if(!this.lastPages.isEmpty()){
                 boolean isMouseOver = mouseX >= guiLeft + 7 && mouseX <= guiLeft + 7 + 15 && mouseY >= guiTop + 219 && mouseY <= guiTop + 219 + 10;
                 this.drawTexturedModalRect(guiLeft + 7, guiTop + 219, isMouseOver ? 15 : 0, 113, 15, 10);
             }
@@ -136,13 +156,11 @@ public class GuiQuestBook extends GuiScreen {
             int finalLeft = left;
             this.renderer.forEach(renderer1 -> renderer1.mouseClick(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, mouseButton, IPage.Side.RIGHT));
         }
-        if(this.backButtonPage != null && mouseX >= guiLeft + 7 && mouseX <= guiLeft + 7 + 15 && mouseY >= guiTop + 219 && mouseY <= guiTop + 219 + 10){ // back button
-            this.setPage(this.backButtonPage);
-            this.backButtonPage = null;
+        if(!this.lastPages.isEmpty() && mouseX >= guiLeft + 7 && mouseX <= guiLeft + 7 + 15 && mouseY >= guiTop + 219 && mouseY <= guiTop + 219 + 10){ // back button
+            this.setPage(this.lastPages.removeFirst(), false);
         }
-        if(this.rewindButtonPage != null && this.rewindButtonPage != this.currentPage && mouseX >= guiLeft + 162 && mouseX <= guiLeft + 162 + 14 && mouseY >= guiTop + 217 && mouseY <= guiTop + 217 + 9){ // back button
-            this.setPage(this.rewindButtonPage);
-            this.backButtonPage = null;
+        if(this.rewindButtonPage != null && this.rewindButtonPage != this.currentPage && mouseX >= guiLeft + 162 && mouseX <= guiLeft + 162 + 14 && mouseY >= guiTop + 217 && mouseY <= guiTop + 217 + 9){ // rewind button
+            this.setPage(this.rewindButtonPage, false);
         }
         this.lastX = mouseX;
         this.lastY = mouseY;
@@ -210,5 +228,13 @@ public class GuiQuestBook extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    @Override
+    public void onGuiClosed() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setInteger("CurrentSlot", this.player.inventory.getSlotFor(this.book));
+        nbt.setTag("Data", Networker.singleTag("PageClass", new NBTTagString(this.currentPage.getClass().getName())));
+        Networker.NET.sendToServer(new HQMPacket(NetActions.STACK_ADD_NBT, this.player, nbt));
     }
 }

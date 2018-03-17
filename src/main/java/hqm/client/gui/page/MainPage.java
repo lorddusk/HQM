@@ -1,6 +1,7 @@
 package hqm.client.gui.page;
 
 import hqm.HQM;
+import hqm.client.Colors;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.component.ComponentPageOpenButton;
@@ -28,7 +29,7 @@ public class MainPage implements IPage{
         List<ComponentSingleText> text = ComponentSingleText.from(gui.getQuestbook().getDescription(), GuiQuestBook.PAGE_WIDTH, Side.RIGHT);
         text.forEach(componentSingleText -> componentSingleText.setScale(0.85F));
         gui.addRenderer(new ComponentTextArea(text, Side.RIGHT));
-        gui.addRenderer(new ComponentPageOpenButton(GuiQuestBook.PAGE_WIDTH / 2, GuiQuestBook.PAGE_HEIGHT + 2, new InformationPage(), Side.LEFT).setText("Open Quests"));
+        gui.addRenderer(new ComponentPageOpenButton(GuiQuestBook.PAGE_WIDTH / 2, GuiQuestBook.PAGE_HEIGHT + 2, new InformationPage(), Side.LEFT).setText(new ComponentSingleText("Click here to start", Side.LEFT).setScale(0.75F).setColor(Colors.LIGHT_GRAY)));
         gui.setRewindPage(this);
     }
 
@@ -37,7 +38,7 @@ public class MainPage implements IPage{
         switch (side){
             case LEFT: {
                 gui.bindTexture(gui.getQuestbook().getImage());
-                Gui.drawScaledCustomSizeModalRect(pageLeft, pageTop, 0, 0, 153, 253, 140, 190, 280, 360);
+                Gui.drawScaledCustomSizeModalRect(pageLeft, pageTop - 10, 0, 0, 153, 253, 140, 190, 280, 360);
                 break;
             }
         }

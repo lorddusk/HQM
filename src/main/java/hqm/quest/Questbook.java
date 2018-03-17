@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author canitzp
@@ -41,7 +42,7 @@ public class Questbook {
     }
 
     public List<String> getDescription() {
-        return description;
+        return this.description.isEmpty() ? Collections.singletonList("No Description") : this.description;
     }
 
     public List<String> getTooltip() {
@@ -68,6 +69,14 @@ public class Questbook {
     public Questbook addTeam(Team team){
         this.teams.add(team);
         return this;
+    }
+
+    public List<String> getQuestLineNames(){
+        return questLines.stream().map(QuestLine::getName).collect(Collectors.toList());
+    }
+
+    public int countQuestLines(){
+        return this.questLines.size();
     }
 
     public int countQuests(){

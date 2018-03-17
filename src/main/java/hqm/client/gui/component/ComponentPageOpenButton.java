@@ -14,7 +14,7 @@ public class ComponentPageOpenButton implements IRenderer {
     private final int x, y;
     private final IPage page;
     private final IPage.Side side;
-    private String text;
+    private ComponentSingleText text;
     private int width;
 
     public ComponentPageOpenButton(int x, int y, IPage page, IPage.Side side) {
@@ -22,28 +22,27 @@ public class ComponentPageOpenButton implements IRenderer {
         this.y = y;
         this.page = page;
         this.side = side;
-        this.setText(page.getId().toString());
+        this.setText(new ComponentSingleText("No button text", side));
     }
 
-    public ComponentPageOpenButton setText(String text){
+    public ComponentPageOpenButton setText(ComponentSingleText text){
         this.text = text;
-        this.width = Minecraft.getMinecraft().fontRenderer.getStringWidth(text);
+        this.width = text.getWidth();
         return this;
     }
 
     @Override
     public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
         if(this.side == side){
-            FontRenderer font = gui.mc.fontRenderer;
-            font.drawString(this.text, this.x + left - this.width / 2, this.y + top, 0x000000);
+            this.text.draw(gui, this.x + left - this.width / 2, this.y + top, width, height, mouseX, mouseY, side);
         }
     }
 
     @Override
-    public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
         if(this.side == side){
-            if(mouseX >= this.x + left - this.width / 2 && mouseX <= this.x + left + this.width / 2 && mouseY >= this.y + top && mouseY <= this.y + top + gui.mc.fontRenderer.FONT_HEIGHT){
-                gui.setPage(this.page);
+            if(mouseX >= this.x + left - this.width / 2 && mouseX <= this.x + left + this.width / 2 && mouseY >= this.y + top && mouseY <= this.y + top + this.text.getScale() * gui.mc.fontRenderer.FONT_HEIGHT){
+                gui.setPage(this.page, true);
             }
         }
     }
