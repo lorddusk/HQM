@@ -1,18 +1,14 @@
 package hqm.client.gui.page;
 
-import com.google.common.collect.Lists;
 import hqm.HQM;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
-import hqm.client.gui.component.ComponentScrollBar;
-import hqm.client.gui.component.ComponentTextArea;
 import hqm.client.gui.component.ComponentTextField;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
 
 /**
  * @author canitzp

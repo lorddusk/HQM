@@ -2,8 +2,11 @@ package hqm.debug;
 
 import com.google.common.collect.Lists;
 import hqm.HQM;
+import hqm.quest.Quest;
 import hqm.quest.QuestLine;
 import hqm.quest.Questbook;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -23,10 +26,15 @@ public class DebugQuestbook extends Questbook{
 
     public DebugQuestbook() {
         super("Debug", new UUID(0L, 0L), desc, tooltip, new ResourceLocation(HQM.MODID, "textures/gui/front.png"), new ArrayList<>());
-        QuestLine numberOne = new DebugQuestLine(0, Collections.emptyList());
-        this.addQuestLine(numberOne);
+        List<Quest> debugQuests = Lists.newArrayList(new Quest("D1", UUID.randomUUID(), null, 0, 0, new ItemStack(Items.WHEAT), Collections.emptyList(), Collections.emptyList()));
+        this.addQuestLine(new DebugQuestLine(0, debugQuests));
         QuestLine numberTwo = new DebugQuestLine(1, Collections.emptyList());
         this.addQuestLine(numberTwo);
+        QuestLine numberThree = new DebugQuestLine(2, Collections.emptyList());
+        this.addQuestLine(numberThree);
+        for(int i = 4; i <= 15; i++){
+            this.addQuestLine(new DebugQuestLine(i, Collections.emptyList()));
+        }
     }
 
 }

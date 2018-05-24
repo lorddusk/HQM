@@ -42,11 +42,11 @@ public class QuestLine {
     }
 
     public List<Quest> getCompleted(Team team){
-        return this.quests.stream().filter(quest -> quest.parentId == null || team.hasSolved(quest)).collect(Collectors.toList());
+        return this.quests.stream().filter(team::hasSolved).collect(Collectors.toList());
     }
 
-    public List<Quest> getUnlockedUncopleted(Team team){
-        return getUnlocked(team).stream().filter(quest -> !team.hasSolved(quest)).collect(Collectors.toList());
+    public List<Quest> getUnlockedUncompleted(Team team){
+        return getUnlocked(team).stream().filter(quest -> quest.parentId == null || !team.hasSolved(quest)).collect(Collectors.toList());
     }
 
 }
