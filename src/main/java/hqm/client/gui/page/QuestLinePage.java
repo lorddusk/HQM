@@ -27,10 +27,9 @@ import java.util.List;
  */
 public class QuestLinePage implements IPage {
 
-    ComponentScrollPane<QuestLineEntries> scrollPane = new ComponentScrollPane<>(Side.LEFT);
-
     @Override
     public void init(GuiQuestBook gui) {
+        ComponentScrollPane<QuestLineEntries> scrollPane = new ComponentScrollPane<>(Side.LEFT);
         Questbook questbook = gui.getQuestbook();
         for(QuestLine questLine : questbook.getQuestLines()){
             scrollPane.addComponent(new QuestLineEntries(questLine));

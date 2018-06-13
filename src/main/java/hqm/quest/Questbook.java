@@ -2,6 +2,7 @@ package hqm.quest;
 
 import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.*;
@@ -19,6 +20,7 @@ public class Questbook {
     private final List<QuestLine> questLines = new ArrayList<>();
     private final List<Integer> dimensions;
     private final List<Team> teams = new ArrayList<>();
+    private NBTTagCompound data;
 
     public Questbook(String name, UUID id, List<String> description, List<String> tooltip, ResourceLocation image, List<Integer> dims) {
         this.name = name;
@@ -27,6 +29,11 @@ public class Questbook {
         this.tooltip = tooltip;
         this.image = image;
         this.dimensions = dims;
+    }
+
+    public Questbook setData(NBTTagCompound data) {
+        this.data = data;
+        return this;
     }
 
     public String getName() {
@@ -92,7 +99,7 @@ public class Questbook {
     }
 
     public int countUnlockedUncompleteQuests(Team team){
-        return this.questLines.stream().mapToInt(questLines -> questLines.getUnlocked(team).size()).sum();
+        return this.questLines.stream().mapToInt(questLines -> questLines.getUnlockedUncompleted(team).size()).sum();
     }
 
     public Team getTeam(EntityPlayer player){

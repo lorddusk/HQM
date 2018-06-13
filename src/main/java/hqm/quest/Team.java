@@ -50,7 +50,7 @@ public class Team {
     }
 
     public boolean hasParentSolved(Quest quest){
-        return this.finishedQuests.contains(quest.parentId);
+        return this.finishedQuests.contains(quest.parent);
     }
 
     public boolean containsPlayer(EntityPlayer player){

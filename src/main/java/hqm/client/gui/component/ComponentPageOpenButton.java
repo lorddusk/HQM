@@ -1,5 +1,6 @@
 package hqm.client.gui.component;
 
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -9,7 +10,7 @@ import net.minecraft.client.gui.FontRenderer;
 /**
  * @author canitzp
  */
-public class ComponentPageOpenButton implements IRenderer {
+public class ComponentPageOpenButton extends AbstractRender {
 
     private final int x, y;
     private final IPage page;

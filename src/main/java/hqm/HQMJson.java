@@ -35,6 +35,7 @@ public class HQMJson {
             List<String> tooltip = new ArrayList<>();
             List<Integer> dims = new ArrayList<>();
             ResourceLocation icon = null;
+            NBTTagCompound data = null;
             in.beginObject();
             while (in.hasNext()){
                 switch (in.nextName().toLowerCase()){
@@ -79,10 +80,14 @@ public class HQMJson {
                         in.endArray();
                         break;
                     }
+                    case "data": {
+                        data = gson.fromJson(in, NBTTagCompound.class);
+                        break;
+                    }
                 }
             }
             in.endObject();
-            return new Questbook(name, id, desc, tooltip, icon, dims);
+            return new Questbook(name, id, desc, tooltip, icon, dims).setData(data);
         }
     };
 
@@ -94,6 +99,7 @@ public class HQMJson {
         public QuestLine read(JsonReader in) throws IOException {
             String name = null;
             int index = Integer.MAX_VALUE;
+            NBTTagCompound data = null;
             List<String> desc = new ArrayList<>();
             List<Quest> quests = new ArrayList<>();
             in.beginObject();
@@ -105,6 +111,11 @@ public class HQMJson {
                     }
                     case "index": {
                         index = in.nextInt();
+                        break;
+                    }
+                    case "data": {
+                        data = gson.fromJson(in, NBTTagCompound.class);
+                        break;
                     }
                     case "desc": {
                         in.beginArray();
@@ -125,7 +136,7 @@ public class HQMJson {
                 }
             }
             in.endObject();
-            return new QuestLine(name, index, desc, quests);
+            return new QuestLine(name, index, desc, quests).setData(data);
         }
     };
 

@@ -48,6 +48,11 @@ public class DebugPage implements IPage {
             public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, Side side) {
                 lastScroll = String.format("Mouse Scroll: x=%d, y=%d, scroll=%d, side=%s", mouseX, mouseY, scroll, side);
             }
+
+            @Override
+            public void setOffset(int x, int y) {
+
+            }
         });
     }
 

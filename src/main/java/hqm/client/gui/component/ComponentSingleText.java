@@ -1,5 +1,6 @@
 package hqm.client.gui.component;
 
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * @author canitzp
  */
-public class ComponentSingleText implements IRenderer {
+public class ComponentSingleText extends AbstractRender implements ComponentScrollPane.IScrollRender {
 
     private final String text;
     private int color = 0x000000, line = 0;
@@ -87,5 +88,18 @@ public class ComponentSingleText implements IRenderer {
                 }
             }
         }
+    }
+
+    @Override
+    public void render(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+        this.draw(gui, left, top, width, height, mouseX, mouseY, side);
+    }
+
+    @Override
+    public void renderRaw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {}
+
+    @Override
+    public int getHeight() {
+        return Math.round(Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * this.scale);
     }
 }

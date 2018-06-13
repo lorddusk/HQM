@@ -1,6 +1,7 @@
 package hqm.client.gui.component;
 
 import hqm.HQM;
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -16,7 +17,7 @@ import java.util.Map;
  * @author canitzp
  */
 //TODO
-public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> implements IRenderer{
+public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> extends AbstractRender {
 
     public static int WIDTH_BAR = 7;
     public static int OFFSET = 2;
@@ -26,6 +27,7 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> im
     private Map<T, Integer> components = new HashMap<>();
     private IPage.Side side;
     private T currentlyClicked = null;
+    private int height = -1;
 
     public ComponentScrollPane(IPage.Side side){
         this.side = side;
@@ -35,11 +37,20 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> im
         this.components.put(component, this.components.size() * component.getHeight());
     }
 
+    public void setHeight(int height){
+        this.height = height;
+    }
+
     @Override
     public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+        left += this.getXOffset();
+        top += this.getYOffset();
+        if(this.height > 0){
+            height = this.height;
+        }
         for(Map.Entry<T, Integer> entry : this.components.entrySet()){
             if(entry.getValue() + this.scrollPosition >= 0 && entry.getValue() + entry.getKey().getHeight() + this.scrollPosition <= height){
-                entry.getKey().render(gui, left, top + this.scrollPosition + entry.getValue(), width - WIDTH_BAR - 1, height, mouseX, mouseY, side);
+                entry.getKey().render(gui, left, top + this.scrollPosition + entry.getValue() + 2, width - WIDTH_BAR - 1, height - 4, mouseX, mouseY, side);
             }
             entry.getKey().renderRaw(gui, left, top, width, height, mouseX, mouseY, side);
         }
@@ -47,8 +58,8 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> im
             gui.bindTexture(LOC);
             GlStateManager.pushMatrix();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            gui.drawTexturedModalRect(left + width - WIDTH_BAR, top + OFFSET, 171, 69, 7, 187);
-            gui.drawTexturedModalRect(left + width - WIDTH_BAR + 1 , top + OFFSET + 1 /*scroll offset calc is missing*/, 250, 167, 5, 6);
+            gui.drawTexturedModalRect(left + width - WIDTH_BAR, top, 171, 69, 7, height);
+            gui.drawTexturedModalRect(left + width - WIDTH_BAR + 1 , top + 1 /*scroll offset calc is missing*/, 250, 167, 5, 6);
             GlStateManager.popMatrix();
         }
     }

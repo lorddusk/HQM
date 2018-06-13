@@ -1,5 +1,6 @@
 package hqm.client.gui.component;
 
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -9,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * @author canitzp
  */
-public class ComponentActivatable implements IRenderer {
+public class ComponentActivatable extends AbstractRender {
 
     private final Supplier<Boolean> supplier;
     private final IRenderer component;

@@ -2,7 +2,6 @@ package hqm.quest;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,20 +12,21 @@ import java.util.UUID;
 public class Quest {
 
     public String name;
-    public UUID id, parentId;
-    public ItemStack icon;
-    public List<String> description;
+    public UUID id, parent;
+    private ItemStack icon;
+    public List<String> desc;
     public List<ITask> tasks;
-    public int xPos, yPos;
+    public int posX, posY;
+    public NBTTagCompound data;
 
     public Quest(String name, UUID id, UUID parentId, int xPos, int yPos, ItemStack icon, List<String> description, List<ITask> tasks) {
         this.name = name;
         this.id = id;
-        this.parentId = parentId;
+        this.parent = parentId;
         this.icon = icon;
-        this.description = description;
-        this.xPos = xPos;
-        this.yPos = yPos;
+        this.desc = description;
+        this.posX = xPos;
+        this.posY = yPos;
         this.tasks = tasks;
     }
 
@@ -36,5 +36,29 @@ public class Quest {
             return this.tasks.get(i + 1);
         }
         return null;
+    }
+
+    public ItemStack getIcon() {
+        return icon != null ? icon : ItemStack.EMPTY;
+    }
+
+    public boolean isBig(){
+        return this.data != null && this.data.getBoolean("big");
+    }
+
+    public boolean isDone(Team team){
+        return team.hasSolved(this) || (this.data != null && this.data.getBoolean("solved"));
+    }
+
+    public boolean isParentDone(QuestLine questLine, Team team){
+        return questLine.getQuest(this.parent) != null && questLine.getQuest(this.parent).isDone(team);
+    }
+
+    public boolean isOpen(QuestLine questLine, Team team){
+        return this.parent == null || this.isDone(team) || this.isParentDone(questLine, team) || (this.data != null && this.data.getBoolean("open"));
+    }
+
+    public boolean isInvisible(QuestLine questLine, Team team){
+        return !this.isOpen(questLine, team) && (this.data != null && this.data.getBoolean("invisible"));
     }
 }

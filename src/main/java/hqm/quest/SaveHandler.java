@@ -3,6 +3,11 @@ package hqm.quest;
 import hqm.HQM;
 import hqm.HQMJson;
 import hqm.debug.DebugQuestbook;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.FallbackResourceManager;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
@@ -10,6 +15,7 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.*;
@@ -29,11 +35,12 @@ public class SaveHandler {
 
     static {
         DebugQuestbook debugQuestbook = new DebugQuestbook();
-        QUEST_DATA.put(debugQuestbook.getId(), debugQuestbook);
+        //QUEST_DATA.put(debugQuestbook.getId(), debugQuestbook);
     }
 
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event){
+        QUEST_DATA.clear();
         if(!event.getWorld().isRemote){
             File worldSave = getWorldSaveFolder(event.getWorld());
             if(worldSave != null){
@@ -67,6 +74,12 @@ public class SaveHandler {
                 System.out.println("F*** there is something really wrong with this world save folder finding reflection");
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerJoin(PlayerEvent.PlayerLoggedInEvent event){
+        QUEST_DATA.clear();
+
     }
 
     public static List<Questbook> readQuestbooks(File hqmWorldFolder){

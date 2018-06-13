@@ -1,0 +1,59 @@
+{
+  "name": "Debug Questline 1",
+  "index": 0,
+  "desc": [
+    "This is the first questline in the debug book",
+    "It is here to test various things"
+  ],
+  "data": {},
+  "quests": [
+    {
+      "name": "Debug Quest 1",
+      "id": "00000000-0000-0000-0000-000000000002",
+      "parent": null,
+      "posX": 0,
+      "posY": 0,
+      "icon": {
+        "item": "minecraft:apple",
+        "amount": 1,
+        "meta": 0,
+        "nbt": {}
+      },
+      "data": {
+        "solved": {
+          "id": 1,
+          "value": 1
+        }
+      },
+      "desc": [
+        "The first quest is a big step everytime,",
+        "but as long as we are going this path together",
+        "everything should be fine :D"
+      ],
+      "tasks": []
+    },
+    {
+      "name": "Debug Quest 2",
+      "id": "00000000-0000-0000-0000-000000000003",
+      "parent": "00000000-0000-0000-0000-000000000002",
+      "posX": 150,
+      "posY": 0,
+      "icon": {
+        "item": "minecraft:fire",
+        "amount": 1,
+        "meta": 0,
+        "nbt": {}
+      },
+      "data": {
+        "big": {
+          "id": 1,
+          "value": 1
+        }
+      },
+      "desc": [
+        "Description of Debug Quest 2"
+      ],
+      "tasks": []
+    }
+  ]
+}

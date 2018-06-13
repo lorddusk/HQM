@@ -1,6 +1,7 @@
 package hqm.client.gui.component;
 
 import hqm.HQM;
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * @author canitzp
  */
-public class ComponentTextField implements IRenderer {
+public class ComponentTextField extends AbstractRender {
 
     private List<String> text;
     private boolean isSingle;

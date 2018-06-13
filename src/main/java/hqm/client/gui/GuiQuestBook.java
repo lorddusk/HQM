@@ -232,9 +232,12 @@ public class GuiQuestBook extends GuiScreen {
 
     @Override
     public void onGuiClosed() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setInteger("CurrentSlot", this.player.inventory.getSlotFor(this.book));
-        nbt.setTag("Data", Networker.singleTag("PageClass", new NBTTagString(this.currentPage.getClass().getName())));
-        Networker.NET.sendToServer(new HQMPacket(NetActions.STACK_ADD_NBT, this.player, nbt));
+        try {
+            this.currentPage.getClass().getConstructor();
+            NBTTagCompound nbt = new NBTTagCompound();
+            nbt.setInteger("CurrentSlot", this.player.inventory.getSlotFor(this.book));
+            nbt.setTag("Data", Networker.singleTag("PageClass", new NBTTagString(this.currentPage.getClass().getName())));
+            Networker.NET.sendToServer(new HQMPacket(NetActions.STACK_ADD_NBT, this.player, nbt));
+        } catch (NoSuchMethodException ignored) {}
     }
 }

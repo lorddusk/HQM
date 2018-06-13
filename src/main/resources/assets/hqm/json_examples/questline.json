@@ -22,7 +22,13 @@
           "id": "uniqueId",
           "nbt": {}
         }
-      ]
+      ],
+      "data": {
+        "big_icon": {
+          "id": 1,
+          "value": 1
+        }
+      }
     },
     {
       "name": "quest2",

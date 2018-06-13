@@ -20,4 +20,6 @@ public interface IRenderer {
 
     default void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, IPage.Side side){}
 
+    void setOffset(int x, int y);
+
 }

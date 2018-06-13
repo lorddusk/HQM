@@ -1,5 +1,6 @@
 package hqm.client.gui.component;
 
+import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
 import hqm.client.gui.IRenderer;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * @author canitzp
  */
-public class ComponentTextArea implements IRenderer {
+public class ComponentTextArea extends AbstractRender {
 
     private final IPage.Side side;
     private final List<ComponentSingleText> text;
