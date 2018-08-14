@@ -10,8 +10,10 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import org.apache.commons.io.Charsets;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class QuestDataUpdateMessage implements IMessage {
 
@@ -31,14 +33,17 @@ public class QuestDataUpdateMessage implements IMessage {
     public void fromBytes(ByteBuf buf) {
         this.players = buf.readInt();
         this.id = ByteBufUtils.readUTF8String(buf);
-        this.data = ByteBufUtils.readUTF8String(buf);
+        int charLength = buf.readInt();
+        this.data = buf.readCharSequence(charLength, StandardCharsets.UTF_8).toString();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(this.players);
         ByteBufUtils.writeUTF8String(buf, id);
-        ByteBufUtils.writeUTF8String(buf, data);
+        buf.writeInt(this.data.length());
+        buf.writeCharSequence(this.data, StandardCharsets.UTF_8);
+        //ByteBufUtils.writeUTF8String(buf, data);
     }
 
     public static class Handler implements IMessageHandler<QuestDataUpdateMessage, IMessage> {
