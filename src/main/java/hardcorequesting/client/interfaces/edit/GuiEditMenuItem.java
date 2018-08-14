@@ -492,7 +492,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                         searchItems.add(new SearchEntry(searchString, advSearchString, new ElementItem(stack)));
                 }
                 for (Fluid fluid : FluidRegistry.getRegisteredFluids().values()) {
-                    String search = fluid.getLocalizedName(null);
+                    String search = fluid.getLocalizedName(new FluidStack(fluid, 1000)); // Dummy Fluid Stack
                     searchFluids.add(new SearchEntry(search, search, new ElementFluid(fluid)));
                 }
             }
