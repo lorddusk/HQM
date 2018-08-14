@@ -284,23 +284,25 @@ public class GuiBase extends GuiScreen {
 
 
     public void drawItemStack(@Nonnull ItemStack stack, int x, int y, boolean renderEffect) {
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.enableDepth();
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.translate(getLeft() + x, getTop() + y, 0);
-
-        Minecraft mc = Minecraft.getMinecraft();
-        boolean flagBefore = mc.fontRenderer.getUnicodeFlag();
-        mc.fontRenderer.setUnicodeFlag(false);
-        Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(stack, 0, 0);
-        Minecraft.getMinecraft().getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, 0, 0, null);
-        mc.fontRenderer.setUnicodeFlag(flagBefore);
-
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.popMatrix();
+        try{
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            RenderHelper.enableGUIStandardItemLighting();
+            GlStateManager.enableDepth();
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.translate(getLeft() + x, getTop() + y, 0);
+    
+            Minecraft mc = Minecraft.getMinecraft();
+            boolean flagBefore = mc.fontRenderer.getUnicodeFlag();
+            mc.fontRenderer.setUnicodeFlag(false);
+            Minecraft.getMinecraft().getRenderItem().renderItemAndEffectIntoGUI(stack, 0, 0);
+            Minecraft.getMinecraft().getRenderItem().renderItemOverlayIntoGUI(mc.fontRenderer, stack, 0, 0, null);
+            mc.fontRenderer.setUnicodeFlag(flagBefore);
+    
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.popMatrix();
+        } catch(Exception ignored){}
     }
 
     public float getZLevel() {
