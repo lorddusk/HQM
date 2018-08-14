@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class EventHandler {
@@ -23,7 +24,7 @@ public class EventHandler {
     public EventHandler() {
         registeredTasks = new List[Type.values().length];
         for (int i = 0; i < registeredTasks.length; i++) {
-            registeredTasks[i] = new ArrayList<>();
+            registeredTasks[i] = new CopyOnWriteArrayList<>();
         }
         MinecraftForge.EVENT_BUS.register(this);
         instance = this;
