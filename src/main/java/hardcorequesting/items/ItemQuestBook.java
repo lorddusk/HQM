@@ -32,7 +32,7 @@ public class ItemQuestBook extends Item {
         setCreativeTab(HardcoreQuesting.HQMTab);
         setMaxStackSize(1);
         setRegistryName(ItemInfo.BOOK_UNLOCALIZED_NAME);
-        setUnlocalizedName(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
+        setTranslationKey(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
     public static ItemStack getOPBook(EntityPlayer player) {
@@ -83,8 +83,8 @@ public class ItemQuestBook extends Item {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName(stack) + "_" + stack.getItemDamage();
+    public String getTranslationKey(ItemStack stack) {
+        return super.getTranslationKey(stack) + "_" + stack.getItemDamage();
     }
 
     @Override

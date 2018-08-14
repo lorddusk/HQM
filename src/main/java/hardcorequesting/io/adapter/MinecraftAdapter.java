@@ -58,7 +58,7 @@ public class MinecraftAdapter {
             if (stack.getCount() != 1) {
                 out.name(STACK_SIZE).value(stack.getCount());
             }
-            if (stack.hasTagCompound() && !stack.getTagCompound().hasNoTags()) {
+            if (stack.hasTagCompound() && !stack.getTagCompound().isEmpty()) {
                 NBT_TAG_COMPOUND.write(out.name(NBT), stack.getTagCompound());
             }
             out.endObject();

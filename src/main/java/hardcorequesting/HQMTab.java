@@ -13,14 +13,7 @@ public class HQMTab extends CreativeTabs {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public ItemStack getIconItemStack() {
-        // the Icon of the creative Tab
+    public ItemStack createIcon(){
         return new ItemStack(ModItems.book, 1, 0);
-    }
-
-    @Override
-    public ItemStack getTabIconItem() {
-        return getIconItemStack();
     }
 }

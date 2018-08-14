@@ -17,12 +17,12 @@ public class LoreResourcePack extends AbstractResourcePack {
 
     @Override
     public InputStream getInputStream(ResourceLocation resource) throws IOException {
-        return this.getInputStreamByName(resource.getResourcePath().replace("sounds/", ""));
+        return this.getInputStreamByName(resource.getPath().replace("sounds/", ""));
     }
 
     @Override
     public boolean resourceExists(ResourceLocation resource) {
-        return hasResourceName(resource.getResourcePath().replace("sounds/", ""));
+        return hasResourceName(resource.getPath().replace("sounds/", ""));
     }
 
     @Override
