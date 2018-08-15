@@ -500,7 +500,7 @@ public class QuestingData {
     }
 
     public Team getTeam() {
-        if (!team.isSingle() && !getTeams().isEmpty())
+        if (!team.isSingle() && !getTeams().isEmpty() )
             team = getTeams().get(team.getId());
         return team;
     }
