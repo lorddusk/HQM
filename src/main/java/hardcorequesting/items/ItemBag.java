@@ -25,6 +25,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+
 
 public class ItemBag extends Item {
 
@@ -93,9 +95,11 @@ public class ItemBag extends Item {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(CreativeTabs tabs, NonNullList<ItemStack> stackList) {
-        for (int i = 0; i < BagTier.values().length; i++) {
-            stackList.add(new ItemStack(this, 1, i));
+    public void getSubItems(@Nonnull CreativeTabs tabs, @Nonnull NonNullList<ItemStack> stackList) {
+        if(this.isInCreativeTab(tabs)){
+            for (int i = 0; i < BagTier.values().length; i++) {
+                stackList.add(new ItemStack(this, 1, i));
+            }
         }
     }
 
