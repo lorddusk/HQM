@@ -92,8 +92,10 @@ public enum GuiType {
                 writer.name(BAG).value(data[1]);
                 writer.name(LIMIT).beginArray();
                 int i = 2;
-                while (i < data.length)
+                while (i < data.length){
                     writer.value(Integer.parseInt(data[i]));
+                    i++;
+                }
                 writer.endArray();
                 writer.endObject();
                 writer.close();
