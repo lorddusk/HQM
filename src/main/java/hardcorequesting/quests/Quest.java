@@ -238,12 +238,16 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return QuestingData.getQuestingData(player).selectedQuest.equals(getId()) && QuestingData.getQuestingData(player).selectedTask == selectedTask.getId();
+                QuestingData data = QuestingData.getQuestingData(player);
+                if(data != null && data.selectedQuest.equals(getId())){
+                    return data.selectedTask == selectedTask.getId();
+                }
+                return false;
             }
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
+                return selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
             }
 
             @Override

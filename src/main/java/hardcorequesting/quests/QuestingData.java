@@ -212,7 +212,7 @@ public class QuestingData {
 
     public static QuestingData getQuestingData(String uuid) {
         if (!data.containsKey(uuid))
-            new QuestingData(uuid);
+            data.put(uuid, new QuestingData(uuid));
 
         return data.get(uuid);
     }
