@@ -1,9 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import hardcorequesting.client.interfaces.GuiBase;
@@ -415,15 +412,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            //Todo fix fluid drawing
-            //gui.drawFluid(fluidStack, x, y, mX, mY);
+            gui.drawFluid(fluidStack, x, y, mX, mY);
         }
 
         @Override
         public List<String> getName(GuiBase gui) {
-            List<String> ret = new ArrayList<>();
-            ret.add(fluidStack.getLocalizedName(null));
-            return ret;
+            if(fluidStack != null){
+                List<String> ret = new ArrayList<>();
+                ret.add(fluidStack.getLocalizedName(new FluidStack(fluidStack, 1000)));
+                return ret;
+            }
+            return Collections.emptyList();
         }
 
         @Override
@@ -438,7 +437,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public Element<?> copy() {
-            ElementFluid ret = new ElementFluid(fluidStack == null ? null : fluidStack);
+            ElementFluid ret = new ElementFluid(fluidStack);
             ret.size = size;
             return ret;
         }

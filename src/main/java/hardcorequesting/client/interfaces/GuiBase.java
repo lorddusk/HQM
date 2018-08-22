@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
@@ -202,40 +203,52 @@ public class GuiBase extends GuiScreen {
         GlStateManager.enableTexture2D();
     }
 
-//TODO Fix Fluid drawing
-//    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
-//        drawItemBackground(x, y, mX, mY, false);
-//        if (fluid != null) {
-//            drawFluid(fluid, x + 1, y + 1);
-//        }
-//    }
-//
-//    public void drawFluid(Fluid fluid, int x, int y) {
-//        //IIcon icon = fluid.getIconStack();
-//        Item fluidStack = null;
-//
-//        if (icon == null) {
-//            if (FluidRegistry.WATER.equals(fluid)) {
-//                icon = Blocks.water.getIconStack(0, 0);
-//            } else if (FluidRegistry.LAVA.equals(fluid)) {
-//                icon = Blocks.water.getIconStack(0, 0);
-//            }
-//        }
-//
-//        if (icon != null) {
-//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-//
-//            ResourceHelper.bindResource(MAP_TEXTURE);
-//
-//            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
-//
-//            ResourceHelper.bindResource(TERRAIN);
-//            setColor(fluid.getColor());
-//            drawIcon(icon, x, y);
-//
-//            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-//        }
-//    }
+    public void drawFluid(Fluid fluid, int x, int y, int mX, int mY) {
+        drawItemBackground(x, y, mX, mY, false);
+        if (fluid != null) {
+            drawFluid(fluid, x + 1, y + 1);
+        }
+    }
+
+    public void drawFluid(Fluid fluid, int x, int y) {
+        if(fluid != null){
+            mc.getTextureManager().bindTexture(new ResourceLocation(fluid.getStill().getNamespace(), "textures/"+fluid.getStill().getPath()+".png"));
+        
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.disableAlpha();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+            GlStateManager.translate(getLeft() + x, getTop() + y, 0);
+            drawModalRectWithCustomSizedTexture(0, 0, 36, 172, 16, 16, 16, 16);
+            GlStateManager.disableBlend();
+            GlStateManager.enableAlpha();
+            GlStateManager.popMatrix();
+        }
+        /*//IIcon icon = fluid.getIconStack();
+        Item fluidStack = null;
+
+        if (icon == null) {
+            if (FluidRegistry.WATER.equals(fluid)) {
+                icon = Blocks.water.getIconStack(0, 0);
+            } else if (FluidRegistry.LAVA.equals(fluid)) {
+                icon = Blocks.water.getIconStack(0, 0);
+            }
+        }
+
+        if (icon != null) {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            ResourceHelper.bindResource(MAP_TEXTURE);
+
+            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
+
+            ResourceHelper.bindResource(TERRAIN);
+            setColor(fluid.getColor());
+            drawIcon(icon, x, y);
+
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }*/
+    }
 
     public void applyColor(int color) {
         float a = (float) (color >> 24 & 255) / 255.0F;

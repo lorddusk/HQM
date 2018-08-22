@@ -3,9 +3,12 @@ package hardcorequesting.tileentity;
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
+import hardcorequesting.quests.data.QuestDataTaskMob;
 import hardcorequesting.quests.task.QuestTask;
+import hardcorequesting.quests.task.QuestTaskItems;
 import hardcorequesting.quests.task.QuestTaskItemsConsume;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -22,7 +25,9 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 
 public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHandler, ITickable {
 
@@ -63,7 +68,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     @Override
     public void setInventorySlotContents(int i, ItemStack stack) {
         QuestTask task = getCurrentTask();
-        if (task != null && task instanceof QuestTaskItemsConsume) {
+        if (task instanceof QuestTaskItemsConsume) {
             NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
             if (((QuestTaskItemsConsume) task).increaseItems(list, (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
@@ -93,8 +98,22 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return true;
+    public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
+        QuestTask task = getCurrentTask();
+        if (task instanceof QuestTaskItemsConsume){
+            for(int i = 0; i < ((QuestTaskItemsConsume) task).getItems().length; i++){
+                QuestTaskItems.ItemRequirement requirement = ((QuestTaskItemsConsume) task).getItems()[i];
+                if(requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)){
+                    QuestDataTaskItems data = (QuestDataTaskItems) task.getData(playerUuid);
+                    if(data.progress.length > i){
+                        return data.progress[i] < requirement.required;
+                    }else{
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -119,7 +138,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
 
     @Override
     public void update() {
-        if (modifiedSyncTimer > 0 && --modifiedSyncTimer == 0) {
+        if (!this.world.isRemote && this.world.getTotalWorldTime() % SYNC_TIME == 0) {
             doSync();
             updateState();
         }
@@ -141,18 +160,11 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     private void updateState() {
         if (!world.isRemote) {
             QuestTask task = getCurrentTask();
-            if (task != null) {
-                EntityPlayer player = QuestingData.getPlayer(playerUuid);
-                if (player != null) {
-                    if(task.isCompleted(player)){
-                        world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState(), 3);
-                    } else {
-                        if(!world.getBlockState(pos).getValue(BlockDelivery.BOUND)){
-                            world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState().withProperty(BlockDelivery.BOUND, true), 3);
-                        }
-                    }
-                }
+            boolean bound = false;
+            if(task != null && !task.isCompleted(this.playerUuid)){
+                bound = true;
             }
+            world.setBlockState(pos, ModBlocks.itemBarrel.getDefaultState().withProperty(BlockDelivery.BOUND, bound), 3);
         }
     }
 
@@ -163,7 +175,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
                 return quest.getTasks().get(selectedTask);
             }
         }
-
         return null;
     }
 
@@ -178,16 +189,23 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     public void storeSettings(EntityPlayer player) {
-        if (modifiedSyncTimer > 0) {
+        /*if (modifiedSyncTimer > 0) {
             modifiedSyncTimer = 0;
             doSync();
-        }
+        }*/
 
         playerUuid = QuestingData.getUserUUID(player);
         QuestingData data = QuestingData.getQuestingData(player);
         selectedQuest = data.selectedQuest;
         selectedTask = data.selectedTask;
-
+        
+        QuestTask task = getCurrentTask();
+        if(task == null || task.isCompleted(playerUuid)){
+            this.playerUuid = null;
+            this.selectedQuest = null;
+            this.selectedTask = 0;
+        }
+        doSync();
         updateState();
     }
 
@@ -199,8 +217,6 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
             playerUuid = compound.getString(NBT_PLAYER_NAME);
             selectedQuest = compound.getString(NBT_QUEST);
             selectedTask = compound.getByte(NBT_TASK);
-        } else {
-            playerUuid = null;
         }
     }
 
@@ -208,7 +224,7 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
 
-        if (playerUuid != null) {
+        if (playerUuid != null && selectedQuest != null) {
             compound.setString(NBT_PLAYER_NAME, playerUuid);
             compound.setString(NBT_QUEST, selectedQuest);
             compound.setByte(NBT_TASK, (byte) selectedTask);
@@ -245,21 +261,21 @@ public class TileEntityBarrel extends TileEntity implements IInventory, IFluidHa
     }
 
     @Override
-    public int fill(FluidStack resource, boolean doFill) {
-        if (resource == null) {
+    public int fill(FluidStack resource, boolean doFill){
+        if(resource == null){
             return 0;
         }
-
-        if (doFill) {
+        int oldAmount = resource.amount;
+        if(doFill){
             QuestTask task = getCurrentTask();
-            if (task != null && task instanceof QuestTaskItemsConsume) {
-                if (((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0) {
+            if(task instanceof QuestTaskItemsConsume){
+                if(((QuestTaskItemsConsume) task).increaseFluid(resource.copy(), (QuestDataTaskItems) task.getData(playerUuid), playerUuid) && modifiedSyncTimer <= 0){
                     modifiedSyncTimer = SYNC_TIME;
+                    return oldAmount - resource.amount;
                 }
             }
         }
-
-        return resource.amount;
+        return 0;
     }
 
     @Nullable

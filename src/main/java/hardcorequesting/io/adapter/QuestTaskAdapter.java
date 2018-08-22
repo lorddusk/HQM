@@ -57,7 +57,7 @@ public class QuestTaskAdapter {
             int required = value.required;
             ItemPrecision precision = value.getPrecision();
             out.beginObject();
-            if (stack != null) {
+            if (value.hasItem && !stack.isEmpty()) {
                 MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack);
             } else if (fluid != null) {
                 MinecraftAdapter.FLUID.write(out.name(FLUID), fluid);
@@ -97,7 +97,7 @@ public class QuestTaskAdapter {
             }
             in.endObject();
             QuestTaskItems.ItemRequirement result = null;
-            if (stack != null) {
+            if (!stack.isEmpty()) {
                 result = new QuestTaskItems.ItemRequirement(stack, required);
             } else if (fluid != null) {
                 result = new QuestTaskItems.ItemRequirement(fluid, required);

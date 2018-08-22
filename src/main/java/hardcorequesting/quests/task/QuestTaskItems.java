@@ -136,14 +136,9 @@ public abstract class QuestTaskItems extends QuestTask {
 
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
-            if (i < data.progress.length) { // possible fix for #233
-                if (!item.hasItem || item.required == data.progress[i]) {
-                    continue;
-                }
-            } else {
-                data.progress = Arrays.copyOf(data.progress, i);
+            if(!item.hasItem || data.isDone(i, item)){
+                continue;
             }
-
 
             for (ItemStack stack : itemsToConsume) {
                 if (item.precision.areItemsSame(stack, item.stack)) {
@@ -151,7 +146,7 @@ public abstract class QuestTaskItems extends QuestTask {
                     if (amount > 0) {
                         stack.shrink(amount);
                         if (stack.getCount() == 0) {
-                            itemsToConsume.set(i, ItemStack.EMPTY);
+                            itemsToConsume.set(itemsToConsume.indexOf(stack), ItemStack.EMPTY);
                         }
                         data.progress[i] += amount;
                         updated = true;
@@ -171,7 +166,7 @@ public abstract class QuestTaskItems extends QuestTask {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
-            if (item.required > data.progress[i]) {
+            if (!data.isDone(i, item)) {
                 isDone = false;
                 break;
             }
@@ -198,8 +193,7 @@ public abstract class QuestTaskItems extends QuestTask {
             if (item.hasItem) {
                 gui.drawItemStack(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
             } else {
-                //Todo fix fluid drawing
-                //gui.drawFluid(fluidStack.fluid, fluidStack.x, fluidStack.y, mX, mY);
+                gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
 
             String str = (getProgress(player, i) * 100 / item.required) + "%";
@@ -330,7 +324,7 @@ public abstract class QuestTaskItems extends QuestTask {
         public Fluid fluid;
         public int required;
         public boolean hasItem;
-        private ItemStack stack;
+        private ItemStack stack = ItemStack.EMPTY;
         private ItemPrecision precision = ItemPrecision.PRECISE;
         private ItemStack[] permutations;
         private int cycleAt = -1;

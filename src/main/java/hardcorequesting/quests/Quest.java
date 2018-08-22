@@ -1448,11 +1448,11 @@ public class Quest {
                     setReward(stack, id, type == GuiEditMenuItem.Type.REWARD);
                 }
             }
-        } else if (selectedTask != null && selectedTask instanceof QuestTaskItems) {
+        } else if (selectedTask instanceof QuestTaskItems) {
             ((QuestTaskItems) selectedTask).setItem(element, id, precision);
-        } else if (selectedTask != null && selectedTask instanceof QuestTaskLocation && type == GuiEditMenuItem.Type.LOCATION) {
+        } else if (selectedTask instanceof QuestTaskLocation && type == GuiEditMenuItem.Type.LOCATION) {
             ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
-        } else if (selectedTask != null && selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
+        } else if (selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
             ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         }
     }

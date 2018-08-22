@@ -26,11 +26,15 @@ repositories {
         name = "HWYLA"
         url = "http://tehnut.info/maven"
     }
+    maven { // Actually Additions
+        url = "http://maven.chaosfield.at"
+    }
 }
 
 dependencies {
     deobfCompile "mcp.mobius.waila:Hwyla:" + project.hwyla_version
     runtime "mezz.jei:jei_" + project.minecraft_version + ":" + project.jei_version
+    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:1.12.2-r140"
 }
 
 version = "${version}"

@@ -8,6 +8,8 @@ import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskItems;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class QuestDataTaskItems extends QuestDataTask {
 
@@ -72,5 +74,17 @@ public class QuestDataTaskItems extends QuestDataTask {
     public void update(QuestDataTask taskData) {
         super.update(taskData);
         this.progress = ((QuestDataTaskItems) taskData).progress;
+    }
+    
+    public int getProgressFor(int index){
+        if(this.progress.length > index){
+            return this.progress[index];
+        }
+        this.progress = Arrays.copyOf(this.progress, index); // We need to be sure that the progress per item has the same length as the required items
+        return 0;
+    }
+    
+    public boolean isDone(int index, QuestTaskItems.ItemRequirement requirement){
+        return this.getProgressFor(index) >= requirement.required;
     }
 }

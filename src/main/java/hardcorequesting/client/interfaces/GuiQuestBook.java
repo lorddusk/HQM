@@ -937,7 +937,7 @@ public class GuiQuestBook extends GuiBase {
     }
 
     public void save() {
-        // TODO send message to server with updated quests
+        // TODO send message to server with updated quests, otherwise editing is only possible in client worlds => exactly what is intended
         QuestLine.saveAll();
         SaveHelper.onSave();
     }

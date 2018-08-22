@@ -13,3 +13,5 @@ libs/
 .classpath
 .project
 .settings/org.eclipse.core.resources.prefs
+.idea/
+classes/

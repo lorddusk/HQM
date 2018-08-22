@@ -16,6 +16,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -43,7 +44,7 @@ public class BlockDelivery extends BlockContainer {
             if (player.inventory.getCurrentItem().isEmpty()) {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityBarrel) {
+                    if (te instanceof TileEntityBarrel) {
                         if (((TileEntityBarrel) te).getCurrentTask() != null && state.getValue(BOUND))
                             player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrel.boundTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
                         else
@@ -54,15 +55,13 @@ public class BlockDelivery extends BlockContainer {
             } else if (player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity te = world.getTileEntity(pos);
-                    if (te != null && te instanceof TileEntityBarrel) {
+                    if (te instanceof TileEntityBarrel) {
                         ((TileEntityBarrel) te).storeSettings(player);
-
                         if (((TileEntityBarrel) te).getCurrentTask() != null){
                             player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrel.bindTo", Quest.getQuest(((TileEntityBarrel) te).selectedQuest).getName()));
-                            world.setBlockState(pos, this.getDefaultState().withProperty(BOUND, true), 3);
-                        }
-                        else
+                        }else{
                             player.sendMessage(new TextComponentTranslation("hqm.message.noTaskSelected"));
+                        }
                     }
                 }
                 return true;
