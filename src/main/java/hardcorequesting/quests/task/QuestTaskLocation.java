@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -54,6 +55,12 @@ public class QuestTaskLocation extends QuestTask {
 
                 for (int i = 0; i < locations.length; ++i) {
                     Location location = this.locations[i];
+                    if(visited.length < i){ // Fix to make sure than the visited array is as long as the location array (#400)
+                        boolean[] oldVisited = ArrayUtils.addAll(visited, (boolean[]) null);
+                        visited = new boolean[i];
+                        System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
+                        ((QuestDataTaskLocation) this.getData(player)).visited = visited;
+                    }
                     if (!visited[i] && player.getEntityWorld().provider.getDimension() == location.dimension) {
                         int current = (int) player.getDistanceSq((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
