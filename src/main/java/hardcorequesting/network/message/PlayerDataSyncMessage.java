@@ -14,14 +14,28 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerDataSyncMessage implements IMessage {
 
     private boolean local, serverWorld, questing, hardcore;
-    private String team, data;
+    private String team;
+
+    private List<String> data = new ArrayList<String>();
 
     public PlayerDataSyncMessage() {
 
+    }
+
+    private List<String> SplitData (String input, int size) {
+        List<String> output = new ArrayList<String>();
+        int len = input.length();
+        for (int i=0; i<len; i+= size) {
+            output.add(input.substring(i, Math.min(len, i+size)));
+        }
+
+        return output;
     }
 
     public PlayerDataSyncMessage(boolean local, boolean serverWorld, EntityPlayer player) {
@@ -30,7 +44,8 @@ public class PlayerDataSyncMessage implements IMessage {
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
         this.team = Team.saveTeam(player);
-        this.data = QuestingData.saveQuestingData(player);
+        String stringData = QuestingData.saveQuestingData(player);
+        this.data = SplitData(stringData, 3000);
     }
 
     @Override
@@ -40,7 +55,11 @@ public class PlayerDataSyncMessage implements IMessage {
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         this.team = ByteBufUtils.readUTF8String(buf);
-        this.data = ByteBufUtils.readUTF8String(buf);
+        int count = buf.readInt();
+        data.clear();
+        for (int i = 0; i<count; i++) {
+            data.add(ByteBufUtils.readUTF8String(buf));
+        }
     }
 
     @Override
@@ -50,7 +69,10 @@ public class PlayerDataSyncMessage implements IMessage {
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         ByteBufUtils.writeUTF8String(buf, team);
-        ByteBufUtils.writeUTF8String(buf, data);
+        buf.writeInt(this.data.size());
+        for (String val : this.data) {
+            ByteBufUtils.writeUTF8String(buf, val);
+        }
     }
 
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {
@@ -72,7 +94,7 @@ public class PlayerDataSyncMessage implements IMessage {
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data"))) {
                     out.print("[");
-                    out.print(message.data);
+                    out.print(String.join("", message.data));
                     out.print("]");
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {
