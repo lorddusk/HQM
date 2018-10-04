@@ -688,7 +688,7 @@ public class QuestSet {
                     }
                 }
 
-                if (shouldDrawText) {
+                if (shouldDrawText && gui.getCurrentMode() != EditMode.MOVE) {
                     gui.drawMouseOver(txt, x0, y0);
                 }
                 break;
