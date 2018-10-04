@@ -139,14 +139,15 @@ public abstract class QuestTaskItems extends QuestTask {
             if(!item.hasItem || data.isDone(i, item)){
                 continue;
             }
-
-            for (ItemStack stack : itemsToConsume) {
-                if (item.precision.areItemsSame(stack, item.stack)) {
+    
+            for(int j = 0; j < itemsToConsume.size(); j++){
+                ItemStack stack = itemsToConsume.get(j);
+                if(item.precision.areItemsSame(stack, item.stack)){
                     int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
-                    if (amount > 0) {
+                    if(amount > 0){
                         stack.shrink(amount);
-                        if (stack.getCount() == 0) {
-                            itemsToConsume.set(itemsToConsume.indexOf(stack), ItemStack.EMPTY);
+                        if(stack.getCount() == 0){
+                            itemsToConsume.set(j, ItemStack.EMPTY);
                         }
                         data.progress[i] += amount;
                         updated = true;
