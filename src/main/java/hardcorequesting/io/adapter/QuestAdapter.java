@@ -266,7 +266,7 @@ public class QuestAdapter {
             in.beginArray();
             while (in.hasNext()) {
                 ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                if (stack != null)
+                if (!stack.isEmpty())
                     stacks.add(stack);
             }
             in.endArray();
@@ -308,7 +308,10 @@ public class QuestAdapter {
                         QUEST.setBigIcon(in.nextBoolean());
                         break;
                     case ICON:
-                        QUEST.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                        ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                        if (!icon.isEmpty()) {
+                            QUEST.setIconStack(icon);
+                        }
                         break;
                     case REQUIREMENTS:
                         readStringArray(requirement, in);

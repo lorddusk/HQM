@@ -67,7 +67,7 @@ public class MinecraftAdapter {
         @Override
         public ItemStack read(JsonReader in) throws IOException {
             if (in.peek() == JsonToken.NULL) {
-                return null;
+                return ItemStack.EMPTY;
             }
             String id = "";
             int damage = 0, size = 1;
@@ -89,7 +89,7 @@ public class MinecraftAdapter {
 
             Item item = Item.getByNameOrId(id);
             if (item == null) {
-                return null;
+                return ItemStack.EMPTY;
             }
             ItemStack stack = new ItemStack(item, size, damage);
             stack.setTagCompound(tag);
