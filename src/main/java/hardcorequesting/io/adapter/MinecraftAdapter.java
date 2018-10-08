@@ -89,7 +89,7 @@ public class MinecraftAdapter {
 
             Item item = Item.getByNameOrId(id);
             if (item == null) {
-                return null;
+                return ItemStack.EMPTY;
             }
             ItemStack stack = new ItemStack(item, size, damage);
             stack.setTagCompound(tag);

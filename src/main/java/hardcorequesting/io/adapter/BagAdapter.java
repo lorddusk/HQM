@@ -56,7 +56,7 @@ public class BagAdapter {
                         in.beginArray();
                         while (in.hasNext()) {
                             ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                            if (stack != null) {
+                            if (!stack.isEmpty()) {
                                 items.add(stack);
                             }
                         }

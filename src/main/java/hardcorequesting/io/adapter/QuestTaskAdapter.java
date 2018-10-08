@@ -155,7 +155,10 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                    if (!icon.isEmpty()) {
+                        result.setIconStack(icon);
+                    }
                 } else if (name.equalsIgnoreCase(VISIBLE)) {
                     result.setVisible(QuestTaskLocation.Visibility.valueOf(in.nextString()));
                 }
@@ -244,7 +247,10 @@ public class QuestTaskAdapter {
                 if (name.equalsIgnoreCase(NAME)) {
                     result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                    if (!icon.isEmpty()) {
+                        result.setIconStack(icon);
+                    }
                 } else if (name.equalsIgnoreCase(MOB)) {
                     result.setMob(in.nextString());
                 } else if (name.equalsIgnoreCase(EXACT)) {
