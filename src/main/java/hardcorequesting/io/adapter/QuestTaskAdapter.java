@@ -216,6 +216,54 @@ public class QuestTaskAdapter {
             return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
         }
     };
+
+    protected static final TypeAdapter<QuestTaskTame.Tame> TAME_ADAPTER = new TypeAdapter<QuestTaskTame.Tame>() {
+        private final String TAMES = "tames";
+        private final String EXACT = "exact";
+        private final String TAME = "tame";
+        private final String ICON = "icon";
+        private final String NAME = "name";
+
+        @Override
+        public void write(JsonWriter out, QuestTaskTame.Tame value) throws IOException {
+            out.beginObject();
+            out.name(NAME).value(value.getName());
+            ItemStack stack = value.getIconStack();
+            if (stack != null) {
+                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
+            }
+            out.name(TAME).value(value.getTame());
+            out.name(TAMES).value(value.getCount());
+            out.name(EXACT).value(value.isExact());
+            out.endObject();
+        }
+
+        @Override
+        public QuestTaskTame.Tame read(JsonReader in) throws IOException {
+            in.beginObject();
+            QuestTaskTame.Tame result = ((QuestTaskTame) TASK).new Tame();
+            while (in.hasNext()) {
+                String name = in.nextName();
+                if (name.equalsIgnoreCase(NAME)) {
+                    result.setName(in.nextString());
+                } else if (name.equalsIgnoreCase(ICON)) {
+                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                    if (!icon.isEmpty()) {
+                        result.setIconStack(icon);
+                    }
+                } else if (name.equalsIgnoreCase(TAME)) {
+                    result.setTame(in.nextString());
+                } else if (name.equalsIgnoreCase(EXACT)) {
+                    result.setExact(in.nextBoolean());
+                } else if (name.equalsIgnoreCase(TAMES)) {
+                    result.setCount(in.nextInt());
+                }
+            }
+            in.endObject();
+            return result;
+        }
+    };
+
     public static QuestTask TASK;
     protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
         private final String KILLS = "kills";
@@ -274,6 +322,7 @@ public class QuestTaskAdapter {
         private final String MOBS = "mobs";
         private final String REPUTATION = "reputation";
         private final String KILLS = "kills";
+        private final String TAME = "tame";
 
         @Override
         public void write(JsonWriter out, QuestTask value) throws IOException {
@@ -296,6 +345,12 @@ public class QuestTaskAdapter {
                 out.name(LOCATIONS).beginArray();
                 for (QuestTaskLocation.Location requirement : ((QuestTaskLocation) value).locations) {
                     LOCATION_ADAPTER.write(out, requirement);
+                }
+                out.endArray();
+            } else if (value instanceof QuestTaskTame) {
+                out.name(TAME).beginArray();
+                for (QuestTaskTame.Tame requirement : ((QuestTaskTame) value).tames) {
+                    TAME_ADAPTER.write(out, requirement);
                 }
                 out.endArray();
             } else if (value instanceof QuestTaskMob) {
@@ -356,6 +411,15 @@ public class QuestTaskAdapter {
                     }
                     in.endArray();
                     ((QuestTaskLocation) TASK).locations = list.toArray(new QuestTaskLocation.Location[list.size()]);
+                } else if (TASK instanceof QuestTaskTame && name.equalsIgnoreCase(TAME)) {
+                    List<QuestTaskTame.Tame> list = new ArrayList<>();
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        QuestTaskTame.Tame entry = TAME_ADAPTER.read(in);
+                        if (entry != null) list.add(entry);
+                    }
+                    in.endArray();
+                    ((QuestTaskTame) TASK).tames = list.toArray(new QuestTaskTame.Tame[list.size()]);
                 } else if (TASK instanceof QuestTaskMob && name.equalsIgnoreCase(MOBS)) {
                     List<QuestTaskMob.Mob> list = new ArrayList<QuestTaskMob.Mob>();
                     in.beginArray();
@@ -392,7 +456,7 @@ public class QuestTaskAdapter {
         ITEMS(QuestDataTaskItems::construct),
         LOCATION(QuestDataTaskLocation::construct),
         MOB(QuestDataTaskMob::construct),
-        REPUTATION_KILL(QuestDataTaskReputationKill::construct);
+        TAME(QuestDataTaskTame::construct);
 
         private Function<JsonReader, QuestDataTask> func;
 

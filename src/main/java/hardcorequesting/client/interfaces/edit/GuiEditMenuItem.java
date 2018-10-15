@@ -325,6 +325,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         QUEST_ICON(false, false, false),
         BAG_ITEM(false, true, false),
         LOCATION(false, false, false),
+        TAME(false, false, false),
         MOB(false, false, false),
         PORTAL(false, false, false);
 
