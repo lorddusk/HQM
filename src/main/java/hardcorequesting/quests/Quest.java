@@ -729,9 +729,7 @@ public class Quest {
     }
 
     public List<Quest> getRequirements() {
-        return QuestLine.getActiveQuestLine().quests.values().stream()
-                .filter(quest -> requirement.contains(quest.getId()))
-                .collect(Collectors.toList());
+        return this.requirement.stream().map(QuestLine.getActiveQuestLine().quests::get).collect(Collectors.toList());
     }
 
     //interface stuff
