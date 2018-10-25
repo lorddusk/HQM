@@ -119,7 +119,7 @@ public class GuiReward extends GuiBase {
             } catch (Throwable ignored) {
             }
         }
-
+        GlStateManager.disableLighting();
         for (Reward reward : rewards) {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {
