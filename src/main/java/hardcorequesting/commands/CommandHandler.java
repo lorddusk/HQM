@@ -27,6 +27,7 @@ public class CommandHandler extends CommandBase {
         register(new CommandHardcore());
         register(new CommandLives());
         register(new CommandEdit());
+        register(new CommandEditMode());
         register(new CommandEnable());
         register(new CommandSave());
         register(new CommandLoad());
