@@ -1,5 +1,9 @@
-### 5.3.5 for 1.12.x (19.12.2018 by canitzp):
+### 5.3.5 for 1.12.x (19.12.2018 by canitzp, duely, codewarrior0, TataTawa):
 - Some code cleanup and therefor fixing a team creation bug #407 (and several similar issues)
+- Added command to toggle edit mode, without game restart! Thanks duely
+- Fixing grey tooltip in reward gui. Thanks to codewarrior0 and duely
+- Performance increase in large quest books up to 5000%! Thanks TataTawa
+- Fixed some null ItemStacks. Thanks duely
 
 ### 5.3.4 for 1.12.x (04.10.2018 by canitzp & duely):
 - [Support larger quest data sizes by splitting information. thanks to duely](https://github.com/lorddusk/HQM/commit/c2ba8e2c1be5dfea8c25a98223b4696468bead8d)
