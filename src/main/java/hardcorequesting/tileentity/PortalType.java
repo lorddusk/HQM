@@ -1,6 +1,9 @@
 package hardcorequesting.tileentity;
 
+import hardcorequesting.blocks.ModBlocks;
+import hardcorequesting.items.ModItems;
 import hardcorequesting.util.Translator;
+import net.minecraft.item.ItemStack;
 
 public enum PortalType {
     TECH("tech", true),
@@ -21,6 +24,10 @@ public enum PortalType {
 
     public String getDescription() {
         return Translator.translate("hqm.portal." + this.id + ".desc");
+    }
+    
+    public ItemStack createItemStack(){
+        return this.isPreset() ? new ItemStack(ModBlocks.itemPortal, 1, this.ordinal() + 1) : ItemStack.EMPTY;
     }
 
     public boolean isPreset() {

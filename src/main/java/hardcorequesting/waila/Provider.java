@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 public class Provider implements IWailaDataProvider {
@@ -39,33 +40,28 @@ public class Provider implements IWailaDataProvider {
         registrar.addConfigRemote(MOD_NAME, IS_REMOTE_AVAILABLE, "Show QDS data");
     }
 
+    @Nonnull
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
         if (accessor.getBlock() == ModBlocks.itemPortal) {
             TileEntity te = accessor.getTileEntity();
             if (te instanceof TileEntityPortal) {
                 TileEntityPortal portal = (TileEntityPortal) te;
-                if (portal.hasTexture(getPlayer())) {
-                    if (portal.getType().isPreset()) {
-                        return new ItemStack(ModBlocks.itemPortal, 1, portal.getType() == PortalType.TECH ? 1 : 2);
-                    } else {
-                        return portal.getStack();
+                if (portal.hasTexture(Minecraft.getMinecraft().player)) {
+                    ItemStack ret = portal.getType().createItemStack();
+                    if(ret.isEmpty()){
+                        ret = portal.getStack();
                     }
+                    return ret;
                 } else {
                     return ItemStack.EMPTY;
                 }
             }
         }
-
         return ItemStack.EMPTY;
     }
 
-    @Override
-    public List<String> getWailaHead(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-
-        return currenttip;
-    }
-
+    @Nonnull
     @Override
     public List<String> getWailaBody(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         if (config.getConfig(IS_REMOTE_AVAILABLE)) {
@@ -74,9 +70,7 @@ public class Provider implements IWailaDataProvider {
                 if (te != null) {
                     if (te instanceof TileEntityBarrel) {
                         TileEntityBarrel qds = (TileEntityBarrel) te;
-
                         qds.readFromNBT(accessor.getNBTData());
-
                         QuestTask task = qds.getCurrentTask();
                         if (task != null && te.getBlockMetadata() == 1) {
                             currenttip.add(qds.getPlayer());
@@ -91,18 +85,4 @@ public class Provider implements IWailaDataProvider {
         return currenttip;
     }
 
-    @Override
-    public List<String> getWailaTail(ItemStack stack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return currenttip;
-    }
-
-    @Override
-    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
-        return tag;
-    }
-
-    @SideOnly(Side.CLIENT)
-    private EntityPlayer getPlayer() {
-        return Minecraft.getMinecraft().player;
-    }
 }

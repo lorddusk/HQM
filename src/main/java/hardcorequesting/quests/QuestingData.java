@@ -44,6 +44,9 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class QuestingData {
 
     // private static boolean debugActive = false;
@@ -371,7 +374,7 @@ public class QuestingData {
         return this.lives;
     }
 
-    public void removeLifeAndSendMessage(EntityPlayer player) {
+    public void removeLifeAndSendMessage(@Nonnull EntityPlayer player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
             player.sendMessage(new TextComponentString(Translator.translate(getLives() != 1, "hqm.message.lostLife", getLives())));
@@ -390,7 +393,7 @@ public class QuestingData {
 
     }
 
-    public boolean removeLives(EntityPlayer player, int amount) {
+    public boolean removeLives(@Nonnull EntityPlayer player, int amount) {
         boolean shareLives = getTeam().isSharingLives();
 
         if (shareLives) {
@@ -443,10 +446,10 @@ public class QuestingData {
         }
     }
 
-    public void die(EntityPlayer player) {
-        if (!QuestingData.isHardcoreActive()) return;
-
-        removeLifeAndSendMessage(player);
+    public void die(@Nonnull EntityPlayer player) {
+        if(QuestingData.isHardcoreActive()){
+            removeLifeAndSendMessage(player);
+        }
     }
 
     /**
@@ -454,6 +457,7 @@ public class QuestingData {
      *
      * @param playerEntity The player that should be banned
      */
+    //todo reinspect this whole behaviour
     private void outOfLives(EntityPlayer playerEntity) {
         QuestingData data = QuestingData.getQuestingData(playerEntity);
         Team team = data.getTeam();
@@ -499,14 +503,21 @@ public class QuestingData {
 
     }
 
+    @Nonnull
     public Team getTeam() {
-        if (!team.isSingle() && !getTeams().isEmpty() )
-            team = getTeams().get(team.getId());
-        return team;
+        if(!this.team.isSingle()){
+            List<Team> teams = getTeams();
+            if(teams.size() > this.team.getId()){
+                this.team = teams.get(this.team.getId());
+            }
+        }
+        return this.team;
     }
 
-    public void setTeam(Team team) {
-        if (team == null) team = new Team(uuid);
+    public void setTeam(@Nullable Team team) {
+        if(team == null){
+            team = new Team(this.uuid);
+        }
         this.team = team;
     }
 
