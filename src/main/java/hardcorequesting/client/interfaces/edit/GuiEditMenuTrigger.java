@@ -7,16 +7,18 @@ import hardcorequesting.quests.TriggerType;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.util.UUID;
+
 public class GuiEditMenuTrigger extends GuiEditMenuExtended {
 
     private TriggerType type;
     private int triggerTasks;
-    private String id;
+    private UUID questId;
 
     public GuiEditMenuTrigger(GuiQuestBook gui, EntityPlayer player, Quest quest) {
         super(gui, player, true, 25, 20, 25, 135);
 
-        this.id = quest.getId();
+        this.questId = quest.getQuestId();
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();
 
@@ -59,7 +61,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
 
     @Override
     public void save(GuiBase gui) {
-        Quest quest = Quest.getQuest(id);
+        Quest quest = Quest.getQuest(questId);
         if (quest != null) {
             quest.setTriggerType(type);
             quest.setTriggerTasks(Math.max(1, triggerTasks));

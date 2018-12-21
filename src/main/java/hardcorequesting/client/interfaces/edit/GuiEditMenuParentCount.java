@@ -6,16 +6,18 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
+import java.util.UUID;
+
 public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     private boolean useModifiedParentRequirement;
     private int parentRequirementCount;
-    private String id;
+    private UUID questId;
 
     public GuiEditMenuParentCount(GuiBase gui, EntityPlayer player, Quest quest) {
         super(gui, player, true, 25, 20, 25, 105);
 
-        this.id = quest.getId();
+        this.questId = quest.getQuestId();
         this.useModifiedParentRequirement = quest.getUseModifiedParentRequirement();
         if (useModifiedParentRequirement) {
             this.parentRequirementCount = quest.getParentRequirementCount();
@@ -59,7 +61,7 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     @Override
     public void save(GuiBase gui) {
-        Quest quest = Quest.getQuest(id);
+        Quest quest = Quest.getQuest(questId);
         if (quest != null) {
             quest.setUseModifiedParentRequirement(useModifiedParentRequirement);
             quest.setParentRequirementCount(parentRequirementCount);

@@ -20,13 +20,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("Duplicates")
 public class TileEntityPortal extends TileEntity implements IBlockSync, ITickable {
@@ -50,8 +51,8 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     private static final String UNCOMPLETED_TEXTURE = "uncompletedTexture";
     private static final String PLAYERS = "players";
     private Quest quest;
-    private String questId;
-    private List<String> players = new ArrayList<>();
+    private UUID questId;
+    private List<UUID> players = new ArrayList<>();
     private PortalType type = PortalType.TECH;
     private ItemStack stack;
     private boolean completedTexture;
@@ -104,7 +105,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
 
     public void writeContentToNBT(NBTTagCompound compound) {
         if (quest != null) {
-            compound.setString(NBT_QUEST, quest.getId());
+            compound.setUniqueId(NBT_QUEST, quest.getQuestId());
         }
         compound.setByte(NBT_TYPE, (byte) type.ordinal());
         if (stack != null) {
@@ -132,8 +133,15 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     }
 
     public void readContentFromNBT(NBTTagCompound compound) {
-        if (compound.hasKey(NBT_QUEST)) {
-            questId = compound.getString(NBT_QUEST);
+        // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
+        if(compound.hasKey(NBT_QUEST, Constants.NBT.TAG_STRING)){
+            try{
+                compound.setUniqueId(NBT_QUEST, UUID.fromString(compound.getString(NBT_QUEST)));
+            } catch(IllegalArgumentException ignored){}
+            compound.removeTag(NBT_QUEST);
+        }
+        if (compound.hasKey(NBT_QUEST + "Most")) {
+            questId = compound.getUniqueId(NBT_QUEST);
             if (Quest.getQuests() != null) {
                 quest = Quest.getQuest(questId);
             }
@@ -173,13 +181,13 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
             boolean updated = false;
 
             if (delay++ >= 20) {
-                if (quest != null && Quest.getQuest(quest.getId()) == null) {
+                if (quest != null && Quest.getQuest(quest.getQuestId()) == null) {
                     quest = null;
                 }
 
                 if (quest != null) {
                     for (Team team : QuestingData.getAllTeams()) {
-                        if (team.getQuestData(quest.getId()).completed) {
+                        if (team.getQuestData(quest.getQuestId()).completed) {
                             for (PlayerEntry entry : team.getPlayers()) {
                                 if (entry.isInTeam() && !players.contains(entry.getUUID())) {
                                     players.add(entry.getUUID());
@@ -194,16 +202,14 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
             }
 
             if (resetDelay++ >= 1200) {
-                if (quest != null && Quest.getQuest(quest.getId()) == null) {
+                if (quest != null && Quest.getQuest(quest.getQuestId()) == null) {
                     quest = null;
                 }
 
                 if (quest != null) {
-                    for (Iterator<String> iterator = players.iterator(); iterator.hasNext(); ) {
-                        String player = iterator.next();
-
-                        if (!QuestingData.hasData(player) || !quest.isCompleted(player)) {
-                            iterator.remove();
+                    for(UUID uuid : new ArrayList<>(this.players)){
+                        if (!QuestingData.hasData(uuid) || !quest.isCompleted(uuid)) {
+                            this.players.remove(uuid);
                             updated = true;
                         }
                     }
@@ -211,8 +217,6 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     players.clear();
                     updated = true;
                 }
-
-
                 resetDelay = 0;
             }
 
@@ -259,7 +263,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
         switch (type) {
             case 0:
                 if (onServer) {
-                    writer.name(QUEST).value(this.quest == null ? null : this.quest.getId());
+                    writer.name(QUEST).value(this.quest == null ? null : this.quest.getQuestId().toString());
                     writer.name(PORTAL_TYPE).value(this.type.ordinal());
                     if (!this.type.isPreset()) {
                         writer.name(HAS_ITEM).value(stack != null);
@@ -275,8 +279,9 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     writer.name(UNCOMPLETED_TEXTURE).value(uncompletedTexture);
 
                     writer.name(PLAYERS).beginArray();
-                    for (String p : players)
-                        writer.value(p);
+                    for (UUID uuid : this.players){
+                        writer.value(uuid.toString());
+                    }
                     writer.endArray();
                 } else {
                     //send empty packet, no info required
@@ -311,7 +316,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     NetworkManager.sendBlockUpdate(this, player, 0);
                 } else {
                     JsonElement questElement = data.get(QUEST);
-                    this.quest = questElement.isJsonNull() ? null : Quest.getQuest(questElement.getAsString());
+                    this.quest = questElement.isJsonNull() ? null : Quest.getQuest(UUID.fromString(questElement.getAsString()));
                     this.type = PortalType.values()[data.get(PORTAL_TYPE).getAsInt()];
                     if (!this.type.isPreset()) {
                         if (data.get(HAS_ITEM).getAsBoolean()) {
@@ -329,15 +334,22 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                     uncompletedTexture = data.get(UNCOMPLETED_TEXTURE).getAsBoolean();
 
                     players.clear();
-                    for (JsonElement p : data.get(PLAYERS).getAsJsonArray())
-                        players.add(p.getAsString());
+                    for (JsonElement p : data.get(PLAYERS).getAsJsonArray()){
+                        try{
+                            UUID uuid = UUID.fromString(p.getAsString());
+                            this.players.add(uuid);
+                        } catch(IllegalArgumentException e){
+                            e.printStackTrace(); // todo proper exception
+                        }
+                    }
+                    
                     IBlockState state = world.getBlockState(pos);
                     world.notifyBlockUpdate(pos, state, state, 3);
                 }
                 break;
             case 1:
                 if (onServer) {
-                    if (Quest.isEditing) {
+                    if (Quest.canQuestsBeEdited(player)) {
                         this.type = PortalType.values()[data.get(PORTAL_TYPE).getAsInt()];
                         if (!this.type.isPreset()) {
                             if (data.get(HAS_ITEM).getAsBoolean()) {

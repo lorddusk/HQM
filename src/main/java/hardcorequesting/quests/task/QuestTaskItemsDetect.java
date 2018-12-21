@@ -2,9 +2,10 @@ package hardcorequesting.quests.task;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
@@ -22,7 +23,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
 
-        register(EventHandler.Type.CRAFTING, EventHandler.Type.PICK_UP, EventHandler.Type.OPEN_BOOK);
+        register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
     }
 
     @SideOnly(Side.CLIENT)
@@ -32,7 +33,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
 
     @Override
-    protected void doCompletionCheck(QuestDataTaskItems data, String uuid) {
+    protected void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
@@ -43,9 +44,9 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
 
         if (isDone) {
-            completeTask(uuid);
+            completeTask(playerID);
         }
-        parent.sendUpdatedDataToTeam(uuid);
+        parent.sendUpdatedDataToTeam(playerID);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
 
     @Override
-    public void onOpenBook(EventHandler.BookOpeningEvent event) {
+    public void onOpenBook(EventTrigger.BookOpeningEvent event) {
         if (event.isRealName()) {
             countItems(event.getPlayer(), ItemStack.EMPTY);
         }
@@ -87,12 +88,12 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
             if(!stack.isEmpty()){
                 items.set(items.size() - 1, stack);
             }
-            countItems(items, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
+            countItems(items, (QuestDataTaskItems) getData(player), player.getPersistentID());
         }
     }
 
-    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, String uuid) {
-        if (!parent.isAvailable(uuid)) return;
+    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
+        if (!parent.isAvailable(playerID)) return;
 
 
         boolean updated = false;
@@ -116,7 +117,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
 
 
         if (updated) {
-            doCompletionCheck(data, uuid);
+            doCompletionCheck(data, playerID);
         }
     }
 

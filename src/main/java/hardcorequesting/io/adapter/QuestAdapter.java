@@ -15,12 +15,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class QuestAdapter {
 
@@ -102,10 +100,10 @@ public class QuestAdapter {
     public static Quest QUEST;
     private static Map<String, Quest> nameToQuestMap = new HashMap<>();
     private static List<ReputationBar> reputationBarList = new ArrayList<>();
-    private static Map<Quest, List<String>> requirementMapping = new HashMap<>();
-    private static Map<Quest, List<String>> prerequisiteMapping = new HashMap<>();
-    private static Map<Quest, List<String>> optionMapping = new HashMap<>();
-    private static Map<Quest, List<String>> optionLinkMapping = new HashMap<>();
+    private static Map<Quest, List<UUID>> requirementMapping = new HashMap<>();
+    private static Map<Quest, List<UUID>> prerequisiteMapping = new HashMap<>();
+    private static Map<Quest, List<UUID>> optionMapping = new HashMap<>();
+    private static Map<Quest, List<UUID>> optionLinkMapping = new HashMap<>();
     private static Map<ReputationReward, String> reputationRewardMapping = new HashMap<>();
     private static final TypeAdapter<ReputationReward> REPUTATION_REWARD_ADAPTER = new TypeAdapter<ReputationReward>() {
         private final String REPUTATION = "reputation";
@@ -166,7 +164,7 @@ public class QuestAdapter {
             if (!quests.isEmpty()) {
                 out.name(name).beginArray();
                 for (Quest quest : quests) {
-                    out.value(quest.getId());
+                    out.value(quest.getQuestId().toString());
                 }
                 out.endArray();
             }
@@ -187,7 +185,7 @@ public class QuestAdapter {
         @Override
         public void write(JsonWriter out, Quest value) throws IOException {
             out.beginObject();
-            out.name(UUID).value(value.getId());
+            out.name(UUID).value(value.getQuestId().toString());
             out.name(NAME).value(value.getName());
             if (!value.getDescription().equals("Unnamed quest"))
                 out.name(DESCRIPTION).value(value.getDescription());
@@ -283,7 +281,7 @@ public class QuestAdapter {
             while (in.hasNext()) {
                 switch (in.nextName().toLowerCase()) {
                     case UUID:
-                        QUEST.setId(in.nextString());
+                        QUEST.setId(java.util.UUID.fromString(in.nextString()));
                         hasUuid = true;
                         break;
                     case NAME:
@@ -365,18 +363,16 @@ public class QuestAdapter {
                         QUEST.setCommandRewards(commands.toArray(new String[commands.size()]));
                         break;
                     default:
-                        QuestLine.getActiveQuestLine().quests.remove(QUEST.getId());
+                        QuestLine.getActiveQuestLine().quests.remove(QUEST.getQuestId());
                         return null;
                 }
             }
             in.endObject();
-            if (!QUEST.getId().isEmpty()) {
-                if (!hasUuid)
-                    nameToQuestMap.put(QUEST.getName(), QUEST);
-                optionalAdd(requirementMapping, requirement);
-                optionalAdd(optionMapping, options);
-                optionalAdd(prerequisiteMapping, prerequisites);
-                optionalAdd(optionLinkMapping, optionLinks);
+            if (hasUuid && QUEST.getQuestId() != null) {
+                optionalAdd(requirementMapping, requirement.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
+                optionalAdd(optionMapping, options.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
+                optionalAdd(prerequisiteMapping, prerequisites.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
+                optionalAdd(optionLinkMapping, optionLinks.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 try {
                     if (HardcoreQuesting.getPlayer() != null) {
                         QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
@@ -386,7 +382,7 @@ public class QuestAdapter {
                 }
                 return QUEST;
             }
-            QuestLine.getActiveQuestLine().quests.remove(QUEST.getId());
+            QuestLine.getActiveQuestLine().quests.remove(QUEST.getQuestId());
             return null;
         }
 
@@ -401,7 +397,7 @@ public class QuestAdapter {
 
         private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
-                QuestLine.getActiveQuestLine().quests.remove(quest.getId());
+                QuestLine.getActiveQuestLine().quests.remove(quest.getQuestId());
             }
             return null;
         }
@@ -475,13 +471,13 @@ public class QuestAdapter {
                 for (Quest quest : quests) {
                     quest.setQuestSet(set);
                 }
-                for (Map.Entry<Quest, List<String>> entry : requirementMapping.entrySet()) {
-                    for (String i : entry.getValue())
-                        entry.getKey().addRequirement(getUuid(i));
+                for (Map.Entry<Quest, List<UUID>> entry : requirementMapping.entrySet()) {
+                    for (UUID i : entry.getValue())
+                        entry.getKey().addRequirement(i);
                 }
-                for (Map.Entry<Quest, List<String>> entry : optionMapping.entrySet()) {
-                    for (String i : entry.getValue())
-                        entry.getKey().addOptionLink(getUuid(i));
+                for (Map.Entry<Quest, List<UUID>> entry : optionMapping.entrySet()) {
+                    for (UUID i : entry.getValue())
+                        entry.getKey().addOptionLink(i);
                 }
                 for (ReputationBar reputationBar : reputationBarList) {
                     for (ReputationBar r : new ArrayList<>(set.getReputationBars())) {
@@ -499,19 +495,15 @@ public class QuestAdapter {
     };
 
     public static void postLoad() throws IOException {
-        for (Map.Entry<Quest, List<String>> entry : prerequisiteMapping.entrySet()) {
-            for (String link : entry.getValue()) {
-                Quest quest = getQuest(link);
-                if (quest != null)
-                    entry.getKey().addRequirement(quest.getId());
+        for (Map.Entry<Quest, List<UUID>> entry : prerequisiteMapping.entrySet()) {
+            for (UUID link : entry.getValue()) {
+                entry.getKey().addRequirement(link);
             }
         }
         prerequisiteMapping.clear();
-        for (Map.Entry<Quest, List<String>> entry : optionLinkMapping.entrySet()) {
-            for (String link : entry.getValue()) {
-                Quest quest = getQuest(link);
-                if (quest != null)
-                    entry.getKey().addOptionLink(quest.getId());
+        for (Map.Entry<Quest, List<UUID>> entry : optionLinkMapping.entrySet()) {
+            for (UUID link : entry.getValue()) {
+                    entry.getKey().addOptionLink(link);
             }
         }
         optionLinkMapping.clear();
@@ -537,16 +529,4 @@ public class QuestAdapter {
         nameToQuestMap.clear();
     }
 
-    private static Quest getQuest(String questString) {
-        String questId = questString;
-        Matcher matcher = OTHER_QUEST_SET.matcher(questString);
-        if (matcher.find()) {
-            questId = matcher.group(2);
-        }
-        return Quest.getQuest(getUuid(questId));
-    }
-
-    private static String getUuid(String id) {
-        return nameToQuestMap.containsKey(id) ? nameToQuestMap.get(id).getId() : id;
-    }
 }

@@ -1,5 +1,6 @@
 package hardcorequesting.blocks;
 
+import hardcorequesting.ModInformation;
 import hardcorequesting.crafting.Recipes;
 import hardcorequesting.items.ItemBlockPortal;
 import hardcorequesting.items.ModItems;
@@ -10,6 +11,7 @@ import hardcorequesting.util.RegisterHelper;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModBlocks {
@@ -28,9 +30,9 @@ public class ModBlocks {
     }
 
     public static void registerTileEntities() {
-        GameRegistry.registerTileEntity(TileEntityBarrel.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.ITEMBARREL_TE_KEY);
-        GameRegistry.registerTileEntity(TileEntityTracker.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.QUEST_TRACKER_TE_KEY);
-        GameRegistry.registerTileEntity(TileEntityPortal.class, BlockInfo.TILEENTITY_PREFIX + BlockInfo.QUEST_PORTAL_TE_KEY);
+        GameRegistry.registerTileEntity(TileEntityBarrel.class, new ResourceLocation(ModInformation.ID, BlockInfo.ITEMBARREL_TE_KEY));
+        GameRegistry.registerTileEntity(TileEntityTracker.class, new ResourceLocation(ModInformation.ID, BlockInfo.QUEST_TRACKER_TE_KEY));
+        GameRegistry.registerTileEntity(TileEntityPortal.class, new ResourceLocation(ModInformation.ID, BlockInfo.QUEST_PORTAL_TE_KEY));
     }
 
     public static void registerRecipes() {

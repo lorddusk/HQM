@@ -318,11 +318,11 @@ public class Reputation {
     }
 
     public int getValue(EntityPlayer player) {
-        return getValue(QuestingData.getUserUUID(player));
+        return getValue(player.getPersistentID());
     }
 
-    public int getValue(String uuid) {
-        return QuestingData.getQuestingData(uuid).getTeam().getReputation(this);
+    public int getValue(UUID playerID) {
+        return QuestingData.getQuestingData(playerID).getTeam().getReputation(this);
     }
 
     @SideOnly(Side.CLIENT)

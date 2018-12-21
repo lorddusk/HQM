@@ -11,17 +11,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
-public class EventHandler {
+public class EventTrigger{
 
-    private static EventHandler instance;
+    private static EventTrigger instance;
     private List<QuestTask>[] registeredTasks;
 
-    public EventHandler() {
+    public EventTrigger() {
         registeredTasks = new List[Type.values().length];
         for (int i = 0; i < registeredTasks.length; i++) {
             registeredTasks[i] = new CopyOnWriteArrayList<>();
@@ -30,7 +29,7 @@ public class EventHandler {
         instance = this;
     }
 
-    public static EventHandler instance() {
+    public static EventTrigger instance() {
         return instance;
     }
 

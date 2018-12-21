@@ -2,7 +2,7 @@ package hardcorequesting.quests.task;
 
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskDeath;
@@ -13,6 +13,8 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.UUID;
+
 
 public class QuestTaskDeath extends QuestTask {
 
@@ -22,7 +24,7 @@ public class QuestTaskDeath extends QuestTask {
     public QuestTaskDeath(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
 
-        register(EventHandler.Type.DEATH);
+        register(EventTrigger.Type.DEATH);
     }
 
     @Override
@@ -49,22 +51,22 @@ public class QuestTaskDeath extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
-        return (float) ((QuestDataTaskDeath) getData(uuid)).deaths / deaths;
+    public float getCompletedRatio(UUID playerID) {
+        return (float) ((QuestDataTaskDeath) getData(playerID)).deaths / deaths;
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         ((QuestDataTaskDeath) own).deaths = Math.max(((QuestDataTaskDeath) own).deaths, ((QuestDataTaskDeath) other).deaths);
 
         if (((QuestDataTaskDeath) own).deaths == deaths) {
-            completeTask(uuid);
+            completeTask(playerID);
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        deaths = ((QuestDataTaskDeath) getData(uuid)).deaths;
+    public void autoComplete(UUID playerID) {
+        deaths = ((QuestDataTaskDeath) getData(playerID)).deaths;
     }
 
     @Override

@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.gson.annotations.SerializedName;
+import hardcorequesting.HardcoreQuesting;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Level;
 
 import com.mojang.authlib.GameProfile;
@@ -55,42 +58,42 @@ public class QuestingData {
     public static boolean autoQuestActivate;
     private static boolean hardcoreActive;
     private static boolean questActive;
-    private static HashMap<String, QuestingData> data = new HashMap<>();
+    private static HashMap<UUID, QuestingData> data = new HashMap<>();
     private static List<Team> teams = new ArrayList<>();
-    public String selectedQuest = null;
+    public UUID selectedQuestId = null;
     public int selectedTask = -1;
     public boolean playedLore;
     public boolean receivedBook;
     private Team team;
     private int lives;
-    private String uuid;
+    private UUID playerId;
     private String name;
-    private Map<String, GroupData> groupData;
+    private Map<UUID, GroupData> groupData;
     private DeathStats deathStat;
 
-    private QuestingData(String uuid) {
+    private QuestingData(UUID playerId) {
         this.lives = defaultLives;
-        this.uuid = uuid;
-        this.team = new Team(uuid);
+        this.playerId = playerId;
+        this.team = new Team(playerId);
         createGroupData();
-        deathStat = new DeathStats(uuid);
-        data.put(uuid, this);
+        deathStat = new DeathStats(playerId);
+        data.put(playerId, this);
     }
 
-    public QuestingData(String uuid, int lives, int teamId, Map<String, GroupData> groupData, DeathStats deathStat) {
-        this.uuid = uuid;
+    public QuestingData(UUID playerId, int lives, int teamId, Map<UUID, GroupData> groupData, DeathStats deathStat) {
+        this.playerId = playerId;
         this.lives = lives;
         if (teamId > -1 && teamId < QuestingData.getTeams().size())
             this.team = QuestingData.getTeams().get(teamId);
-        if (team == null) team = new Team(uuid);
+        if (team == null) team = new Team(playerId);
         createGroupData();
         this.groupData.putAll(groupData);
-        if (deathStat == null) this.deathStat = new DeathStats(uuid);
+        if (deathStat == null) this.deathStat = new DeathStats(playerId);
         else this.deathStat = deathStat;
-        data.put(uuid, this);
+        data.put(playerId, this);
     }
 
-    public static HashMap<String, QuestingData> getData() {
+    public static HashMap<UUID, QuestingData> getData() {
         return data;
     }
 
@@ -108,8 +111,20 @@ public class QuestingData {
     }
 
     public static void activateHardcore() {
-        if (!hardcoreActive && !FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo().isHardcoreModeEnabled()) {
-            hardcoreActive = true;
+        WorldInfo worldInfo = null;
+        try{
+            if(HardcoreQuesting.loadingSide.isServer()){
+                worldInfo = FMLCommonHandler.instance().getMinecraftServerInstance().getEntityWorld().getWorldInfo();
+            } else {
+                worldInfo = Minecraft.getMinecraft().world.getWorldInfo();
+            }
+        } catch(Exception e){
+            e.printStackTrace(); // todo exception handling
+        }
+        if(worldInfo != null){
+            if(!hardcoreActive && !worldInfo.isHardcoreModeEnabled()){
+                hardcoreActive = true;
+            }
         }
     }
 
@@ -147,7 +162,7 @@ public class QuestingData {
         try {
             SaveHandler.saveQuestingState(SaveHandler.getLocalFile("state"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save questing state");
+            HardcoreQuesting.LOG.error("Failed to save questing state!", e);
         }
     }
 
@@ -155,7 +170,7 @@ public class QuestingData {
         try {
             SaveHandler.loadQuestingState(SaveHandler.getFile("state", remote));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+            HardcoreQuesting.LOG.error("Failed to load questing state!", e);
         }
     }
 
@@ -163,7 +178,7 @@ public class QuestingData {
         try {
             SaveHandler.saveQuestingData(SaveHandler.getLocalFile("data"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save questing data");
+            HardcoreQuesting.LOG.error("Failed to save questing data!", e);
         }
     }
 
@@ -174,9 +189,9 @@ public class QuestingData {
     public static void loadQuestingData(boolean remote) {
         try {
             data.clear();
-            SaveHandler.loadQuestingData(SaveHandler.getFile("data", remote)).forEach(qData -> data.put(qData.getUuid(), qData));
+            SaveHandler.loadQuestingData(SaveHandler.getFile("data", remote)).forEach(qData -> data.put(qData.getPlayerId(), qData));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing data");
+            HardcoreQuesting.LOG.error("Failed to load questing data!", e);
         }
     }
 
@@ -191,29 +206,11 @@ public class QuestingData {
         return all;
     }
 
-   /* public static boolean isDebugActive() {
-        return debugActive;
-    }*/
-
     public static QuestingData getQuestingData(EntityPlayer player) {
-        return getQuestingData(getUserUUID(player));
+        return getQuestingData(player.getPersistentID());
     }
 
-    public static String getUserUUID(EntityPlayer player) {
-        return player.getPersistentID().toString();
-    }
-
-    /*public static void activateDebug() {
-        if(!debugActive)
-            debugActive = true;
-    }
-
-    public static void deactivateDebug() {
-        if(debugActive)
-            debugActive = false;
-    }*/
-
-    public static QuestingData getQuestingData(String uuid) {
+    public static QuestingData getQuestingData(UUID uuid) {
         if (!data.containsKey(uuid))
             data.put(uuid, new QuestingData(uuid));
 
@@ -236,7 +233,7 @@ public class QuestingData {
     }
 
     public static void spawnBook(EntityPlayer player) {
-        if (!Quest.isEditing && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
+        if (!Quest.canQuestsBeEdited(player) && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
             NBTTagCompound hqmTag = new NBTTagCompound();
             if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
@@ -279,18 +276,14 @@ public class QuestingData {
     }
 
     public static void remove(EntityPlayer player) {
-        data.remove(getUserUUID(player));
+        data.remove(player.getPersistentID());
     }
 
     public static boolean hasData(EntityPlayer player) {
-        return data.containsKey(player.getGameProfile().getId().toString());
+        return data.containsKey(player.getGameProfile().getId());
     }
 
     public static boolean hasData(UUID uuid) {
-        return data.containsKey(uuid.toString());
-    }
-
-    public static boolean hasData(String uuid) {
         return data.containsKey(uuid);
     }
 
@@ -298,25 +291,21 @@ public class QuestingData {
         return deathStat;
     }
 
-    public String getUuid() {
-        return uuid;
+    public UUID getPlayerId() {
+        return playerId;
     }
 
-    public String getName() {
-        if (name == null) {
-            try { // possible fix for #238
-                EntityPlayer player = QuestingData.getPlayer(uuid);
-                if (player != null) {
-                    name = player.getDisplayNameString();
-                } else {
-                    name = "";
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-                return uuid != null ? uuid : "";
+    public String getName() throws IllegalArgumentException{
+        if (this.name == null) {
+            // possible fix for #238
+            EntityPlayer player = QuestingData.getPlayer(this.playerId);
+            if (player != null) {
+                this.name = player.getDisplayNameString();
+            } else {
+                this.name = "";
             }
         }
-        return name;
+        return this.name;
     }
 
     private void createGroupData() {
@@ -324,8 +313,8 @@ public class QuestingData {
         Group.getGroups().keySet().forEach(this::createGroupData);
     }
 
-    private void createGroupData(String id) {
-        groupData.put(id, new GroupData());
+    private void createGroupData(UUID groupId) {
+        groupData.put(groupId, new GroupData());
     }
 
     public int getLives() {
@@ -346,18 +335,18 @@ public class QuestingData {
         this.lives = lives;
     }
 
-    public QuestData getQuestData(String id) {
-        return getTeam().getQuestData(id);
+    public QuestData getQuestData(UUID questId) {
+        return getTeam().getQuestData(questId);
     }
 
-    public void setQuestData(String id, QuestData data) {
-        getTeam().setQuestData(id, data);
+    public void setQuestData(UUID questId, QuestData data) {
+        getTeam().setQuestData(questId, data);
     }
 
-    public GroupData getGroupData(String id) {
-        if (!groupData.containsKey(id))
-            createGroupData(id);
-        return groupData.get(id);
+    public GroupData getGroupData(UUID groupId) {
+        if (!groupData.containsKey(groupId))
+            createGroupData(groupId);
+        return groupData.get(groupId);
     }
 
     public int addLives(EntityPlayer player, int amount) {
@@ -381,11 +370,11 @@ public class QuestingData {
         }
         if (getTeam().isSharingLives()) {
             for (PlayerEntry entry : getTeam().getPlayers()) {
-                if (entry.isInTeam() && !entry.getUUID().equals(getUserUUID(player))) {
+                if (entry.isInTeam() && !entry.getUUID().equals(player.getPersistentID())) {
                     EntityPlayer other = getPlayer(entry.getUUID());
                     if (other != null) {
                         other.sendMessage(new TextComponentString(
-                                Translator.translate(getLives() != 1, "hqm.message.lostTeamLife", getUserUUID(player), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
+                                Translator.translate(getLives() != 1, "hqm.message.lostTeamLife", player.getDisplayNameString(), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
                     }
                 }
             }
@@ -404,7 +393,7 @@ public class QuestingData {
             while (amount > 0) {
                 int players = 0;
                 for (PlayerEntry entry : QuestingData.getQuestingData(player).getTeam().getPlayers()) {
-                    if (!entry.getUUID().equals(getUserUUID(player)) && QuestingData.getQuestingData(entry.getUUID()).getRawLives() > 1) {
+                    if (!entry.getUUID().equals(player.getPersistentID()) && QuestingData.getQuestingData(entry.getUUID()).getRawLives() > 1) {
                         players++;
                     }
                 }
@@ -413,7 +402,7 @@ public class QuestingData {
                 } else {
                     int id = (int) (Math.random() * players);
                     for (PlayerEntry entry : QuestingData.getQuestingData(player).getTeam().getPlayers()) {
-                        if (!entry.getUUID().equals(getUserUUID(player)) && QuestingData.getQuestingData(entry.getUUID()).getRawLives() > 1) {
+                        if (!entry.getUUID().equals(player.getPersistentID()) && QuestingData.getQuestingData(entry.getUUID()).getRawLives() > 1) {
                             if (id == 0) {
                                 QuestingData.getQuestingData(entry.getUUID()).lives--;
                                 amount--;
@@ -431,7 +420,7 @@ public class QuestingData {
         }
 
         if (player instanceof EntityPlayerMP) {
-            NetworkManager.sendToPlayer(new LivesUpdate(this.uuid, this.lives), (EntityPlayerMP) player);
+            NetworkManager.sendToPlayer(new LivesUpdate(this.playerId, this.lives), (EntityPlayerMP) player);
         }
         getTeam().refreshTeamLives();
         try {
@@ -455,14 +444,14 @@ public class QuestingData {
     /**
      * Deletes the world or bans the player from the server. This is handled on the server side
      *
-     * @param playerEntity The player that should be banned
+     * @param player The player that should be banned
      */
     //todo reinspect this whole behaviour
-    private void outOfLives(EntityPlayer playerEntity) {
-        QuestingData data = QuestingData.getQuestingData(playerEntity);
+    private void outOfLives(EntityPlayer player) {
+        QuestingData data = QuestingData.getQuestingData(player);
         Team team = data.getTeam();
         if (!team.isSingle() && !teams.isEmpty()) {
-            team.removePlayer(QuestingData.getUserUUID(playerEntity));
+            team.removePlayer(player.getPersistentID());
             if (team.getPlayerCount() == 0) {
                 team.deleteTeam();
             } else {
@@ -470,12 +459,12 @@ public class QuestingData {
             }
         }
 
-        playerEntity.inventory.clear(); //had some problem with tconstruct, clear all items to prevent it
+        player.inventory.clear(); //had some problem with tconstruct, clear all items to prevent it
 
-        MinecraftServer mcServer = playerEntity.getServer();
+        MinecraftServer mcServer = player.getServer();
 
-        if (mcServer.isSinglePlayer() && playerEntity.getName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
+        if (mcServer.isSinglePlayer() && player.getName().equals(mcServer.getServerOwner())) {
+            ((EntityPlayerMP) player).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
 
             /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
             mcServer.getActiveAnvilConverter().flushCache();
@@ -492,11 +481,11 @@ public class QuestingData {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";
 
-            UserListBansEntry userlistbansentry = new UserListBansEntry(playerEntity.getGameProfile(), (Date) null, setBannedBy, (Date) null, setBanReason);
+            UserListBansEntry userlistbansentry = new UserListBansEntry(player.getGameProfile(), (Date) null, setBannedBy, (Date) null, setBanReason);
             mcServer.getPlayerList().getBannedPlayers().addEntry(userlistbansentry);
 
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((EntityPlayerMP) playerEntity).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
+            ((EntityPlayerMP) player).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
         }
 
@@ -516,12 +505,12 @@ public class QuestingData {
 
     public void setTeam(@Nullable Team team) {
         if(team == null){
-            team = new Team(this.uuid);
+            team = new Team(this.playerId);
         }
         this.team = team;
     }
 
-    public Map<String, GroupData> getGroupData() {
+    public Map<UUID, GroupData> getGroupData() {
         return groupData;
     }
 }

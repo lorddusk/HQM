@@ -64,7 +64,7 @@ public class ItemQuestBook extends Item {
                         if (QuestingData.hasData(uuid) && CommandHandler.isOwnerOrOp(player)) {
                             EntityPlayer subject = QuestingData.getPlayer(uuid);
                             if (subject instanceof EntityPlayerMP) {
-                                QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID().toString()).setBookOpen(true);
+                                QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID()).setBookOpen(true);
                                 NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.TRUE.toString()), (EntityPlayerMP) subject);
                             }
                             //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
@@ -73,7 +73,7 @@ public class ItemQuestBook extends Item {
                         }
                     }
                 } else {
-                    QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID().toString()).setBookOpen(true);
+                    QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID()).setBookOpen(true);
                     NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.FALSE.toString()), (EntityPlayerMP) player);
                 }
             }

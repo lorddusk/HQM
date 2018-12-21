@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestLine {
@@ -39,9 +40,9 @@ public class QuestLine {
     private static QuestLine world;
     private static boolean hasLoadedMainSound;
     public final List<GroupTier> tiers = new ArrayList<>();
-    public final Map<String, Group> groups = new ConcurrentHashMap<>();
+    public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
     public List<QuestSet> questSets;
-    public Map<String, Quest> quests;
+    public Map<UUID, Quest> quests;
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
     public String mainPath;
@@ -56,7 +57,8 @@ public class QuestLine {
         return server != null ? server : world != null ? world : config;
     }
 
-    public static void receiveServerSync(boolean local, boolean remote) {
+    // client side only
+    public static void receiveServerSync(EntityPlayer receiver, boolean local, boolean remote) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
@@ -80,16 +82,11 @@ public class QuestLine {
 
     public static void sendServerSync(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
-            EntityPlayerMP playerMP = (EntityPlayerMP) player;
-            boolean side = HardcoreQuesting.loadingSide.isServer();
-            if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
-                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
-            else {
-                if (QuestLine.doServerSync) // Send actual data to player on server sync
-                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(), playerMP);
-                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, side, player), playerMP);
+            if(QuestLine.doServerSync){
+                NetworkManager.sendToPlayer(new QuestLineSyncMessage(), (EntityPlayerMP) player);
             }
-            NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
+            NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, true, player), (EntityPlayerMP) player);
+            NetworkManager.sendToPlayer(new DeathStatsMessage(false), (EntityPlayerMP) player);
         }
     }
 

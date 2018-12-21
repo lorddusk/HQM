@@ -9,13 +9,15 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.UUID;
+
 public class QuestTaskItemsConsume extends QuestTaskItems {
 
     public QuestTaskItemsConsume(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
 
-    public boolean increaseFluid(FluidStack fluidStack, QuestDataTaskItems data, String uuid) {
+    public boolean increaseFluid(FluidStack fluidStack, QuestDataTaskItems data, UUID playerId) {
         boolean updated = false;
 
         for (int i = 0; i < items.length; i++) {
@@ -36,7 +38,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
 
 
         if (updated) {
-            doCompletionCheck(data, uuid);
+            doCompletionCheck(data, playerId);
         }
 
         return updated;
@@ -44,7 +46,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
 
     @Override
     public void onUpdate(EntityPlayer player) {
-        if (increaseItems(player.inventory.mainInventory, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player))) {
+        if (increaseItems(player.inventory.mainInventory, (QuestDataTaskItems) getData(player), player.getPersistentID())) {
             player.inventory.markDirty();
         }
     }

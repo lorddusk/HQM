@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class BagAdapter {
 
@@ -24,7 +25,7 @@ public class BagAdapter {
         @Override
         public void write(JsonWriter out, Group value) throws IOException {
             out.beginObject();
-            out.name(ID).value(value.getId());
+            out.name(ID).value(value.getId().toString());
             if (value.hasName())
                 out.name(NAME).value(value.getName());
             out.name(LIMIT).value(value.getLimit());
@@ -65,7 +66,7 @@ public class BagAdapter {
                 }
             }
             in.endObject();
-            Group group = new Group(id);
+            Group group = new Group(UUID.fromString(id));
             group.setName(name);
             group.setLimit(limit);
             group.getItems().addAll(items);

@@ -11,6 +11,8 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -76,16 +78,20 @@ public class PlayerDataSyncMessage implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {
-
+        
+        @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PlayerDataSyncMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
             return null;
         }
-
+    
+        @SideOnly(Side.CLIENT)
         private void handle(PlayerDataSyncMessage message, MessageContext ctx) {
+            /* Why copying our files if we get all quests from the server anyway? It could lead to wrong questlines
             if (!QuestLine.doServerSync) // Copy defaults when server sync is off
                 SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), SaveHandler.getRemoteFolder());
+                */
             try {
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("teams"))) {
                     out.print("[");
@@ -103,7 +109,7 @@ public class PlayerDataSyncMessage implements IMessage {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            QuestLine.receiveServerSync(message.local, message.serverWorld);
+            QuestLine.receiveServerSync(Minecraft.getMinecraft().player, message.local, message.serverWorld);
         }
     }
 }

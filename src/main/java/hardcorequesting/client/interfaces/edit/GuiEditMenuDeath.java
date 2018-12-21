@@ -6,12 +6,13 @@ import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.death.DeathType;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.UUID;
 
 @SideOnly(Side.CLIENT)
 public class GuiEditMenuDeath extends GuiEditMenu {
@@ -43,7 +44,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private static final int LABEL_Y = 210;
     private static final int VISIBLE_PLAYERS = 10;
     private static final float[] DIGIT_TEXT_SIZE = {1F, 1F, 0.8F, 0.6F, 0.4F};
-    private String selectedUuid;
+    private UUID playerId;
     private boolean showTotal;
     private boolean showBest;
     private ScrollBar scrollBar;
@@ -51,7 +52,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, EntityPlayer player) {
         super(guiQuestBook, player);
 
-        selectedUuid = QuestingData.getUserUUID(player);
+        playerId = player.getPersistentID();
 
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
@@ -73,7 +74,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         for (int i = start; i < end; i++) {
             DeathStats stats = deathStats[i];
 
-            boolean selected = stats.getUuid().equals(selectedUuid);
+            boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
             gui.drawString((i + 1) + ". " + stats.getName(), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
@@ -146,11 +147,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translate(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
-            selectedUuid = null;
+            playerId = null;
         } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
-            selectedUuid = null;
+            playerId = null;
         } else {
             showBest = showTotal = false;
             DeathStats[] deathStats = DeathStats.getDeathStats();
@@ -160,10 +161,10 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 DeathStats stats = deathStats[i];
 
                 if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
-                    if (stats.getUuid().equals(selectedUuid)) {
-                        selectedUuid = null;
+                    if (stats.getUuid().equals(playerId)) {
+                        playerId = null;
                     } else {
-                        selectedUuid = stats.getUuid();
+                        playerId = stats.getUuid();
                     }
                 }
             }
@@ -195,8 +196,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             return DeathStats.getBest();
         } else if (showTotal) {
             return DeathStats.getTotal();
-        } else if (selectedUuid != null) {
-            return DeathStats.getDeathStats(selectedUuid);
+        } else if (playerId != null) {
+            return DeathStats.getDeathStats(playerId);
         } else {
             return null;
         }

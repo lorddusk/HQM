@@ -23,24 +23,28 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlockPortal extends BlockContainer {
 
     public BlockPortal() {
         super(Material.WOOD);
-        setRegistryName(BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
-        setCreativeTab(HardcoreQuesting.HQMTab);
-        setHardness(10f);
+        this.setRegistryName(BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
+        this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setHardness(10f);
     }
 
+    @Nullable
     @Override
-    public TileEntity createNewTileEntity(World world, int i) {
+    public TileEntity createNewTileEntity(@Nonnull World world, int i) {
         return new TileEntityPortal();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entity, boolean b) {
+    public void addCollisionBoxToList(IBlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull AxisAlignedBB entityBox, @Nonnull List<AxisAlignedBB> collidingBoxes, Entity entity, boolean b) {
         TileEntity te = world.getTileEntity(pos);
         if (entity instanceof EntityPlayer && te instanceof TileEntityPortal && !((TileEntityPortal) te).hasCollision((EntityPlayer) entity))
             return;
@@ -49,11 +53,11 @@ public class BlockPortal extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (player != null && Quest.isEditing) {
+        if (player != null && Quest.canQuestsBeEdited(player)) {
             if (!player.inventory.getCurrentItem().isEmpty() && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
-                    if (tile != null && tile instanceof TileEntityPortal) {
+                    if (tile instanceof TileEntityPortal) {
                         ((TileEntityPortal) tile).setCurrentQuest();
                         if (((TileEntityPortal) tile).getCurrentQuest() != null)
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_portal_0.bindTo", ((TileEntityPortal) tile).getCurrentQuest().getName()));
@@ -65,7 +69,7 @@ public class BlockPortal extends BlockContainer {
             } else {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
-                    if (tile != null && tile instanceof TileEntityPortal)
+                    if (tile instanceof TileEntityPortal)
                         ((TileEntityPortal) tile).openInterface(player);
                 }
                 return true;
@@ -77,17 +81,18 @@ public class BlockPortal extends BlockContainer {
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entity, ItemStack stack) {
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileEntityPortal) {
+        if (te instanceof TileEntityPortal) {
             TileEntityPortal manager = (TileEntityPortal) te;
             if (stack.hasTagCompound() && stack.getTagCompound().hasKey("Portal", Constants.NBT.TAG_COMPOUND))
                 manager.readContentFromNBT(stack.getTagCompound().getCompoundTag("Portal"));
         }
     }
 
+    @Nonnull
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(@Nonnull IBlockState state, RayTraceResult target, @Nonnull World world, @Nonnull BlockPos pos, EntityPlayer player) {
         TileEntity te = world.getTileEntity(pos);
-        if (te != null && te instanceof TileEntityPortal) {
+        if (te instanceof TileEntityPortal) {
             TileEntityPortal portal = (TileEntityPortal) te;
             ItemStack stack = super.getPickBlock(state, target, world, pos, player);
             if (!stack.isEmpty()) {
@@ -103,9 +108,11 @@ public class BlockPortal extends BlockContainer {
             }
             return stack;
         }
-        return null;
+        return ItemStack.EMPTY;
     }
 
+    @SuppressWarnings("deprecation")
+    @Nonnull
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;

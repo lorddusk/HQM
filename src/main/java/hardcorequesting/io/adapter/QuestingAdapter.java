@@ -12,99 +12,102 @@ import hardcorequesting.team.Team;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class QuestingAdapter {
-
-    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>() {
-        public static final String TEAM = "team";
-        public static final String LIVES = "lives";
-        public static final String UUID = "uuid";
-        public static final String NAME = "name";
-        public static final String GROUP_DATA = "groupData";
-        public static final String SELECTED_QUEST = "selectedQuest";
-        public static final String PLAYER_LORE = "playedLore";
-        public static final String RECEIVED_BOOK = "receivedBook";
-        public static final String DEATHS = "deaths";
-
+public class QuestingAdapter{
+    
+    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>(){
+        public static final String KEY_TEAM = "team";
+        public static final String KEY_LIVES = "lives";
+        public static final String KEY_UUID = "uuid";
+        public static final String KEY_NAME = "name";
+        public static final String KEY_GROUP_DATA = "groupData";
+        public static final String KEY_SELECTED_QUEST = "selectedQuest";
+        public static final String KEY_PLAYER_LORE = "playedLore";
+        public static final String KEY_RECEIVED_BOOK = "receivedBook";
+        public static final String KEY_DEATHS = "deaths";
+        
         @Override
-        public void write(JsonWriter out, QuestingData value) throws IOException {
+        public void write(JsonWriter out, QuestingData value) throws IOException{
             out.beginObject();
-            out.name(UUID).value(value.getUuid());
-            out.name(NAME).value(value.getName());
-            out.name(LIVES).value(value.getRawLives());
-            out.name(TEAM);
-            if (value.getTeam().getId() == -1)
+            out.name(KEY_UUID).value(value.getPlayerId().toString());
+            out.name(KEY_NAME).value(value.getName());
+            out.name(KEY_LIVES).value(value.getRawLives());
+            out.name(KEY_TEAM);
+            if(value.getTeam().getId() == -1)
                 TeamAdapter.TEAM_ADAPTER.write(out, value.getTeam());
             else
                 out.value(value.getTeam().getId());
-            out.name(SELECTED_QUEST).value(value.selectedQuest);
-            out.name(PLAYER_LORE).value(value.playedLore);
-            out.name(RECEIVED_BOOK).value(value.receivedBook);
-            out.name(GROUP_DATA).beginObject();
-            for (Map.Entry<String, GroupData> entry : value.getGroupData().entrySet())
-                if (entry.getKey() != null)
-                    out.name(entry.getKey()).value(entry.getValue().retrieved);
+            out.name(KEY_SELECTED_QUEST).value(value.selectedQuestId != null ? value.selectedQuestId.toString() : null);
+            out.name(KEY_PLAYER_LORE).value(value.playedLore);
+            out.name(KEY_RECEIVED_BOOK).value(value.receivedBook);
+            out.name(KEY_GROUP_DATA).beginObject();
+            for(Map.Entry<UUID, GroupData> entry : value.getGroupData().entrySet())
+                if(entry.getKey() != null)
+                    out.name(entry.getKey().toString()).value(entry.getValue().retrieved);
             out.endObject();
-            out.name(DEATHS);
+            out.name(KEY_DEATHS);
             DeathAdapter.DEATH_STATS_ADAPTER.write(out, value.getDeathStat());
             out.endObject();
         }
-
+        
         @Override
-        public QuestingData read(JsonReader in) throws IOException {
+        public QuestingData read(JsonReader in) throws IOException{
             boolean playerLore = false, receivedBook = false;
             String uuid = null, selectedQuest = null;
             int lives = 0, teamId = -1;
             Team team = null;
-            Map<String, GroupData> data = new HashMap<>();
+            Map<UUID, GroupData> data = new HashMap<>();
             DeathStats deathStats = null;
-
+            
             in.beginObject();
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case UUID:
+            while(in.hasNext()){
+                switch(in.nextName()){
+                    case KEY_UUID:
                         uuid = in.nextString();
                         break;
-                    case NAME:
+                    case KEY_NAME:
                         in.nextString();
                         break;
-                    case LIVES:
+                    case KEY_LIVES:
                         lives = in.nextInt();
                         break;
-                    case TEAM:
-                        if (in.peek() == JsonToken.NUMBER)
+                    case KEY_TEAM:
+                        if(in.peek() == JsonToken.NUMBER)
                             teamId = in.nextInt();
                         else
                             team = TeamAdapter.TEAM_ADAPTER.read(in);
                         break;
-                    case SELECTED_QUEST:
+                    case KEY_SELECTED_QUEST:
                         selectedQuest = in.nextString();
                         break;
-                    case PLAYER_LORE:
+                    case KEY_PLAYER_LORE:
                         playerLore = in.nextBoolean();
                         break;
-                    case RECEIVED_BOOK:
+                    case KEY_RECEIVED_BOOK:
                         receivedBook = in.nextBoolean();
                         break;
-                    case GROUP_DATA:
+                    case KEY_GROUP_DATA:
                         in.beginObject();
-                        while (in.hasNext())
-                            data.put(in.nextName(), new GroupData(in.nextInt()));
+                        while(in.hasNext())
+                            data.put(UUID.fromString(in.nextName()), new GroupData(in.nextInt()));
                         in.endObject();
                         break;
-                    case DEATHS:
+                    case KEY_DEATHS:
                         deathStats = DeathAdapter.DEATH_STATS_ADAPTER.read(in);
                     default:
                         break;
                 }
             }
             in.endObject();
-
-            QuestingData questingData = new QuestingData(uuid, lives, teamId, data, deathStats);
+            
+            QuestingData questingData = new QuestingData(UUID.fromString(uuid), lives, teamId, data, deathStats);
             questingData.playedLore = playerLore;
             questingData.receivedBook = receivedBook;
-            questingData.selectedQuest = selectedQuest;
-            if (teamId == -1)
+            if(selectedQuest != null){
+                questingData.selectedQuestId = UUID.fromString(selectedQuest);
+            }
+            if(teamId == -1)
                 questingData.setTeam(team);
             return questingData;
         }

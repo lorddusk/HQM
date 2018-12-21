@@ -1,5 +1,6 @@
 package hardcorequesting.team;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
@@ -10,11 +11,12 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,14 +29,14 @@ public class Team {
     private List<Team> invites;
     private String name;
     private Map<String, Integer> reputation;
-    private Map<String, QuestData> questData;
+    private Map<UUID, QuestData> questData;
     private int clientTeamLives = -1;
     private RewardSetting rewardSetting = RewardSetting.getDefault();
     private LifeSetting lifeSetting = LifeSetting.SHARE;
 
-    public Team(String playerUuid) {
-        if (playerUuid != null)
-            players.add(new PlayerEntry(playerUuid, true, true));
+    public Team(UUID uuid) {
+        if (uuid != null)
+            players.add(new PlayerEntry(uuid, true, true));
         createQuestData();
         createReputation();
         this.invites = new ArrayList<>();
@@ -52,7 +54,7 @@ public class Team {
             if (isClient)
                 TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Can't load teams");
+            HardcoreQuesting.LOG.error("Can't load teams!", e);
         }
     }
 
@@ -60,15 +62,15 @@ public class Team {
         try {
             SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving teams");
+            HardcoreQuesting.LOG.error("Saving teams failed!", e);
         }
     }
 
-    public static void declineAll(String playerName) {
+    public static void declineAll(UUID playerID) {
         for (Team team : QuestingData.getTeams()) {
             for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
                 PlayerEntry playerEntry = iterator.next();
-                if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerName)) {
+                if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerID)) {
                     iterator.remove();
                     team.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
                     break;
@@ -78,11 +80,11 @@ public class Team {
     }
 
     public void resetProgress(Quest quest) {
-        questData.put(quest.getId(), Quest.getQuest(quest.getId()).createData(getPlayerCount()));
+        questData.put(quest.getQuestId(), Quest.getQuest(quest.getQuestId()).createData(getPlayerCount()));
         refreshData();
     }
 
-    public Map<String, QuestData> getQuestData() {
+    public Map<UUID, QuestData> getQuestData() {
         return this.questData;
     }
 
@@ -162,16 +164,16 @@ public class Team {
     }
 
     public void removePlayer(EntityPlayer player) {
-        removePlayer(QuestingData.getUserUUID(player));
+        removePlayer(player.getPersistentID());
     }
 
-    public void removePlayer(String uuid) {
+    public void removePlayer(UUID uuid) {
         int id = 0;
         for (PlayerEntry player : players) {
             if (player.isInTeam()) {
                 if (player.getUUID().equals(uuid)) {
                     Team leaveTeam = new Team(uuid);
-                    for (String i : questData.keySet()) {
+                    for (UUID i : questData.keySet()) {
                         QuestData leaveData = leaveTeam.questData.get(i);
                         QuestData data = questData.get(i);
                         if (data != null) {
@@ -191,7 +193,7 @@ public class Team {
 
                     players.remove(id);
 
-                    for (String i : questData.keySet()) {
+                    for (UUID i : questData.keySet()) {
                         QuestData leaveData = leaveTeam.questData.get(i);
                         QuestData data = questData.get(i);
                         if (data != null && Quest.getQuest(i) != null) {
@@ -261,8 +263,8 @@ public class Team {
         createQuestData();
         int playerCount = getPlayerCount();
         for (Quest quest : Quest.getQuests().values()) {
-            if (quest != null && questData.get(quest.getId()) != null) {
-                quest.initRewards(playerCount, questData.get(quest.getId()));
+            if (quest != null && questData.get(quest.getQuestId()) != null) {
+                quest.initRewards(playerCount, questData.get(quest.getQuestId()));
             }
         }
         refreshData();
@@ -291,7 +293,7 @@ public class Team {
         //refresh all clients with open books
         for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
             Team team = QuestingData.getQuestingData(player).getTeam();
-            PlayerEntry entry = team.getEntry(player.getUniqueID().toString());
+            PlayerEntry entry = team.getEntry(player.getUniqueID());
             if (entry != null) {
                 team.refreshTeamData(entry, TeamUpdateSize.ALL);
             }
@@ -322,8 +324,8 @@ public class Team {
         NetworkManager.sendToServer(new TeamMessage(TeamAction.DECLINE, "" + id));
     }
 
-    public void kick(String name) {
-        NetworkManager.sendToServer(new TeamMessage(TeamAction.KICK, name));
+    public void kick(UUID playerID) {
+        NetworkManager.sendToServer(new TeamMessage(TeamAction.KICK, playerID.toString()));
     }
 
     public void leave() {
@@ -342,22 +344,22 @@ public class Team {
         NetworkManager.sendToServer(new TeamMessage(TeamAction.NEXT_REWARD_SETTING, ""));
     }
 
-    public boolean isOwner(EntityPlayer player) {
-        return isOwner(QuestingData.getUserUUID(player));
+    public boolean isOwner(@Nonnull EntityPlayer player) {
+        return isOwner(player.getPersistentID());
     }
 
-    public boolean isOwner(String uuid) {
+    public boolean isOwner(@Nullable UUID uuid) {
         PlayerEntry entry = getEntry(uuid);
         return entry != null && entry.isOwner();
     }
 
-    public PlayerEntry getEntry(String uuid) {
+    @Nullable
+    public PlayerEntry getEntry(@Nullable UUID uuid) {
         for (PlayerEntry playerEntry : getPlayers()) {
             if (playerEntry.getUUID().equals(uuid)) {
                 return playerEntry;
             }
         }
-
         return null;
     }
 
@@ -393,19 +395,19 @@ public class Team {
         Quest.getQuests().keySet().forEach(this::createQuestData);
     }
 
-    private void createQuestData(String id) {
-        questData.put(id, Quest.getQuest(id).createData(1));
+    private void createQuestData(UUID questId) {
+        this.questData.put(questId, Quest.getQuest(questId).createData(1));
     }
 
-    public QuestData getQuestData(String id) {
-        if (!questData.containsKey(id)) {
-            createQuestData(id);
+    public QuestData getQuestData(UUID questId) {
+        if (!this.questData.containsKey(questId)) {
+            createQuestData(questId);
         }
-        return questData.get(id);
+        return this.questData.get(questId);
     }
 
-    public void setQuestData(String id, QuestData data) {
-        questData.put(id, data);
+    public void setQuestData(UUID questId, QuestData data) {
+        questData.put(questId, data);
     }
 
     public boolean isSingle() {

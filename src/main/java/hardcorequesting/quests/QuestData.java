@@ -37,7 +37,7 @@ public class QuestData {
         int id = 0;
         for (PlayerEntry entry : team.getPlayers()) {
             if (entry.isInTeam()) {
-                if (entry.getUUID().equals(QuestingData.getUserUUID(player))) {
+                if (entry.getUUID().equals(player.getPersistentID())) {
                     return id;
                 }
                 id++;

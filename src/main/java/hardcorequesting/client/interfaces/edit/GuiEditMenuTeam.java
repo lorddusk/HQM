@@ -495,7 +495,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
 
     private PlayerEntry getEntry(Team team) {
-        return team.getEntry(QuestingData.getUserUUID(player));
+        return team.getEntry(this.player.getPersistentID());
     }
 
     private class TextBoxName extends TextBoxGroup.TextBox {

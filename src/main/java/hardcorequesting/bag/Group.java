@@ -33,14 +33,14 @@ public class Group {
     private List<ItemStack> items;
     private String name;
     private int limit;
-    private String uuid;
+    private UUID groupId;
 
-    public Group(String id) {
-        this.uuid = id;
-        while (this.uuid == null || getGroups().containsKey(this.uuid)) {
-            this.uuid = UUID.randomUUID().toString();
+    public Group(UUID groupId) {
+        this.groupId = groupId;
+        while (this.groupId == null || getGroups().containsKey(this.groupId)) {
+            this.groupId = UUID.randomUUID();
         }
-        if (id == null) {
+        if (groupId == null) {
             if (GroupTier.getTiers().size() < 1)
                 GroupTier.initBaseTiers(QuestLine.getActiveQuestLine());
             this.tier = GroupTier.getTiers().get(0);
@@ -52,12 +52,12 @@ public class Group {
         return QuestLine.getActiveQuestLine().groups.size();
     }
 
-    public static Map<String, Group> getGroups() {
+    public static Map<UUID, Group> getGroups() {
         return QuestLine.getActiveQuestLine().groups;
     }
 
-    public static void remove(String id) {
-        getGroups().remove(id);
+    public static void remove(UUID groupId) {
+        getGroups().remove(groupId);
     }
 
     public static void add(Group group) {
@@ -215,8 +215,8 @@ public class Group {
         });
     }
 
-    public String getId() {
-        return uuid;
+    public UUID getId() {
+        return this.groupId;
     }
 
     public void removeItem(int i) {

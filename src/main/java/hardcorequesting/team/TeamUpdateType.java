@@ -14,6 +14,7 @@ import hardcorequesting.quests.reward.ReputationReward;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unchecked")
 public enum TeamUpdateType {
@@ -52,9 +53,9 @@ public enum TeamUpdateType {
         public void update(Team team, String data) {
             JsonParser parser = new JsonParser();
             JsonObject object = parser.parse(data).getAsJsonObject();
-            Quest quest = Quest.getQuest(object.get(QUEST).getAsString());
+            Quest quest = Quest.getQuest(UUID.fromString(object.get(QUEST).getAsString()));
             if (quest != null) {
-                QuestData questData = team.getQuestData(quest.getId());
+                QuestData questData = team.getQuestData(quest.getQuestId());
                 if (questData != null) {
                     questData.claimed = true;
                     for (JsonElement element : object.get(REPUTATIONS).getAsJsonArray()) {
@@ -72,7 +73,7 @@ public enum TeamUpdateType {
             try {
                 JsonWriter writer = new JsonWriter(out);
                 writer.beginObject();
-                writer.name(QUEST).value(((Quest) data[0]).getId());
+                writer.name(QUEST).value(((Quest) data[0]).getQuestId().toString());
                 writer.name(REPUTATIONS).beginArray();
                 for (ReputationReward reward : ((List<ReputationReward>) data[1])) {
                     writer.beginObject();
@@ -111,7 +112,7 @@ public enum TeamUpdateType {
             String uuid = data.substring(0, 36);
             String teamJson = data.substring(36);
             try {
-                QuestingData.getQuestingData(uuid).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+                QuestingData.getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -128,7 +129,7 @@ public enum TeamUpdateType {
             String uuid = data.substring(0, 36);
             String teamJson = data.substring(36);
             try {
-                QuestingData.getQuestingData(uuid).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+                QuestingData.getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -162,7 +163,7 @@ public enum TeamUpdateType {
         public void update(Team clientTeam, String data) {
             try {
                 Team team = TeamAdapter.TEAM_ADAPTER.fromJson(data);
-                QuestingData.getTeams().set(team.getId(), team);
+                QuestingData.getTeams().add(team.getId(), team);
                 clientTeam.getInvites().add(team);
             } catch (IOException e) {
                 e.printStackTrace();

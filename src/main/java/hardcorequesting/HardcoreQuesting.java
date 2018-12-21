@@ -6,9 +6,12 @@ import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.ConfigHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.event.PlayerDeathEventListener;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.event.WorldEventListener;
+import hardcorequesting.integration.IntegrationHandler;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.proxies.CommonProxy;
@@ -25,12 +28,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory", acceptedMinecraftVersions = "[1.12,1.13)")
 public class HardcoreQuesting {
@@ -47,6 +49,8 @@ public class HardcoreQuesting {
     public static File configDir;
 
     public static Side loadingSide;
+    
+    public static final Logger LOG = LogManager.getFormatterLogger(ModInformation.NAME);
 
     private static EntityPlayer commandUser;
 
@@ -61,7 +65,7 @@ public class HardcoreQuesting {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         loadingSide = event.getSide();
-        new hardcorequesting.event.EventHandler();
+        new EventTrigger();
 
         path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + ModInformation.CONFIG_LOC_NAME.toLowerCase() + File.separator;
         configDir = new File(path);
@@ -78,6 +82,8 @@ public class HardcoreQuesting {
         ModItems.init();
         
         MinecraftForge.EVENT_BUS.register(instance);
+    
+        IntegrationHandler.preInit(event, this);
     }
 
     @EventHandler
@@ -91,8 +97,13 @@ public class HardcoreQuesting {
 
         ModItems.registerRecipes();
         ModBlocks.registerRecipes();
-
-        FMLInterModComms.sendMessage("Waila", "register", "hardcorequesting.waila.Provider.callbackRegister");
+    
+        IntegrationHandler.init(event, this);
+    }
+    
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event){
+        IntegrationHandler.postInit(event, this);
     }
 
     @EventHandler

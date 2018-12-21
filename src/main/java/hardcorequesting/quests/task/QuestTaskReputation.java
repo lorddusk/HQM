@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public abstract class QuestTaskReputation extends QuestTask {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
@@ -48,9 +49,8 @@ public abstract class QuestTaskReputation extends QuestTask {
 
             QuestDataTask data = getData(player);
             if (!data.completed && !player.getEntityWorld().isRemote) {
-                String name = QuestingData.getUserUUID(player);
                 for (ReputationSetting setting : settings) {
-                    if (!setting.isValid(name)) {
+                    if (!setting.isValid(player.getPersistentID())) {
                         return false;
                     }
                 }
@@ -65,7 +65,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     @SideOnly(Side.CLIENT)
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         String info = null;
-        int size = Quest.isEditing ? settings.length + 1 : settings.length;
+        int size = Quest.canQuestsBeEdited(player) ? settings.length + 1 : settings.length;
         for (int i = 0; i < size; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -86,7 +86,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Override
     @SideOnly(Side.CLIENT)
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
             int size = settings.length + 1;
             for (int i = 0; i < size; i++) {
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
@@ -103,7 +103,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
+    public float getCompletedRatio(UUID playerID) {
         int count = settings.length;
         if (count == 0) {
             return 0;
@@ -111,7 +111,7 @@ public abstract class QuestTaskReputation extends QuestTask {
 
         int valid = 0;
         for (ReputationSetting setting : settings) {
-            if (setting.isValid(uuid)) {
+            if (setting.isValid(playerID)) {
                 valid++;
             }
         }
@@ -120,15 +120,15 @@ public abstract class QuestTaskReputation extends QuestTask {
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         if (other.completed) {
             own.completed = true;
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        getData(uuid).completed = true;
+    public void autoComplete(UUID playerID) {
+        getData(playerID).completed = true;
     }
 
     protected EntityPlayer getPlayerForRender(EntityPlayer player) {
@@ -185,11 +185,11 @@ public abstract class QuestTaskReputation extends QuestTask {
             return inverted;
         }
 
-        public boolean isValid(String uuid) {
+        public boolean isValid(UUID playerID) {
             if (getReputation() == null || !getReputation().isValid()) {
                 return false;
             }
-            ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(uuid));
+            ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(playerID));
 
             return ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
         }

@@ -132,7 +132,7 @@ public class FullSyncMessage implements IMessage {
                             out.print(message.questsSets[i]);
                         }
                 }
-                QuestLine.receiveServerSync(message.local, message.serverWorld);
+                QuestLine.receiveServerSync(Minecraft.getMinecraft().player, message.local, message.serverWorld);
             } catch (IOException e) {
                 e.printStackTrace();
             }

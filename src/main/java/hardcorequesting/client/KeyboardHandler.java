@@ -38,7 +38,7 @@ public class KeyboardHandler {
         if (key == Keyboard.KEY_BACK) {
             gui.goBack();
             return true;
-        } else if (Quest.isEditing) {
+        } else if (Quest.canQuestsBeEdited(gui.getPlayer())) {
             if (key >= Keyboard.KEY_1 && key <= Keyboard.KEY_0) {
                 int i = key - Keyboard.KEY_1;
                 if (i < buttons.length) {

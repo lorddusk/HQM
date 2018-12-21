@@ -45,18 +45,10 @@ public class RegisterHelper {
     }
 
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        Iterator<Block> b = blocks.iterator();
-
-        while (b.hasNext()) {
-            event.getRegistry().register(b.next());
-        }
+        blocks.forEach(block -> event.getRegistry().register(block));
     }
 
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        Iterator<Item> i = items.iterator();
-
-        while (i.hasNext()) {
-            event.getRegistry().register(i.next());
-        }
+        items.forEach(item -> event.getRegistry().register(item));
     }
 }

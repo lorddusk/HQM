@@ -3,10 +3,12 @@ package hardcorequesting.quests;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.util.Translator;
 
+import java.util.UUID;
+
 public enum TriggerType {
     NONE("none", false, false) {
         @Override
-        public boolean isQuestVisible(Quest quest, String playerName) {
+        public boolean isQuestVisible(Quest quest, UUID playerId) {
             return true;
         }
 
@@ -17,18 +19,18 @@ public enum TriggerType {
     },
     QUEST_TRIGGER("quest", false, true) {
         @Override
-        public boolean isQuestVisible(Quest quest, String playerName) {
+        public boolean isQuestVisible(Quest quest, UUID playerId) {
             return false;
         }
 
     },
     TASK_TRIGGER("task", true, true) {
         @Override
-        public boolean isQuestVisible(Quest quest, String playerName) {
+        public boolean isQuestVisible(Quest quest, UUID playerId) {
             if (quest.getTriggerTasks() >= quest.getTasks().size()) {
-                return quest.isCompleted(playerName);
+                return quest.isCompleted(playerId);
             } else {
-                return quest.getTasks().get(quest.getTriggerTasks() - 1).isCompleted(playerName);
+                return quest.getTasks().get(quest.getTriggerTasks() - 1).isCompleted(playerId);
             }
         }
 
@@ -39,8 +41,8 @@ public enum TriggerType {
     },
     ANTI_TRIGGER("anti", false, false) {
         @Override
-        public boolean isQuestVisible(Quest quest, String playerName) {
-            return quest.isEnabled(playerName, false);
+        public boolean isQuestVisible(Quest quest, UUID playerId) {
+            return quest.isEnabled(playerId, false);
         }
     };
 
@@ -70,7 +72,7 @@ public enum TriggerType {
         return workAsInvisible;
     }
 
-    public abstract boolean isQuestVisible(Quest quest, String playerName);
+    public abstract boolean isQuestVisible(Quest quest, UUID playerId);
 
     public String getMessage(Quest quest) {
         return GuiColor.ORANGE + getName();

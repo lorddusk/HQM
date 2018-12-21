@@ -19,9 +19,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.UUID;
 
 @SuppressWarnings("Duplicates")
 public enum ClientChange {
+    @Deprecated
     SELECT_QUEST(new ClientUpdater<QuestTask>() {
         private static final String PARENT = "parent";
         private static final String TASK = "task";
@@ -31,7 +33,7 @@ public enum ClientChange {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(PARENT).value(data.getParent().getId());
+            writer.name(PARENT).value(data.getParent().getQuestId().toString());
             writer.name(TASK).value(data.getId());
             writer.endObject();
             writer.close();
@@ -42,7 +44,7 @@ public enum ClientChange {
         public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            QuestingData.getQuestingData(player).selectedQuest = root.get(PARENT).getAsString();
+            QuestingData.getQuestingData(player).selectedQuestId = UUID.fromString(root.get(PARENT).getAsString());
             QuestingData.getQuestingData(player).selectedTask = root.get(TASK).getAsInt();
         }
     }),
@@ -55,7 +57,7 @@ public enum ClientChange {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(QUEST).value(questTask.getParent().getId());
+            writer.name(QUEST).value(questTask.getParent().getQuestId().toString());
             writer.name(TASK).value(questTask.getId());
             writer.endObject();
             writer.close();
@@ -66,22 +68,22 @@ public enum ClientChange {
         public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            Quest quest = Quest.getQuest(root.get(QUEST).getAsString());
+            Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
             int task = root.get(TASK).getAsInt();
             if (quest != null && task > -1 && task < quest.getTasks().size())
                 quest.getTasks().get(task).onUpdate(player);
         }
     }),
-    CLAIM_QUEST(new ClientUpdater<Tuple<String, Integer>>() {
+    CLAIM_QUEST(new ClientUpdater<Tuple<UUID, Integer>>() {
         private static final String QUEST = "quest";
         private static final String REWARD = "reward";
 
         @Override
-        public IMessage build(Tuple<String, Integer> data) throws IOException {
+        public IMessage build(Tuple<UUID, Integer> data) throws IOException {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(QUEST).value(data.getFirst());
+            writer.name(QUEST).value(data.getFirst().toString());
             writer.name(REWARD).value(data.getSecond());
             writer.endObject();
             writer.close();
@@ -92,7 +94,7 @@ public enum ClientChange {
         public void parse(EntityPlayer player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            Quest quest = Quest.getQuest(root.get(QUEST).getAsString());
+            Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
             if (quest != null)
                 quest.claimReward(player, root.get(REWARD).getAsInt());
         }

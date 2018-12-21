@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public enum GuiType {
     NONE {
@@ -59,7 +60,7 @@ public enum GuiType {
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
             JsonElement quest = root.get(QUEST);
-            String questId = quest.isJsonNull() ? null : root.getAsString();
+            UUID questId = quest.isJsonNull() ? null : UUID.fromString(root.getAsString());
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
             TileEntityTracker.openInterface(player, pos, questId, radius, type);

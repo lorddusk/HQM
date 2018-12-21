@@ -7,7 +7,7 @@ import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
@@ -50,14 +50,14 @@ public abstract class QuestTask {
         updateId();
     }
 
-    public static void completeQuest(Quest quest, String playerUuid) {
-        if (!quest.isEnabled(playerUuid) || !quest.isAvailable(playerUuid)) return;
+    public static void completeQuest(Quest quest, UUID uuid) {
+        if (!quest.isEnabled(uuid) || !quest.isAvailable(uuid)) return;
         for (QuestTask questTask : quest.getTasks()) {
-            if (!questTask.getData(playerUuid).completed) {
+            if (!questTask.getData(uuid).completed) {
                 return;
             }
         }
-        QuestData data = quest.getQuestData(playerUuid);
+        QuestData data = quest.getQuestData(uuid);
 
         data.completed = true;
         data.claimed = false;
@@ -65,7 +65,7 @@ public abstract class QuestTask {
         data.time = Quest.serverTicker.getHours();
 
 
-        if (QuestingData.getQuestingData(playerUuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
+        if (QuestingData.getQuestingData(uuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
             int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
         } else {
@@ -73,19 +73,19 @@ public abstract class QuestTask {
                 data.reward[i] = true;
             }
         }
-        quest.sendUpdatedDataToTeam(playerUuid);
-        TeamStats.refreshTeam(QuestingData.getQuestingData(playerUuid).getTeam());
+        quest.sendUpdatedDataToTeam(uuid);
+        TeamStats.refreshTeam(QuestingData.getQuestingData(uuid).getTeam());
 
         for (Quest child : quest.getReversedRequirement()) {
-            completeQuest(child, playerUuid);
-            child.sendUpdatedDataToTeam(playerUuid);
+            completeQuest(child, uuid);
+            child.sendUpdatedDataToTeam(uuid);
         }
 
         if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
-            quest.reset(playerUuid);
+            quest.reset(uuid);
         }
 
-        EntityPlayer player = QuestingData.getPlayer(playerUuid);
+        EntityPlayer player = QuestingData.getPlayer(uuid);
         if (player instanceof EntityPlayerMP && !quest.hasReward(player)) {
             // when there is no reward and it just completes the quest play the music
             NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (EntityPlayerMP) player);
@@ -100,7 +100,7 @@ public abstract class QuestTask {
         return getData(player).completed;
     }
 
-    public boolean isCompleted(String uuid) {
+    public boolean isCompleted(UUID uuid) {
         return getData(uuid).completed;
     }
 
@@ -127,14 +127,14 @@ public abstract class QuestTask {
     }
 
     public QuestDataTask getData(EntityPlayer player) {
-        return getData(QuestingData.getUserUUID(player));
+        return getData(player.getPersistentID());
     }
 
-    public QuestDataTask getData(String uuid) {
-        if (id < 0) {
+    public QuestDataTask getData(UUID uuid) {
+        if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
-        QuestData questData = QuestingData.getQuestingData(uuid).getQuestData(parent.getId());
+        QuestData questData = QuestingData.getQuestingData(uuid).getQuestData(parent.getQuestId());
         if (id >= questData.tasks.length) {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
@@ -196,12 +196,9 @@ public abstract class QuestTask {
     }
 
     public void completeTask(UUID uuid) {
-        completeTask(uuid.toString());
-    }
-
-    public void completeTask(String playerName) {
-        getData(playerName).completed = true;
-        completeQuest(parent, playerName);
+        getData(uuid).completed = true;
+        completeQuest(parent, uuid);
+        
     }
 
     @SideOnly(Side.CLIENT)
@@ -236,22 +233,22 @@ public abstract class QuestTask {
         requirements.clear();
     }
 
-    public abstract float getCompletedRatio(String uuid);
+    public abstract float getCompletedRatio(UUID uuid);
 
-    public abstract void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other);
+    public abstract void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other);
 
-    public abstract void autoComplete(String uuid);
+    public abstract void autoComplete(UUID playerId);
 
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         own.completed = other.completed;
     }
 
     public void onDelete() {
-        EventHandler.instance().remove(this);
+        EventTrigger.instance().remove(this);
     }
 
-    public void register(EventHandler.Type... types) {
-        EventHandler.instance().add(this, types);
+    public void register(EventTrigger.Type... types) {
+        EventTrigger.instance().add(this, types);
     }
 
     //for these to be called one must register the task using the method above using the correct types
@@ -270,9 +267,9 @@ public abstract class QuestTask {
     public void onItemPickUp(EntityItemPickupEvent event) {
     }
 
-    public void onOpenBook(EventHandler.BookOpeningEvent event) {
+    public void onOpenBook(EventTrigger.BookOpeningEvent event) {
     }
 
-    public void onReputationChange(EventHandler.ReputationEvent event) {
+    public void onReputationChange(EventTrigger.ReputationEvent event) {
     }
 }

@@ -2,6 +2,7 @@ package hardcorequesting.items;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import hardcorequesting.HardcoreQuesting;
@@ -103,9 +104,9 @@ public class ItemBag extends Item {
         }
     }
 
-    private void openClientInterface(EntityPlayer player, String id, int bag) {
+    private void openClientInterface(EntityPlayer player, UUID groupId, int bag) {
         List<String> data = new ArrayList<>();
-        data.add(id);
+        data.add(groupId.toString());
         data.add("" + bag);
         data.addAll(Group.getGroups().values().stream()
                 .filter(group -> group.getLimit() != 0)

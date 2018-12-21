@@ -255,7 +255,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return Quest.isEditing && SaveHelper.isLarge();
+                return Quest.canQuestsBeEdited(player) && SaveHelper.isLarge();
             }
 
             @Override
@@ -289,7 +289,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return editMenu == null && Quest.isEditing && currentMode == EditMode.CREATE && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
+                return editMenu == null && Quest.canQuestsBeEdited(player) && currentMode == EditMode.CREATE && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
 
             @Override
@@ -397,7 +397,7 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
 
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(player)) {
             Keyboard.enableRepeatEvents(true);
         }
         QuestingData data = QuestingData.getQuestingData(player);
@@ -462,7 +462,7 @@ public class GuiQuestBook extends GuiBase {
         drawRect(0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
         drawRect(PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
 
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(this.getPlayer())) {
             applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(MAP_TEXTURE);
             SaveHelper.render(this, x, y);
@@ -485,7 +485,7 @@ public class GuiQuestBook extends GuiBase {
         }
 
         if (editMenu == null) {
-            if (Quest.isEditing) {
+            if (Quest.canQuestsBeEdited(this.getPlayer())) {
                 for (EditButton button : getButtons()) {
                     button.draw(x, y);
                 }
@@ -510,7 +510,7 @@ public class GuiQuestBook extends GuiBase {
                 selectedQuest.drawMenu(this, player, x, y);
             }
 
-            if (Quest.isEditing) {
+            if (Quest.canQuestsBeEdited(this.getPlayer())) {
                 for (EditButton button : getButtons()) {
                     button.drawInfo(x, y);
                 }
@@ -584,12 +584,12 @@ public class GuiQuestBook extends GuiBase {
             }
         }
 
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(this.getPlayer())) {
             SaveHelper.onClick(this, x, y);
         }
 
         if (editMenu == null) {
-            if (Quest.isEditing) {
+            if (Quest.canQuestsBeEdited(this.getPlayer())) {
                 for (EditButton editButton : getButtons()) {
                     if (editButton.onClick(x, y)) {
                         onButtonClicked();
@@ -707,7 +707,7 @@ public class GuiQuestBook extends GuiBase {
 
     @Override
     public void onGuiClosed() {
-        NetworkManager.sendToServer(new CloseBookMessage(player.getUniqueID().toString()));
+        NetworkManager.sendToServer(new CloseBookMessage(player.getUniqueID()));
         Keyboard.enableRepeatEvents(true);
         SoundHandler.stopLoreMusic();
     }
@@ -763,7 +763,7 @@ public class GuiQuestBook extends GuiBase {
         }
 
 
-        int deaths = DeathStats.getDeathStats(QuestingData.getUserUUID(player)).getTotalDeaths();
+        int deaths = DeathStats.getDeathStats(this.getPlayer().getPersistentID()).getTotalDeaths();
         drawString(Translator.translate(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         drawString(Translator.translate("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
 
@@ -900,14 +900,14 @@ public class GuiQuestBook extends GuiBase {
                 SoundHandler.playLoreMusic();
             }
         } else {
-            if (Quest.isEditing && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
+            if (Quest.canQuestsBeEdited(this.getPlayer()) && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuTextEditor(this, player);
             }
         }
     }
 
     private void updatePosition(int x, int y) {
-        if (Quest.isEditing && currentMode == EditMode.MOVE) {
+        if (Quest.canQuestsBeEdited(this.getPlayer()) && currentMode == EditMode.MOVE) {
             if (modifyingQuest != null) {
                 modifyingQuest.setGuiCenterX(x);
                 modifyingQuest.setGuiCenterY(y);
@@ -937,7 +937,6 @@ public class GuiQuestBook extends GuiBase {
     }
 
     public void save() {
-        // TODO send message to server with updated quests, otherwise editing is only possible in client worlds => exactly what is intended
         QuestLine.saveAll();
         SaveHelper.onSave();
     }

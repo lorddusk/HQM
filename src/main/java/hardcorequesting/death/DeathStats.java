@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import hardcorequesting.HardcoreQuesting;
 import org.apache.logging.log4j.Level;
 
 import hardcorequesting.client.interfaces.GuiColor;
@@ -28,7 +29,7 @@ public class DeathStats {
 
     private static final DeathComparator deathComparator = new DeathComparator(-1);
     private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
-    private static Map<String, DeathStats> deathMap;
+    private static Map<UUID, DeathStats> deathMap;
     private static DeathStats[] clientDeathList;
     private static DeathStats clientBest;
     private static DeathStats clientTotal;
@@ -40,10 +41,10 @@ public class DeathStats {
     }
 
     protected int[] deaths = new int[DeathType.values().length];
-    private String uuid;
+    private UUID uuid;
     private int totalDeaths = -1;
 
-    public DeathStats(String uuid) {
+    public DeathStats(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -74,7 +75,7 @@ public class DeathStats {
         try {
             SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving bags");
+            HardcoreQuesting.LOG.log(Level.INFO, "Failed saving bags");
         }
     }
 
@@ -96,7 +97,7 @@ public class DeathStats {
         Arrays.sort(clientDeathList, deathComparator);
     }
 
-    public static DeathStats getDeathStats(String uuid) {
+    public static DeathStats getDeathStats(UUID uuid) {
         DeathStats stats = deathMap.get(uuid);
         return stats == null ? new DeathStats(uuid) : stats;
     }
@@ -105,24 +106,20 @@ public class DeathStats {
         return clientDeathList;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
     @SideOnly(Side.CLIENT)
-    public String getName() {
+    public String getName() throws IllegalArgumentException{
         if (Minecraft.getMinecraft().world != null) {
-            try {
-                UUID uuid = UUID.fromString(this.uuid);
-                EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByUUID(uuid);
-                if (player == null) {
-                    return "<invalid>";
-                }
-                return player.getDisplayNameString();
-            } catch (IllegalArgumentException ignored) {
+            EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByUUID(this.uuid);
+            if (player == null) {
+                return "<invalid>";
             }
+            return player.getDisplayNameString();
         }
-        return this.uuid;
+        return this.uuid.toString();
     }
 
     public String getDescription(int id) {
@@ -180,7 +177,7 @@ public class DeathStats {
         private String[] messages = new String[DeathType.values().length];
 
         private DeathStatsBest() {
-            super("hqm.deathStat.worstPlayers");
+            super(null);
             for (int i = 0; i < messages.length; i++) {
                 Arrays.sort(clientDeathList, deathTypeComparator[i]);
                 if (clientDeathList.length < 1) {
@@ -213,7 +210,7 @@ public class DeathStats {
 
         @Override
         public String getName() {
-            return Translator.translate(getUuid());
+            return Translator.translate("hqm.deathStat.worstPlayers");
         }
 
         @Override
@@ -229,7 +226,7 @@ public class DeathStats {
         private int[] count = new int[DeathType.values().length];
 
         private DeathStatsTotal() {
-            super("hqm.deathStat.everyone");
+            super(null);
             for (int i = 0; i < count.length; i++) {
                 for (DeathStats deathStats : clientDeathList) {
                     deaths[i] += deathStats.getDeaths(i);
@@ -251,7 +248,7 @@ public class DeathStats {
 
         @Override
         public String getName() {
-            return Translator.translate(getUuid());
+            return Translator.translate("hqm.deathStat.everyone");
         }
     }
 }

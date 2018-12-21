@@ -26,8 +26,12 @@ repositories {
         name = "HWYLA"
         url = "http://tehnut.info/maven"
     }
-    maven { // Actually Additions
+    maven { // Actually Additions, TUMAT
         url = "http://maven.chaosfield.at"
+    }
+    maven { // The One Probe
+        name 'tterrag maven'
+        url "https://maven.tterrag.com/"
     }
 }
 
@@ -36,6 +40,8 @@ dependencies {
     deobfProvided "mezz.jei:jei_${project.jei_version}:api"
     runtime "mezz.jei:jei_${project.jei_version}"
     deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${project.actadd_version}"
+    deobfCompile "de.canitzp.tumat:TUMAT:${project.tumat_version}"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
 }
 
 version = "${version}"

@@ -7,6 +7,7 @@ import hardcorequesting.death.DeathStats;
 import hardcorequesting.death.DeathType;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class DeathAdapter {
 
@@ -14,7 +15,7 @@ public class DeathAdapter {
         @Override
         public void write(JsonWriter out, DeathStats value) throws IOException {
             out.beginObject();
-            out.name(value.getUuid());
+            out.name(value.getUuid().toString());
             out.beginArray();
             for (DeathType type : DeathType.values())
                 out.value(value.getDeaths(type.ordinal()));
@@ -28,7 +29,7 @@ public class DeathAdapter {
             DeathStats stats = null;
             if (in.hasNext()) {
                 String uuid = in.nextName();
-                stats = new DeathStats(uuid);
+                stats = new DeathStats(UUID.fromString(uuid));
                 in.beginArray();
                 int i = 0;
                 while (in.hasNext())

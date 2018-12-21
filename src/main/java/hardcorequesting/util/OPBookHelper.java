@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.UUID;
 
 public final class OPBookHelper {
 
@@ -61,7 +62,7 @@ public final class OPBookHelper {
                 JsonWriter writer = new JsonWriter(stringWriter);
                 writer.beginObject();
                 if (quest != null)
-                    writer.name(QUEST).value(quest.getId());
+                    writer.name(QUEST).value(quest.getQuestId().toString());
                 if (subject != null)
                     writer.name(SUBJECT).value(subject.getPersistentID().toString());
                 writer.endObject();
@@ -86,7 +87,7 @@ public final class OPBookHelper {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             if (root.has(QUEST))
-                quest = Quest.getQuest(root.get(QUEST).getAsString());
+                quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
             if (root.has(SUBJECT))
                 subject = QuestingData.getPlayer(root.get(SUBJECT).getAsString());
         }

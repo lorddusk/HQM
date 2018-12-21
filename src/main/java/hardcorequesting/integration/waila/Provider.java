@@ -1,11 +1,10 @@
-package hardcorequesting.waila;
+package hardcorequesting.integration.waila;
 
 
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.blocks.BlockPortal;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.task.QuestTask;
-import hardcorequesting.tileentity.PortalType;
 import hardcorequesting.tileentity.TileEntityBarrel;
 import hardcorequesting.tileentity.TileEntityPortal;
 import mcp.mobius.waila.api.IWailaConfigHandler;
@@ -13,14 +12,9 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -36,10 +30,10 @@ public class Provider implements IWailaDataProvider {
         Provider instance = new Provider();
         registrar.registerStackProvider(instance, BlockPortal.class);
         registrar.registerBodyProvider(instance, BlockDelivery.class);
-        registrar.registerNBTProvider(instance, BlockDelivery.class);
         registrar.addConfigRemote(MOD_NAME, IS_REMOTE_AVAILABLE, "Show QDS data");
     }
 
+    @SideOnly(Side.CLIENT)
     @Nonnull
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
@@ -70,13 +64,13 @@ public class Provider implements IWailaDataProvider {
                 if (te != null) {
                     if (te instanceof TileEntityBarrel) {
                         TileEntityBarrel qds = (TileEntityBarrel) te;
-                        qds.readFromNBT(accessor.getNBTData());
+                        //qds.readFromNBT(accessor.getNBTData());
                         QuestTask task = qds.getCurrentTask();
                         if (task != null && te.getBlockMetadata() == 1) {
-                            currenttip.add(qds.getPlayer());
+                            currenttip.add(qds.getPlayerUUID().toString());
                             currenttip.add(task.getParent().getName());
                             currenttip.add(task.getDescription());
-                            currenttip.add((int) (task.getCompletedRatio(qds.getPlayer()) * 100) + "% completed");
+                            currenttip.add((int) (task.getCompletedRatio(qds.getPlayerUUID()) * 100) + "% completed");
                         }
                     }
                 }

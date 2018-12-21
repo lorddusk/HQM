@@ -16,21 +16,19 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-//import net.minecraft.client.renderer.texture.IIconRegister;
-//import net.minecraft.util.IIcon;
-
+import javax.annotation.Nonnull;
 
 public class BlockTracker extends BlockContainer {
 
     public BlockTracker() {
         super(Material.WOOD);
-        setRegistryName(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
-        setCreativeTab(HardcoreQuesting.HQMTab);
-        setHardness(10f);
+        this.setRegistryName(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
+        this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setHardness(10f);
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int var2) {
+    public TileEntity createNewTileEntity(@Nonnull World world, int var2) {
         return new TileEntityTracker();
     }
 
@@ -40,8 +38,8 @@ public class BlockTracker extends BlockContainer {
             if (!player.inventory.getCurrentItem().isEmpty() && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
-                    if (tile != null && tile instanceof TileEntityTracker) {
-                        if (!Quest.isEditing) {
+                    if (tile instanceof TileEntityTracker) {
+                        if (!Quest.canQuestsBeEdited(player)) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) tile).setCurrentQuest();
@@ -58,8 +56,8 @@ public class BlockTracker extends BlockContainer {
             } else {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
-                    if (tile != null && tile instanceof TileEntityTracker) {
-                        if (!Quest.isEditing) {
+                    if (tile instanceof TileEntityTracker) {
+                        if (!Quest.canQuestsBeEdited(player)) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) tile).openInterface(player);
@@ -69,15 +67,17 @@ public class BlockTracker extends BlockContainer {
                 return true;
             }
         }
-
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean canProvidePower(IBlockState state) {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
+    @Nonnull
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;

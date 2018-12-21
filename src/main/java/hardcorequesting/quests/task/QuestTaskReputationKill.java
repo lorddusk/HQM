@@ -2,7 +2,7 @@ package hardcorequesting.quests.task;
 
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskReputationKill;
@@ -12,6 +12,8 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.UUID;
+
 public class QuestTaskReputationKill extends QuestTaskReputation {
 
     private int kills;
@@ -19,7 +21,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 20);
 
-        register(EventHandler.Type.DEATH);
+        register(EventTrigger.Type.DEATH);
     }
 
     @SideOnly(Side.CLIENT)
@@ -27,7 +29,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         super.draw(gui, player, mX, mY);
         int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(player)) {
             gui.drawString(gui.getLinesFromText(Translator.translate(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {
             gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
@@ -35,22 +37,22 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
-        return (float) ((QuestDataTaskReputationKill) getData(uuid)).kills / kills;
+    public float getCompletedRatio(UUID playerID) {
+        return (float) ((QuestDataTaskReputationKill) getData(playerID)).kills / kills;
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         ((QuestDataTaskReputationKill) own).kills = Math.max(((QuestDataTaskReputationKill) own).kills, ((QuestDataTaskReputationKill) other).kills);
 
         if (((QuestDataTaskReputationKill) own).kills == kills) {
-            completeTask(uuid);
+            completeTask(playerID);
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        kills = ((QuestDataTaskReputationKill) getData(uuid)).kills;
+    public void autoComplete(UUID playerID) {
+        this.kills = ((QuestDataTaskReputationKill) getData(playerID)).kills;
     }
 
     @Override

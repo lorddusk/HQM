@@ -12,6 +12,7 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 public abstract class QuestTaskItems extends QuestTask {
 
@@ -89,15 +91,15 @@ public abstract class QuestTaskItems extends QuestTask {
         return data.progress[id];
     }
 
-    protected void resetTask(String playerName, int id) {
-        getData(playerName).completed = false;
-        ((QuestDataTaskItems) getData(playerName)).progress[id] = 0;
+    protected void resetTask(UUID playerId, int id) {
+        getData(playerId).completed = false;
+        ((QuestDataTaskItems) getData(playerId)).progress[id] = 0;
     }
 
-    protected void completeTask(String uuid, int id, int count) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(uuid);
+    protected void completeTask(UUID playerId, int id, int count) {
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
         data.progress[id] = count;
-        doCompletionCheck(data, uuid);
+        doCompletionCheck(data, playerId);
     }
 
     private void setPositions(ItemRequirement[] items) {
@@ -116,14 +118,15 @@ public abstract class QuestTaskItems extends QuestTask {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     private ItemRequirement[] getEditFriendlyItems(ItemRequirement[] items) {
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
             items = Arrays.copyOf(items, items.length + 1);
         } else {
             return items;
         }
 
-        items[items.length - 1] = new ItemRequirement((ItemStack) null, 1);
+        items[items.length - 1] = new ItemRequirement(ItemStack.EMPTY, 1);
         setPositions(items);
         return items;
     }
@@ -131,8 +134,8 @@ public abstract class QuestTaskItems extends QuestTask {
     @SideOnly(Side.CLIENT)
     protected abstract GuiEditMenuItem.Type getMenuTypeId();
 
-    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, String uuid) {
-        if (!parent.isAvailable(uuid)) return false;
+    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
+        if (!parent.isAvailable(playerId)) return false;
 
         boolean updated = false;
 
@@ -159,13 +162,13 @@ public abstract class QuestTaskItems extends QuestTask {
         }
 
         if (updated) {
-            doCompletionCheck(data, uuid);
+            doCompletionCheck(data, playerId);
         }
 
         return updated;
     }
 
-    protected void doCompletionCheck(QuestDataTaskItems data, String uuid) {
+    protected void doCompletionCheck(QuestDataTaskItems data, UUID playerId) {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
@@ -176,9 +179,9 @@ public abstract class QuestTaskItems extends QuestTask {
         }
 
         if (isDone) {
-            completeTask(uuid);
+            completeTask(playerId);
         }
-        parent.sendUpdatedDataToTeam(uuid);
+        parent.sendUpdatedDataToTeam(playerId);
     }
 
     @Override
@@ -216,7 +219,7 @@ public abstract class QuestTaskItems extends QuestTask {
                     str += GuiColor.GREEN;
                 }
                 str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
-                if (Quest.isEditing)
+                if (Quest.canQuestsBeEdited(player))
                     str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
                 if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
                     if (getProgress(player, i) == item.required) {
@@ -235,7 +238,7 @@ public abstract class QuestTaskItems extends QuestTask {
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && GuiScreen.isShiftKeyDown();
-        if (Quest.isEditing || isOpBookWithShiftKeyDown) {
+        if (Quest.canQuestsBeEdited(player) || isOpBookWithShiftKeyDown) {
 
             ItemRequirement[] items = getEditFriendlyItems(this.items);
 
@@ -244,13 +247,13 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                     if (isOpBookWithShiftKeyDown) {
                         if (getProgress(player, i) == item.required) {
-                            resetTask(QuestingData.getUserUUID(player), i);
+                            resetTask(player.getPersistentID(), i);
                         } else {
-                            completeTask(QuestingData.getUserUUID(player), i, item.required);
+                            completeTask(player.getPersistentID(), i, item.required);
                         }
-                    } else if (Quest.isEditing && gui.getCurrentMode() == EditMode.ITEM) {
+                    } else if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.ITEM) {
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
-                    } else if (Quest.isEditing && gui.getCurrentMode() == EditMode.DELETE && (item.stack != null || item.fluid != null)) {
+                    } else if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.DELETE && (item.stack != null || item.fluid != null)) {
                         ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                         int id = 0;
                         for (int j = 0; j < this.items.length; j++) {
@@ -278,8 +281,8 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(uuid);
+    public float getCompletedRatio(UUID playerId) {
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
         int done = 0;
         int total = 0;
         for (int count : data.progress) {
@@ -293,7 +296,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other) {
         int[] ownProgress = ((QuestDataTaskItems) own).progress;
         int[] otherProgress = ((QuestDataTaskItems) other).progress;
 
@@ -306,13 +309,13 @@ public abstract class QuestTaskItems extends QuestTask {
         }
 
         if (completed) {
-            completeTask(uuid);
+            completeTask(playerId);
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(uuid);
+    public void autoComplete(UUID playerId) {
+        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
         for (int i = 0; i < items.length; i++) {
             data.progress[i] = items[i].required;
         }

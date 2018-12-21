@@ -1,6 +1,7 @@
 package hardcorequesting.items;
 
 import java.util.List;
+import java.util.UUID;
 
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.quests.Quest;
@@ -41,8 +42,15 @@ public class ItemBlockPortal extends ItemBlock {
         try {
             if (!stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey("Portal", Constants.NBT.TAG_COMPOUND)) {
                 NBTTagCompound compound = stack.getTagCompound().getCompoundTag("Portal");
-                if (compound.hasKey(TileEntityPortal.NBT_QUEST)) {
-                    Quest quest = Quest.getQuest(compound.getString(TileEntityPortal.NBT_QUEST));
+                // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
+                if(compound.hasKey(TileEntityPortal.NBT_QUEST, Constants.NBT.TAG_STRING)){
+                    try{
+                        compound.setUniqueId(TileEntityPortal.NBT_QUEST, UUID.fromString(compound.getString(TileEntityPortal.NBT_QUEST)));
+                    } catch(IllegalArgumentException ignored){}
+                    compound.removeTag(TileEntityPortal.NBT_QUEST);
+                }
+                if (compound.hasKey(TileEntityPortal.NBT_QUEST + "Most")) {
+                    Quest quest = Quest.getQuest(compound.getUniqueId(TileEntityPortal.NBT_QUEST));
                     if (quest != null) {
                         tooltip.add(GuiColor.GREEN + "Quest: " + quest.getName());
                     } else {

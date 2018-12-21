@@ -1,7 +1,7 @@
 package hardcorequesting.quests.task;
 
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
@@ -16,7 +16,7 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
 
     public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-        register(EventHandler.Type.CRAFTING);
+        register(EventTrigger.Type.CRAFTING);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
                 }
                 NonNullList<ItemStack> list = NonNullList.create();
                 list.add(stack);
-                increaseItems(list, (QuestDataTaskItems) getData(player), QuestingData.getUserUUID(player));
+                increaseItems(list, (QuestDataTaskItems) getData(player), player.getPersistentID());
                 //}
             }
         }

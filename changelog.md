@@ -1,3 +1,12 @@
+### 5.4.0 for 1.12.x (xx.xx.201x by canitzp, duely):
+To accomplish this release of HQM we used a special made modpack with a special server to "field test" the mod completely. Most bugs are fixed through that!
+
+- A lot of internal changes, especially changing string uuid instances to proper UUID instances
+- **Fixing server bug, that quests are missing after a rejoin or server restart! This was a very often heard, but difficult to reproduce bug**
+- Quest sync from a server does now work properly, even if the server quests are updated
+- The QDS is now functioning properly again
+- Click on a requirement item in the quest books opens the jei recipes for it. thanks duely
+
 ### 5.3.5 for 1.12.x (19.12.2018 by canitzp, duely, codewarrior0, TataTawa):
 - Some code cleanup and therefor fixing a team creation bug #407 (and several similar issues)
 - Added command to toggle edit mode, without game restart! Thanks duely

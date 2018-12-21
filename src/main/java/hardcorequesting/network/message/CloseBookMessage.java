@@ -3,30 +3,33 @@ package hardcorequesting.network.message;
 import hardcorequesting.quests.QuestingData;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import java.util.UUID;
+
 public class CloseBookMessage implements IMessage {
 
-    private String uuid;
+    private UUID playerID;
 
     public CloseBookMessage() {
     }
 
-    public CloseBookMessage(String uuid) {
-        this.uuid = uuid;
+    public CloseBookMessage(UUID playerID) {
+        this.playerID = playerID;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        uuid = ByteBufUtils.readUTF8String(buf);
+        this.playerID = new PacketBuffer(buf).readUniqueId();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, uuid);
+        new PacketBuffer(buf).writeUniqueId(this.playerID);
     }
 
     public static class Handler implements IMessageHandler<CloseBookMessage, IMessage> {
@@ -38,7 +41,7 @@ public class CloseBookMessage implements IMessage {
         }
 
         private void handle(CloseBookMessage message, MessageContext ctx) {
-            QuestingData.getQuestingData(message.uuid).getTeam().getEntry(message.uuid).setBookOpen(false);
+            QuestingData.getQuestingData(message.playerID).getTeam().getEntry(message.playerID).setBookOpen(false);
         }
     }
 }

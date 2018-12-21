@@ -1,6 +1,6 @@
 package hardcorequesting.quests.task;
 
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -9,7 +9,7 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
     public QuestTaskReputationTarget(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 0);
 
-        register(EventHandler.Type.OPEN_BOOK, EventHandler.Type.REPUTATION_CHANGE);
+        register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);
     }
 
     private void checkReputation(EntityPlayer player) {
@@ -28,12 +28,12 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
     }
 
     @Override
-    public void onOpenBook(EventHandler.BookOpeningEvent event) {
+    public void onOpenBook(EventTrigger.BookOpeningEvent event) {
         checkReputation(event.getPlayer());
     }
 
     @Override
-    public void onReputationChange(EventHandler.ReputationEvent event) {
+    public void onReputationChange(EventTrigger.ReputationEvent event) {
         checkReputation(event.getPlayer());
     }
 }

@@ -51,7 +51,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public static ThreadingHandler HANDLER = new ThreadingHandler();
     protected Element<?> selected;
     private int id;
-    private String sid;
+    private UUID questId;
     private Type type;
     private List<Element<?>> playerItems;
     public List<Element<?>> searchItems;
@@ -65,15 +65,15 @@ public class GuiEditMenuItem extends GuiEditMenu {
         this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), null, id, type, amount, precision);
     }
 
-    public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, String sid, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), sid, -1, type, amount, precision);
+    public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, UUID questId, Type type, int amount, ItemPrecision precision) {
+        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), questId, -1, type, amount, precision);
     }
 
-    public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Element<?> element, String sid, int id, final Type type, final int amount, ItemPrecision precision) {
+    public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Element<?> element, UUID questId, int id, final Type type, final int amount, ItemPrecision precision) {
         super(gui, player, true);
         this.selected = element;
         this.id = id;
-        this.sid = sid;
+        this.questId = questId;
         this.type = type;
         this.precision = precision;
         
@@ -257,9 +257,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getFluidStack());
             }
         } else if (type == Type.QUEST_ICON) {
-            if (Quest.getQuest(sid) != null && selected instanceof ElementItem) {
+            if (Quest.getQuest(questId) != null && selected instanceof ElementItem) {
                 try {
-                    Quest.getQuest(sid).setIconStack((ItemStack) selected.getFluidStack());
+                    Quest.getQuest(questId).setIconStack((ItemStack) selected.getFluidStack());
                 } catch (Exception e) {
                     System.out.println("Tell LordDusk that he found the issue.");
                 }

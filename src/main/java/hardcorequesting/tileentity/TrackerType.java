@@ -15,7 +15,7 @@ public enum TrackerType {
         public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : QuestingData.getAllTeams()) {
-                if (team.getQuestData(quest.getId()).completed) {
+                if (team.getQuestData(quest.getQuestId()).completed) {
                     boolean valid = radius == 0;
                     valid = isValid(valid, team, tracker, radius);
                     if (valid) {
@@ -33,7 +33,7 @@ public enum TrackerType {
         public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : QuestingData.getAllTeams()) {
-                if (team.getQuestData(quest.getId()).completed) {
+                if (team.getQuestData(quest.getQuestId()).completed) {
 
                     for (PlayerEntry entry : team.getPlayers()) {
                         if (entry.isInTeam()) {

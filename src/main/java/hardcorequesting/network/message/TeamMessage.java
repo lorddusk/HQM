@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 public class TeamMessage implements IMessage {
 
     private TeamAction action;
-    private String data;
+    private String data; // todo rewrite to use NBTTagCompound instead of a freaking string!
 
     public TeamMessage() {
     }

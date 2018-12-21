@@ -12,10 +12,7 @@ import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TeamAdapter {
 
@@ -57,9 +54,9 @@ public class TeamAdapter {
             }
             out.endArray();
             out.name(QUEST_DATA_LIST).beginArray();
-            for (Map.Entry<String, QuestData> data : value.getQuestData().entrySet()) {
+            for (Map.Entry<UUID, QuestData> data : value.getQuestData().entrySet()) {
                 out.beginObject();
-                out.name(QUEST_ID).value(data.getKey());
+                out.name(QUEST_ID).value(data.getKey().toString());
                 out.name(QUEST_DATA);
                 QuestDataAdapter.QUEST_DATA_ADAPTER.write(out, data.getValue());
                 out.endObject();
@@ -144,7 +141,7 @@ public class TeamAdapter {
                                 }
                             }
                             if (id != null && data != null)
-                                team.getQuestData().put(id, data);
+                                team.getQuestData().put(UUID.fromString(id), data);
                             in.endObject();
                         }
                         in.endArray();
@@ -173,7 +170,7 @@ public class TeamAdapter {
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
             Map<Integer, Team> tempMap = new HashMap<>();
-            QuestingData.getTeams().stream().filter(team -> team != null).forEach(team -> tempMap.put(team.getId(), team));
+            QuestingData.getTeams().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
             for (Team team : QuestingData.getTeams()) {
                 List<Integer> invites = invitesMap.get(team);
                 if (invites != null)

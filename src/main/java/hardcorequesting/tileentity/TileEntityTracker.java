@@ -16,8 +16,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.UUID;
 
 public class TileEntityTracker extends TileEntity implements ITickable {
 
@@ -26,7 +29,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     private static final String NBT_RADIUS = "Radius";
     private static final String NBT_TYPE = "TrackerType";
     private Quest quest;
-    private String questId;
+    private UUID questId;
     private int radius;
     private TrackerType type = TrackerType.TEAM;
     private int delay = 0;
@@ -37,7 +40,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void openInterface(EntityPlayer player, BlockPos pos, String questId, int radius, TrackerType type) {
+    public static void openInterface(EntityPlayer player, BlockPos pos, UUID questId, int radius, TrackerType type) {
         TileEntityTracker tracker = getTracker(player.world, pos);
         if (tracker != null) {
             tracker.questId = questId;
@@ -52,7 +55,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
 
     public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
         TileEntityTracker tracker = getTracker(player.world, pos);
-        if (Quest.isEditing && tracker != null) {
+        if (Quest.canQuestsBeEdited(player) && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;
         }
@@ -61,9 +64,17 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-
-        if (compound.hasKey(NBT_QUEST)) {
-            questId = compound.getString(NBT_QUEST);
+    
+        // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
+        if(compound.hasKey(NBT_QUEST, Constants.NBT.TAG_STRING)){
+            try{
+                compound.setUniqueId(NBT_QUEST, UUID.fromString(compound.getString(NBT_QUEST)));
+            } catch(IllegalArgumentException ignored){}
+            compound.removeTag(NBT_QUEST);
+        }
+        
+        if (compound.hasKey(NBT_QUEST + "Most")) {
+            questId = compound.getUniqueId(NBT_QUEST);
         } else {
             quest = null;
         }
@@ -76,7 +87,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         super.writeToNBT(compound);
 
         if (quest != null) {
-            compound.setString(NBT_QUEST, quest.getId());
+            compound.setUniqueId(NBT_QUEST, quest.getQuestId());
         }
         compound.setInteger(NBT_RADIUS, radius);
         compound.setByte(NBT_TYPE, (byte) type.ordinal());
@@ -91,7 +102,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
         }
 
         if (!world.isRemote && delay++ == 20) {
-            if (quest != null && Quest.getQuest(quest.getId()) == null) {
+            if (quest != null && Quest.getQuest(quest.getQuestId()) == null) {
                 quest = null;
             }
             int oldMeta = world.getBlockState(pos).getBlock().getMetaFromState(ModBlocks.itemTracker.getDefaultState());
@@ -156,7 +167,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     private String[] build() {
         String[] data = new String[4];
         data[0] = "" + pos.toLong();
-        data[1] = quest != null ? quest.getId() : null;
+        data[1] = quest != null ? quest.getQuestId().toString() : null;
         data[2] = "" + radius;
         data[3] = "" + type.ordinal();
         return data;

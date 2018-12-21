@@ -1,6 +1,7 @@
 package hardcorequesting.quests.task;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
@@ -10,13 +11,14 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuMob;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskMob;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,7 +40,7 @@ public class QuestTaskMob extends QuestTask {
 
     public QuestTaskMob(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-        register(EventHandler.Type.DEATH);
+        register(EventTrigger.Type.DEATH);
     }
 
     public static EntityPlayer getKiller(LivingDeathEvent event) {
@@ -79,8 +81,9 @@ public class QuestTaskMob extends QuestTask {
         mobs[id].name = str;
     }
 
+    @SideOnly(Side.CLIENT)
     private Mob[] getEditFriendlyMobs(Mob[] mobs) {
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
             mobs = Arrays.copyOf(mobs, mobs.length + 1);
             mobs[mobs.length - 1] = new Mob();
             return mobs;
@@ -123,7 +126,7 @@ public class QuestTaskMob extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
             Mob[] mobs = getEditFriendlyMobs(this.mobs);
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
@@ -171,12 +174,12 @@ public class QuestTaskMob extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
+    public float getCompletedRatio(UUID playerID) {
         int killed = 0;
         int total = 0;
 
         for (int i = 0; i < mobs.length; i++) {
-            killed += ((QuestDataTaskMob) getData(uuid)).killed[i];
+            killed += ((QuestDataTaskMob) getData(playerID)).killed[i];
             total += mobs[i].count;
         }
 
@@ -184,7 +187,7 @@ public class QuestTaskMob extends QuestTask {
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         int[] killed = ((QuestDataTaskMob) own).killed;
         int[] otherKilled = ((QuestDataTaskMob) other).killed;
 
@@ -197,13 +200,13 @@ public class QuestTaskMob extends QuestTask {
         }
 
         if (all) {
-            completeTask(uuid);
+            completeTask(playerID);
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        int[] killed = ((QuestDataTaskMob) getData(uuid)).killed;
+    public void autoComplete(UUID playerID) {
+        int[] killed = ((QuestDataTaskMob) getData(playerID)).killed;
         for (int i = 0; i < killed.length; i++) {
             killed[i] = mobs[i].count;
         }

@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import org.lwjgl.opencl.CL;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -41,6 +42,10 @@ public class NetworkManager {
         WRAPPER.registerMessage(TeamMessage.Handler.class, TeamMessage.class, id++, Side.SERVER);
         WRAPPER.registerMessage(ClientUpdateMessage.Handler.class, ClientUpdateMessage.class, id++, Side.SERVER);
         WRAPPER.registerMessage(OpActionMessage.Handler.class, OpActionMessage.class, id++, Side.SERVER);
+        
+        WRAPPER.registerMessage(SyncableTileMessage.class, SyncableTileMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, Side.CLIENT);
+        WRAPPER.registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, Side.SERVER);
     }
 
     public static void sendToPlayer(IMessage message, EntityPlayerMP player) {
@@ -91,6 +96,12 @@ public class NetworkManager {
             } else {
                 sendToPlayersAround(message, block, IBlockSync.BLOCK_UPDATE_RANGE);
             }
+        }
+    }
+    
+    public static void sendSyncPacket(TileEntity tile){
+        if(tile instanceof ISyncableTile && !tile.getWorld().isRemote){
+            sendToPlayersAround(new SyncableTileMessage(tile), tile, 128D);
         }
     }
 }

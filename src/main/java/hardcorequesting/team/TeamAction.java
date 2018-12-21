@@ -9,6 +9,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
+import java.util.UUID;
+
 public enum TeamAction {
     CREATE {
         @Override
@@ -30,7 +32,7 @@ public enum TeamAction {
                 team.setName(teamName);
                 team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
 
-                Team.declineAll(QuestingData.getUserUUID(player));
+                Team.declineAll(player.getPersistentID());
                 TeamStats.refreshTeam(team);
                 NetworkManager.sendToAllPlayers(TeamUpdateType.CREATE_TEAM.build(team));
                 if (player instanceof EntityPlayerMP) {
@@ -44,7 +46,7 @@ public enum TeamAction {
         public void process(Team team, EntityPlayer player, String playerName) {
             EntityPlayer invitee = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
             if (!team.isSingle() && team.isOwner(player) && invitee != null) {
-                PlayerEntry entry = new PlayerEntry(invitee.getUniqueID().toString(), false, false);
+                PlayerEntry entry = new PlayerEntry(invitee.getUniqueID(), false, false);
 
                 if (!QuestingData.hasData(entry.getUUID())) {
                     TeamError.INVALID_PLAYER.sendToClient(player);
@@ -77,17 +79,17 @@ public enum TeamAction {
                     for (PlayerEntry entry : inviteTeam.getPlayers()) {
                         if (entry.isInTeam()) {
                             id++;
-                        } else if (entry.getUUID().equals(QuestingData.getUserUUID(player))) {
+                        } else if (entry.getUUID().equals(player.getPersistentID())) {
                             entry.setBookOpen(true);
                             entry.setInTeam(true);
                             QuestingData.getQuestingData(entry.getUUID()).setTeam(inviteTeam);
                             team.setId(inviteTeam.getId());
 
-                            for (String quest : inviteTeam.getQuestData().keySet()) {
-                                QuestData joinData = team.getQuestData().get(quest);
-                                QuestData questData = inviteTeam.getQuestData().get(quest);
+                            for (UUID questId : inviteTeam.getQuestData().keySet()) {
+                                QuestData joinData = team.getQuestData().get(questId);
+                                QuestData questData = inviteTeam.getQuestData().get(questId);
                                 if (questData != null) {
-                                    boolean old[] = questData.reward;
+                                    boolean[] old = questData.reward;
                                     questData.reward = new boolean[old.length + 1];
                                     for (int j = 0; j < questData.reward.length; j++) {
                                         if (j == id) {
@@ -102,11 +104,11 @@ public enum TeamAction {
                                 }
                             }
 
-                            for (String quest : inviteTeam.getQuestData().keySet()) {
-                                QuestData joinData = team.getQuestData().get(quest);
-                                QuestData questData = inviteTeam.getQuestData().get(quest);
-                                if (questData != null && Quest.getQuest(quest) != null)
-                                    Quest.getQuest(quest).mergeProgress(QuestingData.getUserUUID(player), questData, joinData);
+                            for (UUID questId : inviteTeam.getQuestData().keySet()) {
+                                QuestData joinData = team.getQuestData().get(questId);
+                                QuestData questData = inviteTeam.getQuestData().get(questId);
+                                if (questData != null && Quest.getQuest(questId) != null)
+                                    Quest.getQuest(questId).mergeProgress(player.getPersistentID(), questData, joinData);
                             }
 
                             for (Reputation reputation : Reputation.getReputations().values()) {
@@ -125,7 +127,7 @@ public enum TeamAction {
 
                             inviteTeam.refreshData();
                             inviteTeam.refreshTeamData(TeamUpdateSize.ALL);
-                            Team.declineAll(QuestingData.getUserUUID(player));
+                            Team.declineAll(player.getPersistentID());
                             TeamStats.refreshTeam(inviteTeam);
                             NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, entry.getUUID()), entry.getPlayerMP());
                             break;
@@ -142,7 +144,7 @@ public enum TeamAction {
                 int declineId = Integer.parseInt(data);
                 if (declineId >= 0 && declineId < QuestingData.getTeams().size()) {
                     Team inviteTeam = QuestingData.getTeams().get(declineId);
-                    inviteTeam.getPlayers().remove(new PlayerEntry(QuestingData.getUserUUID(player), false, false));
+                    inviteTeam.getPlayers().remove(new PlayerEntry(player.getPersistentID(), false, false));
                     inviteTeam.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
                 }
@@ -154,7 +156,7 @@ public enum TeamAction {
         public void process(Team team, EntityPlayer player, String toRemovePlayerUuid) {
             EntityPlayer playerToRemove = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(toRemovePlayerUuid));
             if (!team.isSingle() && team.isOwner(player) && playerToRemove != null) {
-                PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUniqueID().toString());
+                PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUniqueID());
                 if (!entryToRemove.isOwner()) {
                     if (entryToRemove.isInTeam()) {
                         team.removePlayer(playerToRemove);

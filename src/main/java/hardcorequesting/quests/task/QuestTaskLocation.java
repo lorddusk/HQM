@@ -6,13 +6,14 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuLocation;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskLocation;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class QuestTaskLocation extends QuestTask {
 
@@ -39,7 +41,7 @@ public class QuestTaskLocation extends QuestTask {
     public QuestTaskLocation(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
 
-        register(EventHandler.Type.SERVER, EventHandler.Type.PLAYER);
+        register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
 
     private void tick(EntityPlayer player, boolean isPlayerEvent) {
@@ -84,9 +86,10 @@ public class QuestTaskLocation extends QuestTask {
             }
         }
     }
-
+    
+    @SideOnly(Side.CLIENT)
     private Location[] getEditFriendlyLocations(Location[] locations) {
-        if (Quest.isEditing) {
+        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
             locations = Arrays.copyOf(locations, locations.length + 1);
             locations[locations.length - 1] = new Location();
             return locations;
@@ -171,7 +174,7 @@ public class QuestTaskLocation extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.isEditing && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
             Location[] locations = getEditFriendlyLocations(this.locations);
             for (int i = 0; i < locations.length; i++) {
                 Location location = locations[i];
@@ -219,9 +222,9 @@ public class QuestTaskLocation extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
+    public float getCompletedRatio(UUID playerID) {
         int visited = 0;
-        for (boolean b : ((QuestDataTaskLocation) getData(uuid)).visited) {
+        for (boolean b : ((QuestDataTaskLocation) getData(playerID)).visited) {
             if (b) {
                 visited++;
             }
@@ -231,7 +234,7 @@ public class QuestTaskLocation extends QuestTask {
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         boolean[] visited = ((QuestDataTaskLocation) own).visited;
         boolean[] otherVisited = ((QuestDataTaskLocation) other).visited;
 
@@ -245,13 +248,13 @@ public class QuestTaskLocation extends QuestTask {
         }
 
         if (all) {
-            completeTask(uuid);
+            completeTask(playerID);
         }
     }
 
     @Override
-    public void autoComplete(String uuid) {
-        boolean[] visited = ((QuestDataTaskLocation) getData(uuid)).visited;
+    public void autoComplete(UUID playerID) {
+        boolean[] visited = ((QuestDataTaskLocation) getData(playerID)).visited;
         for (int i = 0; i < visited.length; i++) {
             visited[i] = true;
         }
