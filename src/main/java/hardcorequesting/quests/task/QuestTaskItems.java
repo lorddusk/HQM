@@ -4,6 +4,7 @@ import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.integration.jei.JEIIntegration;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
@@ -17,6 +18,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -263,7 +265,15 @@ public abstract class QuestTaskItems extends QuestTask {
                     break;
                 }
             }
-
+        } else {
+            if (Loader.isModLoaded("jei")) {
+                for (ItemRequirement item : getEditFriendlyItems(this.items)) {
+                    if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
+                        JEIIntegration.showItemStack(item.getStack());
+                        return;
+                    }
+                }
+            }
         }
     }
 
