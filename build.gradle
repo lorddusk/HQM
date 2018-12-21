@@ -33,6 +33,7 @@ repositories {
 
 dependencies {
     deobfCompile "mcp.mobius.waila:Hwyla:${project.hwyla_version}"
+    deobfProvided "mezz.jei:jei_${project.jei_version}:api"
     runtime "mezz.jei:jei_${project.jei_version}"
     deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${project.actadd_version}"
 }
