@@ -30,13 +30,13 @@ public enum GeneralUsage{
     
     BOOK_OPEN{
         @Override
-        public void receiveData(EntityPlayer player, NBTTagCompound nbt, Side side){
+        public void receiveData(EntityPlayer player, NBTTagCompound nbt){
             GuiQuestBook.displayGui(player, nbt.getBoolean("OP"));
         }
     },
     BOOK_SELECT_TASK{
         @Override
-        public void receiveData(EntityPlayer player, NBTTagCompound nbt, Side side){
+        public void receiveData(EntityPlayer player, NBTTagCompound nbt){
             QuestingData data = QuestingData.getQuestingData(player);
             data.selectedQuestId = nbt.getUniqueId("QuestId");
             data.selectedTask = nbt.getInteger("TaskId");
@@ -44,7 +44,7 @@ public enum GeneralUsage{
     },
     BAG_OPENED{
         @Override
-        public void receiveData(EntityPlayer player, NBTTagCompound nbt, Side side){
+        public void receiveData(EntityPlayer player, NBTTagCompound nbt){
             UUID groupId = nbt.getUniqueId("GroupId");
             int bag = nbt.getInteger("Bag");
             int[] limits = nbt.getIntArray("Limits");
@@ -78,7 +78,7 @@ public enum GeneralUsage{
         BAG_OPENED.sendMessageToServer(nbt);
     }
     
-    public abstract void receiveData(EntityPlayer player, NBTTagCompound nbt, Side side);
+    public abstract void receiveData(EntityPlayer player, NBTTagCompound nbt);
     
     @SideOnly(Side.CLIENT)
     public void sendMessageToServer(NBTTagCompound data){

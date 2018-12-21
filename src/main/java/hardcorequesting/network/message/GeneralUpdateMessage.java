@@ -1,7 +1,9 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.network.GeneralUsage;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,6 +15,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.UUID;
 
@@ -40,7 +43,14 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
         World world = DimensionManager.getWorld(worldId);
         if(world != null){
             this.player = world.getPlayerEntityByUUID(playerId);
+        } else if(HardcoreQuesting.loadingSide.isClient()){
+            this.player = getClientPlayer();
         }
+    }
+    
+    @SideOnly(Side.CLIENT)
+    private EntityPlayer getClientPlayer(){
+        return Minecraft.getMinecraft().player;
     }
     
     @Override
@@ -56,11 +66,7 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
         if(message.data != null && message.usage >= 0){
             GeneralUsage usage = GeneralUsage.values()[message.usage];
             if(message.player != null){
-                if(message.player instanceof EntityPlayerMP){// message from client
-                    usage.receiveData(message.player, message.data, Side.SERVER);
-                } else {// message from server
-                    usage.receiveData(message.player, message.data, Side.CLIENT);
-                }
+                usage.receiveData(message.player, message.data);
             }
         }
         return null;
