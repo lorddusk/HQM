@@ -35,6 +35,7 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
         int worldId = buf.readInt();
         UUID playerId = new PacketBuffer(buf).readUniqueId();
         this.data = ByteBufUtils.readTag(buf);
+        this.usage = buf.readInt();
     
         World world = DimensionManager.getWorld(worldId);
         if(world != null){
@@ -47,17 +48,20 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
         buf.writeInt(this.player.getEntityWorld().provider.getDimension());
         new PacketBuffer(buf).writeUniqueId(this.player.getPersistentID());
         ByteBufUtils.writeTag(buf, this.data);
+        buf.writeInt(this.usage);
     }
     
     @Override
     public IMessage onMessage(GeneralUpdateMessage message, MessageContext ctx){
         if(message.data != null && message.usage >= 0){
             GeneralUsage usage = GeneralUsage.values()[message.usage];
-            /*if(message.player instanceof EntityPlayerSP){ // message from server
-                usage.receiveData(message.player, message.data, Side.CLIENT);
-            } else if (message.player instanceof EntityPlayerMP){ // message from client
-                usage.receiveData(message.player, message.data, Side.SERVER);
-            }*/
+            if(message.player != null){
+                if(message.player instanceof EntityPlayerMP){// message from client
+                    usage.receiveData(message.player, message.data, Side.SERVER);
+                } else {// message from server
+                    usage.receiveData(message.player, message.data, Side.CLIENT);
+                }
+            }
         }
         return null;
     }

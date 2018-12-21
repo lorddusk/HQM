@@ -76,49 +76,6 @@ public enum GuiType {
         public void open(EntityPlayer player, String data) {
             GuiQuestBook.displayGui(player, Boolean.parseBoolean(data));
         }
-    },
-    BAG {
-        private static final String GROUP = "group";
-        private static final String BAG = "bag";
-        private static final String LIMIT = "limit";
-
-        @Override
-        public IMessage build(String... data) {
-            StringWriter stringWriter = new StringWriter();
-
-            try {
-                JsonWriter writer = new JsonWriter(stringWriter);
-                writer.beginObject();
-                writer.name(GROUP).value(data[0]);
-                writer.name(BAG).value(data[1]);
-                writer.name(LIMIT).beginArray();
-                int i = 2;
-                while (i < data.length){
-                    writer.value(Integer.parseInt(data[i]));
-                    i++;
-                }
-                writer.endArray();
-                writer.endObject();
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return new OpenGuiMessage(this, stringWriter.toString());
-        }
-
-        @Override
-        public void open(EntityPlayer player, String data) {
-            JsonParser parser = new JsonParser();
-            JsonObject root = parser.parse(data).getAsJsonObject();
-            String groupId = root.get(GROUP).getAsString();
-            int bag = root.get(BAG).getAsInt();
-            JsonArray limitsArray = root.get(LIMIT).getAsJsonArray();
-            List<Integer> limits = new ArrayList<>();
-            for (JsonElement element : limitsArray)
-                limits.add(element.getAsInt());
-            GuiReward.open(player, groupId, bag, limits);
-        }
     };
 
     public abstract IMessage build(String... data);

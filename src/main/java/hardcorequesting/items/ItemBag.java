@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Lists;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
+import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.network.NetworkManager;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -25,6 +27,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 
@@ -105,6 +108,7 @@ public class ItemBag extends Item {
     }
 
     private void openClientInterface(EntityPlayer player, UUID groupId, int bag) {
+        /* legacy code
         List<String> data = new ArrayList<>();
         data.add(groupId.toString());
         data.add("" + bag);
@@ -114,6 +118,11 @@ public class ItemBag extends Item {
                 .collect(Collectors.toList()));
         if (ItemBag.displayGui && player instanceof EntityPlayerMP)
             NetworkManager.sendToPlayer(GuiType.BAG.build(data.toArray(new String[data.size()])), (EntityPlayerMP) player);
+            */
+        GeneralUsage.sendOpenBagUpdate(groupId, bag, ArrayUtils.toPrimitive(Group.getGroups().values().stream()
+                                                                                 .filter(group -> group.getLimit() != 0)
+                                                                                 .map(group -> group.getRetrievalCount(player))
+                                                                                 .toArray(Integer[]::new)));
         SoundHandler.play(Sounds.BAG, player);
     }
 }

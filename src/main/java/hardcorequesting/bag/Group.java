@@ -64,8 +64,8 @@ public class Group {
         getGroups().put(group.getId(), group);
     }
 
-    public static Group getGroup(String id) {
-        return Group.getGroups().get(id);
+    public static Group getGroup(UUID groupId) {
+        return Group.getGroups().get(groupId);
     }
 
     @SideOnly(Side.CLIENT)

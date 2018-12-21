@@ -721,6 +721,7 @@ public class GuiQuestBook extends GuiBase {
         if (selectedGroup != null) {
             selectedGroup.draw(this, x, y);
             textBoxes.draw(this);
+            
         } else {
             Group.drawOverview(this, tierScroll, groupScroll, x, y);
         }

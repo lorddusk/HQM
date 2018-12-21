@@ -6,6 +6,7 @@ To accomplish this release of HQM we used a special made modpack with a special 
 - Quest sync from a server does now work properly, even if the server quests are updated
 - The QDS is now functioning properly again
 - Click on a requirement item in the quest books opens the jei recipes for it. thanks duely
+- Added TUMAT and TheOneProbe integration (same behaviour as Waila/Hwyla)
 
 ### 5.3.5 for 1.12.x (19.12.2018 by canitzp, duely, codewarrior0, TataTawa):
 - Some code cleanup and therefor fixing a team creation bug #407 (and several similar issues)

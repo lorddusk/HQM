@@ -3,6 +3,7 @@ package hardcorequesting.client.interfaces;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.ModConfig;
@@ -68,12 +69,12 @@ public class GuiReward extends GuiBase {
         }
     }
 
-    public static void open(EntityPlayer player, String groupId, int bag, List<Integer> limits) {
+    public static void open(EntityPlayer player, UUID groupId, int bag, int[] limits) {
         Group rewardGroup = Group.getGroups().get(groupId);
         int i = 0;
         for (Group group : Group.getGroups().values())
             if (group.getLimit() != 0)
-                group.setRetrievalCount(player, limits.get(i++));
+                group.setRetrievalCount(player, limits[i++]);
 
         if (ItemBag.displayGui) {
             Minecraft.getMinecraft().displayGuiScreen(new GuiReward(rewardGroup, bag, player));

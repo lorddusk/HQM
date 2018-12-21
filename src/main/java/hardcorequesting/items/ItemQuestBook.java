@@ -7,6 +7,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.commands.CommandHandler;
+import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
@@ -23,16 +24,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+
 public class ItemQuestBook extends Item {
 
     private static final String NBT_PLAYER = "UseAsPlayer";
 
     public ItemQuestBook() {
-        super();
-        setCreativeTab(HardcoreQuesting.HQMTab);
-        setMaxStackSize(1);
-        setRegistryName(ItemInfo.BOOK_UNLOCALIZED_NAME);
-        setTranslationKey(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
+        this.setCreativeTab(HardcoreQuesting.HQMTab);
+        this.setMaxStackSize(1);
+        this.setRegistryName(ItemInfo.BOOK_UNLOCALIZED_NAME);
+        this.setTranslationKey(ItemInfo.LOCALIZATION_START + ItemInfo.BOOK_UNLOCALIZED_NAME);
     }
 
     public static ItemStack getOPBook(EntityPlayer player) {
@@ -43,8 +45,9 @@ public class ItemQuestBook extends Item {
         return stack;
     }
 
+    @Nonnull
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         if (!world.isRemote && player instanceof EntityPlayerMP) {
             ItemStack stack = player.getHeldItem(hand);
             if (!QuestingData.isQuestActive()) {
@@ -65,7 +68,7 @@ public class ItemQuestBook extends Item {
                             EntityPlayer subject = QuestingData.getPlayer(uuid);
                             if (subject instanceof EntityPlayerMP) {
                                 QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID()).setBookOpen(true);
-                                NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.TRUE.toString()), (EntityPlayerMP) subject);
+                                GeneralUsage.sendOpenBook(player, true);
                             }
                             //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                         } else {
@@ -74,14 +77,15 @@ public class ItemQuestBook extends Item {
                     }
                 } else {
                     QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID()).setBookOpen(true);
-                    NetworkManager.sendToPlayer(GuiType.BOOK.build(Boolean.FALSE.toString()), (EntityPlayerMP) player);
+                    GeneralUsage.sendOpenBook(player, false);
                 }
             }
-
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
         return super.onItemRightClick(world, player, hand);
     }
 
+    @Nonnull
     @Override
     public String getTranslationKey(ItemStack stack) {
         return super.getTranslationKey(stack) + "_" + stack.getItemDamage();
