@@ -119,7 +119,7 @@ public class ItemBag extends Item {
         if (ItemBag.displayGui && player instanceof EntityPlayerMP)
             NetworkManager.sendToPlayer(GuiType.BAG.build(data.toArray(new String[data.size()])), (EntityPlayerMP) player);
             */
-        GeneralUsage.sendOpenBagUpdate(groupId, bag, ArrayUtils.toPrimitive(Group.getGroups().values().stream()
+        GeneralUsage.sendOpenBagUpdate(player, groupId, bag, ArrayUtils.toPrimitive(Group.getGroups().values().stream()
                                                                                  .filter(group -> group.getLimit() != 0)
                                                                                  .map(group -> group.getRetrievalCount(player))
                                                                                  .toArray(Integer[]::new)));
