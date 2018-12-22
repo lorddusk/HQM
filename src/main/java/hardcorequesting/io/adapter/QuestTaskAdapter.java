@@ -456,6 +456,7 @@ public class QuestTaskAdapter {
         ITEMS(QuestDataTaskItems::construct),
         LOCATION(QuestDataTaskLocation::construct),
         MOB(QuestDataTaskMob::construct),
+        REPUTATION_KILL(QuestDataTaskReputationKill::construct),
         TAME(QuestDataTaskTame::construct);
 
         private Function<JsonReader, QuestDataTask> func;
