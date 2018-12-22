@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityOwnable;
+import net.minecraft.entity.passive.AbstractHorse;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -75,7 +76,7 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
             // TODO: IEntityOwnable doesn't necessarily indicate that the mob properly
             // generates an animal tame event.
             Class<?> clazz = entry.getValue().getEntityClass();
-            if (EntityTameable.class.isAssignableFrom(clazz) || ArrayUtils.contains(clazz.getInterfaces(), IEntityOwnable.class)) {
+            if (EntityTameable.class.isAssignableFrom(clazz) || AbstractHorse.class.isAssignableFrom(clazz) || ArrayUtils.contains(clazz.getInterfaces(), IEntityOwnable.class)) {
                 rawTames.add(entry.getValue().getName());
             }
         }

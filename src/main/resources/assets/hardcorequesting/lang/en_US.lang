@@ -400,7 +400,7 @@ hqm.mobTask.totalKills=Kill a total of %s
 # ======================================
 #           TAMING TASK
 # ======================================
-hqm.tameTask.reqTames=Required tame count
+hqm.tameTask.reqKills=Required tame count
 hqm.tameTask.search=Search
 hqm.tameTask.nothingSelected=Nothing Selected
 hqm.tameTask.currentlySelected=Currently Selected
