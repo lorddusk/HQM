@@ -72,12 +72,9 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         rawTames = new ArrayList<>();
         tames = new ArrayList<>();
 
-
         for (Map.Entry<ResourceLocation, EntityEntry> entry : ForgeRegistries.ENTITIES.getEntries()) {
-            // TODO: IEntityOwnable doesn't necessarily indicate that the mob properly
-            // generates an animal tame event.
             Class<?> clazz = entry.getValue().getEntityClass();
-            if (EntityTameable.class.isAssignableFrom(clazz) || AbstractHorse.class.isAssignableFrom(clazz) || ArrayUtils.contains(clazz.getInterfaces(), IEntityOwnable.class)) {
+            if (EntityLivingBase.class.isAssignableFrom(clazz)) {
                 rawTames.add(entry.getKey().toString());
             }
         }
