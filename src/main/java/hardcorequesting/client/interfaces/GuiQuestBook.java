@@ -531,7 +531,9 @@ public class GuiQuestBook extends GuiBase {
             editMenu.drawMouseOver(this, x, y);
         }
 
-        buttons.forEach(button -> button.drawMouseOver(this, player, x, y));
+        if (currentMode != EditMode.MOVE) {
+            buttons.forEach(button -> button.drawMouseOver(this, player, x, y));
+        }
 
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             drawMouseOver(Translator.translate("hqm.questBook.goBack") + "\n" + GuiColor.GRAY + Translator.translate("hqm.questBook.rightClick"), x + left, y + top);
