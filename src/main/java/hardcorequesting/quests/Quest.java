@@ -34,17 +34,7 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.reward.CommandRewardList;
 import hardcorequesting.quests.reward.ItemStackRewardList;
 import hardcorequesting.quests.reward.ReputationReward;
-import hardcorequesting.quests.task.QuestTask;
-import hardcorequesting.quests.task.QuestTaskDeath;
-import hardcorequesting.quests.task.QuestTaskItems;
-import hardcorequesting.quests.task.QuestTaskItemsConsume;
-import hardcorequesting.quests.task.QuestTaskItemsConsumeQDS;
-import hardcorequesting.quests.task.QuestTaskItemsCrafting;
-import hardcorequesting.quests.task.QuestTaskItemsDetect;
-import hardcorequesting.quests.task.QuestTaskLocation;
-import hardcorequesting.quests.task.QuestTaskMob;
-import hardcorequesting.quests.task.QuestTaskReputationKill;
-import hardcorequesting.quests.task.QuestTaskReputationTarget;
+import hardcorequesting.quests.task.*;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
@@ -1461,6 +1451,8 @@ public class Quest {
             ((QuestTaskItems) selectedTask).setItem(element, id, precision);
         } else if (selectedTask instanceof QuestTaskLocation && type == GuiEditMenuItem.Type.LOCATION) {
             ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
+        } else if (selectedTask instanceof QuestTaskTame && type == GuiEditMenuItem.Type.TAME) {
+            ((QuestTaskTame) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         } else if (selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
             ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         }
@@ -1649,6 +1641,7 @@ public class Quest {
         CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
         DETECT(QuestTaskItemsDetect.class, "detect"),
         KILL(QuestTaskMob.class, "kill"),
+        TAME(QuestTaskTame.class, "tame"),
         DEATH(QuestTaskDeath.class, "death"),
         REPUTATION(QuestTaskReputationTarget.class, "reputation"),
         REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill");

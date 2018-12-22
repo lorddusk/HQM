@@ -4,6 +4,7 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -105,6 +106,14 @@ public class EventTrigger{
         }
     }
 
+    @SubscribeEvent
+    public void onEvent(AnimalTameEvent event) {
+        for (QuestTask task : getTasks(Type.ANIMAL_TAME)) {
+            task.onAnimalTame(event);
+        }
+    }
+
+
     private List<QuestTask> getTasks(Type type) {
         return registeredTasks[type.ordinal()];
     }
@@ -117,6 +126,7 @@ public class EventTrigger{
         PICK_UP,
         OPEN_BOOK,
         REPUTATION_CHANGE,
+        ANIMAL_TAME,
     }
 
     public static class BookOpeningEvent {

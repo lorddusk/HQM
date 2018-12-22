@@ -157,6 +157,8 @@ hqm.taskType.reputation.title=Reputation task
 hqm.taskType.reputation.desc=A task where the player has to reach a certain reputation.
 hqm.taskType.reputationKill.title=Rep kill task
 hqm.taskType.reputationKill.desc=A task where the player has to kill other players with certain reputations.
+hqm.taskType.tame.title=Taming task
+hqm.taskType.tame.desc=A task where the player has to tame specific creatures.
 
 # ======================================
 #			DEATH TYPES
@@ -279,8 +281,8 @@ hqm.editMode.repeatable.title=Set Repeatability
 hqm.editMode.repeatable.desc=Change if a quest should be repeatable or not, and if so, the properties of the repeatability.
 hqm.editMode.trigger.title=Trigger Quests
 hqm.editMode.trigger.desc=Specify any properties for trigger quests.
-hqm.editMode.mob.title=Edit Monster
-hqm.editMode.mob.desc=Edit the monster target for killing tasks.
+hqm.editMode.mob.title=Edit Creature
+hqm.editMode.mob.desc=Edit the creature target for killing and taming tasks.
 hqm.editMode.questSelection.title=Select Quest
 hqm.editMode.questSelection.desc=Mark a quest as the selected quest. When a quest is selected you can bind it to a Quest Tracker System or a Quest Gate System by right clicking it with a book.
 hqm.editMode.questOption.title=Quest Option
@@ -395,6 +397,20 @@ hqm.mobTask.typeMatch.desc=Matching every monster that has the selected type or 
 hqm.mobTask.allKilled=All killed
 hqm.mobTask.partKills=%s[%s%%] killed
 hqm.mobTask.totalKills=Kill a total of %s
+# ======================================
+#           TAMING TASK
+# ======================================
+hqm.tameTask.reqKills=Required tame count
+hqm.tameTask.search=Search
+hqm.tameTask.nothingSelected=Nothing Selected
+hqm.tameTask.currentlySelected=Currently Selected
+hqm.tameTask.exactMatch.title=Exact Match
+hqm.tameTask.typeMatch.title=Type Match
+hqm.tameTask.exactMatch.desc=Only matching creatures with the selected type, subtypes are not counted towards the taming count
+hqm.tameTask.typeMatch.desc=Matching every creature that has the selected type or a subtype to the selected type.
+hqm.tameTask.allTamed=All tamed
+hqm.tameTask.partTames=%s[%s%%] tamed
+hqm.tameTask.totalTames=Tame a total of %s
 
 # ======================================
 #			REPUTATION REWARD

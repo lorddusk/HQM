@@ -20,6 +20,7 @@ import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -271,5 +272,9 @@ public abstract class QuestTask {
     }
 
     public void onReputationChange(EventTrigger.ReputationEvent event) {
+    }
+
+    public void onAnimalTame(AnimalTameEvent event) {
+
     }
 }

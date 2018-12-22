@@ -11,12 +11,14 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskLocation;
 import hardcorequesting.quests.task.QuestTaskMob;
+import hardcorequesting.quests.task.QuestTaskTame;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,6 +39,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     private ReputationMarker reputationMarker;
     private int location = -1;
     private int mob = -1;
+    private int tame = -1;
     private boolean isName;
 
     protected GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
@@ -149,6 +152,12 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.location = id;
     }
 
+    public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskTame task, int id, QuestTaskTame.Tame tame) {
+        this(gui, player, tame.getName(), true);
+        this.task = task;
+        this.tame = id;
+    }
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskMob task, int id, QuestTaskMob.Mob mob) {
         this(gui, player, mob.getName(), true);
         this.task = task;
@@ -199,6 +208,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
                     str = str.substring(0, str.length() - 1);
                 }
                 ((QuestTaskLocation) task).setName(location, str, player);
+            } else if (tame != -1) {
+                while (gui.getStringWidth(str) > 110) {
+                    str = str.substring(0, str.length() - 1);
+                }
+                ((QuestTaskTame) task).setName(tame, str, player);
             } else if (mob != -1) {
                 while (gui.getStringWidth(str) > 110) {
                     str = str.substring(0, str.length() - 1);
