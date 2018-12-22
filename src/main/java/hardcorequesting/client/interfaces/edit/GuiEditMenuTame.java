@@ -6,6 +6,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -14,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,11 +72,10 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         tames = new ArrayList<>();
 
         for (Map.Entry<ResourceLocation, EntityEntry> entry : ForgeRegistries.ENTITIES.getEntries()) {
-            // TODO: There are mods which have taming but do not derive from
-            // EntityTameable. Whether these properly implement the AnimalTameEvent
-            // is questionable, but the only ones which can definitely be relied
-            // upon are vanilla tameables and anything that derives from them.
-            if (EntityTameable.class.isAssignableFrom(entry.getValue().getEntityClass())) {
+            // TODO: IEntityOwnable doesn't necessarily indicate that the mob properly
+            // generates an animal tame event.
+            Class<?> clazz = entry.getValue().getEntityClass();
+            if (EntityTameable.class.isAssignableFrom(clazz) || ArrayUtils.contains(clazz.getInterfaces(), IEntityOwnable.class)) {
                 rawTames.add(entry.getValue().getName());
             }
         }
