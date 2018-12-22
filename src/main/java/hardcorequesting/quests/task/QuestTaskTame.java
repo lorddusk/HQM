@@ -1,6 +1,7 @@
 package hardcorequesting.quests.task;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 
@@ -11,6 +12,7 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTame;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.event.EventHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
@@ -39,7 +41,7 @@ public class QuestTaskTame extends QuestTask {
 
     public QuestTaskTame(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-        register(EventHandler.Type.ANIMAL_TAME);
+        register(EventTrigger.Type.ANIMAL_TAME);
     }
 
     public void setTame(int id, Tame tame, EntityPlayer player) {
@@ -160,7 +162,7 @@ public class QuestTaskTame extends QuestTask {
     }
 
     @Override
-    public float getCompletedRatio(String uuid) {
+    public float getCompletedRatio(UUID uuid) {
         int tamed = 0;
         int total = 0;
 
@@ -173,7 +175,7 @@ public class QuestTaskTame extends QuestTask {
     }
 
     @Override
-    public void mergeProgress(String uuid, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
         int[] tamed = ((QuestDataTaskTame) own).tamed;
         int[] otherTamed = ((QuestDataTaskTame) other).tamed;
 
@@ -191,7 +193,7 @@ public class QuestTaskTame extends QuestTask {
     }
 
     @Override
-    public void autoComplete(String uuid) {
+    public void autoComplete(UUID uuid) {
         int[] tamed = ((QuestDataTaskTame) getData(uuid)).tamed;
         for (int i = 0; i < tamed.length; i++) {
             tamed[i] = tames[i].count;
