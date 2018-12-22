@@ -11,7 +11,6 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTame;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.event.EventHandler;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
@@ -25,7 +24,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
