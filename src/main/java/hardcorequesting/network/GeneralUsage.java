@@ -70,12 +70,12 @@ public enum GeneralUsage{
     }
     
     // server -> client
-    public static void sendOpenBagUpdate(UUID groupId, int bag, int[] limits){
+    public static void sendOpenBagUpdate(EntityPlayer player, UUID groupId, int bag, int[] limits){
         NBTTagCompound nbt = new NBTTagCompound();
         nbt.setUniqueId("GroupId", groupId);
         nbt.setInteger("Bag", bag);
         nbt.setIntArray("Limits", limits);
-        BAG_OPENED.sendMessageToServer(nbt);
+        BAG_OPENED.sendMessageToPlayer(nbt, player);
     }
     
     public abstract void receiveData(EntityPlayer player, NBTTagCompound nbt);
