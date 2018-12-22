@@ -13,6 +13,10 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'idea'
 
+runClient {
+    args '--username', 'hqmtest'
+}
+
 repositories {
     maven {
         name = "Forge"
