@@ -207,7 +207,7 @@ public class QuestTaskTame extends QuestTask {
 
     @Override
     public void onAnimalTame (AnimalTameEvent event) {
-        EntityPlayer player = (EntityPlayer) event.getTamer();
+        EntityPlayer player = event.getTamer();
 
         if (player != null && parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !isCompleted(player)) {
             boolean updated = false;
