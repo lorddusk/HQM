@@ -371,12 +371,14 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawItemStack(fluidStack, x, y, mX, mY, false);
+            if (fluidStack != null && !fluidStack.isEmpty()) {
+                gui.drawItemStack(fluidStack, x, y, mX, mY, false);
+            }
         }
 
         @Override
         public List<String> getName(GuiBase gui) {
-            if (!fluidStack.isEmpty()) {
+            if (fluidStack != null && !fluidStack.isEmpty()) {
                 return fluidStack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
             } else {
                 List<String> ret = new ArrayList<>();
@@ -387,19 +389,19 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public int getAmount() {
-            return fluidStack.isEmpty() ? 0 : fluidStack.getCount();
+            return (fluidStack == null || fluidStack.isEmpty()) ? 0 : fluidStack.getCount();
         }
 
         @Override
         public void setAmount(int val) {
-            if (!fluidStack.isEmpty()) {
+            if (fluidStack != null && !fluidStack.isEmpty()) {
                 fluidStack.setCount(val);
             }
         }
 
         @Override
         public Element<?> copy() {
-            return new ElementItem(fluidStack.isEmpty() ? null : fluidStack.copy());
+            return new ElementItem((fluidStack == null || fluidStack.isEmpty()) ? null : fluidStack.copy());
         }
     }
 
