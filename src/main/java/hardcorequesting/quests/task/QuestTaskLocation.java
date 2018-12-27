@@ -47,8 +47,9 @@ public class QuestTaskLocation extends QuestTask {
     private void tick(EntityPlayer player, boolean isPlayerEvent) {
         if (!isPlayerEvent) {
             delay++;
-            delay %= CHECK_DELAY;
-        } else if (this.delay == 0) {
+        } else if (this.delay >= 0) {
+            delay = 0;
+
             World world = player.getEntityWorld();
             if (!world.isRemote) {
                 boolean[] visited = ((QuestDataTaskLocation) this.getData(player)).visited;
