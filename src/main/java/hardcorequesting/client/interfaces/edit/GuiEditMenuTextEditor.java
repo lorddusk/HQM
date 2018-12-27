@@ -44,6 +44,10 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
 
     protected GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
         super(gui, player, false);
+        if (txt != null && !txt.isEmpty()) {
+            txt = txt.replace("\n", "\\n");
+        }
+
         this.text = new TextBoxLogic(gui, txt, 140, true);
         this.isName = isName;
         buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
@@ -76,7 +80,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                text.addText(gui, GuiScreen.getClipboardString());
+                String clip = GuiScreen.getClipboardString();
+                if (!clip.isEmpty()) {
+                    clip = clip.replace("\n", "\\n");
+                }
+                text.addText(gui, clip);
             }
         });
 
@@ -110,7 +118,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
 
             @Override
             public void onClick(GuiBase gui, EntityPlayer player) {
-                text.setTextAndCursor(gui, GuiScreen.getClipboardString());
+                String clip = GuiScreen.getClipboardString();
+                if (!clip.isEmpty()) {
+                    clip = clip.replace("\n", "\\n");
+                }
+                text.setTextAndCursor(gui, clip);
             }
         });
     }
@@ -194,6 +206,10 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         String str = text.getText();
         if (str == null || str.isEmpty()) {
             str = Translator.translate("hqm.textEditor.unnamed");
+        }
+
+        if (!isName && group == null && groupTier == null) {
+            str = str.replace("\\n", "\n");
         }
 
         if (quest != null) {
