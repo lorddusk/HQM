@@ -121,5 +121,9 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
     }
 
+    @Override
+    public boolean allowDetect () {
+        return true;
+    }
 
 }

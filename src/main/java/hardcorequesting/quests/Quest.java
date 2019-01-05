@@ -160,12 +160,12 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return ((QuestTaskItemsConsume) selectedTask).allowManual();
+                return selectedTask.allowManual();
             }
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
+                return selectedTask != null && selectedTask.allowManual() && !selectedTask.isCompleted(player);
             }
 
             @Override
@@ -177,12 +177,12 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.manualDetect", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
-                return true;
+                return selectedTask.allowDetect();
             }
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskItemsDetect && !selectedTask.isCompleted(player);
+                return selectedTask != null && selectedTask.allowDetect() && !selectedTask.isCompleted(player);
             }
 
             @Override
@@ -1453,6 +1453,8 @@ public class Quest {
             ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         } else if (selectedTask instanceof QuestTaskTame && type == GuiEditMenuItem.Type.TAME) {
             ((QuestTaskTame) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
+        } else if (selectedTask instanceof QuestTaskAdvancement && type == GuiEditMenuItem.Type.ADVANCEMENT) {
+            ((QuestTaskAdvancement) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         } else if (selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
             ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getFluidStack(), player);
         }
@@ -1644,7 +1646,8 @@ public class Quest {
         TAME(QuestTaskTame.class, "tame"),
         DEATH(QuestTaskDeath.class, "death"),
         REPUTATION(QuestTaskReputationTarget.class, "reputation"),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill");
+        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill"),
+        ADVANCEMENT(QuestTaskAdvancement.class, "advancement");
 
         private final Class<? extends QuestTask> clazz;
         private final String id;

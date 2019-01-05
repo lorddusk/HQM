@@ -8,10 +8,7 @@ import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.client.interfaces.TextBoxLogic;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestSet;
-import hardcorequesting.quests.task.QuestTask;
-import hardcorequesting.quests.task.QuestTaskLocation;
-import hardcorequesting.quests.task.QuestTaskMob;
-import hardcorequesting.quests.task.QuestTaskTame;
+import hardcorequesting.quests.task.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
@@ -40,6 +37,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     private int location = -1;
     private int mob = -1;
     private int tame = -1;
+    private int advancementId = -1;
     private boolean isName;
 
     protected GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, String txt, boolean isName) {
@@ -164,6 +162,12 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.location = id;
     }
 
+    public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskAdvancement task, int id, QuestTaskAdvancement.AdvancementTask advancement) {
+        this(gui, player, advancement.getName(), true);
+        this.task = task;
+        this.advancementId = id;
+    }
+
     public GuiEditMenuTextEditor(GuiQuestBook gui, EntityPlayer player, QuestTaskTame task, int id, QuestTaskTame.Tame tame) {
         this(gui, player, tame.getName(), true);
         this.task = task;
@@ -234,6 +238,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
                     str = str.substring(0, str.length() - 1);
                 }
                 ((QuestTaskMob) task).setName(mob, str, player);
+            } else if (advancementId != -1) {
+                 while (gui.getStringWidth(str) > 110) {
+                     str = str.substring(0, str.length() -1);
+                 }
+                ((QuestTaskAdvancement) task).setName(advancementId, str, player);
             } else if (isName) {
                 task.setDescription(str);
             } else {

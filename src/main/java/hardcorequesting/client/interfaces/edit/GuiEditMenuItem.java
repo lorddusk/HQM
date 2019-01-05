@@ -327,6 +327,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         LOCATION(false, false, false),
         TAME(false, false, false),
         MOB(false, false, false),
+        ADVANCEMENT(false, false, false),
         PORTAL(false, false, false);
 
 
