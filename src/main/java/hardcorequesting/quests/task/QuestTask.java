@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -95,6 +96,14 @@ public abstract class QuestTask {
 
     public void updateId() {
         this.id = parent.nextTaskId++;
+    }
+
+    public boolean allowManual () {
+        return false;
+    }
+
+    public boolean allowDetect () {
+        return false;
     }
 
     public boolean isCompleted(EntityPlayer player) {
@@ -275,6 +284,8 @@ public abstract class QuestTask {
     }
 
     public void onAnimalTame(AnimalTameEvent event) {
+    }
 
+    public void onAdvancement(AdvancementEvent event) {
     }
 }

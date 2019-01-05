@@ -57,6 +57,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
         return GuiEditMenuItem.Type.CONSUME_TASK;
     }
 
+    @Override
     public boolean allowManual() {
         return true;
     }

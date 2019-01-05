@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -113,6 +114,13 @@ public class EventTrigger{
         }
     }
 
+    @SubscribeEvent
+    public void onEvent(AdvancementEvent event) {
+        for (QuestTask task : getTasks(Type.ADVANCEMENT)) {
+            task.onAdvancement(event);
+        }
+    }
+
 
     private List<QuestTask> getTasks(Type type) {
         return registeredTasks[type.ordinal()];
@@ -127,6 +135,7 @@ public class EventTrigger{
         OPEN_BOOK,
         REPUTATION_CHANGE,
         ANIMAL_TAME,
+        ADVANCEMENT,
     }
 
     public static class BookOpeningEvent {

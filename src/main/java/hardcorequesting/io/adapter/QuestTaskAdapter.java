@@ -264,6 +264,49 @@ public class QuestTaskAdapter {
         }
     };
 
+     protected static final TypeAdapter<QuestTaskAdvancement.AdvancementTask> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<QuestTaskAdvancement.AdvancementTask>() {
+         private final String ICON = "icon";
+         private final String VISIBLE = "visible";
+         private final String NAME = "name";
+         private final String ADV_NAME = "adv_name";
+
+          @Override
+         public void write(JsonWriter out, QuestTaskAdvancement.AdvancementTask value) throws IOException {
+             out.beginObject();
+             out.name(NAME).value(value.getName());
+             ItemStack stack = value.getIconStack();
+             if (stack != null) {
+                 MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
+             }
+             if (value.getAdvancement() != null) {
+                 out.name(ADV_NAME).value(value.getAdvancement());
+             }
+             if (value.getVisible() != QuestTaskAdvancement.Visibility.FULL)
+                 out.name(VISIBLE).value(value.getVisible().name());
+             out.endObject();
+         }
+
+          @Override
+         public QuestTaskAdvancement.AdvancementTask read(JsonReader in) throws IOException {
+             in.beginObject();
+             QuestTaskAdvancement.AdvancementTask result = new QuestTaskAdvancement.AdvancementTask();
+             while (in.hasNext()) {
+                 String name = in.nextName();
+                 if (name.equalsIgnoreCase(NAME)) {
+                     result.setName(in.nextString());
+                 } else if (name.equalsIgnoreCase(ICON)) {
+                     result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                 } else if (name.equalsIgnoreCase(ADV_NAME)) {
+                     result.setAdvancement(in.nextString());
+                 } else if (name.equalsIgnoreCase(VISIBLE)) {
+                     result.setVisible(QuestTaskAdvancement.Visibility.valueOf(in.nextString()));
+                 }
+             }
+             in.endObject();
+             return result;
+         }
+     };
+
     public static QuestTask TASK;
     protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
         private final String KILLS = "kills";
@@ -323,6 +366,7 @@ public class QuestTaskAdapter {
         private final String REPUTATION = "reputation";
         private final String KILLS = "kills";
         private final String TAME = "tame";
+        private final String ADVANCEMENTS = "advancements";
 
         @Override
         public void write(JsonWriter out, QuestTask value) throws IOException {
@@ -351,6 +395,12 @@ public class QuestTaskAdapter {
                 out.name(TAME).beginArray();
                 for (QuestTaskTame.Tame requirement : ((QuestTaskTame) value).tames) {
                     TAME_ADAPTER.write(out, requirement);
+                }
+                out.endArray();
+            } else if (value instanceof QuestTaskAdvancement) {
+                out.name(ADVANCEMENTS).beginArray();
+                for (QuestTaskAdvancement.AdvancementTask requirement : ((QuestTaskAdvancement) value).advancements) {
+                    ADVANCEMENT_TASK_ADAPTER.write(out, requirement);
                 }
                 out.endArray();
             } else if (value instanceof QuestTaskMob) {
@@ -411,6 +461,15 @@ public class QuestTaskAdapter {
                     }
                     in.endArray();
                     ((QuestTaskLocation) TASK).locations = list.toArray(new QuestTaskLocation.Location[list.size()]);
+                } else if (TASK instanceof QuestTaskAdvancement && name.equalsIgnoreCase(ADVANCEMENTS)) {
+                    List<QuestTaskAdvancement.AdvancementTask> list = new ArrayList<>();
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        QuestTaskAdvancement.AdvancementTask entry = ADVANCEMENT_TASK_ADAPTER.read(in);
+                        if (entry != null) list.add(entry);
+                    }
+                    in.endArray();
+                    ((QuestTaskAdvancement) TASK).advancements = list.toArray(new QuestTaskAdvancement.AdvancementTask[list.size()]);
                 } else if (TASK instanceof QuestTaskTame && name.equalsIgnoreCase(TAME)) {
                     List<QuestTaskTame.Tame> list = new ArrayList<>();
                     in.beginArray();
@@ -457,7 +516,8 @@ public class QuestTaskAdapter {
         LOCATION(QuestDataTaskLocation::construct),
         MOB(QuestDataTaskMob::construct),
         REPUTATION_KILL(QuestDataTaskReputationKill::construct),
-        TAME(QuestDataTaskTame::construct);
+        TAME(QuestDataTaskTame::construct),
+        ADVANCEMENT(QuestDataTaskAdvancement::construct);
 
         private Function<JsonReader, QuestDataTask> func;
 

@@ -159,6 +159,8 @@ hqm.taskType.reputationKill.title=Rep kill task
 hqm.taskType.reputationKill.desc=A task where the player has to kill other players with certain reputations.
 hqm.taskType.tame.title=Taming task
 hqm.taskType.tame.desc=A task where the player has to tame specific creatures.
+hqm.taskType.advancement.title=Advancement task
+hqm.taskType.advancement.desc=A task where the player has to complete a specific advancement.
 
 # ======================================
 #			DEATH TYPES
@@ -579,6 +581,10 @@ hqm.locationMenu.visited=Visited
 hqm.locationMenu.mAway=%sm away
 hqm.locationMenu.mRadius=%sm radius
 hqm.locationMenu.wrongDim=Wrong dimension
+# ======================================
+#		  ADVANCEMENT MENU
+# ======================================
+hqm.advancementMenu.visited=Completed
 
 # ======================================
 #		    REPEAT MENU
