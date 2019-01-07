@@ -425,9 +425,12 @@ public class GuiQuestBook extends GuiBase {
     }
 
     public static void displayGui(EntityPlayer player, boolean isOpBook) {
-        if (player != null)
-            if (Minecraft.getMinecraft().currentScreen == null || !(Minecraft.getMinecraft().currentScreen instanceof GuiQuestBook))
-                Minecraft.getMinecraft().displayGuiScreen(new GuiQuestBook(player, isOpBook));
+        if (player != null){
+            Minecraft mc = Minecraft.getMinecraft();
+            if (!(mc.currentScreen instanceof GuiQuestBook)){
+                mc.displayGuiScreen(new GuiQuestBook(player, isOpBook));
+            }
+        }
     }
 
     public static void setSelectedStack(ItemStack stack) {
