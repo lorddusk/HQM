@@ -1,6 +1,7 @@
 package hardcorequesting.io;
 
 import com.google.gson.annotations.SerializedName;
+import hardcorequesting.api.IQuest;
 import hardcorequesting.api.ITask;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
@@ -10,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * This class represents the save format 3 of HQM.
@@ -62,6 +64,18 @@ public class QuestbookData{
             @SerializedName("tasks") private List<TaskData> tasks;
             // name, desc, parent, x, y, icon
             @SerializedName("data") private NBTTagCompound data;
+    
+            @Nullable
+            public IQuest generateQuest(boolean callQuestCreate, boolean callTaskCreate){
+                if(this.className != null && !className.isEmpty()){
+                    IQuest quest = HQMUtil.tryToCreateClassOfType(this.className, IQuest.class);
+                    if(quest != null && this.tasks != null && callQuestCreate){
+                        quest.onCreation(this.uuid, this.data, this.tasks.stream().map(taskData -> taskData.generateTask(callTaskCreate)).collect(Collectors.toList()));
+                    }
+                    return quest;
+                }
+                return null;
+            }
             
             public class TaskData {
     
