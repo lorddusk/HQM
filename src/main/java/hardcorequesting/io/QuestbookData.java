@@ -1,9 +1,13 @@
 package hardcorequesting.io;
 
 import com.google.gson.annotations.SerializedName;
+import hardcorequesting.api.ITask;
+import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,22 +58,29 @@ public class QuestbookData{
         public class QuestData {
     
             @SerializedName("uuid") private UUID uuid;
-            @SerializedName("name") private String nameTranslationKey;
-            @SerializedName("desc") private String descriptionTranslationKey;
-            @SerializedName("parent") private UUID parentUUID; // null means no parent
-            @SerializedName("x") private int posX;
-            @SerializedName("y") private int posY;
-            @SerializedName("icon") private ItemStack icon;
+            @SerializedName("class") private String className;
             @SerializedName("tasks") private List<TaskData> tasks;
-            @SerializedName("data") private NBTTagCompound data; // for additional data to create a more dynamic quest data
+            // name, desc, parent, x, y, icon
+            @SerializedName("data") private NBTTagCompound data;
             
             public class TaskData {
     
                 @SerializedName("uuid") private UUID uuid;
-                @SerializedName("name") private String nameTranslationKey; // Names are changeable
-                @SerializedName("desc") private String descriptionTranslationKey; // Tasks can have custom description
                 @SerializedName("class") private String className;
-                @SerializedName("data") private NBTTagCompound data; // for additional data
+                // name, desc
+                @SerializedName("data") private NBTTagCompound data;
+                
+                @Nullable
+                public ITask generateTask(boolean callCreate){
+                    if(this.className != null && !className.isEmpty()){
+                        ITask task = HQMUtil.tryToCreateClassOfType(this.className, ITask.class);
+                        if(task != null && callCreate){
+                            task.onCreation(this.uuid, this.data);
+                        }
+                        return task;
+                    }
+                    return null;
+                }
                 
             }
         }
