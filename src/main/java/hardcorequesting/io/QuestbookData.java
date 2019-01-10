@@ -2,6 +2,7 @@ package hardcorequesting.io;
 
 import com.google.gson.annotations.SerializedName;
 import hardcorequesting.api.IQuest;
+import hardcorequesting.api.IQuestline;
 import hardcorequesting.api.ITask;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
@@ -51,11 +52,21 @@ public class QuestbookData{
     public class QuestlineData {
     
         @SerializedName("uuid") private UUID uuid;
-        @SerializedName("name") private String nameTranslationKey;
-        @SerializedName("index") private int sortIndex; // lower means higher
-        @SerializedName("desc") private String descriptionTranslationKey;
-        @SerializedName("data") private NBTTagCompound data; // additional data
+        @SerializedName("class") private String className;
         @SerializedName("quests") private List<QuestData> quests;
+        @SerializedName("data") private NBTTagCompound data; // additional data
+    
+        @Nullable
+        public IQuestline generateQuestline(boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
+            if(this.className != null && !className.isEmpty()){
+                IQuestline questline = HQMUtil.tryToCreateClassOfType(this.className, IQuestline.class);
+                if(questline != null && this.quests != null && callQuestlineCreate){
+                    questline.onCreation(this.uuid, this.data, this.quests.stream().map(questData -> questData.generateQuest(callQuestCreate, callTaskCreate)).collect(Collectors.toList()));
+                }
+                return questline;
+            }
+            return null;
+        }
         
         public class QuestData {
     
