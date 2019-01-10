@@ -18,7 +18,7 @@ public interface ITask{
     String getNameTranslationKey();
     
     @Nullable
-    String getDescritpionTranslationKey();
+    String getDescTranslationKey();
     
     @Nonnull
     NBTTagCompound getAdditionalData();

@@ -23,7 +23,7 @@ public interface IQuest{
     String getNameTranslationKey();
     
     @Nullable
-    String getDescritpionTranslationKey();
+    String getDescTranslationKey();
     
     @Nonnull
     NBTTagCompound getAdditionalData();
