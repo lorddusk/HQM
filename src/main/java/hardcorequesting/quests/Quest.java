@@ -260,7 +260,7 @@ public class Quest {
 
         int itemIds = 0;
         for (final TaskType taskType : TaskType.values()) {
-            buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 35) {
+            buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
                 public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                     return true;
