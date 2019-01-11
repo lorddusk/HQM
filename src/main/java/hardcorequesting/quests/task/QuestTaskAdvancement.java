@@ -190,12 +190,16 @@ public class QuestTaskAdvancement extends QuestTask {
 
                 Advancement advAdvancement = manager.getAdvancement(advResource);
 
-                AdvancementProgress progress = playerAdvancements.getProgress(advAdvancement);
-
-                if (progress.isDone()) {
-                    advanced[i] = true;
-                } else {
+                if (advAdvancement == null) {
                     completed = false;
+                } else {
+                    AdvancementProgress progress = playerAdvancements.getProgress(advAdvancement);
+
+                    if (progress.isDone()) {
+                        advanced[i] = true;
+                    } else {
+                        completed = false;
+                    }
                 }
             }
 
