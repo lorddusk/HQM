@@ -5,7 +5,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import java.util.List;
 import java.util.UUID;
 
-public class DefaultQuestline implements IQuestline{
+public abstract class DefaultQuestline implements IQuestline{
     
     private UUID questlineId;
     private String nameTranslationKey, descTranslationKey;

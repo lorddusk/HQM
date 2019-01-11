@@ -2,6 +2,7 @@ package hardcorequesting.io;
 
 import com.google.gson.annotations.SerializedName;
 import hardcorequesting.api.IQuest;
+import hardcorequesting.api.IQuestbook;
 import hardcorequesting.api.IQuestline;
 import hardcorequesting.api.ITask;
 import hardcorequesting.util.HQMUtil;
@@ -41,13 +42,21 @@ import java.util.stream.Collectors;
 public class QuestbookData{
     
     @SerializedName("uuid") private UUID uuid;
-    @SerializedName("name") private String nameTranslationKey;
-    @SerializedName("icon") private String iconPath; // can be a ResourceLocation, but also a absolute path (starts with anything but '/') on the file system or a path relative to the questbook.json folder ('/' means questbook.json folder)
-    @SerializedName("desc") private String descriptionTranslationKey;
-    @SerializedName("tooltip") private String tooltipAdditionTranslationKey;
-    @SerializedName("dim") private List<Integer> allowedDimensionIds;
+    @SerializedName("class") private String className;
     @SerializedName("data") private NBTTagCompound data; // additional data
     @SerializedName("questlines") private List<QuestlineData> questlines;
+    
+    @Nullable
+    public IQuestbook generateQuestline(boolean callQuestbookCreate, boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
+        if(this.className != null && !className.isEmpty()){
+            IQuestbook questbook = HQMUtil.tryToCreateClassOfType(this.className, IQuestbook.class);
+            if(questbook != null && this.questlines != null && callQuestbookCreate){
+                questbook.onCreation(this.uuid, this.data, this.questlines.stream().map(questlineData -> questlineData.generateQuestline(callQuestlineCreate, callQuestCreate, callTaskCreate)).collect(Collectors.toList()));
+            }
+            return questbook;
+        }
+        return null;
+    }
     
     public class QuestlineData {
     
