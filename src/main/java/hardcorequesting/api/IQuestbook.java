@@ -1,8 +1,9 @@
 package hardcorequesting.api;
 
-import hardcorequesting.api.page.ISite;
+import hardcorequesting.api.page.ILayout;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -49,9 +50,18 @@ public interface IQuestbook{
      * This method is called whenever someone tries to open a questbook item via right click.
      *
      * @param stack A never null and never {@link ItemStack#EMPTY} ItemStack
-     * @return The {@link ISite} instance to open
+     * @return The {@link ILayout} instance to open
      */
     @Nullable
-    ISite openBook(@Nonnull ItemStack stack);
+    ILayout openBook(@Nonnull ItemStack stack);
+    
+    /**
+     * A method to get all items that are possible with this one questbook.
+     * Normally this should be one, with the specified tooltip applied.
+     *
+     * @return A list of items, normally just one.
+     */
+    @Nonnull
+    NonNullList<ItemStack> getItemStacks();
     
 }

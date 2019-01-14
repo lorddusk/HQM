@@ -7,7 +7,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
-public interface ISite{
+public interface ILayout{
     
     void onCreation(IQuestbook questbook, @Nonnull ItemStack stack);
     

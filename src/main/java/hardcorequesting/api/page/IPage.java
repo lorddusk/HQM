@@ -5,9 +5,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public interface IPage{
     
-    void onCreation(ISite site);
+    void onCreation(ILayout site);
     
-    ISite getSite();
+    ILayout getSite();
     
     //todo
     @SideOnly(Side.CLIENT)
