@@ -8,14 +8,21 @@ import java.util.UUID;
 
 public abstract class DefaultTask implements ITask{
     
+    private IQuest quest;
     private UUID taskId;
     private String nameTranslationKey, descTranslationKey;
     
     @Override
-    public void onCreation(UUID taskId, NBTTagCompound additionalData){
+    public void onCreation(IQuest quest, UUID taskId, NBTTagCompound additionalData){
         this.taskId = taskId;
         this.nameTranslationKey = additionalData.getString("Name");
         this.descTranslationKey = additionalData.getString("Desc");
+    }
+    
+    @Nonnull
+    @Override
+    public IQuest getQuest(){
+        return this.quest;
     }
     
     @Nonnull

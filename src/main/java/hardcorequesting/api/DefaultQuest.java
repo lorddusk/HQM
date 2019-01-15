@@ -12,23 +12,33 @@ import java.util.UUID;
 
 public abstract class DefaultQuest implements IQuest{
     
+    private IQuestline questline;
     private UUID questId, parentId;
     private String nameTranslationKey, descTranslationKey;
     private List<ITask> tasks;
+    private List<IHook> hooks;
     private int posX, posY;
     
     @Nonnull
     private ItemStack renderIcon = ItemStack.EMPTY;
     
     @Override
-    public void onCreation(UUID questId, NBTTagCompound additionalData, List<ITask> tasks){
+    public void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks){
+        this.questline = questline;
         this.questId = questId;
         this.parentId = additionalData.getUniqueId("Parent");
         this.nameTranslationKey = additionalData.getString("Name");
         this.descTranslationKey = additionalData.getString("Desc");
         this.tasks = tasks;
+        this.hooks = hooks;
         this.posX = additionalData.getInteger("X");
         this.posY = additionalData.getInteger("Y");
+    }
+    
+    @Nonnull
+    @Override
+    public IQuestline getQuestline(){
+        return this.questline;
     }
     
     @Nonnull
@@ -74,6 +84,11 @@ public abstract class DefaultQuest implements IQuest{
     @Override
     public List<ITask> getTasks(){
         return this.tasks;
+    }
+    
+    @Override
+    public List<IHook> getHooks(){
+        return this.hooks;
     }
     
     @Override

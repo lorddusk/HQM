@@ -9,7 +9,10 @@ import java.util.UUID;
 // here need to be a lot of additional calls, whenever something happens in mc
 public interface ITask{
     
-    void onCreation(UUID taskId, NBTTagCompound additionalData);
+    void onCreation(IQuest quest, UUID taskId, NBTTagCompound additionalData);
+    
+    @Nonnull
+    IQuest getQuest();
     
     @Nonnull
     UUID getUUID();

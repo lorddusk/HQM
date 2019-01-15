@@ -54,4 +54,12 @@ public class HQMUtil{
         return list;
     }
     
+    public static void setIntListToNBT(NBTTagCompound nbt, String key, List<Integer> ints){
+        NBTTagList nbtTagList = new NBTTagList();
+        for(int i : ints){
+            nbtTagList.appendTag(new NBTTagInt(i));
+        }
+        nbt.setTag(key, nbtTagList);
+    }
+    
 }

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class DefaultQuestbook implements IQuestbook{
+public abstract class DefaultQuestbook implements IQuestbook{
     
     private UUID questbookId;
     private String nameTranslationKey, descTranslationKey, tooltipTranslationKey;
@@ -66,12 +66,13 @@ public class DefaultQuestbook implements IQuestbook{
         if(this.getTooltipTranslationKey() != null){
             data.setString("Tooltip", this.getTooltipTranslationKey());
         }
+        HQMUtil.setIntListToNBT(data, "AllowedDimensions", this.allowedDimensions);
         return data;
     }
     
     @Override
     public boolean canExist(World world){
-        return this.allowedDimensions.isEmpty() ? true : this.allowedDimensions.contains(world.provider.getDimension());
+        return this.allowedDimensions.isEmpty() || this.allowedDimensions.contains(world.provider.getDimension());
     }
     
     @Nullable

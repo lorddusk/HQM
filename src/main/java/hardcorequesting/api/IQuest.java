@@ -11,7 +11,10 @@ import java.util.UUID;
 
 public interface IQuest{
     
-    void onCreation(UUID questId, NBTTagCompound additionalData, List<ITask> tasks);
+    void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks);
+    
+    @Nonnull
+    IQuestline getQuestline();
     
     @Nonnull
     UUID getUUID();
@@ -29,6 +32,8 @@ public interface IQuest{
     NBTTagCompound getAdditionalData();
     
     List<ITask> getTasks();
+    
+    List<IHook> getHooks();
     
     int getX();
     
