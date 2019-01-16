@@ -42,6 +42,16 @@ public interface IQuest{
     
     int getY();
     
+    /**
+     * This method defines how many rewards can be gathered by completing the quest
+     * or a invalid value if all rewards are given to the player.
+     *
+     * A value is valid if: 0 < value < rewards.size()
+     *
+     * @return The amount of rewards.
+     */
+    int getRewardAmount();
+    
     // todo add parameter
     @SideOnly(Side.CLIENT)
     void renderIcon();

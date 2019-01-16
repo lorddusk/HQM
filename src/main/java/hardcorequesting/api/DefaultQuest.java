@@ -19,7 +19,7 @@ public abstract class DefaultQuest implements IQuest{
     private List<ITask> tasks;
     private List<IHook> hooks;
     private List<IReward> rewards;
-    private int posX, posY;
+    private int posX, posY, rewardAmount;
     
     @Nonnull
     private ItemStack renderIcon = ItemStack.EMPTY;
@@ -36,6 +36,7 @@ public abstract class DefaultQuest implements IQuest{
         this.rewards = rewards;
         this.posX = additionalData.getInteger("X");
         this.posY = additionalData.getInteger("Y");
+        this.rewardAmount = additionalData.getInteger("RewardAmount");
     }
     
     @Nonnull
@@ -81,6 +82,7 @@ public abstract class DefaultQuest implements IQuest{
         }
         data.setInteger("X", this.getX());
         data.setInteger("Y", this.getY());
+        data.setInteger("RewardAmount", this.getRewardAmount());
         return data;
     }
     
@@ -107,6 +109,11 @@ public abstract class DefaultQuest implements IQuest{
     @Override
     public int getY(){
         return this.posY;
+    }
+    
+    @Override
+    public int getRewardAmount(){
+        return this.rewardAmount;
     }
     
     @SideOnly(Side.CLIENT)
