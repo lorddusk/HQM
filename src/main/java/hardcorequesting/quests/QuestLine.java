@@ -81,12 +81,17 @@ public class QuestLine {
     }
 
     public static void sendServerSync(EntityPlayer player) {
-        if (player instanceof EntityPlayerMP) {
-            if(QuestLine.doServerSync){
-                NetworkManager.sendToPlayer(new QuestLineSyncMessage(), (EntityPlayerMP) player);
+         if (player instanceof EntityPlayerMP) {
+            EntityPlayerMP playerMP = (EntityPlayerMP) player;
+            boolean side = HardcoreQuesting.loadingSide.isServer();
+            if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
+            else {
+                if (QuestLine.doServerSync) // Send actual data to player on server sync
+                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(), playerMP);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, side, player), playerMP);
             }
-            NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, true, player), (EntityPlayerMP) player);
-            NetworkManager.sendToPlayer(new DeathStatsMessage(false), (EntityPlayerMP) player);
+            NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
         }
     }
 

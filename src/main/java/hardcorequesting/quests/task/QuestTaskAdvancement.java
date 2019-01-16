@@ -184,7 +184,7 @@ public class QuestTaskAdvancement extends QuestTask {
                 if (advanced[i]) continue;
 
                 AdvancementTask advancement = this.advancements[i];
-                if (advancement == null) continue;
+                if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
 
                 ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
 
@@ -288,7 +288,6 @@ public class QuestTaskAdvancement extends QuestTask {
         private Visibility visible = Visibility.FULL;
         private String adv_name;
 
-        // TODO: Implement the actual storing of the advancement
         private AdvancementTask copy() {
             AdvancementTask advancement = new AdvancementTask();
             advancement.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
