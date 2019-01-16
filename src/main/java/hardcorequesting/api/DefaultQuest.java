@@ -1,6 +1,8 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.render.ICustomIconRenderer;
 import hardcorequesting.api.reward.IReward;
+import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,9 +22,7 @@ public abstract class DefaultQuest implements IQuest{
     private List<IHook> hooks;
     private List<IReward> rewards;
     private int posX, posY, rewardAmount;
-    
-    @Nonnull
-    private ItemStack renderIcon = ItemStack.EMPTY;
+    private ICustomIconRenderer renderer;
     
     @Override
     public void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks, List<IReward> rewards){
@@ -37,6 +37,7 @@ public abstract class DefaultQuest implements IQuest{
         this.posX = additionalData.getInteger("X");
         this.posY = additionalData.getInteger("Y");
         this.rewardAmount = additionalData.getInteger("RewardAmount");
+        this.renderer = HQMUtil.getInstanceFromNBT(additionalData, "Renderer", ICustomIconRenderer.class);
     }
     
     @Nonnull
@@ -83,6 +84,9 @@ public abstract class DefaultQuest implements IQuest{
         data.setInteger("X", this.getX());
         data.setInteger("Y", this.getY());
         data.setInteger("RewardAmount", this.getRewardAmount());
+        if(this.renderer != null){
+            HQMUtil.setInstanceToNBT(data, "Renderer", this.renderer);
+        }
         return data;
     }
     
@@ -117,12 +121,10 @@ public abstract class DefaultQuest implements IQuest{
     }
     
     @SideOnly(Side.CLIENT)
+    @Nullable
     @Override
-    public void renderIcon(){
-        //todo
+    public ICustomIconRenderer getIconRenderer(){
+        return null;
     }
     
-    public void setRenderItemStack(@Nonnull ItemStack stack){
-        this.renderIcon = stack;
-    }
 }

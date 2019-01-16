@@ -1,5 +1,6 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.render.ICustomIconRenderer;
 import hardcorequesting.api.reward.IReward;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
@@ -52,8 +53,8 @@ public interface IQuest{
      */
     int getRewardAmount();
     
-    // todo add parameter
     @SideOnly(Side.CLIENT)
-    void renderIcon();
+    @Nullable
+    ICustomIconRenderer getIconRenderer();
     
 }
