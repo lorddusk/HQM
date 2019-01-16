@@ -1,5 +1,6 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.reward.IReward;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 public interface IQuest{
     
-    void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks);
+    void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks, List<IReward> rewards);
     
     @Nonnull
     IQuestline getQuestline();
@@ -34,6 +35,8 @@ public interface IQuest{
     List<ITask> getTasks();
     
     List<IHook> getHooks();
+    
+    List<IReward> getRewards();
     
     int getX();
     

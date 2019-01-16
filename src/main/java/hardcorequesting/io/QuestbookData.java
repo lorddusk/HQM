@@ -2,6 +2,7 @@ package hardcorequesting.io;
 
 import com.google.gson.annotations.SerializedName;
 import hardcorequesting.api.*;
+import hardcorequesting.api.reward.IReward;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -80,6 +81,7 @@ public class QuestbookData{
             @SerializedName("class") private String className;
             @SerializedName("tasks") private List<TaskData> tasks;
             @SerializedName("hooks") private List<HookData> hooks;
+            @SerializedName("rewards") private List<RewardData> rewards;
             // name, desc, parent, x, y, icon
             @SerializedName("data") private NBTTagCompound data;
     
@@ -91,7 +93,8 @@ public class QuestbookData{
                         if(this.hooks != null && this.tasks != null && callQuestCreate){
                             List<ITask> tasks = this.tasks.stream().map(taskData -> taskData.generateTask(quest, callTaskCreate)).collect(Collectors.toList());
                             List<IHook> hooks = this.hooks.stream().map(hookData -> hookData.generateQuest(quest)).collect(Collectors.toList());
-                            quest.onCreation(questline, this.uuid, this.data, tasks, hooks);
+                            List<IReward> rewards = this.rewards.stream().map(rewardData -> rewardData.generateQuest(quest)).collect(Collectors.toList());
+                            quest.onCreation(questline, this.uuid, this.data, tasks, hooks, rewards);
                         }
                     }
                     return quest;
@@ -111,6 +114,23 @@ public class QuestbookData{
                             hook.onCreation(quest, this.data);
                         }
                         return hook;
+                    }
+                    return null;
+                }
+            }
+    
+            public class RewardData {
+                @SerializedName("class") private String className;
+                @SerializedName("data") private NBTTagCompound data;
+        
+                @Nullable
+                public IReward generateQuest(IQuest quest){
+                    if(this.className != null && !className.isEmpty()){
+                        IReward reward = HQMUtil.tryToCreateClassOfType(this.className, IReward.class);
+                        if(reward != null){
+                            reward.onCreation(quest, this.data);
+                        }
+                        return reward;
                     }
                     return null;
                 }

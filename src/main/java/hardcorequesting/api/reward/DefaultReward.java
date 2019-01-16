@@ -1,10 +1,12 @@
-package hardcorequesting.api;
+package hardcorequesting.api.reward;
 
+import hardcorequesting.api.IQuest;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
 
-public abstract class DefaultHook implements IHook{
+public abstract class DefaultReward implements IReward{
     
     private IQuest quest;
     
@@ -24,4 +26,5 @@ public abstract class DefaultHook implements IHook{
     public NBTTagCompound getAdditionalData(){
         return new NBTTagCompound();
     }
+    
 }
