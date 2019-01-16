@@ -184,7 +184,7 @@ public class QuestTaskAdvancement extends QuestTask {
                 if (advanced[i]) continue;
 
                 AdvancementTask advancement = this.advancements[i];
-                if (advancement == null) continue;
+                if (advancement == null || advancement.getName() == null) continue;
 
                 ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
 
