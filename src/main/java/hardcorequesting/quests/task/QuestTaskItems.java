@@ -32,6 +32,7 @@ public abstract class QuestTaskItems extends QuestTask {
     private static final int OFFSET = 20;
     private static final int SIZE = 18;
     private static final int TEXT_HEIGHT = 9;
+    private int lastClicked;
     ItemRequirement[] items;
 
     public QuestTaskItems(Quest parent, String description, String longDescription) {
@@ -238,6 +239,7 @@ public abstract class QuestTaskItems extends QuestTask {
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && GuiScreen.isShiftKeyDown();
+        boolean doubleClick = false;
         if (Quest.canQuestsBeEdited(player) || isOpBookWithShiftKeyDown) {
 
             ItemRequirement[] items = getEditFriendlyItems(this.items);
@@ -245,25 +247,34 @@ public abstract class QuestTaskItems extends QuestTask {
             for (int i = 0; i < items.length; i++) {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
+                    int lastDiff = player.ticksExisted - lastClicked;
+                    if (lastDiff < 6) {
+                        doubleClick = true;
+                    } else {
+                        lastClicked = player.ticksExisted;
+                    }
+
                     if (isOpBookWithShiftKeyDown) {
                         if (getProgress(player, i) == item.required) {
                             resetTask(player.getPersistentID(), i);
                         } else {
                             completeTask(player.getPersistentID(), i, item.required);
                         }
-                    } else if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.ITEM) {
-                        gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
-                    } else if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.DELETE && (item.stack != null || item.fluid != null)) {
-                        ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
-                        int id = 0;
-                        for (int j = 0; j < this.items.length; j++) {
-                            if (j != i) {
-                                newItems[id] = this.items[j];
-                                id++;
+                    } else if (Quest.canQuestsBeEdited(player)) {
+                        if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
+                            gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
+                        } else if (gui.getCurrentMode() == EditMode.DELETE && (item.stack != null || item.fluid != null)) {
+                            ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
+                            int id = 0;
+                            for (int j = 0; j < this.items.length; j++) {
+                                if (j != i) {
+                                    newItems[id] = this.items[j];
+                                    id++;
+                                }
                             }
+                            setItems(newItems);
+                            SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
                         }
-                        setItems(newItems);
-                        SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
                     }
                     break;
                 }
