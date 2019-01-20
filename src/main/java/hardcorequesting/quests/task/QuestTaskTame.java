@@ -69,6 +69,7 @@ public class QuestTaskTame extends QuestTask {
         tames[id].name = str;
     }
 
+    @SideOnly(Side.CLIENT)
     private Tame[] getEditFriendlyTames(Tame[] tames) {
         if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
             tames = Arrays.copyOf(tames, tames.length + 1);
