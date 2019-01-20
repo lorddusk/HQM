@@ -545,6 +545,10 @@ public class GuiQuestBook extends GuiBase {
         }
     }
 
+    public void openSet () {
+        isSetOpened = true;
+    }
+
     @Override
     protected void keyTyped(char c, int k) throws IOException {
         super.keyTyped(c, k);

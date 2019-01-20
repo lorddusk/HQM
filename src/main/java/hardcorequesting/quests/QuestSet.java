@@ -28,6 +28,8 @@ public class QuestSet {
     private static final int LINE_2_X = 10;
     private static final int LINE_2_Y = 12;
     private static final int INFO_Y = 100;
+    private static int lastClicked = -1;
+    private static QuestSet lastLastQuestSet = null;
     private String name;
     private String description;
     private List<String> cachedDescription;
@@ -234,7 +236,15 @@ public class QuestSet {
                         if (!(!Quest.canQuestsBeEdited(gui.getPlayer()) && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
                             break;
                     case NORMAL:
-                        GuiQuestBook.selectedSet = (GuiQuestBook.selectedSet == questSet ? null : questSet);
+                        int thisClicked = gui.getPlayer().ticksExisted - lastClicked;
+                        if (lastClicked != -1 && thisClicked < 6) {
+                            if (GuiQuestBook.selectedSet == null && lastLastQuestSet != null) GuiQuestBook.selectedSet = lastLastQuestSet;
+                            gui.openSet();
+                        } else {
+                            GuiQuestBook.selectedSet = (questSet == GuiQuestBook.selectedSet) ? null : questSet;
+                            lastClicked = gui.getPlayer().ticksExisted;
+                            lastLastQuestSet = questSet;
+                        }
                         break;
                 }
                 break;
