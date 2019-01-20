@@ -237,7 +237,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
     }
 
     public void setCurrentQuest() {
-        quest = Quest.getQuest(Quest.selectedQuestId);
+        quest = Quest.getQuest(Quest.speciallySelectedQuestId);
         resetDelay = delay = 1200;
         NetworkManager.sendBlockUpdate(this, null, 0);
     }

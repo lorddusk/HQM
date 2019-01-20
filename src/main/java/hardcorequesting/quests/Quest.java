@@ -86,7 +86,7 @@ public class Quest {
     public static boolean isEditing = false;
     public static boolean saveDefault = true;
     public static boolean useDefault = true;
-    public static UUID selectedQuestId;
+    public static UUID speciallySelectedQuestId = null;
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
     private final List<LargeButton> buttons = new ArrayList<>();
@@ -236,7 +236,7 @@ public class Quest {
             @Override
             public boolean isEnabled(GuiBase gui, EntityPlayer player) {
                 QuestingData data = QuestingData.getQuestingData(player);
-                if(data != null && data.selectedQuestId.equals(getQuestId())){
+                if(data != null && data.selectedQuestId != null && data.selectedQuestId.equals(getQuestId())){
                     return data.selectedTask == selectedTask.getId();
                 }
                 return false;

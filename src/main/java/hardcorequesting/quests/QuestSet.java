@@ -421,7 +421,8 @@ public class QuestSet {
                 GlStateManager.pushMatrix();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getColorFilter(player, gui.getTick()));
+
+                gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getQuestId().equals(Quest.speciallySelectedQuestId) ? 0xFFF8BBFF : quest.getColorFilter(player, gui.getTick()));
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
                 gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
 
@@ -770,7 +771,8 @@ public class QuestSet {
                                 gui.setEditMenu(new GuiEditMenuParentCount(gui, player, quest));
                                 break;
                             case QUEST_SELECTION:
-                                Quest.selectedQuestId = quest.getQuestId();
+                                if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
+                                else Quest.speciallySelectedQuestId = quest.getQuestId();
                                 break;
                             case QUEST_OPTION:
                                 if (gui.modifyingQuest == quest) {

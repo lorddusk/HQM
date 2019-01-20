@@ -152,7 +152,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
     }
 
     public void setCurrentQuest() {
-        quest = Quest.getQuest(Quest.selectedQuestId);
+        quest = Quest.getQuest(Quest.speciallySelectedQuestId);
     }
 
     public Quest getCurrentQuest() {
