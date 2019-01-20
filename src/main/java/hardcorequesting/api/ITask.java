@@ -1,5 +1,7 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.reward.IReward;
+import hardcorequesting.api.team.ITeam;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
@@ -25,5 +27,7 @@ public interface ITask{
     
     @Nonnull
     NBTTagCompound getAdditionalData();
+    
+    void onRewardCollection(IReward reward, ITeam team);
     
 }

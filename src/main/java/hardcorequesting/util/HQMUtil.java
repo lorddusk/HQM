@@ -1,5 +1,6 @@
 package hardcorequesting.util;
 
+import hardcorequesting.api.ISimpleParsable;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
@@ -60,6 +61,33 @@ public class HQMUtil{
             nbtTagList.appendTag(new NBTTagInt(i));
         }
         nbt.setTag(key, nbtTagList);
+    }
+    
+    @Nullable
+    public static <T extends ISimpleParsable> T getInstanceFromNBT(NBTTagCompound nbt, String key, Class<T> classToGet){
+        NBTTagCompound rawData = nbt.getCompoundTag(key);
+        if(!rawData.isEmpty() && rawData.hasKey("Class", Constants.NBT.TAG_STRING) && rawData.hasKey("Data", Constants.NBT.TAG_COMPOUND)){
+            try{
+                Class c = Class.forName(rawData.getString("Class"));
+                if(classToGet.isAssignableFrom(c)){
+                    Object o = c.newInstance();
+                    if(o instanceof ISimpleParsable){
+                        ((ISimpleParsable) o).onLoad(rawData.getCompoundTag("Data"));
+                        return (T) o;
+                    }
+                }
+            }catch(ClassNotFoundException | InstantiationException | IllegalAccessException e){
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+    
+    public static void setInstanceToNBT(@Nonnull NBTTagCompound nbt, @Nonnull String key, @Nonnull ISimpleParsable object){
+        NBTTagCompound rawData = new NBTTagCompound();
+        rawData.setString("Class", object.getClassName());
+        rawData.setTag("Data", object.getData());
+        nbt.setTag(key, rawData);
     }
     
 }
