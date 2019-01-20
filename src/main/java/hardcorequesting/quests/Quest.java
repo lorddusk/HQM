@@ -1505,6 +1505,8 @@ public class Quest {
             //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
             GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
         }
+
+        EventTrigger.instance().onEvent(new EventTrigger.QuestSelectedEvent(player, this.getQuestId()));
     }
 
     public boolean hasSet(QuestSet selectedSet) {

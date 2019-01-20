@@ -13,7 +13,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
@@ -101,6 +103,18 @@ public class EventTrigger{
         }
     }
 
+    public void onEvent(QuestCompletedEvent event) {
+        for (QuestTask task : getTasks(Type.QUEST_COMPLETED)) {
+            task.onQuestCompleted(event);
+        }
+    }
+
+    public void onEvent(QuestSelectedEvent event) {
+        for (QuestTask task : getTasks(Type.QUEST_SELECTED)) {
+            task.onQuestSelected(event);
+        }
+    }
+
     public void onEvent(ReputationEvent event) {
         for (QuestTask task : getTasks(Type.REPUTATION_CHANGE)) {
             task.onReputationChange(event);
@@ -136,6 +150,8 @@ public class EventTrigger{
         REPUTATION_CHANGE,
         ANIMAL_TAME,
         ADVANCEMENT,
+        QUEST_COMPLETED,
+        QUEST_SELECTED,
     }
 
     public static class BookOpeningEvent {
@@ -165,6 +181,31 @@ public class EventTrigger{
         public EntityPlayer getPlayer() {
             return QuestingData.getPlayerFromUsername(playerName);
         }
+    }
+
+    @ParametersAreNonnullByDefault
+    public static class QuestCompletedEvent {
+        private UUID questCompleted;
+        private EntityPlayer player;
+
+        public QuestCompletedEvent (EntityPlayer player, UUID questCompleted) {
+            this.player = player;
+            this.questCompleted = questCompleted;
+        }
+
+        public UUID getQuestCompleted () { return questCompleted; }
+
+        public EntityPlayer getPlayer () {
+            return player;
+        }
+    }
+
+    public static class QuestSelectedEvent extends QuestCompletedEvent {
+        public QuestSelectedEvent (EntityPlayer player, UUID questSelected) {
+            super(player, questSelected);
+        }
+
+        public UUID getQuestSelected () { return getQuestCompleted(); }
     }
 
     public static class ReputationEvent {

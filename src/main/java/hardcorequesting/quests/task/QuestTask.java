@@ -92,6 +92,10 @@ public abstract class QuestTask {
             // when there is no reward and it just completes the quest play the music
             NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (EntityPlayerMP) player);
         }
+
+        if (player != null) {
+            EventTrigger.instance().onEvent(new EventTrigger.QuestCompletedEvent(player, quest.getQuestId()));
+        }
     }
 
     public void updateId() {
@@ -287,5 +291,11 @@ public abstract class QuestTask {
     }
 
     public void onAdvancement(AdvancementEvent event) {
+    }
+
+    public void onQuestCompleted(EventTrigger.QuestCompletedEvent event) {
+    }
+
+    public void onQuestSelected(EventTrigger.QuestSelectedEvent event) {
     }
 }
