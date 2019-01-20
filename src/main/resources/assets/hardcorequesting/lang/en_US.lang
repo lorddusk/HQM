@@ -160,8 +160,10 @@ hqm.taskType.reputationKill.title=Rep kill task
 hqm.taskType.reputationKill.desc=A task where the player has to kill other players with certain reputations.
 hqm.taskType.tame.title=Taming task
 hqm.taskType.tame.desc=A task where the player has to tame specific creatures.
-hqm.taskType.advancement.title=Advancement task
+hqm.taskType.advancement.title=Advancement
 hqm.taskType.advancement.desc=A task where the player has to complete a specific advancement.
+hqm.taskType.completion.title=Quest Complete
+hqm.taskType.completion.desc=A task where the player must have already completed another quest.
 
 # ======================================
 #			DEATH TYPES
@@ -287,7 +289,7 @@ hqm.editMode.trigger.desc=Specify any properties for trigger quests.
 hqm.editMode.mob.title=Edit Creature
 hqm.editMode.mob.desc=Edit the creature target for killing and taming tasks.
 hqm.editMode.questSelection.title=Select Quest
-hqm.editMode.questSelection.desc=Mark a quest as the selected quest. When a quest is selected you can bind it to a Quest Tracker System or a Quest Gate System by right clicking it with a book.
+hqm.editMode.questSelection.desc=Mark a quest as the selected quest. When a quest is selected you can bind it to a Quest Tracker System or a Quest Gate System by right clicking it with a book. You can also bind it to a Quest Completed task by using the Name or Change Item tool on the task.
 hqm.editMode.questOption.title=Quest Option
 hqm.editMode.questOption.desc=Click on a quest to select it and then click on the quests you want to link it to. If an option linked quest is completed all quests it's linked to becomes invisible and uncompletable.\n\nHold shift and click on the selected quest to remove all its links.
 hqm.editMode.changeTask.title=Change Task
@@ -586,6 +588,10 @@ hqm.locationMenu.wrongDim=Wrong dimension
 #		  ADVANCEMENT MENU
 # ======================================
 hqm.advancementMenu.visited=Completed
+# ======================================
+#		  COMPLETION MENU
+# ======================================
+hqm.completedMenu.visited=Completed
 
 # ======================================
 #		    REPEAT MENU

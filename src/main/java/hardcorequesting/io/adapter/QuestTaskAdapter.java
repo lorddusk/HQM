@@ -13,10 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.Fluid;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static hardcorequesting.io.adapter.QuestAdapter.QUEST;
@@ -307,6 +304,38 @@ public class QuestTaskAdapter {
          }
      };
 
+     protected static final TypeAdapter<QuestTaskCompleted.CompletedQuestTask> QUEST_COMPLETED_ADAPTER = new TypeAdapter<QuestTaskCompleted.CompletedQuestTask>() {
+         private final String VISIBLE = "visible";
+         private final String QUEST_UUID = "quest_uuid";
+
+         @Override
+         public void write(JsonWriter out, QuestTaskCompleted.CompletedQuestTask value) throws IOException {
+             out.beginObject();
+             if (value.getQuest() != null) {
+                 out.name(QUEST_UUID).value(value.getQuestId().toString());
+             }
+             if (value.getVisible() != QuestTaskCompleted.Visibility.FULL)
+                 out.name(VISIBLE).value(value.getVisible().name());
+             out.endObject();
+         }
+
+          @Override
+         public QuestTaskCompleted.CompletedQuestTask read(JsonReader in) throws IOException {
+             in.beginObject();
+             QuestTaskCompleted.CompletedQuestTask result = new QuestTaskCompleted.CompletedQuestTask();
+             while (in.hasNext()) {
+                 String name = in.nextName();
+                 if (name.equalsIgnoreCase(QUEST_UUID)) {
+                     result.setQuest(UUID.fromString(in.nextString()));
+                 } else if (name.equalsIgnoreCase(VISIBLE)) {
+                     result.setVisible(QuestTaskCompleted.Visibility.valueOf(in.nextString()));
+                 }
+             }
+             in.endObject();
+             return result;
+         }
+     };
+
     public static QuestTask TASK;
     protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
         private final String KILLS = "kills";
@@ -367,6 +396,7 @@ public class QuestTaskAdapter {
         private final String KILLS = "kills";
         private final String TAME = "tame";
         private final String ADVANCEMENTS = "advancements";
+        private final String COMPLETED_QUESTS = "completed_quests";
 
         @Override
         public void write(JsonWriter out, QuestTask value) throws IOException {
@@ -401,6 +431,12 @@ public class QuestTaskAdapter {
                 out.name(ADVANCEMENTS).beginArray();
                 for (QuestTaskAdvancement.AdvancementTask requirement : ((QuestTaskAdvancement) value).advancements) {
                     ADVANCEMENT_TASK_ADAPTER.write(out, requirement);
+                }
+                out.endArray();
+            } else if (value instanceof QuestTaskCompleted) {
+                out.name(COMPLETED_QUESTS).beginArray();
+                for (QuestTaskCompleted.CompletedQuestTask requirement : ((QuestTaskCompleted) value).quests) {
+                    QUEST_COMPLETED_ADAPTER.write(out, requirement);
                 }
                 out.endArray();
             } else if (value instanceof QuestTaskMob) {
@@ -470,6 +506,15 @@ public class QuestTaskAdapter {
                     }
                     in.endArray();
                     ((QuestTaskAdvancement) TASK).advancements = list.toArray(new QuestTaskAdvancement.AdvancementTask[list.size()]);
+                } else if (TASK instanceof QuestTaskCompleted && name.equalsIgnoreCase(COMPLETED_QUESTS)) {
+                    List<QuestTaskCompleted.CompletedQuestTask> list = new ArrayList<>();
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        QuestTaskCompleted.CompletedQuestTask entry = QUEST_COMPLETED_ADAPTER.read(in);
+                        if (entry != null) list.add(entry);
+                    }
+                    in.endArray();
+                    ((QuestTaskCompleted) TASK).quests = list.toArray(new QuestTaskCompleted.CompletedQuestTask[0]);
                 } else if (TASK instanceof QuestTaskTame && name.equalsIgnoreCase(TAME)) {
                     List<QuestTaskTame.Tame> list = new ArrayList<>();
                     in.beginArray();
@@ -517,7 +562,8 @@ public class QuestTaskAdapter {
         MOB(QuestDataTaskMob::construct),
         REPUTATION_KILL(QuestDataTaskReputationKill::construct),
         TAME(QuestDataTaskTame::construct),
-        ADVANCEMENT(QuestDataTaskAdvancement::construct);
+        ADVANCEMENT(QuestDataTaskAdvancement::construct),
+        COMPLETED(QuestDataTaskCompleted::construct);
 
         private Function<JsonReader, QuestDataTask> func;
 

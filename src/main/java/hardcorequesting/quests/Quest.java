@@ -1651,7 +1651,8 @@ public class Quest {
         DEATH(QuestTaskDeath.class, "death"),
         REPUTATION(QuestTaskReputationTarget.class, "reputation"),
         REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill"),
-        ADVANCEMENT(QuestTaskAdvancement.class, "advancement");
+        ADVANCEMENT(QuestTaskAdvancement.class, "advancement"),
+        COMPLETION(QuestTaskCompleted.class, "completion");
 
         private final Class<? extends QuestTask> clazz;
         private final String id;
