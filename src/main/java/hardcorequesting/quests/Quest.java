@@ -1164,7 +1164,7 @@ public class Quest {
                 if (task.isVisible(player) || canQuestsBeEdited(player)) {
 
                     if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
-                        if (canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+                        if (canQuestsBeEdited(player) && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
                                 gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, task, true));
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
