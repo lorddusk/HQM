@@ -62,6 +62,7 @@ tile.hqm:item_barrel.boundTo=The QDS is currently bound to '%s'
 tile.hqm:item_barrel.bindTo=You bound '%s' to the QDS
 tile.hqm:quest_tracker.name=Quest Tracking System
 tile.hqm:quest_tracker.offLimit=You're not in edit mode. This block is off limit.
+tile.hqm:quest_tracker.bindTo=You bound '%s' to the Quest Tracker.
 tile.hqm:quest_portal_0.name=Quest Gate System
 tile.hqm:quest_portal_0.bindTo=You bound '%s' to the QGS
 tile.hqm:quest_portal_1.name=Solid Wall

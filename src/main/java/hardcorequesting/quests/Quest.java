@@ -407,6 +407,8 @@ public class Quest {
     }
 
     public static Quest getQuest(UUID questId) {
+        if (questId == null) return null;
+
         return QuestLine.getActiveQuestLine().quests.get(questId);
     }
 

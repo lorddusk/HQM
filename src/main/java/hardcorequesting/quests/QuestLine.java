@@ -42,7 +42,7 @@ public class QuestLine {
     public final List<GroupTier> tiers = new ArrayList<>();
     public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
     public List<QuestSet> questSets;
-    public Map<UUID, Quest> quests;
+    public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
     public String mainPath;
@@ -68,7 +68,7 @@ public class QuestLine {
             reset();
             server = new QuestLine();
             server.mainPath = config.mainPath;
-            server.quests = new ConcurrentHashMap<>();
+            server.quests.clear();
             server.questSets = new ArrayList<>();
         }
         loadAll(true, remote);
@@ -162,7 +162,7 @@ public class QuestLine {
 
     public static void init(String path) {
         QuestLine.getActiveQuestLine().mainPath = path;
-        QuestLine.getActiveQuestLine().quests = new ConcurrentHashMap<>();
+        QuestLine.getActiveQuestLine().quests.clear();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
     }
 
