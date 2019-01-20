@@ -74,6 +74,10 @@ public class TextBoxLogic {
         return builder.toString();
     }
 
+    public int getWidth () {
+        return this.width;
+    }
+
     public void setWidth(int width) {
         this.width = width;
     }
@@ -159,9 +163,22 @@ public class TextBoxLogic {
             deleteText(gui, -1);
         } else if (k == 211) {
             deleteText(gui, 1);
+        } else if (k == 28) { // enter
+            addText(gui, "\\n");
+        } else if (k == 199) { // home key
+            cursor = 0;
+            updateCursor();
+        } else if (k == 207) {
+            cursor = text.length();
+            updateCursor();
         } else if (isCharacterValid(c)) {
             addText(gui, Character.toString(c));
         }
+    }
+
+    public void setCursor (int cursor) {
+        this.cursor = cursor;
+        updateCursor();
     }
 
     protected boolean isCharacterValid(char c) {
