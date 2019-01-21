@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -28,13 +29,10 @@ public class MinecraftAdapter {
         @Override
         public NBTTagCompound read(JsonReader in) throws IOException {
             try {
-                NBTBase nbtBase = JsonToNBT.getTagFromJson(in.nextString());
-                if (nbtBase instanceof NBTTagCompound) {
-                    return (NBTTagCompound) nbtBase;
-                }
-            } catch (Exception ignored) {
+                return JsonToNBT.getTagFromJson(in.nextString());
+            } catch (NBTException e) {
+                throw new IOException("Failed to read NBT", e);
             }
-            throw new IOException("Failed to read NBT");
         }
     };
     public static final TypeAdapter<ItemStack> ITEM_STACK = new TypeAdapter<ItemStack>() {

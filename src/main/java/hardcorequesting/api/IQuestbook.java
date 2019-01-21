@@ -23,18 +23,24 @@ import java.util.UUID;
  */
 public interface IQuestbook{
     
-    void onCreation(UUID questbookID, NBTTagCompound additionalData, List<IQuestline> questlines);
+    void onCreation(@Nonnull UUID questbookID, @Nonnull NBTTagCompound additionalData, @Nonnull List<IQuestline> questlines);
     
+    @Nonnull
     UUID getUUID();
     
+    @Nullable
     String getNameTranslationKey();
     
+    @Nullable
     String getDescTranslationKey();
     
+    @Nullable
     String getTooltipTranslationKey();
     
+    @Nonnull
     List<IQuestline> getQuestlines();
     
+    @Nonnull
     NBTTagCompound getAdditionalData();
     
     /**
@@ -44,7 +50,7 @@ public interface IQuestbook{
      * @param world The world to check if it is valid
      * @return True to allow book usage or false to reject it.
      */
-    boolean canExist(World world);
+    boolean canExist(@Nonnull World world);
     
     /**
      * This method is called whenever someone tries to open a questbook item via right click.
