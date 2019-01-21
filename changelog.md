@@ -1,3 +1,6 @@
+### 6.0.0 for 1.xx.x (xx.xx.20xx by canitzp):
+This update is planned for anytime in 2019 or 2020 and completely changes the base structure and logic of HQM, forever!
+
 ### 5.4.0 for 1.12.x (xx.xx.201x by canitzp, duely):
 To accomplish this release of HQM we used a special made modpack with a special server to "field test" the mod completely. Most bugs are fixed through that!
 
