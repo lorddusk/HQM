@@ -24,7 +24,7 @@ public interface IQuest{
     @Nullable
     UUID getParentUUID();
     
-    @Nonnull
+    @Nullable
     String getNameTranslationKey();
     
     @Nullable
@@ -53,8 +53,11 @@ public interface IQuest{
      */
     int getRewardAmount();
     
+    /**
+     * @return The icon renderer for the quest.
+     */
     @SideOnly(Side.CLIENT)
-    @Nullable
+    @Nonnull
     ICustomIconRenderer getIconRenderer();
     
 }

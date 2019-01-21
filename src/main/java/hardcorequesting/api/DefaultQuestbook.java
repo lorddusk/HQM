@@ -22,7 +22,7 @@ public abstract class DefaultQuestbook implements IQuestbook{
     private List<IQuestline> questlines;
     
     @Override
-    public void onCreation(UUID questbookID, NBTTagCompound additionalData, List<IQuestline> questlines){
+    public void onCreation(@Nonnull UUID questbookID, @Nonnull NBTTagCompound additionalData, @Nonnull List<IQuestline> questlines){
         this.questbookId = questbookID;
         this.nameTranslationKey = additionalData.getString("Name");
         this.descTranslationKey = additionalData.getString("Desc");
@@ -31,35 +31,43 @@ public abstract class DefaultQuestbook implements IQuestbook{
         this.questlines = questlines;
     }
     
+    @Nonnull
     @Override
     public UUID getUUID(){
         return this.questbookId;
     }
     
+    @Nullable
     @Override
     public String getNameTranslationKey(){
         return this.nameTranslationKey;
     }
     
+    @Nullable
     @Override
     public String getDescTranslationKey(){
         return this.descTranslationKey;
     }
     
+    @Nullable
     @Override
     public String getTooltipTranslationKey(){
         return this.tooltipTranslationKey;
     }
     
+    @Nonnull
     @Override
     public List<IQuestline> getQuestlines(){
         return this.questlines;
     }
     
+    @Nonnull
     @Override
     public NBTTagCompound getAdditionalData(){
         NBTTagCompound data = new NBTTagCompound();
-        data.setString("Name", this.getNameTranslationKey());
+        if(this.getNameTranslationKey() != null){
+            data.setString("Name", this.getNameTranslationKey());
+        }
         if(this.getDescTranslationKey() != null){
             data.setString("Desc", this.getDescTranslationKey());
         }
@@ -71,7 +79,7 @@ public abstract class DefaultQuestbook implements IQuestbook{
     }
     
     @Override
-    public boolean canExist(World world){
+    public boolean canExist(@Nonnull World world){
         return this.allowedDimensions.isEmpty() || this.allowedDimensions.contains(world.provider.getDimension());
     }
     

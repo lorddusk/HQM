@@ -1,8 +1,11 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.page.IPage;
 import hardcorequesting.api.reward.IReward;
-import hardcorequesting.api.team.ITeam;
+import hardcorequesting.api.team.Party;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +31,9 @@ public interface ITask{
     @Nonnull
     NBTTagCompound getAdditionalData();
     
-    void onRewardCollection(IReward reward, ITeam team);
+    @Nonnull
+    IPage getRightSite();
+    
+    default void onRewardCollection(@Nonnull IReward reward, @Nonnull Party team){}
     
 }

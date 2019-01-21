@@ -1,5 +1,7 @@
 package hardcorequesting.api;
 
+import hardcorequesting.api.reward.IReward;
+import hardcorequesting.api.team.Party;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
@@ -53,4 +55,5 @@ public abstract class DefaultTask implements ITask{
         }
         return data;
     }
+    
 }
