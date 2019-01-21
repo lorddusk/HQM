@@ -1,5 +1,6 @@
 package hqm.api;
 
+import hqm.Registry;
 import hqm.api.page.ILayout;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class DefaultQuestbook implements IQuestbook{
+public class DefaultQuestbook implements IQuestbook{
     
     private UUID questbookId;
     private String nameTranslationKey, descTranslationKey, tooltipTranslationKey;
@@ -54,6 +55,12 @@ public abstract class DefaultQuestbook implements IQuestbook{
         return this.tooltipTranslationKey;
     }
     
+    @Nullable
+    @Override
+    public String getAuthor(){
+        return null;
+    }
+    
     @Nonnull
     @Override
     public List<IQuestline> getQuestlines(){
@@ -84,13 +91,17 @@ public abstract class DefaultQuestbook implements IQuestbook{
     
     @Nullable
     @Override
-    public ILayout openBook(@Nonnull ItemStack stack){
+    public ILayout openBook(){
         return null;
     }
     
     @Nonnull
     @Override
     public NonNullList<ItemStack> getItemStacks(){
-        return NonNullList.create();
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setUniqueId("Questbook", this.getUUID());
+        ItemStack stack = new ItemStack(Registry.itemQuestBook);
+        stack.setTagCompound(nbt);
+        return NonNullList.from(ItemStack.EMPTY, stack);
     }
 }

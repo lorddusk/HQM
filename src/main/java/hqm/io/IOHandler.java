@@ -14,14 +14,17 @@ import org.apache.commons.io.FileUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class IOHandler{
     
     public static final Gson GENERAL_GSON = new GsonBuilder()
         .registerTypeAdapter(ItemStack.class, MinecraftAdapter.ITEM_STACK)
-        .registerTypeAdapter(NBTTagCompound.class, MinecraftAdapter.NBT_TAG_COMPOUND)
+        .registerTypeAdapter(NBTTagCompound.class, Adapter.NBT_TAG_COMPOUND)
         .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
         .setPrettyPrinting()
         .create();
@@ -40,7 +43,9 @@ public class IOHandler{
                 }
             }
             if(file.createNewFile()){
-                GENERAL_GSON.toJson(type, new FileWriter(file));
+                try(FileWriter writer = new FileWriter(file)){
+                    GENERAL_GSON.toJson(type, writer);
+                }
                 return false;
             }
         }catch(IOException e){
@@ -105,8 +110,8 @@ public class IOHandler{
                 return entry.getKey();
             }
         }
-        String fileName = (questbook.getNameTranslationKey() != null ? questbook.getNameTranslationKey() : String.valueOf(questbook.getUUID())).concat(".json");
-        File file = new File(getRootFolder(), fileName);
+        String fileName = (questbook.getNameTranslationKey() != null && !questbook.getNameTranslationKey().isEmpty()) ? questbook.getNameTranslationKey() : String.valueOf(questbook.getUUID());
+        File file = new File(getRootFolder(), fileName.concat(".json"));
         while(file.exists()){ // we never want to overwrite a existing book
             String newName = file.getName().replace(".json", "_.json");
             if(newName.length() >= 200){ // windows caps at 255, but we want to have some space
@@ -116,6 +121,40 @@ public class IOHandler{
         }
         questbooksLoaded.put(file, questbook);
         return file;
+    }
+    
+    public static List<IQuestbook> getAllQuestbooks(){
+        return new ArrayList<>(questbooksLoaded.values());
+    }
+    
+    @Nullable
+    public static IQuestbook getQuestbook(UUID questbookId){
+        return getAllQuestbooks().stream().filter(questbook -> questbook.getUUID().equals(questbookId)).findFirst().orElse(null);
+    }
+    
+    public static void addQuestbook(@Nonnull IQuestbook questbook){
+        getQuestbookFile(questbook);
+    }
+    
+    /**
+     * Writes the questbook to the corresponding file.
+     * Creates a backup of the old state id it exists.
+     *
+     * @param questbook The questbook to write.
+     */
+    public static void writeQuestbook(@Nonnull IQuestbook questbook){
+        File file = getQuestbookFile(questbook);
+        File oldFile = new File(file.getParentFile(), file.getName().concat(".old"));
+        try{
+            FileUtils.deleteQuietly(oldFile);
+            if(file.exists() && !oldFile.exists()){
+                FileUtils.copyFile(file, oldFile);
+            }
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        FileUtils.deleteQuietly(file);
+        writeQuestbookToFile(new QuestbookData().generateData(questbook), file);
     }
     
     public static void writeTeamDataToFile(@Nonnull TeamData teamData, @Nonnull File file){
