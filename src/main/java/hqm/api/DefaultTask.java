@@ -1,68 +1,57 @@
-package hardcorequesting.api;
+package hqm.api;
 
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+import javax.annotation.Nullable;
 import java.util.UUID;
 
-public abstract class DefaultQuestline implements IQuestline{
+public abstract class DefaultTask implements ITask{
     
-    private IQuestbook questbook;
-    private UUID questlineId;
+    private IQuest quest;
+    private UUID taskId;
     private String nameTranslationKey, descTranslationKey;
-    private int sortIndex;
-    private List<IQuest> quests;
     
     @Override
-    public void onCreation(IQuestbook questbook, UUID questlineID, NBTTagCompound additionalData, List<IQuest> quests){
-        this.questbook = questbook;
-        this.questlineId = questlineID;
+    public void onCreation(IQuest quest, UUID taskId, NBTTagCompound additionalData){
+        this.taskId = taskId;
         this.nameTranslationKey = additionalData.getString("Name");
         this.descTranslationKey = additionalData.getString("Desc");
-        this.sortIndex = additionalData.getInteger("Sort");
-        this.quests = quests;
     }
     
     @Nonnull
     @Override
-    public IQuestbook getQuestbook(){
-        return this.questbook;
+    public IQuest getQuest(){
+        return this.quest;
     }
     
+    @Nonnull
     @Override
     public UUID getUUID(){
-        return this.questlineId;
+        return this.taskId;
     }
     
+    @Nonnull
     @Override
     public String getNameTranslationKey(){
         return this.nameTranslationKey;
     }
     
+    @Nullable
     @Override
     public String getDescTranslationKey(){
         return this.descTranslationKey;
     }
     
-    @Override
-    public int getSortIndex(){
-        return this.sortIndex;
-    }
-    
-    @Override
-    public List<IQuest> getQuests(){
-        return this.quests;
-    }
-    
+    @Nonnull
     @Override
     public NBTTagCompound getAdditionalData(){
         NBTTagCompound data = new NBTTagCompound();
-        data.setInteger("Sort", this.getSortIndex());
         data.setString("Name", this.getNameTranslationKey());
         if(this.getDescTranslationKey() != null){
             data.setString("Desc", this.getDescTranslationKey());
         }
         return data;
     }
+    
 }

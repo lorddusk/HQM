@@ -1,4 +1,4 @@
-package hardcorequesting.api;
+package hqm.api;
 
 import net.minecraft.nbt.NBTTagCompound;
 

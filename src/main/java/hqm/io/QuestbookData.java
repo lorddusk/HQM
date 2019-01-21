@@ -1,14 +1,14 @@
-package hardcorequesting.io;
+package hqm.io;
 
 import com.google.gson.annotations.SerializedName;
-import hardcorequesting.api.*;
-import hardcorequesting.api.reward.IReward;
+import hqm.api.*;
+import hqm.api.reward.IReward;
 import hardcorequesting.util.HQMUtil;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,7 +45,7 @@ public class QuestbookData{
     @SerializedName("questlines") private List<QuestlineData> questlines;
     
     @Nullable
-    public IQuestbook generateQuestline(boolean callQuestbookCreate, boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
+    public IQuestbook generateQuestbook(boolean callQuestbookCreate, boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
         if(this.className != null && !className.isEmpty()){
             IQuestbook questbook = HQMUtil.tryToCreateClassOfType(this.className, IQuestbook.class);
             if(questbook != null && this.questlines != null && callQuestbookCreate){
@@ -56,15 +56,25 @@ public class QuestbookData{
         return null;
     }
     
+    @Nonnull
+    public QuestbookData generateData(@Nonnull IQuestbook questbook){
+        this.uuid = questbook.getUUID();
+        this.className = questbook.getClass().getName();
+        this.data = questbook.getAdditionalData();
+        this.questlines = new ArrayList<>();
+        this.questlines.addAll(questbook.getQuestlines().stream().map(questline -> new QuestlineData().generateData(questline)).collect(Collectors.toList()));
+        return this;
+    }
+    
     public class QuestlineData {
     
         @SerializedName("uuid") private UUID uuid;
         @SerializedName("class") private String className;
+        @SerializedName("data") private NBTTagCompound data;
         @SerializedName("quests") private List<QuestData> quests;
-        @SerializedName("data") private NBTTagCompound data; // additional data
     
         @Nullable
-        public IQuestline generateQuestline(IQuestbook questbook, boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
+        private IQuestline generateQuestline(@Nonnull IQuestbook questbook, boolean callQuestlineCreate, boolean callQuestCreate, boolean callTaskCreate){
             if(this.className != null && !className.isEmpty()){
                 IQuestline questline = HQMUtil.tryToCreateClassOfType(this.className, IQuestline.class);
                 if(questline != null && this.quests != null && callQuestlineCreate){
@@ -75,18 +85,27 @@ public class QuestbookData{
             return null;
         }
         
+        @Nonnull
+        private QuestlineData generateData(@Nonnull IQuestline questline){
+            this.uuid = questline.getUUID();
+            this.className = questline.getClass().getName();
+            this.data = questline.getAdditionalData();
+            this.quests = new ArrayList<>();
+            this.quests.addAll(questline.getQuests().stream().map(quest -> new QuestData().generateData(quest)).collect(Collectors.toList()));
+            return this;
+        }
+        
         public class QuestData {
     
             @SerializedName("uuid") private UUID uuid;
             @SerializedName("class") private String className;
-            @SerializedName("tasks") private List<TaskData> tasks;
-            @SerializedName("hooks") private List<HookData> hooks;
-            @SerializedName("rewards") private List<RewardData> rewards;
-            // name, desc, parent, x, y, icon
             @SerializedName("data") private NBTTagCompound data;
-    
+            @SerializedName("tasks") private List<TaskData> tasks;
+            @SerializedName("rewards") private List<RewardData> rewards;
+            @SerializedName("hooks") private List<HookData> hooks;
+            
             @Nullable
-            public IQuest generateQuest(IQuestline questline, boolean callQuestCreate, boolean callTaskCreate){
+            private IQuest generateQuest(@Nonnull IQuestline questline, boolean callQuestCreate, boolean callTaskCreate){
                 if(this.className != null && !className.isEmpty()){
                     IQuest quest = HQMUtil.tryToCreateClassOfType(this.className, IQuest.class);
                     if(quest != null){
@@ -102,12 +121,26 @@ public class QuestbookData{
                 return null;
             }
             
+            @Nonnull
+            private QuestData generateData(@Nonnull IQuest quest){
+                this.uuid = quest.getUUID();
+                this.className = quest.getClass().getName();
+                this.data = quest.getAdditionalData();
+                this.tasks = new ArrayList<>();
+                this.tasks.addAll(quest.getTasks().stream().map(task -> new TaskData().generateData(task)).collect(Collectors.toList()));
+                this.rewards = new ArrayList<>();
+                this.rewards.addAll(quest.getRewards().stream().map(reward -> new RewardData().generateData(reward)).collect(Collectors.toList()));
+                this.hooks = new ArrayList<>();
+                this.hooks.addAll(quest.getHooks().stream().map(hook -> new HookData().generateData(hook)).collect(Collectors.toList()));
+                return this;
+            }
+            
             public class HookData {
                 @SerializedName("class") private String className;
                 @SerializedName("data") private NBTTagCompound data;
     
                 @Nullable
-                public IHook generateQuest(IQuest quest){
+                private IHook generateQuest(@Nonnull IQuest quest){
                     if(this.className != null && !className.isEmpty()){
                         IHook hook = HQMUtil.tryToCreateClassOfType(this.className, IHook.class);
                         if(hook != null){
@@ -117,6 +150,13 @@ public class QuestbookData{
                     }
                     return null;
                 }
+    
+                @Nonnull
+                private HookData generateData(@Nonnull IHook hook){
+                    this.className = hook.getClass().getName();
+                    this.data = hook.getAdditionalData();
+                    return this;
+                }
             }
     
             public class RewardData {
@@ -124,7 +164,7 @@ public class QuestbookData{
                 @SerializedName("data") private NBTTagCompound data;
         
                 @Nullable
-                public IReward generateQuest(IQuest quest){
+                private IReward generateQuest(@Nonnull IQuest quest){
                     if(this.className != null && !className.isEmpty()){
                         IReward reward = HQMUtil.tryToCreateClassOfType(this.className, IReward.class);
                         if(reward != null){
@@ -133,6 +173,13 @@ public class QuestbookData{
                         return reward;
                     }
                     return null;
+                }
+                
+                @Nonnull
+                private RewardData generateData(@Nonnull IReward reward){
+                    this.className = reward.getClass().getName();
+                    this.data = reward.getAdditionalData();
+                    return this;
                 }
             }
             
@@ -144,7 +191,7 @@ public class QuestbookData{
                 @SerializedName("data") private NBTTagCompound data;
                 
                 @Nullable
-                public ITask generateTask(IQuest parent, boolean callCreate){
+                private ITask generateTask(@Nonnull IQuest parent, boolean callCreate){
                     if(this.className != null && !className.isEmpty()){
                         ITask task = HQMUtil.tryToCreateClassOfType(this.className, ITask.class);
                         if(task != null && callCreate){
@@ -155,6 +202,13 @@ public class QuestbookData{
                     return null;
                 }
                 
+                @Nonnull
+                private TaskData generateData(@Nonnull ITask task){
+                    this.uuid = task.getUUID();
+                    this.className = task.getClass().getName();
+                    this.data = task.getAdditionalData();
+                    return this;
+                }
             }
         }
     }

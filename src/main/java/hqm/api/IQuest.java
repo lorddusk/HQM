@@ -1,7 +1,7 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.render.ICustomIconRenderer;
-import hardcorequesting.api.reward.IReward;
+import hqm.api.render.ICustomIconRenderer;
+import hqm.api.reward.IReward;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,7 +24,7 @@ public interface IQuest{
     @Nullable
     UUID getParentUUID();
     
-    @Nonnull
+    @Nullable
     String getNameTranslationKey();
     
     @Nullable
@@ -53,8 +53,11 @@ public interface IQuest{
      */
     int getRewardAmount();
     
+    /**
+     * @return The icon renderer for the quest.
+     */
     @SideOnly(Side.CLIENT)
-    @Nullable
+    @Nonnull
     ICustomIconRenderer getIconRenderer();
     
 }

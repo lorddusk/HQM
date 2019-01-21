@@ -1,7 +1,8 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.reward.IReward;
-import hardcorequesting.api.team.ITeam;
+import hqm.api.page.IPage;
+import hqm.api.reward.IReward;
+import hqm.team.Team;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
@@ -28,6 +29,9 @@ public interface ITask{
     @Nonnull
     NBTTagCompound getAdditionalData();
     
-    void onRewardCollection(IReward reward, ITeam team);
+    @Nonnull
+    IPage getRightSite();
+    
+    default void onRewardCollection(@Nonnull IReward reward, @Nonnull Team team){}
     
 }

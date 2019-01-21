@@ -1,31 +1,33 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.render.ICustomIconRenderer;
-import hardcorequesting.api.reward.IReward;
+import hqm.client.EmptyIconRenderer;
+import hqm.api.render.ICustomIconRenderer;
+import hqm.api.reward.IReward;
 import hardcorequesting.util.HQMUtil;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public abstract class DefaultQuest implements IQuest{
     
     private IQuestline questline;
-    private UUID questId, parentId;
-    private String nameTranslationKey, descTranslationKey;
-    private List<ITask> tasks;
-    private List<IHook> hooks;
-    private List<IReward> rewards;
+    private UUID questId = UUID.randomUUID();
+    @Nullable private UUID parentId;
+    @Nullable private String nameTranslationKey, descTranslationKey;
+    private List<ITask> tasks = new ArrayList<>();
+    private List<IHook> hooks = new ArrayList<>();
+    private List<IReward> rewards = new ArrayList<>();
     private int posX, posY, rewardAmount;
-    private ICustomIconRenderer renderer;
+    @Nullable private ICustomIconRenderer renderer;
     
     @Override
-    public void onCreation(IQuestline questline, UUID questId, NBTTagCompound additionalData, List<ITask> tasks, List<IHook> hooks, List<IReward> rewards){
+    public void onCreation(@Nonnull IQuestline questline, @Nonnull UUID questId, @Nonnull NBTTagCompound additionalData, @Nonnull List<ITask> tasks, @Nonnull List<IHook> hooks, @Nonnull List<IReward> rewards){
         this.questline = questline;
         this.questId = questId;
         this.parentId = additionalData.getUniqueId("Parent");
@@ -58,7 +60,7 @@ public abstract class DefaultQuest implements IQuest{
         return this.parentId;
     }
     
-    @Nonnull
+    @Nullable
     @Override
     public String getNameTranslationKey(){
         return this.nameTranslationKey;
@@ -77,7 +79,9 @@ public abstract class DefaultQuest implements IQuest{
         if(this.getParentUUID() != null){
             data.setUniqueId("Parent", this.getParentUUID());
         }
-        data.setString("Name", this.getNameTranslationKey());
+        if(this.getNameTranslationKey() != null){
+            data.setString("Name", this.getNameTranslationKey());
+        }
         if(this.getDescTranslationKey() != null){
             data.setString("Desc", this.getDescTranslationKey());
         }
@@ -90,16 +94,19 @@ public abstract class DefaultQuest implements IQuest{
         return data;
     }
     
+    @Nonnull
     @Override
     public List<ITask> getTasks(){
         return this.tasks;
     }
     
+    @Nonnull
     @Override
     public List<IHook> getHooks(){
         return this.hooks;
     }
     
+    @Nonnull
     @Override
     public List<IReward> getRewards(){
         return rewards;
@@ -120,11 +127,11 @@ public abstract class DefaultQuest implements IQuest{
         return this.rewardAmount;
     }
     
+    @Nonnull
     @SideOnly(Side.CLIENT)
-    @Nullable
     @Override
     public ICustomIconRenderer getIconRenderer(){
-        return null;
+        return this.renderer != null ? this.renderer : EmptyIconRenderer.get();
     }
     
 }

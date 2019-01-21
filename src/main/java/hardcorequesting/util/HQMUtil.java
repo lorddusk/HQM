@@ -1,6 +1,6 @@
 package hardcorequesting.util;
 
-import hardcorequesting.api.ISimpleParsable;
+import hqm.api.ISimpleParsable;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
