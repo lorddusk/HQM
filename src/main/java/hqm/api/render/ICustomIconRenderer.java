@@ -1,15 +1,11 @@
-package hardcorequesting.api.page;
+package hqm.api.render;
 
+import hqm.api.ISimpleParsable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public interface IPage{
+public interface ICustomIconRenderer extends ISimpleParsable{
     
-    void onCreation(ILayout site);
-    
-    ILayout getSite();
-    
-    //todo
     @SideOnly(Side.CLIENT)
     void render();
     

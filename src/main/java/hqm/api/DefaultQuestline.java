@@ -1,59 +1,68 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.reward.IReward;
-import hardcorequesting.api.team.Party;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
-public abstract class DefaultTask implements ITask{
+public abstract class DefaultQuestline implements IQuestline{
     
-    private IQuest quest;
-    private UUID taskId;
+    private IQuestbook questbook;
+    private UUID questlineId;
     private String nameTranslationKey, descTranslationKey;
+    private int sortIndex;
+    private List<IQuest> quests;
     
     @Override
-    public void onCreation(IQuest quest, UUID taskId, NBTTagCompound additionalData){
-        this.taskId = taskId;
+    public void onCreation(IQuestbook questbook, UUID questlineID, NBTTagCompound additionalData, List<IQuest> quests){
+        this.questbook = questbook;
+        this.questlineId = questlineID;
         this.nameTranslationKey = additionalData.getString("Name");
         this.descTranslationKey = additionalData.getString("Desc");
+        this.sortIndex = additionalData.getInteger("Sort");
+        this.quests = quests;
     }
     
     @Nonnull
     @Override
-    public IQuest getQuest(){
-        return this.quest;
+    public IQuestbook getQuestbook(){
+        return this.questbook;
     }
     
-    @Nonnull
     @Override
     public UUID getUUID(){
-        return this.taskId;
+        return this.questlineId;
     }
     
-    @Nonnull
     @Override
     public String getNameTranslationKey(){
         return this.nameTranslationKey;
     }
     
-    @Nullable
     @Override
     public String getDescTranslationKey(){
         return this.descTranslationKey;
     }
     
-    @Nonnull
+    @Override
+    public int getSortIndex(){
+        return this.sortIndex;
+    }
+    
+    @Override
+    public List<IQuest> getQuests(){
+        return this.quests;
+    }
+    
     @Override
     public NBTTagCompound getAdditionalData(){
         NBTTagCompound data = new NBTTagCompound();
+        data.setInteger("Sort", this.getSortIndex());
         data.setString("Name", this.getNameTranslationKey());
         if(this.getDescTranslationKey() != null){
             data.setString("Desc", this.getDescTranslationKey());
         }
         return data;
     }
-    
 }

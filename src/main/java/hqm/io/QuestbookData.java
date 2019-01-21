@@ -1,12 +1,10 @@
-package hardcorequesting.io;
+package hqm.io;
 
 import com.google.gson.annotations.SerializedName;
-import hardcorequesting.api.*;
-import hardcorequesting.api.reward.IReward;
+import hqm.api.*;
+import hqm.api.reward.IReward;
 import hardcorequesting.util.HQMUtil;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

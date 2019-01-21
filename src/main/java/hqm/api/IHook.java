@@ -1,6 +1,6 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.reward.IReward;
+import hqm.api.reward.IReward;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
