@@ -24,6 +24,7 @@ import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -297,5 +298,11 @@ public abstract class QuestTask {
     }
 
     public void onQuestSelected(EventTrigger.QuestSelectedEvent event) {
+    }
+
+    public void onBlockPlaced(BlockEvent.PlaceEvent event) {
+    }
+
+    public void onBlockBroken(BlockEvent.BreakEvent event) {
     }
 }

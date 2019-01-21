@@ -164,6 +164,10 @@ hqm.taskType.advancement.title=Advancement
 hqm.taskType.advancement.desc=A task where the player has to complete a specific advancement.
 hqm.taskType.completion.title=Quest Complete
 hqm.taskType.completion.desc=A task where the player must have already completed another quest.
+hqm.taskType.break.title=Break Block
+hqm.taskType.break.desc=A task where the player must break one or more blocks.
+hqm.taskType.place.title=Place Block
+hqm.taskType.place.desc=A task where the player must place one or more blocks.
 
 # ======================================
 #			DEATH TYPES

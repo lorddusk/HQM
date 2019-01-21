@@ -1652,7 +1652,9 @@ public class Quest {
         REPUTATION(QuestTaskReputationTarget.class, "reputation"),
         REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill"),
         ADVANCEMENT(QuestTaskAdvancement.class, "advancement"),
-        COMPLETION(QuestTaskCompleted.class, "completion");
+        COMPLETION(QuestTaskCompleted.class, "completion"),
+        BLOCK_BREAK(QuestTaskBlockBreak.class, "break"),
+        BLOCK_PLACE(QuestTaskBlockPlace.class, "place");
 
         private final Class<? extends QuestTask> clazz;
         private final String id;

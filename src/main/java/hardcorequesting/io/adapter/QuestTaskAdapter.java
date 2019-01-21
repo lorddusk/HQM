@@ -397,6 +397,7 @@ public class QuestTaskAdapter {
         private final String TAME = "tame";
         private final String ADVANCEMENTS = "advancements";
         private final String COMPLETED_QUESTS = "completed_quests";
+        private final String BLOCKS = "blocks";
 
         @Override
         public void write(JsonWriter out, QuestTask value) throws IOException {
@@ -407,7 +408,13 @@ public class QuestTaskAdapter {
                 out.name(DESCRIPTION).value(value.getDescription());
             if (!value.getLongDescription().equals(type.getDescription()))
                 out.name(LONG_DESCRIPTION).value(value.getLongDescription());
-            if (value instanceof QuestTaskItems) {
+            if (value instanceof QuestTaskBlock) {
+                out.name(BLOCKS).beginArray();
+                for (QuestTaskItems.ItemRequirement requirement : ((QuestTaskBlock) value).getItems()) {
+                    ITEM_REQUIREMENT_ADAPTER.write(out, requirement);
+                }
+                out.endArray();
+            } else if (value instanceof QuestTaskItems) {
                 out.name(ITEMS).beginArray();
                 for (QuestTaskItems.ItemRequirement requirement : ((QuestTaskItems) value).getItems()) {
                     ITEM_REQUIREMENT_ADAPTER.write(out, requirement);
@@ -476,6 +483,15 @@ public class QuestTaskAdapter {
                     TASK.description = in.nextString();
                 } else if (name.equalsIgnoreCase(LONG_DESCRIPTION)) {
                     TASK.setLongDescription(in.nextString());
+                } else if (TASK instanceof QuestTaskBlock && name.equalsIgnoreCase(BLOCKS)) {
+                    List<QuestTaskItems.ItemRequirement> list = new ArrayList<>();
+                    in.beginArray();
+                    while (in.hasNext()) {
+                        QuestTaskItems.ItemRequirement entry = ITEM_REQUIREMENT_ADAPTER.read(in);
+                        if (entry != null) list.add(entry);
+                    }
+                    in.endArray();
+                    ((QuestTaskBlock) TASK).setItems(list.toArray(new QuestTaskItems.ItemRequirement[0]));
                 } else if (TASK instanceof QuestTaskItems && name.equalsIgnoreCase(ITEMS)) {
                     List<QuestTaskItems.ItemRequirement> list = new ArrayList<>();
                     in.beginArray();

@@ -328,8 +328,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
         TAME(false, false, false),
         MOB(false, false, false),
         ADVANCEMENT(false, false, false),
-        PORTAL(false, false, false);
-
+        PORTAL(false, false, false),
+        BLOCK_PLACE_TASK(false, true, false),
+        BLOCK_BREAK_TASK(false, true, false);
 
         private boolean allowFluids;
         private boolean allowAmount;

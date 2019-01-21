@@ -9,6 +9,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -154,6 +155,19 @@ public class EventTrigger{
         }
     }
 
+    @SubscribeEvent
+    public void onEvent(BlockEvent.BreakEvent event) {
+        for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
+            task.onBlockBroken(event);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEvent(BlockEvent.PlaceEvent event) {
+        for (QuestTask task : getTasks(Type.BLOCK_PLACED)) {
+            task.onBlockPlaced(event);
+        }
+    }
 
     private List<QuestTask> getTasks(Type type) {
         return registeredTasks[type.ordinal()];
@@ -171,6 +185,8 @@ public class EventTrigger{
         ADVANCEMENT,
         QUEST_COMPLETED,
         QUEST_SELECTED,
+        BLOCK_PLACED,
+        BLOCK_BROKEN,
     }
 
     public static class BookOpeningEvent {
