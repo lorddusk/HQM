@@ -112,8 +112,7 @@ public class Quest {
     private RepeatInfo repeatInfo = new RepeatInfo(RepeatType.NONE, 0, 0);
     private TriggerType triggerType = TriggerType.NONE;
     private int triggerTasks = 1;
-    private boolean useModifiedParentRequirement;
-    private int parentRequirementCount;
+    private int parentRequirementCount = -1;
     private int x;
     private int y;
     private boolean isBig;
@@ -1598,15 +1597,11 @@ public class Quest {
     }
 
     public boolean getUseModifiedParentRequirement() {
-        return useModifiedParentRequirement;
-    }
-
-    public void setUseModifiedParentRequirement(boolean useModifiedParentRequirement) {
-        this.useModifiedParentRequirement = useModifiedParentRequirement;
+        return this.parentRequirementCount < this.getRequirements().size();
     }
 
     public int getParentRequirementCount() {
-        return parentRequirementCount;
+        return (parentRequirementCount == -1) ? this.getRequirements().size() : this.parentRequirementCount;
     }
 
     public void setParentRequirementCount(int parentRequirementCount) {
@@ -1711,7 +1706,7 @@ public class Quest {
 
         private boolean isValid(UUID uuid, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
             int parents = getRequirements().size();
-            int requiredAmount = useModifiedParentRequirement ? parentRequirementCount : parents;
+            int requiredAmount = getParentRequirementCount();
             if (requiredAmount > parents) {
                 return false;
             }
