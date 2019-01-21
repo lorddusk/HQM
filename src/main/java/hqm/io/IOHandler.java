@@ -1,10 +1,10 @@
-package hardcorequesting.io;
+package hqm.io;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.api.IQuestbook;
+import hqm.api.IQuestbook;
 import hardcorequesting.io.adapter.MinecraftAdapter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
@@ -14,10 +14,8 @@ import org.apache.commons.io.FileUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class IOHandler{
     

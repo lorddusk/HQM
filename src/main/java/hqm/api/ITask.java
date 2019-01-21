@@ -1,11 +1,9 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.page.IPage;
-import hardcorequesting.api.reward.IReward;
-import hardcorequesting.api.team.Party;
+import hqm.api.page.IPage;
+import hqm.api.reward.IReward;
+import hqm.team.Team;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,6 +32,6 @@ public interface ITask{
     @Nonnull
     IPage getRightSite();
     
-    default void onRewardCollection(@Nonnull IReward reward, @Nonnull Party team){}
+    default void onRewardCollection(@Nonnull IReward reward, @Nonnull Team team){}
     
 }

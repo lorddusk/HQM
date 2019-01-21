@@ -1,7 +1,7 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.render.ICustomIconRenderer;
-import hardcorequesting.api.reward.IReward;
+import hqm.api.render.ICustomIconRenderer;
+import hqm.api.reward.IReward;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

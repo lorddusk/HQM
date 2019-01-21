@@ -1,6 +1,6 @@
-package hardcorequesting.api.page;
+package hqm.api.page;
 
-import hardcorequesting.api.IQuestbook;
+import hqm.api.IQuestbook;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

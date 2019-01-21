@@ -1,6 +1,7 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.page.ILayout;
+import hqm.api.page.ILayout;
+import hqm.io.QuestbookData;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
@@ -16,7 +17,7 @@ import java.util.UUID;
  * Every questbook (not the item/itemstack) has to implement this interface,
  * otherwise the general HQM logic won't work.
  *
- * It can be created from a questbook.json file via {@link hardcorequesting.io.QuestbookData}
+ * It can be created from a questbook.json file via {@link QuestbookData}
  *
  * @author canitzp
  * @since 11.01.2019 HQM 6(?)

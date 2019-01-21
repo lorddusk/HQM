@@ -1,12 +1,11 @@
-package hardcorequesting.api;
+package hqm.api;
 
-import hardcorequesting.api.page.ILayout;
+import hqm.api.page.ILayout;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

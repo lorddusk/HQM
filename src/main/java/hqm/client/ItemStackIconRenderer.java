@@ -1,5 +1,6 @@
-package hardcorequesting.api.render;
+package hqm.client;
 
+import hqm.api.render.ICustomIconRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;

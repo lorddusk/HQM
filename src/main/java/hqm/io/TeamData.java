@@ -1,7 +1,7 @@
-package hardcorequesting.io;
+package hqm.io;
 
 import com.google.gson.annotations.SerializedName;
-import hardcorequesting.api.team.Party;
+import hqm.team.Team;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;
@@ -19,21 +19,21 @@ public class TeamData{
     @SerializedName("quests") private List<QuestCompletionData> questData;
     
     @Nullable
-    public Party toTeam(){
+    public Team toTeam(){
         return this.uuid != null && this.additionalData != null && this.questData != null ?
-            new Party(this.uuid, this.additionalData, this.questData.stream()
-                                                                    .map(QuestCompletionData::toQuestCompletion)
-                                                                    .filter(Objects::nonNull)
-                                                                    .collect(Collectors.toList())) : null;
+            new Team(this.uuid, this.additionalData, this.questData.stream()
+                                                                   .map(QuestCompletionData::toQuestCompletion)
+                                                                   .filter(Objects::nonNull)
+                                                                   .collect(Collectors.toList())) : null;
     }
     
     @Nonnull
-    public static TeamData fromTeam(@Nonnull Party party){
+    public static TeamData fromTeam(@Nonnull Team team){
         TeamData td = new TeamData();
-        td.uuid = party.getTeamID();
-        td.additionalData = party.getData();
+        td.uuid = team.getTeamID();
+        td.additionalData = team.getData();
         td.questData = new ArrayList<>();
-        td.questData.addAll(party.getQuests().stream().map(QuestCompletionData::fromTaskCompletion).collect(Collectors.toList()));
+        td.questData.addAll(team.getQuests().stream().map(QuestCompletionData::fromTaskCompletion).collect(Collectors.toList()));
         return td;
     }
     
@@ -43,16 +43,16 @@ public class TeamData{
         @SerializedName("tasks") private List<TaskCompletionData> tasks;
     
         @Nullable
-        private Party.QuestCompletion toQuestCompletion(){
+        private Team.QuestCompletion toQuestCompletion(){
             return this.questId != null && this.additionalData != null && this.tasks != null ?
-                new Party.QuestCompletion(this.questId, this.additionalData, this.tasks.stream()
-                                                                                       .map(TaskCompletionData::toTaskCompletion)
-                                                                                       .filter(Objects::nonNull)
-                                                                                       .collect(Collectors.toList())) : null;
+                new Team.QuestCompletion(this.questId, this.additionalData, this.tasks.stream()
+                                                                                      .map(TaskCompletionData::toTaskCompletion)
+                                                                                      .filter(Objects::nonNull)
+                                                                                      .collect(Collectors.toList())) : null;
         }
     
         @Nonnull
-        private static QuestCompletionData fromTaskCompletion(@Nonnull Party.QuestCompletion qc){
+        private static QuestCompletionData fromTaskCompletion(@Nonnull Team.QuestCompletion qc){
             QuestCompletionData qcd = new QuestCompletionData();
             qcd.questId = qc.getQuestID();
             qcd.additionalData = qc.getQuestData();
@@ -66,12 +66,12 @@ public class TeamData{
             @SerializedName("data") private NBTTagCompound additionalData;
             
             @Nullable
-            private Party.QuestCompletion.TaskCompletion toTaskCompletion(){
-                return this.taskUuid != null && this.additionalData != null ? new Party.QuestCompletion.TaskCompletion(this.taskUuid, this.additionalData) : null;
+            private Team.QuestCompletion.TaskCompletion toTaskCompletion(){
+                return this.taskUuid != null && this.additionalData != null ? new Team.QuestCompletion.TaskCompletion(this.taskUuid, this.additionalData) : null;
             }
             
             @Nonnull
-            private static TaskCompletionData fromTaskCompletion(@Nonnull Party.QuestCompletion.TaskCompletion tc){
+            private static TaskCompletionData fromTaskCompletion(@Nonnull Team.QuestCompletion.TaskCompletion tc){
                 TaskCompletionData tcd = new TaskCompletionData();
                 tcd.taskUuid = tc.getTaskID();
                 tcd.additionalData = tc.getTaskData();

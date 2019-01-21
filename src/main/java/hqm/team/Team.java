@@ -1,4 +1,4 @@
-package hardcorequesting.api.team;
+package hqm.team;
 
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class Party{
+public class Team{
     
     @Nonnull private UUID teamID;
     @Nullable private NBTTagCompound data;
     @Nonnull private List<QuestCompletion> quests;
     
-    public Party(@Nonnull UUID teamID, @Nullable NBTTagCompound data, @Nonnull List<QuestCompletion> quests){
+    public Team(@Nonnull UUID teamID, @Nullable NBTTagCompound data, @Nonnull List<QuestCompletion> quests){
         this.teamID = teamID;
         this.data = data;
         this.quests = quests;
