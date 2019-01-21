@@ -7,6 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
+import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -87,6 +88,24 @@ public class EventTrigger{
     public void onEvent(PlayerEvent.ItemCraftedEvent event) {
         for (QuestTask task : getTasks(Type.CRAFTING)) {
             task.onCrafting(event);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEvent(AnvilRepairEvent event) {
+        CraftEventWrapper wrapper = new CraftEventWrapper(event.getEntityPlayer(), event);
+
+        for (QuestTask task : getTasks(Type.CRAFTING)) {
+            task.onCrafting(wrapper);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEvent(PlayerEvent.ItemSmeltedEvent event) {
+        CraftEventWrapper wrapper = new CraftEventWrapper(event.player, event);
+
+        for (QuestTask task : getTasks(Type.CRAFTING)) {
+            task.onCrafting(wrapper);
         }
     }
 
@@ -222,4 +241,13 @@ public class EventTrigger{
         }
     }
 
+    public static class CraftEventWrapper extends PlayerEvent.ItemCraftedEvent {
+        public CraftEventWrapper(EntityPlayer player, AnvilRepairEvent event) {
+            super(player, event.getItemResult(), null);
+        }
+
+        public CraftEventWrapper(EntityPlayer player, PlayerEvent.ItemSmeltedEvent event) {
+            super(player, event.smelting, null);
+        }
+    }
 }
