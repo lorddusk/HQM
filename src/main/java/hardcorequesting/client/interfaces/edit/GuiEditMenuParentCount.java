@@ -12,12 +12,12 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     private boolean showModifiedParentRequirement;
     private int parentRequirementCount;
-    private UUID questId;
+    private Quest quest;
 
     public GuiEditMenuParentCount(GuiBase gui, EntityPlayer player, Quest quest) {
         super(gui, player, true, 25, 20, 25, 105);
 
-        this.questId = quest.getQuestId();
+        this.quest = quest;
         this.parentRequirementCount = quest.getParentRequirementCount();
         this.showModifiedParentRequirement = quest.getUseModifiedParentRequirement();
 
@@ -56,10 +56,7 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     @Override
     public void save(GuiBase gui) {
-        Quest quest = Quest.getQuest(questId);
-        if (quest != null) {
-            quest.setParentRequirementCount(parentRequirementCount);
-            SaveHelper.add(SaveHelper.EditType.PARENT_REQUIREMENT_CHANGED);
-        }
+        quest.setParentRequirementCount(showModifiedParentRequirement ? parentRequirementCount : -1);
+        SaveHelper.add(SaveHelper.EditType.PARENT_REQUIREMENT_CHANGED);
     }
 }
