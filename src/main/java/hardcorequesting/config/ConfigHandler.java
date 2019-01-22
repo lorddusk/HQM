@@ -36,9 +36,10 @@ public class ConfigHandler {
     }
 
     public static void initEditConfig(String configPath) {
-        if(new File(configPath, "default").exists()){
+        /* This error message is unclear */
+        /*if(new File(configPath, "default").exists()){
             FMLLog.warning("[HQM] Detected old HQM quest files! These aren't fully compatible with the newer versions. To disable this message, delete the 'default' folder.");
-        }
+        }*/
         try {
             FileUtils.writeLines(new File(configPath, "ReadMe.txt"), readMeText);
         } catch (IOException e) {
