@@ -17,15 +17,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PlayerDataSyncMessage implements IMessage {
 
     private boolean local, serverWorld, questing, hardcore;
     private String team;
-
-    private List<String> data = new ArrayList<>();
+    private String data;
 
     public PlayerDataSyncMessage() {
     }
@@ -36,8 +33,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
         this.team = Team.saveTeam(player);
-        String stringData = QuestingData.saveQuestingData(player);
-        this.data = SyncUtil.splitData(stringData, 3000);
+        this.data = QuestingData.saveQuestingData(player);
     }
 
     @Override
@@ -47,11 +43,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         this.team = ByteBufUtils.readUTF8String(buf);
-        int count = buf.readInt();
-        data.clear();
-        for (int i = 0; i<count; i++) {
-            data.add(ByteBufUtils.readUTF8String(buf));
-        }
+        this.data = SyncUtil.readLargeString(buf);
     }
 
     @Override
@@ -61,21 +53,18 @@ public class PlayerDataSyncMessage implements IMessage {
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         ByteBufUtils.writeUTF8String(buf, team);
-        buf.writeInt(this.data.size());
-        for (String val : this.data) {
-            ByteBufUtils.writeUTF8String(buf, val);
-        }
+        SyncUtil.writeLargeString(this.data, buf);
     }
 
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {
-        
+
         @SideOnly(Side.CLIENT)
         @Override
         public IMessage onMessage(PlayerDataSyncMessage message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
             return null;
         }
-    
+
         @SideOnly(Side.CLIENT)
         private void handle(PlayerDataSyncMessage message, MessageContext ctx) {
             /* Why copying our files if we get all quests from the server anyway? It could lead to wrong questlines
@@ -90,7 +79,7 @@ public class PlayerDataSyncMessage implements IMessage {
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data"))) {
                     out.print("[");
-                    out.print(SyncUtil.joinData(message.data));
+                    out.print(message.data);
                     out.print("]");
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {
