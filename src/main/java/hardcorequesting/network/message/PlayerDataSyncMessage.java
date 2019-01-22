@@ -4,6 +4,7 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.Team;
+import hardcorequesting.util.SyncUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,20 +25,9 @@ public class PlayerDataSyncMessage implements IMessage {
     private boolean local, serverWorld, questing, hardcore;
     private String team;
 
-    private List<String> data = new ArrayList<String>();
+    private List<String> data = new ArrayList<>();
 
     public PlayerDataSyncMessage() {
-
-    }
-
-    private List<String> SplitData (String input, int size) {
-        List<String> output = new ArrayList<String>();
-        int len = input.length();
-        for (int i=0; i<len; i+= size) {
-            output.add(input.substring(i, Math.min(len, i+size)));
-        }
-
-        return output;
     }
 
     public PlayerDataSyncMessage(boolean local, boolean serverWorld, EntityPlayer player) {
@@ -47,7 +37,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.hardcore = QuestingData.isHardcoreActive();
         this.team = Team.saveTeam(player);
         String stringData = QuestingData.saveQuestingData(player);
-        this.data = SplitData(stringData, 3000);
+        this.data = SyncUtil.splitData(stringData, 3000);
     }
 
     @Override
@@ -100,7 +90,7 @@ public class PlayerDataSyncMessage implements IMessage {
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data"))) {
                     out.print("[");
-                    out.print(String.join("", message.data));
+                    out.print(SyncUtil.joinData(message.data));
                     out.print("]");
                 }
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {

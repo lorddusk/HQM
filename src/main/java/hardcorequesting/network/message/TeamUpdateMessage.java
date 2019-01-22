@@ -3,6 +3,7 @@ package hardcorequesting.network.message;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
+import hardcorequesting.util.SyncUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -16,24 +17,14 @@ import java.util.List;
 public class TeamUpdateMessage implements IMessage {
 
     private TeamUpdateType type;
-    private List<String> data = new ArrayList<String>();
+    private List<String> data = new ArrayList<>();
 
     public TeamUpdateMessage() {
     }
 
-    private List<String> SplitData (String input, int size) {
-        List<String> output = new ArrayList<String>();
-        int len = input.length();
-        for (int i=0; i<len; i+= size) {
-            output.add(input.substring(i, Math.min(len, i+size)));
-        }
-
-        return output;
-    }
-
     public TeamUpdateMessage(TeamUpdateType type, String data) {
         this.type = type;
-        this.data = SplitData(data, 3000);
+        this.data = SyncUtil.splitData(data, 3000);
     }
 
     @Override
@@ -54,11 +45,6 @@ public class TeamUpdateMessage implements IMessage {
         for (String chunk : this.data) {
             ByteBufUtils.writeUTF8String(buf, chunk);
         }
-
-        //buf.writeInt(this.data.getBytes().length);
-        
-        //for(int i = 0; i < data.getBytes().length; i++)
-          //  buf.writeByte(data.getBytes()[i]);
     }
 
     public static class Handler implements IMessageHandler<TeamUpdateMessage, IMessage> {
@@ -70,7 +56,7 @@ public class TeamUpdateMessage implements IMessage {
         }
 
         private void handle(TeamUpdateMessage message, MessageContext ctx) {
-            message.type.update(QuestingData.getQuestingData(HardcoreQuesting.proxy.getPlayer(ctx)).getTeam(), String.join("", message.data));
+            message.type.update(QuestingData.getQuestingData(HardcoreQuesting.proxy.getPlayer(ctx)).getTeam(), SyncUtil.joinData(message.data));
         }
     }
 }
