@@ -8,6 +8,7 @@ import java.util.List;
 
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.util.SyncUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -33,10 +34,10 @@ public class QuestLineSyncMessage implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        mainDesc = ByteBufUtils.readUTF8String(buf);
-        reputations = ByteBufUtils.readUTF8String(buf);
-        bags = ByteBufUtils.readUTF8String(buf);
-        setOrder = ByteBufUtils.readUTF8String(buf);
+        mainDesc = SyncUtil.readLargeString(buf);
+        reputations = SyncUtil.readLargeString(buf);
+        bags = SyncUtil.readLargeString(buf);
+        setOrder = SyncUtil.readLargeString(buf);
 
         int size = buf.readInt();
         this.questSetNames = new String[size];
@@ -49,11 +50,12 @@ public class QuestLineSyncMessage implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, mainDesc);
-        ByteBufUtils.writeUTF8String(buf, reputations);
-        ByteBufUtils.writeUTF8String(buf, bags);
-        ByteBufUtils.writeUTF8String(buf, setOrder);
-        
+
+        SyncUtil.writeLargeString(mainDesc, buf);
+        SyncUtil.writeLargeString(reputations, buf);
+        SyncUtil.writeLargeString(bags, buf);
+        SyncUtil.writeLargeString(setOrder, buf);
+
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
             ByteBufUtils.writeUTF8String(buf, questSetNames[i]);
