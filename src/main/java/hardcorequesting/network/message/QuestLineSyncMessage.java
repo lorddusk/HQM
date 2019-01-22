@@ -27,8 +27,8 @@ public class QuestLineSyncMessage implements IMessage {
         List<String> names = new ArrayList<>();
         List<String> questSets = new ArrayList<>();
         this.setOrder = SaveHandler.saveAllQuestSets(names, questSets);
-        this.questSetNames = names.toArray(new String[names.size()]);
-        this.questsSets = questSets.toArray(new String[questSets.size()]);
+        this.questSetNames = names.toArray(new String[0]);
+        this.questsSets = questSets.toArray(new String[0]);
     }
 
     @Override
