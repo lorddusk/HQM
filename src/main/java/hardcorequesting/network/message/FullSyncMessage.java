@@ -6,9 +6,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.SyncUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -45,8 +47,8 @@ public class FullSyncMessage implements IMessage {
         List<String> names = new ArrayList<>();
         List<String> questSets = new ArrayList<>();
         this.setOrder = SaveHandler.saveAllQuestSets(names, questSets);
-        this.questSetNames = names.toArray(new String[names.size()]);
-        this.questsSets = questSets.toArray(new String[questSets.size()]);
+        this.questSetNames = names.toArray(new String[0]);
+        this.questsSets = questSets.toArray(new String[0]);
     }
 
     @Override
@@ -56,13 +58,13 @@ public class FullSyncMessage implements IMessage {
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         if (local) return;
-        mainDesc = ByteBufUtils.readUTF8String(buf);
-        reputations = ByteBufUtils.readUTF8String(buf);
-        bags = ByteBufUtils.readUTF8String(buf);
-        teams = ByteBufUtils.readUTF8String(buf);
-        data = ByteBufUtils.readUTF8String(buf);
-        setOrder = ByteBufUtils.readUTF8String(buf);
-        
+        mainDesc = SyncUtil.readLargeString(buf);
+        reputations = SyncUtil.readLargeString(buf);
+        bags = SyncUtil.readLargeString(buf);
+        teams = SyncUtil.readLargeString(buf);
+        data = SyncUtil.readLargeString(buf);
+        setOrder = SyncUtil.readLargeString(buf);
+
         int size = buf.readInt();
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
@@ -80,13 +82,13 @@ public class FullSyncMessage implements IMessage {
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         if (this.local) return;
-        ByteBufUtils.writeUTF8String(buf, mainDesc);
-        ByteBufUtils.writeUTF8String(buf, reputations);
-        ByteBufUtils.writeUTF8String(buf, bags);
-        ByteBufUtils.writeUTF8String(buf, teams);
-        ByteBufUtils.writeUTF8String(buf, data);
-        ByteBufUtils.writeUTF8String(buf, setOrder);
-        
+        SyncUtil.writeLargeString(mainDesc, buf);
+        SyncUtil.writeLargeString(reputations, buf);
+        SyncUtil.writeLargeString(bags, buf);
+        SyncUtil.writeLargeString(teams, buf);
+        SyncUtil.writeLargeString(data, buf);
+        SyncUtil.writeLargeString(setOrder, buf);
+
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
             ByteBufUtils.writeUTF8String(buf, questSetNames[i]);
