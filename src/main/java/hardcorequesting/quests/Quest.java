@@ -1597,7 +1597,7 @@ public class Quest {
     }
 
     public boolean getUseModifiedParentRequirement() {
-        return this.parentRequirementCount < this.getRequirements().size();
+        return (parentRequirementCount != -1) && this.parentRequirementCount < this.getRequirements().size();
     }
 
     public int getParentRequirementCount() {
