@@ -107,7 +107,7 @@ public class QuestLine {
         try {
             SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+            HardcoreQuesting.LOG.error("Failed to load local questing state from descriptions.txt");
         }
     }
 
@@ -115,7 +115,7 @@ public class QuestLine {
         try {
             SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+            HardcoreQuesting.LOG.error("Failed to load default questing state from description.txt");
         }
     }
 
@@ -124,7 +124,7 @@ public class QuestLine {
             QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
             QuestLine.getActiveQuestLine().cachedMainDescription = null;
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to load questing state");
+            HardcoreQuesting.LOG.error("Failed to load remote questing state from description.txt");
         }
     }
 
