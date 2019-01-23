@@ -152,7 +152,6 @@ public final class SaveHelper {
         return isLarge;
     }
 
-
     public enum EditType {
         QUEST_CREATE(BaseEditType.ADD, Type.QUEST),
         QUEST_REMOVE(BaseEditType.REMOVE, Type.QUEST),
@@ -183,6 +182,12 @@ public final class SaveHelper {
         LOCATION_CREATE(BaseEditType.ADD, Type.LOCATION),
         LOCATION_CHANGE(BaseEditType.CHANGE, Type.LOCATION),
         LOCATION_REMOVE(BaseEditType.REMOVE, Type.LOCATION),
+        ADVANCEMENT_CREATE(BaseEditType.ADD, Type.ADVANCEMENT),
+        ADVANCEMENT_CHANGE(BaseEditType.CHANGE, Type.ADVANCEMENT),
+        ADVANCEMENT_REMOVE(BaseEditType.REMOVE, Type.ADVANCEMENT),
+        COMPLETE_CHECK_CREATE(BaseEditType.ADD, Type.COMPLETION),
+        COMPLETE_CHECK_CHANGE(BaseEditType.CHANGE, Type.COMPLETION),
+        COMPLETE_CHECK_REMOVE(BaseEditType.REMOVE, Type.COMPLETION),
         TIER_CREATE(BaseEditType.ADD, Type.TIER),
         TIER_CHANGE(BaseEditType.CHANGE, Type.TIER),
         TIER_REMOVE(BaseEditType.REMOVE, Type.TIER),
@@ -274,7 +279,10 @@ public final class SaveHelper {
             KILLS("kills"),
             REPUTATION_BAR("repBar"),
             BETWEEN_SETS("betweenSets"),
-            COMMAND("command");
+            COMMAND("command"),
+            ADVANCEMENT("advancement"),
+            COMPLETION("questCompletion"),
+            TASK_BLOCK("taskBlock");
 
             private String id;
 
@@ -300,7 +308,7 @@ public final class SaveHelper {
 
         @Override
         public int compareTo(ListElement o) {
-            return ((Integer) o.count).compareTo(count);
+            return Integer.compare(o.count, count);
         }
     }
 }

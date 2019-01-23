@@ -66,9 +66,9 @@ public class QuestTaskAdvancement extends QuestTask {
             advancements = Arrays.copyOf(advancements, advancements.length + 1);
             QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
             data.advanced = Arrays.copyOf(data.advanced, data.advanced.length + 1);
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
+            SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
         } else {
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
+            SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
         }
 
         advancements[id] = advancement;
@@ -142,7 +142,7 @@ public class QuestTaskAdvancement extends QuestTask {
                                     }
                                 }
                                 this.advancements = newAdvancements;
-                                SaveHelper.add(SaveHelper.EditType.LOCATION_REMOVE);
+                                SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_REMOVE);
                             }
                             break;
                         default:
