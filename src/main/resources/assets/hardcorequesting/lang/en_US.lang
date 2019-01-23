@@ -704,3 +704,5 @@ hqm.editType.kills=kills
 hqm.editType.repBar=rep bar
 hqm.editType.betweenSets=between sets
 hqm.editType.command=commands
+hqm.editType.advancement=advancements
+hqm.editType.questCompletion=quest completions

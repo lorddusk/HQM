@@ -55,9 +55,9 @@ public class QuestTaskCompleted extends QuestTask {
             quests = Arrays.copyOf(quests, quests.length + 1);
             QuestDataTaskCompleted data = (QuestDataTaskCompleted) getData(player);
             data.quests = Arrays.copyOf(data.quests, data.quests.length + 1);
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
+            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
         } else {
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
+            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
         }
 
         quests[id] = task;
@@ -123,7 +123,7 @@ public class QuestTaskCompleted extends QuestTask {
                                     }
                                 }
                                 this.quests = newCompleted;
-                                SaveHelper.add(SaveHelper.EditType.LOCATION_REMOVE);
+                                SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_REMOVE);
                             }
                             break;
                         default:
