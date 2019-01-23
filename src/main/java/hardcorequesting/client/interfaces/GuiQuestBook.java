@@ -587,15 +587,21 @@ public class GuiQuestBook extends GuiBase {
             return;
         }
 
+        boolean buttonClicked = false;
+
         for (LargeButton largeButton : buttons) {
             if (largeButton.isVisible(this, player) && largeButton.isEnabled(this, player) && largeButton.inButtonBounds(this, x, y)) {
                 largeButton.onClick(this, player);
+                buttonClicked = true;
+                break;
             }
         }
 
         if (Quest.canQuestsBeEdited(this.getPlayer())) {
             SaveHelper.onClick(this, x, y);
         }
+
+        if (buttonClicked) return;
 
         if (editMenu == null) {
             if (Quest.canQuestsBeEdited(this.getPlayer())) {
