@@ -736,7 +736,7 @@ public class QuestSet {
             HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
             for (Quest quest : this.getQuests().values()) {
                 if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
-                    if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
+                    if (Quest.canQuestsBeEdited()) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
                                 gui.modifyingQuest = quest;
@@ -798,7 +798,14 @@ public class QuestSet {
                             case TRIGGER:
                                 gui.setEditMenu(new GuiEditMenuTrigger(gui, player, quest));
                                 break;
+                            case NORMAL:
+                                if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
+                                    OPBookHelper.reverseQuestCompletion(quest, player);
+                                    break;
+                                } // deliberate drop through
                             default:
+                                GuiQuestBook.selectedQuest = quest;
+                                quest.onOpen(gui, player);
                                 break;
                         }
                     } else {
