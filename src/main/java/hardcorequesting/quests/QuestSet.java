@@ -45,6 +45,11 @@ public class QuestSet {
         this.id = Quest.getQuestSets().size();
     }
 
+    public static void loginReset () {
+        lastClicked = -1;
+        lastLastQuestSet = null;
+    }
+
     public static void loadAll(boolean remote) {
         try {
             SaveHandler.loadAllQuestSets(SaveHandler.getFolder(remote));
@@ -233,13 +238,11 @@ public class QuestSet {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), questSet, true));
                         break;
                     default:
-                        if (!(!Quest.canQuestsBeEdited() && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
-                            break;
-                    case NORMAL:
                         int thisClicked = gui.getPlayer().ticksExisted - lastClicked;
                         if (lastClicked != -1 && thisClicked < 6) {
                             if (GuiQuestBook.selectedSet == null && lastLastQuestSet != null) GuiQuestBook.selectedSet = lastLastQuestSet;
                             gui.openSet();
+                            lastLastQuestSet = null;
                         } else {
                             GuiQuestBook.selectedSet = (questSet == GuiQuestBook.selectedSet) ? null : questSet;
                             lastClicked = gui.getPlayer().ticksExisted;

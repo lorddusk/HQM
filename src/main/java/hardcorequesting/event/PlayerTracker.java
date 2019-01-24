@@ -3,6 +3,7 @@ package hardcorequesting.event;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
@@ -52,6 +53,9 @@ public class PlayerTracker {
                 tags.removeTag(HQ_TAG);
             }
         }
+
+        QuestSet.loginReset();
+
         QuestingData.spawnBook(player);
     }
 
