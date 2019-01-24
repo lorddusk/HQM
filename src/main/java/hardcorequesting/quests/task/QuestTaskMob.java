@@ -204,10 +204,14 @@ public class QuestTaskMob extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID playerID) {
+    public void autoComplete(UUID playerID, boolean status) {
         int[] killed = ((QuestDataTaskMob) getData(playerID)).killed;
         for (int i = 0; i < killed.length; i++) {
-            killed[i] = mobs[i].count;
+            if (status) {
+                killed[i] = mobs[i].count;
+            } else {
+                killed[i] = 0;
+            }
         }
     }
 

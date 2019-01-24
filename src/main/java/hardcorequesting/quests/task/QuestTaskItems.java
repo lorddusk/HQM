@@ -323,10 +323,14 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID playerId) {
+    public void autoComplete(UUID playerId, boolean status) {
         QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
         for (int i = 0; i < items.length; i++) {
-            data.progress[i] = items[i].required;
+            if (status) {
+                data.progress[i] = items[i].required;
+            } else {
+                data.progress[i] = 0;
+            }
         }
     }
 

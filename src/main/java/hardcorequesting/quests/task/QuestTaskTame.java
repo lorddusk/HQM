@@ -192,12 +192,17 @@ public class QuestTaskTame extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID uuid) {
+    public void autoComplete(UUID uuid, boolean status) {
         int[] tamed = ((QuestDataTaskTame) getData(uuid)).tamed;
         int q = tamed.length;
         for (int i = 0; i < q; i++) {
+            // This can sometimes cause an array-out-of-bounds error
             if (q != tamed.length) q = tamed.length;
-            tamed[i] = tames[i].count;
+            if (status) {
+                tamed[i] = tames[i].count;
+            } else {
+                tamed[i] = 0;
+            }
         }
     }
 

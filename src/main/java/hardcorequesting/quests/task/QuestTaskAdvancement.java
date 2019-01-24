@@ -241,10 +241,10 @@ public class QuestTaskAdvancement extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID uuid) {
+    public void autoComplete(UUID uuid, boolean status) {
         boolean[] advanced = ((QuestDataTaskAdvancement) getData(uuid)).advanced;
         for (int i = 0; i < advanced.length; i++) {
-            advanced[i] = true;
+            advanced[i] = status;
         }
     }
 

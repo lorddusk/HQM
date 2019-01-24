@@ -252,7 +252,11 @@ public abstract class QuestTask {
 
     public abstract void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other);
 
-    public abstract void autoComplete(UUID playerId);
+    public void autoComplete (UUID playerId) {
+        autoComplete(playerId, true);
+    }
+
+    public abstract void autoComplete(UUID playerId, boolean status);
 
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         own.completed = other.completed;
