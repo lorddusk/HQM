@@ -47,14 +47,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import javax.annotation.Nonnull;
 
 public class Quest {
 
@@ -200,7 +196,7 @@ public class Quest {
             @Override
             @SideOnly(Side.CLIENT)
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskDeath && Quest.canQuestsBeEdited(player);
+                return selectedTask != null && selectedTask instanceof QuestTaskDeath && Quest.canQuestsBeEdited();
             }
 
             @Override
@@ -220,7 +216,7 @@ public class Quest {
             @Override
             @SideOnly(Side.CLIENT)
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskReputationKill && Quest.canQuestsBeEdited(player);
+                return selectedTask != null && selectedTask instanceof QuestTaskReputationKill && Quest.canQuestsBeEdited();
             }
 
             @Override
@@ -267,7 +263,7 @@ public class Quest {
 
                 @Override
                 public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                    return canQuestsBeEdited(player) && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
+                    return canQuestsBeEdited() && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
                 }
 
                 @Override
@@ -285,7 +281,7 @@ public class Quest {
 
                     @Override
                     public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                        return canQuestsBeEdited(player) && selectedTask != null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.CHANGE_TASK;
+                        return canQuestsBeEdited() && selectedTask != null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.CHANGE_TASK;
                     }
 
                     @Override
@@ -808,7 +804,7 @@ public class Quest {
 
     @SideOnly(Side.CLIENT)
     public int getColorFilter(EntityPlayer player, int tick) {
-        if (canQuestsBeEdited(player) && !isVisible(player)) {
+        if (canQuestsBeEdited() && !isVisible(player)) {
             return 0x55FFFFFF;
         } else if (!isEnabled(player)) {
             return 0xFF888888;
@@ -872,7 +868,7 @@ public class Quest {
 
     @SideOnly(Side.CLIENT)
     public void drawMenu(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
-        if (!canQuestsBeEdited(player) && selectedTask != null && !selectedTask.isVisible(player)) {
+        if (!canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
             if (tasks.size() > 0) {
                 selectedTask = tasks.get(0);
             } else {
@@ -891,7 +887,7 @@ public class Quest {
         for (int i = start; i < end; i++) {
             QuestTask task = tasks.get(i);
             boolean isVisible = task.isVisible(player);
-            if (isVisible || Quest.canQuestsBeEdited(player)) {
+            if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(player);
                 int yPos = getTaskY(gui, id);
                 boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY);
@@ -905,10 +901,10 @@ public class Quest {
         if (selectedReward != -1 && !hasReward(player)) {
             selectedReward = -1;
         }
-        if (!rewards.isEmpty() || canQuestsBeEdited(player)) {
+        if (!rewards.isEmpty() || canQuestsBeEdited()) {
             gui.drawString(Translator.translate("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewards.toArray(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
-            if (!rewardChoices.isEmpty() || canQuestsBeEdited(player)) {
+            if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
                 gui.drawString(Translator.translate("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
                 drawRewards(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
@@ -928,11 +924,11 @@ public class Quest {
 
 
         boolean claimed = getQuestData(player).claimed;
-        int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited(player) ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
+        int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited() ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
         boolean hover = gui.inBounds(REPUTATION_X, y, REPUTATION_SIZE, REPUTATION_SIZE, mX, mY);
 
 
-        if (reputationRewards != null || canQuestsBeEdited(player)) {
+        if (reputationRewards != null || canQuestsBeEdited()) {
             if (reputationRewards == null) {
                 claimed = true;
             }
@@ -966,7 +962,7 @@ public class Quest {
         }
 
         if (selectedTask != null) {
-            if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
+            if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
                 if (selectedTask instanceof QuestTaskItems) {
                     gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskChangeTo"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 } else {
@@ -979,15 +975,15 @@ public class Quest {
 
                 selectedTask.draw(gui, player, mX, mY);
             }
-        } else if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.TASK) {
+        } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-        } else if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
+        } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
 
-        if (!rewards.isEmpty() || canQuestsBeEdited(player)) {
+        if (!rewards.isEmpty() || canQuestsBeEdited()) {
             drawRewardMouseOver(gui, rewards.toArray(), REWARD_Y, -1, mX, mY);
-            if (!rewardChoices.isEmpty() || canQuestsBeEdited(player)) {
+            if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
                 drawRewardMouseOver(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
             }
         } else if (!rewardChoices.isEmpty()) {
@@ -1019,7 +1015,7 @@ public class Quest {
 
     @SideOnly(Side.CLIENT)
     private int getVisibleTasks(GuiBase gui) {
-        if (canQuestsBeEdited(gui.mc.player)) {
+        if (canQuestsBeEdited()) {
             return tasks.size();
         }
 
@@ -1059,7 +1055,7 @@ public class Quest {
                         GuiQuestBook.setSelectedStack(rewards[i]);
                         List<String> str = new ArrayList<String>();
                         try {
-                            if (canQuestsBeEdited(gui.getPlayer()) && !GuiQuestBook.isCtrlKeyDown()) {
+                            if (canQuestsBeEdited() && !GuiQuestBook.isCtrlKeyDown()) {
                                 str = rewards[i].getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
                                 str.add("");
                                 str.add(GuiColor.GRAY + Translator.translate("hqm.quest.crtlNonEditor"));
@@ -1085,7 +1081,7 @@ public class Quest {
     private ItemStack[] getEditFriendlyRewards(ItemStack[] rewards, int max) {
         if (rewards == null) {
             return new ItemStack[]{ItemStack.EMPTY};
-        } else if (canQuestsBeEdited(Minecraft.getMinecraft().player) && rewards.length < max) {
+        } else if (canQuestsBeEdited() && rewards.length < max) {
             ItemStack[] ret = Arrays.copyOf(rewards, rewards.length + 1);
             ret[ret.length - 1] = ItemStack.EMPTY;
             return ret;
@@ -1100,15 +1096,15 @@ public class Quest {
 
         for (int i = 0; i < rewards.length; i++) {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                if (canSelect && (!canQuestsBeEdited(player) || gui.getCurrentMode() == EditMode.NORMAL)) {
+                if (canSelect && (!canQuestsBeEdited() || gui.getCurrentMode() == EditMode.NORMAL)) {
                     if (selectedReward == i) {
                         selectedReward = -1;
                     } else if (rewards[i] != null) {
                         selectedReward = i;
                     }
-                } else if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.ITEM) {
+                } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.ITEM) {
                     gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
-                } else if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.DELETE && rewards[i] != null) {
+                } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.DELETE && rewards[i] != null) {
                     ItemStack[] newRewards;
                     if (rawRewards.length == 1) {
                         newRewards = null;
@@ -1160,10 +1156,10 @@ public class Quest {
             int end = Math.min(start + VISIBLE_TASKS, tasks.size());
             for (int i = start; i < end; i++) {
                 QuestTask task = tasks.get(i);
-                if (task.isVisible(player) || canQuestsBeEdited(player)) {
+                if (task.isVisible(player) || canQuestsBeEdited()) {
 
                     if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
-                        if (canQuestsBeEdited(player) && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
+                        if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
                                 gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, task, true));
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
@@ -1206,9 +1202,9 @@ public class Quest {
                 scrollBar.onClick(gui, mX, mY);
             }
 
-            if (!rewards.isEmpty() || canQuestsBeEdited(player)) {
+            if (!rewards.isEmpty() || canQuestsBeEdited()) {
                 handleRewardClick(gui, player, rewards.toArray(), REWARD_Y, false, mX, mY);
-                if (!rewardChoices.isEmpty() || canQuestsBeEdited(player)) {
+                if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
                     handleRewardClick(gui, player, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
                 }
             } else if (!rewardChoices.isEmpty()) {
@@ -1237,12 +1233,12 @@ public class Quest {
                 }
             }
 
-            if (canQuestsBeEdited(player) && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
+            if (canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
                 selectedTask = null;
             }
 
-            if (canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
-                int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited(player) ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
+            if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
+                int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited() ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
                 if (gui.inBounds(REPUTATION_X, y, REPUTATION_SIZE, REPUTATION_SIZE, mX, mY)) {
                     gui.setEditMenu(new GuiEditMenuReputationReward(gui, player, reputationRewards));
                 }
@@ -1624,8 +1620,8 @@ public class Quest {
         return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedRequirement.contains(quest.getQuestId())).collect(Collectors.toList());
     }
 
-    public static boolean canQuestsBeEdited(@Nonnull EntityPlayer player){
-        if(isEditing && !HQMUtil.isGameSingleplayer(player.getEntityWorld())){
+    public static boolean canQuestsBeEdited(){
+        if(isEditing && !HQMUtil.isGameSingleplayer()){
             setEditMode(false);
         }
         return isEditing;

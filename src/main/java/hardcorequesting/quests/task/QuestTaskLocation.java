@@ -13,7 +13,6 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskLocation;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -90,7 +89,7 @@ public class QuestTaskLocation extends QuestTask {
     
     @SideOnly(Side.CLIENT)
     private Location[] getEditFriendlyLocations(Location[] locations) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             locations = Arrays.copyOf(locations, locations.length + 1);
             locations[locations.length - 1] = new Location();
             return locations;
@@ -175,7 +174,7 @@ public class QuestTaskLocation extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Location[] locations = getEditFriendlyLocations(this.locations);
             for (int i = 0; i < locations.length; i++) {
                 Location location = locations[i];

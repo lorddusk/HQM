@@ -55,7 +55,7 @@ public class TileEntityTracker extends TileEntity implements ITickable {
 
     public static void saveToServer(EntityPlayer player, BlockPos pos, int radius, TrackerType type) {
         TileEntityTracker tracker = getTracker(player.world, pos);
-        if (Quest.canQuestsBeEdited(player) && tracker != null) {
+        if (Quest.canQuestsBeEdited() && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;
         }

@@ -29,7 +29,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         super.draw(gui, player, mX, mY);
         int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
-        if (Quest.canQuestsBeEdited(player)) {
+        if (Quest.canQuestsBeEdited()) {
             gui.drawString(gui.getLinesFromText(Translator.translate(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {
             gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);

@@ -349,7 +349,7 @@ public class TileEntityPortal extends TileEntity implements IBlockSync, ITickabl
                 break;
             case 1:
                 if (onServer) {
-                    if (Quest.canQuestsBeEdited(player)) {
+                    if (Quest.canQuestsBeEdited()) {
                         this.type = PortalType.values()[data.get(PORTAL_TYPE).getAsInt()];
                         if (!this.type.isPreset()) {
                             if (data.get(HAS_ITEM).getAsBoolean()) {

@@ -18,7 +18,6 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskTame;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
@@ -71,7 +70,7 @@ public class QuestTaskTame extends QuestTask {
 
     @SideOnly(Side.CLIENT)
     private Tame[] getEditFriendlyTames(Tame[] tames) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             tames = Arrays.copyOf(tames, tames.length + 1);
             tames[tames.length - 1] = new Tame();
             return tames;
@@ -114,7 +113,7 @@ public class QuestTaskTame extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Tame[] tames = getEditFriendlyTames(this.tames);
             for (int i = 0; i < tames.length; i++) {
                 Tame tame = tames[i];

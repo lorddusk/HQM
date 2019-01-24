@@ -9,7 +9,6 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskCompleted;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -17,7 +16,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -37,7 +35,7 @@ public class QuestTaskCompleted extends QuestTask {
 
     @SideOnly(Side.CLIENT)
     private CompletedQuestTask[] getEditFriendlyCompleted(CompletedQuestTask[] completed) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             completed = Arrays.copyOf(completed, completed.length + 1);
             completed[completed.length - 1] = new CompletedQuestTask();
             return completed;
@@ -95,7 +93,7 @@ public class QuestTaskCompleted extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
             for (int i = 0; i < completed_quests.length; i++) {
                 CompletedQuestTask completed = completed_quests[i];

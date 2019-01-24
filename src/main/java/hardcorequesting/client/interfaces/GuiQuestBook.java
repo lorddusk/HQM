@@ -255,7 +255,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return Quest.canQuestsBeEdited(player) && SaveHelper.isLarge();
+                return Quest.canQuestsBeEdited() && SaveHelper.isLarge();
             }
 
             @Override
@@ -289,7 +289,7 @@ public class GuiQuestBook extends GuiBase {
 
             @Override
             public boolean isVisible(GuiBase gui, EntityPlayer player) {
-                return editMenu == null && Quest.canQuestsBeEdited(player) && currentMode == EditMode.CREATE && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
+                return editMenu == null && Quest.canQuestsBeEdited() && currentMode == EditMode.CREATE && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
 
             @Override
@@ -397,7 +397,7 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
 
-        if (Quest.canQuestsBeEdited(player)) {
+        if (Quest.canQuestsBeEdited()) {
             Keyboard.enableRepeatEvents(true);
         }
         QuestingData data = QuestingData.getQuestingData(player);
@@ -465,7 +465,7 @@ public class GuiQuestBook extends GuiBase {
         drawRect(0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
         drawRect(PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
 
-        if (Quest.canQuestsBeEdited(this.getPlayer())) {
+        if (Quest.canQuestsBeEdited()) {
             applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(MAP_TEXTURE);
             SaveHelper.render(this, x, y);
@@ -488,7 +488,7 @@ public class GuiQuestBook extends GuiBase {
         }
 
         if (editMenu == null) {
-            if (Quest.canQuestsBeEdited(this.getPlayer())) {
+            if (Quest.canQuestsBeEdited()) {
                 for (EditButton button : getButtons()) {
                     button.draw(x, y);
                 }
@@ -513,7 +513,7 @@ public class GuiQuestBook extends GuiBase {
                 selectedQuest.drawMenu(this, player, x, y);
             }
 
-            if (Quest.canQuestsBeEdited(this.getPlayer())) {
+            if (Quest.canQuestsBeEdited()) {
                 for (EditButton button : getButtons()) {
                     button.drawInfo(x, y);
                 }
@@ -597,14 +597,14 @@ public class GuiQuestBook extends GuiBase {
             }
         }
 
-        if (Quest.canQuestsBeEdited(this.getPlayer())) {
+        if (Quest.canQuestsBeEdited()) {
             SaveHelper.onClick(this, x, y);
         }
 
         if (buttonClicked) return;
 
         if (editMenu == null) {
-            if (Quest.canQuestsBeEdited(this.getPlayer())) {
+            if (Quest.canQuestsBeEdited()) {
                 for (EditButton editButton : getButtons()) {
                     if (editButton.onClick(x, y)) {
                         onButtonClicked();
@@ -916,14 +916,14 @@ public class GuiQuestBook extends GuiBase {
                 SoundHandler.playLoreMusic();
             }
         } else {
-            if (Quest.canQuestsBeEdited(this.getPlayer()) && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
+            if (Quest.canQuestsBeEdited() && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuTextEditor(this, player);
             }
         }
     }
 
     private void updatePosition(int x, int y) {
-        if (Quest.canQuestsBeEdited(this.getPlayer()) && currentMode == EditMode.MOVE) {
+        if (Quest.canQuestsBeEdited() && currentMode == EditMode.MOVE) {
             if (modifyingQuest != null) {
                 modifyingQuest.setGuiCenterX(x);
                 modifyingQuest.setGuiCenterY(y);

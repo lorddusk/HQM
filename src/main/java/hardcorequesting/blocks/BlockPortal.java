@@ -53,7 +53,7 @@ public class BlockPortal extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (player != null && Quest.canQuestsBeEdited(player)) {
+        if (player != null && Quest.canQuestsBeEdited()) {
             if (!player.inventory.getCurrentItem().isEmpty() && player.inventory.getCurrentItem().getItem() == ModItems.book) {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
