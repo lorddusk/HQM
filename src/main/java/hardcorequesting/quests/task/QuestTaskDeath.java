@@ -65,8 +65,12 @@ public class QuestTaskDeath extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID playerID) {
-        deaths = ((QuestDataTaskDeath) getData(playerID)).deaths;
+    public void autoComplete(UUID playerID, boolean status) {
+        if (status) {
+            deaths = ((QuestDataTaskDeath) getData(playerID)).deaths;
+        } else {
+            deaths = 0;
+        }
     }
 
     @Override

@@ -51,8 +51,12 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
 
     @Override
-    public void autoComplete(UUID playerID) {
-        this.kills = ((QuestDataTaskReputationKill) getData(playerID)).kills;
+    public void autoComplete(UUID playerID, boolean status) {
+        if (status) {
+            this.kills = ((QuestDataTaskReputationKill) getData(playerID)).kills;
+        } else {
+            this.kills = 0;
+        }
     }
 
     @Override

@@ -253,10 +253,10 @@ public class QuestTaskLocation extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID playerID) {
+    public void autoComplete(UUID playerID, boolean status) {
         boolean[] visited = ((QuestDataTaskLocation) getData(playerID)).visited;
         for (int i = 0; i < visited.length; i++) {
-            visited[i] = true;
+            visited[i] = status;
         }
     }
 

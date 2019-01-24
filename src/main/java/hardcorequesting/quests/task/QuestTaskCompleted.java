@@ -219,10 +219,10 @@ public class QuestTaskCompleted extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID uuid) {
+    public void autoComplete(UUID uuid, boolean status) {
         boolean[] completed = ((QuestDataTaskCompleted) getData(uuid)).quests;
         for (int i = 0; i < quests.length; i++) {
-            completed[i] = true;
+            completed[i] = status;
         }
     }
 

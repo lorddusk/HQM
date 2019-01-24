@@ -126,8 +126,8 @@ public abstract class QuestTaskReputation extends QuestTask {
     }
 
     @Override
-    public void autoComplete(UUID playerID) {
-        getData(playerID).completed = true;
+    public void autoComplete(UUID playerID, boolean status) {
+        getData(playerID).completed = status;
     }
 
     protected EntityPlayer getPlayerForRender(EntityPlayer player) {
