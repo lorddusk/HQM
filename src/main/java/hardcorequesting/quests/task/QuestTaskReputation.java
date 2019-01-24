@@ -5,7 +5,6 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationSetting;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
@@ -65,7 +64,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     @SideOnly(Side.CLIENT)
     public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
         String info = null;
-        int size = Quest.canQuestsBeEdited(player) ? settings.length + 1 : settings.length;
+        int size = Quest.canQuestsBeEdited() ? settings.length + 1 : settings.length;
         for (int i = 0; i < size; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -86,7 +85,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Override
     @SideOnly(Side.CLIENT)
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             int size = settings.length + 1;
             for (int i = 0; i < size; i++) {
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {

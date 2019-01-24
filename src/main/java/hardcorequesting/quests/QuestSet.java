@@ -143,7 +143,7 @@ public class QuestSet {
             }
         }
 
-        if ((Quest.canQuestsBeEdited(player) && gui.getCurrentMode() == EditMode.CREATE)) {
+        if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (GuiQuestBook.selectedSet != null) {
@@ -197,7 +197,7 @@ public class QuestSet {
         if (reward > 0) {
             info.add(GuiColor.PURPLE.toString() + Translator.translate(reward != 1, "hqm.questBook.unclaimedQuests", reward));
         }
-        if (Quest.canQuestsBeEdited(player) && !GuiScreen.isCtrlKeyDown()) {
+        if (Quest.canQuestsBeEdited() && !GuiScreen.isCtrlKeyDown()) {
             info.add(GuiColor.LIGHT_GRAY.toString() + Translator.translate(realTotal != 1, "hqm.questBook.inclInvisiQuests", realTotal));
         }
         gui.drawString(info, x, y, 0.7F, 0x404040);
@@ -233,7 +233,7 @@ public class QuestSet {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), questSet, true));
                         break;
                     default:
-                        if (!(!Quest.canQuestsBeEdited(gui.getPlayer()) && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
+                        if (!(!Quest.canQuestsBeEdited() && questSet.isEnabled(gui.getPlayer(), isVisibleCache, isLinkFreeCache)))
                             break;
                     case NORMAL:
                         int thisClicked = gui.getPlayer().ticksExisted - lastClicked;
@@ -252,7 +252,7 @@ public class QuestSet {
         }
 
 
-        if (Quest.canQuestsBeEdited(gui.getPlayer()) && gui.getCurrentMode() == EditMode.RENAME) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
                 gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
             }
@@ -397,11 +397,11 @@ public class QuestSet {
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
 
         for (Quest child : getQuests().values()) {
-            if (Quest.canQuestsBeEdited(player) || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+            if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirements()) {
-                    if (Quest.canQuestsBeEdited(player) || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+                    if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
-                            int color = Quest.canQuestsBeEdited(player) && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
+                            int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
                             gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
@@ -411,7 +411,7 @@ public class QuestSet {
                 }
             }
         }
-        if (Quest.canQuestsBeEdited(player)) {
+        if (Quest.canQuestsBeEdited()) {
             for (Quest child : getQuests().values()) {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
@@ -426,7 +426,7 @@ public class QuestSet {
         }
 
         for (Quest quest : getQuests().values()) {
-            if ((Quest.canQuestsBeEdited(player) || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
+            if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
 
                 GlStateManager.pushMatrix();
                 GlStateManager.enableBlend();
@@ -453,7 +453,7 @@ public class QuestSet {
 
 
         for (Quest quest : getQuests().values()) {
-            boolean editing = Quest.canQuestsBeEdited(player) && !GuiScreen.isCtrlKeyDown();
+            boolean editing = Quest.canQuestsBeEdited() && !GuiScreen.isCtrlKeyDown();
             if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
                 boolean shouldDrawText = false;
                 boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
@@ -714,7 +714,7 @@ public class QuestSet {
     @SideOnly(Side.CLIENT)
     public void mouseClicked(GuiQuestBook gui, int x, int y) {
         EntityPlayer player = gui.getPlayer();
-        if (Quest.canQuestsBeEdited(player) && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {
+        if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {
             switch (gui.getCurrentMode()) {
                 case CREATE:
                     if (x > 0) {
@@ -735,8 +735,8 @@ public class QuestSet {
             HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
             HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
             for (Quest quest : this.getQuests().values()) {
-                if ((Quest.canQuestsBeEdited(player) || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
-                    if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+                if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
+                    if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
                                 gui.modifyingQuest = quest;
@@ -814,7 +814,7 @@ public class QuestSet {
             }
         }
 
-        if (Quest.canQuestsBeEdited(player))
+        if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(this.getReputationBars()))
                 reputationBar.mouseClicked(gui, x, y);
     }

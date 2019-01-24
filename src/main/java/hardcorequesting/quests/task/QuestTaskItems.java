@@ -7,12 +7,10 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.integration.jei.JEIIntegration;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -121,7 +119,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
     @SideOnly(Side.CLIENT)
     private ItemRequirement[] getEditFriendlyItems(ItemRequirement[] items) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             items = Arrays.copyOf(items, items.length + 1);
         } else {
             return items;
@@ -220,7 +218,7 @@ public abstract class QuestTaskItems extends QuestTask {
                     str += GuiColor.GREEN;
                 }
                 str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
-                if (Quest.canQuestsBeEdited(player))
+                if (Quest.canQuestsBeEdited())
                     str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
                 if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
                     if (getProgress(player, i) == item.required) {
@@ -240,7 +238,7 @@ public abstract class QuestTaskItems extends QuestTask {
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && GuiScreen.isShiftKeyDown();
         boolean doubleClick = false;
-        if (Quest.canQuestsBeEdited(player) || isOpBookWithShiftKeyDown) {
+        if (Quest.canQuestsBeEdited() || isOpBookWithShiftKeyDown) {
 
             ItemRequirement[] items = getEditFriendlyItems(this.items);
 
@@ -260,7 +258,7 @@ public abstract class QuestTaskItems extends QuestTask {
                         } else {
                             completeTask(player.getPersistentID(), i, item.required);
                         }
-                    } else if (Quest.canQuestsBeEdited(player)) {
+                    } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
                         } else if (gui.getCurrentMode() == EditMode.DELETE && (item.stack != null || item.fluid != null)) {

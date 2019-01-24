@@ -17,7 +17,6 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementManager;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.PlayerAdvancements;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -48,7 +47,7 @@ public class QuestTaskAdvancement extends QuestTask {
 
     @SideOnly(Side.CLIENT)
     private AdvancementTask[] getEditFriendlyAdvancements(AdvancementTask[] advancements) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             advancements = Arrays.copyOf(advancements, advancements.length + 1);
             advancements[advancements.length - 1] = new AdvancementTask();
             return advancements;
@@ -112,7 +111,7 @@ public class QuestTaskAdvancement extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
             for (int i = 0; i < advancements.length; i++) {
                 AdvancementTask advancement = advancements[i];

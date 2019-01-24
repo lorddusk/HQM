@@ -39,7 +39,7 @@ public class BlockTracker extends BlockContainer {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
                     if (tile instanceof TileEntityTracker) {
-                        if (!Quest.canQuestsBeEdited(player)) {
+                        if (!Quest.canQuestsBeEdited()) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) tile).setCurrentQuest();
@@ -57,7 +57,7 @@ public class BlockTracker extends BlockContainer {
                 if (!world.isRemote) {
                     TileEntity tile = world.getTileEntity(pos);
                     if (tile instanceof TileEntityTracker) {
-                        if (!Quest.canQuestsBeEdited(player)) {
+                        if (!Quest.canQuestsBeEdited()) {
                             player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
                         } else {
                             ((TileEntityTracker) tile).openInterface(player);

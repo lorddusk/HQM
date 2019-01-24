@@ -18,7 +18,6 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskMob;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
@@ -83,7 +82,7 @@ public class QuestTaskMob extends QuestTask {
 
     @SideOnly(Side.CLIENT)
     private Mob[] getEditFriendlyMobs(Mob[] mobs) {
-        if (Quest.canQuestsBeEdited(Minecraft.getMinecraft().player)) {
+        if (Quest.canQuestsBeEdited()) {
             mobs = Arrays.copyOf(mobs, mobs.length + 1);
             mobs[mobs.length - 1] = new Mob();
             return mobs;
@@ -126,7 +125,7 @@ public class QuestTaskMob extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited(player) && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Mob[] mobs = getEditFriendlyMobs(this.mobs);
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];

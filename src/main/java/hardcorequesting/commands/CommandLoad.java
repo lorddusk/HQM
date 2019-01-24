@@ -130,7 +130,7 @@ public class CommandLoad extends CommandBase {
 
     @Override
     public boolean isVisible(ICommandSender sender) {
-        return sender instanceof EntityPlayer && Quest.canQuestsBeEdited((EntityPlayer) sender) && QuestingData.hasData(((EntityPlayer) sender)) && super.isVisible(sender);
+        return sender instanceof EntityPlayer && Quest.canQuestsBeEdited() && QuestingData.hasData(((EntityPlayer) sender)) && super.isVisible(sender);
     }
 
     @Override

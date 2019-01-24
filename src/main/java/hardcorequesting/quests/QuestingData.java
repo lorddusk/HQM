@@ -8,10 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.google.gson.annotations.SerializedName;
 import hardcorequesting.HardcoreQuesting;
 import net.minecraft.client.Minecraft;
-import org.apache.logging.log4j.Level;
 
 import com.mojang.authlib.GameProfile;
 
@@ -44,7 +42,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import javax.annotation.Nonnull;
@@ -233,7 +230,7 @@ public class QuestingData {
     }
 
     public static void spawnBook(EntityPlayer player) {
-        if (!Quest.canQuestsBeEdited(player) && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
+        if (!Quest.canQuestsBeEdited() && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
             NBTTagCompound hqmTag = new NBTTagCompound();
             if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
