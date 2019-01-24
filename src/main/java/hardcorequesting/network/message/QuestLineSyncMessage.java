@@ -43,8 +43,8 @@ public class QuestLineSyncMessage implements IMessage {
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
         for (int i = 0; i < size; i++) {
-            questSetNames[i] = ByteBufUtils.readUTF8String(buf);
-            questsSets[i] = ByteBufUtils.readUTF8String(buf);
+            questSetNames[i] = SyncUtil.readLargeString(buf);
+            questsSets[i] = SyncUtil.readLargeString(buf);
         }
     }
 
@@ -58,8 +58,8 @@ public class QuestLineSyncMessage implements IMessage {
 
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
-            ByteBufUtils.writeUTF8String(buf, questSetNames[i]);
-            ByteBufUtils.writeUTF8String(buf, questsSets[i]);
+            SyncUtil.writeLargeString(questSetNames[i], buf);
+            SyncUtil.writeLargeString(questsSets[i], buf);
         }
     }
 
