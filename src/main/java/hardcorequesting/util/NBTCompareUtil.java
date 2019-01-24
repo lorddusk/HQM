@@ -6,11 +6,16 @@
 
 package hardcorequesting.util;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 public class NBTCompareUtil {
+    public static boolean isTagEmpty (ItemStack stack) {
+        return (stack != null && stack.getTagCompound() != null) && stack.getTagCompound().getKeySet().isEmpty();
+    }
+
     /**
      * Checks if two NBT types are partially similar. For two tags to be similar, tag one must
      * have every value that tag two has. Tag two is not required to have any of tag one's
