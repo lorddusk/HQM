@@ -25,7 +25,8 @@ public class HQMUtil {
      * @return true if the player plays in a real single player world
      */
     public static boolean isGameSingleplayer() {
-        return FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer();
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        return server == null || server.isSinglePlayer();
         // casuses dedicated server crash
         // return server == null || (server instanceof IntegratedServer && !(((IntegratedServer) server).getPublic()));
     }
