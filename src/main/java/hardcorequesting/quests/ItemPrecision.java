@@ -1,9 +1,11 @@
 package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
+import hardcorequesting.util.NBTCompareUtil;
 import hardcorequesting.util.OreDictionaryHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 
 import java.util.LinkedHashMap;
@@ -47,6 +49,22 @@ public abstract class ItemPrecision {
             return OreDictionaryHelper.getPermutations(stack);
         }
     };
+    public static final ItemPrecision NBT_SUBSET = new ItemPrecision("nbtSubset", false) {
+        @Override
+        protected boolean same(ItemStack stack1, ItemStack stack2) {
+            final NBTTagCompound ref = (stack2.hasTagCompound()) ? stack2.getTagCompound() : null;
+            final NBTTagCompound checking = (stack1.hasTagCompound()) ? stack1.getTagCompound() : null;
+
+            if (ref != null)
+                ref.removeTag( "RepairCost");
+
+            boolean nbt = NBTCompareUtil.arePartiallySimilar(checking, ref);
+
+            if (!nbt) return false;
+
+            return stack1.getItem() == stack2.getItem(); // improve for dmaageable && stack1.getItemDamage() == stack2.getItemDamage();
+        }
+    };
     private static final LinkedHashMap<String, ItemPrecision> precisionTypes;
 
     static {
@@ -57,6 +75,7 @@ public abstract class ItemPrecision {
         registerPrecisionType("NBT_FUZZY", NBT_FUZZY);
         registerPrecisionType("FUZZY", FUZZY);
         registerPrecisionType("ORE_DICTIONARY", ORE_DICTIONARY);
+        registerPrecisionType("NBT_SUBSET", NBT_SUBSET);
     }
 
     protected boolean hasPermutations = false;
@@ -90,6 +109,7 @@ public abstract class ItemPrecision {
         return precisionTypes.containsKey(uniqueID) ? precisionTypes.get(uniqueID) : PRECISE;
     }
 
+    /* This code is never called
     public static ItemPrecision getOldPrecisionType(int ordinal) {
         switch (ordinal) {
             case 1: {
@@ -105,7 +125,7 @@ public abstract class ItemPrecision {
                 return PRECISE;
             }
         }
-    }
+    } */
 
     public static String getUniqueID(ItemPrecision p) {
         for (Map.Entry<String, ItemPrecision> entry : precisionTypes.entrySet()) {

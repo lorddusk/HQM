@@ -230,6 +230,7 @@ hqm.precision.precise=Precise detection
 hqm.precision.nbtFuzzy=NBT independent detection
 hqm.precision.fuzzy=Fuzzy detection
 hqm.precision.oreDict=Ore dictionary detection
+hqm.precision.nbtSubset=NBT subset detection
 
 # ======================================
 #			REPEAT TYPES
