@@ -28,6 +28,7 @@ public class CommandEditMode extends CommandBase {
                 }
             } else {
                 sender.sendMessage(new TextComponentTranslation(("Editing mode isn't intended for server use it is deactivated!")));
+                Quest.setEditMode(false);
             }
         }
     }
