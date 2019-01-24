@@ -194,7 +194,9 @@ public class QuestTaskTame extends QuestTask {
     @Override
     public void autoComplete(UUID uuid) {
         int[] tamed = ((QuestDataTaskTame) getData(uuid)).tamed;
-        for (int i = 0; i < tamed.length; i++) {
+        int q = tamed.length;
+        for (int i = 0; i < q; i++) {
+            if (q != tamed.length) q = tamed.length;
             tamed[i] = tames[i].count;
         }
     }
