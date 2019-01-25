@@ -79,6 +79,8 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
             }
         }
 
+        rawTames.add("minecraft:abstracthorse");
+
         Collections.sort(rawTames);
         updateTames("");
     }
