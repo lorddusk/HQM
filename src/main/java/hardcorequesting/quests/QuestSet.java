@@ -22,6 +22,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestSet {
 
@@ -33,14 +34,13 @@ public class QuestSet {
     private String name;
     private String description;
     private List<String> cachedDescription;
-    private Map<UUID, Quest> quests;
+    private Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     private List<ReputationBar> reputationBars;
     private int id;
 
     public QuestSet(String name, String description) {
         this.name = name;
         this.description = description;
-        this.quests = new HashMap<>();
         this.reputationBars = new ArrayList<>();
         this.id = Quest.getQuestSets().size();
     }
