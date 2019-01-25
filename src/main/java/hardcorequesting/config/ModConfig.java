@@ -60,6 +60,8 @@ public class ModConfig {
     private static final String LOSE_QUEST_BOOK_ON_DEATH_KEY = "LoseQuestBookOnDeath";
     private static final boolean LOSE_QUEST_BOOK_ON_DEATH_DEFAULT = true;
     private static final String LOSE_QUEST_BOOK_ON_DEATH_COMMENT = "Loose the quest book when you die, if set to false it will stay in your inventory";
+    private static final String NBT_KEY = "NBTSubsetFilter";
+    private static final String NBT_COMMENT = "Use this to specify NBT tags that should be filtered out from reference items";
     public static int MAXLIVES;
     public static boolean spawnBook;
     public static boolean ROTTIMER;
@@ -71,6 +73,7 @@ public class ModConfig {
     public static int OVERLAY_YPOS;
     public static int OVERLAY_XPOSDEFAULT = 2;
     public static int OVERLAY_YPOSDEFAULT = 2;
+    public static String[] NBT_SUBSET_FILTER;
 
     public static Configuration config;
 
@@ -123,6 +126,8 @@ public class ModConfig {
         ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES = config.get(CATEGORY_GENERAL, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT).getBoolean(ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT);
 
         LOSE_QUEST_BOOK_ON_DEATH = config.get(CATEGORY_GENERAL, LOSE_QUEST_BOOK_ON_DEATH_KEY, LOSE_QUEST_BOOK_ON_DEATH_DEFAULT, LOSE_QUEST_BOOK_ON_DEATH_COMMENT).getBoolean(LOSE_QUEST_BOOK_ON_DEATH_DEFAULT);
+
+        NBT_SUBSET_FILTER = config.get(CATEGORY_GENERAL, NBT_KEY, new String[]{"RepairCost"}, NBT_COMMENT).getStringList();
 
         if (config.hasChanged())
             config.save();

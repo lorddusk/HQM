@@ -74,6 +74,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         }
 
+
+
         Collections.sort(rawMobs);
         updateMobs("");
     }
