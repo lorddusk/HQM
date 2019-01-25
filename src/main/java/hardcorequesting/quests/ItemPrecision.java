@@ -1,6 +1,7 @@
 package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
+import hardcorequesting.config.ModConfig;
 import hardcorequesting.util.NBTCompareUtil;
 import hardcorequesting.util.OreDictionaryHelper;
 import hardcorequesting.util.Translator;
@@ -55,8 +56,11 @@ public abstract class ItemPrecision {
             final NBTTagCompound ref = (stack2.hasTagCompound()) ? stack2.getTagCompound() : null;
             final NBTTagCompound checking = (stack1.hasTagCompound()) ? stack1.getTagCompound() : null;
 
-            if (ref != null)
-                ref.removeTag( "RepairCost");
+            if (ref != null) {
+                for (String key : ModConfig.NBT_SUBSET_FILTER) {
+                    ref.removeTag(key);
+                }
+            }
 
             boolean nbt = NBTCompareUtil.arePartiallySimilar(checking, ref);
 
