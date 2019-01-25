@@ -38,10 +38,7 @@ import hardcorequesting.quests.task.*;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
-import hardcorequesting.util.HQMUtil;
-import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.TooltipFlag;
-import hardcorequesting.util.Translator;
+import hardcorequesting.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -1160,14 +1157,7 @@ public class Quest {
                 if (task.isVisible(player) || canQuestsBeEdited()) {
                     if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
                         if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
-                            UUID playerId = player.getPersistentID();
-                            if (task.isCompleted(playerId)) {
-                                task.autoComplete(playerId, false);
-                                task.getData(playerId).completed = false;
-                            } else {
-                                task.autoComplete(playerId);
-                                task.getData(playerId).completed = true;
-                            }
+                            OPBookHelper.reverseTaskCompletion(task, player);
                             return;
 
                         }
