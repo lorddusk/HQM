@@ -222,7 +222,7 @@ public class QuestTaskTame extends QuestTask {
             boolean updated = false;
             for (int i = 0; i < tames.length; i++) {
                 Tame tame = tames[i];
-                if (tame.count > ((QuestDataTaskTame) getData(player)).tamed[i]) {
+                if (tame.count > ((QuestDataTaskTame) getData(player)).tamed[i] && tame.tame != null) {
                     if (tame.tame.equals("minecraft:abstracthorse")) {
                         if (event.getEntityLiving() instanceof AbstractHorse) {
                             ((QuestDataTaskTame) getData(player)).tamed[i]++;
