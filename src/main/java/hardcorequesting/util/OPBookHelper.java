@@ -8,11 +8,13 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.OpActionMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.task.QuestTask;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.UUID;
 
 public final class OPBookHelper {
@@ -21,11 +23,15 @@ public final class OPBookHelper {
     }
 
     public static void reverseQuestCompletion(Quest quest, EntityPlayer subject) {
-        NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, subject));
+        NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, null, subject));
+    }
+
+    public static void reverseTaskCompletion (QuestTask task, EntityPlayer subject) {
+        NetworkManager.sendToServer(OpAction.TASK_COMPLETION.build(task.getParent(), task, subject));
     }
 
     public static void reset(EntityPlayer player) {
-        NetworkManager.sendToServer(OpAction.RESET.build(null, player));
+        NetworkManager.sendToServer(OpAction.RESET.build(null, null, player));
     }
 
     public enum OpAction {
@@ -49,14 +55,34 @@ public final class OPBookHelper {
                     quest.sendUpdatedDataToTeam(subject);
                 }
             }
+        },
+        TASK_COMPLETION {
+            @Override
+            public void process(String data) {
+                fromJson(data);
+                if (quest == null) return;
+
+                if (task != null) {
+                    List<QuestTask> task_list = quest.getTasks();
+                    if (task.isCompleted(subject)) {
+                        task.getData(subject).completed = false;
+                        QuestingData.getQuestingData(subject).getTeam().resetProgress(quest); // automatically reset progress
+                    } else {
+                        task.completeTask(subject.getPersistentID());
+                    }
+                }
+                quest.sendUpdatedDataToTeam(subject);
+            }
         };
 
         private static final String QUEST = "quest";
         private static final String SUBJECT = "subject";
+        private static final String TASK = "task";
         protected Quest quest;
         protected EntityPlayer subject;
+        protected QuestTask task;
 
-        private static String toJson(Quest quest, EntityPlayer subject) {
+        private static String toJson(Quest quest, QuestTask task, EntityPlayer subject) {
             StringWriter stringWriter = new StringWriter();
             try {
                 JsonWriter writer = new JsonWriter(stringWriter);
@@ -65,6 +91,8 @@ public final class OPBookHelper {
                     writer.name(QUEST).value(quest.getQuestId().toString());
                 if (subject != null)
                     writer.name(SUBJECT).value(subject.getPersistentID().toString());
+                if (task != null)
+                    writer.name(TASK).value(task.getId());
                 writer.endObject();
                 writer.close();
             } catch (IOException ignored) {
@@ -74,8 +102,8 @@ public final class OPBookHelper {
 
         public abstract void process(String data);
 
-        public IMessage build(Quest quest, EntityPlayer subject) {
-            return new OpActionMessage(this, toJson(quest, subject));
+        public IMessage build(Quest quest, QuestTask task, EntityPlayer subject) {
+            return new OpActionMessage(this, toJson(quest, task, subject));
         }
 
         public void process(EntityPlayer player, String data) {
@@ -90,6 +118,8 @@ public final class OPBookHelper {
                 quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
             if (root.has(SUBJECT))
                 subject = QuestingData.getPlayer(root.get(SUBJECT).getAsString());
+            if (root.has(TASK) && quest != null)
+                task = quest.getTasks().get(root.get(TASK).getAsInt());
         }
     }
 }
