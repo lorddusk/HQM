@@ -23,9 +23,7 @@ public class QuestTaskBlockBreak extends QuestTaskBlock {
 
     @Override
     public void onBlockBroken (BlockEvent.BreakEvent event) {
-        EntityPlayer player = event.getPlayer();
-
-        checkProgress(event.getState(), event.getPlayer());
+        checkProgress(event, event.getState(), event.getPlayer());
     }
 }
 

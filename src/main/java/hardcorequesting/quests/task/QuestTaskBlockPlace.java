@@ -23,11 +23,7 @@ public class QuestTaskBlockPlace extends QuestTaskBlock {
 
     @Override
     public void onBlockPlaced (BlockEvent.PlaceEvent event) {
-        EntityPlayer player = event.getPlayer();
-
-        if (player.world.isRemote) return;
-
-        checkProgress(event.getPlacedBlock(), event.getPlayer());
+        checkProgress(event, event.getPlacedBlock(), event.getPlayer());
     }
 }
 
