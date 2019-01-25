@@ -20,6 +20,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.passive.AbstractHorse;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -222,17 +223,24 @@ public class QuestTaskTame extends QuestTask {
             for (int i = 0; i < tames.length; i++) {
                 Tame tame = tames[i];
                 if (tame.count > ((QuestDataTaskTame) getData(player)).tamed[i]) {
-                    Class<? extends Entity> clazz = EntityList.getClass(new ResourceLocation(tame.tame));
-                    if (clazz != null) {
-                        if (tame.isExact()) {
-                            if (clazz.equals(event.getEntityLiving().getClass())) {
-                                ((QuestDataTaskTame) getData(player)).tamed[i]++;
-                                updated = true;
-                            }
-                        } else {
-                            if (clazz.isAssignableFrom(event.getEntityLiving().getClass())) {
-                                ((QuestDataTaskTame) getData(player)).tamed[i]++;
-                                updated = true;
+                    if (tame.tame.equals("minecraft:abstracthorse")) {
+                        if (event.getEntityLiving() instanceof AbstractHorse) {
+                            ((QuestDataTaskTame) getData(player)).tamed[i]++;
+                            updated = true;
+                        }
+                    } else {
+                        Class<? extends Entity> clazz = EntityList.getClass(new ResourceLocation(tame.tame));
+                        if (clazz != null) {
+                            if (tame.isExact()) {
+                                if (clazz.equals(event.getEntityLiving().getClass())) {
+                                    ((QuestDataTaskTame) getData(player)).tamed[i]++;
+                                    updated = true;
+                                }
+                            } else {
+                                if (clazz.isAssignableFrom(event.getEntityLiving().getClass())) {
+                                    ((QuestDataTaskTame) getData(player)).tamed[i]++;
+                                    updated = true;
+                                }
                             }
                         }
                     }
