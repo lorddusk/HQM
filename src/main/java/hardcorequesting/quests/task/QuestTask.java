@@ -270,6 +270,10 @@ public abstract class QuestTask {
         EventTrigger.instance().add(this, types);
     }
 
+    public boolean isValid () {
+        return getParent() != null && getParent().getTasks() != null && getParent().getTasks().contains(this);
+    }
+
     //for these to be called one must register the task using the method above using the correct types
     public void onServerTick(TickEvent.ServerTickEvent event) {
     }
