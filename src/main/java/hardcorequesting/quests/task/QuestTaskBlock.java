@@ -6,14 +6,14 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.util.NBTCompareUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockSlab;
+import net.minecraft.block.*;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.NonNullList;
@@ -58,15 +58,35 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
             }
         }
 
-        Item itemBlock = Item.getItemFromBlock(block);
+        return genericForState(state);
+    }
+
+    public static ItemStack genericForState (IBlockState state) {
+        Block block = state.getBlock();
 
         int meta = 0;
 
-        if (itemBlock.getHasSubtypes()) {
-            meta = block.getMetaFromState(state);
-        }
+        Item itemBlock = Item.getItemFromBlock(block);
+        if (itemBlock == Items.AIR) {
+            // TODO: This assumption could fail dramaticlaly
+            ItemBlockSpecial iBlock = new ItemBlockSpecial(block);
+            if (iBlock.getHasSubtypes()) {
+                meta = block.getMetaFromState(state);
+            }
 
-        return new ItemStack(itemBlock, 1, meta);
+            return new ItemStack(iBlock, 1, meta);
+        } else {
+            if (itemBlock.getHasSubtypes()) {
+                meta = block.getMetaFromState(state);
+            }
+
+            return new ItemStack(itemBlock, 1, meta);
+        }
+    }
+
+    // TODO: Delete this
+    public static ItemStack getItemDropped (IBlockState state) {
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -84,40 +104,59 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
         // TODO: Unhappy with this solution
         Collection<IProperty<?>> keys = state.getPropertyKeys();
 
+        ItemStack drop = ItemStack.EMPTY;
+
+        World world = event.getWorld();
+        BlockPos pos = event.getPos();
+        Block block = state.getBlock();
+
+        if (block instanceof BlockBed) {
+            drop = ((BlockBed) block).getItem(world, pos, state);
+        }
+
         if (keys.contains(BlockSlab.HALF)) {
             state = state.withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM);
         } else if (keys.contains(BlockDoor.HALF)) {
             state = state.withProperty(BlockDoor.HALF, BlockDoor.EnumDoorHalf.LOWER);
+        } else if (keys.contains(BlockBed.PART)) {
+            state = state.withProperty(BlockBed.PART, BlockBed.EnumPartType.HEAD);
         }
 
         NonNullList<ItemStack> consume = NonNullList.create();
-
-        World world = event.getWorld();
-        BlockPos pos = event.getPos();
-
-        Block block = state.getBlock();
 
         ItemStack stateStack = itemForState(state);
 
         NonNullList<ItemStack> drops = NonNullList.create();
         block.getDrops(drops, world, pos, state, 0);
+        drops.removeIf(ItemStack::isEmpty);
 
-        ItemStack drop = ItemStack.EMPTY;
+        if (drop.isEmpty()) {
+            for (ItemStack droppedStack : drops) {
+                if (droppedStack.getItem() != stateStack.getItem()) continue;
 
-        for (ItemStack droppedStack : drops) {
-            if (droppedStack.getItem() != stateStack.getItem()) continue;
+                if (droppedStack.getMetadata() != stateStack.getMetadata()) continue;
 
-            if (droppedStack.getMetadata() != stateStack.getMetadata()) continue;
+                drop = droppedStack;
+                break;
+            }
 
-            drop = droppedStack;
-            break;
+            if (drops.size() == 1 && stateStack.isEmpty()) {
+                drop = drops.get(0);
+            }
+
+            if (drop.isEmpty()) {
+                if (!stateStack.isEmpty()) {
+                    drop = stateStack;
+                } else {
+                    drop = genericForState(state);
+                }
+            }
+
+            if (drop.isEmpty()) {
+                // wing and a prayer
+                drop = drops.get(0);
+            }
         }
-
-        if (drops.size() == 1 && stateStack.isEmpty()) {
-            drop = drops.get(0);
-        }
-
-        if (drop.isEmpty()) drop = stateStack;
 
         for (ItemRequirement ireq : items) {
             if (!ireq.hasItem) continue;
