@@ -314,8 +314,6 @@ public class QuestTaskAdapter {
              if (value.getQuest() != null) {
                  out.name(QUEST_UUID).value(value.getQuestId().toString());
              }
-             if (value.getVisible() != QuestTaskCompleted.Visibility.FULL)
-                 out.name(VISIBLE).value(value.getVisible().name());
              out.endObject();
          }
 
@@ -327,8 +325,6 @@ public class QuestTaskAdapter {
                  String name = in.nextName();
                  if (name.equalsIgnoreCase(QUEST_UUID)) {
                      result.setQuest(UUID.fromString(in.nextString()));
-                 } else if (name.equalsIgnoreCase(VISIBLE)) {
-                     result.setVisible(QuestTaskCompleted.Visibility.valueOf(in.nextString()));
                  }
              }
              in.endObject();
