@@ -597,6 +597,9 @@ hqm.advancementMenu.visited=Completed
 #		  COMPLETION MENU
 # ======================================
 hqm.completedMenu.visited=Completed
+hqm.completionTask.firstline=Use "Quest Select" tool
+hqm.completionTask.secondline=to pick a quest then
+hqm.completionTask.thirdline=click icon to set.
 
 # ======================================
 #		    REPEAT MENU

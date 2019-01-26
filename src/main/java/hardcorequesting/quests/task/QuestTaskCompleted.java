@@ -61,6 +61,7 @@ public class QuestTaskCompleted extends QuestTask {
         quests[id] = task;
     }
 
+    @SuppressWarnings("unused")
     public void setQuest(int id, UUID quest, EntityPlayer player) {
         setTask(id, id >= quests.length ? new CompletedQuestTask() : quests[id], player);
 
@@ -82,7 +83,13 @@ public class QuestTaskCompleted extends QuestTask {
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(completed.getIconStack(), x, y, mX, mY, false);
-            gui.drawString(completed.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            if (completed.getQuest() != null) {
+                gui.drawString(completed.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            } else {
+                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.firstline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.secondline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
+                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.thirdline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
+            }
 
             if (completed(i, player)) {
                 gui.drawString(GuiColor.GREEN + Translator.translate("hqm.completedMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
@@ -93,7 +100,7 @@ public class QuestTaskCompleted extends QuestTask {
     @SideOnly(Side.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
+        if (Quest.canQuestsBeEdited()) {
             CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
             for (int i = 0; i < completed_quests.length; i++) {
                 CompletedQuestTask completed = completed_quests[i];
@@ -102,29 +109,24 @@ public class QuestTaskCompleted extends QuestTask {
                 int y = START_Y + i * Y_OFFSET;
 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    switch (gui.getCurrentMode()) {
-                        case LOCATION:
-                        case ITEM:
-                        case RENAME:
-                            CompletedQuestTask copy = completed.copy();
-                            copy.setQuest(Quest.speciallySelectedQuestId);
-                            this.setTask(i, copy, player);
-                            break;
-                        case DELETE:
-                            if (i < this.quests.length) {
-                                CompletedQuestTask[] newCompleted = new CompletedQuestTask[this.quests.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < this.quests.length; j++) {
-                                    if (j != i) {
-                                        newCompleted[id] = this.quests[j];
-                                        id++;
-                                    }
+                    if (gui.getCurrentMode() == EditMode.DELETE) {
+                        if (i < this.quests.length) {
+                            CompletedQuestTask[] newCompleted = new CompletedQuestTask[this.quests.length - 1];
+                            int id = 0;
+                            for (int j = 0; j < this.quests.length; j++) {
+                                if (j != i) {
+                                    newCompleted[id] = this.quests[j];
+                                    id++;
                                 }
-                                this.quests = newCompleted;
-                                SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_REMOVE);
                             }
-                            break;
-                        default:
+                            this.quests = newCompleted;
+                            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_REMOVE);
+                        }
+                    } else if (completed.getQuest() == null) {
+                        CompletedQuestTask copy = completed.copy();
+                        copy.setQuest(Quest.speciallySelectedQuestId);
+                        this.setTask(i, copy, player);
+                        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
                     }
 
                     break;
@@ -238,34 +240,12 @@ public class QuestTaskCompleted extends QuestTask {
         return true;
     }
 
-    public enum Visibility {
-        FULL("Full"),
-        NONE("None");
-
-        private String id;
-
-        Visibility(String id) {
-            this.id = id;
-        }
-
-        // TODO: fix these
-        public String getName() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".title");
-        }
-
-        public String getDescription() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
-        }
-    }
-
     public static class CompletedQuestTask {
 
-        private Visibility visible = Visibility.FULL;
         private UUID quest_id;
 
         private CompletedQuestTask copy() {
             CompletedQuestTask completed = new CompletedQuestTask();
-            completed.visible = visible;
             completed.quest_id = quest_id;
 
             return completed;
@@ -278,15 +258,7 @@ public class QuestTaskCompleted extends QuestTask {
 
         public String getName() {
             Quest q = getQuest();
-            return (q != null) ? q.getName() : "Invalid quest";
-        }
-
-        public Visibility getVisible() {
-            return visible;
-        }
-
-        public void setVisible(Visibility visible) {
-            this.visible = visible;
+            return (q != null) ? q.getName() : "Use \"Select Quest\" to pick";
         }
 
         public void setQuest(UUID quest_id) {
