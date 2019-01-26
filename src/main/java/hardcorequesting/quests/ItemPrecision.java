@@ -66,7 +66,9 @@ public abstract class ItemPrecision {
 
             if (!nbt) return false;
 
-            return stack1.getItem() == stack2.getItem(); // improve for dmaageable && stack1.getItemDamage() == stack2.getItemDamage();
+            if (!stack2.isItemStackDamageable() && stack1.getMetadata() != stack2.getMetadata()) return false;
+
+            return stack1.getItem() == stack2.getItem();
         }
     };
     private static final LinkedHashMap<String, ItemPrecision> precisionTypes;
