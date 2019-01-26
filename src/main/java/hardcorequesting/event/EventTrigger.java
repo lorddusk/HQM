@@ -170,6 +170,7 @@ public class EventTrigger{
     }
 
     private List<QuestTask> getTasks(Type type) {
+        registeredTasks[type.ordinal()].removeIf((task) -> !task.isValid());
         return registeredTasks[type.ordinal()];
     }
 
