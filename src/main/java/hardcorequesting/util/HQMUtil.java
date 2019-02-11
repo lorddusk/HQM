@@ -21,8 +21,6 @@ public class HQMUtil {
      */
     public static boolean isGameSingleplayer() {
         MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-        return server == null || server.isSinglePlayer();
-        // casuses dedicated server crash
-        // return server == null || (server instanceof IntegratedServer && !(((IntegratedServer) server).getPublic()));
+        return server != null && server.isSinglePlayer();
     }
 }
