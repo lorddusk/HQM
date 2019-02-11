@@ -5,10 +5,10 @@ import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class CommandEdit extends CommandBase {
+public class CommandOpBook extends CommandBase {
 
-    public CommandEdit() {
-        super("edit");
+    public CommandOpBook() {
+        super("op");
     }
 
     @Override

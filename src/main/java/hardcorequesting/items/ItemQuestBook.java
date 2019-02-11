@@ -9,7 +9,9 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.network.NetworkManager;
+import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
@@ -48,6 +50,10 @@ public class ItemQuestBook extends Item {
     @Nonnull
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
+        if (world.isRemote && Quest.isEditing == true && !HQMUtil.isGameSingleplayer()) {
+            Quest.setEditMode(false);
+        }
+
         if (!world.isRemote && player instanceof EntityPlayerMP) {
             ItemStack stack = player.getHeldItem(hand);
             if (!QuestingData.isQuestActive()) {

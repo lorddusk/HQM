@@ -1,10 +1,14 @@
 package hardcorequesting.commands;
 
+import hardcorequesting.config.ModConfig;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.HQMUtil;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * @author nooby
@@ -12,22 +16,28 @@ import net.minecraft.util.text.TextComponentTranslation;
 public class CommandEditMode extends CommandBase {
 
     public CommandEditMode() {
-        super("mode");
+        super("edit");
     }
 
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments) {
         if (sender instanceof EntityPlayer && isPlayerOp(sender)) {
+            if (!ModConfig.OP_REMINDER && !HQMUtil.isGameSingleplayer()) {
+                sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.useOP").setStyle(new Style().setColor(TextFormatting.GREEN)));
+            }
+
             if(HQMUtil.isGameSingleplayer()){
                 boolean newEditModeState = !Quest.canQuestsBeEdited();
                 Quest.setEditMode(newEditModeState);
                 if (newEditModeState) {
-                    sender.sendMessage(new TextComponentTranslation(("Editing mode is now enabled.")));
+                    sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.enabled"));
                 } else {
-                    sender.sendMessage(new TextComponentTranslation(("Editing mode is now disabled.")));
+                    sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.disabled"));
                 }
+                EntityPlayerSP player;
+
             } else {
-                sender.sendMessage(new TextComponentTranslation(("Editing mode isn't intended for server use it is deactivated!")));
+                sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.server"));
                 Quest.setEditMode(false);
             }
         }

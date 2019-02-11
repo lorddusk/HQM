@@ -8,6 +8,9 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.event.EventTrigger;
+import hardcorequesting.quests.Quest;
+import hardcorequesting.util.HQMUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
