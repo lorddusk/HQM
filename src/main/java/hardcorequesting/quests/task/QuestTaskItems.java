@@ -14,6 +14,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class QuestTaskItems extends QuestTask {
@@ -203,18 +205,19 @@ public abstract class QuestTaskItems extends QuestTask {
             ItemRequirement item = items[i];
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
-                String str = "";
-                if (getProgress(player, i) == item.required) {
-                    str += GuiColor.GREEN;
+                ItemStack stack = item.getStack();
+                List<String> str = stack.getTooltip(player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+
+                str.add(Translator.translate("hqm.questBook.itemRequirementProgress") + ": " + getProgress(player, i) + "/" + item.required);
+                if (Quest.canQuestsBeEdited()) {
+                    str.add("");
+                    str.add(GuiColor.GRAY + item.getPrecision().getName());
                 }
-                str += item.getDisplayName() + ": " + getProgress(player, i) + "/" + item.required;
-                if (Quest.canQuestsBeEdited())
-                    str += "\n" + GuiColor.GRAY + item.getPrecision().getName();
                 if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
                     if (getProgress(player, i) == item.required) {
-                        str += "\n\n" + GuiColor.RED + Translator.translate("hqm.questBook.resetTask");
+                        str.addAll(Arrays.asList("", "", GuiColor.RED + Translator.translate("hqm.questBook.resetTask")));
                     } else {
-                        str += "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.questBook.completeTask");
+                        str.addAll(Arrays.asList("", "", GuiColor.ORANGE + Translator.translate("hqm.questBook.completeTask")));
                     }
                 }
                 gui.drawMouseOver(str, mX + gui.getLeft(), mY + gui.getTop());

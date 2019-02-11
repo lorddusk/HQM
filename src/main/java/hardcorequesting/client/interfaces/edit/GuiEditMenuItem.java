@@ -12,10 +12,9 @@ import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.TooltipFlag;
-import mcjty.theoneprobe.apiimpl.elements.ElementItemStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
@@ -392,7 +391,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         @Override
         public List<String> getName(GuiBase gui) {
             if (stack != null && !stack.isEmpty()) {
-                return stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
+                return stack.getTooltip(Minecraft.getMinecraft().player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
             } else {
                 List<String> ret = new ArrayList<>();
                 ret.add("Unknown");
@@ -504,8 +503,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 }
                 EntityPlayer player = Minecraft.getMinecraft().player;
                 for (ItemStack stack : stacks) {
-                        List tooltipList = stack.getTooltip(player, new TooltipFlag(false));
-                        List advTooltipList = stack.getTooltip(player, new TooltipFlag(true));
+                        List tooltipList = stack.getTooltip(player, ITooltipFlag.TooltipFlags.NORMAL);
+                        List advTooltipList = stack.getTooltip(player, ITooltipFlag.TooltipFlags.ADVANCED);
                         String searchString = "";
                         for (Object string : tooltipList) {
                             if (string != null)
