@@ -283,8 +283,46 @@ public class QuestSet {
         return name;
     }
 
-    public void setName(String name) {
+    private static List<String> FORBIDDEN_SET_NAMES = Arrays.asList("sets", "reputations", "bags", "con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "com0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "lpt0");
+    private static List<String> FORBIDDEN_SET_NAME_PIECES = Arrays.asList("<", ">", ":", "\"", "\\", "/", "|", "?", "*");
+
+    public boolean setName(String name) {
+        // Let's add some sanity checking.
+        String test_name = name.toLowerCase().trim();
+
+        if (FORBIDDEN_SET_NAMES.contains(test_name)) {
+            return false;
+        } else {
+            for (String piece : FORBIDDEN_SET_NAME_PIECES) {
+                if (test_name.contains(piece)) {
+                    return false;
+                }
+            }
+        }
+
+        int inc = 1;
+        boolean found_conflict = false;
+
+        String new_name = name;
+
+        while (inc < 20) {
+            for (QuestSet set : Quest.getQuestSets()) {
+                if (set.getName().equalsIgnoreCase(new_name)) {
+                    new_name = String.format("%s%d", name, inc++);
+                    found_conflict = true;
+                }
+            }
+
+            if (!found_conflict) {
+                name = new_name;
+                break;
+            }
+        }
+
+        if (found_conflict) return false;
+
         this.name = name;
+        return true;
     }
 
     public String getFilename() {

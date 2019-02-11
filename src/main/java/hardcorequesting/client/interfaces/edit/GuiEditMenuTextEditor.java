@@ -16,6 +16,9 @@ import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -250,7 +253,9 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
             }
         } else if (questSet != null) {
             if (isName) {
-                questSet.setName(str);
+                if (!questSet.setName(str)) {
+                    player.sendMessage(new TextComponentTranslation("hqm.editMode.rename.invalid_set").setStyle(new Style().setBold(true).setColor(TextFormatting.RED)));
+                }
             } else {
                 questSet.setDescription(str);
             }
