@@ -41,7 +41,7 @@ public class ModConfig {
     private static final String SPAWNBOOK_COMMENT = "Use this if you want the book to spawn on create world";
     private static final String EDITOR_KEY = "UseEditor";
     private static final boolean EDITOR_DEFAULT = false;
-    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. You can toggle the mode using /hqm edit";
+    private static final String EDITOR_COMMENT = "This will permanently enable edit mode. Use of /hqm edit is generally preferred";
     private static final String MULTI_REWARD_KEY = "MultiReward";
     private static final boolean MULTI_REWARD_DEFAULT = true;
     private static final String MULTI_REWARD_COMMENT = "Allow every single player in a party to claim the reward for a quest. Setting this to false will give the party one set of rewards to share.";
