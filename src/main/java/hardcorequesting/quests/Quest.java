@@ -42,6 +42,7 @@ import hardcorequesting.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -1056,20 +1057,10 @@ public class Quest {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (rewards[i] != null) {
                         GuiQuestBook.setSelectedStack(rewards[i]);
-                        List<String> str = new ArrayList<String>();
-                        try {
-                            if (canQuestsBeEdited() && !GuiQuestBook.isCtrlKeyDown()) {
-                                str = rewards[i].getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
-                                str.add("");
-                                str.add(GuiColor.GRAY + Translator.translate("hqm.quest.crtlNonEditor"));
-                            } else {
-                                str.add(rewards[i].getDisplayName());
-                            }
-                        } catch (Throwable ignored) {
-                            break;
-                        }
+                        List<String> str = rewards[i].getTooltip(Minecraft.getMinecraft().player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
 
                         if (selected == i) {
+                            str.add("");
                             str.add(GuiColor.GREEN + Translator.translate("hqm.quest.selected"));
                         }
                         gui.drawMouseOver(str, gui.getLeft() + mX, gui.getTop() + mY);

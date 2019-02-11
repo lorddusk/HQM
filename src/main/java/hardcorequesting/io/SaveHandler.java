@@ -115,7 +115,7 @@ public class SaveHandler {
         try {
             FileUtils.copyDirectory(from, to);
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Couldn't copy default files");
+            HardcoreQuesting.LOG.info("Couldn't copy default files");
         }
     }
 

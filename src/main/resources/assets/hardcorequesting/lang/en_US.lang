@@ -571,6 +571,7 @@ hqm.questBook.availableQuests=%s [[quest||quests]] available for completion
 hqm.questBook.unclaimedQuests=%s [[quest||quests]] with unclaimed rewards
 hqm.questBook.inclInvisiQuests=%s [[quest||quests]] including invisible ones
 hqm.questBook.moreInfo=Click here for more info
+hqm.questBook.itemRequirementProgress=Progress
 
 # ======================================
 #			    TEAM LIST

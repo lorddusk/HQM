@@ -17,10 +17,10 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.TooltipFlag;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -292,7 +292,7 @@ public class Group {
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, x, y)) {
                 if (!stack.isEmpty()) {
                     try {
-                        gui.drawMouseOver(stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips)), x + gui.getLeft(), y + gui.getTop());
+                        gui.drawMouseOver(stack.getTooltip(Minecraft.getMinecraft().player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL), x + gui.getLeft(), y + gui.getTop());
                     } catch (Exception ignored) {
                     }
                 }

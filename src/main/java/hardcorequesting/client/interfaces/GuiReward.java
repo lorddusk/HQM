@@ -8,11 +8,11 @@ import java.util.UUID;
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.items.ItemBag;
-import hardcorequesting.util.TooltipFlag;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -126,11 +126,11 @@ public class GuiReward extends GuiBase {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {
                     if (GuiScreen.isShiftKeyDown()) {
-                        drawMouseOver(reward.stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips)), mX0, mY0);
+                        drawMouseOver(reward.stack.getTooltip(Minecraft.getMinecraft().player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL), mX0, mY0);
                     } else {
                         List<String> str = new ArrayList<String>();
                         try {
-                            List<?> info = reward.stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
+                            List<?> info = reward.stack.getTooltip(Minecraft.getMinecraft().player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
                             if (info.size() > 0) {
                                 str.add((String) info.get(0));
                                 if (info.size() > 1) {
