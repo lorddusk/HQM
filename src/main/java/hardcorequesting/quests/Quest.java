@@ -1164,7 +1164,9 @@ public class Quest {
                         if (gui.isOpBook && GuiScreen.isShiftKeyDown()) {
                             OPBookHelper.reverseTaskCompletion(task, player);
                             return;
-
+                        }
+                        if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
+                            gui.setCurrentMode(EditMode.NORMAL);
                         }
                         if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
