@@ -52,6 +52,7 @@ hqm.message.eatRottenHearth=Why did you eat a rotten heart?
 hqm.message.hearthDecay=One or more of your hearts has just decade into a Rotten Heart.
 hqm.message.alreadyEditing=Another OP is already accessing this player's quests.
 hqm.message.bookNoPermission=You don't have permission to use this book.
+hqm.message.bookNoData=Still loading quest data.
 hqm.message.noTaskSelected=You currently have not selected any tasks
 
 # ======================================
@@ -335,6 +336,7 @@ hqm.command.editMode.enabled=Editing mode is now enabled.
 hqm.command.editMode.disabled=Editing mode is now disabled.
 hqm.command.editMode.server=Editing mode does not function properly on servers and has been disabled.
 hqm.command.editMode.useOP=This command now toggles edit mode in single-player. To receive an operator quest book, use /hqm op instead. This message can be disabled in the configuration.
+hqm.command.editMode.disableSync=You must disable Server Sync in your configuration in order to properly and safely edit your quests without losing data.
 
 hqm.command.info.help.start=Available commands are:
 hqm.command.help.syntax0=/hqm help <command>

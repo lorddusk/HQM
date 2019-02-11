@@ -7,9 +7,11 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.commands.CommandHandler;
+import hardcorequesting.event.EventTrigger;
 import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
@@ -22,6 +24,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -54,6 +59,11 @@ public class ItemQuestBook extends Item {
             Quest.setEditMode(false);
         }
 
+        if (!world.isRemote && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
+            player.sendMessage(new TextComponentTranslation("hqm.command.editMode.disableSync").setStyle(new Style().setColor(TextFormatting.RED).setBold(true)));
+            Quest.setEditMode(false);
+        }
+
         if (!world.isRemote && player instanceof EntityPlayerMP) {
             ItemStack stack = player.getHeldItem(hand);
             if (!QuestingData.isQuestActive()) {
@@ -70,18 +80,24 @@ public class ItemQuestBook extends Item {
                             compound.removeTag(NBT_PLAYER);
                             return new ActionResult<>(EnumActionResult.FAIL, stack);
                         }
-                        if (QuestingData.hasData(uuid) && CommandHandler.isOwnerOrOp(player)) {
-                            EntityPlayer subject = QuestingData.getPlayer(uuid);
-                            if (subject instanceof EntityPlayerMP) {
-                                QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID()).setBookOpen(true);
-                                GeneralUsage.sendOpenBook(player, true);
+                        if (QuestingData.hasData(uuid)) {
+                            if (CommandHandler.isOwnerOrOp(player)) {
+                                EntityPlayer subject = QuestingData.getPlayer(uuid);
+                                if (subject instanceof EntityPlayerMP) {
+                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getName(), true, false));
+                                    QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID()).setBookOpen(true);
+                                    GeneralUsage.sendOpenBook(player, true);
+                                }
+                                //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
+                            } else {
+                                player.sendMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
                             }
-                            //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                         } else {
-                            player.sendMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
+                            player.sendMessage(new TextComponentTranslation("hqm.message.bookNoData"));
                         }
                     }
                 } else {
+                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getName(), false, true));
                     QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID()).setBookOpen(true);
                     GeneralUsage.sendOpenBook(player, false);
                 }

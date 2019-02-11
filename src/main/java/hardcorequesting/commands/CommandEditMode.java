@@ -2,6 +2,7 @@ package hardcorequesting.commands;
 
 import hardcorequesting.config.ModConfig;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.HQMUtil;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.ICommandSender;
@@ -26,7 +27,10 @@ public class CommandEditMode extends CommandBase {
                 sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.useOP").setStyle(new Style().setColor(TextFormatting.GREEN)));
             }
 
-            if(HQMUtil.isGameSingleplayer()){
+            if (HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
+                sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.disableSync").setStyle(new Style().setColor(TextFormatting.RED).setBold(true)));
+                Quest.setEditMode(false);
+            } else if(HQMUtil.isGameSingleplayer()){
                 boolean newEditModeState = !Quest.canQuestsBeEdited();
                 Quest.setEditMode(newEditModeState);
                 if (newEditModeState) {
