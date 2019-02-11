@@ -10,7 +10,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -26,7 +25,7 @@ public class CommandHandler extends CommandBase {
         register(new CommandQuest());
         register(new CommandHardcore());
         register(new CommandLives());
-        register(new CommandEdit());
+        register(new CommandOpBook());
         register(new CommandEditMode());
         register(new CommandEnable());
         register(new CommandSave());

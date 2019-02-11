@@ -20,8 +20,11 @@ public class ModConfig {
     public static final String MAXLIVES_KEY = "MaxLives";
     public static final int MAXLIVES_DEFAULT = 20;
     public static final boolean NO_HARDCORE_MESSAGE_DEFAULT = true;
+    public static final boolean OP_REMINDER_DEFAULT = false;
     public static final String NO_HARDCORE_MESSAGE_COMMENT = "Enable or disable sending a status message if Hardcore Questing mode is off";
+    public static final String OP_REMINDER_COMMENT = "Set to false to prevent the 'use /hqm op instead' message when operators use 'hqm edit'.";
     public static final String NO_HARDCORE_MESSAGE_KEY = "NoHardcoreMessage";
+    public static final String OP_REMINDER_KEY = "OpReminder";
     private static final String CATEGORY_GENERAL = "General";
     private static final String LIVES_KEY = "Default lives";
     private static final int LIVES_DEFAULT = 3;
@@ -38,7 +41,7 @@ public class ModConfig {
     private static final String SPAWNBOOK_COMMENT = "Use this if you want the book to spawn on create world";
     private static final String EDITOR_KEY = "UseEditor";
     private static final boolean EDITOR_DEFAULT = false;
-    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. Leaving this off allows you the play the existing quests.";
+    private static final String EDITOR_COMMENT = "Only use this as a map maker who wants to create quests. You can toggle the mode using /hqm edit";
     private static final String MULTI_REWARD_KEY = "MultiReward";
     private static final boolean MULTI_REWARD_DEFAULT = true;
     private static final String MULTI_REWARD_COMMENT = "Allow every single player in a party to claim the reward for a quest. Setting this to false will give the party one set of rewards to share.";
@@ -67,6 +70,7 @@ public class ModConfig {
     public static boolean ROTTIMER;
     public static int MAXROT;
     public static boolean NO_HARDCORE_MESSAGE;
+    public static boolean OP_REMINDER;
     public static boolean ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES;
     public static boolean LOSE_QUEST_BOOK_ON_DEATH;
     public static int OVERLAY_XPOS;
@@ -122,6 +126,8 @@ public class ModConfig {
         MAXROT = config.get(CATEGORY_GENERAL, ROT_KEY, ROT_DEFAULT, ROT_COMMENT).getInt(ROT_DEFAULT);
 
         NO_HARDCORE_MESSAGE = config.get(CATEGORY_GENERAL, NO_HARDCORE_MESSAGE_KEY, NO_HARDCORE_MESSAGE_DEFAULT, NO_HARDCORE_MESSAGE_COMMENT).getBoolean(NO_HARDCORE_MESSAGE_DEFAULT);
+
+        OP_REMINDER = config.get(CATEGORY_GENERAL, OP_REMINDER_KEY, OP_REMINDER_DEFAULT, OP_REMINDER_COMMENT).getBoolean(OP_REMINDER_DEFAULT);
 
         ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES = config.get(CATEGORY_GENERAL, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_COMMENT).getBoolean(ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_DEFAULT);
 
