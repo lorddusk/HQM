@@ -9,6 +9,7 @@ import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
+import hardcorequesting.util.OPBookHelper;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
@@ -90,17 +91,6 @@ public abstract class QuestTaskItems extends QuestTask {
         return data.progress[id];
     }
 
-    protected void resetTask(UUID playerId, int id) {
-        getData(playerId).completed = false;
-        ((QuestDataTaskItems) getData(playerId)).progress[id] = 0;
-    }
-
-    protected void completeTask(UUID playerId, int id, int count) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
-        data.progress[id] = count;
-        doCompletionCheck(data, playerId);
-    }
-
     private void setPositions(ItemRequirement[] items) {
         int x = START_X;
         int y = START_Y;
@@ -167,7 +157,7 @@ public abstract class QuestTaskItems extends QuestTask {
         return updated;
     }
 
-    protected void doCompletionCheck(QuestDataTaskItems data, UUID playerId) {
+    public void doCompletionCheck(QuestDataTaskItems data, UUID playerId) {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
@@ -253,11 +243,7 @@ public abstract class QuestTaskItems extends QuestTask {
                     }
 
                     if (isOpBookWithShiftKeyDown) {
-                        if (getProgress(player, i) == item.required) {
-                            resetTask(player.getPersistentID(), i);
-                        } else {
-                            completeTask(player.getPersistentID(), i, item.required);
-                        }
+                        OPBookHelper.reverseRequirementCompletion(this, i, player);
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));

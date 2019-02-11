@@ -7,7 +7,6 @@ import java.util.UUID;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -33,7 +32,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
 
     @Override
-    protected void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
+    public void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
         boolean isDone = true;
         for (int i = 0; i < items.length; i++) {
             ItemRequirement item = items[i];
