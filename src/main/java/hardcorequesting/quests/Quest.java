@@ -46,6 +46,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -245,6 +248,8 @@ public class Quest {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
                 QuestingData.getQuestingData(player).selectedQuestId = getQuestId();
                 QuestingData.getQuestingData(player).selectedTask = selectedTask.getId();
+
+                player.sendMessage(new TextComponentTranslation("tile.hqm:item_barrele.selectedTask", selectedTask.getDescription()).setStyle(new Style().setColor(TextFormatting.GREEN)));
 
                 //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
                 GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
