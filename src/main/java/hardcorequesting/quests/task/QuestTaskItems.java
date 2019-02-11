@@ -48,7 +48,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
 
     public void setItem(GuiEditMenuItem.Element element, int id, ItemPrecision precision) {
-        if (element.getFluidStack() == null) return;
+        if (element.getStack() == null) return;
 
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);
@@ -62,13 +62,13 @@ public abstract class QuestTaskItems extends QuestTask {
                 GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem) element;
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                ItemStack stack = item.getFluidStack().copy();
+                ItemStack stack = item.getStack().copy();
                 stack.setCount(1);
                 items[id].stack = stack;
             } else {
                 GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
                 items[id].hasItem = false;
-                items[id].fluid = fluid.getFluidStack();
+                items[id].fluid = fluid.getStack();
                 items[id].stack = null;
             }
             items[id].required = element.getAmount();
@@ -203,7 +203,7 @@ public abstract class QuestTaskItems extends QuestTask {
 
             String str = (getProgress(player, i) * 100 / item.required) + "%";
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0, 0, 200);// magic z value to write over fluidStack render
+            GlStateManager.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
             gui.drawStringWithShadow(str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
             GlStateManager.popMatrix();
