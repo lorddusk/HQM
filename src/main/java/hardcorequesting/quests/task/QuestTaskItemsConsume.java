@@ -2,7 +2,6 @@ package hardcorequesting.quests.task;
 
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fluids.FluidStack;
