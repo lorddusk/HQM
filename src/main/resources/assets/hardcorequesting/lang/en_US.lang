@@ -60,6 +60,7 @@ tile.hqm:item_barrel.name=Quest Delivery System
 tile.hqm:item_barrel.nonBound=You currently have not bound a quest to the QDS
 tile.hqm:item_barrel.boundTo=The QDS is currently bound to '%s'
 tile.hqm:item_barrel.bindTo=You bound '%s' to the QDS
+tile.hqm:item_barrele.selectedTask=The task '%s' has been selected and can now be applied to a QDS by right-clicking with the quest book.
 tile.hqm:quest_tracker.name=Quest Tracking System
 tile.hqm:quest_tracker.offLimit=You're not in edit mode. This block is off limit.
 tile.hqm:quest_tracker.bindTo=You bound '%s' to the Quest Tracker.
