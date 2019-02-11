@@ -27,7 +27,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
             }
 
             if (fluidStack != null && fluidStack.getFluid().getName().equals(item.fluid.getName())) {
-                //System.out.println(fluidStack.amount);
+                //System.out.println(stack.amount);
                 int amount = Math.min(item.required - data.progress[i], fluidStack.amount);
                 data.progress[i] += amount;
                 fluidStack.amount -= amount;

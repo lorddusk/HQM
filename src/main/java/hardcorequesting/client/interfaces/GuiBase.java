@@ -225,7 +225,7 @@ public class GuiBase extends GuiScreen {
             GlStateManager.popMatrix();
         }
         /*//IIcon icon = fluid.getIconStack();
-        Item fluidStack = null;
+        Item stack = null;
 
         if (icon == null) {
             if (FluidRegistry.WATER.equals(fluid)) {

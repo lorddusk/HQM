@@ -17,8 +17,8 @@ public class GuiEditMenuItemPortal extends GuiEditMenuItem {
 
     @Override
     public void save(GuiBase gui) {
-        if (selected instanceof ElementItem && selected.getFluidStack() != null) {
-            parent.setItem((ItemStack) selected.getFluidStack());
+        if (selected instanceof ElementItem && selected.getStack() != null) {
+            parent.setItem((ItemStack) selected.getStack());
         }
     }
 

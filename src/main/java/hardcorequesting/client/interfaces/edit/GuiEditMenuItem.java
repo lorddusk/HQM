@@ -13,6 +13,7 @@ import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.TooltipFlag;
+import mcjty.theoneprobe.apiimpl.elements.ElementItemStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,11 +63,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), null, id, type, amount, precision);
+        this(gui, player, Element.create(obj), null, id, type, amount, precision);
     }
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, UUID questId, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, obj instanceof ItemStack ? new ElementItem((ItemStack) obj) : new ElementFluid((Fluid) obj), questId, -1, type, amount, precision);
+        this(gui, player, Element.create(obj), questId, -1, type, amount, precision);
     }
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Element<?> element, UUID questId, int id, final Type type, final int amount, ItemPrecision precision) {
@@ -88,7 +89,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 stack.setCount(1);
                 boolean exists = false;
                 for (Element<?> other : playerItems) {
-                    if (ItemStack.areItemStacksEqual(stack, (ItemStack) other.getFluidStack())) {
+                    if (ItemStack.areItemStacksEqual(stack, (ItemStack) other.getStack())) {
                         exists = true;
                         break;
                     }
@@ -104,7 +105,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             int end = playerItems.size();
             for (int i = 0; i < end; i++) {
                 Element<?> item = playerItems.get(i);
-                ItemStack stack = (ItemStack) item.getFluidStack();
+                ItemStack stack = (ItemStack) item.getStack();
                 if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)) {
                     FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
                     if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
@@ -253,20 +254,22 @@ public class GuiEditMenuItem extends GuiEditMenu {
     @Override
     public void save(GuiBase gui) {
         if (type == Type.BAG_ITEM) {
-            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && selected.getFluidStack() != null) {
-                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getFluidStack());
+            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && selected.getStack() != null && !selected.isEmpty()) {
+                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getStack());
             }
         } else if (type == Type.QUEST_ICON) {
-            if (Quest.getQuest(questId) != null && selected instanceof ElementItem) {
+            if (Quest.getQuest(questId) != null && selected instanceof ElementItem && !selected.isEmpty()) {
                 try {
-                    Quest.getQuest(questId).setIconStack((ItemStack) selected.getFluidStack());
+                    Quest.getQuest(questId).setIconStack((ItemStack) selected.getStack());
                 } catch (Exception e) {
                     System.out.println("Tell LordDusk that he found the issue.");
                 }
                 SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
             }
         } else {
-            GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
+            if (!selected.isEmpty()) {
+                GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
+            }
         }
     }
 
@@ -345,7 +348,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
     public static abstract class Element<T> {
 
-        protected T fluidStack;
+        protected T stack;
 
         protected Element() {
         }
@@ -358,30 +361,38 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         public abstract void setAmount(int val);
 
-        public T getFluidStack() {
-            return fluidStack;
+        public T getStack() {
+            return stack;
         }
 
         public abstract Element<?> copy();
+
+        public abstract boolean isEmpty();
+
+        public static Element<?> create (Object stack) {
+            if (stack instanceof ItemStack) return new ElementItem((ItemStack) stack);
+            else if (stack instanceof FluidStack) return new ElementFluid((Fluid) stack);
+            else return null;
+        }
     }
 
     public static class ElementItem extends Element<ItemStack> {
 
         public ElementItem(ItemStack stack) {
-            this.fluidStack = stack;
+            this.stack = stack;
         }
 
         @Override
         public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            if (fluidStack != null && !fluidStack.isEmpty()) {
-                gui.drawItemStack(fluidStack, x, y, mX, mY, false);
+            if (stack != null && !stack.isEmpty()) {
+                gui.drawItemStack(stack, x, y, mX, mY, false);
             }
         }
 
         @Override
         public List<String> getName(GuiBase gui) {
-            if (fluidStack != null && !fluidStack.isEmpty()) {
-                return fluidStack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
+            if (stack != null && !stack.isEmpty()) {
+                return stack.getTooltip(Minecraft.getMinecraft().player, new TooltipFlag(Minecraft.getMinecraft().gameSettings.advancedItemTooltips));
             } else {
                 List<String> ret = new ArrayList<>();
                 ret.add("Unknown");
@@ -391,20 +402,26 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public int getAmount() {
-            return (fluidStack == null || fluidStack.isEmpty()) ? 0 : fluidStack.getCount();
+            return (stack == null || stack.isEmpty()) ? 0 : stack.getCount();
         }
 
         @Override
         public void setAmount(int val) {
-            if (fluidStack != null && !fluidStack.isEmpty()) {
-                fluidStack.setCount(val);
+            if (stack != null && !stack.isEmpty()) {
+                stack.setCount(val);
             }
         }
 
         @Override
         public Element<?> copy() {
-            return new ElementItem((fluidStack == null || fluidStack.isEmpty()) ? null : fluidStack.copy());
+            return new ElementItem((stack == null || stack.isEmpty()) ? null : stack.copy());
         }
+
+        @Override
+        public boolean isEmpty() {
+            return stack.isEmpty();
+        }
+
     }
 
     public static class ElementFluid extends Element<Fluid> {
@@ -412,19 +429,19 @@ public class GuiEditMenuItem extends GuiEditMenu {
         private int size;
 
         public ElementFluid(Fluid fluid) {
-            this.fluidStack = fluid;
+            this.stack = fluid;
         }
 
         @Override
         public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawFluid(fluidStack, x, y, mX, mY);
+            gui.drawFluid(stack, x, y, mX, mY);
         }
 
         @Override
         public List<String> getName(GuiBase gui) {
-            if(fluidStack != null){
+            if(stack != null){
                 List<String> ret = new ArrayList<>();
-                ret.add(fluidStack.getLocalizedName(new FluidStack(fluidStack, 1000)));
+                ret.add(stack.getLocalizedName(new FluidStack(stack, 1000)));
                 return ret;
             }
             return Collections.emptyList();
@@ -442,11 +459,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
 
         @Override
         public Element<?> copy() {
-            ElementFluid ret = new ElementFluid(fluidStack);
+            ElementFluid ret = new ElementFluid(stack);
             ret.size = size;
             return ret;
         }
-    }
+
+        @Override
+        // I don't think this is technically ever really empty
+        public boolean isEmpty() {
+            return false;
+        }
+}
 
     public static class Search implements Runnable {
 

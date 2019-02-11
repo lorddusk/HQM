@@ -69,7 +69,7 @@ public class ItemBlockPortal extends ItemBlock {
 
                         tooltip.add(GuiColor.YELLOW + "Item: " + new ItemStack(Item.getItemById(id), 1, dmg).getDisplayName());
                     } else {
-                        tooltip.add(GuiColor.GRAY + "No fluidStack selected.");
+                        tooltip.add(GuiColor.GRAY + "No stack selected.");
                     }
                 }
 
