@@ -53,6 +53,8 @@ hqm.message.hearthDecay=One or more of your hearts has just decade into a Rotten
 hqm.message.alreadyEditing=Another OP is already accessing this player's quests.
 hqm.message.bookNoPermission=You don't have permission to use this book.
 hqm.message.bookNoData=Still loading quest data.
+hqm.message.bookNoEntry=No entry was found for that player.
+hqm.message.bookNoPlayer=No player entry could be loaded for you. Please try again soon or report to your server administrator. This shouldn't happen.
 hqm.message.noTaskSelected=You currently have not selected any tasks
 
 # ======================================
