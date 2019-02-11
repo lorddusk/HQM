@@ -59,7 +59,7 @@ public class ItemQuestBook extends Item {
             Quest.setEditMode(false);
         }
 
-        if (!world.isRemote && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
+        if (!world.isRemote && Quest.isEditing == true && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
             player.sendMessage(new TextComponentTranslation("hqm.command.editMode.disableSync").setStyle(new Style().setColor(TextFormatting.RED).setBold(true)));
             Quest.setEditMode(false);
         }
