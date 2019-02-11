@@ -223,13 +223,18 @@ public class QuestSet {
             if (gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y)) {
                 switch (gui.getCurrentMode()) {
                     case DELETE:
-                        if (questSet.getQuests().isEmpty()) {
-                            for (int j = questSet.getId() + 1; j < Quest.getQuestSets().size(); j++) {
-                                Quest.getQuestSets().get(j).decreaseId();
+                        if (!questSet.getQuests().isEmpty()) {
+                            List<Quest> quests = new ArrayList<>(questSet.getQuests().values());
+                            for (Quest q : quests) {
+                                questSet.removeQuest(q);
+                                Quest.removeQuest(q);
                             }
-                            Quest.getQuestSets().remove(questSet);
-                            SaveHelper.add(SaveHelper.EditType.SET_REMOVE);
                         }
+                        for (int j = questSet.getId() + 1; j < Quest.getQuestSets().size(); j++) {
+                            Quest.getQuestSets().get(j).decreaseId();
+                        }
+                        Quest.getQuestSets().remove(questSet);
+                        SaveHelper.add(SaveHelper.EditType.SET_REMOVE);
                         break;
                     case SWAP_SELECT:
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
