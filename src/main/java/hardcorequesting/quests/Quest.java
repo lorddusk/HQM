@@ -117,6 +117,7 @@ public class Quest {
     private ItemStack iconStack = ItemStack.EMPTY;
     private QuestSet set;
     private int selectedReward = -1;
+    private int lastClicked;
     private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
         @Override
         protected boolean isValid(UUID playerId, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
@@ -1088,16 +1089,28 @@ public class Quest {
     private void handleRewardClick(GuiQuestBook gui, EntityPlayer player, ItemStack[] rawRewards, int y, boolean canSelect, int mX, int mY) {
         ItemStack[] rewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
 
+        boolean doubleClick = false;
+
         for (int i = 0; i < rewards.length; i++) {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                if (canSelect && (!canQuestsBeEdited() || gui.getCurrentMode() == EditMode.NORMAL)) {
+                 if (gui.getCurrentMode() == EditMode.NORMAL) {
+                    int lastDiff = player.ticksExisted - lastClicked;
+                    if (lastDiff < 6) {
+                        doubleClick = true;
+                    } else {
+                        lastClicked = player.ticksExisted;
+                    }
+                }
+                if (canSelect && (!canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
                     if (selectedReward == i) {
                         selectedReward = -1;
                     } else if (rewards[i] != null) {
                         selectedReward = i;
                     }
-                } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.ITEM) {
-                    gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
+                } else if (canQuestsBeEdited()) {
+                    if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
+                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
+                    }
                 } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.DELETE && rewards[i] != null) {
                     ItemStack[] newRewards;
                     if (rawRewards.length == 1) {

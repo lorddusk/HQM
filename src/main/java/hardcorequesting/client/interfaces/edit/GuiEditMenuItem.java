@@ -59,6 +59,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private boolean clicked;
     private TextBoxGroup.TextBox amountTextBox;
     private TextBoxGroup textBoxes;
+    private int lastClicked;
 
 
     public GuiEditMenuItem(GuiBase gui, EntityPlayer player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
@@ -219,8 +220,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public void onClick(GuiBase gui, int mX, int mY, int b) {
         super.onClick(gui, mX, mY, b);
 
-        clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
-        clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+        if (clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY)) return;
+        if (clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY)) return;
 
         textBoxes.onClick(gui, mX, mY);
 
@@ -298,7 +299,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
     }
 
-    private void clickList(GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private boolean clickList(GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             Element<?> element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
@@ -312,11 +313,19 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     } else {
                         selected.setAmount(1);
                     }
+                    int lastDiff = player.ticksExisted - lastClicked;
+                    if (lastDiff < 6) {
+                        save(gui);
+                        close(gui);
+                        return true;
+                    } else {
+                        lastClicked = player.ticksExisted;
+                    }
                 }
                 break;
             }
         }
-
+        return false;
     }
 
     public enum Type {
