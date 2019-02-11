@@ -13,6 +13,7 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.util.ITooltipFlag;
@@ -85,8 +86,13 @@ public class ItemQuestBook extends Item {
                                 EntityPlayer subject = QuestingData.getPlayer(uuid);
                                 if (subject instanceof EntityPlayerMP) {
                                     EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getName(), true, false));
-                                    QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID()).setBookOpen(true);
-                                    GeneralUsage.sendOpenBook(player, true);
+                                    PlayerEntry entry = QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUniqueID());
+                                    if (entry != null) {
+                                        entry.setBookOpen(true);
+                                        GeneralUsage.sendOpenBook(player, true);
+                                    } else {
+                                        player.sendMessage(new TextComponentTranslation("hqm.message.bookNoEntry"));
+                                    }
                                 }
                                 //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                             } else {
@@ -98,8 +104,13 @@ public class ItemQuestBook extends Item {
                     }
                 } else {
                     EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getName(), false, true));
-                    QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID()).setBookOpen(true);
-                    GeneralUsage.sendOpenBook(player, false);
+                    PlayerEntry entry = QuestingData.getQuestingData(player).getTeam().getEntry(player.getUniqueID());
+                    if (entry != null) {
+                        entry.setBookOpen(true);
+                        GeneralUsage.sendOpenBook(player, false);
+                    } else {
+                        player.sendMessage(new TextComponentTranslation("hqm.message.bookNoPlayer"));
+                    }
                 }
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
