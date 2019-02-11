@@ -65,6 +65,7 @@ public class MinecraftAdapter {
         @Override
         public ItemStack read(JsonReader in) throws IOException {
             if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
                 return ItemStack.EMPTY;
             }
             String id = "";
