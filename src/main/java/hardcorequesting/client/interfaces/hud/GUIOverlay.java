@@ -1,6 +1,6 @@
 package hardcorequesting.client.interfaces.hud;
 
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -29,8 +29,8 @@ public class GUIOverlay extends Gui {
             return;
         }
 
-        int xPos = ModConfig.OVERLAY_XPOS;
-        int yPos = ModConfig.OVERLAY_YPOS;
+        int xPos = HQMConfig.OVERLAY_XPOS;
+        int yPos = HQMConfig.OVERLAY_YPOS;
         GlStateManager.enableBlend();
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);

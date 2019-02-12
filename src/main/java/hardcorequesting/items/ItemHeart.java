@@ -5,7 +5,7 @@ import java.util.List;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
@@ -43,7 +43,7 @@ public class ItemHeart extends Item {
             if (value == 3) {
                 if (!QuestingData.isHardcoreActive()) {
                     player.sendMessage(new TextComponentTranslation("hqm.message.noHardcoreYet"));
-                } else if (QuestingData.getQuestingData(player).getRawLives() < ModConfig.MAXLIVES) {
+                } else if (QuestingData.getQuestingData(player).getRawLives() < HQMConfig.Hardcore.MAX_LIVES) {
                     QuestingData.getQuestingData(player).addLives(player, 1);
                     player.sendMessage(new TextComponentTranslation("hqm.message.addOne"));
                     int lives = QuestingData.getQuestingData(player).getLives();
@@ -81,14 +81,14 @@ public class ItemHeart extends Item {
     public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
         if (entity instanceof EntityPlayer) {
             EntityPlayer entityPlayer = (EntityPlayer) entity;
-            if (value == 3 && ModConfig.ROTTIMER) {
+            if (value == 3 && HQMConfig.Hardcore.HEART_ROT_ENABLE) {
                 NBTTagCompound tagCompound = stack.getTagCompound();
                 if (tagCompound == null) {
                     tagCompound = new NBTTagCompound();
                     stack.setTagCompound(tagCompound);
                 }
                 if (!tagCompound.hasKey("RotTime")) {
-                    int rot = (ModConfig.MAXROT * 20);
+                    int rot = (HQMConfig.Hardcore.HEART_ROT_TIME * 20);
                     tagCompound.setInteger("MaxRot", rot);
                     tagCompound.setInteger("RotTime", rot);
                 } else {
@@ -110,7 +110,7 @@ public class ItemHeart extends Item {
 
         if (value == 3) {
             tooltip.add(Translator.translate("item.hqm:hearts_heart.tooltip"));
-            if (ModConfig.ROTTIMER) {
+            if (HQMConfig.Hardcore.HEART_ROT_ENABLE) {
                 NBTTagCompound tagCompound = stack.getTagCompound();
                 if (tagCompound == null) {
                     tagCompound = new NBTTagCompound();

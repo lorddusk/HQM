@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.util.NBTCompareUtil;
 import hardcorequesting.util.OreDictionaryHelper;
 import hardcorequesting.util.Translator;
@@ -57,7 +57,7 @@ public abstract class ItemPrecision {
             final NBTTagCompound checking = (stack1.hasTagCompound()) ? stack1.getTagCompound() : null;
 
             if (ref != null) {
-                for (String key : ModConfig.NBT_SUBSET_FILTER) {
+                for (String key : HQMConfig.NBT_SUBSET_FILTER) {
                     ref.removeTag(key);
                 }
             }

@@ -1,7 +1,7 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.Lang;
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -153,13 +153,13 @@ public class CommandLives extends CommandBase {
     }
 
     private void addLives(EntityPlayer player, int amount) {
-        if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES) {
+        if (QuestingData.getQuestingData(player).getRawLives() + amount <= HQMConfig.Hardcore.MAX_LIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
             sendChat(player, amount != 1, "hqm.message.addLives", amount);
             currentLives(player);
         } else {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(player, ModConfig.MAXLIVES != 1, "hqm.message.cantAddLives", ModConfig.MAXLIVES);
+            sendChat(player, HQMConfig.Hardcore.MAX_LIVES != 1, "hqm.message.cantAddLives", HQMConfig.Hardcore.MAX_LIVES);
             currentLives(player);
         }
     }
@@ -167,16 +167,16 @@ public class CommandLives extends CommandBase {
     private void addLivesTo(ICommandSender sender, String playerName, int amount) {
         EntityPlayer player = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
 
-        if (QuestingData.getQuestingData(player).getRawLives() + amount <= ModConfig.MAXLIVES) {
+        if (QuestingData.getQuestingData(player).getRawLives() + amount <= HQMConfig.Hardcore.MAX_LIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
             sendChat(sender, amount != 1, "hqm.message.addLivesTo", amount, playerName);
             sendChat(player, amount != 1, "hqm.message.addLivesBy", amount, sender.getName());
             currentLives(player);
         } else {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(sender, "hqm.message.cantGiveMoreLives", playerName, ModConfig.MAXLIVES);
-            sendChat(sender, "hqm.massage.setLivesInstead", player, ModConfig.MAXLIVES);
-            sendChat(player, "hqm.massage.setLivesBy", ModConfig.MAXLIVES, sender.getName());
+            sendChat(sender, "hqm.message.cantGiveMoreLives", playerName, HQMConfig.Hardcore.MAX_LIVES);
+            sendChat(sender, "hqm.massage.setLivesInstead", player, HQMConfig.Hardcore.MAX_LIVES);
+            sendChat(player, "hqm.massage.setLivesBy", HQMConfig.Hardcore.MAX_LIVES, sender.getName());
             currentLives(player);
         }
     }
