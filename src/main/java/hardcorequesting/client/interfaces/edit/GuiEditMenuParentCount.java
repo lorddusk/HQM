@@ -6,8 +6,6 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.EntityPlayer;
 
-import java.util.UUID;
-
 public class GuiEditMenuParentCount extends GuiEditMenuExtended {
 
     private boolean showModifiedParentRequirement;

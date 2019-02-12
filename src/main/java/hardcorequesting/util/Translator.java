@@ -1,14 +1,14 @@
 package hardcorequesting.util;
 
 
-import java.util.IllegalFormatException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
+
+import java.util.IllegalFormatException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Translator {
 

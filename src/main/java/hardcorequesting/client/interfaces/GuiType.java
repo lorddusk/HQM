@@ -1,6 +1,5 @@
 package hardcorequesting.client.interfaces;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,8 +13,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public enum GuiType {

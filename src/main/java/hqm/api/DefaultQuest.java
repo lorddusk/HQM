@@ -1,9 +1,9 @@
 package hqm.api;
 
-import hqm.client.EmptyIconRenderer;
+import hardcorequesting.util.HQMUtil;
 import hqm.api.render.ICustomIconRenderer;
 import hqm.api.reward.IReward;
-import hardcorequesting.util.HQMUtil;
+import hqm.client.EmptyIconRenderer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

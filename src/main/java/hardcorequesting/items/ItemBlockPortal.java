@@ -1,8 +1,5 @@
 package hardcorequesting.items;
 
-import java.util.List;
-import java.util.UUID;
-
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.PortalType;
@@ -17,6 +14,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
+import java.util.UUID;
 
 
 public class ItemBlockPortal extends ItemBlock {

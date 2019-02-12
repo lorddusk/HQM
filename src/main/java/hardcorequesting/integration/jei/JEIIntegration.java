@@ -1,9 +1,11 @@
 package hardcorequesting.integration.jei;
 
-import net.minecraft.item.ItemStack;
-import mezz.jei.api.*;
+import mezz.jei.api.IJeiRuntime;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.IRecipeRegistry;
+import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.recipe.IFocus;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 

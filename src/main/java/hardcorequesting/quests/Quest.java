@@ -1,29 +1,9 @@
 package hardcorequesting.quests;
 
-import java.awt.Polygon;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.EditMode;
-import hardcorequesting.client.interfaces.GuiBase;
-import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.client.interfaces.LargeButton;
-import hardcorequesting.client.interfaces.ResourceHelper;
-import hardcorequesting.client.interfaces.ScrollBar;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuDeathTask;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationKillTask;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationReward;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.client.interfaces.*;
+import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.event.EventTrigger;
@@ -38,7 +18,10 @@ import hardcorequesting.quests.task.*;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
 import hardcorequesting.team.Team;
-import hardcorequesting.util.*;
+import hardcorequesting.util.HQMUtil;
+import hardcorequesting.util.OPBookHelper;
+import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -53,6 +36,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.awt.*;
+import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Quest {
 

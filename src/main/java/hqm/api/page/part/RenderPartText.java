@@ -2,7 +2,6 @@ package hqm.api.page.part;
 
 import hqm.api.page.IRenderPart;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;

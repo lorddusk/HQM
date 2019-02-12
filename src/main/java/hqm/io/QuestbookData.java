@@ -1,9 +1,9 @@
 package hqm.io;
 
 import com.google.gson.annotations.SerializedName;
+import hardcorequesting.util.HQMUtil;
 import hqm.api.*;
 import hqm.api.reward.IReward;
-import hardcorequesting.util.HQMUtil;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;

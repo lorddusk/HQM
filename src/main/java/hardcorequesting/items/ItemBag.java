@@ -1,23 +1,14 @@
 package hardcorequesting.items;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
-import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.GeneralUsage;
-import hardcorequesting.network.NetworkManager;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -30,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.UUID;
 
 
 public class ItemBag extends Item {

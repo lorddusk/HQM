@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 

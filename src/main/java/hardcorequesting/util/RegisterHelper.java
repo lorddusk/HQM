@@ -1,16 +1,14 @@
 package hardcorequesting.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.google.common.collect.Sets;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.event.RegistryEvent;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Set;
 
 public class RegisterHelper {
     static Set<Block> blocks = Sets.newHashSet();

@@ -1,8 +1,8 @@
 package hqm.api;
 
+import hardcorequesting.util.HQMUtil;
 import hqm.Registry;
 import hqm.api.page.ILayout;
-import hardcorequesting.util.HQMUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;

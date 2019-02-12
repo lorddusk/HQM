@@ -5,9 +5,8 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
-import hardcorequesting.util.NBTCompareUtil;
-import net.minecraft.block.*;
-import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockFlowerPot;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -17,12 +16,9 @@ import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.event.world.BlockEvent;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 
 public abstract class QuestTaskBlock extends QuestTaskItems {
     public static Method getSilkTouchDrop = null;

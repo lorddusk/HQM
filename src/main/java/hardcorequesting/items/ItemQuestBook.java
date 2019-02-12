@@ -1,15 +1,10 @@
 package hardcorequesting.items;
 
-import java.util.List;
-import java.util.UUID;
-
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiColor;
-import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.network.GeneralUsage;
-import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
@@ -33,6 +28,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.UUID;
 
 public class ItemQuestBook extends Item {
 

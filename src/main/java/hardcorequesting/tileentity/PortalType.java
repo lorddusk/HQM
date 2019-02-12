@@ -1,7 +1,6 @@
 package hardcorequesting.tileentity;
 
 import hardcorequesting.blocks.ModBlocks;
-import hardcorequesting.items.ModItems;
 import hardcorequesting.util.Translator;
 import net.minecraft.item.ItemStack;
 

@@ -1,5 +1,6 @@
 package hardcorequesting.quests;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
@@ -13,10 +14,8 @@ import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.Level;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -57,7 +56,7 @@ public class QuestSet {
             QuestAdapter.postLoad();
             orderAll(remote);
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed loading quest sets");
+            HardcoreQuesting.LOG.info("Failed loading quest sets for remote");
         }
     }
 
@@ -68,7 +67,7 @@ public class QuestSet {
                 SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
             }
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
+            HardcoreQuesting.LOG.info("Failed saving quest sets for local and/or default");
         }
     }
 
@@ -76,7 +75,7 @@ public class QuestSet {
         try {
             SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving quest sets");
+            HardcoreQuesting.LOG.info("Failed saving all quest sets to the default folder");
         }
     }
 
@@ -100,7 +99,7 @@ public class QuestSet {
                 });
             }
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed ordering quest sets");
+            HardcoreQuesting.LOG.info("Failed ordering quest sets");
         }
     }
 

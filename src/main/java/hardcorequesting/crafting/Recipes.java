@@ -1,7 +1,5 @@
 package hardcorequesting.crafting;
 
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,6 +7,8 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.List;
 
 public class Recipes
 {

@@ -1,7 +1,5 @@
 package hardcorequesting.items;
 
-import java.util.List;
-
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
@@ -20,6 +18,8 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class ItemHeart extends Item {
     private int value;

@@ -1,7 +1,6 @@
 package hqm.net;
 
 import hqm.HQM;
-import hqm.api.IQuest;
 import hqm.api.IQuestbook;
 import hqm.client.gui.GuiQuestbook;
 import hqm.io.IOHandler;

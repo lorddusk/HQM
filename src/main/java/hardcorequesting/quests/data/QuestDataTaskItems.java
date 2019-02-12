@@ -9,7 +9,6 @@ import hardcorequesting.quests.task.QuestTaskItems;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 public class QuestDataTaskItems extends QuestDataTask {
 

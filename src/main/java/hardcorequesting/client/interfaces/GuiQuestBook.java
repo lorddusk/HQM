@@ -1,27 +1,12 @@
 package hardcorequesting.client.interfaces;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.EditButton;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.KeyboardHandler;
-import hardcorequesting.client.interfaces.edit.GuiEditMenu;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuCommandEditor;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuDeath;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuTeam;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.items.ModItems;
@@ -48,6 +33,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiQuestBook extends GuiBase {

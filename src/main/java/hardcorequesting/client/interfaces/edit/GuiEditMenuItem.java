@@ -1,8 +1,5 @@
 package hardcorequesting.client.interfaces.edit;
 
-import java.util.*;
-import java.util.regex.Pattern;
-
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -28,6 +25,9 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class GuiEditMenuItem extends GuiEditMenu {
 

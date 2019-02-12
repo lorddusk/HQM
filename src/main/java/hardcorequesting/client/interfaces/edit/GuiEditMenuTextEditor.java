@@ -15,7 +15,6 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;

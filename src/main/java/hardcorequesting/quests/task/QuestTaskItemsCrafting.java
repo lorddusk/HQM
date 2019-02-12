@@ -3,7 +3,6 @@ package hardcorequesting.quests.task;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

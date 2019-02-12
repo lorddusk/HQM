@@ -1,12 +1,5 @@
 package hardcorequesting.bag;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
@@ -26,6 +19,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Group {
 

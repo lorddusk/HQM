@@ -19,10 +19,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.IOException;

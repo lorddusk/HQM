@@ -1,8 +1,5 @@
 package hardcorequesting.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import hardcorequesting.Lang;
 import hardcorequesting.util.Translator;
 import net.minecraft.command.CommandException;
@@ -11,6 +8,9 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommandHelp extends CommandBase {
 

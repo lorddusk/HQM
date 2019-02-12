@@ -1,17 +1,16 @@
 package hardcorequesting.client.sounds;
 
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.common.collect.Sets;
-
 import hardcorequesting.ModInformation;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 public enum Sounds {
     COMPLETE("complete"),
