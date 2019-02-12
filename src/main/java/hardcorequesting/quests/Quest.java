@@ -516,6 +516,8 @@ public class Quest {
     }
 
     public void addRequirement(UUID requirementQuestId) {
+        if (requirementQuestId.equals(this.questId)) return;
+
         if (lookForId(requirementQuestId, false) || lookForId(requirementQuestId, true)) return;
 
         Quest quest = QuestLine.getActiveQuestLine().quests.get(requirementQuestId);
@@ -542,6 +544,8 @@ public class Quest {
     }
 
     public void addOptionLink(UUID optionLinkId) {
+        if (optionLinkId.equals(this.questId)) return;
+
         for (UUID currentOptionId : optionLinks) {
             if (currentOptionId.equals(optionLinkId)) {
                 return;
