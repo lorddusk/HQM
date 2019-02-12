@@ -116,15 +116,7 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     }
 
     public void checkProgress(BlockEvent event, IBlockState state, EntityPlayer player) {
-        // TODO: Unhappy with this solution
-        Collection<IProperty<?>> keys = state.getPropertyKeys();
-
-        World world = event.getWorld();
-        BlockPos pos = event.getPos();
-        Block block = state.getBlock();
-
-        NonNullList<ItemStack> consume = NonNullList.create();
-        ItemStack drop = block.getPickBlock(state, null, world, pos, player);
+        ItemStack drop = state.getBlock().getPickBlock(state, null, event.getWorld(), event.getPos(), player);
 
         /* * * CUSTOM OVERRIDES * * * /
                  THESE ARE
@@ -133,26 +125,8 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
         if (state.getBlock() instanceof BlockFlowerPot) {
             drop = new ItemStack(Items.FLOWER_POT);
         }
-
-        for (ItemRequirement ireq : items) {
-            if (!ireq.hasItem) continue;
-
-            ItemStack istack = ireq.getStack();
-
-            if (istack.getItem() != drop.getItem() || istack.getMetadata() != drop.getMetadata()) continue;
-
-            if (istack.hasTagCompound() && !drop.hasTagCompound()) continue; // rip
-
-            if (!istack.hasTagCompound() && !drop.hasTagCompound()) {
-                consume.add(istack.copy());
-            } else if (NBTCompareUtil.arePartiallySimilar(drop.getTagCompound(), istack.getTagCompound())) {
-                consume.add(istack.copy());
-            }
-        }
-
-        if (consume.size() != 0) {
-            increaseItems(consume, (QuestDataTaskItems) getData(player), player.getPersistentID());
-        }
+        NonNullList<ItemStack> consume = NonNullList.withSize(1, drop);
+        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getPersistentID());
     }
 }
 
