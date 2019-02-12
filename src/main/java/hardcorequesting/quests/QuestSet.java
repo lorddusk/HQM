@@ -23,6 +23,7 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class QuestSet {
 
@@ -306,27 +307,18 @@ public class QuestSet {
         }
 
         int inc = 1;
-        boolean found_conflict = false;
 
         String new_name = name;
 
-        while (inc < 20) {
-            for (QuestSet set : Quest.getQuestSets()) {
-                if (set.getName().equalsIgnoreCase(new_name)) {
-                    new_name = String.format("%s%d", name, inc++);
-                    found_conflict = true;
-                }
-            }
+        List<String> names = Quest.getQuestSets().stream().filter((q) -> q != this).map((q) -> q.getName().toLowerCase()).collect(Collectors.toList());
 
-            if (!found_conflict) {
-                name = new_name;
-                break;
-            }
+        while (names.contains(new_name.toLowerCase())) {
+            new_name = String.format("%s%d", name, inc++);
+
+            if (inc >= 20) return false;
         }
 
-        if (found_conflict) return false;
-
-        this.name = name;
+        this.name = new_name;
         return true;
     }
 
