@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.config.HQMConfig;
 import net.minecraft.client.Minecraft;
 
 import com.mojang.authlib.GameProfile;
@@ -17,7 +18,6 @@ import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
-import hardcorequesting.config.ModConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.io.SaveHandler;
@@ -230,7 +230,7 @@ public class QuestingData {
     }
 
     public static void spawnBook(EntityPlayer player) {
-        if (!Quest.canQuestsBeEdited() && !player.world.isRemote && ModConfig.spawnBook && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
+        if (!Quest.canQuestsBeEdited() && !player.world.isRemote && HQMConfig.SPAWN_BOOK && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
             NBTTagCompound hqmTag = new NBTTagCompound();
             if (player.getEntityData().hasKey(PlayerTracker.HQ_TAG))
@@ -347,7 +347,7 @@ public class QuestingData {
     }
 
     public int addLives(EntityPlayer player, int amount) {
-        int max = ModConfig.MAXLIVES;
+        int max = HQMConfig.Hardcore.MAX_LIVES;
         int i = getRawLives() + amount;
 
         if (i <= max) {

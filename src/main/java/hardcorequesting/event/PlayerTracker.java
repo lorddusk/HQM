@@ -1,6 +1,6 @@
 package hardcorequesting.event;
 
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
@@ -11,13 +11,9 @@ import hardcorequesting.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -47,7 +43,7 @@ public class PlayerTracker {
 
         if (QuestingData.isHardcoreActive())
             sendLoginMessage(player);
-        else if (ModConfig.NO_HARDCORE_MESSAGE)
+        else if (HQMConfig.Message.NO_HARDCORE_MESSAGE)
             player.sendMessage(new TextComponentTranslation("hqm.message.noHardcore"));
 
         if (!HQMUtil.isGameSingleplayer()) {

@@ -1,6 +1,6 @@
 package hardcorequesting.event;
 
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.QuestingData;
@@ -40,7 +40,7 @@ public class PlayerDeathEventListener {
                 || event.getEntityPlayer() instanceof FakePlayer
                 || event.isCanceled()
                 || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-                || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
+                || HQMConfig.LOSE_QUEST_BOOK) {
             return;
         }
 
@@ -62,7 +62,7 @@ public class PlayerDeathEventListener {
                 || !event.isWasDeath()
                 || event.isCanceled()
                 || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-                || ModConfig.LOSE_QUEST_BOOK_ON_DEATH) {
+                || HQMConfig.LOSE_QUEST_BOOK) {
             return;
         }
 

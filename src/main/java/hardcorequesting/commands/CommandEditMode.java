@@ -1,6 +1,6 @@
 package hardcorequesting.commands;
 
-import hardcorequesting.config.ModConfig;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.HQMUtil;
@@ -23,7 +23,7 @@ public class CommandEditMode extends CommandBase {
     @Override
     public void handleCommand(ICommandSender sender, String[] arguments) {
         if (sender instanceof EntityPlayer && isPlayerOp(sender)) {
-            if (!ModConfig.OP_REMINDER && !HQMUtil.isGameSingleplayer()) {
+            if (!HQMConfig.Message.OP_REMINDER && !HQMUtil.isGameSingleplayer()) {
                 sender.sendMessage(new TextComponentTranslation("hqm.command.editMode.useOP").setStyle(new Style().setColor(TextFormatting.GREEN)));
             }
 

@@ -5,13 +5,12 @@ import java.io.File;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.commands.CommandHandler;
-import hardcorequesting.config.ConfigHandler;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.event.PlayerDeathEventListener;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.event.WorldEventListener;
 import hardcorequesting.integration.IntegrationHandler;
-import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.proxies.CommonProxy;
@@ -34,7 +33,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, guiFactory = "hardcorequesting.client.interfaces.HQMModGuiFactory", acceptedMinecraftVersions = "[1.12,1.13)")
+@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, acceptedMinecraftVersions = "[1.12)")
 public class HardcoreQuesting {
 
     @Instance(ModInformation.ID)
@@ -69,9 +68,9 @@ public class HardcoreQuesting {
 
         path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + ModInformation.CONFIG_LOC_NAME.toLowerCase() + File.separator;
         configDir = new File(path);
-        ConfigHandler.initModConfig(path);
-        ConfigHandler.initEditConfig(path);
         QuestLine.init(path);
+
+        HQMConfig.loadConfig();
 
         proxy.init();
         proxy.initSounds(path);
