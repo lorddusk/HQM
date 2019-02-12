@@ -1,9 +1,5 @@
 package hardcorequesting.quests.task;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.UUID;
-
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
@@ -16,6 +12,10 @@ import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
 

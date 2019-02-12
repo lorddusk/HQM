@@ -6,7 +6,7 @@ import hardcorequesting.io.adapter.QuestTaskAdapter;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskAdvancement;
 
-  import java.io.IOException;
+import java.io.IOException;
 
   public class QuestDataTaskAdvancement extends QuestDataTask {
 

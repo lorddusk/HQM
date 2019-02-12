@@ -1,11 +1,6 @@
 package hardcorequesting.bag;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.logging.log4j.Level;
-
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
@@ -15,9 +10,12 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class GroupTier {
 
@@ -39,7 +37,7 @@ public class GroupTier {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
+            HardcoreQuesting.LOG.info("Failed to save bags to local file");
         }
     }
 
@@ -47,7 +45,7 @@ public class GroupTier {
         try {
             SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
+            HardcoreQuesting.LOG.info("Failed to save bags to the default file");
         }
     }
 
@@ -57,7 +55,7 @@ public class GroupTier {
             GroupTier.getTiers().clear();
             GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getFile("bags", remote)));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed to save bags");
+            HardcoreQuesting.LOG.info("Failed to load bags from the remote folder");
         }
     }
 

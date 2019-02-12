@@ -2,16 +2,12 @@ package hardcorequesting.integration;
 
 import de.canitzp.tumat.api.TUMATApi;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.integration.top.TheOneProbeIntegration;
 import hardcorequesting.integration.tumat.TumatIntegration;
-import mcjty.theoneprobe.api.ITheOneProbe;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
-import java.util.function.Function;
 
 public class IntegrationHandler{
     

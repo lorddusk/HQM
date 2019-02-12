@@ -2,7 +2,6 @@ package hardcorequesting.network;
 
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.GuiReward;
-import hardcorequesting.items.ItemQuestBook;
 import hardcorequesting.network.message.GeneralUpdateMessage;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;

@@ -1,10 +1,6 @@
 package hardcorequesting.client.interfaces;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.items.ItemBag;
@@ -16,6 +12,10 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class GuiReward extends GuiBase {
 

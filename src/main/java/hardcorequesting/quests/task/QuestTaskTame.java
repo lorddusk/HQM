@@ -1,10 +1,5 @@
 package hardcorequesting.quests.task;
 
-import java.util.Arrays;
-import java.util.UUID;
-
-import javax.annotation.Nonnull;
-
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -27,6 +22,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.UUID;
 
 public class QuestTaskTame extends QuestTask {
 

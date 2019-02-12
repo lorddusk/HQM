@@ -14,9 +14,7 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
-import net.minecraftforge.fml.common.FMLLog;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.lang.reflect.Type;

@@ -1,19 +1,6 @@
 package hardcorequesting.reputation;
 
-import static hardcorequesting.client.interfaces.GuiQuestBook.selectedReputation;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.logging.log4j.Level;
-
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -30,9 +17,13 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.IOException;
+import java.util.*;
+
+import static hardcorequesting.client.interfaces.GuiQuestBook.selectedReputation;
 
 public class Reputation {
 
@@ -281,7 +272,7 @@ public class Reputation {
         try {
             SaveHandler.loadReputations(SaveHandler.getFile("reputations", remote)).forEach(Reputation::addReputation);
         } catch (IOException ignored) {
-            FMLLog.log("HQM", Level.INFO, "Failed loading reputations");
+            HardcoreQuesting.LOG.info("Failed loading reputations from remote");
         }
     }
 
@@ -289,7 +280,7 @@ public class Reputation {
         try {
             SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
+            HardcoreQuesting.LOG.info("Failed saving reputations to local file");
         }
     }
 
@@ -297,7 +288,7 @@ public class Reputation {
         try {
             SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
         } catch (IOException e) {
-            FMLLog.log("HQM", Level.INFO, "Failed saving reputations");
+            HardcoreQuesting.LOG.info("Failed saving reputations to the default file");
         }
     }
 

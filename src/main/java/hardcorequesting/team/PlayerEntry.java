@@ -1,25 +1,19 @@
 package hardcorequesting.team;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.UUID;
-
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.event.EventTrigger;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.util.HQMUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Objects;
+import java.util.UUID;
 
 public class PlayerEntry {
 

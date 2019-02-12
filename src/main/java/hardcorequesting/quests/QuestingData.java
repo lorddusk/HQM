@@ -1,23 +1,12 @@
 package hardcorequesting.quests;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.config.HQMConfig;
-import net.minecraft.client.Minecraft;
-
 import com.mojang.authlib.GameProfile;
-
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.event.PlayerTracker;
 import hardcorequesting.io.SaveHandler;
@@ -29,6 +18,7 @@ import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.team.TeamUpdateSize;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -46,6 +36,8 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.*;
 
 public class QuestingData {
 
