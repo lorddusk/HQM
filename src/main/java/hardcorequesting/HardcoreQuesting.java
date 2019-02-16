@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION, acceptedMinecraftVersions = "[1.12)")
+@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION)
 public class HardcoreQuesting {
 
     @Instance(ModInformation.ID)
