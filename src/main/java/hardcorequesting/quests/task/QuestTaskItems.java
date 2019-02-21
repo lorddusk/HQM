@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -206,7 +207,12 @@ public abstract class QuestTaskItems extends QuestTask {
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
                 ItemStack stack = item.getStack();
-                List<String> str = stack.getTooltip(player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+                List<String> str;
+                if (stack.isEmpty()) {
+                    str = new ArrayList<>();
+                } else {
+                    str = stack.getTooltip(player, gui.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+                }
 
                 str.add(Translator.translate("hqm.questBook.itemRequirementProgress") + ": " + getProgress(player, i) + "/" + item.required);
                 if (Quest.canQuestsBeEdited()) {
