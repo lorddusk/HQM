@@ -6,6 +6,7 @@ import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.network.NetworkManager;
@@ -803,12 +804,14 @@ public class Quest {
     @SideOnly(Side.CLIENT)
     public int getColorFilter(EntityPlayer player, int tick) {
         if (canQuestsBeEdited() && !isVisible(player)) {
-            return 0x55FFFFFF;
+            return HQMConfig.QUEST_INVISIBLE;
         } else if (!isEnabled(player)) {
-            return 0xFF888888;
+            return HQMConfig.QUEST_DISABLED;
         } else if (!isAvailable(player) && !hasReward(player)) {
-            return getRepeatInfo().getType() == RepeatType.NONE ? 0xFFFFFFFF : 0xFFFFFFCC;
+            return getRepeatInfo().getType() == RepeatType.NONE ? HQMConfig.QUEST_COMPLETE : HQMConfig.QUEST_COMPLETE_REPEATABLE;
         } else {
+            if (HQMConfig.Interface.Quests.SINGLE_COLOUR) return HQMConfig.QUEST_AVAILABLE;
+
             int componentBase = 0xBB;
             int componentVariable = (int) (Math.abs(Math.sin(tick / 5F)) * 0x44);
 

@@ -4,6 +4,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
+import hardcorequesting.config.HQMConfig;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.QuestAdapter;
 import hardcorequesting.quests.task.QuestTask;
@@ -19,8 +20,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -118,8 +121,16 @@ public class QuestSet {
             int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
 
             int total = questSet.getQuests().size();
+
             boolean enabled = questSet.isEnabled(player, isVisibleCache, isLinkFreeCache);
-            int completedCount = enabled ? questSet.getCompletedCount(player, isVisibleCache, isLinkFreeCache) : 0; //no need to check for the completed count if it's not enabled
+
+            int completedCount; //no need to check for the completed count if it's not enabled
+            if (enabled) {
+                completedCount = questSet.getCompletedCount(player, isVisibleCache, isLinkFreeCache);
+            }
+            else {
+                completedCount = 0;
+            }
 
             boolean completed = true;
             int unclaimed = 0;
@@ -131,7 +142,46 @@ public class QuestSet {
             }
             boolean selected = questSet == GuiQuestBook.selectedSet;
             boolean inBounds = gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y);
-            int color = gui.modifyingQuestSet == questSet ? 0x4040DD : enabled ? completed ? selected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : selected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : 0x404040 : 0xDDDDDD;
+
+            int color;
+            if (gui.modifyingQuestSet == questSet) {
+                color = HQMConfig.CURRENTLY_MODIFYING_QUEST_SET;
+            }
+            else if (enabled) {
+                if (completed) {
+                    if (selected) {
+                        if (inBounds) {
+                            color = HQMConfig.COMPLETED_SELECTED_IN_BOUNDS_SET;
+                        }
+                        else {
+                            color = HQMConfig.COMPLETED_SELECTED_OUT_OF_BOUNDS_SET;
+                        }
+                    }
+                    else if (inBounds) {
+                        color = HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET;
+                    }
+                    else {
+                        color = HQMConfig.COMPLETED_UNSELECTED_OUT_OF_BOUNDS_SET;
+                    }
+                }
+                else if (selected) {
+                    if (inBounds) {
+                        color = HQMConfig.UNCOMPLETED_SELECTED_IN_BOUNDS_SET;
+                    }
+                    else {
+                        color = HQMConfig.UNCOMPLETED_SELECTED_OUT_OF_BOUNDS_SET;
+                    }
+                }
+                else if (inBounds) {
+                    color = HQMConfig.UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET;
+                }
+                else {
+                    color = HQMConfig.UNCOMPLETED_UNSELECTED_OUT_OF_BOUNDS_SET;
+                }
+            }
+            else {
+                color = HQMConfig.DISABLED_SET;
+            }
             gui.drawString(questSet.getName(i), GuiQuestBook.LIST_X, setY, color);
 
             String info;
@@ -475,7 +525,12 @@ public class QuestSet {
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-                gui.applyColor(quest == gui.modifyingQuest ? 0xFFBBFFBB : quest.getQuestId().equals(Quest.speciallySelectedQuestId) ? 0xFFF8BBFF : quest.getColorFilter(player, gui.getTick()));
+                int color;
+                if (quest == gui.modifyingQuest) color = 0xffbbffbb;
+                else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = 0xfff8bbff;
+                else color = quest.getColorFilter(player, gui.getTick());
+
+                gui.applyColor(color);
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
                 gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
 
