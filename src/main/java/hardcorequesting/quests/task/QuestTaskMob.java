@@ -15,6 +15,8 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -42,8 +44,12 @@ public class QuestTaskMob extends QuestTask {
     }
 
     public static EntityPlayer getKiller(LivingDeathEvent event) {
-        if (event.getEntityLiving() != null && !event.getEntityLiving().getEntityWorld().isRemote && event.getSource() != null) {
-            if (event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
+        Entity entity = event.getEntityLiving();
+
+        if (entity != null && entity.getEntityWorld().isRemote && event.getSource() != null) {
+            if (entity instanceof EntityTameable && ((EntityTameable) entity).isTamed()) {
+                return null;
+            } else if (event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
                 return (EntityPlayer) event.getSource().getTrueSource();
             } else if (event.getEntityLiving().getCommandSenderEntity() instanceof EntityPlayer) {
                 return (EntityPlayer) event.getEntityLiving().getCommandSenderEntity();
