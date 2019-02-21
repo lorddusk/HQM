@@ -1,7 +1,6 @@
 package hardcorequesting.commands;
 
 import com.mojang.authlib.GameProfile;
-import hardcorequesting.Lang;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
@@ -100,8 +99,8 @@ public class CommandHandler extends CommandBase {
                 command.handleCommand(sender, Arrays.copyOfRange(args, 1, args.length));
                 return;
             }
-            throw new CommandException(Lang.NO_PERMISSION);
+            throw new CommandException(CommandStrings.NO_PERMISSION);
         }
-        throw new CommandNotFoundException(Lang.NOT_FOUND);
+        throw new CommandNotFoundException(CommandStrings.NOT_FOUND);
     }
 }

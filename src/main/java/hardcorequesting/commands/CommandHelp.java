@@ -1,6 +1,5 @@
 package hardcorequesting.commands;
 
-import hardcorequesting.Lang;
 import hardcorequesting.util.Translator;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandNotFoundException;
@@ -45,7 +44,7 @@ public class CommandHelp extends CommandBase {
     public void handleCommand(ICommandSender sender, String[] arguments) throws CommandException {
         switch (arguments.length) {
             case 0:
-                StringBuilder output = new StringBuilder(Translator.translate(Lang.HELP_START) + " ");
+                StringBuilder output = new StringBuilder(Translator.translate(CommandStrings.HELP_START) + " ");
                 List<String> commands = new ArrayList<>();
                 for (ISubCommand command : CommandHandler.commands.values()) {
                     if (command.isVisible(sender)) commands.add(command.getCommandName());
@@ -62,19 +61,19 @@ public class CommandHelp extends CommandBase {
                 String commandName = arguments[0];
 
                 if (!CommandHandler.commandExists(commandName)) {
-                    throw new CommandNotFoundException(Lang.NOT_FOUND);
+                    throw new CommandNotFoundException(CommandStrings.NOT_FOUND);
                 }
                 ISubCommand command = CommandHandler.getCommand(commandName);
                 if (command.isVisible(sender)) {
                     for (int i : command.getSyntaxOptions(sender))
-                        sender.sendMessage(new TextComponentTranslation(YELLOW + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.SYNTAX_SUFFIX + i)
-                                + WHITE + " - " + Translator.translate(Lang.COMMAND_PREFIX + commandName + Lang.INFO_SUFFIX + i)));
+                        sender.sendMessage(new TextComponentTranslation(YELLOW + Translator.translate(CommandStrings.COMMAND_PREFIX + commandName + CommandStrings.SYNTAX_SUFFIX + i)
+                                + WHITE + " - " + Translator.translate(CommandStrings.COMMAND_PREFIX + commandName + CommandStrings.INFO_SUFFIX + i)));
                 } else {
-                    throw new CommandException(Lang.NO_PERMISSION);
+                    throw new CommandException(CommandStrings.NO_PERMISSION);
                 }
                 break;
             default:
-                throw new WrongUsageException(Lang.COMMAND_PREFIX + getCommandName() + Lang.SYNTAX_SUFFIX);
+                throw new WrongUsageException(CommandStrings.COMMAND_PREFIX + getCommandName() + CommandStrings.SYNTAX_SUFFIX);
         }
     }
 

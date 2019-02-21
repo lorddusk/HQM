@@ -1,6 +1,6 @@
-package hardcorequesting;
+package hardcorequesting.commands;
 
-public class Lang {
+public class CommandStrings {
 
     public static final String PREFIX = "hqm.";
 
