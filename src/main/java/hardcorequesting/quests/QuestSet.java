@@ -60,6 +60,7 @@ public class QuestSet {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void saveAll() {
         try {
             SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
