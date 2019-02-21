@@ -52,6 +52,7 @@ public class ItemQuestBook extends Item {
 
     @Nonnull
     @Override
+    @SuppressWarnings("deprecation")
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         if (world.isRemote && Quest.isEditing == true && !HQMUtil.isGameSingleplayer()) {
             Quest.setEditMode(false);
