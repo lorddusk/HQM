@@ -99,6 +99,20 @@ public class QuestTaskDeath extends QuestTask {
         }
     }
 
+    @Override
+    public void uncomplete(UUID playerId) {
+        super.uncomplete(playerId);
+
+        ((QuestDataTaskDeath) getData(playerId)).deaths = 0;
+    }
+
+    @Override
+    public void completeTask(UUID uuid) {
+        super.completeTask(uuid);
+        ((QuestDataTaskDeath) getData(uuid)).deaths = deaths;
+        completeQuest(parent, uuid);
+    }
+
     public int getDeaths() {
         return deaths;
     }

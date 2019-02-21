@@ -71,6 +71,7 @@ public final class OPBookHelper {
                 if (task != null) {
                     if (task.isCompleted(subject)) {
                         task.getData(subject).completed = false;
+                        task.uncomplete(subject.getUniqueID());
                         QuestingData.getQuestingData(subject).getTeam().resetCompletion(quest); // automatically reset progress
                     } else {
                         task.completeTask(subject.getPersistentID());

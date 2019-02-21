@@ -213,7 +213,6 @@ public abstract class QuestTask {
     public void completeTask(UUID uuid) {
         getData(uuid).completed = true;
         completeQuest(parent, uuid);
-        
     }
 
     @SideOnly(Side.CLIENT)
@@ -254,6 +253,9 @@ public abstract class QuestTask {
 
     public void autoComplete (UUID playerId) {
         autoComplete(playerId, true);
+    }
+
+    public void uncomplete (UUID playerId) {
     }
 
     public abstract void autoComplete(UUID playerId, boolean status);
