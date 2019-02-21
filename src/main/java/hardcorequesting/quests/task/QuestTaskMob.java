@@ -46,10 +46,11 @@ public class QuestTaskMob extends QuestTask {
     public static EntityPlayer getKiller(LivingDeathEvent event) {
         Entity entity = event.getEntityLiving();
 
-        if (entity != null && entity.getEntityWorld().isRemote && event.getSource() != null) {
+        if (entity != null && !entity.getEntityWorld().isRemote && event.getSource() != null) {
             if (entity instanceof EntityTameable && ((EntityTameable) entity).isTamed()) {
                 return null;
-            } else if (event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
+            }
+            if (event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof EntityPlayer) {
                 return (EntityPlayer) event.getSource().getTrueSource();
             } else if (event.getEntityLiving().getCommandSenderEntity() instanceof EntityPlayer) {
                 return (EntityPlayer) event.getEntityLiving().getCommandSenderEntity();
