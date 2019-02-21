@@ -2,7 +2,7 @@ package hardcorequesting.client.sounds;
 
 
 import com.google.common.collect.Sets;
-import hardcorequesting.ModInformation;
+import hardcorequesting.HardcoreQuesting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -30,7 +30,7 @@ public enum Sounds {
 
     public static void initSounds() {
         for (Sounds sound : Sounds.values()) {
-            SoundEvent event = registerSound(new ResourceLocation(ModInformation.ID, sound.getSoundName()));
+            SoundEvent event = registerSound(new ResourceLocation(HardcoreQuesting.ID, sound.getSoundName()));
             sounds.put(sound, event);
         }
     }

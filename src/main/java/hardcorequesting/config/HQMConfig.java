@@ -1,7 +1,6 @@
 package hardcorequesting.config;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.ModInformation;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.items.ItemBag;
 import hardcorequesting.quests.Quest;
@@ -13,9 +12,9 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Config(modid = ModInformation.ID)
+@Config(modid = HardcoreQuesting.ID)
 @Config.RequiresMcRestart
-@Mod.EventBusSubscriber(modid = ModInformation.ID)
+@Mod.EventBusSubscriber(modid = HardcoreQuesting.ID)
 public class HQMConfig {
 
     @Config.Comment("Settings related to hardcore mode")
@@ -140,7 +139,7 @@ public class HQMConfig {
 
     @SubscribeEvent
     public void onConfigChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equalsIgnoreCase(ModInformation.ID))
+        if (event.getModID().equalsIgnoreCase(HardcoreQuesting.ID))
             loadConfig();
     }
 

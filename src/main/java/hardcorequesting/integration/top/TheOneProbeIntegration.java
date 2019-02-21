@@ -1,6 +1,6 @@
 package hardcorequesting.integration.top;
 
-import hardcorequesting.ModInformation;
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.blocks.BlockDelivery;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.TileEntityBarrel;
@@ -27,7 +27,7 @@ public class TheOneProbeIntegration implements Function<ITheOneProbe, Void>, IPr
     
     @Override
     public String getID(){
-        return new ResourceLocation(ModInformation.ID, "top_integration").toString();
+        return new ResourceLocation(HardcoreQuesting.ID, "top_integration").toString();
     }
     
     @Override

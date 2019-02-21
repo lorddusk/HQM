@@ -1,7 +1,7 @@
 package hardcorequesting.blocks;
 
 
-import hardcorequesting.ModInformation;
+import hardcorequesting.HardcoreQuesting;
 
 public abstract class BlockInfo {
 
@@ -12,7 +12,7 @@ public abstract class BlockInfo {
     public static final String QUEST_TRACKER_TE_KEY = "QuestTracker";
     public static final String QUEST_PORTAL_UNLOCALIZED_NAME = "quest_portal";
     public static final String QUEST_PORTAL_TE_KEY = "QuestPortal";
-    public static final String TILEENTITY_PREFIX = ModInformation.ID + "_";
+    public static final String TILEENTITY_PREFIX = HardcoreQuesting.ID + "_";
 
     private BlockInfo() {
     }

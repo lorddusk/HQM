@@ -1,7 +1,7 @@
 package hardcorequesting.network;
 
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.ModInformation;
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.network.message.*;
 import hardcorequesting.tileentity.IBlockSync;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,7 +17,7 @@ import java.io.StringWriter;
 
 public class NetworkManager {
 
-    private static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(ModInformation.CHANNEL);
+    private static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(HardcoreQuesting.CHANNEL);
     private static int id = 0;
 
     public static void init() {

@@ -36,10 +36,16 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = ModInformation.ID, name = ModInformation.NAME, version = ModInformation.VERSION)
+@Mod(modid = HardcoreQuesting.ID, name = HardcoreQuesting.NAME, version = HardcoreQuesting.VERSION)
 public class HardcoreQuesting {
 
-    @Instance(ModInformation.ID)
+    public static final String ID = "hardcorequesting";
+    public static final String VERSION = "@VERSION@";
+    public static final String CHANNEL = "hcQuesting";
+    public static final String CONFIG_LOC_NAME = "hqm";
+    public static final String SOUNDLOC = "hardcorequesting";
+
+    @Instance(ID)
     public static HardcoreQuesting instance;
 
     @SidedProxy(clientSide = "hardcorequesting.proxies.ClientProxy", serverSide = "hardcorequesting.proxies.CommonProxy")
@@ -51,8 +57,9 @@ public class HardcoreQuesting {
     public static File configDir;
 
     public static Side loadingSide;
-    
-    public static final Logger LOG = LogManager.getFormatterLogger(ModInformation.NAME);
+
+    public static final String NAME = "Hardcore Questing Mode";
+    public static final Logger LOG = LogManager.getFormatterLogger(NAME);
 
     private static EntityPlayer commandUser;
 
@@ -69,7 +76,7 @@ public class HardcoreQuesting {
         loadingSide = event.getSide();
         new EventTrigger();
 
-        path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + ModInformation.CONFIG_LOC_NAME.toLowerCase() + File.separator;
+        path = event.getModConfigurationDirectory().getAbsolutePath() + File.separator + CONFIG_LOC_NAME.toLowerCase() + File.separator;
         configDir = new File(path);
         QuestLine.init(path);
 

@@ -1,7 +1,7 @@
 package hardcorequesting.client.sounds;
 
 import com.google.common.collect.Lists;
-import hardcorequesting.ModInformation;
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
@@ -67,7 +67,7 @@ public class SoundHandler {
                     return false;
                 }
                 try {
-                    method.invoke(handler, new ResourceLocation(ModInformation.SOUNDLOC, LABEL + number), list);
+                    method.invoke(handler, new ResourceLocation(HardcoreQuesting.SOUNDLOC, LABEL + number), list);
                     loreMusic = true;
                     loreNumber = number;
                     paths.add(path);
@@ -102,7 +102,7 @@ public class SoundHandler {
 
     @SideOnly(Side.CLIENT)
     private static ISound play(String sound, float volume, float pitch) {
-        return play(new ResourceLocation(ModInformation.SOUNDLOC, sound), volume, pitch);
+        return play(new ResourceLocation(HardcoreQuesting.SOUNDLOC, sound), volume, pitch);
     }
 
     @SideOnly(Side.CLIENT)
