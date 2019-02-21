@@ -19,6 +19,7 @@ hqm.message.lostLife=You just lost a life. You have %s [[live||lives]] left
 hqm.message.lostTeamLife=%s just lost a life %s. You have %s [[live||lives]] left
 hqm.message.andBanned=and got banned
 hqm.message.gameOver=You're out of lives. Game over, man, it's game over!
+hqm.message.singlePlayerHardcore=BAM BAM!!! You're dead! Game over! (Hardcore doesn't really work in Single Player. Try deleting your world and starting over!)
 hqm.message.vanillaHardcore=Hardcore mode don't work together with vanilla hardcore mode. Will try to disable it...
 hqm.message.vanillaHardcoreOn=Vanilla hardcore mode is already enabled. Can't enable Hardcore Mode.
 hqm.message.vanillaHardcoreOverride=Vanilla hardcore mode has now been disabled. Please reopen your world for the change to take full effect.

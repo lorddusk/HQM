@@ -453,19 +453,7 @@ public class QuestingData {
         MinecraftServer mcServer = player.getServer();
 
         if (mcServer.isSinglePlayer() && player.getName().equals(mcServer.getServerOwner())) {
-            ((EntityPlayerMP) player).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
-
-            /*ReflectionHelper.setPrivateValue(MinecraftServer.class, mcServer, true, 41);
-            mcServer.getActiveAnvilConverter().flushCache();
-
-            mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectoryName());
-            mcServer.initiateShutdown();*/
-            // @todo: is this correct? lets fucking not delete the world
-            //mcServer.getActiveAnvilConverter().flushCache();
-            //mcServer.getActiveAnvilConverter().deleteWorldDirectory(mcServer.worldServers[0].getSaveHandler().getWorldDirectory().getName());
-            //mcServer.initiateShutdown();
-//            mcServer.deleteWorldAndStopServer();
-
+            player.sendStatusMessage(new TextComponentTranslation("hqm.message.singlePlayerHardcore"), true);
         } else {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";
