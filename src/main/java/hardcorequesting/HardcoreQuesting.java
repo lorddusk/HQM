@@ -91,7 +91,14 @@ public class HardcoreQuesting {
         ModItems.init();
         
         MinecraftForge.EVENT_BUS.register(instance);
-    
+
+        File hqmconfig = new File(path, "hqmconfig.cfg");
+        File editmode = new File(path, "editmode.cfg");
+
+        if (hqmconfig.exists() || editmode.exists()) {
+            HQMConfig.handleOldConfig(hqmconfig, editmode);
+        }
+
         IntegrationHandler.preInit(event, this);
     }
 
