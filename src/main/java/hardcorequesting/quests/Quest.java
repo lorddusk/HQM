@@ -1088,7 +1088,10 @@ public class Quest {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                  if (gui.getCurrentMode() == EditMode.NORMAL) {
                     int lastDiff = player.ticksExisted - lastClicked;
-                    if (lastDiff < 6) {
+                    if (lastDiff < 0) {
+                        lastClicked = player.ticksExisted;
+                    }
+                    else if (lastDiff < 6) {
                         doubleClick = true;
                     } else {
                         lastClicked = player.ticksExisted;
