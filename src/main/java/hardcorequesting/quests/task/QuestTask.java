@@ -22,8 +22,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -314,5 +316,11 @@ public abstract class QuestTask {
     }
 
     public void onBlockBroken(BlockEvent.BreakEvent event) {
+    }
+
+    public void onItemUsed (PlayerInteractEvent.RightClickItem event) {
+    }
+
+    public void onItemUsed (PlayerInteractEvent.RightClickBlock event) {
     }
 }
