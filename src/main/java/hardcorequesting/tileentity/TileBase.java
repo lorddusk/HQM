@@ -67,11 +67,7 @@ public class TileBase extends TileEntity{
     
     public void syncToClientsNearby(){
         if(!this.world.isRemote){
-            for(EntityPlayer player : this.world.playerEntities){
-                if(player instanceof EntityPlayerMP){
-                    ((EntityPlayerMP) player).connection.sendPacket(this.getUpdatePacket());
-                }
-            }
+            this.world.getMinecraftServer().getPlayerList().sendToAllNearExcept(null, pos.getX(), pos.getY(), pos.getZ(), 128, this.world.provider.getDimension(), this.getUpdatePacket());
         }
     }
     
