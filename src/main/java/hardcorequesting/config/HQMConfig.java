@@ -117,6 +117,7 @@ public class HQMConfig {
         public String[] HOTKEYS = new String[]{"D:delete", "N:create", "M:move", "INSERT:create", "R:rename", "DELETE:delete", "SPACE:normal", "S:swap", "S:swap_select"};
     }
 
+    @SuppressWarnings("deprecation")
     public static void loadConfig() {
         int maxlives = HQMConfig.Hardcore.MAX_LIVES;
         int lives = HQMConfig.Hardcore.DEFAULT_LIVES;
