@@ -239,7 +239,10 @@ public abstract class QuestTaskItems extends QuestTask {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                     int lastDiff = player.ticksExisted - lastClicked;
-                    if (lastDiff < 6) {
+                    if (lastDiff < 0) {
+                        lastClicked = player.ticksExisted;
+                    }
+                    else if (lastDiff < 6) {
                         doubleClick = true;
                     } else {
                         lastClicked = player.ticksExisted;

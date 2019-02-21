@@ -314,7 +314,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
                         selected.setAmount(1);
                     }
                     int lastDiff = player.ticksExisted - lastClicked;
-                    if (lastDiff < 6 && !selected.isEmpty()) {
+                    if (lastDiff < 0) {
+                        lastClicked = player.ticksExisted;
+                    } else if (lastDiff < 6 && !selected.isEmpty()) {
                         save(gui);
                         close(gui);
                         return true;

@@ -245,6 +245,11 @@ public class QuestSet {
                         break;
                     default:
                         int thisClicked = gui.getPlayer().ticksExisted - lastClicked;
+
+                        if (thisClicked < 0) {
+                            lastClicked = -1;
+                        }
+
                         if (lastClicked != -1 && thisClicked < 6) {
                             if (GuiQuestBook.selectedSet == null && lastLastQuestSet != null) GuiQuestBook.selectedSet = lastLastQuestSet;
                             gui.openSet();
