@@ -82,6 +82,14 @@ public class Team {
         refreshData();
     }
 
+    public void resetCompletion(Quest quest) {
+        QuestData data = getQuestData(quest.getQuestId());
+        data.completed = false;
+        data.claimed = false;
+        data.available = true;
+        refreshData();
+    }
+
     public Map<UUID, QuestData> getQuestData() {
         return this.questData;
     }
