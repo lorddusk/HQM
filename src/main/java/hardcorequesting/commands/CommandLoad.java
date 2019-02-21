@@ -11,8 +11,7 @@ import hardcorequesting.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -62,7 +61,8 @@ public class CommandLoad extends CommandBase {
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
             QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
-                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, set.getName())));
+
+                sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, set.getName()));
             } else {
                 throw new CommandException(CommandStrings.LOAD_FAILED);
             }
@@ -84,7 +84,7 @@ public class CommandLoad extends CommandBase {
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
                     Reputation.addReputation(reputation);
-                    sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
+                    sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, "Reputation: " + reputation.getName()));
                 } else {
                     throw new CommandException(CommandStrings.LOAD_FAILED);
                 }
@@ -106,7 +106,7 @@ public class CommandLoad extends CommandBase {
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
-                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, "Bags")));
+                sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, "Bags"));
             } else {
                 throw new CommandException(CommandStrings.LOAD_FAILED);
             }
