@@ -58,6 +58,13 @@ public class EventTrigger{
     }
 
     @SubscribeEvent
+    public void onPlayerLogin (PlayerEvent.PlayerLoggedInEvent event) {
+        for (List<QuestTask> list : registeredTasks) {
+            list.removeIf((q) -> !q.isValid());
+        }
+    }
+
+    @SubscribeEvent
     public void onEvent(TickEvent.ServerTickEvent event) {
         for (QuestTask task : getTasks(Type.SERVER)) {
             task.onServerTick(event);
