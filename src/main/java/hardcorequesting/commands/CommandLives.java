@@ -1,6 +1,5 @@
 package hardcorequesting.commands;
 
-import hardcorequesting.Lang;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.CommandException;
@@ -52,7 +51,7 @@ public class CommandLives extends CommandBase {
             currentLives((EntityPlayer) sender);
 
         if (!isPlayerOp(sender))
-            throw new CommandException(Lang.NO_PERMISSION);
+            throw new CommandException(CommandStrings.NO_PERMISSION);
 
         if (arguments.length == 1) {
             if (arguments[0].matches(REMOVE)) {

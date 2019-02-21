@@ -1,7 +1,6 @@
 package hardcorequesting.commands;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.Lang;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.QuestAdapter;
@@ -56,26 +55,26 @@ public class CommandLoad extends CommandBase {
 
     private void loadSet(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
-            throw new CommandException(Lang.FILE_NOT_FOUND);
+            throw new CommandException(CommandStrings.FILE_NOT_FOUND);
         }
         try {
             if (sender instanceof EntityPlayer)
                 HardcoreQuesting.setPlayer((EntityPlayer) sender);
             QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
-                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, set.getName())));
+                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, set.getName())));
             } else {
-                throw new CommandException(Lang.LOAD_FAILED);
+                throw new CommandException(CommandStrings.LOAD_FAILED);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CommandException(Lang.LOAD_FAILED);
+            throw new CommandException(CommandStrings.LOAD_FAILED);
         }
     }
 
     private void loadReputation(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
-            throw new CommandException(Lang.FILE_NOT_FOUND);
+            throw new CommandException(CommandStrings.FILE_NOT_FOUND);
         }
         try {
             if (sender instanceof EntityPlayer)
@@ -85,20 +84,20 @@ public class CommandLoad extends CommandBase {
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
                     Reputation.addReputation(reputation);
-                    sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
+                    sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, "Reputation: " + reputation.getName())));
                 } else {
-                    throw new CommandException(Lang.LOAD_FAILED);
+                    throw new CommandException(CommandStrings.LOAD_FAILED);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CommandException(Lang.LOAD_FAILED);
+            throw new CommandException(CommandStrings.LOAD_FAILED);
         }
     }
 
     private void loadBags(ICommandSender sender, File file) throws CommandException {
         if (!file.exists()) {
-            throw new CommandException(Lang.FILE_NOT_FOUND);
+            throw new CommandException(CommandStrings.FILE_NOT_FOUND);
         }
         try {
             if (sender instanceof EntityPlayer)
@@ -107,13 +106,13 @@ public class CommandLoad extends CommandBase {
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
-                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(Lang.LOAD_SUCCESS, "Bags")));
+                sender.sendMessage(new TextComponentString(I18n.translateToLocalFormatted(CommandStrings.LOAD_SUCCESS, "Bags")));
             } else {
-                throw new CommandException(Lang.LOAD_FAILED);
+                throw new CommandException(CommandStrings.LOAD_FAILED);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CommandException(Lang.LOAD_FAILED);
+            throw new CommandException(CommandStrings.LOAD_FAILED);
         }
     }
 
