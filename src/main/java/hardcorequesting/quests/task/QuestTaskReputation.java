@@ -32,6 +32,10 @@ public abstract class QuestTaskReputation extends QuestTask {
         return settings;
     }
 
+    public void setSettings (ReputationSetting[] newSettings) {
+        this.settings = newSettings;
+    }
+
     public void setSetting(int id, ReputationSetting setting) {
         if (id >= settings.length) {
             settings = Arrays.copyOf(settings, settings.length + 1);

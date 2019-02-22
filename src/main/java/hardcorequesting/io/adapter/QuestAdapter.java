@@ -521,18 +521,6 @@ public class QuestAdapter {
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();
-        for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
-            List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();
-            for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {
-                QuestTaskReputation.ReputationSetting setting = constructor.constructReuptationSetting();
-                if (setting != null) {
-                    reputationSettingList.add(setting);
-                }
-            }
-            ReflectionHelper.setPrivateValue(QuestTaskReputation.class, entry.getKey(), reputationSettingList.toArray(new QuestTaskReputation.ReputationSetting[reputationSettingList.size()]), "settings");
-        }
-        QuestTaskAdapter.taskReputationListMap.clear();
         nameToQuestMap.clear();
     }
-
 }

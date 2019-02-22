@@ -210,6 +210,7 @@ public class QuestTaskAdapter {
                         break;
                 }
             }
+            in.endObject();
             return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
         }
     };
@@ -546,17 +547,16 @@ public class QuestTaskAdapter {
                     in.endArray();
                     ((QuestTaskMob) TASK).mobs = list.toArray(new QuestTaskMob.Mob[list.size()]);
                 } else if (TASK instanceof QuestTaskReputation && name.equalsIgnoreCase(REPUTATION)) {
-                    List<ReputationSettingConstructor> list = new ArrayList<>();
+                    List<QuestTaskReputation.ReputationSetting> list = new ArrayList<>();
                     in.beginArray();
                     while (in.hasNext()) {
-                        ReputationSettingConstructor constructor = ReputationSettingConstructor.read(in);
-                        if (constructor != null) {
-                            list.add(constructor);
+                        QuestTaskReputation.ReputationSetting setting = REPUTATION_TASK_ADAPTER.read(in);
+                        if (setting != null) {
+                            list.add(setting);
                         }
                     }
                     in.endArray();
-                    taskReputationListMap.put((QuestTaskReputation) TASK, list);
-//                    ReflectionHelper.setPrivateValue(QuestTaskReputation.class, (QuestTaskReputation) TASK, list.toArray(new QuestTaskReputation.ReputationSetting[list.size()]), "settings");
+                    ((QuestTaskReputation) TASK).setSettings(list.toArray(new QuestTaskReputation.ReputationSetting[0]));
                 } else if (name.equalsIgnoreCase(KILLS) && TASK instanceof QuestTaskReputationKill) {
                     ((QuestTaskReputationKill) TASK).setKills(in.nextInt());
                 }
