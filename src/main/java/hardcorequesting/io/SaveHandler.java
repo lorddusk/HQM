@@ -208,7 +208,13 @@ public class SaveHandler {
     public static QuestSet loadQuestSet(File file) throws IOException {
         if (!file.exists()) return null;
         JsonReader reader = new JsonReader(new FileReader(file));
-        QuestSet set = GSON.fromJson(reader, QuestSet.class);
+        QuestSet set;
+        try {
+            set = GSON.fromJson(reader, QuestSet.class);
+        } catch (JsonSyntaxException e) {
+            HardcoreQuesting.LOG.error(String.format("Error loading quest set: %s", file.getName()), e);
+            throw e;
+        }
         reader.close();
         return set;
     }

@@ -10,7 +10,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-public class QuestTaskBlockPlace extends QuestTaskItems {
+public class QuestTaskBlockPlace extends QuestTaskBlock {
     public QuestTaskBlockPlace(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
 

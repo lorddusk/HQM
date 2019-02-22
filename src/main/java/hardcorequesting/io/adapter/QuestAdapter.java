@@ -331,7 +331,14 @@ public class QuestAdapter {
                     case TASKS:
                         in.beginArray();
                         while (in.hasNext()) {
-                            QuestTask task = QuestTaskAdapter.TASK_ADAPTER.read(in);
+
+                            QuestTask task;
+                            try {
+                                task = QuestTaskAdapter.TASK_ADAPTER.read(in);
+                            } catch (IllegalStateException e) {
+                                HardcoreQuesting.LOG.error(String.format("Illegal state while reading task for %s (task size %d)", QUEST.getName(), QUEST.getTasks().size()), e);
+                                throw e;
+                            }
                             if (task != null) {
                                 QUEST.getTasks().add(task);
 
