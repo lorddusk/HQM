@@ -7,14 +7,10 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.RewardSetting;
-import net.minecraftforge.common.config.*;
+import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
-import java.io.File;
-import java.lang.reflect.Method;
 
 import static net.minecraftforge.common.config.Config.*;
 
@@ -267,98 +263,5 @@ public class HQMConfig {
             @Comment("Set to true to disable the default colour pulse and use the colour specified above")
             public boolean SINGLE_COLOUR = false;
         }
-    }
-
-    public static void handleOldConfig (File hqmconfig, File editmode) {
-        Method getConfig = ReflectionHelper.findMethod(ConfigManager.class, "getConfiguration", null, String.class, String.class);
-        getConfig.setAccessible(true);
-
-        Configuration currentConfig;
-
-        try {
-            currentConfig = (Configuration) getConfig.invoke(null, HardcoreQuesting.ID, null);
-        } catch (ReflectiveOperationException e) {
-            HardcoreQuesting.LOG.info("Unable to load internal configuration to import old configuration files", e);
-            return;
-        }
-
-        ConfigCategory general = currentConfig.getCategory("general");
-        ConfigCategory editor = currentConfig.getCategory("general.editing settings");
-        ConfigCategory hardcore = currentConfig.getCategory("general.hardcore settings");
-        ConfigCategory loot = currentConfig.getCategory("general.loot settings");
-        ConfigCategory startSettings = currentConfig.getCategory("general.server start settings");
-
-        String G = "General";
-
-        if (hqmconfig.exists()) {
-            Configuration hqmConfig = new Configuration(hqmconfig);
-
-            String LIVES_KEY = "Default lives";
-
-            int default_lives = hqmConfig.get(G, LIVES_KEY, -1, "").getInt();
-            if (default_lives != -1) {
-                hardcore.get("Default lives").set(default_lives);
-            }
-
-            String AUTO_KEY = "Auto-start hardcore mode";
-            boolean auto_start = hqmConfig.get(G, AUTO_KEY, false, "").getBoolean();
-            startSettings.get("Auto-start hardcore mode").set(auto_start);
-
-            String AUTO_QUEST_KEY = "Auto-start questing mode";
-            boolean auto_quest = hqmConfig.get(G, AUTO_QUEST_KEY, false, "").getBoolean();
-            startSettings.get("Auto-start questing mode").set(auto_quest);
-
-            String SPAWNBOOK_KEY = "SpawnBook";
-            boolean spawnbook = hqmConfig.get(G, SPAWNBOOK_KEY, false, "").getBoolean();
-            general.get("Enable spawn with book").set(spawnbook);
-
-            String MULTI_REWARD_KEY = "MultiReward";
-            boolean multireward = hqmConfig.get(G, MULTI_REWARD_KEY, false, "").getBoolean();
-            general.get("All in party get rewards").set(multireward);
-
-            String SYNC_KEY = "ServerSync";
-            boolean sync = hqmConfig.get(G, SYNC_KEY, false, "").getBoolean();
-            startSettings.get("Enable server sync").set(sync);
-
-            String REWARD_KEY = "RewardInterface";
-            boolean reward = hqmConfig.get(G, REWARD_KEY, false, "").getBoolean();
-            loot.get("Display reward interface").set(reward);
-
-            String FRESHNESS_KEY = "RotTimer";
-            boolean fresh = hqmConfig.get(G, FRESHNESS_KEY, false, "").getBoolean();
-            hardcore.get("Enable rot timer").set(fresh);
-
-            String ROT_KEY = "RotTime";
-            int rot = hqmConfig.get(G, ROT_KEY, -1, "").getInt();
-            if (rot != -1) {
-                hardcore.get("Heart Rot Timer in Seconds").set(rot);
-            }
-
-            String ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY = "AlwaysUseTierNameForRewardTitles";
-            boolean always = hqmConfig.get(G, ALWAYS_USE_TIER_NAME_FOR_REWARD_TITLES_KEY, false, "").getBoolean();
-            loot.get("Always use tier name for reward titles").set(always);
-
-            String LOSE_QUEST_BOOK_ON_DEATH_KEY = "LoseQuestBookOnDeath";
-            boolean book = hqmConfig.get(G, LOSE_QUEST_BOOK_ON_DEATH_KEY, false, "").getBoolean();
-            general.get("Lose quest book upon death").set(book);
-        }
-
-        if (editmode.exists()) {
-            Configuration editConfig = new Configuration(editmode);
-
-            String EDITOR_KEY = "UseEditor";
-            boolean default_editor = editConfig.get(G, EDITOR_KEY, false, "").getBoolean();
-            editor.get("Enable edit mode by default").set(default_editor);
-
-            String SAVE_DEFAULT_KEY = "SaveDefault";
-            boolean save_default = editConfig.get(G, SAVE_DEFAULT_KEY, false, "").getBoolean();
-            editor.get("Save quests in default folder").set(save_default);
-
-            String KEYMAP_KEY = "KeyMap";
-            String[] keymap = editConfig.get(G, KEYMAP_KEY, new String[]{}, "").getStringList();
-            editor.get("Hotkeys").set(keymap);
-        }
-
-        currentConfig.save();
     }
 }
