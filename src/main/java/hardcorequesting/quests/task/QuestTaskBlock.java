@@ -16,6 +16,9 @@ import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.world.BlockEvent;
 
 import java.lang.reflect.Method;
@@ -112,7 +115,9 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     }
 
     public void checkProgress(BlockEvent event, IBlockState state, EntityPlayer player) {
-        ItemStack drop = state.getBlock().getPickBlock(state, null, event.getWorld(), event.getPos(), player);
+        BlockPos pos = event.getPos();
+        Vec3d hit = new Vec3d(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5);
+        ItemStack drop = state.getBlock().getPickBlock(state, new RayTraceResult(hit, player.getHorizontalFacing(), pos), event.getWorld(), event.getPos(), player);
 
         /* * * CUSTOM OVERRIDES * * * /
                  THESE ARE
