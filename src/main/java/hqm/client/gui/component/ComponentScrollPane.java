@@ -1,16 +1,10 @@
 package hqm.client.gui.component;
 
-import hqm.HQM;
 import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
-import hqm.client.gui.IRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +36,7 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> ex
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
         left += this.getXOffset();
         top += this.getYOffset();
         if(this.height > 0){
@@ -56,23 +50,25 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> ex
         }
         if(this.side == side){
             gui.bindTexture(LOC);
+            /* todo implement with 1.15 mappings
             GlStateManager.pushMatrix();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             gui.drawTexturedModalRect(left + width - WIDTH_BAR, top, 171, 69, 7, height);
-            gui.drawTexturedModalRect(left + width - WIDTH_BAR + 1 , top + 1 /*scroll offset calc is missing*/, 250, 167, 5, 6);
+            gui.drawTexturedModalRect(left + width - WIDTH_BAR + 1 , top + 1/*scroll offset calc is missing*//*, 250, 167, 5, 6);
             GlStateManager.popMatrix();
+            */
         }
     }
 
     @Override
-    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
         this.components.keySet().forEach(t -> t.clickRaw(gui, left, top, width, height, mouseX, mouseY, mouseButton, side));
         if(this.currentlyClicked != null){
             this.currentlyClicked.unClicked(gui, mouseX, mouseY, mouseButton, side);
         }
         if(this.side == side){
             int lowest = this.getLowestHeight(height);
-            int i = ((mouseY - top) / lowest - (this.scrollPosition / lowest)-1) * lowest + lowest;
+            double i = ((mouseY - top) / lowest - (this.scrollPosition / lowest)-1) * lowest + lowest;
             for(Map.Entry<T, Integer> entry : this.components.entrySet()) {
                 if(entry.getValue() == i){
                     entry.getKey().click(gui, left, top + this.scrollPosition + entry.getValue(), width - WIDTH_BAR - 1, height, mouseX, mouseY, mouseButton, side);
@@ -84,7 +80,7 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> ex
     }
 
     @Override
-    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, IPage.Side side) {
+    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int scroll, IPage.Side side) {
         if(this.side == side){
             int lowest = getLowestHeight(height);
             int scrollFactor = (int) (scroll / 120.0F);
@@ -115,12 +111,12 @@ public class ComponentScrollPane<T extends ComponentScrollPane.IScrollRender> ex
     }
 
     public  interface IScrollRender{
-        void render(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side);
-        void renderRaw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side);
+        void render(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side);
+        void renderRaw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side);
         int getHeight();
-        default void click(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side){}
-        default void clickRaw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side){}
-        default void unClicked(GuiQuestBook gui, int mouseX, int mouseY, int mouseButton, IPage.Side side){}
+        default void click(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side){}
+        default void clickRaw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side){}
+        default void unClicked(GuiQuestBook gui, double mouseX, double mouseY, int mouseButton, IPage.Side side){}
     }
 
 }

@@ -2,23 +2,19 @@ package hqm.client.gui;
 
 import hqm.HQM;
 import hqm.client.gui.page.MainPage;
-import hqm.net.HQMPacket;
-import hqm.net.NetActions;
 import hqm.net.Networker;
 import hqm.quest.Questbook;
 import hqm.quest.SaveHandler;
 import hqm.quest.Team;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Mouse;
+import net.minecraft.util.text.StringTextComponent;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * @author canitzp
  */
-public class GuiQuestBook extends GuiScreen {
+public class GuiQuestBook extends Screen{
 
     public static final ResourceLocation LOC_PAGE = new ResourceLocation(HQM.MODID, "textures/gui/book.png");
     public static final ResourceLocation QUESTMAP = new ResourceLocation(HQM.MODID, "textures/gui/questmap.png");
@@ -35,15 +31,16 @@ public class GuiQuestBook extends GuiScreen {
 
     private final UUID questbookId;
     public int guiLeft, guiTop, xSize = 340, ySize = 234;
-    private int lastX, lastY;
+    private double lastX, lastY;
     private ArrayDeque<IPage> lastPages = new ArrayDeque<>();
     private IPage currentPage, rewindButtonPage;
     private List<IRenderer> renderer = new CopyOnWriteArrayList<>();
     private Team team;
     private ItemStack book;
-    private EntityPlayer player;
+    private PlayerEntity player;
 
-    public GuiQuestBook(UUID questbookId, EntityPlayer player, ItemStack book){
+    public GuiQuestBook(UUID questbookId, PlayerEntity player, ItemStack book){
+        super(new StringTextComponent("QuestBook"));
         this.questbookId = questbookId;
         this.team = this.getQuestbook().getTeam(player);
         this.book = book;
@@ -53,7 +50,7 @@ public class GuiQuestBook extends GuiScreen {
     public Questbook getQuestbook(){
         Questbook questbook = SaveHandler.QUEST_DATA.get(this.questbookId);
         if(questbook == null){
-            Minecraft.getMinecraft().displayGuiScreen(null);
+            Minecraft.getInstance().displayGuiScreen(null);
         }
         return questbook;
     }
@@ -63,8 +60,8 @@ public class GuiQuestBook extends GuiScreen {
     }
 
     public void tryToLoadPage(ItemStack stack) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if(!stack.isEmpty() && stack.hasTagCompound()){
-            String clazz = stack.getTagCompound().getString("PageClass");
+        if(!stack.isEmpty() && stack.hasTag()){
+            String clazz = stack.getTag().getString("PageClass");
             if(!clazz.isEmpty()){
                 Class c = Class.forName(clazz);
                 if(c != null && IPage.class.isAssignableFrom(c)){
@@ -95,11 +92,11 @@ public class GuiQuestBook extends GuiScreen {
     }
 
     public void bindTexture(ResourceLocation loc){
-        this.mc.getTextureManager().bindTexture(loc);
+        this.getMinecraft().getTextureManager().bindTexture(loc);
     }
 
     @Override
-    public void initGui() {
+    public void init() {
         this.guiLeft = (this.width - this.xSize) / 2;
         this.guiTop = (this.height - this.ySize) / 2;
         if(this.currentPage == null){
@@ -108,7 +105,8 @@ public class GuiQuestBook extends GuiScreen {
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        /* todo when 1.15 mappings are out
         GlStateManager.pushMatrix();
         this.bindTexture(LOC_PAGE);
         this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, xSize / 2, ySize);
@@ -139,12 +137,12 @@ public class GuiQuestBook extends GuiScreen {
                 this.drawTexturedModalRect(guiLeft + 162, guiTop + 217, isMouseOver ? 14 : 0, 104, 14, 9);
             }
             GlStateManager.popMatrix();
-        }
+        }*/
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
+        //super.mouseClicked(mouseX, mouseY, mouseButton);
         int left = this.guiLeft + PAGE_START_X;
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH + 20 && mouseY >= top && mouseY <= top + PAGE_HEIGHT + 20){
@@ -164,11 +162,12 @@ public class GuiQuestBook extends GuiScreen {
         }
         this.lastX = mouseX;
         this.lastY = mouseY;
+        return true;
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
-        super.mouseReleased(mouseX, mouseY, mouseButton);
+    public boolean mouseReleased(double mouseX, double mouseY, int mouseButton) {
+        //super.mouseReleased(mouseX, mouseY, mouseButton);
         int left = this.guiLeft + PAGE_START_X;
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH + 20 && mouseY >= top && mouseY <= top + PAGE_HEIGHT + 20){
@@ -184,27 +183,32 @@ public class GuiQuestBook extends GuiScreen {
         }
         this.lastX = 0;
         this.lastY = 0;
+        return true;
     }
 
     @Override
-    protected void mouseClickMove(int mouseX, int mouseY, int mouseButton, long timeSinceLastClick) {
-        super.mouseClickMove(mouseX, mouseY, mouseButton, timeSinceLastClick);
+    public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double unknown1, double unknown2) {
+        //super.mouseDragged(mouseX, mouseY, mouseButton, unknown1, unknown2);
         int left = this.guiLeft + PAGE_START_X;
         int top = this.guiTop + PAGE_START_Y;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick, IPage.Side.LEFT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton, IPage.Side.LEFT));
         }
         left += PAGE_SECOND_OFFSET + PAGE_WIDTH;
         if(mouseX >= left && mouseX <= left + PAGE_WIDTH && mouseY >= top && mouseY <= top + PAGE_HEIGHT){
             int finalLeft = left;
-            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton, timeSinceLastClick,  IPage.Side.RIGHT));
+            this.renderer.forEach(renderer1 -> renderer1.mouseClickMove(this, finalLeft, top, PAGE_WIDTH, PAGE_HEIGHT, mouseX, mouseY, lastX, lastY, mouseButton,  IPage.Side.RIGHT));
         }
         this.lastX = mouseX;
         this.lastY = mouseY;
+        return true;
     }
-
+    
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollAmount){
+        /* todo implement with 1.15 mappings
+        @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         int mouseX = (Mouse.getEventX() * this.width / this.mc.displayWidth);
@@ -224,20 +228,26 @@ public class GuiQuestBook extends GuiScreen {
             }
         }
     }
+         */
+        return true;
+    }
+    
+    
 
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
-
+    
     @Override
-    public void onGuiClosed() {
+    public void onClose(){
         try {
             this.currentPage.getClass().getConstructor();
-            NBTTagCompound nbt = new NBTTagCompound();
-            nbt.setInteger("CurrentSlot", this.player.inventory.getSlotFor(this.book));
-            nbt.setTag("Data", Networker.singleTag("PageClass", new NBTTagString(this.currentPage.getClass().getName())));
-            Networker.NET.sendToServer(new HQMPacket(NetActions.STACK_ADD_NBT, this.player, nbt));
+            CompoundNBT nbt = new CompoundNBT();
+            nbt.putInt("CurrentSlot", this.player.inventory.getSlotFor(this.book));
+            nbt.put("Data", Networker.singleTag("PageClass", StringNBT.func_229705_a_(this.currentPage.getClass().getName())));
+            // todo 1.15 implement network traffic Networker.NET.sendToServer(new HQMPacket(NetActions.STACK_ADD_NBT, this.player, nbt));
         } catch (NoSuchMethodException ignored) {}
     }
+    
 }

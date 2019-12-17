@@ -1,12 +1,8 @@
 package hqm.client.gui.component;
 
-import hqm.HQM;
 import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
-import hqm.client.gui.IRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,27 +34,27 @@ public class ComponentTextField extends AbstractRender {
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
 
     }
 
     @Override
-    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
 
     }
 
     @Override
-    public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
 
     }
 
     @Override
-    public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, IPage.Side side) {
+    public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, double lastMouseX, double lastMouseY, int mouseButton, IPage.Side side) {
 
     }
 
     @Override
-    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, IPage.Side side) {
+    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int scroll, IPage.Side side) {
 
     }
 

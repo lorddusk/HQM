@@ -1,13 +1,9 @@
 package hqm.net;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.Constants;
-
-import java.util.function.BiConsumer;
 
 /**
  * @author canitzp
@@ -16,25 +12,25 @@ public enum NetActions {
 
     STACK_ADD_NBT((data, sender, receiver) -> {
         if(receiver.getUniqueID() == sender.getUniqueID()){
-            if(data.hasKey("CurrentSlot", Constants.NBT.TAG_INT) && data.hasKey("Data", Constants.NBT.TAG_COMPOUND)){
-                int slot = data.getInteger("CurrentSlot");
+            if(data.contains("CurrentSlot", Constants.NBT.TAG_INT) && data.contains("Data", Constants.NBT.TAG_COMPOUND)){
+                int slot = data.getInt("CurrentSlot");
                 ItemStack stack = receiver.inventory.getStackInSlot(slot);
-                if(stack.hasTagCompound()){
-                    stack.getTagCompound().merge(data.getCompoundTag("Data"));
+                if(stack.hasTag()){
+                    stack.getTag().merge(data.getCompound("Data"));
                 } else {
-                    stack.setTagCompound(data.getCompoundTag("Data"));
+                    stack.setTag(data.getCompound("Data"));
                 }
             }
         }
     });
 
-    private TriConsumer<NBTTagCompound, EntityPlayer, EntityPlayer> action;
+    private TriConsumer<CompoundNBT, PlayerEntity, PlayerEntity> action;
 
-    NetActions(TriConsumer<NBTTagCompound, EntityPlayer, EntityPlayer> action){
+    NetActions(TriConsumer<CompoundNBT, PlayerEntity, PlayerEntity> action){
         this.action = action;
     }
 
-    public void action(NBTTagCompound data, EntityPlayer sender, EntityPlayer receiver){
+    public void action(CompoundNBT data, PlayerEntity sender, PlayerEntity receiver){
         this.action.accept(data, sender, receiver);
     }
 

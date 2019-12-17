@@ -2,7 +2,6 @@ package hqm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -11,9 +10,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +37,7 @@ public class HQMJson {
             List<String> tooltip = new ArrayList<>();
             List<Integer> dims = new ArrayList<>();
             ResourceLocation icon = null;
-            NBTTagCompound data = null;
+            CompoundNBT data = null;
             in.beginObject();
             while (in.hasNext()){
                 switch (in.nextName().toLowerCase()){
@@ -81,7 +83,7 @@ public class HQMJson {
                         break;
                     }
                     case "data": {
-                        data = gson.fromJson(in, NBTTagCompound.class);
+                        data = gson.fromJson(in, CompoundNBT.class);
                         break;
                     }
                 }
@@ -99,7 +101,7 @@ public class HQMJson {
         public QuestLine read(JsonReader in) throws IOException {
             String name = null;
             int index = Integer.MAX_VALUE;
-            NBTTagCompound data = null;
+            CompoundNBT data = null;
             List<String> desc = new ArrayList<>();
             List<Quest> quests = new ArrayList<>();
             in.beginObject();
@@ -114,7 +116,7 @@ public class HQMJson {
                         break;
                     }
                     case "data": {
-                        data = gson.fromJson(in, NBTTagCompound.class);
+                        data = gson.fromJson(in, CompoundNBT.class);
                         break;
                     }
                     case "desc": {
@@ -212,54 +214,54 @@ public class HQMJson {
         }
     };
 
-    public static final TypeAdapter<NBTTagCompound> NBT_TAG_COMPOUND = new TypeAdapter<NBTTagCompound>() {
+    public static final TypeAdapter<CompoundNBT> NBT_TAG_COMPOUND = new TypeAdapter<CompoundNBT>() {
         @Override
-        public void write(JsonWriter out, NBTTagCompound value) {} // We don't write anything
+        public void write(JsonWriter out, CompoundNBT value) {} // We don't write anything
 
         @Override
-        public NBTTagCompound read(JsonReader in) throws IOException {
-            NBTTagCompound nbt = new NBTTagCompound();
+        public CompoundNBT read(JsonReader in) throws IOException {
+            CompoundNBT nbt = new CompoundNBT();
             in.beginObject();
             while (in.hasNext()){
                 String key = in.nextName();
-                NBTBase nbtBase = null;
+                INBT nbtBase = null;
                 in.beginObject();
                 in.skipValue(); // skipping the name "id" here
                 int index = in.nextInt();
                 in.skipValue(); // skipping the name "value" here
                 switch (index){
                     case 1: {
-                        nbtBase = new NBTTagByte((byte) in.nextInt());
+                        nbtBase = ByteNBT.func_229671_a_((byte) in.nextInt());
                         break;
                     }
                     case 2: {
-                        nbtBase = new NBTTagShort((short) in.nextInt());
+                        nbtBase = ShortNBT.func_229701_a_((short) in.nextInt());
                         break;
                     }
                     case 3: {
-                        nbtBase = new NBTTagInt(in.nextInt());
+                        nbtBase = IntNBT.func_229692_a_(in.nextInt());
                         break;
                     }
                     case 4: {
-                        nbtBase = new NBTTagLong(in.nextLong());
+                        nbtBase = LongNBT.func_229698_a_(in.nextLong());
                         break;
                     }
                     case 5: {
-                        nbtBase = new NBTTagFloat((float) in.nextDouble());
+                        nbtBase = FloatNBT.func_229689_a_((float) in.nextDouble());
                         break;
                     }
                     case 6: {
-                        nbtBase = new NBTTagDouble(in.nextDouble());
+                        nbtBase = DoubleNBT.func_229684_a_(in.nextDouble());
                         break;
                     }
                     case 7: {
-                        nbtBase = new NBTTagByteArray((byte[]) gson.fromJson(in, byte[].class));
+                        nbtBase = new ByteArrayNBT((byte[]) gson.fromJson(in, byte[].class));
                         break;
                     } // TODO add more
                 }
                 in.endObject();
                 if(nbtBase != null){
-                    nbt.setTag(key, nbtBase);
+                    nbt.put(key, nbtBase);
                 } else {
                     System.out.println("Couldn't read NBTBase " + key);
                 }
@@ -377,7 +379,7 @@ public class HQMJson {
             Item item = null;
             int meta = 0;
             int amount = 1;
-            NBTTagCompound nbt = new NBTTagCompound();
+            CompoundNBT nbt = new CompoundNBT();
             in.beginObject();
             while (in.hasNext()){
                 switch (in.nextName().toLowerCase()){
@@ -385,7 +387,7 @@ public class HQMJson {
                         item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(in.nextString()));
                         break;
                     }
-                    case "meta": {
+                    case "meta": { // todo remove, cause of deprecation
                         meta = in.nextInt();
                         break;
                     }
@@ -394,15 +396,15 @@ public class HQMJson {
                         break;
                     }
                     case "nbt": {
-                        nbt = gson.fromJson(in, NBTTagCompound.class);
+                        nbt = gson.fromJson(in, CompoundNBT.class);
                         break;
                     }
                 }
             }
             in.endObject();
             if(item != null){
-                ItemStack stack = new ItemStack(item, amount, meta);
-                stack.setTagCompound(nbt);
+                ItemStack stack = new ItemStack(item, amount);
+                stack.setTag(nbt);
                 return stack;
             }
             return null;
@@ -417,7 +419,7 @@ public class HQMJson {
         public ITask read(JsonReader in) throws IOException {
             String className = null;
             UUID id = null;
-            NBTTagCompound nbt = new NBTTagCompound();
+            CompoundNBT nbt = new CompoundNBT();
             in.beginObject();
             while (in.hasNext()){
                 switch (in.nextName().toLowerCase()){
@@ -435,7 +437,7 @@ public class HQMJson {
                         }
                     }
                     case "nbt": {
-                        nbt = gson.fromJson(in, NBTTagCompound.class);
+                        nbt = gson.fromJson(in, CompoundNBT.class);
                         break;
                     }
                 }
@@ -461,7 +463,7 @@ public class HQMJson {
     public static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Questbook.class, QUESTBOOK)
             .registerTypeAdapter(QuestLine.class, QUEST_LINE)
-            .registerTypeAdapter(NBTTagCompound.class, NBT_TAG_COMPOUND)
+            .registerTypeAdapter(CompoundNBT.class, NBT_TAG_COMPOUND)
             .registerTypeAdapter(TeamList.class, TEAMLIST)
             .registerTypeAdapter(ItemStack.class, ITEMSTACK)
             .registerTypeAdapter(ITask.class, ITASK)

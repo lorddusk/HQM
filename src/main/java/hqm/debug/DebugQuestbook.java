@@ -5,8 +5,8 @@ import hqm.HQM;
 import hqm.quest.Quest;
 import hqm.quest.QuestLine;
 import hqm.quest.Questbook;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;

@@ -1,13 +1,10 @@
 package hqm.quest;
 
-import com.google.common.collect.Lists;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author canitzp
@@ -53,8 +50,8 @@ public class Team {
         return this.finishedQuests.contains(quest.parent);
     }
 
-    public boolean containsPlayer(EntityPlayer player){
-        return this.teamMembers.contains(player.getPersistentID());
+    public boolean containsPlayer(PlayerEntity player){
+        return this.teamMembers.contains(player.getUniqueID());
     }
 
     public UUID getAdmin(){

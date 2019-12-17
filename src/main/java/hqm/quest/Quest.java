@@ -1,7 +1,7 @@
 package hqm.quest;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +17,7 @@ public class Quest {
     public List<String> desc;
     public List<ITask> tasks;
     public int posX, posY;
-    public NBTTagCompound data;
+    public CompoundNBT data;
 
     public Quest(String name, UUID id, UUID parentId, int xPos, int yPos, ItemStack icon, List<String> description, List<ITask> tasks) {
         this.name = name;

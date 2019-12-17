@@ -1,11 +1,14 @@
 package hqm.quest;
 
 import com.google.common.collect.Lists;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -20,7 +23,7 @@ public class Questbook {
     private final List<QuestLine> questLines = new ArrayList<>();
     private final List<Integer> dimensions;
     private final List<Team> teams = new ArrayList<>();
-    private NBTTagCompound data;
+    private CompoundNBT data;
 
     public Questbook(String name, UUID id, List<String> description, List<String> tooltip, ResourceLocation image, List<Integer> dims) {
         this.name = name;
@@ -31,7 +34,7 @@ public class Questbook {
         this.dimensions = dims;
     }
 
-    public Questbook setData(NBTTagCompound data) {
+    public Questbook setData(CompoundNBT data) {
         this.data = data;
         return this;
     }
@@ -52,6 +55,7 @@ public class Questbook {
         return this.description.isEmpty() ? Collections.singletonList("No Description") : this.description;
     }
 
+    // todo use ITextComponent instead of String
     public List<String> getTooltip() {
         return tooltip;
     }
@@ -102,13 +106,13 @@ public class Questbook {
         return this.questLines.stream().mapToInt(questLines -> questLines.getUnlockedUncompleted(team).size()).sum();
     }
 
-    public Team getTeam(EntityPlayer player){
+    public Team getTeam(PlayerEntity player){
         for(Team team : this.teams){
             if(team.containsPlayer(player)){
                 return team;
             }
         }
-        Team team = new Team(player.getDisplayNameString(), 0x000000, 3, Lists.newArrayList(player.getPersistentID())); // TODO random color
+        Team team = new Team(player.getDisplayName().getString(), 0x000000, 3, Lists.newArrayList(player.getUniqueID())); // TODO random color
         this.teams.add(team);
         return team;
     }

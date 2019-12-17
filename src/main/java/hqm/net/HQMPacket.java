@@ -1,28 +1,24 @@
 package hqm.net;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author canitzp
  */
-public class HQMPacket implements IMessage, IMessageHandler<HQMPacket, IMessage> {
+// todo packet update to 1.13
+public class HQMPacket {
 
-    private NBTTagCompound data;
+    /*private CompoundNBT data;
     private int action;
 
-    private EntityPlayer player;
+    private PlayerEntity player;
 
     public HQMPacket(){}
 
-    public HQMPacket(NetActions action, EntityPlayer sender, NBTTagCompound data){
+    public HQMPacket(NetActions action, PlayerEntity sender, CompoundNBT data){
         this.action = action.ordinal();
         this.data = data;
         this.data.setUniqueId("PlayerId", sender.getUniqueID());
@@ -50,13 +46,13 @@ public class HQMPacket implements IMessage, IMessageHandler<HQMPacket, IMessage>
     @Override
     public IMessage onMessage(HQMPacket message, MessageContext ctx) {
         NetActions action = NetActions.get(message.action);
-        NBTTagCompound data = message.data;
+        CompoundNBT data = message.data;
         if(action != null && data != null && !data.hasNoTags()){
-            EntityPlayer sender = ctx.getServerHandler().player.world.getPlayerEntityByUUID(data.getUniqueId("PlayerId"));
-            EntityPlayer receiver = ctx.getServerHandler().player;
+            PlayerEntity sender = ctx.getServerHandler().player.world.getPlayerEntityByUUID(data.getUniqueId("PlayerId"));
+            PlayerEntity receiver = ctx.getServerHandler().player;
             action.action(data, sender, receiver);
         }
         return null;
-    }
+    }*/
 
 }

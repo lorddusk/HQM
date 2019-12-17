@@ -21,35 +21,35 @@ public class ComponentActivatable extends AbstractRender {
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
         if(this.supplier.get()){
             this.component.draw(gui, left, top, width, height, mouseX, mouseY, side);
         }
     }
 
     @Override
-    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
         if(this.supplier.get()){
             this.component.mouseClick(gui, left, top, width, height, mouseX, mouseY, mouseButton, side);
         }
     }
 
     @Override
-    public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseRelease(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
         if(this.supplier.get()){
             this.component.mouseRelease(gui, left, top, width, height, mouseX, mouseY, mouseButton, side);
         }
     }
 
     @Override
-    public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int lastMouseX, int lastMouseY, int mouseButton, long ticks, IPage.Side side) {
+    public void mouseClickMove(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, double lastMouseX, double lastMouseY, int mouseButton, IPage.Side side) {
         if(this.supplier.get()){
-            this.component.mouseClickMove(gui, left, top, width, height, mouseX, mouseY, lastMouseX, lastMouseY, mouseButton, ticks, side);
+            this.component.mouseClickMove(gui, left, top, width, height, mouseX, mouseY, lastMouseX, lastMouseY, mouseButton, side);
         }
     }
 
     @Override
-    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int scroll, IPage.Side side) {
+    public void mouseScroll(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int scroll, IPage.Side side) {
         if(this.supplier.get()){
             this.component.mouseScroll(gui, left, top, width, height, mouseX, mouseY, scroll, side);
         }

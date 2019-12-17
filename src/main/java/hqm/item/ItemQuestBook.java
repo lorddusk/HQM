@@ -6,19 +6,21 @@ import hqm.quest.Questbook;
 import hqm.quest.SaveHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,20 +34,18 @@ public class ItemQuestBook extends ItemBase<ItemQuestBook> {
 
     public ItemQuestBook(){
         super("quest_book");
-        this.setMaxStackSize(1);
+        //this.setMaxStackSize(1);
     }
 
-    @SideOnly(Side.CLIENT)
-    @Nonnull
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if(world.isRemote){
-            ItemStack stack = player.getHeldItem(hand);
-            if(stack.hasTagCompound()){
-                UUID uuid = stack.getTagCompound().getUniqueId("QuestbookId");
+    public ActionResultType onItemUse(ItemUseContext context){
+        if(context.getWorld().isRemote()){
+            ItemStack stack = context.getPlayer().getHeldItem(context.getHand());
+            if(stack.hasTag()){
+                UUID uuid = stack.getTag().getUniqueId("QuestbookId");
                 if(SaveHandler.QUEST_DATA.containsKey(uuid)){
-                    GuiQuestBook gui = new GuiQuestBook(uuid, player, stack);
-                    Minecraft.getMinecraft().displayGuiScreen(gui);
+                    GuiQuestBook gui = new GuiQuestBook(uuid, context.getPlayer(), stack);
+                    Minecraft.getInstance().displayGuiScreen(gui);
                     try {
                         gui.tryToLoadPage(stack);
                     } catch (Exception e) {
@@ -54,54 +54,55 @@ public class ItemQuestBook extends ItemBase<ItemQuestBook> {
                 }
             }
         }
-        return EnumActionResult.SUCCESS;
+        return ActionResultType.SUCCESS;
     }
-
+    
+    @OnlyIn(Dist.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        if(stack.hasTagCompound()){
-            NBTTagCompound nbt = stack.getTagCompound();
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag){
+        if(stack.hasTag()){
+            CompoundNBT nbt = stack.getTag();
             UUID uuid = nbt.getUniqueId("QuestbookId");
             if(SaveHandler.QUEST_DATA.containsKey(uuid)){
                 Questbook questbook = SaveHandler.QUEST_DATA.get(uuid);
-                tooltip.addAll(questbook.getTooltip());
-                if(flagIn.isAdvanced()){
-                    tooltip.add("Questbook ID: " + uuid);
-                    if(nbt.hasKey("PageClass", Constants.NBT.TAG_STRING)){
-                        tooltip.add("Current Page: " + nbt.getString("PageClass"));
+                //tooltip.addAll(questbook.getTooltip());
+                if(flag.isAdvanced()){
+                    tooltip.add(new StringTextComponent("Questbook ID: " + uuid));
+                    if(nbt.contains("PageClass", Constants.NBT.TAG_STRING)){
+                        tooltip.add(new StringTextComponent("Current Page: " + nbt.getString("PageClass")));
                     }
                 }
             }
         }
     }
-
+    
     @Override
-    public void getSubItems(@Nonnull CreativeTabs tab, @Nonnull NonNullList<ItemStack> items) {
-        if(this.isInCreativeTab(tab)){
+    public void fillItemGroup(ItemGroup tab, NonNullList<ItemStack> items){
+        if(this.isInGroup(tab)){
             if(!SaveHandler.QUEST_DATA.isEmpty()){
                 for(Questbook questbook : SaveHandler.QUEST_DATA.values()){
-                    NBTTagCompound itemBookNbt = new NBTTagCompound();
-                    itemBookNbt.setString("DisplayName", questbook.getName());
-                    itemBookNbt.setUniqueId("QuestbookId", questbook.getId());
+                    CompoundNBT itemBookNbt = new CompoundNBT();
+                    itemBookNbt.putString("DisplayName", questbook.getName());
+                    itemBookNbt.putUniqueId("QuestbookId", questbook.getId());
                     ItemStack book = new ItemStack(this);
-                    book.setTagCompound(itemBookNbt);
+                    book.setTag(itemBookNbt);
                     items.add(book);
                 }
             } else {
-                super.getSubItems(tab, items);
+                super.fillItemGroup(tab, items);
             }
         }
     }
-
-    @Nonnull
+    
     @Override
-    public String getItemStackDisplayName(@Nonnull ItemStack stack) {
-        if(stack.hasTagCompound()){
-            NBTTagCompound nbt = stack.getTagCompound();
-            if(nbt.hasKey("DisplayName", Constants.NBT.TAG_STRING)){
-                return nbt.getString("DisplayName");
+    public ITextComponent getDisplayName(ItemStack stack){
+        if(stack.hasTag()){
+            CompoundNBT nbt = stack.getTag();
+            if(nbt.contains("DisplayName", Constants.NBT.TAG_STRING)){
+                return new StringTextComponent(nbt.getString("DisplayName"));
             }
         }
-        return super.getItemStackDisplayName(stack);
+        return super.getDisplayName(stack);
     }
+    
 }

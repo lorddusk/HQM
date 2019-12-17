@@ -43,12 +43,12 @@ public class QuestPage implements IPage {
             descPane.addComponent(new ComponentSingleText("No Description provided!", Side.LEFT).setColor(Colors.LIGHT_GRAY).setScale(0.8F));
         }
         descPane.setHeight(GuiQuestBook.PAGE_HEIGHT / 2 - 25);
-        descPane.setOffset(0, Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT + 2);
+        descPane.setOffset(0, Minecraft.getInstance().fontRenderer.FONT_HEIGHT + 2);
         gui.addRenderer(descPane);
     }
 
     @Override
-    public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
+    public void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side) {
 
     }
 }

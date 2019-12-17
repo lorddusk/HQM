@@ -21,7 +21,7 @@ public class TeamPage implements IPage {
     }
 
     @Override
-    public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
+    public void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side) {
 
     }
 }

@@ -3,11 +3,8 @@ package hqm.client.gui.component;
 import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
-import hqm.client.gui.IRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +27,7 @@ public class ComponentSingleText extends AbstractRender implements ComponentScro
 
     public static List<ComponentSingleText> from(List<String> lines, int width, IPage.Side side){
         List<ComponentSingleText> list = new ArrayList<>();
-        lines.forEach(s -> Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(s, width).forEach(s1 -> list.add(new ComponentSingleText(s1, side))));
+        lines.forEach(s -> Minecraft.getInstance().fontRenderer.listFormattedStringToWidth(s, width).forEach(s1 -> list.add(new ComponentSingleText(s1, side))));
         return list;
     }
 
@@ -65,12 +62,13 @@ public class ComponentSingleText extends AbstractRender implements ComponentScro
     }
 
     public int getWidth(){
-        return Math.round(Minecraft.getMinecraft().fontRenderer.getStringWidth(this.text) * this.getScale());
+        return Math.round(Minecraft.getInstance().fontRenderer.getStringWidth(this.text) * this.getScale());
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
         if(this.side == side){
+            /* todo implement with 1.15 mappings
             FontRenderer font = gui.mc.fontRenderer;
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -86,20 +84,20 @@ public class ComponentSingleText extends AbstractRender implements ComponentScro
                     gui.drawHoveringText(this.hoveringText, mouseX, mouseY);
                     GlStateManager.popMatrix();
                 }
-            }
+            }*/
         }
     }
 
     @Override
-    public void render(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void render(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
         this.draw(gui, left, top, width, height, mouseX, mouseY, side);
     }
 
     @Override
-    public void renderRaw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {}
+    public void renderRaw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {}
 
     @Override
     public int getHeight() {
-        return Math.round(Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * this.scale);
+        return Math.round(Minecraft.getInstance().fontRenderer.FONT_HEIGHT * this.scale);
     }
 }

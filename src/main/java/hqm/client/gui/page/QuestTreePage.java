@@ -7,7 +7,6 @@ import hqm.client.gui.IRenderer;
 import hqm.quest.Quest;
 import hqm.quest.QuestLine;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 /**
@@ -33,14 +32,17 @@ public class QuestTreePage implements IPage, IRenderer {
     }
 
     @Override
-    public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
+    public void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side) {
         if(side == Side.LEFT){
             for(Quest quest : questLine.getQuests()){
+                /*
                 GlStateManager.pushMatrix();
                 gui.mc.getTextureManager().bindTexture(questLoc);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 renderQuest(gui, quest, pageLeft, pageTop);
                 GlStateManager.popMatrix();
+                
+                 */
             }
         }
     }
@@ -52,6 +54,7 @@ public class QuestTreePage implements IPage, IRenderer {
         int x = quest.posX + left;
         int y = quest.posY + top;
         boolean isDone = quest.isDone(gui.getTeam());
+        /* todo 1.15 mappings
         if(!quest.isOpen(this.questLine, gui.getTeam())){
             GlStateManager.color(0.5F, 0.5F, 0.5F, 0.5F);
         }
@@ -59,13 +62,15 @@ public class QuestTreePage implements IPage, IRenderer {
         GlStateManager.translate(x, y, 0);
         GlStateManager.scale(0.95F, 0.95F, 1.0F);
         Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(quest.getIcon(), quest.isBig() ? 9 : 4, quest.isBig() ? 9 : 4);
+       
+         */
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, Side side) {}
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, Side side) {}
 
     @Override
-    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, Side side) {
         for (Quest quest : questLine.getQuests()) {
             if (quest.posX + left <= mouseX && quest.posX + left + (quest.isBig() ? 31 : 23) >= mouseX) {
                 if (quest.posY + top <= mouseY && quest.posY + top + (quest.isBig() ? 36 : 26) >= mouseY) {

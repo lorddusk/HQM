@@ -11,7 +11,7 @@ public interface IPage {
 
     default void init(GuiQuestBook gui){}
 
-    void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side);
+    void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side);
 
     enum Side {
         RIGHT,

@@ -1,22 +1,17 @@
 package hqm.client.gui.page;
 
-import com.google.common.collect.Lists;
 import hqm.HQM;
 import hqm.client.Colors;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
-import hqm.client.gui.component.ComponentActivatable;
 import hqm.client.gui.component.ComponentPageOpenButton;
 import hqm.client.gui.component.ComponentSingleText;
 import hqm.client.gui.component.ComponentTextArea;
 import hqm.quest.Questbook;
 import hqm.quest.Team;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,7 +49,7 @@ public class InformationPage implements IPage {
     }
 
     @Override
-    public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
+    public void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side) {
 
     }
 }

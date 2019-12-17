@@ -3,22 +3,11 @@ package hqm.quest;
 import hqm.HQM;
 import hqm.HQMJson;
 import hqm.debug.DebugQuestbook;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.FallbackResourceManager;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.ISaveHandler;
-import net.minecraft.world.storage.MapStorage;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +27,11 @@ public class SaveHandler {
         //QUEST_DATA.put(debugQuestbook.getId(), debugQuestbook);
     }
 
+    /* todo 1.15
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event){
         QUEST_DATA.clear();
-        if(!event.getWorld().isRemote){
+        if(!event.getWorld().isRemote()){
             File worldSave = getWorldSaveFolder(event.getWorld());
             if(worldSave != null){
                 File hqmWorldFolder = new File(worldSave, "hqm");
@@ -55,10 +45,13 @@ public class SaveHandler {
             }
         }
     }
+    
+     */
 
+    /*todo 1.15
     @SubscribeEvent
     public static void onWorldSave(WorldEvent.Save event){
-        if(!event.getWorld().isRemote){
+        if(!event.getWorld().isRemote()){
             File worldSave = getWorldSaveFolder(event.getWorld());
             if(worldSave != null){
                 File hqmWorldFolder = new File(worldSave, "hqm");
@@ -75,12 +68,16 @@ public class SaveHandler {
             }
         }
     }
+    
+     */
 
+    /*todo 1.15
     @SubscribeEvent
     public static void onServerJoin(PlayerEvent.PlayerLoggedInEvent event){
         QUEST_DATA.clear();
 
     }
+     */
 
     public static List<Questbook> readQuestbooks(File hqmWorldFolder){
         List<Questbook> questbooks = new ArrayList<>();
@@ -153,6 +150,7 @@ public class SaveHandler {
     }
 
     private static File getWorldSaveFolder(World world){
+        /* todo idk how to in 1.15
         MapStorage mapStorage = world.getMapStorage();
         if(mapStorage != null){
             try {
@@ -163,7 +161,7 @@ public class SaveHandler {
             } catch (Exception e){
                 e.printStackTrace();
             }
-        }
+        }*/
         return null;
     }
 

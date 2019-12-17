@@ -7,7 +7,6 @@ import hqm.client.gui.IPage;
 import hqm.client.gui.component.ComponentPageOpenButton;
 import hqm.client.gui.component.ComponentSingleText;
 import hqm.client.gui.component.ComponentTextArea;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
@@ -34,11 +33,11 @@ public class MainPage implements IPage{
     }
 
     @Override
-    public void render(GuiQuestBook gui, int pageLeft, int pageTop, int mouseX, int mouseY, Side side) {
+    public void render(GuiQuestBook gui, int pageLeft, int pageTop, double mouseX, double mouseY, Side side) {
         switch (side){
             case LEFT: {
                 gui.bindTexture(gui.getQuestbook().getImage());
-                Gui.drawScaledCustomSizeModalRect(pageLeft, pageTop - 10, 0, 0, 153, 253, 140, 190, 280, 360);
+                //AbstractGui.drawScaledCustomSizeModalRect(pageLeft, pageTop - 10, 0, 0, 153, 253, 140, 190, 280, 360);
                 break;
             }
         }

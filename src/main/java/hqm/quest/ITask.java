@@ -1,7 +1,6 @@
 package hqm.quest;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundNBT;
 
 import java.util.UUID;
 
@@ -15,6 +14,6 @@ public interface ITask {
 
     UUID getId();
 
-    void init(NBTTagCompound data);
+    void init(CompoundNBT data);
 
 }

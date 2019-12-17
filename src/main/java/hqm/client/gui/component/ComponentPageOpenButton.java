@@ -3,9 +3,6 @@ package hqm.client.gui.component;
 import hqm.client.gui.AbstractRender;
 import hqm.client.gui.GuiQuestBook;
 import hqm.client.gui.IPage;
-import hqm.client.gui.IRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 
 /**
  * @author canitzp
@@ -33,16 +30,16 @@ public class ComponentPageOpenButton extends AbstractRender {
     }
 
     @Override
-    public void draw(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, IPage.Side side) {
+    public void draw(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, IPage.Side side) {
         if(this.side == side){
             this.text.draw(gui, this.x + left - this.width / 2, this.y + top, width, height, mouseX, mouseY, side);
         }
     }
 
     @Override
-    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, int mouseX, int mouseY, int mouseButton, IPage.Side side) {
+    public void mouseClick(GuiQuestBook gui, int left, int top, int width, int height, double mouseX, double mouseY, int mouseButton, IPage.Side side) {
         if(this.side == side){
-            if(mouseX >= this.x + left - this.width / 2 && mouseX <= this.x + left + this.width / 2 && mouseY >= this.y + top && mouseY <= this.y + top + this.text.getScale() * gui.mc.fontRenderer.FONT_HEIGHT){
+            if(mouseX >= this.x + left - this.width / 2 && mouseX <= this.x + left + this.width / 2 && mouseY >= this.y + top && mouseY <= this.y + top + this.text.getScale() * gui.getMinecraft().fontRenderer.FONT_HEIGHT){
                 gui.setPage(this.page, true);
             }
         }

@@ -1,8 +1,8 @@
 package hqm.quest;
 
-import net.minecraft.nbt.NBTTagCompound;
 
-import java.util.ArrayList;
+import net.minecraft.nbt.CompoundNBT;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ public class QuestLine {
 
     private final String name;
     private final int index;
-    private NBTTagCompound data;
+    private CompoundNBT data;
     private final List<String> description;
     private final List<Quest> quests;
 
@@ -25,7 +25,7 @@ public class QuestLine {
         this.quests = quests;
     }
 
-    public QuestLine setData(NBTTagCompound data) {
+    public QuestLine setData(CompoundNBT data) {
         this.data = data;
         return this;
     }
