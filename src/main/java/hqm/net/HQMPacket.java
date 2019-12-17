@@ -3,25 +3,33 @@ package hqm.net;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * @author canitzp
  */
-// todo packet update to 1.13
 public class HQMPacket {
 
-    /*private CompoundNBT data;
+    private CompoundNBT data;
     private int action;
 
     private PlayerEntity player;
 
     public HQMPacket(){}
+    
+    public HQMPacket(PacketBuffer buf){
+        this.action = buf.readInt();
+        this.data = buf.readCompoundTag();
+    }
 
     public HQMPacket(NetActions action, PlayerEntity sender, CompoundNBT data){
         this.action = action.ordinal();
         this.data = data;
-        this.data.setUniqueId("PlayerId", sender.getUniqueID());
+        this.data.putUniqueId("PlayerId", sender.getUniqueID());
         this.player = sender;
     }
 
@@ -30,29 +38,22 @@ public class HQMPacket {
         return this;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        this.action = buf.readInt();
-        this.data = ByteBufUtils.readTag(buf);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(this.action);
-        ByteBufUtils.writeTag(buf, this.data);
+        buf.writeCompoundTag(this.data);
     }
-
-    @Override
-    public IMessage onMessage(HQMPacket message, MessageContext ctx) {
-        NetActions action = NetActions.get(message.action);
-        CompoundNBT data = message.data;
-        if(action != null && data != null && !data.hasNoTags()){
-            PlayerEntity sender = ctx.getServerHandler().player.world.getPlayerEntityByUUID(data.getUniqueId("PlayerId"));
-            PlayerEntity receiver = ctx.getServerHandler().player;
-            action.action(data, sender, receiver);
-        }
-        return null;
-    }*/
+    
+    public void handle(Supplier<NetworkEvent.Context> supplier){
+        NetworkEvent.Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            NetActions action = NetActions.get(this.action);
+            if(action != null && this.data != null && !this.data.isEmpty()){
+                PlayerEntity sender = ctx.getSender().getEntityWorld().getPlayerByUuid(this.data.getUniqueId("PlayerId"));
+                PlayerEntity receiver = ctx.getSender();
+                action.action(this.data, sender, receiver);
+            }
+        });
+        ctx.setPacketHandled(true);
+    }
 
 }

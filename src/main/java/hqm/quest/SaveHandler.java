@@ -3,7 +3,10 @@ package hqm.quest;
 import hqm.HQM;
 import hqm.HQMJson;
 import hqm.debug.DebugQuestbook;
-import net.minecraft.world.World;
+import net.minecraft.world.IWorld;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.io.File;
@@ -27,7 +30,6 @@ public class SaveHandler {
         //QUEST_DATA.put(debugQuestbook.getId(), debugQuestbook);
     }
 
-    /* todo 1.15
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event){
         QUEST_DATA.clear();
@@ -46,9 +48,6 @@ public class SaveHandler {
         }
     }
     
-     */
-
-    /*todo 1.15
     @SubscribeEvent
     public static void onWorldSave(WorldEvent.Save event){
         if(!event.getWorld().isRemote()){
@@ -69,15 +68,10 @@ public class SaveHandler {
         }
     }
     
-     */
-
-    /*todo 1.15
     @SubscribeEvent
     public static void onServerJoin(PlayerEvent.PlayerLoggedInEvent event){
         QUEST_DATA.clear();
-
     }
-     */
 
     public static List<Questbook> readQuestbooks(File hqmWorldFolder){
         List<Questbook> questbooks = new ArrayList<>();
@@ -149,7 +143,7 @@ public class SaveHandler {
         }
     }
 
-    private static File getWorldSaveFolder(World world){
+    private static File getWorldSaveFolder(IWorld world){
         /* todo idk how to in 1.15
         MapStorage mapStorage = world.getMapStorage();
         if(mapStorage != null){

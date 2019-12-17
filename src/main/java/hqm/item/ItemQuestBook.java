@@ -1,20 +1,18 @@
 package hqm.item;
 
 
+import hqm.HQM;
 import hqm.client.gui.GuiQuestBook;
 import hqm.quest.Questbook;
 import hqm.quest.SaveHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -22,7 +20,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +30,7 @@ import java.util.UUID;
 public class ItemQuestBook extends ItemBase<ItemQuestBook> {
 
     public ItemQuestBook(){
-        super("quest_book");
-        //this.setMaxStackSize(1);
+        super("quest_book", () -> new Properties().maxStackSize(1));
     }
 
     @Override

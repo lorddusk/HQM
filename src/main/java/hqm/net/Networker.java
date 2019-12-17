@@ -3,18 +3,21 @@ package hqm.net;
 import hqm.HQM;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 /**
  * @author canitzp
  */
 public class Networker {
 
-    // todo 1.15 implement network traffic
-    //public static final SimpleNetworkWrapper NET;
+    public static SimpleChannel NET;
 
     static {
-        //NET = new SimpleNetworkWrapper(HQM.MODNAME);
-        //NET.registerMessage(HQMPacket.class, HQMPacket.class, 0, Side.SERVER);
+        NET = NetworkRegistry.newSimpleChannel(new ResourceLocation(HQM.MODID, "main"), () -> "1.0", s -> true, s -> true);
+        
+        NET.registerMessage(0, HQMPacket.class, HQMPacket::toBytes, HQMPacket::new, HQMPacket::handle);
     }
 
     public static CompoundNBT singleTag(String name, INBT nbt){

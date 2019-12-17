@@ -1,17 +1,26 @@
 package hqm;
 
+import hqm.item.ItemBase;
+import hqm.item.ItemQuestBook;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
  * @author canitzp
  */
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = HQM.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Registry {
 
-    /* todo something with 1.15 blablabla
-    public static CreativeTabs TAB = new CreativeTabs(HQM.MODID) {
+    public static ItemGroup TAB = new ItemGroup(HQM.MODID) {
         @Override
-        public ItemStack getTabIconItem() {
+        public ItemStack createIcon(){
             return new ItemStack(questBook);
         }
     };
@@ -23,12 +32,12 @@ public class Registry {
         ItemBase.ITEMS.forEach(itemBase -> reg.getRegistry().register(itemBase));
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void bakeEvent(ModelBakeEvent event){
-        ItemBase.ITEMS.forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory")));
+        //todo model bake ItemBase.ITEMS.forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory")));
     }
     
-     */
+    
 
 }
