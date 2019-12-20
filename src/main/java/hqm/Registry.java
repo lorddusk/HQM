@@ -5,9 +5,6 @@ import hqm.item.ItemQuestBook;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,13 +28,6 @@ public class Registry {
     public static void registerItems(RegistryEvent.Register<Item> reg){
         ItemBase.ITEMS.forEach(itemBase -> reg.getRegistry().register(itemBase));
     }
-
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void bakeEvent(ModelBakeEvent event){
-        //todo model bake ItemBase.ITEMS.forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory")));
-    }
-    
     
 
 }
