@@ -1,80 +1,67 @@
 package hardcorequesting.event;
 
-import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathType;
-import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.QuestingData;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Iterator;
-
-@Mod.EventBusSubscriber
 public class PlayerDeathEventListener {
-
+    public static PlayerDeathEventListener instance;
+    
     public PlayerDeathEventListener() {
-        MinecraftForge.EVENT_BUS.register(this);
+        instance = this;
     }
-
-    @SubscribeEvent
-    public void onPlayerDeath(LivingDeathEvent event) {
-        if (event.getEntityLiving() instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
+    
+    public void onLivingDeath(PlayerEntity entity, DamageSource source) {
+        if (entity instanceof ServerPlayerEntity) {
+            ServerPlayerEntity player = (ServerPlayerEntity) entity;
             QuestingData.getQuestingData(player).die(player);
-            DeathType.onDeath(player, event.getSource());
+            DeathType.onDeath(player, source);
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPlayerDropItemsOnDeath(PlayerDropsEvent event) {
-        if (event.getEntityPlayer() == null
-                || event.getEntityPlayer() instanceof FakePlayer
-                || event.isCanceled()
-                || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-                || HQMConfig.LOSE_QUEST_BOOK) {
-            return;
-        }
+//    @SubscribeEvent(priority = EventPriority.HIGHEST)
+//    public void onPlayerDropItemsOnDeath(PlayerDropsEvent event) {
+//        if (event.getEntityPlayer() == null
+//            || event.getEntityPlayer() instanceof FakePlayer
+//            || event.isCanceled()
+//            || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
+//            || HQMConfig.LOSE_QUEST_BOOK) {
+//            return;
+//        }
+//        
+//        Iterator<EntityItem> iter = event.getDrops().iterator();
+//        while (iter.hasNext()) {
+//            EntityItem entityItem = iter.next();
+//            ItemStack stack = entityItem.getItem();
+//            if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
+//                event.getEntityPlayer().inventory.addItemStackToInventory(stack);
+//                iter.remove();
+//            }
+//        }
+//    }
 
-        Iterator<EntityItem> iter = event.getDrops().iterator();
-        while (iter.hasNext()) {
-            EntityItem entityItem = iter.next();
-            ItemStack stack = entityItem.getItem();
-            if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
-                event.getEntityPlayer().inventory.addItemStackToInventory(stack);
-                iter.remove();
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onPlayerRespawn(PlayerEvent.Clone event) {
-        if (event.getEntityPlayer() == null
-                || event.getEntityPlayer() instanceof FakePlayer
-                || !event.isWasDeath()
-                || event.isCanceled()
-                || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-                || HQMConfig.LOSE_QUEST_BOOK) {
-            return;
-        }
-
-        if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
-            ItemStack bookStack = new ItemStack(ModItems.book);
-            for (ItemStack stack : event.getOriginal().inventory.mainInventory) {
-                if (bookStack.isItemEqual(stack)) {
-                    bookStack = stack.copy(); // Copy the actual stack
-                    break;
-                }
-            }
-            event.getEntityPlayer().inventory.addItemStackToInventory(bookStack);
-        }
-    }
+//    @SubscribeEvent
+//    public void onPlayerRespawn(PlayerEvent.Clone event) {
+//        if (event.getEntityPlayer() == null
+//            || event.getEntityPlayer() instanceof FakePlayer
+//            || !event.isWasDeath()
+//            || event.isCanceled()
+//            || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
+//            || HQMConfig.LOSE_QUEST_BOOK) {
+//            return;
+//        }
+//        
+//        if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
+//            ItemStack bookStack = new ItemStack(ModItems.book);
+//            for (ItemStack stack : event.getOriginal().inventory.mainInventory) {
+//                if (bookStack.isItemEqual(stack)) {
+//                    bookStack = stack.copy(); // Copy the actual stack
+//                    break;
+//                }
+//            }
+//            event.getEntityPlayer().inventory.addItemStackToInventory(bookStack);
+//        }
+//    }
 }

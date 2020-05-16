@@ -16,7 +16,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("unchecked")
 public enum TeamUpdateType {
     FULL {
         @Override
@@ -26,7 +25,7 @@ public enum TeamUpdateType {
             } catch (IOException ignored) {
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
@@ -37,7 +36,7 @@ public enum TeamUpdateType {
         public void update(Team team, String data) {
             team.setClientTeamLives(Integer.parseInt(data));
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, "" + team.getSharedLives());
@@ -48,7 +47,7 @@ public enum TeamUpdateType {
         private static final String REPUTATIONS = "reputations";
         private static final String ID = "id";
         private static final String VAL = "val";
-
+        
         @Override
         public void update(Team team, String data) {
             JsonParser parser = new JsonParser();
@@ -66,7 +65,7 @@ public enum TeamUpdateType {
                 }
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             StringWriter out = new StringWriter();
@@ -86,7 +85,7 @@ public enum TeamUpdateType {
                 writer.close();
             } catch (IOException ignored) {
             }
-
+            
             return new TeamUpdateMessage(this, out.toString());
         }
     },
@@ -100,7 +99,7 @@ public enum TeamUpdateType {
                 e.printStackTrace();
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
@@ -117,7 +116,7 @@ public enum TeamUpdateType {
                 e.printStackTrace();
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson(team));
@@ -134,7 +133,7 @@ public enum TeamUpdateType {
                 e.printStackTrace();
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, data[0].toString() + TeamAdapter.TEAM_ADAPTER.toJson((Team) data[1]));
@@ -146,13 +145,13 @@ public enum TeamUpdateType {
             int id = Integer.parseInt(data);
             List<Team> teams = QuestingData.getTeams();
             teams.remove(id);
-
+            
             for (int i = id; i < teams.size(); i++) {
                 Team team = teams.get(i);
-                team.setId(team.getId()-1);
+                team.setId(team.getId() - 1);
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, "" + team.getId());
@@ -169,14 +168,14 @@ public enum TeamUpdateType {
                 e.printStackTrace();
             }
         }
-
+        
         @Override
         public TeamUpdateMessage build(Team team, Object... data) {
             return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     };
-
+    
     public abstract void update(Team team, String data);
-
+    
     public abstract TeamUpdateMessage build(Team team, Object... data);
 }

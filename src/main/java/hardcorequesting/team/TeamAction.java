@@ -1,63 +1,62 @@
 package hardcorequesting.team;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.reputation.Reputation;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.UUID;
 
 public enum TeamAction {
     CREATE {
         @Override
-        public void process(Team team, EntityPlayer player, String teamName) {
+        public void process(Team team, PlayerEntity player, String teamName) {
             if (team.isSingle()) {
-
                 if (teamName.length() == 0) {
                     return;
                 }
-
+                
                 for (Team t : QuestingData.getTeams()) {
                     if (t.getName().equals(teamName)) {
                         TeamError.USED_NAME.sendToClient(player);
                         return;
                     }
                 }
-
+                
                 QuestingData.addTeam(team);
                 team.setName(teamName);
                 team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
-
-                Team.declineAll(player.getPersistentID());
+                
+                Team.declineAll(player.getUuid());
                 TeamStats.refreshTeam(team);
                 NetworkManager.sendToAllPlayers(TeamUpdateType.CREATE_TEAM.build(team));
-                if (player instanceof EntityPlayerMP) {
-                    NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(team, player.getUniqueID().toString()), (EntityPlayerMP) player);
+                if (player instanceof ServerPlayerEntity) {
+                    NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(team, player.getUuid().toString()), (ServerPlayerEntity) player);
                 }
             }
         }
     },
     INVITE {
         @Override
-        public void process(Team team, EntityPlayer player, String playerName) {
-            EntityPlayer invitee = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
+        public void process(Team team, PlayerEntity player, String playerName) {
+            PlayerEntity invitee = HardcoreQuesting.getServer().getPlayerManager().getPlayer(playerName);
             if (!team.isSingle() && team.isOwner(player) && invitee != null) {
-                PlayerEntry entry = new PlayerEntry(invitee.getUniqueID(), false, false);
-
+                PlayerEntry entry = new PlayerEntry(invitee.getUuid(), false, false);
+                
                 if (!QuestingData.hasData(entry.getUUID())) {
                     TeamError.INVALID_PLAYER.sendToClient(player);
                     return;
                 }
-
+                
                 if (!QuestingData.getQuestingData(entry.getUUID()).getTeam().isSingle()) {
                     TeamError.IN_PARTY.sendToClient(player);
                     return;
                 }
-
+                
                 if (!team.getPlayers().contains(entry)) {
                     team.getPlayers().add(entry);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
@@ -70,7 +69,7 @@ public enum TeamAction {
     },
     ACCEPT {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (team.isSingle()) {
                 int acceptId = Integer.parseInt(data);
                 if (acceptId >= 0 && acceptId < QuestingData.getTeams().size()) {
@@ -79,12 +78,12 @@ public enum TeamAction {
                     for (PlayerEntry entry : inviteTeam.getPlayers()) {
                         if (entry.isInTeam()) {
                             id++;
-                        } else if (entry.getUUID().equals(player.getPersistentID())) {
+                        } else if (entry.getUUID().equals(player.getUuid())) {
                             entry.setBookOpen(true);
                             entry.setInTeam(true);
                             QuestingData.getQuestingData(entry.getUUID()).setTeam(inviteTeam);
                             team.setId(inviteTeam.getId());
-
+                            
                             for (UUID questId : inviteTeam.getQuestData().keySet()) {
                                 QuestData joinData = team.getQuestData().get(questId);
                                 QuestData questData = inviteTeam.getQuestData().get(questId);
@@ -99,18 +98,18 @@ public enum TeamAction {
                                         } else {
                                             questData.reward[j] = old[j - 1];
                                         }
-
+                                        
                                     }
                                 }
                             }
-
+                            
                             for (UUID questId : inviteTeam.getQuestData().keySet()) {
                                 QuestData joinData = team.getQuestData().get(questId);
                                 QuestData questData = inviteTeam.getQuestData().get(questId);
                                 if (questData != null && Quest.getQuest(questId) != null)
-                                    Quest.getQuest(questId).mergeProgress(player.getPersistentID(), questData, joinData);
+                                    Quest.getQuest(questId).mergeProgress(player.getUuid(), questData, joinData);
                             }
-
+                            
                             for (Reputation reputation : Reputation.getReputations().values()) {
                                 if (reputation != null) {
                                     int joinValue = team.getReputation(reputation);
@@ -124,10 +123,10 @@ public enum TeamAction {
                                     inviteTeam.setReputation(reputation, targetValue);
                                 }
                             }
-
+                            
                             inviteTeam.refreshData();
                             inviteTeam.refreshTeamData(TeamUpdateSize.ALL);
-                            Team.declineAll(player.getPersistentID());
+                            Team.declineAll(player.getUuid());
                             TeamStats.refreshTeam(inviteTeam);
                             NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, entry.getUUID()), entry.getPlayerMP());
                             break;
@@ -139,12 +138,12 @@ public enum TeamAction {
     },
     DECLINE {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (team.isSingle()) {
                 int declineId = Integer.parseInt(data);
                 if (declineId >= 0 && declineId < QuestingData.getTeams().size()) {
                     Team inviteTeam = QuestingData.getTeams().get(declineId);
-                    inviteTeam.getPlayers().remove(new PlayerEntry(player.getPersistentID(), false, false));
+                    inviteTeam.getPlayers().remove(new PlayerEntry(player.getUuid(), false, false));
                     inviteTeam.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
                 }
@@ -153,10 +152,10 @@ public enum TeamAction {
     },
     KICK {
         @Override
-        public void process(Team team, EntityPlayer player, String toRemovePlayerUuid) {
-            EntityPlayer playerToRemove = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(java.util.UUID.fromString(toRemovePlayerUuid));
+        public void process(Team team, PlayerEntity player, String toRemovePlayerUuid) {
+            PlayerEntity playerToRemove = HardcoreQuesting.getServer().getPlayerManager().getPlayer(UUID.fromString(toRemovePlayerUuid));
             if (!team.isSingle() && team.isOwner(player) && playerToRemove != null) {
-                PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUniqueID());
+                PlayerEntry entryToRemove = team.getEntry(playerToRemove.getUuid());
                 if (!entryToRemove.isOwner()) {
                     if (entryToRemove.isInTeam()) {
                         team.removePlayer(playerToRemove);
@@ -166,7 +165,7 @@ public enum TeamAction {
                         team.getPlayers().remove(entryToRemove);
                         team.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
                     }
-
+                    
                     QuestingData.getQuestingData(playerToRemove).getTeam().refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
                 }
             }
@@ -174,7 +173,7 @@ public enum TeamAction {
     },
     LEAVE {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (!team.isSingle() && !team.isOwner(player)) {
                 team.removePlayer(player);
                 team.refreshTeamData(TeamUpdateSize.ALL);
@@ -185,7 +184,7 @@ public enum TeamAction {
     },
     DISBAND {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (!team.isSingle() && team.isOwner(player)) {
                 team.deleteTeam();
                 TeamStats.refreshTeam(team);
@@ -194,7 +193,7 @@ public enum TeamAction {
     },
     NEXT_LIFE_SETTING {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (!team.isSingle() && team.isOwner(player)) {
                 team.setLifeSetting(LifeSetting.values()[(team.getLifeSetting().ordinal() + 1) % LifeSetting.values().length]);
                 team.refreshTeamData(TeamUpdateSize.ALL);
@@ -203,7 +202,7 @@ public enum TeamAction {
     },
     NEXT_REWARD_SETTING {
         @Override
-        public void process(Team team, EntityPlayer player, String data) {
+        public void process(Team team, PlayerEntity player, String data) {
             if (!team.isSingle() && team.isOwner(player)) {
                 team.setRewardSetting(RewardSetting.values()[(team.getRewardSetting().ordinal() + 1) % RewardSetting.values().length]);
                 if (team.getRewardSetting() == RewardSetting.ALL)
@@ -212,14 +211,14 @@ public enum TeamAction {
             }
         }
     };
-
-    private static Team getTeam(EntityPlayer player) {
+    
+    private static Team getTeam(PlayerEntity player) {
         return QuestingData.getQuestingData(player).getTeam();
     }
-
-    public void process(EntityPlayer player, String data) {
+    
+    public void process(PlayerEntity player, String data) {
         process(getTeam(player), player, data);
     }
-
-    public abstract void process(Team team, EntityPlayer player, String data);
+    
+    public abstract void process(Team team, PlayerEntity player, String data);
 }

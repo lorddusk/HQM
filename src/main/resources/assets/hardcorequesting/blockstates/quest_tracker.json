@@ -1,12 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "minecraft:cube_all",
-    "transform": "forge:default-block",
-    "textures" : { "all" : "hardcorequesting:blocks/hqm_quest_tracker"}
-  },
   "variants": {
-    "normal": [{}],
-    "inventory": [{}]
+    "": {
+      "model": "hardcorequesting:block/quest_tracker"
+    }
   }
 }

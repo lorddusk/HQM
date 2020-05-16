@@ -1,48 +1,46 @@
 package hardcorequesting.network.message;
 
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.util.OPBookHelper;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 public class OpActionMessage implements IMessage {
-
+    
     private OPBookHelper.OpAction action;
     private String data;
-
+    
     public OpActionMessage() {
     }
-
+    
     public OpActionMessage(OPBookHelper.OpAction action, String data) {
         this.action = action;
         this.data = data;
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.action = OPBookHelper.OpAction.values()[buf.readInt()];
-        this.data = ByteBufUtils.readUTF8String(buf);
+        this.data = buf.readString(32767);
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(this.action.ordinal());
-        ByteBufUtils.writeUTF8String(buf, data);
+        buf.writeString(data);
     }
-
+    
     public static class Handler implements IMessageHandler<OpActionMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(OpActionMessage message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(OpActionMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(OpActionMessage message, MessageContext ctx) {
+        
+        private void handle(OpActionMessage message, PacketContext ctx) {
             message.action.process(HardcoreQuesting.proxy.getPlayer(ctx), message.data);
         }
     }

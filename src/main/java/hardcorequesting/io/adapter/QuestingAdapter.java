@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class QuestingAdapter{
+public class QuestingAdapter {
     
-    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>(){
+    public static final TypeAdapter<QuestingData> QUESTING_DATA_ADAPTER = new TypeAdapter<QuestingData>() {
         public static final String KEY_TEAM = "team";
         public static final String KEY_LIVES = "lives";
         public static final String KEY_UUID = "uuid";
@@ -28,13 +28,13 @@ public class QuestingAdapter{
         public static final String KEY_DEATHS = "deaths";
         
         @Override
-        public void write(JsonWriter out, QuestingData value) throws IOException{
+        public void write(JsonWriter out, QuestingData value) throws IOException {
             out.beginObject();
             out.name(KEY_UUID).value(value.getPlayerId().toString());
             out.name(KEY_NAME).value(value.getName());
             out.name(KEY_LIVES).value(value.getRawLives());
             out.name(KEY_TEAM);
-            if(value.getTeam().getId() == -1)
+            if (value.getTeam().getId() == -1)
                 TeamAdapter.TEAM_ADAPTER.write(out, value.getTeam());
             else
                 out.value(value.getTeam().getId());
@@ -42,8 +42,8 @@ public class QuestingAdapter{
             out.name(KEY_PLAYER_LORE).value(value.playedLore);
             out.name(KEY_RECEIVED_BOOK).value(value.receivedBook);
             out.name(KEY_GROUP_DATA).beginObject();
-            for(Map.Entry<UUID, GroupData> entry : value.getGroupData().entrySet())
-                if(entry.getKey() != null)
+            for (Map.Entry<UUID, GroupData> entry : value.getGroupData().entrySet())
+                if (entry.getKey() != null)
                     out.name(entry.getKey().toString()).value(entry.getValue().retrieved);
             out.endObject();
             out.name(KEY_DEATHS);
@@ -52,7 +52,7 @@ public class QuestingAdapter{
         }
         
         @Override
-        public QuestingData read(JsonReader in) throws IOException{
+        public QuestingData read(JsonReader in) throws IOException {
             boolean playerLore = false, receivedBook = false;
             String uuid = null, selectedQuest = null;
             int lives = 0, teamId = -1;
@@ -61,8 +61,8 @@ public class QuestingAdapter{
             DeathStats deathStats = null;
             
             in.beginObject();
-            while(in.hasNext()){
-                switch(in.nextName()){
+            while (in.hasNext()) {
+                switch (in.nextName()) {
                     case KEY_UUID:
                         uuid = in.nextString();
                         break;
@@ -73,7 +73,7 @@ public class QuestingAdapter{
                         lives = in.nextInt();
                         break;
                     case KEY_TEAM:
-                        if(in.peek() == JsonToken.NUMBER)
+                        if (in.peek() == JsonToken.NUMBER)
                             teamId = in.nextInt();
                         else
                             team = TeamAdapter.TEAM_ADAPTER.read(in);
@@ -89,7 +89,7 @@ public class QuestingAdapter{
                         break;
                     case KEY_GROUP_DATA:
                         in.beginObject();
-                        while(in.hasNext())
+                        while (in.hasNext())
                             data.put(UUID.fromString(in.nextName()), new GroupData(in.nextInt()));
                         in.endObject();
                         break;
@@ -104,10 +104,10 @@ public class QuestingAdapter{
             QuestingData questingData = new QuestingData(UUID.fromString(uuid), lives, teamId, data, deathStats);
             questingData.playedLore = playerLore;
             questingData.receivedBook = receivedBook;
-            if(selectedQuest != null){
+            if (selectedQuest != null) {
                 questingData.selectedQuestId = UUID.fromString(selectedQuest);
             }
-            if(teamId == -1)
+            if (teamId == -1)
                 questingData.setTeam(team);
             return questingData;
         }

@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -7,16 +8,15 @@ import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.UUID;
 
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiEditMenuDeath extends GuiEditMenu {
-
+    
     private static final int PLAYER_INFO_X = 180;
     private static final int PLAYER_INFO_Y = 20;
     private static final int PLAYER_TOTAL_DEATHS_Y = 12;
@@ -48,12 +48,12 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private boolean showTotal;
     private boolean showBest;
     private ScrollBar scrollBar;
-
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, EntityPlayer player) {
+    
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, PlayerEntity player) {
         super(guiQuestBook, player);
-
-        playerId = player.getPersistentID();
-
+        
+        playerId = player.getUuid();
+        
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
@@ -61,51 +61,51 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             }
         };
     }
-
+    
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
-
+        
         scrollBar.draw(gui);
-
+        
         DeathStats[] deathStats = DeathStats.getDeathStats();
         int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
         int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
         for (int i = start; i < end; i++) {
             DeathStats stats = deathStats[i];
-
+            
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
             gui.drawString((i + 1) + ". " + stats.getName(), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
             gui.drawString(deaths, DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
-
+        
         gui.drawString(Translator.translate(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
         gui.drawString(Translator.translate(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
-
+        
         DeathStats stats = getStats();
-
+        
         if (stats != null) {
-
+            
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
-
+                
                 gui.drawRect(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
                 gui.drawRect(TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
-
+            
             gui.drawString(stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
             gui.drawString(Translator.translate("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
-
+            
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
-
+                
                 String str = String.valueOf(stats.getDeaths(i));
                 if (str.length() > 5)
                     str = Translator.translate("hqm.deathMenu.lots");
@@ -113,37 +113,37 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
                 gui.drawString(str, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
             }
-
-
+            
+            
         }
-
+        
     }
-
+    
     @Override
-    public void drawMouseOver(GuiBase gui, int mX, int mY) {
-        super.drawMouseOver(gui, mX, mY);
-
+    public void renderTooltip(GuiBase gui, int mX, int mY) {
+        super.renderTooltip(gui, mX, mY);
+        
         DeathStats stats = getStats();
         if (stats != null) {
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
-
-
+                
+                
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
-                    gui.drawMouseOver(stats.getDescription(i), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltip(stats.getDescription(i), mX + gui.getLeft(), mY + gui.getTop());
                     break;
                 }
             }
         }
     }
-
+    
     @Override
     public void onClick(GuiBase gui, int mX, int mY, int b) {
         super.onClick(gui, mX, mY, b);
-
+        
         scrollBar.onClick(gui, mX, mY);
-
+        
         if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translate(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
@@ -159,7 +159,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
             for (int i = start; i < end; i++) {
                 DeathStats stats = deathStats[i];
-
+                
                 if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {
                         playerId = null;
@@ -170,27 +170,27 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             }
         }
     }
-
+    
     @Override
     public void onDrag(GuiBase gui, int mX, int mY) {
         scrollBar.onDrag(gui, mX, mY);
     }
-
+    
     @Override
     public void onRelease(GuiBase gui, int mX, int mY) {
         scrollBar.onRelease(gui, mX, mY);
     }
-
+    
     @Override
-    public void onScroll(GuiBase gui, int mX, int mY, int scroll) {
+    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
         scrollBar.onScroll(gui, mX, mY, scroll);
     }
-
+    
     @Override
     public void save(GuiBase gui) {
-
+        
     }
-
+    
     private DeathStats getStats() {
         if (showBest) {
             return DeathStats.getBest();
@@ -202,10 +202,10 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             return null;
         }
     }
-
+    
     private int getColor(boolean selected, boolean inBounds) {
         return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
     }
-
-
+    
+    
 }

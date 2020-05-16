@@ -1,106 +1,68 @@
 package hardcorequesting.commands;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.CommandNotFoundException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import hardcorequesting.commands.sub.*;
+import hardcorequesting.quests.QuestingData;
+import hardcorequesting.util.Translator;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class CommandHandler extends CommandBase {
+import static net.minecraft.server.command.CommandManager.literal;
 
-    public static Map<String, ISubCommand> commands = new LinkedHashMap<>();
-    public static CommandHandler instance = new CommandHandler();
-
+public class CommandHandler {
+    public static final Map<String, SubCommand> SUB_COMMANDS;
+    
     static {
-        register(new CommandHelp());
-        register(new CommandVersion());
-        register(new CommandQuest());
-        register(new CommandHardcore());
-        register(new CommandLives());
-        register(new CommandOpBook());
-        register(new CommandEditMode());
-        register(new CommandEnable());
-        register(new CommandSave());
-        register(new CommandLoad());
+        SUB_COMMANDS = new HashMap<>();
+        SUB_COMMANDS.put("help", new HelpSubCommand());
+        SUB_COMMANDS.put("hardcore", new HardcoreSubCommand());
+        SUB_COMMANDS.put("lives", new LivesSubCommand());
+        SUB_COMMANDS.put("op", new OpSubCommand());
+        SUB_COMMANDS.put("edit", new EditSubCommand());
+        SUB_COMMANDS.put("quest", new QuestSubCommand());
+        SUB_COMMANDS.put("enable", new EnableSubCommand());
+        SUB_COMMANDS.put("version", new VersionSubCommand());
     }
-
-    public static void register(ISubCommand command) {
-        commands.put(command.getCommandName(), command);
-    }
-
-    public static boolean commandExists(String name) {
-        return commands.containsKey(name);
-    }
-
-    public static boolean isOwnerOrOp(ICommandSender sender) {
-        if (sender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) sender;
-            GameProfile username = player.getGameProfile();
-            return isCommandsAllowedOrOwner(sender, username);
-        } else
-            return true;
-    }
-
-    public static boolean isCommandsAllowedOrOwner(ICommandSender sender, GameProfile username) {
-        return sender.getServer().getPlayerList().canSendCommands(username) || (sender.getServer().isSinglePlayer() && sender.getServer().getServerOwner().equals(username.getName()));
-    }
-
-    public static ISubCommand getCommand(String commandName) {
-        return commands.get(commandName);
-    }
-
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return true;
-    }
-
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-        if (args.length == 1) {
-            String subCommand = args[0];
-            List<String> result = new ArrayList<>();
-            for (ISubCommand command : commands.values()) {
-                if (command.isVisible(sender) && command.getCommandName().startsWith(subCommand))
-                    result.add(command.getCommandName());
-            }
-            return result;
-        } else if (commands.containsKey(args[0]) && commands.get(args[0]).isVisible(sender)) {
-            return commands.get(args[0]).addTabCompletionOptions(sender, Arrays.copyOfRange(args, 1, args.length));
+    
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        LiteralArgumentBuilder<ServerCommandSource> builder = literal("hqm");
+        for (String s : SUB_COMMANDS.keySet()) {
+            builder = builder.then(SUB_COMMANDS.get(s).build(literal(s)));
         }
-        return new ArrayList<>();
+        dispatcher.register(builder.executes(context -> {
+            return 1;
+        }));
     }
-
-    @Override
-    public String getName() {
-        return "hqm";
-    }
-
-    @Override
-    public String getUsage(ICommandSender sender) {
-        return "/" + getName() + " help";
-    }
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if (args.length < 1) {
-            args = new String[]{"help"};
+    
+    public interface SubCommand {
+        ArgumentBuilder<ServerCommandSource, ?> build(LiteralArgumentBuilder<ServerCommandSource> builder);
+        
+        default int[] getSyntaxOptions(CommandContext<ServerCommandSource> context) {
+            return new int[0];
         }
-        ISubCommand command = commands.get(args[0]);
-        if (command != null) {
-            if (command.isVisible(sender) && (sender.canUseCommand(command.getPermissionLevel(), getName() + " " + command.getCommandName())
-                    || (sender instanceof EntityPlayerMP && command.getPermissionLevel() <= 0))) {
-                command.handleCommand(sender, Arrays.copyOfRange(args, 1, args.length));
-                return;
-            }
-            throw new CommandException(CommandStrings.NO_PERMISSION);
+        
+        default void currentLives(PlayerEntity player) {
+            player.getCommandSource().sendFeedback(new LiteralText("You currently have " + QuestingData.getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        throw new CommandNotFoundException(CommandStrings.NOT_FOUND);
+        
+        default void currentLives(ServerCommandSource source, PlayerEntity player) {
+            source.sendFeedback(new LiteralText(player.getEntityName() + " currently has " + QuestingData.getQuestingData(player).getLives() + " live(s) left."), false);
+        }
+        
+        default void sendChat(ServerCommandSource sender, String key, Object... args) {
+            sendChat(sender, false, key, args);
+        }
+        
+        default void sendChat(ServerCommandSource sender, boolean plural, String key, Object... args) {
+            sender.sendFeedback(new TranslatableText(Translator.translate(plural, key, args)), false);
+        }
     }
 }

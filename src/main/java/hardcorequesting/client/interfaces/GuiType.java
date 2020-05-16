@@ -4,12 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.network.IMessage;
 import hardcorequesting.network.message.OpenGuiMessage;
-import hardcorequesting.tileentity.TileEntityTracker;
+import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -21,10 +21,10 @@ public enum GuiType {
         public IMessage build(String... data) {
             return null;
         }
-
+        
         @Override
-        public void open(EntityPlayer player, String data) {
-
+        public void open(PlayerEntity player, String data) {
+            
         }
     },
     TRACKER {
@@ -32,8 +32,8 @@ public enum GuiType {
         private static final String QUEST = "quest";
         private static final String RADIUS = "radius";
         private static final String TYPE = "trackerType";
-
-
+        
+        
         @Override
         public IMessage build(String... data) {
             StringWriter stringWriter = new StringWriter();
@@ -47,12 +47,12 @@ public enum GuiType {
                 writer.endObject();
             } catch (IOException ignored) {
             }
-
+            
             return new OpenGuiMessage(this, stringWriter.toString());
         }
-
+        
         @Override
-        public void open(EntityPlayer player, String data) {
+        public void open(PlayerEntity player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
@@ -60,7 +60,7 @@ public enum GuiType {
             UUID questId = quest.isJsonNull() ? null : UUID.fromString(root.getAsString());
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
-            TileEntityTracker.openInterface(player, pos, questId, radius, type);
+            TrackerBlockEntity.openInterface(player, pos, questId, radius, type);
         }
     },
     BOOK {
@@ -68,14 +68,14 @@ public enum GuiType {
         public IMessage build(String... data) {
             return new OpenGuiMessage(this, data[0]);
         }
-
+        
         @Override
-        public void open(EntityPlayer player, String data) {
+        public void open(PlayerEntity player, String data) {
             GuiQuestBook.displayGui(player, Boolean.parseBoolean(data));
         }
     };
-
+    
     public abstract IMessage build(String... data);
-
-    public abstract void open(EntityPlayer player, String data);
+    
+    public abstract void open(PlayerEntity player, String data);
 }

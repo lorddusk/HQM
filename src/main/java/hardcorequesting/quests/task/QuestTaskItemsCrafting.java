@@ -4,38 +4,38 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
-import net.minecraft.entity.player.EntityPlayer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.DefaultedList;
 
 public class QuestTaskItemsCrafting extends QuestTaskItems {
-
+    
     public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.CRAFTING);
     }
-
+    
     @Override
-    public void onUpdate(EntityPlayer player) {
-
+    public void onUpdate(PlayerEntity player) {
+        
     }
-
+    
     @Override
-    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
-        create(event.player, event.crafting);
+    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
+        create(player, stack);
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
         return GuiEditMenuItem.Type.CRAFTING_TASK;
     }
-
-    private void create(EntityPlayer player, ItemStack stack) {
-        if (!player.getEntityWorld().isRemote) {
+    
+    private void create(PlayerEntity player, ItemStack stack) {
+        if (!player.getEntityWorld().isClient) {
             if (!stack.isEmpty()) {
                 //no need for the quest to be active
                 //if (parent.isVisible(player) && parent.isEnabled(player) && isVisible(player)) {
@@ -43,13 +43,13 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
                 if (stack.getCount() == 0) {
                     stack.setCount(1);
                 }
-                NonNullList<ItemStack> list = NonNullList.create();
+                DefaultedList<ItemStack> list = DefaultedList.of();
                 list.add(stack);
-                increaseItems(list, (QuestDataTaskItems) getData(player), player.getPersistentID());
+                increaseItems(list, (QuestDataTaskItems) getData(player), player.getUuid());
                 //}
             }
         }
     }
-
-
+    
+    
 }

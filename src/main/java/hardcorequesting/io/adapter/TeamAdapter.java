@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class TeamAdapter {
-
+    
     private static Map<Team, List<Integer>> invitesMap = new HashMap<>();
     public static final TypeAdapter<Team> TEAM_ADAPTER = new TypeAdapter<Team>() {
         private static final String ID = "id";
@@ -30,12 +30,12 @@ public class TeamAdapter {
         private static final String QUEST_ID = "questId";
         private static final String QUEST_DATA = "questData";
         private static final String INVITES = "invites";
-
+        
         @Override
         public void write(JsonWriter out, Team value) throws IOException {
-        		if(value == null)
-        			return;
-        	
+            if (value == null)
+                return;
+            
             out.beginObject();
             out.name(ID).value(value.getId());
             out.name(NAME).value(value.getName());
@@ -68,7 +68,7 @@ public class TeamAdapter {
             out.endArray();
             out.endObject();
         }
-
+        
         @Override
         public Team read(JsonReader in) throws IOException {
             in.beginObject();
@@ -162,11 +162,11 @@ public class TeamAdapter {
             return team;
         }
     };
-
+    
     public static void clearInvitesMap() {
         invitesMap.clear();
     }
-
+    
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
             Map<Integer, Team> tempMap = new HashMap<>();

@@ -7,26 +7,27 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskReputationKill;
 import hardcorequesting.util.Translator;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.UUID;
 
 public class QuestTaskReputationKill extends QuestTaskReputation {
-
+    
     private int kills;
-
+    
     public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 20);
-
+        
         register(EventTrigger.Type.DEATH);
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
+    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         super.draw(gui, player, mX, mY);
         int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
         if (Quest.canQuestsBeEdited()) {
@@ -35,21 +36,21 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
             gui.drawString(gui.getLinesFromText(killCount == kills ? GuiColor.GREEN + Translator.translate(kills != 1, "hqm.repKil.killCount", kills) : Translator.translate("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }
     }
-
+    
     @Override
     public float getCompletedRatio(UUID playerID) {
         return (float) ((QuestDataTaskReputationKill) getData(playerID)).kills / kills;
     }
-
+    
     @Override
     public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         ((QuestDataTaskReputationKill) own).kills = Math.max(((QuestDataTaskReputationKill) own).kills, ((QuestDataTaskReputationKill) other).kills);
-
+        
         if (((QuestDataTaskReputationKill) own).kills == kills) {
             completeTask(playerID);
         }
     }
-
+    
     @Override
     public void autoComplete(UUID playerID, boolean status) {
         if (status) {
@@ -58,52 +59,52 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
             this.kills = 0;
         }
     }
-
+    
     @Override
-    protected EntityPlayer getPlayerForRender(EntityPlayer player) {
+    protected PlayerEntity getPlayerForRender(PlayerEntity player) {
         return null;
     }
-
+    
     @Override
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskReputationKill.class;
     }
-
+    
     @Override
-    public void onUpdate(EntityPlayer player) {
-
+    public void onUpdate(PlayerEntity player) {
+        
     }
-
+    
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
-
+        
         ((QuestDataTaskReputationKill) own).kills = ((QuestDataTaskReputationKill) other).kills;
     }
-
+    
     @Override
-    public void onLivingDeath(LivingDeathEvent event) {
-        EntityPlayer killer = QuestTaskMob.getKiller(event);
-        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(event.getEntityLiving())) {
-            if (event.getEntityLiving() instanceof EntityPlayer && isPlayerInRange((EntityPlayer) event.getEntityLiving())) {
+    public void onLivingDeath(LivingEntity entity, DamageSource source) {
+        PlayerEntity killer = QuestTaskMob.getKiller(source);
+        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
+            if (entity instanceof PlayerEntity && isPlayerInRange((PlayerEntity) entity)) {
                 QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill) getData(killer);
                 if (killData.kills < kills) {
                     killData.kills += 1;
-
+                    
                     if (killData.kills == kills) {
-                        completeTask(killer.getUniqueID());
+                        completeTask(killer.getUuid());
                     }
-
+                    
                     parent.sendUpdatedDataToTeam(killer);
                 }
             }
         }
     }
-
+    
     public int getKills() {
         return kills;
     }
-
+    
     public void setKills(int kills) {
         this.kills = kills;
     }

@@ -1,18 +1,18 @@
 package hardcorequesting.tileentity;
 
-import com.mojang.authlib.GameProfile;
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.Translator;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public enum TrackerType {
     TEAM("team") {
         @Override
-        public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
+        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : QuestingData.getAllTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
@@ -30,21 +30,21 @@ public enum TrackerType {
     },
     PLAYER("player") {
         @Override
-        public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
+        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : QuestingData.getAllTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
-
+                    
                     for (PlayerEntry entry : team.getPlayers()) {
                         if (entry.isInTeam()) {
                             boolean valid = radius == 0;
                             if (!valid) {
-                                EntityPlayer player = QuestingData.getPlayer(entry.getUUID());
+                                PlayerEntity player = QuestingData.getPlayer(entry.getUUID());
                                 if (player != null && isPlayerWithinRadius(tracker, player, radius)) {
                                     valid = true;
                                 }
                             }
-
+                            
                             if (valid) {
                                 meta++;
                                 if (meta == 15) {
@@ -53,7 +53,7 @@ public enum TrackerType {
                             }
                         }
                     }
-
+                    
                 }
             }
             return meta;
@@ -61,7 +61,7 @@ public enum TrackerType {
     },
     PROGRESS_MAX("progressMax") {
         @Override
-        public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
+        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : QuestingData.getAllTeams()) {
                 int newMeta = (int) (quest.getProgress(team) * 15);
@@ -77,20 +77,17 @@ public enum TrackerType {
     },
     PROGRESS_CLOSE("progressClose") {
         @Override
-        public int getMeta(TileEntityTracker tracker, Quest quest, int radius) {
+        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             double closest = 0;
-            EntityPlayer closestPlayer = null;
-            for (GameProfile profile : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getOnlinePlayerProfiles()) {
-                EntityPlayer player = QuestingData.getPlayer(profile.getId());
-                if (player != null) {
-                    double distance = player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
-                    if (closestPlayer == null || distance < closest) {
-                        closest = distance;
-                        closestPlayer = player;
-                    }
+            PlayerEntity closestPlayer = null;
+            for (ServerPlayerEntity player : HardcoreQuesting.getServer().getPlayerManager().getPlayerList()) {
+                double distance = player.squaredDistanceTo(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
+                if (closestPlayer == null || distance < closest) {
+                    closest = distance;
+                    closestPlayer = player;
                 }
             }
-
+            
             if (closestPlayer != null) {
                 return (int) (quest.getProgress(QuestingData.getQuestingData(closestPlayer).getTeam()) * 15);
             } else {
@@ -98,23 +95,23 @@ public enum TrackerType {
             }
         }
     };
-
-
+    
+    
     private String id;
-
+    
     TrackerType(String name) {
         this.id = name;
     }
-
-    private static boolean isPlayerWithinRadius(TileEntityTracker tracker, EntityPlayer player, int radius) {
-        return player.getDistanceSq(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
+    
+    private static boolean isPlayerWithinRadius(TrackerBlockEntity tracker, PlayerEntity player, int radius) {
+        return player.squaredDistanceTo(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
     }
-
-    private static boolean isValid(boolean valid, Team team, TileEntityTracker tracker, int radius) {
+    
+    private static boolean isValid(boolean valid, Team team, TrackerBlockEntity tracker, int radius) {
         if (!valid) {
             for (PlayerEntry entry : team.getPlayers()) {
                 if (entry.isInTeam()) {
-                    EntityPlayer player = QuestingData.getPlayer(entry.getUUID());
+                    PlayerEntity player = QuestingData.getPlayer(entry.getUUID());
                     if (player != null && isPlayerWithinRadius(tracker, player, radius))
                         return true;
                 }
@@ -122,14 +119,14 @@ public enum TrackerType {
         }
         return valid;
     }
-
+    
     public String getName() {
         return Translator.translate("hqm.tracker." + id + ".title");
     }
-
+    
     public String getDescription() {
         return Translator.translate("hqm.tracker." + id + ".desc");
     }
-
-    public abstract int getMeta(TileEntityTracker tracker, Quest quest, int radius);
+    
+    public abstract int getMeta(TrackerBlockEntity tracker, Quest quest, int radius);
 }

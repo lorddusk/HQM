@@ -2,120 +2,137 @@ package hardcorequesting.client.interfaces;
 
 
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.util.NarratorManager;
+import net.minecraft.util.Identifier;
 
-import java.io.IOException;
-
-@SideOnly(Side.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiWrapperEditMenu extends GuiBase {
-
-    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
-    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
+    
+    public static final Identifier BG_TEXTURE = ResourceHelper.getResource("wrapper");
+    public static final Identifier C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
     private static final int TEXTURE_WIDTH = 170;
     private static final int TEXTURE_HEIGHT = 234;
     private GuiEditMenu editMenu;
-
+    
+    public GuiWrapperEditMenu() {
+        super(NarratorManager.EMPTY);
+    }
+    
     @Override
     public void setEditMenu(GuiEditMenu editMenu) {
-
         if (editMenu != null) {
             this.editMenu = editMenu;
         } else {
-            this.mc.displayGuiScreen(null);
+            this.minecraft.openScreen(null);
         }
     }
-
+    
     @Override
-    public void drawScreen(int mX0, int mY0, float f) {
+    public void render(int mX0, int mY0, float f) {
         boolean doublePage = editMenu.doesRequiredDoublePage();
-
+        
         this.left = (this.width - (doublePage ? TEXTURE_WIDTH * 2 : TEXTURE_WIDTH)) / 2;
         this.top = (this.height - TEXTURE_HEIGHT) / 2;
-
+        
         applyColor(0xFFFFFFFF);
-
+        
         ResourceHelper.bindResource(BG_TEXTURE);
-
-
+        
+        
         drawRect(0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         if (doublePage) {
             drawRect(TEXTURE_WIDTH, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
         }
-
+        
         applyColor(0xFFFFFFFF);
-
+        
         ResourceHelper.bindResource(MAP_TEXTURE);
-
-
+        
+        
         int mX = mX0 - left;
         int mY = mY0 - top;
-
+        
         if (editMenu != null) {
             editMenu.draw(this, mX, mY);
-            editMenu.drawMouseOver(this, mX, mY);
+            editMenu.renderTooltip(this, mX, mY);
         }
     }
-
+    
     @Override
-    protected void keyTyped(char c, int k) throws IOException {
-        super.keyTyped(c, k);
-
+    public boolean charTyped(char c, int k) {
+        if (super.charTyped(c, k)) {
+            return true;
+        }
+        
         if (editMenu != null) {
-            editMenu.onKeyTyped(this, c, k);
+            editMenu.onKeyStroke(this, c, -1);
+            return true;
         }
-    }
-
-    @Override
-    protected void mouseClicked(int mX0, int mY0, int b) {
-        int mX = mX0 - left;
-        int mY = mY0 - top;
-
-        if (editMenu != null) {
-            editMenu.onClick(this, mX, mY, b);
-        }
-    }
-
-    @Override
-    protected void mouseReleased(int mX0, int mY0, int b) {
-        int mX = mX0 - left;
-        int mY = mY0 - top;
-
-        if (editMenu != null) {
-            editMenu.onRelease(this, mX, mY);
-        }
-    }
-
-    @Override
-    protected void mouseClickMove(int mX0, int mY0, int b, long ticks) {
-        int mX = mX0 - left;
-        int mY = mY0 - top;
-
-        if (editMenu != null) {
-            editMenu.onDrag(this, mX, mY);
-        }
-    }
-
-    @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-
-        if (editMenu != null) {
-            int x = (Mouse.getEventX() * this.width / this.mc.displayWidth) - left;
-            int y = (this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1) - top;
-
-            int scroll = Mouse.getEventDWheel();
-            if (scroll != 0) {
-                editMenu.onScroll(this, x, y, scroll);
-            }
-        }
-    }
-
-    @Override
-    public boolean doesGuiPauseGame() {
         return false;
     }
-
+    
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        
+        if (editMenu != null) {
+            editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean mouseClicked(double mX0, double mY0, int b) {
+        int mX = (int) (mX0 - left);
+        int mY = (int) (mY0 - top);
+        
+        if (editMenu != null) {
+            editMenu.onClick(this, mX, mY, b);
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean mouseReleased(double mX0, double mY0, int b) {
+        int mX = (int) (mX0 - left);
+        int mY = (int) (mY0 - top);
+        
+        if (editMenu != null) {
+            editMenu.onRelease(this, mX, mY);
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        int mX = (int) (mouseX - left);
+        int mY = (int) (mouseY - top);
+        
+        if (editMenu != null) {
+            editMenu.onDrag(this, mX, mY);
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+    
+    @Override
+    public boolean mouseScrolled(double d, double e, double amount) {
+        if (super.mouseScrolled(d, e, amount)) {
+            return true;
+        }
+        editMenu.onScroll(this, d, e, amount);
+        return true;
+    }
+    
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+    
 }

@@ -4,33 +4,31 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.DefaultedList;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
 public class QuestTaskItemsDetect extends QuestTaskItems {
-
+    
     public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-
+        
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
         return GuiEditMenuItem.Type.CRAFTING_TASK;
     }
-
+    
     @Override
     public void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
         boolean isDone = true;
@@ -41,36 +39,36 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
                 isDone = false;
             }
         }
-
+        
         if (isDone) {
             completeTask(playerID);
         }
         parent.sendUpdatedDataToTeam(playerID);
     }
-
+    
     @Override
-    public void onUpdate(EntityPlayer player) {
+    public void onUpdate(PlayerEntity player) {
         countItems(player, ItemStack.EMPTY);
     }
-
+    
     @Override
-    public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
-        onCrafting(event.player, event.crafting, event.craftMatrix);
+    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
+        onCrafting(player, stack);
     }
-
+    
     @Override
-    public void onItemPickUp(EntityItemPickupEvent event) {
-        countItems(event.getEntityPlayer(), event.getItem().getItem());
+    public void onItemPickUp(PlayerEntity playerEntity, ItemStack stack) {
+        countItems(playerEntity, stack);
     }
-
+    
     @Override
     public void onOpenBook(EventTrigger.BookOpeningEvent event) {
         if (event.isRealName()) {
             countItems(event.getPlayer(), ItemStack.EMPTY);
         }
     }
-
-    public void onCrafting(EntityPlayer player, ItemStack stack, IInventory craftMatrix) {
+    
+    public void onCrafting(PlayerEntity player, ItemStack stack) {
         if (player != null) {
             stack = stack.copy();
             if (stack.getCount() == 0) {
@@ -79,24 +77,24 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
             countItems(player, stack);
         }
     }
-
-    private void countItems(EntityPlayer player, ItemStack stack) {
-        if(!player.getEntityWorld().isRemote){
-            NonNullList<ItemStack> items = NonNullList.withSize(player.inventory.mainInventory.size() + 1, ItemStack.EMPTY);
-            Collections.copy(items, player.inventory.mainInventory);
-            if(!stack.isEmpty()){
+    
+    private void countItems(PlayerEntity player, ItemStack stack) {
+        if (!player.getEntityWorld().isClient) {
+            DefaultedList<ItemStack> items = DefaultedList.ofSize(player.inventory.main.size() + 1, ItemStack.EMPTY);
+            Collections.copy(items, player.inventory.main);
+            if (!stack.isEmpty()) {
                 items.set(items.size() - 1, stack);
             }
-            countItems(items, (QuestDataTaskItems) getData(player), player.getPersistentID());
+            countItems(items, (QuestDataTaskItems) getData(player), player.getUuid());
         }
     }
-
-    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
+    
+    public void countItems(DefaultedList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
         if (!parent.isAvailable(playerID)) return;
-
-
+        
+        
         boolean updated = false;
-
+        
         if (data.progress.length < items.length)
             data.progress = Arrays.copyOf(data.progress, items.length);
         for (int i = 0; i < items.length; i++) {
@@ -104,7 +102,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
             if (!item.hasItem || item.required == data.progress[i]) {
                 continue;
             }
-
+            
             for (ItemStack stack : itemsToCount) {
                 if (item.getPrecision().areItemsSame(stack, item.getStack())) {
                     int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
@@ -113,16 +111,16 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
                 }
             }
         }
-
-
+        
+        
         if (updated) {
             doCompletionCheck(data, playerID);
         }
     }
-
+    
     @Override
-    public boolean allowDetect () {
+    public boolean allowDetect() {
         return true;
     }
-
+    
 }

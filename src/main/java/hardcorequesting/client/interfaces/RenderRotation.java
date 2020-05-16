@@ -5,12 +5,12 @@ public enum RenderRotation {
     ROTATE_90,
     ROTATE_180,
     ROTATE_270,
-
+    
     FLIP_HORIZONTAL,
     ROTATE_90_FLIP,
     FLIP_VERTICAL,
     ROTATE_270_FLIP;
-
+    
     public RenderRotation getNextRotation() {
         switch (this) {
             default:
@@ -22,7 +22,7 @@ public enum RenderRotation {
                 return ROTATE_270;
             case ROTATE_270:
                 return NORMAL;
-
+            
             case FLIP_HORIZONTAL:
                 return ROTATE_90_FLIP;
             case ROTATE_90_FLIP:
@@ -33,7 +33,7 @@ public enum RenderRotation {
                 return FLIP_HORIZONTAL;
         }
     }
-
+    
     public RenderRotation getFlippedRotation() {
         switch (this) {
             default:
@@ -45,7 +45,7 @@ public enum RenderRotation {
                 return FLIP_VERTICAL;
             case ROTATE_270:
                 return ROTATE_270_FLIP;
-
+            
             case FLIP_HORIZONTAL:
                 return NORMAL;
             case ROTATE_90_FLIP:
@@ -56,5 +56,5 @@ public enum RenderRotation {
                 return ROTATE_270;
         }
     }
-
+    
 }

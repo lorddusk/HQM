@@ -1,49 +1,46 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestingData;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 import java.util.UUID;
 
 public class LivesUpdate implements IMessage {
-
+    
     private UUID uuid;
     private int lives;
-
+    
     public LivesUpdate() {
     }
-
+    
     public LivesUpdate(UUID uuid, int lives) {
         this.uuid = uuid;
         this.lives = lives;
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.lives = buf.readInt();
-        uuid = new PacketBuffer(buf).readUniqueId();
+        uuid = buf.readUuid();
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(this.lives);
-        new PacketBuffer(buf).writeUniqueId(this.uuid);
+        buf.writeUuid(this.uuid);
     }
-
+    
     public static class Handler implements IMessageHandler<LivesUpdate, IMessage> {
-
         @Override
-        public IMessage onMessage(LivesUpdate message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(LivesUpdate message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(LivesUpdate message, MessageContext ctx) {
+        
+        private void handle(LivesUpdate message, PacketContext ctx) {
             QuestingData.getQuestingData(message.uuid).setRawLives(message.lives);
         }
     }

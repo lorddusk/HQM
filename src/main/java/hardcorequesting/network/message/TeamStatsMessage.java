@@ -1,41 +1,39 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TeamStatsMessage implements IMessage {
-
+    
     private List<TeamStats> stats;
-
+    
     public TeamStatsMessage() {
     }
-
+    
     public TeamStatsMessage(Team team) {
         stats = new ArrayList<>();
         stats.add(team.toStat());
     }
-
+    
     public TeamStatsMessage(List<Team> teams) {
         stats = teams.stream().map(Team::toStat).collect(Collectors.toList());
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         int size = buf.readInt();
         stats = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            String name = ByteBufUtils.readUTF8String(buf);
-            if(name == "NULL")
+            String name = buf.readString(32767);
+            if (name.equals("NULL"))
                 name = null;
             
             int players = buf.readInt();
@@ -44,31 +42,30 @@ public class TeamStatsMessage implements IMessage {
             stats.add(new TeamStats(name, players, lives, progress));
         }
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(stats.size());
         for (TeamStats teamStats : stats) {
             if (teamStats.getName() != null) {
-                ByteBufUtils.writeUTF8String(buf, teamStats.getName());
-            }
-            else
-                ByteBufUtils.writeUTF8String(buf, "NULL");
+                buf.writeString(teamStats.getName());
+            } else
+                buf.writeString("NULL");
             buf.writeInt(teamStats.getPlayers());
             buf.writeInt(teamStats.getLives());
             buf.writeFloat(teamStats.getProgress());
         }
     }
-
+    
     public static class Handler implements IMessageHandler<TeamStatsMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(TeamStatsMessage message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(TeamStatsMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(TeamStatsMessage message, MessageContext ctx) {
+        
+        private void handle(TeamStatsMessage message, PacketContext ctx) {
             if (message.stats.size() == 1)
                 TeamStats.updateTeam(message.stats.get(0));
             else

@@ -11,21 +11,21 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class QuestDataTaskItems extends QuestDataTask {
-
+    
     private static final String COUNT = "count";
     private static final String PROGRESS = "progress";
     public int[] progress;
-
+    
     public QuestDataTaskItems(QuestTask task) {
         super(task);
         this.progress = new int[((QuestTaskItems) task).getItems().length];
     }
-
+    
     protected QuestDataTaskItems() {
         super();
         this.progress = new int[0];
     }
-
+    
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskItems taskData = new QuestDataTaskItems();
         try {
@@ -53,12 +53,12 @@ public class QuestDataTaskItems extends QuestDataTask {
         }
         return taskData;
     }
-
+    
     @Override
     public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.ITEMS;
     }
-
+    
     @Override
     public void write(JsonWriter out) throws IOException {
         super.write(out);
@@ -68,22 +68,22 @@ public class QuestDataTaskItems extends QuestDataTask {
             out.value(i);
         out.endArray();
     }
-
+    
     @Override
     public void update(QuestDataTask taskData) {
         super.update(taskData);
         this.progress = ((QuestDataTaskItems) taskData).progress;
     }
     
-    public int getProgressFor(int index){
-        if(this.progress.length > index){
+    public int getProgressFor(int index) {
+        if (this.progress.length > index) {
             return this.progress[index];
         }
         this.progress = Arrays.copyOf(this.progress, index); // We need to be sure that the progress per item has the same length as the required items
         return 0;
     }
     
-    public boolean isDone(int index, QuestTaskItems.ItemRequirement requirement){
+    public boolean isDone(int index, QuestTaskItems.ItemRequirement requirement) {
         return this.getProgressFor(index) >= requirement.required;
     }
 }

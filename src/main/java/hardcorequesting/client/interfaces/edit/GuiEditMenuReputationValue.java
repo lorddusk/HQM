@@ -4,52 +4,52 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
-
+    
     private ReputationMarker marker;
     private int value;
-
-    public GuiEditMenuReputationValue(GuiBase gui, EntityPlayer player, ReputationMarker marker) {
+    
+    public GuiEditMenuReputationValue(GuiBase gui, PlayerEntity player, ReputationMarker marker) {
         super(gui, player, true, -1, -1, 25, 30);
-
+        
         this.marker = marker;
         this.value = marker.getValue();
-
+        
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repValue.tierValue") {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;
             }
-
+            
             @Override
             protected int getValue() {
                 return value;
             }
-
+            
             @Override
             protected void setValue(int number) {
                 value = number;
             }
         });
     }
-
+    
     @Override
     protected void onArrowClick(boolean left) {
-
+        
     }
-
+    
     @Override
     protected String getArrowText() {
         return null;
     }
-
+    
     @Override
     protected String getArrowDescription() {
         return null;
     }
-
+    
     @Override
     public void save(GuiBase gui) {
         marker.setValue(value);

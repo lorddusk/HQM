@@ -10,29 +10,29 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 public class GroupTier {
-
+    
     private String name;
     private GuiColor color;
     private int[] weights;
-
+    
     public GroupTier(String name, GuiColor color, int... weights) {
         this.name = name;
         this.color = color;
         this.weights = Arrays.copyOf(weights, weights.length);
     }
-
+    
     public static List<GroupTier> getTiers() {
         return QuestLine.getActiveQuestLine().tiers;
     }
-
+    
     public static void saveAll() {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
@@ -40,7 +40,7 @@ public class GroupTier {
             HardcoreQuesting.LOG.info("Failed to save bags to local file");
         }
     }
-
+    
     public static void saveAllDefault() {
         try {
             SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
@@ -48,7 +48,7 @@ public class GroupTier {
             HardcoreQuesting.LOG.info("Failed to save bags to the default file");
         }
     }
-
+    
     public static void loadAll(boolean remote) {
         try {
             Group.getGroups().clear();
@@ -58,14 +58,14 @@ public class GroupTier {
             HardcoreQuesting.LOG.info("Failed to load bags from the remote folder");
         }
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar tierScroll, int x, int y) {
         List<GroupTier> tiers = GroupTier.getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
             GroupTier groupTier = tiers.get(i);
-
+            
             int posY = GuiQuestBook.TIERS_Y + GuiQuestBook.TIERS_SPACING * (i - start);
             if (gui.inBounds(GuiQuestBook.TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, x, y)) {
                 switch (gui.getCurrentMode()) {
@@ -99,7 +99,7 @@ public class GroupTier {
             }
         }
     }
-
+    
     public static void initBaseTiers(QuestLine questLine) {
         questLine.tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
         questLine.tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
@@ -108,31 +108,31 @@ public class GroupTier {
         questLine.tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
         questLine.tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
     }
-
+    
     public String getName() {
         return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }
-
+    
     public GuiColor getColor() {
         return color;
     }
-
+    
     public void setColor(GuiColor color) {
         this.color = color;
     }
-
+    
     public int[] getWeights() {
         return weights;
     }
-
+    
     public GroupTier copy() {
         return new GroupTier(getName(), getColor(), getWeights());
     }
-
+    
     public void load(GroupTier tier) {
         this.name = tier.name;
         this.color = tier.color;

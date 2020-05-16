@@ -2,203 +2,203 @@ package hardcorequesting.event;
 
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.item.ItemEvent;
-import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.server.ServerTickCallback;
+import net.fabricmc.fabric.api.event.world.WorldTickCallback;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Mod.EventBusSubscriber
-public class EventTrigger{
-
+public class EventTrigger {
+    
     private static EventTrigger instance;
     private List<QuestTask>[] registeredTasks;
-
+    
     public EventTrigger() {
         registeredTasks = new List[Type.values().length];
         for (int i = 0; i < registeredTasks.length; i++) {
             registeredTasks[i] = new CopyOnWriteArrayList<>();
         }
-        MinecraftForge.EVENT_BUS.register(this);
+        ServerTickCallback.EVENT.register(this::onServerTick);
+        WorldTickCallback.EVENT.register(world -> {
+            for (PlayerEntity player : world.getPlayers()) {
+                if (player instanceof ServerPlayerEntity) {
+                    onPlayerTick((ServerPlayerEntity) player);
+                }
+            }
+        });
+        UseItemCallback.EVENT.register(this::onItemUsed);
+        UseBlockCallback.EVENT.register(this::onBlockUsed);
         instance = this;
     }
-
+    
     public static EventTrigger instance() {
         return instance;
     }
-
+    
     public void clear() {
         for (List<QuestTask> registeredTask : registeredTasks) {
             registeredTask.clear();
         }
     }
-
+    
     public void add(QuestTask task, Type... types) {
         for (Type type : types) {
             registeredTasks[type.ordinal()].add(task);
         }
     }
-
+    
     public void remove(QuestTask task) {
         for (List<QuestTask> registeredTask : registeredTasks) {
             registeredTask.remove(task);
         }
     }
-
-    @SubscribeEvent
-    public void onPlayerLogin (PlayerEvent.PlayerLoggedInEvent event) {
+    
+    public void onPlayerLogin(ServerPlayerEntity entity) {
         for (List<QuestTask> list : registeredTasks) {
             list.removeIf((q) -> !q.isValid());
         }
+        if (QuestingData.isQuestActive()) {
+            QuestingData.spawnBook(entity);
+        }
     }
-
-    @SubscribeEvent
-    public void onEvent(TickEvent.ServerTickEvent event) {
+    
+    public void onServerTick(MinecraftServer server) {
         for (QuestTask task : getTasks(Type.SERVER)) {
-            task.onServerTick(event);
+            task.onServerTick(server);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(TickEvent.PlayerTickEvent event) {
+    
+    public void onPlayerTick(ServerPlayerEntity playerEntity) {
         for (QuestTask task : getTasks(Type.PLAYER)) {
-            task.onPlayerTick(event);
+            task.onPlayerTick(playerEntity);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(LivingDeathEvent event) {
+    
+    public void onLivingDeath(LivingEntity entity, DamageSource source) {
         for (QuestTask task : getTasks(Type.DEATH)) {
-            task.onLivingDeath(event);
+            task.onLivingDeath(entity, source);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(PlayerEvent.PlayerLoggedInEvent event) {
-        if(QuestingData.isQuestActive()) {
-            QuestingData.spawnBook(event.player);
-        }
-    }
-
-    @SubscribeEvent
-    public void onEvent(PlayerEvent.ItemCraftedEvent event) {
+    
+    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
         for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(event);
+            task.onCrafting(player, stack, craftingInv);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(AnvilRepairEvent event) {
-        CraftEventWrapper wrapper = new CraftEventWrapper(event.getEntityPlayer(), event);
-
-        for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(wrapper);
-        }
-    }
-
-    @SubscribeEvent
-    public void onEvent(PlayerEvent.ItemSmeltedEvent event) {
-        CraftEventWrapper wrapper = new CraftEventWrapper(event.player, event);
-
-        for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(wrapper);
-        }
-    }
-
-    @SubscribeEvent
-    public void onEvent(EntityItemPickupEvent event) {
+    
+    // TODO Anvil
+//    @SubscribeEvent
+//    public void onEvent(AnvilRepairEvent event) {
+//        CraftEventWrapper wrapper = new CraftEventWrapper(event.getEntityPlayer(), event);
+//        
+//        for (QuestTask task : getTasks(Type.CRAFTING)) {
+//            task.onCrafting(wrapper);
+//        }
+//    }
+    
+    // TODO Furnace
+//    @SubscribeEvent
+//    public void onEvent(PlayerEvent.ItemSmeltedEvent event) {
+//        CraftEventWrapper wrapper = new CraftEventWrapper(event.player, event);
+//        
+//        for (QuestTask task : getTasks(Type.CRAFTING)) {
+//            task.onCrafting(wrapper);
+//        }
+//    }
+    
+    public void onItemPickUp(PlayerEntity playerEntity, ItemStack stack) {
         for (QuestTask task : getTasks(Type.PICK_UP)) {
-            task.onItemPickUp(event);
+            task.onItemPickUp(playerEntity, stack);
         }
     }
-
+    
     public void onEvent(BookOpeningEvent event) {
         for (QuestTask task : getTasks(Type.OPEN_BOOK)) {
             task.onOpenBook(event);
         }
     }
-
+    
     public void onEvent(QuestCompletedEvent event) {
         for (QuestTask task : getTasks(Type.QUEST_COMPLETED)) {
             task.onQuestCompleted(event);
         }
     }
-
+    
     public void onEvent(QuestSelectedEvent event) {
         for (QuestTask task : getTasks(Type.QUEST_SELECTED)) {
             task.onQuestSelected(event);
         }
     }
-
+    
     public void onEvent(ReputationEvent event) {
         for (QuestTask task : getTasks(Type.REPUTATION_CHANGE)) {
             task.onReputationChange(event);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(AnimalTameEvent event) {
+    
+    public void onAnimalTame(PlayerEntity tamer, Entity entity) {
         for (QuestTask task : getTasks(Type.ANIMAL_TAME)) {
-            task.onAnimalTame(event);
+            task.onAnimalTame(tamer, entity);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(AdvancementEvent event) {
+    
+    public void onAdvancement(ServerPlayerEntity playerEntity) {
         for (QuestTask task : getTasks(Type.ADVANCEMENT)) {
-            task.onAdvancement(event);
+            task.onAdvancement(playerEntity);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(BlockEvent.BreakEvent event) {
+    
+    public void onBlockBreak(BlockPos blockPos, BlockState blockState, ServerPlayerEntity player) {
         for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
-            task.onBlockBroken(event);
+            task.onBlockBroken(blockPos, blockState, player);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(BlockEvent.PlaceEvent event) {
+    
+    public void onBlockPlaced(BlockItem item, ItemUsageContext context) {
         for (QuestTask task : getTasks(Type.BLOCK_PLACED)) {
-            task.onBlockPlaced(event);
+            task.onBlockPlaced(item, context);
         }
     }
-
-    @SubscribeEvent
-    public void onEvent(PlayerInteractEvent.RightClickItem event) {
+    
+    private TypedActionResult<ItemStack> onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
-            task.onItemUsed(event);
+            task.onItemUsed(playerEntity, world, hand);
         }
+        return TypedActionResult.pass(playerEntity.getStackInHand(hand));
     }
-
-    @SubscribeEvent
-    public void onEvent(PlayerInteractEvent.RightClickBlock event) {
+    
+    private ActionResult onBlockUsed(PlayerEntity playerEntity, World world, Hand hand, BlockHitResult blockHitResult) {
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
-            task.onItemUsed(event);
+            task.onBlockUsed(playerEntity, world, hand, blockHitResult);
         }
+        return ActionResult.PASS;
     }
-
-
+    
     private List<QuestTask> getTasks(Type type) {
         registeredTasks[type.ordinal()].removeIf((task) -> !task.isValid());
         return registeredTasks[type.ordinal()];
     }
-
+    
     public enum Type {
         SERVER,
         PLAYER,
@@ -215,82 +215,69 @@ public class EventTrigger{
         BLOCK_BROKEN,
         ITEM_USED
     }
-
+    
     public static class BookOpeningEvent {
-
+        
         private String playerName;
         private boolean isOpBook;
         private boolean isRealName;
-
+        
         public BookOpeningEvent(String playerName, boolean isOpBook, boolean isRealName) {
             this.playerName = playerName;
             this.isOpBook = isOpBook;
             this.isRealName = isRealName;
         }
-
+        
         public String getPlayerName() {
             return playerName;
         }
-
+        
         public boolean isOpBook() {
             return isOpBook;
         }
-
+        
         public boolean isRealName() {
             return isRealName;
         }
-
-        public EntityPlayer getPlayer() {
+        
+        public PlayerEntity getPlayer() {
             return QuestingData.getPlayerFromUsername(playerName);
         }
     }
-
-    @ParametersAreNonnullByDefault
+    
     public static class QuestCompletedEvent {
         private UUID questCompleted;
-        private EntityPlayer player;
-
-        public QuestCompletedEvent (EntityPlayer player, UUID questCompleted) {
+        private PlayerEntity player;
+        
+        public QuestCompletedEvent(PlayerEntity player, UUID questCompleted) {
             this.player = player;
             this.questCompleted = questCompleted;
         }
-
-        public UUID getQuestCompleted () { return questCompleted; }
-
-        public EntityPlayer getPlayer () {
+        
+        public UUID getQuestCompleted() { return questCompleted; }
+        
+        public PlayerEntity getPlayer() {
             return player;
         }
     }
-
+    
     public static class QuestSelectedEvent extends QuestCompletedEvent {
-        public QuestSelectedEvent (EntityPlayer player, UUID questSelected) {
+        public QuestSelectedEvent(PlayerEntity player, UUID questSelected) {
             super(player, questSelected);
         }
-
-        public UUID getQuestSelected () { return getQuestCompleted(); }
+        
+        public UUID getQuestSelected() { return getQuestCompleted(); }
     }
-
+    
     public static class ReputationEvent {
-
-        private EntityPlayer player;
-
-
-        public ReputationEvent(EntityPlayer player) {
+        private PlayerEntity player;
+        
+        public ReputationEvent(PlayerEntity player) {
             this.player = player;
         }
-
-        public EntityPlayer getPlayer() {
+        
+        public PlayerEntity getPlayer() {
             return player;
-        }
-    }
-
-    public static class CraftEventWrapper extends PlayerEvent.ItemCraftedEvent {
-        public CraftEventWrapper(EntityPlayer player, AnvilRepairEvent event) {
-            super(player, event.getItemResult(), null);
-        }
-
-        public CraftEventWrapper(EntityPlayer player, PlayerEvent.ItemSmeltedEvent event) {
-            super(player, event.smelting, null);
         }
     }
 }

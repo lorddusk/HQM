@@ -2,50 +2,46 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.GuiType;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 public class OpenGuiMessage implements IMessage {
-
     private String data;
     private GuiType gui;
-
+    
     public OpenGuiMessage() {
         this.gui = GuiType.NONE;
     }
-
+    
     public OpenGuiMessage(GuiType gui, String data) {
         this.gui = gui;
         this.data = data;
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.gui = GuiType.values()[buf.readInt()];
         if (this.gui == GuiType.NONE) return;
-        data = ByteBufUtils.readUTF8String(buf);        
+        data = buf.readString(32767);
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(this.gui.ordinal());
         if (this.gui == GuiType.NONE) return;
-        ByteBufUtils.writeUTF8String(buf, data);
+        buf.writeString(data);
     }
-
+    
     public static class Handler implements IMessageHandler<OpenGuiMessage, IMessage> {
-
         @Override
-        public IMessage onMessage(OpenGuiMessage message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(OpenGuiMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().submit(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(OpenGuiMessage message, MessageContext ctx) {
+        
+        private void handle(OpenGuiMessage message, PacketContext ctx) {
             message.gui.open(HardcoreQuesting.proxy.getPlayer(ctx), message.data);
         }
     }

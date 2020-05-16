@@ -1,5 +1,6 @@
 package hardcorequesting.event;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.Quest;
@@ -8,69 +9,63 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
 
-@Mod.EventBusSubscriber
 public class PlayerTracker {
-
+    
+    public static PlayerTracker instance;
     public static final String HQ_TAG = "HardcoreQuesting";
     public static final String RECEIVED_BOOK = "questBook";
-
+    
     public PlayerTracker() {
-        MinecraftForge.EVENT_BUS.register(this);
+        instance = this;
     }
-
-    public int getRemainingLives(ICommandSender sender) {
-        return QuestingData.getQuestingData((EntityPlayer) sender).getLives();
+    
+    public int getRemainingLives(PlayerEntity sender) {
+        return QuestingData.getQuestingData(sender).getLives();
     }
-
-    @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        EntityPlayer player = event.player;
+    
+    public void onPlayerLogin(ServerPlayerEntity player) {
         if (!QuestingData.hasData(player)) {
             DeathStats.resync();
         }
-
+        
         QuestLine.sendServerSync(player);
-
+        
         if (QuestingData.isHardcoreActive())
             sendLoginMessage(player);
-        else if (HQMConfig.Message.NO_HARDCORE_MESSAGE)
-            player.sendMessage(new TextComponentTranslation("hqm.message.noHardcore"));
-
+        else if (HQMConfig.getInstance().Message.NO_HARDCORE_MESSAGE)
+            player.sendMessage(new TranslatableText("hqm.message.noHardcore"));
+        
         if (!HQMUtil.isGameSingleplayer()) {
             Quest.setEditMode(false);
         }
-
-        NBTTagCompound tags = player.getEntityData();
-        if (tags.hasKey(HQ_TAG)) {
-            if (tags.getCompoundTag(HQ_TAG).getBoolean(RECEIVED_BOOK)) {
+        
+        CompoundTag tags = HardcoreQuesting.PLAYER_EXTRA_DATA.get(player).tag;
+        if (tags.contains(HQ_TAG)) {
+            if (tags.getCompound(HQ_TAG).getBoolean(RECEIVED_BOOK)) {
                 QuestingData.getQuestingData(player).receivedBook = true;
             }
             if (!QuestingData.isQuestActive()) {
-                tags.removeTag(HQ_TAG);
+                tags.remove(HQ_TAG);
             }
         }
-
+        
         QuestSet.loginReset();
-
+        
         QuestingData.spawnBook(player);
     }
-
-
-    private void sendLoginMessage(EntityPlayer player) {
-        player.sendMessage(new TextComponentString(
+    
+    
+    private void sendLoginMessage(PlayerEntity player) {
+        player.sendMessage(new LiteralText(
                 Translator.translate("hqm.message.hardcore") + " "
-                        + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
+                + Translator.translate(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))
         ));
-
+        
     }
 }

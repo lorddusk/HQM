@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReputationAdapter {
-
+    
     private static final TypeAdapter<ReputationMarker> REPUTATION_MARKER_ADAPTER = new TypeAdapter<ReputationMarker>() {
         private static final String NAME = "name";
         private static final String VALUE = "value";
-
+        
         @Override
         public void write(JsonWriter out, ReputationMarker value) throws IOException {
             out.beginObject();
@@ -23,7 +23,7 @@ public class ReputationAdapter {
             out.name(VALUE).value(value.getValue());
             out.endObject();
         }
-
+        
         @Override
         public ReputationMarker read(JsonReader in) throws IOException {
             in.beginObject();
@@ -43,13 +43,13 @@ public class ReputationAdapter {
             return new ReputationMarker(name, value, false);
         }
     };
-
+    
     public static final TypeAdapter<Reputation> REPUTATION_ADAPTER = new TypeAdapter<Reputation>() {
         private static final String ID = "id";
         private static final String NAME = "name";
         private static final String NEUTRAL = "neutral";
         private static final String MARKERS = "markers";
-
+        
         @Override
         public void write(JsonWriter out, Reputation value) throws IOException {
             out.beginObject();
@@ -65,7 +65,7 @@ public class ReputationAdapter {
             }
             out.endObject();
         }
-
+        
         @Override
         public Reputation read(JsonReader in) throws IOException {
             in.beginObject();

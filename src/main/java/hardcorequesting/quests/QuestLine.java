@@ -15,12 +15,11 @@ import hardcorequesting.network.message.QuestLineSyncMessage;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestLine {
-
+    
     public static boolean doServerSync;
     private static QuestLine config = new QuestLine();
     private static QuestLine server;
@@ -44,19 +43,19 @@ public class QuestLine {
     public String mainDescription = "No description";
     public List<String> cachedMainDescription;
     public String mainPath;
-    @SideOnly(Side.CLIENT)
-    public ResourceLocation front;
-
+    @Environment(EnvType.CLIENT)
+    public Identifier front;
+    
     public QuestLine() {
         GroupTier.initBaseTiers(this);
     }
-
+    
     public static QuestLine getActiveQuestLine() {
         return server != null ? server : world != null ? world : config;
     }
-
+    
     // client side only
-    public static void receiveServerSync(EntityPlayer receiver, boolean local, boolean remote) {
+    public static void receiveServerSync(PlayerEntity receiver, boolean local, boolean remote) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
@@ -72,17 +71,17 @@ public class QuestLine {
         loadAll(true, remote);
         SoundHandler.loadLoreReading(getActiveQuestLine().mainPath);
     }
-
+    
     public static void reset() {
         server = null;
         world = null;
     }
-
-    public static void sendServerSync(EntityPlayer player) {
-         if (player instanceof EntityPlayerMP) {
-            EntityPlayerMP playerMP = (EntityPlayerMP) player;
-            boolean side = HardcoreQuesting.loadingSide.isServer();
-            if (FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) // Integrated server
+    
+    public static void sendServerSync(PlayerEntity player) {
+        if (player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+            boolean side = HardcoreQuesting.loadingSide == EnvType.SERVER;
+            if (HardcoreQuesting.getServer().isSinglePlayer()) // Integrated server
                 NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
             else {
                 if (QuestLine.doServerSync) // Send actual data to player on server sync
@@ -92,7 +91,7 @@ public class QuestLine {
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
         }
     }
-
+    
     public static void loadWorldData(File worldPath, boolean isClient) {
         File pathFile = new File(worldPath, "hqm");
         String path = pathFile.getAbsolutePath() + File.separator;
@@ -100,7 +99,7 @@ public class QuestLine {
         world = new QuestLine();
         init(path, isClient);
     }
-
+    
     public static void saveDescription() {
         try {
             SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
@@ -108,7 +107,7 @@ public class QuestLine {
             HardcoreQuesting.LOG.error("Failed to load local questing state from descriptions.txt");
         }
     }
-
+    
     public static void saveDescriptionDefault() {
         try {
             SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
@@ -116,7 +115,7 @@ public class QuestLine {
             HardcoreQuesting.LOG.error("Failed to load default questing state from description.txt");
         }
     }
-
+    
     public static void loadDescription(boolean remote) {
         try {
             QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
@@ -125,7 +124,7 @@ public class QuestLine {
             HardcoreQuesting.LOG.error("Failed to load remote questing state from description.txt");
         }
     }
-
+    
     public static void saveAll() {
         QuestingData.saveState();
         QuestLine.saveDescription();
@@ -143,7 +142,7 @@ public class QuestLine {
         }
         SaveHelper.onSave();
     }
-
+    
     public static void loadAll(boolean isClient, boolean remote) {
         QuestingData.loadState(remote);
         QuestLine.loadDescription(remote);
@@ -157,18 +156,18 @@ public class QuestLine {
         if (isClient)
             GuiEditMenuItem.Search.initItems();
     }
-
+    
     public static void init(String path) {
         QuestLine.getActiveQuestLine().mainPath = path;
         QuestLine.getActiveQuestLine().quests.clear();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
     }
-
+    
     public static void init(String path, boolean isClient) {
         init(path);
         loadAll(isClient, false);
     }
-
+    
     public static void copyDefaults(File worldPath) {
         File path = new File(worldPath, "hqm");
         if (!path.exists()) path.mkdirs();

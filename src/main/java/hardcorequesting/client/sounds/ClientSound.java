@@ -1,23 +1,15 @@
 package hardcorequesting.client.sounds;
 
-import net.minecraft.client.audio.PositionedSound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.util.Identifier;
 
-@SideOnly(Side.CLIENT)
-public class ClientSound extends PositionedSound {
-
-    public ClientSound(ResourceLocation resource, float volume, float pitch) {
-        super(resource, SoundCategory.BLOCKS);
-        this.volume = volume;
-        this.pitch = pitch;
-        this.xPosF = 0.0F;
-        this.yPosF = 0.0F;
-        this.zPosF = 0.0F;
-        this.repeat = false;
-        this.repeatDelay = 0;
-        this.attenuationType = AttenuationType.NONE;
+@Environment(EnvType.CLIENT)
+public class ClientSound extends PositionedSoundInstance {
+    
+    public ClientSound(Identifier resource, float volume, float pitch) {
+        super(resource, SoundCategory.BLOCKS, volume, pitch, false, 0, AttenuationType.NONE, 0, 0, 0, false);
     }
 }

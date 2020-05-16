@@ -1,16 +1,22 @@
 package hardcorequesting.io.adapter;
 
+import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
+import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import net.minecraft.item.Item;
+import com.mojang.datafixers.Dynamic;
+import com.mojang.datafixers.types.JsonOps;
+import net.minecraft.datafixer.NbtOps;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.io.IOException;
 
@@ -18,20 +24,16 @@ import java.io.IOException;
  * Created by lang2 on 10/12/2015.
  */
 public class MinecraftAdapter {
-
-    public static final TypeAdapter<NBTTagCompound> NBT_TAG_COMPOUND = new TypeAdapter<NBTTagCompound>() {
+    
+    public static final TypeAdapter<CompoundTag> NBT_TAG_COMPOUND = new TypeAdapter<CompoundTag>() {
         @Override
-        public void write(JsonWriter out, NBTTagCompound value) throws IOException {
-            out.value(value.toString());
+        public void write(JsonWriter out, CompoundTag value) throws IOException {
+            Streams.write(Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, value), out);
         }
-
+        
         @Override
-        public NBTTagCompound read(JsonReader in) throws IOException {
-            try {
-                return JsonToNBT.getTagFromJson(in.nextString());
-            } catch (NBTException e) {
-                throw new IOException("Failed to read NBT", e);
-            }
+        public CompoundTag read(JsonReader in) throws IOException {
+            return (CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, Streams.parse(in));
         }
     };
     public static final TypeAdapter<ItemStack> ITEM_STACK = new TypeAdapter<ItemStack>() {
@@ -39,70 +41,40 @@ public class MinecraftAdapter {
         private static final String DAMAGE = "damage";
         private static final String STACK_SIZE = "amount";
         private static final String NBT = "nbt";
-
+        
         @Override
         public void write(JsonWriter out, ItemStack stack) throws IOException {
             if (stack.isEmpty()) {
                 out.nullValue();
                 return;
             }
-            String id = stack.getItem().getRegistryName().toString();
-            out.beginObject();
-            out.name(ID).value(id);
-            if (stack.getItemDamage() != 0) {
-                out.name(DAMAGE).value(stack.getItemDamage());
-            }
-            if (stack.getCount() != 1) {
-                out.name(STACK_SIZE).value(stack.getCount());
-            }
-            if (stack.hasTagCompound() && !stack.getTagCompound().isEmpty()) {
-                NBT_TAG_COMPOUND.write(out.name(NBT), stack.getTagCompound());
-            }
-            out.endObject();
+            Streams.write(Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, stack.toTag(new CompoundTag())), out);
         }
-
+        
         @Override
         public ItemStack read(JsonReader in) throws IOException {
             if (in.peek() == JsonToken.NULL) {
                 in.nextNull();
                 return ItemStack.EMPTY;
             }
-            String id = "";
-            int damage = 0, size = 1;
-            NBTTagCompound tag = null;
-            in.beginObject();
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(ID)) {
-                    id = in.nextString();
-                } else if (name.equalsIgnoreCase(DAMAGE)) {
-                    damage = in.nextInt();
-                } else if (name.equalsIgnoreCase(STACK_SIZE)) {
-                    size = in.nextInt();
-                } else if (name.equalsIgnoreCase(NBT)) {
-                    tag = NBT_TAG_COMPOUND.read(in);
-                }
-            }
-            in.endObject();
-
-            Item item = Item.getByNameOrId(id);
-            if (item == null) {
-                return ItemStack.EMPTY;
-            }
-            ItemStack stack = new ItemStack(item, size, damage);
-            stack.setTagCompound(tag);
-            return stack;
+            return ItemStack.fromTag((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, Streams.parse(in)));
         }
     };
-    public static final TypeAdapter<Fluid> FLUID = new TypeAdapter<Fluid>() {
+    public static final TypeAdapter<FluidVolume> FLUID = new TypeAdapter<FluidVolume>() {
         @Override
-        public void write(JsonWriter out, Fluid value) throws IOException {
-            out.value(value.getName());
+        public void write(JsonWriter out, FluidVolume value) throws IOException {
+            JsonObject object = new JsonObject();
+            object.addProperty("fluid", Registry.FLUID.getId(value.getRawFluid()).toString());
+            object.add("volume", Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, value.getAmount_F().toNbt()));
+            Streams.write(object, out);
         }
-
+        
         @Override
-        public Fluid read(JsonReader in) throws IOException {
-            return FluidRegistry.getFluid(in.nextString());
+        public FluidVolume read(JsonReader in) throws IOException {
+            JsonObject object = Streams.parse(in).getAsJsonObject();
+            Fluid fluid = Registry.FLUID.get(new Identifier(object.get("fluid").getAsString()));
+            FluidAmount amount = FluidAmount.fromNbt((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, object.get("volume")));
+            return FluidKeys.get(fluid).withAmount(amount);
         }
     };
 }

@@ -9,18 +9,18 @@ import hardcorequesting.quests.task.QuestTask;
 import java.io.IOException;
 
 public class QuestDataTaskDeath extends QuestDataTask {
-
+    
     private static final String DEATHS = "deaths";
     public int deaths;
-
+    
     public QuestDataTaskDeath(QuestTask task) {
         super(task);
     }
-
+    
     protected QuestDataTaskDeath() {
         super();
     }
-
+    
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskDeath taskData = new QuestDataTaskDeath();
         try {
@@ -40,18 +40,18 @@ public class QuestDataTaskDeath extends QuestDataTask {
         }
         return taskData;
     }
-
+    
     @Override
     public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.DEATH;
     }
-
+    
     @Override
     public void write(JsonWriter out) throws IOException {
         super.write(out);
         out.name(DEATHS).value(deaths);
     }
-
+    
     @Override
     public void update(QuestDataTask taskData) {
         super.update(taskData);

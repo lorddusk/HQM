@@ -1,84 +1,61 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
+plugins {
+    id "fabric-loom" version "0.4.13"
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'idea'
 
-runClient {
-    args '--username', 'hqmtest'
-}
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
 repositories {
-    maven {
-        name = "Forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-    maven {
-        name = "JEI"
-        url =  "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "HWYLA"
-        url = "http://tehnut.info/maven"
-    }
-    maven { // Actually Additions, TUMAT
-        url = "http://maven.chaosfield.at"
-    }
-    maven { // The One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
+    maven { url "https://dl.bintray.com/ladysnake/libs" }
+    maven { url "https://mod-buildcraft.com/maven" }
+    maven { url "http://tehnut.info/maven" }
 }
 
 dependencies {
-    deobfCompile "mcp.mobius.waila:Hwyla:${project.hwyla_version}"
-    deobfProvided "mezz.jei:jei_${project.jei_version}:api"
-    runtime "mezz.jei:jei_${project.jei_version}"
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${project.actadd_version}"
-    deobfCompile "de.canitzp.tumat:TUMAT:${project.tumat_version}"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
+    minecraft("com.mojang:minecraft:${project.minecraft_version}")
+    mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+    modCompile("net.fabricmc:fabric-loader:${project.loader_version}")
+    modCompile("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
+    modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
+    depend("org.jetbrains:annotations:19.0.0")
+    depend("com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
+    depend("com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
+    depend("alexiil.mc.lib:libblockattributes-core:${project.lba}") 
+    depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}") 
 }
 
-version = "${version}"
-group = "${group}"
-archivesBaseName = "${archives_base_name}"
-
-sourceCompatibility = targetCompatibility = 1.8
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+def depend(String string) {
+    dependencies.modApi(string) {
+        exclude(module: "fabric")
+    }
+    dependencies.include(string)
 }
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    mappings = "${forge_mappings}"
-    runDir = "run"
-
-    useDepAts = true
-
-    replace "@VERSION@", "${version}"
-    replaceIn "src/main/java/hardcorequesting/ModInformation.java"
+    accessWidener(file("src/main/resources/hqm.accesswidener"))
 }
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
 
     from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        include "fabric.mod.json"
+        expand "version": project.version
     }
 
-    from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
 
-    // Move access transformers to META-INF
-    rename '(.+_at.cfg)', 'META-INF/$1'
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+jar {
+    from "LICENSE"
 }

@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class BagAdapter {
-
+    
     public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
         private final String ID = "id";
         private final String ITEMS = "items";
         private final String NAME = "name";
         private final String LIMIT = "limit";
-
+        
         @Override
         public void write(JsonWriter out, Group value) throws IOException {
             out.beginObject();
@@ -35,7 +35,7 @@ public class BagAdapter {
             out.endArray();
             out.endObject();
         }
-
+        
         @Override
         public Group read(JsonReader in) throws IOException {
             in.beginObject();
@@ -80,7 +80,7 @@ public class BagAdapter {
         private final String COLOUR = "colour";
         private final String WEIGHTS = "weights";
         private final String GROUPS = "groups";
-
+        
         @Override
         public void write(JsonWriter out, GroupTier value) throws IOException {
             out.beginObject();
@@ -98,7 +98,7 @@ public class BagAdapter {
             out.endArray();
             out.endObject();
         }
-
+        
         @Override
         public GroupTier read(JsonReader in) throws IOException {
             in.beginObject();
@@ -140,6 +140,6 @@ public class BagAdapter {
             return tier;
         }
     };
-
-
+    
+    
 }

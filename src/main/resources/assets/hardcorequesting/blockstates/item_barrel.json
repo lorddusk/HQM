@@ -1,18 +1,10 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures" : { "all" : "hardcorequesting:blocks/hqm_item_barrel_empty"},
-    "model": "minecraft:cube_all",
-    "transform": "forge:default-block"
-  },
   "variants": {
-    "normal": [{}],
-    "inventory": [{}],
-    "bound": {
-      "true" : {
-        "textures": {"all": "hardcorequesting:blocks/hqm_item_barrel"}
-      },
-      "false":{}
+    "bound=false": {
+      "model": "hardcorequesting:block/item_barrel_empty"
+    },
+    "bound=true": {
+      "model": "hardcorequesting:block/item_barrel"
     }
   }
 }

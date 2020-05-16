@@ -10,21 +10,21 @@ import hardcorequesting.quests.task.QuestTaskTame;
 import java.io.IOException;
 
 public class QuestDataTaskTame extends QuestDataTask {
-
+    
     private static final String COUNT = "count";
     private static final String TAMED = "tamed";
     public int[] tamed;
-
+    
     public QuestDataTaskTame(QuestTask task) {
         super(task);
         this.tamed = new int[((QuestTaskTame) task).tames.length];
     }
-
+    
     protected QuestDataTaskTame() {
         super();
         this.tamed = new int[0];
     }
-
+    
     public static QuestDataTask construct(JsonReader in) {
         QuestDataTaskTame taskData = new QuestDataTaskTame();
         try {
@@ -52,12 +52,12 @@ public class QuestDataTaskTame extends QuestDataTask {
         }
         return taskData;
     }
-
+    
     @Override
     public QuestTaskAdapter.QuestDataType getDataType() {
         return QuestTaskAdapter.QuestDataType.TAME;
     }
-
+    
     @Override
     public void write(JsonWriter out) throws IOException {
         super.write(out);
@@ -67,7 +67,7 @@ public class QuestDataTaskTame extends QuestDataTask {
             out.value(i);
         out.endArray();
     }
-
+    
     @Override
     public void update(QuestDataTask taskData) {
         super.update(taskData);

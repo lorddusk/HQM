@@ -32,17 +32,17 @@ public enum EditMode {
     REP_BAR_CHANGE("repBarChange"),
     COMMAND_CREATE("commandCreate"),
     COMMAND_CHANGE("commandChange");
-
+    
     private String id;
-
+    
     EditMode(String id) {
         this.id = id;
     }
-
+    
     public String getName() {
         return Translator.translate("hqm.editMode." + id + ".title");
     }
-
+    
     public String getDescription() {
         return Translator.translate("hqm.editMode." + id + ".desc");
     }

@@ -7,11 +7,10 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -19,40 +18,39 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DeathStats {
-
     private static final DeathComparator deathComparator = new DeathComparator(-1);
     private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
     private static Map<UUID, DeathStats> deathMap;
     private static DeathStats[] clientDeathList;
     private static DeathStats clientBest;
     private static DeathStats clientTotal;
-
+    
     static {
         for (int i = 0; i < deathTypeComparator.length; i++) {
             deathTypeComparator[i] = new DeathComparator(i);
         }
     }
-
+    
     protected int[] deaths = new int[DeathType.values().length];
     private UUID uuid;
     private int totalDeaths = -1;
-
+    
     public DeathStats(UUID uuid) {
         this.uuid = uuid;
     }
-
+    
     public static DeathStats getBest() {
         return clientBest;
     }
-
+    
     public static DeathStats getTotal() {
         return clientTotal;
     }
-
+    
     public static List<DeathStats> getDeathStatsList() {
         return QuestingData.getData().values().stream().map(QuestingData::getDeathStat).collect(Collectors.toList());
     }
-
+    
     public static void loadAll(boolean isClient, boolean remote) {
         deathMap = new HashMap<>();
         try {
@@ -63,7 +61,7 @@ public class DeathStats {
             e.printStackTrace();
         }
     }
-
+    
     public static void saveAll() {
         try {
             SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
@@ -71,11 +69,11 @@ public class DeathStats {
             HardcoreQuesting.LOG.log(Level.INFO, "Failed saving bags");
         }
     }
-
+    
     public static void resync() {
-        NetworkManager.sendToAllPlayers(new DeathStatsMessage(FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()));
+        NetworkManager.sendToAllPlayers(new DeathStatsMessage(HardcoreQuesting.loadingSide == EnvType.CLIENT));
     }
-
+    
     private static void updateClientDeathList() {
         clientDeathList = new DeathStats[deathMap.size()];
         int id = 0;
@@ -83,76 +81,76 @@ public class DeathStats {
             deathStats.totalDeaths = -1;
             clientDeathList[id++] = deathStats;
         }
-
+        
         clientBest = new DeathStatsBest();
         clientTotal = new DeathStatsTotal();
-
+        
         Arrays.sort(clientDeathList, deathComparator);
     }
-
+    
     public static DeathStats getDeathStats(UUID uuid) {
         DeathStats stats = deathMap.get(uuid);
         return stats == null ? new DeathStats(uuid) : stats;
     }
-
+    
     public static DeathStats[] getDeathStats() {
         return clientDeathList;
     }
-
+    
     public UUID getUuid() {
         return uuid;
     }
-
-    @SideOnly(Side.CLIENT)
-    public String getName() throws IllegalArgumentException{
-        if (Minecraft.getMinecraft().world != null) {
-            EntityPlayer player = Minecraft.getMinecraft().world.getPlayerEntityByUUID(this.uuid);
+    
+    @Environment(EnvType.CLIENT)
+    public String getName() throws IllegalArgumentException {
+        if (MinecraftClient.getInstance().world != null) {
+            PlayerEntity player = MinecraftClient.getInstance().world.getPlayerByUuid(this.uuid);
             if (player == null) {
                 return "<invalid>";
             }
-            return player.getDisplayNameString();
+            return player.getEntityName();
         }
         return this.uuid.toString();
     }
-
+    
     public String getDescription(int id) {
         return DeathType.values()[id].getName() + ": " + deaths[id];
     }
-
+    
     public void increaseDeath(int id) {
         deaths[id]++;
         totalDeaths = -1;
         resync();
     }
-
+    
     public void increaseDeath(int id, int count, boolean resync) {
         deaths[id] += count;
         totalDeaths = -1;
         if (resync) resync();
     }
-
+    
     public int getTotalDeaths() {
         if (totalDeaths == -1) {
             totalDeaths = 0;
             for (int death : deaths)
                 totalDeaths += death;
         }
-
+        
         return totalDeaths;
     }
-
+    
     public int getDeaths(int id) {
         return deaths[id];
     }
-
+    
     private static class DeathComparator implements Comparator<DeathStats> {
-
+        
         private int id;
-
+        
         private DeathComparator(int id) {
             this.id = id;
         }
-
+        
         @Override
         public int compare(DeathStats o1, DeathStats o2) {
             if (id == -1) {
@@ -162,13 +160,13 @@ public class DeathStats {
             }
         }
     }
-
+    
     private static class DeathStatsBest extends DeathStats {
-
+        
         private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
         private String[] messages = new String[DeathType.values().length];
-
+        
         private DeathStatsBest() {
             super(null);
             for (int i = 0; i < messages.length; i++) {
@@ -196,28 +194,28 @@ public class DeathStats {
                         messages[i] += colourPrefixes[standing] + Translator.translate("hqm.deathStat." + placePrefixes[standing]);
                         messages[i] += GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
                     }
-
+                    
                 }
             }
         }
-
+        
         @Override
         public String getName() {
             return Translator.translate("hqm.deathStat.worstPlayers");
         }
-
+        
         @Override
         public String getDescription(int id) {
             return DeathType.values()[id].getName() + "\n\n" + messages[id];
         }
-
-
+        
+        
     }
-
+    
     private static class DeathStatsTotal extends DeathStats {
-
+        
         private int[] count = new int[DeathType.values().length];
-
+        
         private DeathStatsTotal() {
             super(null);
             for (int i = 0; i < count.length; i++) {
@@ -227,18 +225,18 @@ public class DeathStats {
                         count[i]++;
                     }
                 }
-
+                
             }
         }
-
+        
         @Override
         public String getDescription(int id) {
             return super.getDescription(id) + "\n\n" +
-                    (count[id] == 0 ?
-                            GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied") :
-                            GuiColor.GREEN.toString() + count[id] + " " + Translator.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + Translator.translate("hqm.deathStat.diedThisWay"));
+                   (count[id] == 0 ?
+                           GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied") :
+                           GuiColor.GREEN.toString() + count[id] + " " + Translator.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + Translator.translate("hqm.deathStat.diedThisWay"));
         }
-
+        
         @Override
         public String getName() {
             return Translator.translate("hqm.deathStat.everyone");

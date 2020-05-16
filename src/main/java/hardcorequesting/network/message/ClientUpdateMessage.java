@@ -1,48 +1,46 @@
 package hardcorequesting.network.message;
 
 import hardcorequesting.client.ClientChange;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 public class ClientUpdateMessage implements IMessage {
-
+    
     private ClientChange update;
     private String data;
-
+    
     public ClientUpdateMessage() {
     }
-
+    
     public ClientUpdateMessage(ClientChange update, String data) {
         this.update = update;
         this.data = data;
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.update = ClientChange.values()[buf.readInt()];
-        data = ByteBufUtils.readUTF8String(buf);
+        data = buf.readString(32767);
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(this.update.ordinal());
-        ByteBufUtils.writeUTF8String(buf, data);
+        buf.writeString(data);
     }
-
+    
     public static class Handler implements IMessageHandler<ClientUpdateMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(ClientUpdateMessage message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(ClientUpdateMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(ClientUpdateMessage message, MessageContext ctx) {
-            message.update.parse(ctx.getServerHandler().player, message.data);
+        
+        private void handle(ClientUpdateMessage message, PacketContext ctx) {
+            message.update.parse(ctx.getPlayer(), message.data);
         }
     }
 }

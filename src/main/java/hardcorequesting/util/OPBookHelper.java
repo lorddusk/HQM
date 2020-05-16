@@ -3,7 +3,8 @@ package hardcorequesting.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.commands.CommandHandler;
+import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.network.IMessage;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.OpActionMessage;
 import hardcorequesting.quests.Quest;
@@ -11,35 +12,33 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskItems;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.entity.player.PlayerEntity;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.UUID;
 
 public final class OPBookHelper {
-
+    
     private OPBookHelper() {
     }
-
-    public static void reverseQuestCompletion(Quest quest, EntityPlayer subject) {
+    
+    public static void reverseQuestCompletion(Quest quest, PlayerEntity subject) {
         NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, null, -1, subject));
     }
-
-    public static void reverseTaskCompletion (QuestTask task, EntityPlayer subject) {
+    
+    public static void reverseTaskCompletion(QuestTask task, PlayerEntity subject) {
         NetworkManager.sendToServer(OpAction.TASK_COMPLETION.build(task.getParent(), task, -1, subject));
     }
-
-    public static void reverseRequirementCompletion (QuestTask task, int requirement, EntityPlayer subject) {
+    
+    public static void reverseRequirementCompletion(QuestTask task, int requirement, PlayerEntity subject) {
         NetworkManager.sendToServer(OpAction.REQUIREMENT_COMPLETION.build(task.getParent(), task, requirement, subject));
     }
-
-    public static void reset(EntityPlayer player) {
+    
+    public static void reset(PlayerEntity player) {
         NetworkManager.sendToServer(OpAction.RESET.build(null, null, -1, player));
     }
-
+    
     public enum OpAction {
         RESET {
             @Override
@@ -67,14 +66,14 @@ public final class OPBookHelper {
             public void process(String data) {
                 fromJson(data);
                 if (quest == null) return;
-
+                
                 if (task != null) {
                     if (task.isCompleted(subject)) {
                         task.getData(subject).completed = false;
-                        task.uncomplete(subject.getUniqueID());
+                        task.uncomplete(subject.getUuid());
                         QuestingData.getQuestingData(subject).getTeam().resetCompletion(quest); // automatically reset progress
                     } else {
-                        task.completeTask(subject.getPersistentID());
+                        task.completeTask(subject.getUuid());
                     }
                 }
                 quest.sendUpdatedDataToTeam(subject);
@@ -85,36 +84,36 @@ public final class OPBookHelper {
             public void process(String data) {
                 fromJson(data);
                 if (quest == null || task == null) return;
-
+                
                 if (task instanceof QuestTaskItems) {
                     QuestTaskItems itemTask = (QuestTaskItems) task;
                     QuestTaskItems.ItemRequirement[] requirements = itemTask.getItems();
                     if (requirement >= 0 && requirement < requirements.length) {
-                        QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUniqueID());
+                        QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUuid());
                         if (qData.progress[requirement] == requirements[requirement].required) {
                             qData.progress[requirement] = 0;
-                            itemTask.getData(subject.getUniqueID()).completed = false;
+                            itemTask.getData(subject.getUuid()).completed = false;
                             QuestingData.getQuestingData(subject).getTeam().refreshData();
                         } else {
                             qData.progress[requirement] = requirements[requirement].required;
-                            itemTask.doCompletionCheck(qData, subject.getUniqueID());
+                            itemTask.doCompletionCheck(qData, subject.getUuid());
                         }
                         quest.sendUpdatedDataToTeam(subject);
                     }
                 }
             }
         };
-
+        
         private static final String QUEST = "quest";
         private static final String SUBJECT = "subject";
         private static final String TASK = "task";
         private static final String REQUIREMENT = "requirement";
         protected int requirement;
         protected Quest quest;
-        protected EntityPlayer subject;
+        protected PlayerEntity subject;
         protected QuestTask task;
-
-        private static String toJson(Quest quest, QuestTask task, int requirement, EntityPlayer subject) {
+        
+        private static String toJson(Quest quest, QuestTask task, int requirement, PlayerEntity subject) {
             StringWriter stringWriter = new StringWriter();
             try {
                 JsonWriter writer = new JsonWriter(stringWriter);
@@ -122,7 +121,7 @@ public final class OPBookHelper {
                 if (quest != null)
                     writer.name(QUEST).value(quest.getQuestId().toString());
                 if (subject != null)
-                    writer.name(SUBJECT).value(subject.getPersistentID().toString());
+                    writer.name(SUBJECT).value(subject.getUuid().toString());
                 if (task != null)
                     writer.name(TASK).value(task.getId());
                 if (requirement != -1)
@@ -133,18 +132,20 @@ public final class OPBookHelper {
             }
             return stringWriter.toString();
         }
-
+        
         public abstract void process(String data);
-
-        public IMessage build(Quest quest, QuestTask task, int requirement, EntityPlayer subject) {
+        
+        public IMessage build(Quest quest, QuestTask task, int requirement, PlayerEntity subject) {
             return new OpActionMessage(this, toJson(quest, task, requirement, subject));
         }
-
-        public void process(EntityPlayer player, String data) {
-            if (CommandHandler.isOwnerOrOp(player))
+        
+        public void process(PlayerEntity player, String data) {
+            // TODO is op
+//            if (CommandHandler.isOwnerOrOp(player))
+            if (HardcoreQuesting.getServer().getPermissionLevel(player.getGameProfile()) >= 4)
                 process(data);
         }
-
+        
         protected void fromJson(String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();

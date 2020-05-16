@@ -3,20 +3,18 @@ package hardcorequesting.team;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.HardcoreQuesting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerEntry {
-
     private static final String ENTRY_UUID = "uuid";
     private static final String ENTRY_OWNER = "owner";
     private static final String ENTRY_BOOK = "bookOpen";
@@ -26,11 +24,11 @@ public class PlayerEntry {
     private boolean owner;
     private boolean bookOpen;
     private String playername;
-
+    
     private PlayerEntry() {
         this.playername = null;
     }
-
+    
     public PlayerEntry(UUID uuid, boolean inTeam, boolean owner) {
         this();
         this.uuid = uuid;
@@ -38,16 +36,16 @@ public class PlayerEntry {
         this.owner = owner;
         this.bookOpen = false;
     }
-
+    
     public static PlayerEntry read(JsonReader in) throws IOException {
         PlayerEntry playerEntry = new PlayerEntry();
         in.beginObject();
         while (in.hasNext()) {
             switch (in.nextName()) {
                 case ENTRY_UUID:
-                    try{
+                    try {
                         playerEntry.uuid = UUID.fromString(in.nextString());
-                    } catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         e.printStackTrace(); // todo error print
                     }
                     break;
@@ -67,58 +65,58 @@ public class PlayerEntry {
         in.endObject();
         return playerEntry;
     }
-
+    
     public UUID getUUID() {
         return uuid;
     }
-
+    
     @Nullable
-    @SideOnly(Side.CLIENT)
+    @Environment(EnvType.CLIENT)
     public String getDisplayName() {
-        if(this.playername == null){
-            EntityPlayer entry = Minecraft.getMinecraft().world.getPlayerEntityByUUID(this.getUUID());
-            if(entry != null){
-                this.playername = entry.getDisplayNameString();
+        if (this.playername == null) {
+            PlayerEntity entry = MinecraftClient.getInstance().world.getPlayerByUuid(this.getUUID());
+            if (entry != null) {
+                this.playername = entry.getEntityName();
             }
         }
         return playername;
     }
-
+    
     public boolean isInTeam() {
         return inTeam;
     }
-
+    
     public void setInTeam(boolean inTeam) {
         this.inTeam = inTeam;
     }
-
+    
     public boolean isOwner() {
         return owner;
     }
-
+    
     @Override
     public int hashCode() {
         return uuid != null ? uuid.hashCode() : 0;
     }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
+        
         PlayerEntry entry = (PlayerEntry) o;
-
+        
         return Objects.equals(uuid, entry.uuid);
     }
-
+    
     public boolean isBookOpen() {
         return bookOpen;
     }
-
+    
     public void setBookOpen(boolean bookOpen) {
         this.bookOpen = bookOpen;
     }
-
+    
     public void write(JsonWriter out) throws IOException {
         out.beginObject();
         out.name(ENTRY_UUID).value(uuid.toString());
@@ -128,12 +126,12 @@ public class PlayerEntry {
         out.endObject();
     }
     
-    public EntityPlayerMP getPlayerMP() {
-        if(HardcoreQuesting.loadingSide.isServer()){
-            return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUUID(this.getUUID());
+    public ServerPlayerEntity getPlayerMP() {
+        if (HardcoreQuesting.loadingSide == EnvType.SERVER) {
+            return HardcoreQuesting.getServer().getPlayerManager().getPlayer(this.getUUID());
         } else {
-            if(Minecraft.getMinecraft().isIntegratedServerRunning()){
-                return Minecraft.getMinecraft().getIntegratedServer().getPlayerList().getPlayerByUUID(this.getUUID());
+            if (MinecraftClient.getInstance().isIntegratedServerRunning()) {
+                return MinecraftClient.getInstance().getServer().getPlayerManager().getPlayer(this.getUUID());
             }
         }
         return null;

@@ -13,21 +13,20 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskAdvancement;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementManager;
-import net.minecraft.advancements.AdvancementProgress;
-import net.minecraft.advancements.PlayerAdvancements;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.ServerAdvancementLoader;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -38,14 +37,14 @@ public class QuestTaskAdvancement extends QuestTask {
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     public AdvancementTask[] advancements = new AdvancementTask[0];
-
+    
     public QuestTaskAdvancement(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-
+        
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     private AdvancementTask[] getEditFriendlyAdvancements(AdvancementTask[] advancements) {
         if (Quest.canQuestsBeEdited()) {
             advancements = Arrays.copyOf(advancements, advancements.length + 1);
@@ -55,12 +54,12 @@ public class QuestTaskAdvancement extends QuestTask {
             return advancements;
         }
     }
-
-    private boolean advanced(int id, EntityPlayer player) {
+    
+    private boolean advanced(int id, PlayerEntity player) {
         return id < advancements.length && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
     }
-
-    public void setAdvancement(int id, AdvancementTask advancement, EntityPlayer player) {
+    
+    public void setAdvancement(int id, AdvancementTask advancement, PlayerEntity player) {
         if (id >= advancements.length) {
             advancements = Arrays.copyOf(advancements, advancements.length + 1);
             QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
@@ -69,56 +68,56 @@ public class QuestTaskAdvancement extends QuestTask {
         } else {
             SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
         }
-
+        
         advancements[id] = advancement;
     }
-
-    public void setIcon(int id, ItemStack stack, EntityPlayer player) {
+    
+    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
-
+        
         advancements[id].iconStack = stack;
     }
-
-    public void setName(int id, String str, EntityPlayer player) {
+    
+    public void setName(int id, String str, PlayerEntity player) {
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
-
+        
         advancements[id].name = str;
     }
-
+    
     @Override
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskAdvancement.class;
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
+    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
         for (int i = 0; i < advancements.length; i++) {
             AdvancementTask advancement = advancements[i];
-
+            
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(advancement.iconStack, x, y, mX, mY, false);
             gui.drawString(advancement.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-
+            
             if (advanced(i, player)) {
                 gui.drawString(GuiColor.GREEN + Translator.translate("hqm.advancementMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         }
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
             for (int i = 0; i < advancements.length; i++) {
                 AdvancementTask advancement = advancements[i];
-
+                
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;
-
+                
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     switch (gui.getCurrentMode()) {
                         case LOCATION:
@@ -146,54 +145,54 @@ public class QuestTaskAdvancement extends QuestTask {
                             break;
                         default:
                     }
-
+                    
                     break;
                 }
             }
         }
     }
-
+    
     @Override
-    public void onAdvancement(AdvancementEvent event) {
-        checkAdvancement(event.getEntityPlayer());
+    public void onAdvancement(ServerPlayerEntity playerEntity) {
+        checkAdvancement(playerEntity);
     }
-
+    
     @Override
-    public void onUpdate(EntityPlayer player) {
+    public void onUpdate(PlayerEntity player) {
         checkAdvancement(player);
     }
-
-    private void checkAdvancement(EntityPlayer player) {
+    
+    private void checkAdvancement(PlayerEntity player) {
         World world = player.getEntityWorld();
-        if (!world.isRemote && !this.isCompleted(player) && player.getServer() != null) {
+        if (!world.isClient && !this.isCompleted(player) && player.getServer() != null) {
             boolean[] advanced = ((QuestDataTaskAdvancement) this.getData(player)).advanced;
-
+            
             if (advanced.length < advancements.length) {
                 boolean[] oldVisited = ArrayUtils.addAll(advanced, (boolean[]) null);
                 advanced = new boolean[advancements.length];
                 System.arraycopy(oldVisited, 0, advanced, 0, oldVisited.length);
                 ((QuestDataTaskAdvancement) this.getData(player)).advanced = advanced;
             }
-
+            
             boolean completed = true;
-            AdvancementManager manager = player.getServer().getAdvancementManager();
-            PlayerAdvancements playerAdvancements = player.getServer().getPlayerList().getPlayerAdvancements((EntityPlayerMP) player);
-
+            ServerAdvancementLoader manager = player.getServer().getAdvancementLoader();
+            PlayerAdvancementTracker playerAdvancements = player.getServer().getPlayerManager().getAdvancementTracker((ServerPlayerEntity) player);
+            
             for (int i = 0; i < advancements.length; i++) {
                 if (advanced[i]) continue;
-
+                
                 AdvancementTask advancement = this.advancements[i];
                 if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
-
-                ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
-
-                Advancement advAdvancement = manager.getAdvancement(advResource);
-
+                
+                Identifier advResource = new Identifier(advancement.getAdvancement());
+                
+                Advancement advAdvancement = manager.get(advResource);
+                
                 if (advAdvancement == null) {
                     completed = false;
                 } else {
                     AdvancementProgress progress = playerAdvancements.getProgress(advAdvancement);
-
+                    
                     if (progress.isDone()) {
                         advanced[i] = true;
                     } else {
@@ -201,14 +200,14 @@ public class QuestTaskAdvancement extends QuestTask {
                     }
                 }
             }
-
+            
             if (completed && advancements.length > 0) {
-                completeTask(player.getUniqueID());
+                completeTask(player.getUuid());
                 parent.sendUpdatedDataToTeam(player);
             }
         }
     }
-
+    
     @Override
     public float getCompletedRatio(UUID uuid) {
         int advanced = 0;
@@ -217,15 +216,15 @@ public class QuestTaskAdvancement extends QuestTask {
                 advanced++;
             }
         }
-
+        
         return (float) advanced / advancements.length;
     }
-
+    
     @Override
     public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
         boolean[] advanced = ((QuestDataTaskAdvancement) own).advanced;
         boolean[] otherVisited = ((QuestDataTaskAdvancement) other).advanced;
-
+        
         boolean all = true;
         for (int i = 0; i < advanced.length; i++) {
             if (otherVisited[i]) {
@@ -234,12 +233,12 @@ public class QuestTaskAdvancement extends QuestTask {
                 all = false;
             }
         }
-
+        
         if (all) {
             completeTask(uuid);
         }
     }
-
+    
     @Override
     public void autoComplete(UUID uuid, boolean status) {
         boolean[] advanced = ((QuestDataTaskAdvancement) getData(uuid)).advanced;
@@ -247,92 +246,92 @@ public class QuestTaskAdvancement extends QuestTask {
             advanced[i] = status;
         }
     }
-
+    
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
         boolean[] advanced = ((QuestDataTaskAdvancement) own).advanced;
         System.arraycopy(((QuestDataTaskAdvancement) other).advanced, 0, advanced, 0, advanced.length);
     }
-
+    
     @Override
-    public boolean allowDetect () {
+    public boolean allowDetect() {
         return true;
     }
-
+    
     public enum Visibility {
         FULL("Full"),
         NONE("None");
-
+        
         private String id;
-
+        
         Visibility(String id) {
             this.id = id;
         }
-
+        
         // TODO: fix these
         public String getName() {
             return Translator.translate("hqm.locationMenu.vis" + id + ".title");
         }
-
+        
         public String getDescription() {
             return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
         }
     }
-
+    
     public static class AdvancementTask {
-
+        
         private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
         private Visibility visible = Visibility.FULL;
         private String adv_name;
-
+        
         private AdvancementTask copy() {
             AdvancementTask advancement = new AdvancementTask();
             advancement.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
             advancement.name = name;
             advancement.visible = visible;
             advancement.adv_name = adv_name;
-
+            
             return advancement;
         }
-
+        
         public ItemStack getIconStack() {
             return iconStack;
         }
-
-        public void setIconStack(@Nonnull ItemStack iconStack) {
+        
+        public void setIconStack(@NotNull ItemStack iconStack) {
             this.iconStack = iconStack;
         }
-
+        
         public String getName() {
             return name;
         }
-
+        
         public void setName(String name) {
             this.name = name;
         }
-
+        
         public Visibility getVisible() {
             return visible;
         }
-
+        
         public void setVisible(Visibility visible) {
             this.visible = visible;
         }
-
+        
         public void setAdvancement(String name) {
             this.adv_name = name;
         }
-
+        
         public String getAdvancement() {
             return this.adv_name;
         }
-
-        public void setAdvancement(ResourceLocation name) {
+        
+        public void setAdvancement(Identifier name) {
             setAdvancement(name.toString());
         }
-
+        
         public void unsetAdvancement() {
             this.adv_name = null;
         }

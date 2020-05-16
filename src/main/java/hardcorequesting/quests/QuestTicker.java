@@ -1,29 +1,20 @@
 package hardcorequesting.quests;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.fabricmc.fabric.api.event.client.ClientTickCallback;
+import net.fabricmc.fabric.api.event.server.ServerTickCallback;
 
 public class QuestTicker {
-
+    
     private int hours;
     private int ticks;
-
+    
     public QuestTicker(boolean isClient) {
-        MinecraftForge.EVENT_BUS.register(this);
+        if (isClient) {
+            ClientTickCallback.EVENT.register(minecraftClient -> tick(true));
+        }
+        ServerTickCallback.EVENT.register(minecraftClient -> tick(false));
     }
-
-    @SubscribeEvent
-    public void tick(TickEvent.ServerTickEvent event) {
-        tick(false);
-    }
-
-    @SubscribeEvent
-    public void tick(TickEvent.ClientTickEvent event) {
-        tick(true);
-    }
-
-
+    
     public void tick(boolean isClient) {
         if (++ticks == 1000) {
             ticks = 0;
@@ -42,8 +33,8 @@ public class QuestTicker {
             }
         }
     }
-
-
+    
+    
     public int getHours() {
         return hours;
     }

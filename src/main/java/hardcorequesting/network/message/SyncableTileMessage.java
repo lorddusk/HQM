@@ -1,61 +1,60 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.network.ISyncableTile;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTileMessage, IMessage>{
+public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTileMessage, IMessage> {
     
-    private TileEntity tileToSync;
-    private NBTTagCompound data;
+    private BlockEntity tileToSync;
+    private CompoundTag data;
     
-    public SyncableTileMessage(){}
+    public SyncableTileMessage() {}
     
-    public SyncableTileMessage(TileEntity tileToSync){
+    public SyncableTileMessage(BlockEntity tileToSync) {
         this.tileToSync = tileToSync;
-        if(tileToSync instanceof ISyncableTile){
+        if (tileToSync instanceof ISyncableTile) {
             this.data = ((ISyncableTile) tileToSync).getSyncData();
         }
     }
     
     @Override
-    public void fromBytes(ByteBuf buf){
-        int worldId = buf.readInt();
-        BlockPos pos = new PacketBuffer(buf).readBlockPos();
-        this.data = ByteBufUtils.readTag(buf);
-    
-        World world = DimensionManager.getWorld(worldId);
-        if(world != null){
-            this.tileToSync = world.getTileEntity(pos);
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+        Identifier worldId = buf.readIdentifier();
+        BlockPos pos = buf.readBlockPos();
+        this.data = buf.readCompoundTag();
+        
+        World world = HardcoreQuesting.getServer().getWorld(Registry.DIMENSION_TYPE.get(worldId));
+        if (world != null) {
+            this.tileToSync = world.getBlockEntity(pos);
             System.out.println(this.tileToSync.hashCode());
         }
     }
     
     @Override
-    public void toBytes(ByteBuf buf){
-        buf.writeInt(this.tileToSync.getWorld().provider.getDimension());
-        new PacketBuffer(buf).writeBlockPos(this.tileToSync.getPos());
-        ByteBufUtils.writeTag(buf, this.data);
+    public void toBytes(PacketByteBuf buf) {
+        buf.writeIdentifier(Registry.DIMENSION_TYPE.getId(this.tileToSync.getWorld().getDimension().getType()));
+        buf.writeBlockPos(this.tileToSync.getPos());
+        buf.writeCompoundTag(this.data);
     }
     
-    @SideOnly(Side.CLIENT)
+    @Environment(EnvType.CLIENT)
     @Override
-    public IMessage onMessage(SyncableTileMessage message, MessageContext ctx){
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if(message.tileToSync instanceof ISyncableTile && message.data != null){
-                System.out.println(message.tileToSync.getWorld().getTileEntity(message.tileToSync.getPos()).hashCode());
+    public IMessage onMessage(SyncableTileMessage message, PacketContext ctx) {
+        ctx.getTaskQueue().execute(() -> {
+            if (message.tileToSync instanceof ISyncableTile && message.data != null) {
+                System.out.println(message.tileToSync.getWorld().getBlockEntity(message.tileToSync.getPos()).hashCode());
                 ((ISyncableTile) message.tileToSync).onData(message.data);
                 System.out.println(message.tileToSync.hashCode());
             }

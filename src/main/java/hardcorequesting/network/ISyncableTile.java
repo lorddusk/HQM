@@ -1,11 +1,11 @@
 package hardcorequesting.network;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
-public interface ISyncableTile{
+public interface ISyncableTile {
     
-    NBTTagCompound getSyncData();
+    CompoundTag getSyncData();
     
-    void onData(NBTTagCompound data);
+    void onData(CompoundTag data);
     
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class DeathAdapter {
-
+    
     public static final TypeAdapter<DeathStats> DEATH_STATS_ADAPTER = new TypeAdapter<DeathStats>() {
         @Override
         public void write(JsonWriter out, DeathStats value) throws IOException {
@@ -22,7 +22,7 @@ public class DeathAdapter {
             out.endArray();
             out.endObject();
         }
-
+        
         @Override
         public DeathStats read(JsonReader in) throws IOException {
             in.beginObject();

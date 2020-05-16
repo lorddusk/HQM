@@ -1,15 +1,15 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiEditMenuTier extends GuiEditMenu {
-
+    
     private static final int ARROW_X_LEFT = 20;
     private static final int ARROW_X_RIGHT = 150;
     private static final int ARROW_Y = 40;
@@ -29,13 +29,13 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private GroupTier original;
     private TextBoxGroup textBoxes;
     private boolean clicked;
-
-    public GuiEditMenuTier(GuiQuestBook gui, EntityPlayer player, GroupTier original) {
+    
+    public GuiEditMenuTier(GuiQuestBook gui, PlayerEntity player, GroupTier original) {
         super(gui, player, true);
         this.original = original;
         this.tier = original.copy();
         this.textBoxes = new TextBoxGroup();
-
+        
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             final int id = i;
@@ -44,7 +44,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
                 protected boolean isCharacterValid(char c) {
                     return getText().length() < 6 && Character.isDigit(c);
                 }
-
+                
                 @Override
                 public void textChanged(GuiBase gui) {
                     try {
@@ -54,47 +54,47 @@ public class GuiEditMenuTier extends GuiEditMenu {
                         } else {
                             number = Integer.parseInt(getText());
                         }
-
+                        
                         tier.getWeights()[id] = number;
                     } catch (Exception ignored) {
                     }
-
+                    
                 }
             });
         }
     }
-
+    
     @Override
     public void draw(GuiBase gui, int mX, int mY) {
         super.draw(gui, mX, mY);
-
+        
         gui.drawString(tier.getName(), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
-
+        
         gui.drawString(Translator.translate("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
-
+        
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             BagTier bagTier = values[i];
-
+            
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
             gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
-
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
+        
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-
+        
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
         gui.drawCenteredString(tier.getColor().getName(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
-
+        
         textBoxes.draw(gui);
     }
-
+    
     @Override
     public void onClick(GuiBase gui, int mX, int mY, int b) {
         super.onClick(gui, mX, mY, b);
-
+        
         if (inArrowBounds(gui, mX, mY, true)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
             clicked = true;
@@ -102,37 +102,37 @@ public class GuiEditMenuTier extends GuiEditMenu {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
             clicked = true;
         }
-
+        
         textBoxes.onClick(gui, mX, mY);
     }
-
+    
     @Override
-    public void onKeyTyped(GuiBase gui, char c, int k) {
-        super.onKeyTyped(gui, c, k);
-
+    public void onKeyStroke(GuiBase gui, char c, int k) {
+        super.onKeyStroke(gui, c, k);
+        
         textBoxes.onKeyStroke(gui, c, k);
     }
-
+    
     @Override
     public void onRelease(GuiBase gui, int mX, int mY) {
         super.onRelease(gui, mX, mY);
         clicked = false;
     }
-
+    
     @Override
     public void save(GuiBase gui) {
         original.load(tier);
         SaveHelper.add(SaveHelper.EditType.TIER_CHANGE);
     }
-
+    
     private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {
         return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
     }
-
+    
     private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
-
+        
         gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
 }

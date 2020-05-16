@@ -2,53 +2,51 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.io.SaveHandler;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 public class DeathStatsMessage implements IMessage {
-
+    
     private boolean local;
     private String deaths;
-
+    
     public DeathStatsMessage() {
     }
-
+    
     public DeathStatsMessage(boolean local) {
         this.local = local;
         if (local) DeathStats.saveAll();
         this.deaths = SaveHandler.saveDeaths();
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
         if (this.local) return;
-        deaths = ByteBufUtils.readUTF8String(buf);
+        deaths = buf.readString(32767);
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeBoolean(this.local);
         if (local) return;
-        ByteBufUtils.writeUTF8String(buf, deaths);
+        buf.writeString(deaths);
     }
-
+    
     public static class Handler implements IMessageHandler<DeathStatsMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(DeathStatsMessage message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(DeathStatsMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(DeathStatsMessage message, MessageContext ctx) {
+        
+        private void handle(DeathStatsMessage message, PacketContext ctx) {
             if (!message.local) {
                 try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
                     out.print(message.deaths);

@@ -2,15 +2,15 @@ package hardcorequesting.util;
 
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class SaveHelper {
-
+    
     private static final int START_X = 5;
     private static final int START_Y = 30;
     private static final int INDENT = 5;
@@ -38,14 +38,14 @@ public final class SaveHelper {
     private static int total;
     private static ListElement[] list;
     private static List<ListElement> sortedList;
-
+    
     static {
         createList();
     }
-
+    
     private SaveHelper() {
     }
-
+    
     private static void createList() {
         list = new ListElement[EditType.values().length];
         for (int i = 0; i < list.length; i++) {
@@ -56,38 +56,38 @@ public final class SaveHelper {
         Collections.sort(sortedList);
         total = 0;
     }
-
+    
     public static void add(EditType type, int count) {
         list[type.ordinal()].count += count;
         Collections.sort(sortedList);
         total += count;
     }
-
+    
     public static void add(EditType type) {
         add(type, 1);
     }
-
+    
     public static void onSave() {
         saveTime = System.currentTimeMillis();
         createList();
     }
-
+    
     public static void onLoad() {
         createList();
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     public static void render(GuiQuestBook gui, int mX, int mY) {
         if (isLarge) {
             gui.drawRect(X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
         } else {
             gui.drawRect(X, Y, SMALL_SRC_X, SMALL_SRC_Y, SMALL_SIZE, SMALL_SIZE);
         }
-
+        
         int indexX = isLarge ? 0 : 1;
         int indexY = gui.inBounds(X + CHANGE_X, Y + CHANGE_Y, CHANGE_SIZE, CHANGE_SIZE, mX, mY) ? 1 : 0;
         gui.drawRect(X + CHANGE_X, Y + CHANGE_Y, CHANGE_SRC_X + indexX * CHANGE_SIZE, SRC_Y + indexY * CHANGE_SIZE, CHANGE_SIZE, CHANGE_SIZE);
-
+        
         if (isLarge) {
             if (total == 0) {
                 gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
@@ -97,7 +97,7 @@ public final class SaveHelper {
                 } else {
                     gui.drawString(formatTime((int) ((System.currentTimeMillis() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
-
+                
                 gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
                 int others = total;
                 for (int i = 0; i < LISTED_TYPES; i++) {
@@ -118,8 +118,8 @@ public final class SaveHelper {
             gui.drawRect(X + SAVE_X, Y + SAVE_Y, SAVE_SRC_X + index * SAVE_SIZE, SRC_Y, SAVE_SIZE, SAVE_SIZE);
         }
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     public static void onClick(GuiQuestBook gui, int mX, int mY) {
         if (gui.inBounds(X + CHANGE_X, Y + CHANGE_Y, CHANGE_SIZE, CHANGE_SIZE, mX, mY)) {
             isLarge = !isLarge;
@@ -127,16 +127,16 @@ public final class SaveHelper {
             gui.save();
         }
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     public static boolean inSaveBounds(GuiQuestBook gui, int mX, int mY) {
         return !isLarge && gui.inBounds(X + SAVE_X, Y + SAVE_Y, SAVE_SIZE, SAVE_SIZE, mX, mY);
     }
-
+    
     private static String formatTime(int minutes) {
         int hours = minutes / 60;
         minutes -= hours * 60;
-
+        
         if (hours == 0) {
             if (minutes == 0) {
                 return Translator.translate("hqm.editType.savedRecent");
@@ -147,11 +147,11 @@ public final class SaveHelper {
             return Translator.translate(hours != 1, "hqm.editType.savedMinutes", hours);
         }
     }
-
+    
     public static boolean isLarge() {
         return isLarge;
     }
-
+    
     public enum EditType {
         QUEST_CREATE(BaseEditType.ADD, Type.QUEST),
         QUEST_REMOVE(BaseEditType.REMOVE, Type.QUEST),
@@ -218,38 +218,38 @@ public final class SaveHelper {
         COMMAND_ADD(BaseEditType.ADD, Type.COMMAND),
         COMMAND_CHANGE(BaseEditType.CHANGE, Type.COMMAND),
         COMMAND_REMOVE(BaseEditType.REMOVE, Type.COMMAND);
-
+        
         private BaseEditType basType;
         private Type type;
-
+        
         EditType(BaseEditType basType, Type type) {
             this.basType = basType;
             this.type = type;
         }
-
+        
         public String translate(int number) {
             return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
         }
-
+        
         private enum BaseEditType {
             ADD("added", GuiColor.GREEN),
             CHANGE("changed", GuiColor.ORANGE),
             MOVE("moved", GuiColor.ORANGE),
             REMOVE("removed", GuiColor.RED);
-
+            
             private String id;
             private GuiColor colour;
-
+            
             BaseEditType(String id, GuiColor colour) {
                 this.id = id;
                 this.colour = colour;
             }
-
+            
             private String translate() {
                 return Translator.translate("hqm.editType." + id);
             }
         }
-
+        
         private enum Type {
             QUEST("quest"),
             TASK("task"),
@@ -283,29 +283,29 @@ public final class SaveHelper {
             ADVANCEMENT("advancement"),
             COMPLETION("questCompletion"),
             TASK_BLOCK("taskBlock");
-
+            
             private String id;
-
+            
             Type(String id) {
                 this.id = id;
             }
-
+            
             private String translate() {
                 return Translator.translate("hqm.editType." + id);
             }
         }
     }
-
+    
     public static class ListElement implements Comparable<ListElement> {
-
+        
         private EditType type;
         private int count;
-
+        
         private ListElement(EditType type) {
             this.type = type;
             this.count = 0;
         }
-
+        
         @Override
         public int compareTo(ListElement o) {
             return Integer.compare(o.count, count);

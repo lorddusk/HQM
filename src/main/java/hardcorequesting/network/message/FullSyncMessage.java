@@ -1,15 +1,13 @@
 package hardcorequesting.network.message;
 
 import hardcorequesting.io.SaveHandler;
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.SyncUtil;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,21 +16,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FullSyncMessage implements IMessage {
-
+    
     private boolean local, questing, hardcore, serverWorld;
     private String timestamp, reputations, bags, teams, data, setOrder, mainDesc;
     private String[] questsSets, questSetNames;
-
+    
     public FullSyncMessage() {
     }
-
+    
     public FullSyncMessage(boolean local, boolean serverWorld) {
         this.local = local;
         this.serverWorld = serverWorld;
         this.questing = QuestingData.isQuestActive();
         this.hardcore = QuestingData.isHardcoreActive();
     }
-
+    
     // TODO: this can't be one packet
     public FullSyncMessage(boolean serverWorld) {
         this.serverWorld = serverWorld;
@@ -49,9 +47,9 @@ public class FullSyncMessage implements IMessage {
         this.questSetNames = names.toArray(new String[0]);
         this.questsSets = questSets.toArray(new String[0]);
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
         this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
@@ -63,19 +61,19 @@ public class FullSyncMessage implements IMessage {
         teams = SyncUtil.readLargeString(buf);
         data = SyncUtil.readLargeString(buf);
         setOrder = SyncUtil.readLargeString(buf);
-
+        
         int size = buf.readInt();
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
         for (int i = 0; i < size; i++) {
-            questSetNames[i] = ByteBufUtils.readUTF8String(buf);
-            questsSets[i] = ByteBufUtils.readUTF8String(buf);
+            questSetNames[i] = buf.readString(32767);
+            questsSets[i] = buf.readString(32767);
         }
-
+        
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeBoolean(this.local);
         buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
@@ -87,23 +85,23 @@ public class FullSyncMessage implements IMessage {
         SyncUtil.writeLargeString(teams, buf);
         SyncUtil.writeLargeString(data, buf);
         SyncUtil.writeLargeString(setOrder, buf);
-
+        
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
-            ByteBufUtils.writeUTF8String(buf, questSetNames[i]);
-            ByteBufUtils.writeUTF8String(buf, questsSets[i]);
+            buf.writeString(questSetNames[i]);
+            buf.writeString(questsSets[i]);
         }
     }
-
+    
     public static class Handler implements IMessageHandler<FullSyncMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(FullSyncMessage message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(FullSyncMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(FullSyncMessage message, MessageContext ctx) {
+        
+        private void handle(FullSyncMessage message, PacketContext ctx) {
             try {
                 if (!message.local) {
                     try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("description.txt"))) {
@@ -133,7 +131,7 @@ public class FullSyncMessage implements IMessage {
                             out.print(message.questsSets[i]);
                         }
                 }
-                QuestLine.receiveServerSync(Minecraft.getMinecraft().player, message.local, message.serverWorld);
+                QuestLine.receiveServerSync(ctx.getPlayer(), message.local, message.serverWorld);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,45 +1,35 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.crafting.Recipes;
-import hardcorequesting.items.ItemBlockPortal;
-import hardcorequesting.items.ModItems;
-import hardcorequesting.tileentity.TileEntityBarrel;
-import hardcorequesting.tileentity.TileEntityPortal;
-import hardcorequesting.tileentity.TileEntityTracker;
+import hardcorequesting.tileentity.BarrelBlockEntity;
+import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.util.RegisterHelper;
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.util.Identifier;
 
 public class ModBlocks {
-
-    public static Block itemBarrel = new BlockDelivery().setTranslationKey(BlockInfo.LOCALIZATION_START + BlockInfo.ITEMBARREL_UNLOCALIZED_NAME);
-    public static Block itemTracker = new BlockTracker().setTranslationKey(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME);
-    public static Block itemPortal = new BlockPortal().setTranslationKey(BlockInfo.LOCALIZATION_START + BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME);
-
+    public static Block blockBarrel = new DeliveryBlock();
+    public static Block blockTracker = new TrackerBlock();
+    //    public static Block blockPortal = new PortalBlock();
+    public static BlockEntityType<BarrelBlockEntity> typeBarrel;
+    public static BlockEntityType<TrackerBlockEntity> typeTracker;
+//    public static BlockEntityType<PortalBlockEntity> typePortal;
+    
     private ModBlocks() {
     }
-
+    
     public static void init() {
-        RegisterHelper.registerBlock(itemBarrel, ItemBlock.class);
-        RegisterHelper.registerBlock(itemTracker, ItemBlock.class);
-        RegisterHelper.registerBlock(itemPortal, ItemBlockPortal.class);
+        RegisterHelper.registerBlock(blockBarrel, BlockInfo.ITEMBARREL_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
+        RegisterHelper.registerBlock(blockTracker, BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
+//        RegisterHelper.registerBlock(blockPortal, BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME, block -> new PortalBlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
     }
-
+    
     public static void registerTileEntities() {
-        GameRegistry.registerTileEntity(TileEntityBarrel.class, new ResourceLocation(HardcoreQuesting.ID, BlockInfo.ITEMBARREL_TE_KEY));
-        GameRegistry.registerTileEntity(TileEntityTracker.class, new ResourceLocation(HardcoreQuesting.ID, BlockInfo.QUEST_TRACKER_TE_KEY));
-        GameRegistry.registerTileEntity(TileEntityPortal.class, new ResourceLocation(HardcoreQuesting.ID, BlockInfo.QUEST_PORTAL_TE_KEY));
-    }
-
-    public static void registerRecipes() {
-        Recipes.addShapedRecipe(new ItemStack(ModBlocks.itemBarrel),
-                "wgw",
-                "gqg",
-                "wgw",
-                'w', "plankWood", 'q', ModItems.book.setContainerItem(ModItems.book), 'g', "blockGlassColorless");
+        typeBarrel = RegisterHelper.registerTileEntity(BarrelBlockEntity::new, new Identifier(HardcoreQuesting.ID, BlockInfo.ITEMBARREL_UNLOCALIZED_NAME));
+        typeTracker = RegisterHelper.registerTileEntity(TrackerBlockEntity::new, new Identifier(HardcoreQuesting.ID, BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME));
+//        typePortal = RegisterHelper.registerTileEntity(PortalBlockEntity::new, new Identifier(HardcoreQuesting.ID, BlockInfo.QUEST_PORTAL_TE_KEY));
     }
 }

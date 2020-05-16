@@ -13,21 +13,23 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskLocation;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.entity.player.EntityPlayer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.UUID;
 
 public class QuestTaskLocation extends QuestTask {
-
-
+    
+    
     private static final int CHECK_DELAY = 20;
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -36,35 +38,35 @@ public class QuestTaskLocation extends QuestTask {
     private static final int ITEM_SIZE = 18;
     public Location[] locations = new Location[0];
     private int delay = 1;
-
+    
     public QuestTaskLocation(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-
+        
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
-
-    private void tick(EntityPlayer player, boolean isPlayerEvent) {
+    
+    private void tick(PlayerEntity player, boolean isPlayerEvent) {
         if (!isPlayerEvent) {
             delay++;
         } else if (this.delay >= 0) {
             delay = 0;
-
+            
             World world = player.getEntityWorld();
-            if (!world.isRemote) {
+            if (!world.isClient) {
                 boolean[] visited = ((QuestDataTaskLocation) this.getData(player)).visited;
                 boolean all = true;
                 boolean updated = false;
-
+                
                 for (int i = 0; i < locations.length; ++i) {
                     Location location = this.locations[i];
-                    if(visited.length < i){ // Fix to make sure than the visited array is as long as the location array (#400)
+                    if (visited.length < i) { // Fix to make sure than the visited array is as long as the location array (#400)
                         boolean[] oldVisited = ArrayUtils.addAll(visited, (boolean[]) null);
                         visited = new boolean[i];
                         System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
                         ((QuestDataTaskLocation) this.getData(player)).visited = visited;
                     }
-                    if (!visited[i] && player.getEntityWorld().provider.getDimension() == location.dimension) {
-                        int current = (int) player.getDistanceSq((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
+                    if (!visited[i] && player.getEntityWorld().dimension.getType() == location.dimension) {
+                        int current = (int) player.squaredDistanceTo((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
                             all = false;
@@ -76,10 +78,10 @@ public class QuestTaskLocation extends QuestTask {
                         }
                     }
                 }
-
+                
                 if (updated) {
                     if (all) {
-                        completeTask(player.getUniqueID());
+                        completeTask(player.getUuid());
                     }
                     parent.sendUpdatedDataToTeam(player);
                 }
@@ -87,7 +89,7 @@ public class QuestTaskLocation extends QuestTask {
         }
     }
     
-    @SideOnly(Side.CLIENT)
+    @Environment(EnvType.CLIENT)
     private Location[] getEditFriendlyLocations(Location[] locations) {
         if (Quest.canQuestsBeEdited()) {
             locations = Arrays.copyOf(locations, locations.length + 1);
@@ -97,12 +99,12 @@ public class QuestTaskLocation extends QuestTask {
             return locations;
         }
     }
-
-    private boolean visited(int id, EntityPlayer player) {
+    
+    private boolean visited(int id, PlayerEntity player) {
         return id < locations.length && ((QuestDataTaskLocation) getData(player)).visited[id];
     }
-
-    public void setLocation(int id, Location location, EntityPlayer player) {
+    
+    public void setLocation(int id, Location location, PlayerEntity player) {
         if (id >= locations.length) {
             locations = Arrays.copyOf(locations, locations.length + 1);
             QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
@@ -111,77 +113,77 @@ public class QuestTaskLocation extends QuestTask {
         } else {
             SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
         }
-
+        
         locations[id] = location;
     }
-
-    public void setIcon(int id, ItemStack stack, EntityPlayer player) {
+    
+    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
-
+        
         locations[id].iconStack = stack;
     }
-
-    public void setName(int id, String str, EntityPlayer player) {
+    
+    public void setName(int id, String str, PlayerEntity player) {
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
-
+        
         locations[id].name = str;
     }
-
+    
     @Override
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskLocation.class;
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, EntityPlayer player, int mX, int mY) {
+    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         Location[] locations = getEditFriendlyLocations(this.locations);
         for (int i = 0; i < locations.length; i++) {
             Location location = locations[i];
-
+            
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(location.iconStack, x, y, mX, mY, false);
             gui.drawString(location.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-
+            
             if (visited(i, player)) {
                 gui.drawString(GuiColor.GREEN + Translator.translate("hqm.locationMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             } else if (location.visible.doShowCoordinate()) {
                 if (location.radius >= 0) {
                     gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
-
-                if (player.getEntityWorld().provider.getDimension() == location.dimension) {
+                
+                if (player.getEntityWorld().dimension.getType() == location.dimension) {
                     if (location.radius >= 0) {
                         String str;
-                        int distance = (int) player.getDistance(location.x + 0.5, location.y + 0.5, location.z + 0.5);
+                        int distance = (int) player.squaredDistanceTo(location.x + 0.5, location.y + 0.5, location.z + 0.5);
                         str = Translator.translate("hqm.locationMenu.mAway", distance);
                         if (location.visible.doShowRadius()) {
                             str += " [" + Translator.translate("hqm.locationMenu.mRadius", location.radius) + "]";
                         }
                         gui.drawString(str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
                     }
-
+                    
                 } else {
                     gui.drawString(Translator.translate("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
                 }
-
+                
             }
-
+            
         }
     }
-
-    @SideOnly(Side.CLIENT)
+    
+    @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, EntityPlayer player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Location[] locations = getEditFriendlyLocations(this.locations);
             for (int i = 0; i < locations.length; i++) {
                 Location location = locations[i];
-
+                
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;
-
+                
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     switch (gui.getCurrentMode()) {
                         case LOCATION:
@@ -209,18 +211,18 @@ public class QuestTaskLocation extends QuestTask {
                             break;
                         default:
                     }
-
+                    
                     break;
                 }
             }
         }
     }
-
+    
     @Override
-    public void onUpdate(EntityPlayer player) {
-
+    public void onUpdate(PlayerEntity player) {
+        
     }
-
+    
     @Override
     public float getCompletedRatio(UUID playerID) {
         int visited = 0;
@@ -229,15 +231,15 @@ public class QuestTaskLocation extends QuestTask {
                 visited++;
             }
         }
-
+        
         return (float) visited / locations.length;
     }
-
+    
     @Override
     public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
         boolean[] visited = ((QuestDataTaskLocation) own).visited;
         boolean[] otherVisited = ((QuestDataTaskLocation) other).visited;
-
+        
         boolean all = true;
         for (int i = 0; i < visited.length; i++) {
             if (otherVisited[i]) {
@@ -246,12 +248,12 @@ public class QuestTaskLocation extends QuestTask {
                 all = false;
             }
         }
-
+        
         if (all) {
             completeTask(playerID);
         }
     }
-
+    
     @Override
     public void autoComplete(UUID playerID, boolean status) {
         boolean[] visited = ((QuestDataTaskLocation) getData(playerID)).visited;
@@ -259,62 +261,60 @@ public class QuestTaskLocation extends QuestTask {
             visited[i] = status;
         }
     }
-
+    
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
         super.copyProgress(own, other);
         boolean[] visited = ((QuestDataTaskLocation) own).visited;
         System.arraycopy(((QuestDataTaskLocation) other).visited, 0, visited, 0, visited.length);
     }
-
+    
     @Override
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.side == Side.SERVER) {
-            tick(null, false);
+    public void onServerTick(MinecraftServer server) {
+        tick(null, false);
+    }
+    
+    @Override
+    public void onPlayerTick(ServerPlayerEntity playerEntity) {
+        if (!playerEntity.world.isClient) {
+            tick(playerEntity, true);
         }
     }
-
-    @Override
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.side == Side.SERVER) {
-            tick(event.player, true);
-        }
-    }
-
+    
     public enum Visibility {
         FULL("Full", true, true),
         LOCATION("Location", true, false),
         NONE("None", false, false);
-
+        
         private boolean showCoordinate;
         private boolean showRadius;
         private String id;
-
+        
         Visibility(String id, boolean showCoordinate, boolean showRadius) {
             this.id = id;
             this.showCoordinate = showCoordinate;
             this.showRadius = showRadius;
         }
-
+        
         public boolean doShowCoordinate() {
             return showCoordinate;
         }
-
+        
         public boolean doShowRadius() {
             return showRadius;
         }
-
+        
         public String getName() {
             return Translator.translate("hqm.locationMenu.vis" + id + ".title");
         }
-
+        
         public String getDescription() {
             return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
         }
     }
-
+    
     public static class Location {
-
+        
         private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
         private int x;
@@ -322,8 +322,8 @@ public class QuestTaskLocation extends QuestTask {
         private int z;
         private int radius = 3;
         private Visibility visible = Visibility.LOCATION;
-        private int dimension;
-
+        private DimensionType dimension;
+        
         private Location copy() {
             Location location = new Location();
             location.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
@@ -334,71 +334,71 @@ public class QuestTaskLocation extends QuestTask {
             location.radius = radius;
             location.visible = visible;
             location.dimension = dimension;
-
+            
             return location;
         }
-
+        
         public ItemStack getIconStack() {
             return iconStack;
         }
-
-        public void setIconStack(@Nonnull ItemStack iconStack) {
+        
+        public void setIconStack(@NotNull ItemStack iconStack) {
             this.iconStack = iconStack;
         }
-
+        
         public String getName() {
             return name;
         }
-
+        
         public void setName(String name) {
             this.name = name;
         }
-
+        
         public int getX() {
             return x;
         }
-
+        
         public void setX(int x) {
             this.x = x;
         }
-
+        
         public int getY() {
             return y;
         }
-
+        
         public void setY(int y) {
             this.y = y;
         }
-
+        
         public int getZ() {
             return z;
         }
-
+        
         public void setZ(int z) {
             this.z = z;
         }
-
+        
         public int getRadius() {
             return radius;
         }
-
+        
         public void setRadius(int radius) {
             this.radius = radius;
         }
-
+        
         public Visibility getVisible() {
             return visible;
         }
-
+        
         public void setVisible(Visibility visible) {
             this.visible = visible;
         }
-
-        public int getDimension() {
+        
+        public DimensionType getDimension() {
             return dimension;
         }
-
-        public void setDimension(int dimension) {
+        
+        public void setDimension(DimensionType dimension) {
             this.dimension = dimension;
         }
     }

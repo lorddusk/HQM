@@ -1,52 +1,36 @@
 package hardcorequesting.util;
 
-import com.google.common.collect.Sets;
+import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.blocks.ModBlocks;
+import hardcorequesting.items.ModItems;
 import net.minecraft.block.Block;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class RegisterHelper {
-    static Set<Block> blocks = Sets.newHashSet();
-    static Set<Item> items = Sets.newHashSet();
+    public static void registerBlock(Block block, String id, Function<Block, BlockItem> itemFunction) {
+        Registry.register(Registry.BLOCK, new Identifier(HardcoreQuesting.ID, id), block);
+        registerItem(itemFunction.apply(block), id);
+    }
     
-    public static void registerBlock(Block block) {
-        blocks.add(block);
+    public static void registerItem(Item item, String id) {
+        Registry.register(Registry.ITEM, new Identifier(HardcoreQuesting.ID, id), item);
     }
-
-    public static void registerBlock(Block block, Class<? extends ItemBlock> blockClass) {
-        blocks.add(block);
-        items.add(createItemBlock(block, blockClass));
+    
+    public static void register() {
+        ModBlocks.init();
+        ModBlocks.registerTileEntities();
+        ModItems.init();
     }
-
-    private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
-        try {
-            Class<?>[] ctorArgClasses = new Class<?>[1];
-            ctorArgClasses[0] = Block.class;
-            Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
-            
-            ItemBlock itemblock = itemCtor.newInstance(block);
-            itemblock.setRegistryName(block.getRegistryName());
-            return itemblock;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public static void registerItem(Item item) {
-        items.add(item);
-    }
-
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        blocks.forEach(block -> event.getRegistry().register(block));
-    }
-
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        items.forEach(item -> event.getRegistry().register(item));
+    
+    public static <T extends BlockEntity> BlockEntityType<T> registerTileEntity(Supplier<T> blockEntitySupplier, Identifier identifier) {
+        return Registry.register(Registry.BLOCK_ENTITY_TYPE, identifier, BlockEntityType.Builder.create(blockEntitySupplier).build(null));
     }
 }

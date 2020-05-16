@@ -1,19 +1,19 @@
 package hardcorequesting.client.interfaces;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 
 public abstract class ResourceHelper {
-
+    
     private ResourceHelper() {
     }
-
-    public static ResourceLocation getResource(String name) {
-        return new ResourceLocation("hardcorequesting", "textures/gui/" + name + ".png");
+    
+    public static Identifier getResource(String name) {
+        return new Identifier("hardcorequesting", "textures/gui/" + name + ".png");
     }
-
-    public static void bindResource(ResourceLocation resource) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(resource);
+    
+    public static void bindResource(Identifier resource) {
+        MinecraftClient.getInstance().getTextureManager().bindTexture(resource);
     }
-
+    
 }

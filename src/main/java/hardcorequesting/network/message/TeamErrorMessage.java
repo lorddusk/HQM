@@ -1,42 +1,41 @@
 package hardcorequesting.network.message;
 
+import hardcorequesting.network.IMessage;
+import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.TeamError;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.fabricmc.fabric.api.network.PacketContext;
+import net.minecraft.util.PacketByteBuf;
 
 public class TeamErrorMessage implements IMessage {
-
+    
     TeamError error;
-
+    
     public TeamErrorMessage() {
     }
-
+    
     public TeamErrorMessage(TeamError error) {
         this.error = error;
     }
-
+    
     @Override
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketByteBuf buf, PacketContext context) {
         this.error = TeamError.values()[buf.readInt()];
     }
-
+    
     @Override
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketByteBuf buf) {
         buf.writeInt(this.error.ordinal());
     }
-
+    
     public static class Handler implements IMessageHandler<TeamErrorMessage, IMessage> {
-
+        
         @Override
-        public IMessage onMessage(TeamErrorMessage message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
+        public IMessage onMessage(TeamErrorMessage message, PacketContext ctx) {
+            ctx.getTaskQueue().execute(() -> handle(message, ctx));
             return null;
         }
-
-        private void handle(TeamErrorMessage message, MessageContext ctx) {
+        
+        private void handle(TeamErrorMessage message, PacketContext ctx) {
             TeamError.latestError = message.error;
         }
     }
