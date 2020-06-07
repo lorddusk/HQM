@@ -12,7 +12,7 @@ import net.minecraft.util.Formatting;
 import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -721,20 +721,20 @@ public class Translator {
         return new LiteralText(translate(id));
     }
     
-    private static final Function<String, String> storageTranslator = Executor.call(() -> () -> s -> I18n.translate(s), () -> () -> s -> {
+    @SuppressWarnings("Convert2MethodRef")
+    private static final BiFunction<String, Object[], String> storageTranslator = Executor.call(() -> () -> (s, args) -> I18n.translate(s, args), () -> () -> (s, args) -> {
         String s1 = MAP.get(s);
-        if (s1 == null) return s;
-        return s1;
+        if (s1 == null) s1 = s;
+        
+        try {
+            return String.format(s1, args);
+        } catch (IllegalFormatException var5) {
+            return "Format error: " + s1;
+        }
     });
     
     private static String storageTranslate(String id, Object... args) {
-        String string = storageTranslator.apply(id);
-        
-        try {
-            return String.format(string, args);
-        } catch (IllegalFormatException var5) {
-            return "Format error: " + string;
-        }
+        return storageTranslator.apply(id, args);
     }
     
     public static String translate(String id) {
