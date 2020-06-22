@@ -5,7 +5,6 @@ import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class QuestTaskBlockBreak extends QuestTaskBlock {
@@ -24,7 +23,7 @@ public class QuestTaskBlockBreak extends QuestTaskBlock {
     }
     
     @Override
-    public void onBlockBroken(BlockPos blockPos, BlockState blockState, ServerPlayerEntity player) {
+    public void onBlockBroken(BlockPos blockPos, BlockState blockState, PlayerEntity player) {
         checkProgress(blockState, player);
     }
 }

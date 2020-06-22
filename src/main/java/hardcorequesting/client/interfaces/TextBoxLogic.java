@@ -1,10 +1,13 @@
 package hardcorequesting.client.interfaces;
 
+import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.text.StringRenderable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class TextBoxLogic {
@@ -104,7 +107,7 @@ public class TextBoxLogic {
     
     
     public void textChanged(GuiBase gui) {
-        lines = gui.getLinesFromText(text, mult, width);
+        lines = gui.getLinesFromText(Translator.plain(text), mult, width).stream().map(Translator::rawString).collect(Collectors.toList());
     }
     
     public List<String> getLines() {

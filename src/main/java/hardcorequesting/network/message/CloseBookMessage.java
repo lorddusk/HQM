@@ -4,7 +4,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestingData;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.UUID;
 

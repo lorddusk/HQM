@@ -18,10 +18,12 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.ArrayUtils;
@@ -91,7 +93,7 @@ public class QuestTaskAdvancement extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
         for (int i = 0; i < advancements.length; i++) {
             AdvancementTask advancement = advancements[i];
@@ -99,10 +101,10 @@ public class QuestTaskAdvancement extends QuestTask {
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(advancement.iconStack, x, y, mX, mY, false);
-            gui.drawString(advancement.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawString(matrices, Translator.plain(advancement.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             if (advanced(i, player)) {
-                gui.drawString(GuiColor.GREEN + Translator.translate("hqm.advancementMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.advancementMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         }
     }
@@ -271,11 +273,11 @@ public class QuestTaskAdvancement extends QuestTask {
         
         // TODO: fix these
         public String getName() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".title");
+            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".title");
         }
         
         public String getDescription() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
+            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".desc");
         }
     }
     

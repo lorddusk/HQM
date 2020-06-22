@@ -4,7 +4,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.TeamError;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 public class TeamErrorMessage implements IMessage {
     

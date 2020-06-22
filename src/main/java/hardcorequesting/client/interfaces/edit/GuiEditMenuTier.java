@@ -6,7 +6,9 @@ import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     
@@ -65,19 +67,19 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
-        gui.drawString(tier.getName(), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
+        gui.drawString(matrices, Translator.plain(tier.getName()), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
         
-        gui.drawString(Translator.translate("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
+        gui.drawString(matrices, Translator.translated("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
         
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             BagTier bagTier = values[i];
             
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(bagTier.getColor().toString() + bagTier.getName(), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(matrices, Translator.colored(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
         }
         
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -86,9 +88,9 @@ public class GuiEditMenuTier extends GuiEditMenu {
         
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
-        gui.drawCenteredString(tier.getColor().getName(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+        gui.drawCenteredString(matrices, Translator.plain(tier.getColor().getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         
-        textBoxes.draw(gui);
+        textBoxes.draw(matrices, gui);
     }
     
     @Override

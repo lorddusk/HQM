@@ -7,7 +7,7 @@ import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DefaultedList;
+import net.minecraft.util.collection.DefaultedList;
 
 import java.lang.reflect.Method;
 

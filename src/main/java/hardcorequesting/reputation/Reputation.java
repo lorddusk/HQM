@@ -18,7 +18,10 @@ import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.io.IOException;
 import java.util.*;
@@ -100,33 +103,28 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawAll(GuiQuestBook gui, int x, int y, int mX, int mY, final PlayerEntity player) {
+    public static void drawAll(MatrixStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final PlayerEntity player) {
         String info = null;
         
         List<Reputation> reputations = getReputationList();
         
-        Collections.sort(reputations, new Comparator<Reputation>() {
-            @Override
-            public int compare(Reputation reputation1, Reputation reputation2) {
-                return ((Integer) Math.abs(reputation2.getValue(player))).compareTo(Math.abs(reputation1.getValue(player)));
-            }
-        });
+        Collections.sort(reputations, (reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(player)), Math.abs(reputation1.getValue(player))));
         
         int start = gui.reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * gui.reputationDisplayScroll.getScroll()) : 0;
         int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputations.get(i).draw(gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, player, false, null, null, false, null, null, false);
+            info = reputations.get(i).draw(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, player, false, null, null, false, null, null, false);
         }
         
         if (info != null) {
-            gui.renderTooltip(info, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawEditPage(GuiQuestBook gui, int mX, int mY) {
+    public static void drawEditPage(MatrixStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
@@ -139,13 +137,13 @@ public class Reputation {
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
                 boolean selected = reputationList.get(i).equals(selectedReputation);
                 
-                gui.drawString(str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
         }
         
         if (selectedReputation != null) {
-            String neutralName = Translator.translate("hqm.rep.neutral", selectedReputation.neutral.getName());
-            gui.drawString(neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
+            StringRenderable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
             int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.markers.size() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATION_TIERS, selectedReputation.markers.size());
@@ -155,7 +153,7 @@ public class Reputation {
                 String str = selectedReputation.markers.get(i).getTitle();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
-                gui.drawString(str, x, y, hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(matrices, Translator.plain(str), x, y, hover ? 0xAAAAAA : 0x404040);
             }
         }
     }
@@ -218,7 +216,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            String neutralName = Translator.translate("hqm.rep.neutral", selectedReputation.neutral.getName());
+            StringRenderable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
@@ -316,12 +314,12 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String draw(GuiQuestBook gui, int x, int y, int mX, int mY, String info, PlayerEntity player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public String draw(MatrixStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, PlayerEntity player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
         String error = getError();
         
         if (error != null) {
             gui.drawRect(x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
-            gui.drawString(error, x + TEXT_X, y + TEXT_Y, 0.7F, GuiColor.RED.getHexColor());
+            gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, GuiColor.RED.getHexColor());
             return info;
         }
         
@@ -442,7 +440,7 @@ public class Reputation {
             str = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                str = GuiColor.RED + Translator.translate("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
+                str = GuiColor.RED + I18n.translate("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -457,7 +455,7 @@ public class Reputation {
                         }
                     } else {
                         if (inverted) {
-                            str = Translator.translate("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
+                            str = I18n.translate("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
                         } else {
                             str = lowerName + " <= " + name + " <= " + upperName;
                         }
@@ -473,11 +471,12 @@ public class Reputation {
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
-        gui.drawString(str, x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
+        gui.drawString(matrices, Translator.plain(str), x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
         
         return info;
     }
     
+    @Environment(EnvType.CLIENT)
     private String getError() {
         String error = null;
         if (markers.size() < 2) {
@@ -501,7 +500,7 @@ public class Reputation {
             }
         }
         
-        return error == null ? null : Translator.translate("hqm.rep." + error);
+        return error == null ? null : I18n.translate("hqm.rep." + error);
     }
     
     public ReputationMarker getCurrentMarker(int value) {
@@ -519,6 +518,7 @@ public class Reputation {
         return current;
     }
     
+    @Environment(EnvType.CLIENT)
     private boolean drawPointer(GuiQuestBook gui, int value, int x, int y, int offsetY, int srcX, int mX, int mY, boolean selectedTexture) {
         boolean flag = false;
         int pointerX = x + BAR_X - ARROW_SIZE / 2 + getPointerPosition(value, true);

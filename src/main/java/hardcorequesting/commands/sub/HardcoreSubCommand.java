@@ -15,7 +15,6 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
     @Override
     public ArgumentBuilder<ServerCommandSource, ?> build(LiteralArgumentBuilder<ServerCommandSource> builder) {
         Command<ServerCommandSource> enable = context -> {
-            QuestingData.disableVanillaHardcore(context.getSource());
             if (context.getSource().getWorld().getLevelProperties().isHardcore())
                 context.getSource().sendFeedback(new TranslatableText("hqm.message.vanillaHardcoreOn"), true);
             else

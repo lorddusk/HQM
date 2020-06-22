@@ -1,10 +1,10 @@
 package hardcorequesting.mixin;
 
 import hardcorequesting.event.EventTrigger;
-import net.minecraft.container.CraftingResultSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.CraftingResultSlot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "0.4.13"
+    id "fabric-loom" version "0.4-SNAPSHOT"
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
@@ -11,21 +11,22 @@ group = project.maven_group
 repositories {
     maven { url "https://dl.bintray.com/ladysnake/libs" }
     maven { url "https://mod-buildcraft.com/maven" }
-    maven { url "http://tehnut.info/maven" }
+    maven { url "https://dl.bintray.com/shedaniel/legacy-yarn-updated" }
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
-    mappings("net.fabricmc:yarn:${project.yarn_mappings}:v2")
+    mappings("me.shedaniel:legacy-yarn:${project.yarn_mappings}:v2")
     modCompile("net.fabricmc:fabric-loader:${project.loader_version}")
     modCompile("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
     modCompileOnly("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
     modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
     depend("org.jetbrains:annotations:19.0.0")
-    depend("com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
-    depend("com.github.NerdHubMC.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
+    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
+    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}") 
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}") 
+    depend("me.shedaniel.cloth.api:cloth-api:${project.cloth}") 
 }
 
 def depend(String string) {

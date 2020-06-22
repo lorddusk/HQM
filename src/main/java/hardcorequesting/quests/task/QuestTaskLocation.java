@@ -15,10 +15,13 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import org.apache.commons.lang3.ArrayUtils;
@@ -65,7 +68,7 @@ public class QuestTaskLocation extends QuestTask {
                         System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
                         ((QuestDataTaskLocation) this.getData(player)).visited = visited;
                     }
-                    if (!visited[i] && player.getEntityWorld().dimension.getType() == location.dimension) {
+                    if (!visited[i] && player.getEntityWorld().getDimensionRegistryKey() == location.dimension) {
                         int current = (int) player.squaredDistanceTo((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
@@ -136,7 +139,7 @@ public class QuestTaskLocation extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         Location[] locations = getEditFriendlyLocations(this.locations);
         for (int i = 0; i < locations.length; i++) {
             Location location = locations[i];
@@ -144,28 +147,28 @@ public class QuestTaskLocation extends QuestTask {
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(location.iconStack, x, y, mX, mY, false);
-            gui.drawString(location.name, x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawString(matrices, Translator.plain(location.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             if (visited(i, player)) {
-                gui.drawString(GuiColor.GREEN + Translator.translate("hqm.locationMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.locationMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             } else if (location.visible.doShowCoordinate()) {
                 if (location.radius >= 0) {
-                    gui.drawString("(" + location.x + ", " + location.y + ", " + location.z + ")", x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.plain("(" + location.x + ", " + location.y + ", " + location.z + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
                 
-                if (player.getEntityWorld().dimension.getType() == location.dimension) {
+                if (player.getEntityWorld().getDimensionRegistryKey() == location.dimension) {
                     if (location.radius >= 0) {
-                        String str;
+                        StringRenderable str;
                         int distance = (int) player.squaredDistanceTo(location.x + 0.5, location.y + 0.5, location.z + 0.5);
-                        str = Translator.translate("hqm.locationMenu.mAway", distance);
+                        str = Translator.translated("hqm.locationMenu.mAway", distance);
                         if (location.visible.doShowRadius()) {
-                            str += " [" + Translator.translate("hqm.locationMenu.mRadius", location.radius) + "]";
+                            str = StringRenderable.concat(str, Translator.plain(" ["), Translator.translated("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
                         }
-                        gui.drawString(str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
+                        gui.drawString(matrices, str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
                     }
                     
                 } else {
-                    gui.drawString(Translator.translate("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translated("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
                 }
                 
             }
@@ -305,11 +308,11 @@ public class QuestTaskLocation extends QuestTask {
         }
         
         public String getName() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".title");
+            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".title");
         }
         
         public String getDescription() {
-            return Translator.translate("hqm.locationMenu.vis" + id + ".desc");
+            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".desc");
         }
     }
     
@@ -322,7 +325,7 @@ public class QuestTaskLocation extends QuestTask {
         private int z;
         private int radius = 3;
         private Visibility visible = Visibility.LOCATION;
-        private DimensionType dimension;
+        private RegistryKey<DimensionType> dimension;
         
         private Location copy() {
             Location location = new Location();
@@ -394,11 +397,11 @@ public class QuestTaskLocation extends QuestTask {
             this.visible = visible;
         }
         
-        public DimensionType getDimension() {
+        public RegistryKey<DimensionType> getDimension() {
             return dimension;
         }
         
-        public void setDimension(DimensionType dimension) {
+        public void setDimension(RegistryKey<DimensionType> dimension) {
             this.dimension = dimension;
         }
     }

@@ -9,10 +9,11 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 
 public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTileMessage, IMessage> {
@@ -35,7 +36,7 @@ public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTi
         BlockPos pos = buf.readBlockPos();
         this.data = buf.readCompoundTag();
         
-        World world = HardcoreQuesting.getServer().getWorld(Registry.DIMENSION_TYPE.get(worldId));
+        World world = HardcoreQuesting.getServer().getWorld(RegistryKey.of(Registry.DIMENSION, worldId));
         if (world != null) {
             this.tileToSync = world.getBlockEntity(pos);
             System.out.println(this.tileToSync.hashCode());
@@ -44,7 +45,7 @@ public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTi
     
     @Override
     public void toBytes(PacketByteBuf buf) {
-        buf.writeIdentifier(Registry.DIMENSION_TYPE.getId(this.tileToSync.getWorld().getDimension().getType()));
+        buf.writeIdentifier(this.tileToSync.getWorld().getRegistryKey().getValue());
         buf.writeBlockPos(this.tileToSync.getPos());
         buf.writeCompoundTag(this.data);
     }

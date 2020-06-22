@@ -7,7 +7,9 @@ import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,21 +73,21 @@ public abstract class GuiEditMenu {
         });
     }
     
-    public void draw(GuiBase gui, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible(gui, null)) {
-                button.draw(gui, player, mX, mY);
+                button.draw(matrices, gui, player, mX, mY);
             }
         }
         for (CheckBox checkbox : checkboxes) {
-            checkbox.draw(gui, mX, mY);
+            checkbox.draw(matrices, gui, mX, mY);
         }
     }
     
-    public void renderTooltip(GuiBase gui, int mX, int mY) {
+    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible(gui, null)) {
-                button.renderTooltip(gui, player, mX, mY);
+                button.renderTooltip(matrices, gui, player, mX, mY);
             }
         }
     }
@@ -144,7 +146,7 @@ public abstract class GuiEditMenu {
         private int x;
         private int y;
         private String name;
-        private List<String> cached;
+        private List<StringRenderable> cached;
         private int width = Integer.MAX_VALUE;
         
         protected CheckBox(String name, int x, int y) {
@@ -158,13 +160,13 @@ public abstract class GuiEditMenu {
             this.width = width;
         }
         
-        protected void draw(GuiBase gui, int mX, int mY) {
+        protected void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
             if (!isVisible()) {
                 return;
             }
             
             if (cached == null) {
-                cached = gui.getLinesFromText(Translator.translate(name), 0.7F, width);
+                cached = gui.getLinesFromText(Translator.translated(name), 0.7F, width);
             }
             
             boolean selected = getValue();
@@ -175,7 +177,7 @@ public abstract class GuiEditMenu {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             gui.drawRect(x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
-            gui.drawString(cached, x + 12, y + 2, 0.7F, 0x404040);
+            gui.drawString(matrices, cached, x + 12, y + 2, 0.7F, 0x404040);
         }
         
         protected void onClick(GuiBase gui, int mX, int mY) {

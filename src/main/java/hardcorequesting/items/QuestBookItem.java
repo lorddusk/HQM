@@ -16,13 +16,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.Util;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,14 +56,14 @@ public class QuestBookItem extends Item {
         }
         
         if (!world.isClient && Quest.isEditing && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
-            player.sendMessage(new TranslatableText("hqm.command.editMode.disableSync").setStyle(new Style().setColor(Formatting.RED).setBold(true)));
+            player.sendMessage(Translator.translatable("hqm.command.editMode.disableSync").fillStyle(Style.EMPTY.setColor(Formatting.RED).setBold(true)), Util.NIL_UUID);
             Quest.setEditMode(false);
         }
         
         if (!world.isClient && player instanceof ServerPlayerEntity) {
             ItemStack stack = player.getStackInHand(hand);
             if (!QuestingData.isQuestActive()) {
-                player.sendMessage(Translator.translateToIChatComponent("hqm.message.noQuestYet"));
+                player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
             } else {
                 if (stack.getItem() == ModItems.enabledBook) {
                     CompoundTag compound = stack.getSubTag("hqm");
@@ -76,8 +77,6 @@ public class QuestBookItem extends Item {
                             return TypedActionResult.fail(stack);
                         }
                         if (QuestingData.hasData(uuid)) {
-                            // TODO CommandHandler
-//                            if (CommandHandler.isOwnerOrOp(player)) {
                             if (HardcoreQuesting.getServer().getPermissionLevel(player.getGameProfile()) >= 4) {
                                 PlayerEntity subject = QuestingData.getPlayer(uuid);
                                 if (subject instanceof ServerPlayerEntity) {
@@ -87,15 +86,14 @@ public class QuestBookItem extends Item {
                                         entry.setBookOpen(true);
                                         GeneralUsage.sendOpenBook(player, true);
                                     } else {
-                                        player.sendMessage(new TranslatableText("hqm.message.bookNoEntry"));
+                                        player.sendMessage(Translator.translatable("hqm.message.bookNoEntry"), Util.NIL_UUID);
                                     }
                                 }
-                                //player.addChatComponentMessage(Translator.translateToIChatComponent("hqm.message.alreadyEditing"));
                             } else {
-                                player.sendMessage(Translator.translateToIChatComponent("hqm.message.bookNoPermission"));
+                                player.sendMessage(Translator.translatable("hqm.message.bookNoPermission"), Util.NIL_UUID);
                             }
                         } else {
-                            player.sendMessage(new TranslatableText("hqm.message.bookNoData"));
+                            player.sendMessage(Translator.translatable("hqm.message.bookNoData"), Util.NIL_UUID);
                         }
                     }
                 } else {
@@ -105,7 +103,7 @@ public class QuestBookItem extends Item {
                         entry.setBookOpen(true);
                         GeneralUsage.sendOpenBook(player, false);
                     } else {
-                        player.sendMessage(new TranslatableText("hqm.message.bookNoPlayer"));
+                        player.sendMessage(new TranslatableText("hqm.message.bookNoPlayer"), Util.NIL_UUID);
                     }
                 }
             }
@@ -120,9 +118,9 @@ public class QuestBookItem extends Item {
             CompoundTag compound = stack.getSubTag("hqm");
             if (compound != null && compound.contains(NBT_PLAYER)) {
                 PlayerEntity useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
-                tooltip.add(Translator.translateToIChatComponent("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getEntityName()));
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getEntityName()));
             } else
-                tooltip.add(new LiteralText(GuiColor.RED + Translator.translate("item.hqm:quest_book_1.invalid")));
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").fillStyle(Style.EMPTY.withColor(TextColor.fromRgb(GuiColor.RED.getHexColor() & 0xFFFFFF))));
         }
     }
     

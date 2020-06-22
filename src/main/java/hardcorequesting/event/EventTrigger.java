@@ -2,6 +2,9 @@ package hardcorequesting.event;
 
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
+import me.shedaniel.cloth.api.common.events.v1.BlockBreakCallback;
+import me.shedaniel.cloth.api.common.events.v1.BlockPlaceCallback;
+import me.shedaniel.cloth.api.common.events.v1.ItemPickupCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerTickCallback;
@@ -12,9 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
@@ -22,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -48,6 +50,9 @@ public class EventTrigger {
         });
         UseItemCallback.EVENT.register(this::onItemUsed);
         UseBlockCallback.EVENT.register(this::onBlockUsed);
+        BlockPlaceCallback.EVENT.register(this::onBlockPlaced);
+        BlockBreakCallback.EVENT.register(this::onBlockBreak);
+        ItemPickupCallback.EVENT.register(this::onItemPickUp);
         instance = this;
     }
     
@@ -168,16 +173,17 @@ public class EventTrigger {
         }
     }
     
-    public void onBlockBreak(BlockPos blockPos, BlockState blockState, ServerPlayerEntity player) {
+    public void onBlockBreak(IWorld world, BlockPos pos, BlockState state, PlayerEntity player) {
         for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
-            task.onBlockBroken(blockPos, blockState, player);
+            task.onBlockBroken(pos, state, player);
         }
     }
     
-    public void onBlockPlaced(BlockItem item, ItemUsageContext context) {
+    public ActionResult onBlockPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         for (QuestTask task : getTasks(Type.BLOCK_PLACED)) {
-            task.onBlockPlaced(item, context);
+            task.onBlockPlaced(itemStack, world, state, placer);
         }
+        return ActionResult.PASS;
     }
     
     private TypedActionResult<ItemStack> onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {

@@ -9,9 +9,12 @@ import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -62,7 +65,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         String info = null;
         int size = Quest.canQuestsBeEdited() ? settings.length + 1 : settings.length;
         for (int i = 0; i < size; i++) {
@@ -73,12 +76,12 @@ public abstract class QuestTaskReputation extends QuestTask {
                 gui.drawRect(START_X + Reputation.BAR_X, START_Y + startOffsetY + i * OFFSET_Y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             } else {
                 ReputationSetting setting = settings[i];
-                info = setting.reputation.draw(gui, START_X, START_Y + startOffsetY + i * OFFSET_Y, mX, mY, info, getPlayerForRender(player), true, setting.lower, setting.upper, setting.inverted, null, null, getData(player).completed);
+                info = setting.reputation.draw(matrices, gui, START_X, START_Y + startOffsetY + i * OFFSET_Y, mX, mY, info, getPlayerForRender(player), true, setting.lower, setting.upper, setting.inverted, null, null, getData(player).completed);
             }
         }
         
         if (info != null) {
-            gui.renderTooltip(info, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     

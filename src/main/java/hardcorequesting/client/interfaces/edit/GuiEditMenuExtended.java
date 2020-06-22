@@ -6,7 +6,9 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.TextBoxGroup;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 public abstract class GuiEditMenuExtended extends GuiEditMenu {
     
@@ -38,8 +40,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -49,14 +51,14 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);
             
-            gui.drawCenteredString(getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(matrices, Translator.plain(getArrowText()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
             String description = getArrowDescription();
             if (description != null) {
-                gui.drawString(gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(Translator.plain(description), 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
             }
         }
         
-        textBoxes.draw(gui);
+        textBoxes.draw(matrices, gui);
     }
     
     @Override
@@ -135,10 +137,10 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         }
         
         @Override
-        protected void draw(GuiBase gui, boolean selected) {
-            super.draw(gui, selected);
+        protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+            super.draw(matrices, gui, selected);
             
-            gui.drawString(Translator.translate(title), BOX_X, BOX_Y + BOX_OFFSET * id + TEXT_OFFSET, 0x404040);
+            gui.drawString(matrices, Translator.translated(title), BOX_X, BOX_Y + BOX_OFFSET * id + TEXT_OFFSET, 0x404040);
         }
         
         @Override

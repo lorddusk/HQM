@@ -10,7 +10,8 @@ import hardcorequesting.util.Translator;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,13 +57,17 @@ public class CommandHandler {
         default void currentLives(ServerCommandSource source, PlayerEntity player) {
             source.sendFeedback(new LiteralText(player.getEntityName() + " currently has " + QuestingData.getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        
-        default void sendChat(ServerCommandSource sender, String key, Object... args) {
-            sendChat(sender, false, key, args);
+    
+        default void sendChat(ServerCommandSource sender, Text text) {
+            sender.sendFeedback(text, false);
         }
         
-        default void sendChat(ServerCommandSource sender, boolean plural, String key, Object... args) {
-            sender.sendFeedback(new TranslatableText(Translator.translate(plural, key, args)), false);
+        default void sendTranslatableChat(ServerCommandSource sender, String key, Object... args) {
+            sender.sendFeedback(Translator.translatable(key, args), false);
+        }
+        
+        default void sendTranslatableChat(ServerCommandSource sender, boolean plural, String key, Object... args) {
+            sender.sendFeedback(Translator.translatable(Formatting.RESET, plural, key, args), false);
         }
     }
 }

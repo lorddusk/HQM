@@ -5,7 +5,9 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.RenderRotation;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
     
@@ -33,8 +35,8 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
@@ -48,15 +50,15 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
-            gui.drawString(teamStat.getName(), x, y, 0x404040);
-            gui.drawString(Translator.translate("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
-            gui.drawString(Translator.translate("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
-            gui.drawString(Translator.translate("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.plain(teamStat.getName()), x, y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
         }
         
-        gui.drawCenteredString(Translator.translate("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
+        gui.drawCenteredString(matrices, Translator.translated("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
         if (end - start > TEAMS_PER_PAGE) {
-            gui.drawCenteredString(Translator.translate("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
+            gui.drawCenteredString(matrices, Translator.translated("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
         }
     }
     

@@ -2,7 +2,9 @@ package hardcorequesting.quests;
 
 import com.google.common.collect.ImmutableList;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.util.Translator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tag.Tag;
@@ -145,8 +147,9 @@ public abstract class ItemPrecision {
         return "hqm.precision." + tag;
     }
     
+    @Environment(EnvType.CLIENT)
     public String getName() {
-        return Translator.translate(getLocalizationTag());
+        return I18n.translate(getLocalizationTag());
     }
     
     // For backwards compatibility

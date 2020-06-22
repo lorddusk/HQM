@@ -1,6 +1,7 @@
 package hardcorequesting.tileentity;
 
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.ItemStack;
 
 public enum PortalType {
@@ -17,11 +18,11 @@ public enum PortalType {
     }
     
     public String getName() {
-        return Translator.translate("hqm.portal." + this.id + ".title");
+        return I18n.translate("hqm.portal." + this.id + ".title");
     }
     
     public String getDescription() {
-        return Translator.translate("hqm.portal." + this.id + ".desc");
+        return I18n.translate("hqm.portal." + this.id + ".desc");
     }
     
     public ItemStack createItemStack() {

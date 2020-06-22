@@ -3,8 +3,8 @@
   "package": "hardcorequesting.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinBlockItem", "MixinCraftingResultSlot", "MixinHorseBondWithPlayerGoal", "MixinItemEntity", "MixinMinecraftServer", "MixinPlayerAdvancementTracker",
-    "MixinPlayerEntity", "MixinPlayerInventory", "MixinPlayerManager", "MixinServerPlayerInteractionManager", "MixinServerWorld"
+    "MixinCraftingResultSlot", "MixinHorseBondWithPlayerGoal", "MixinMinecraftServer", "MixinPlayerAdvancementTracker",
+    "MixinPlayerEntity", "MixinPlayerInventory"
   ],
   "client": [
   ],

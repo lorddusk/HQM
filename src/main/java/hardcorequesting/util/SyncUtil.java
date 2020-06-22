@@ -1,7 +1,7 @@
 package hardcorequesting.util;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;

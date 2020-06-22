@@ -5,6 +5,7 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.NarratorManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 @Environment(EnvType.CLIENT)
@@ -25,12 +26,12 @@ public class GuiWrapperEditMenu extends GuiBase {
         if (editMenu != null) {
             this.editMenu = editMenu;
         } else {
-            this.minecraft.openScreen(null);
+            this.client.openScreen(null);
         }
     }
     
     @Override
-    public void render(int mX0, int mY0, float f) {
+    public void render(MatrixStack matrices, int mX0, int mY0, float f) {
         boolean doublePage = editMenu.doesRequiredDoublePage();
         
         this.left = (this.width - (doublePage ? TEXTURE_WIDTH * 2 : TEXTURE_WIDTH)) / 2;
@@ -55,8 +56,8 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = mY0 - top;
         
         if (editMenu != null) {
-            editMenu.draw(this, mX, mY);
-            editMenu.renderTooltip(this, mX, mY);
+            editMenu.draw(matrices, this, mX, mY);
+            editMenu.renderTooltip(matrices, this, mX, mY);
         }
     }
     

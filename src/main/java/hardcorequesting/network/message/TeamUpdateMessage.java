@@ -7,7 +7,7 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 public class TeamUpdateMessage implements IMessage {
     

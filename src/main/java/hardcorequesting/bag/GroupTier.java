@@ -9,9 +9,9 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.language.I18n;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -110,7 +110,7 @@ public class GroupTier {
     }
     
     public String getName() {
-        return name == null || name.equals("") ? Translator.translate("hqm.bag.unknown") : name;
+        return name == null || name.equals("") ? I18n.translate("hqm.bag.unknown") : name;
     }
     
     public void setName(String name) {
@@ -130,7 +130,7 @@ public class GroupTier {
     }
     
     public GroupTier copy() {
-        return new GroupTier(getName(), getColor(), getWeights());
+        return new GroupTier(name, getColor(), getWeights());
     }
     
     public void load(GroupTier tier) {

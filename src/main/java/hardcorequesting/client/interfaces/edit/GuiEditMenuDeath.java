@@ -10,7 +10,9 @@ import hardcorequesting.death.DeathType;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.UUID;
 
@@ -63,8 +65,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         scrollBar.draw(gui);
         
@@ -76,13 +78,13 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
-            gui.drawString((i + 1) + ". " + stats.getName(), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
+            gui.drawString(matrices, Translator.plain((i + 1) + ". " + stats.getName()), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
-            gui.drawString(deaths, DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
+            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
         
-        gui.drawString(Translator.translate(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
-        gui.drawString(Translator.translate(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
+        gui.drawString(matrices, Translator.translated(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
+        gui.drawString(matrices, Translator.translated(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
         
         DeathStats stats = getStats();
         
@@ -99,19 +101,21 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 gui.drawRect(TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
-            gui.drawString(stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
-            gui.drawString(Translator.translate("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.plain(stats.getName()), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
             
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
-                
-                String str = String.valueOf(stats.getDeaths(i));
+    
+                StringRenderable text = Translator.plain(stats.getDeaths(i) + "");
+                String str = Translator.rawString(text);
                 if (str.length() > 5)
-                    str = Translator.translate("hqm.deathMenu.lots");
+                    text = Translator.translated("hqm.deathMenu.lots");
+                str = Translator.rawString(text);
                 float f = DIGIT_TEXT_SIZE[str.length() - 1];
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
-                gui.drawString(str, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
+                gui.drawString(matrices, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
             }
             
             
@@ -120,8 +124,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(GuiBase gui, int mX, int mY) {
-        super.renderTooltip(gui, mX, mY);
+    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.renderTooltip(matrices, gui, mX, mY);
         
         DeathStats stats = getStats();
         if (stats != null) {
@@ -131,7 +135,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 
                 
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
-                    gui.renderTooltip(stats.getDescription(i), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltip(matrices, Translator.plain(stats.getDescription(i)), mX + gui.getLeft(), mY + gui.getTop());
                     break;
                 }
             }
@@ -144,11 +148,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
         scrollBar.onClick(gui, mX, mY);
         
-        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translate(BEST_LABEL)), 9, mX, mY)) {
+        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translated(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
             playerId = null;
-        } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translate(TOTAL_LABEL)), 9, mX, mY)) {
+        } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translated(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
             playerId = null;

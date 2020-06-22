@@ -5,7 +5,7 @@ import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;

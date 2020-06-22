@@ -3,6 +3,7 @@ package hardcorequesting.blocks;
 import hardcorequesting.items.QuestBookItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.BarrelBlockEntity;
+import hardcorequesting.util.Translator;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricMaterialBuilder;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
@@ -16,6 +17,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
@@ -26,7 +28,7 @@ public class DeliveryBlock extends BlockWithEntity {
     public static final BooleanProperty BOUND = BooleanProperty.of("bound");
     
     public DeliveryBlock() {
-        super(FabricBlockSettings.of(new FabricMaterialBuilder(MaterialColor.WOOD).burnable().requiresTool().build()).hardness(1.0F).breakByTool(FabricToolTags.AXES, 0));
+        super(FabricBlockSettings.of(Material.WOOD).requiresTool().hardness(1.0F).breakByTool(FabricToolTags.AXES, 0));
         this.setDefaultState(this.getStateManager().getDefaultState().with(BOUND, false));
     }
     
@@ -44,15 +46,15 @@ public class DeliveryBlock extends BlockWithEntity {
                 if (!hold.isEmpty() && hold.getItem() instanceof QuestBookItem) {
                     ((BarrelBlockEntity) tile).storeSettings(player);
                     if (((BarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendMessage(new TranslatableText("tile.hqm:item_barrel.bindTo", Quest.getQuest(((BarrelBlockEntity) tile).getQuestUUID()).getName()));
+                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.bindTo", Quest.getQuest(((BarrelBlockEntity) tile).getQuestUUID()).getName()), Util.NIL_UUID);
                     } else {
-                        player.sendMessage(new TranslatableText("hqm.message.noTaskSelected"));
+                        player.sendMessage(Translator.translatable("hqm.message.noTaskSelected"), Util.NIL_UUID);
                     }
                 } else {
                     if (((BarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendMessage(new TranslatableText("tile.hqm:item_barrel.boundTo", Quest.getQuest(((BarrelBlockEntity) tile).getQuestUUID()).getName()));
+                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.boundTo", Quest.getQuest(((BarrelBlockEntity) tile).getQuestUUID()).getName()), Util.NIL_UUID);
                     } else {
-                        player.sendMessage(new TranslatableText("tile.hqm:item_barrel.nonBound"));
+                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.nonBound"), Util.NIL_UUID);
                     }
                 }
             }

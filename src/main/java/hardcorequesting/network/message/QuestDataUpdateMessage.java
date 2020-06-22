@@ -7,7 +7,7 @@ import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

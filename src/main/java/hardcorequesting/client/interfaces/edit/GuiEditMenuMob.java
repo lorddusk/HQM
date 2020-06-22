@@ -4,8 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskMob;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
@@ -63,7 +66,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         
         for (EntityType type : Registry.ENTITY_TYPE) {
             if (type.isSummonable()) {
-                rawMobs.add(type.getName().asFormattedString());
+                rawMobs.add(type.getName().getString());
             }
         }
         
@@ -84,8 +87,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -97,13 +100,13 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             boolean selected = mobs.get(i).equals(mob.getMob());
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
-            gui.drawString(mobs.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Translator.plain(mobs.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
-        gui.drawString(Translator.translate("hqm.mobTask.search"), 180, 20, 0x404040);
-        gui.drawString(Translator.translate("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(matrices, Translator.translated("hqm.mobTask.search"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.translated("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (mob.getMob() != null) {
-            gui.drawString(mob.getMob(), 180, 50, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.plain(mob.getMob()), 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -141,12 +144,12 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return Translator.translate("hqm.mobTask." + "type" + "Match.title");
+        return I18n.translate("hqm.mobTask." + "type" + "Match.title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return Translator.translate("hqm.mobTask." + "type" + "Match.desc");
+        return I18n.translate("hqm.mobTask." + "type" + "Match.desc");
     }
     
     @Override

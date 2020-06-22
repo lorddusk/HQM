@@ -6,9 +6,9 @@ import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.HQMUtil;
+import hardcorequesting.util.Translator;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Style;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 public class EditSubCommand implements CommandHandler.SubCommand {
@@ -18,18 +18,18 @@ public class EditSubCommand implements CommandHandler.SubCommand {
                 .requires(source -> source.hasPermissionLevel(4))
                 .executes(context -> {
                     if (HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
-                        context.getSource().sendFeedback(new TranslatableText("hqm.command.editMode.disableSync").setStyle(new Style().setColor(Formatting.RED).setBold(true)), false);
+                        context.getSource().sendFeedback(Translator.translatable("hqm.command.editMode.disableSync").setStyle(Style.EMPTY.setColor(Formatting.RED).setBold(true)), false);
                         Quest.setEditMode(false);
                     } else if (HQMUtil.isGameSingleplayer()) {
                         boolean newEditModeState = !Quest.canQuestsBeEdited();
                         Quest.setEditMode(newEditModeState);
                         if (newEditModeState) {
-                            context.getSource().sendFeedback(new TranslatableText("hqm.command.editMode.enabled"), false);
+                            context.getSource().sendFeedback(Translator.translatable("hqm.command.editMode.enabled"), false);
                         } else {
-                            context.getSource().sendFeedback(new TranslatableText("hqm.command.editMode.disabled"), false);
+                            context.getSource().sendFeedback(Translator.translatable("hqm.command.editMode.disabled"), false);
                         }
                     } else {
-                        context.getSource().sendFeedback(new TranslatableText("hqm.command.editMode.server"), false);
+                        context.getSource().sendFeedback(Translator.translatable("hqm.command.editMode.server"), false);
                         Quest.setEditMode(false);
                     }
                     return 1;

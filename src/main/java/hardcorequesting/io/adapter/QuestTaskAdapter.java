@@ -13,6 +13,7 @@ import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryKey;
 
 import java.io.IOException;
 import java.util.*;
@@ -128,7 +129,7 @@ public class QuestTaskAdapter {
             out.name(X).value(value.getX());
             out.name(Y).value(value.getY());
             out.name(Z).value(value.getZ());
-            out.name(DIM).value(Registry.DIMENSION_TYPE.getId(value.getDimension()).toString());
+            out.name(DIM).value(value.getDimension().getValue().toString());
             out.name(RADIUS).value(value.getRadius());
             if (value.getVisible() != QuestTaskLocation.Visibility.LOCATION)
                 out.name(VISIBLE).value(value.getVisible().name());
@@ -150,7 +151,7 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(Z)) {
                     result.setZ(in.nextInt());
                 } else if (name.equalsIgnoreCase(DIM)) {
-                    result.setDimension(Registry.DIMENSION_TYPE.get(new Identifier(in.nextString())));
+                    result.setDimension(RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier(in.nextString())));
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {

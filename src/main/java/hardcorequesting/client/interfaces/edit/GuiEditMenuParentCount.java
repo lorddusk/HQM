@@ -4,6 +4,7 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiEditMenuParentCount extends GuiEditMenuExtended {
@@ -44,12 +45,12 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return Translator.translate("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
+        return I18n.translate("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return Translator.translate("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
+        return I18n.translate("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
     }
     
     @Override

@@ -4,6 +4,9 @@ import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,7 +80,7 @@ public final class SaveHelper {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void render(GuiQuestBook gui, int mX, int mY) {
+    public static void render(MatrixStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (isLarge) {
             gui.drawRect(X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
         } else {
@@ -90,15 +93,15 @@ public final class SaveHelper {
         
         if (isLarge) {
             if (total == 0) {
-                gui.drawString(Translator.translate("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
             } else {
                 if (saveTime == 0) {
-                    gui.drawString(Translator.translate("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translated("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 } else {
-                    gui.drawString(formatTime((int) ((System.currentTimeMillis() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                    gui.drawString(matrices, formatTime((int) ((System.currentTimeMillis() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
                 
-                gui.drawString(Translator.translate("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
                 int others = total;
                 for (int i = 0; i < LISTED_TYPES; i++) {
                     ListElement element = sortedList.get(i);
@@ -106,11 +109,11 @@ public final class SaveHelper {
                         //since it's sorted, the first 0 means the rest is empty
                         break;
                     }
-                    gui.drawString(element.type.translate(element.count), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.plain(element.type.translate(element.count)), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                     others -= element.count;
                 }
                 if (others > 0) {
-                    gui.drawString(Translator.translate("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translated("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                 }
             }
         } else {
@@ -133,18 +136,18 @@ public final class SaveHelper {
         return !isLarge && gui.inBounds(X + SAVE_X, Y + SAVE_Y, SAVE_SIZE, SAVE_SIZE, mX, mY);
     }
     
-    private static String formatTime(int minutes) {
+    private static StringRenderable formatTime(int minutes) {
         int hours = minutes / 60;
         minutes -= hours * 60;
         
         if (hours == 0) {
             if (minutes == 0) {
-                return Translator.translate("hqm.editType.savedRecent");
+                return Translator.translated("hqm.editType.savedRecent");
             } else {
-                return Translator.translate(minutes != 1, "hqm.editType.savedMinutes", minutes);
+                return Translator.pluralTranslated(minutes != 1, "hqm.editType.savedMinutes", minutes);
             }
         } else {
-            return Translator.translate(hours != 1, "hqm.editType.savedMinutes", hours);
+            return Translator.pluralTranslated(hours != 1, "hqm.editType.savedMinutes", hours);
         }
     }
     
@@ -246,7 +249,7 @@ public final class SaveHelper {
             }
             
             private String translate() {
-                return Translator.translate("hqm.editType." + id);
+                return I18n.translate("hqm.editType." + id);
             }
         }
         
@@ -291,7 +294,7 @@ public final class SaveHelper {
             }
             
             private String translate() {
-                return Translator.translate("hqm.editType." + id);
+                return I18n.translate("hqm.editType." + id);
             }
         }
     }

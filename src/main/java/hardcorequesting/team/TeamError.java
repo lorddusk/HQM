@@ -3,6 +3,9 @@ package hardcorequesting.team;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.TeamErrorMessage;
 import hardcorequesting.util.Translator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -21,12 +24,14 @@ public enum TeamError {
         this.header = header;
     }
     
+    @Environment(EnvType.CLIENT)
     public String getMessage() {
-        return Translator.translate(message);
+        return I18n.translate(message);
     }
     
+    @Environment(EnvType.CLIENT)
     public String getHeader() {
-        return Translator.translate(header);
+        return I18n.translate(header);
     }
     
     public void sendToClient(PlayerEntity player) {

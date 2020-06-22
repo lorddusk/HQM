@@ -8,7 +8,10 @@ import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamError;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,8 +152,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            protected String getName() {
-                return Translator.translate(selectedEntry.isInTeam() ? "hqm.party.kickPlayer" : "hqm.party.removeInvite");
+            protected StringRenderable getName() {
+                return Translator.translated(selectedEntry.isInTeam() ? "hqm.party.kickPlayer" : "hqm.party.removeInvite");
             }
         });
         
@@ -240,7 +243,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
         
         
         Team team = getTeam();
@@ -267,9 +270,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             Team.reloadedInvites = false;
         }
         
-        super.draw(gui, mX, mY);
+        super.draw(matrices, gui, mX, mY);
         
-        textBoxes.draw(gui);
+        textBoxes.draw(matrices, gui);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
@@ -281,23 +284,23 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         if (team.isSingle() && inviteTeam == null) {
             int inviteCount = team.getInvites() == null ? 0 : team.getInvites().size();
             if (inviteCount > 0) {
-                gui.drawString(Translator.translate("hqm.party.invites"), TITLE_X, TITLE_Y, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.party.invites"), TITLE_X, TITLE_Y, 0x404040);
                 List<Team> invites = team.getInvites();
                 int start = inviteScroll.isVisible(gui) ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
                 int end = Math.min(invites.size(), start + VISIBLE_INVITES);
                 for (int i = start; i < end; i++) {
                     Team invite = invites.get(i);
-                    gui.drawString(invite.getName(), PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), 0x404040);
+                    gui.drawString(matrices, Translator.plain(invite.getName()), PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), 0x404040);
                 }
             } else {
-                gui.drawString(Translator.translate("hqm.party.noInvites"), TITLE_X, TITLE_Y, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.party.noInvites"), TITLE_X, TITLE_Y, 0x404040);
             }
             
-            gui.drawString(Translator.translate("hqm.party.name"), 180, 20, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.party.name"), 180, 20, 0.7F, 0x404040);
         } else {
             boolean isOwner = inviteTeam == null && entry.isOwner();
             String title = (inviteTeam == null ? team : inviteTeam).getName();
-            gui.drawString(title, TITLE_X, TITLE_Y, 0x404040);
+            gui.drawString(matrices, Translator.plain(title), TITLE_X, TITLE_Y, 0x404040);
             List<PlayerEntry> players = (inviteTeam == null ? team : inviteTeam).getPlayers();
             int y = 0;
             int start = memberScroll.isVisible(gui) ? Math.round(((isOwner ? players.size() : (inviteTeam == null ? team : inviteTeam).getPlayerCount()) - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
@@ -306,10 +309,10 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 String str = player.getDisplayName();
                 
                 if (player.isOwner()) {
-                    str += GuiColor.ORANGE + " [" + Translator.translate("hqm.party.owner") + "]";
+                    str += GuiColor.ORANGE + " [" + I18n.translate("hqm.party.owner") + "]";
                 } else if (!player.isInTeam()) {
                     if (isOwner) {
-                        str += GuiColor.LIGHT_GRAY + " [" + Translator.translate("hqm.party.invite") + "]";
+                        str += GuiColor.LIGHT_GRAY + " [" + I18n.translate("hqm.party.invite") + "]";
                     } else {
                         continue;
                     }
@@ -324,7 +327,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                             color = 0x808080;
                         }
                     }
-                    gui.drawString(str, PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), 0.7F, color);
+                    gui.drawString(matrices, Translator.plain(str), PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), 0.7F, color);
                 }
                 y++;
                 if (y == start + VISIBLE_MEMBERS) {
@@ -334,21 +337,21 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             
             if (inviteTeam == null) {
                 if (entry.isOwner()) {
-                    gui.drawString(Translator.translate("hqm.party.playerName"), 180, 20, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translated("hqm.party.playerName"), 180, 20, 0.7F, 0x404040);
                     
                     if (selectedEntry != null) {
-                        gui.drawString(gui.getLinesFromText(Translator.translate("hqm.party.currentSelection", selectedEntry.getDisplayName()), 0.7F, 70), 177, 52, 0.7F, 0x404040);
+                        gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.party.currentSelection", selectedEntry.getDisplayName()), 0.7F, 70), 177, 52, 0.7F, 0x404040);
                         
                         if (selectedEntry.isOwner()) {
-                            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, GuiColor.RED.getHexColor());
+                            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, GuiColor.RED.getHexColor());
                         }
                     }
                     
                 } else {
-                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, GuiColor.RED.getHexColor());
+                    gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, GuiColor.RED.getHexColor());
                 }
             }
-            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.party.stats"), 0.7F, 70), 177, 192, 0.7F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.party.stats"), 0.7F, 70), 177, 192, 0.7F, 0x404040);
             
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             
@@ -361,8 +364,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             gui.drawRect(INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             gui.drawRect(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             
-            gui.drawString(Translator.translate("hqm.party.lifeSetting", infoTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
-            gui.drawString(Translator.translate("hqm.party.rewardSetting", infoTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.party.lifeSetting", infoTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.party.rewardSetting", infoTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
             
         }
         
@@ -370,8 +373,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(GuiBase gui, int mX, int mY) {
-        super.renderTooltip(gui, mX, mY);
+    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.renderTooltip(matrices, gui, mX, mY);
         
         Team team = getTeam();
         PlayerEntry entry = getEntry(team);
@@ -381,15 +384,15 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltip(gui.getLinesFromText(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.party.change") : ""), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltip(gui.getLinesFromText(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + Translator.translate("hqm.party.change") : ""), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
         
         if (TeamError.latestError != null) {
             if (inviteButton.inButtonBounds(gui, mX, mY)) {
-                gui.renderTooltip(gui.getLinesFromText(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage(), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
             } else {
                 TeamError.latestError = null;
             }

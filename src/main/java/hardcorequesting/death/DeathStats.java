@@ -10,6 +10,7 @@ import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import org.apache.logging.log4j.Level;
 
@@ -173,7 +174,7 @@ public class DeathStats {
                 Arrays.sort(clientDeathList, deathTypeComparator[i]);
                 if (clientDeathList.length < 1) {
                     deaths[i] = 0;
-                    messages[i] = GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied");
+                    messages[i] = GuiColor.RED + I18n.translate("hqm.deathStat.noOneDied");
                 } else {
                     deaths[i] = clientDeathList[0].getDeaths(i);
                     messages[i] = "";
@@ -191,7 +192,7 @@ public class DeathStats {
                         if (j != 0) {
                             messages[i] += "\n";
                         }
-                        messages[i] += colourPrefixes[standing] + Translator.translate("hqm.deathStat." + placePrefixes[standing]);
+                        messages[i] += colourPrefixes[standing] + I18n.translate("hqm.deathStat." + placePrefixes[standing]);
                         messages[i] += GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
                     }
                     
@@ -201,15 +202,13 @@ public class DeathStats {
         
         @Override
         public String getName() {
-            return Translator.translate("hqm.deathStat.worstPlayers");
+            return I18n.translate("hqm.deathStat.worstPlayers");
         }
         
         @Override
         public String getDescription(int id) {
             return DeathType.values()[id].getName() + "\n\n" + messages[id];
         }
-        
-        
     }
     
     private static class DeathStatsTotal extends DeathStats {
@@ -233,13 +232,13 @@ public class DeathStats {
         public String getDescription(int id) {
             return super.getDescription(id) + "\n\n" +
                    (count[id] == 0 ?
-                           GuiColor.RED + Translator.translate("hqm.deathStat.noOneDied") :
-                           GuiColor.GREEN.toString() + count[id] + " " + Translator.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + Translator.translate("hqm.deathStat.diedThisWay"));
+                           GuiColor.RED + I18n.translate("hqm.deathStat.noOneDied") :
+                           GuiColor.GREEN.toString() + count[id] + " " + I18n.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + I18n.translate("hqm.deathStat.diedThisWay"));
         }
         
         @Override
         public String getName() {
-            return Translator.translate("hqm.deathStat.everyone");
+            return I18n.translate("hqm.deathStat.everyone");
         }
     }
 }

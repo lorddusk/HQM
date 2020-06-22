@@ -11,8 +11,10 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -75,7 +77,7 @@ public class QuestTaskCompleted extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
         for (int i = 0; i < completed_quests.length; i++) {
             CompletedQuestTask completed = completed_quests[i];
@@ -84,15 +86,15 @@ public class QuestTaskCompleted extends QuestTask {
             int y = START_Y + i * Y_OFFSET;
             gui.drawItemStack(completed.getIconStack(), x, y, mX, mY, false);
             if (completed.getQuest() != null) {
-                gui.drawString(completed.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+                gui.drawString(matrices, Translator.plain(completed.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             } else {
-                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.firstline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.secondline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
-                gui.drawString(GuiColor.RED + Translator.translate("hqm.completionTask.thirdline"), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.completionTask.firstline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.completionTask.secondline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.completionTask.thirdline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
             }
             
             if (completed(i, player)) {
-                gui.drawString(GuiColor.GREEN + Translator.translate("hqm.completedMenu.visited"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.completedMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         }
     }

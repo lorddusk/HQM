@@ -9,10 +9,15 @@ import hardcorequesting.util.Translator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.NarratorManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -55,7 +60,7 @@ public class GuiReward extends GuiBase {
         int myWeight = group.getTier().getWeights()[bagTier];
         float chance = ((float) myWeight / totalWeight);
         
-        statisticsText = Translator.translate("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
+        statisticsText = I18n.translate("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
         
         
         lines = (int) Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
@@ -85,7 +90,7 @@ public class GuiReward extends GuiBase {
     }
     
     @Override
-    public void render(int mX0, int mY0, float f) {
+    public void render(MatrixStack matrices, int mX0, int mY0, float f) {
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(TEXTURE);
         
@@ -104,23 +109,23 @@ public class GuiReward extends GuiBase {
         int mX = mX0 - left;
         int mY = mY0 - top;
         
-        String title = group.getName();
+        String title = group.getDisplayName();
         
         // fall back to the tier's name if this particular bag has no title,
         // or if the user explicitly asked us to do so.
         if (HQMConfig.getInstance().Loot.ALWAYS_USE_TIER || title == null || title.isEmpty()) {
-            title = Translator.translate("hqm.rewardGui.tierReward", group.getTier().getName());
+            title = I18n.translate("hqm.rewardGui.tierReward", group.getTier().getName());
         }
         
-        drawCenteredString(group.getTier().getColor() + title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
-        drawCenteredString(statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
-        drawCenteredString(Translator.translate("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
+        drawCenteredString(matrices, StringRenderable.styled(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
+        drawCenteredString(matrices, Translator.plain(statisticsText), 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
+        drawCenteredString(matrices, Translator.translated("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
         for (Reward reward : rewards) {
             try {
                 drawItemStack(reward.stack, reward.x, reward.y, true);
                 //itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, MinecraftClient.getInstance().getTextureManager(), reward.stack, reward.x + left + 1, reward.y + top + 1);
-                itemRenderer.renderGuiItemOverlay(font, reward.stack, (reward.x + left + 1), (reward.y + top + 1), "");
+                itemRenderer.renderGuiItemOverlay(textRenderer, reward.stack, (reward.x + left + 1), (reward.y + top + 1), "");
             } catch (Throwable ignored) {
             }
         }
@@ -129,18 +134,18 @@ public class GuiReward extends GuiBase {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {
                     if (Screen.hasShiftDown()) {
-                        renderTooltip(reward.stack, mX0, mY0);
+                        renderTooltip(matrices, reward.stack, mX0, mY0);
                     } else {
-                        List<String> str = new ArrayList<String>();
+                        List<StringRenderable> str = new ArrayList<>();
                         try {
-                            List<Text> info = reward.stack.getTooltip(MinecraftClient.getInstance().player, minecraft.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
+                            List<Text> info = reward.stack.getTooltip(MinecraftClient.getInstance().player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
                             if (info.size() > 0) {
-                                str.add(info.get(0).asFormattedString());
+                                str.add(info.get(0));
                                 if (info.size() > 1) {
-                                    str.add(GuiColor.GRAY + Translator.translate("hqm.rewardGui.shiftInfo"));
+                                    str.add(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY));
                                 }
                             }
-                            renderTooltip(str, mX0, mY0);
+                            renderTooltip(matrices, str, mX0, mY0);
                         } catch (Throwable ignored) {
                         }
                     }

@@ -3,6 +3,7 @@ package hardcorequesting.client.interfaces;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
+import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -13,14 +14,16 @@ import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -123,18 +126,18 @@ public class GuiBase extends Screen {
         
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
-        bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).texture((float) pt1[0], (float) pt1[1]).next();
-        bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).texture((float) pt2[0], (float) pt2[1]).next();
-        bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).texture((float) pt3[0], (float) pt3[1]).next();
-        bufferBuilder.vertex(x, y, this.getBlitOffset()).texture((float) pt4[0], (float) pt4[1]).next();
+        bufferBuilder.vertex(x, y + targetH, this.getZOffset()).texture((float) pt1[0], (float) pt1[1]).next();
+        bufferBuilder.vertex(x + targetW, y + targetH, this.getZOffset()).texture((float) pt2[0], (float) pt2[1]).next();
+        bufferBuilder.vertex(x + targetW, y, this.getZOffset()).texture((float) pt3[0], (float) pt3[1]).next();
+        bufferBuilder.vertex(x, y, this.getZOffset()).texture((float) pt4[0], (float) pt4[1]).next();
         bufferBuilder.end();
         RenderSystem.enableAlphaTest();
         BufferRenderer.draw(bufferBuilder);
     }
     
     @Override
-    public void renderTooltip(String str, int x, int y) {
-        renderTooltip(Arrays.asList(str.split("\n")), x, y);
+    public void renderTooltip(MatrixStack matrices, StringRenderable stringRenderable, int x, int y) {
+        renderTooltip(matrices, textRenderer.getTextHandler().wrapLines(stringRenderable, Integer.MAX_VALUE, Style.EMPTY), x, y);
     }
     
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
@@ -150,6 +153,11 @@ public class GuiBase extends Screen {
         GL11.glEnd();
         
         RenderSystem.enableTexture();
+    }
+    
+    @Override
+    public void renderTooltip(MatrixStack matrices, ItemStack stack, int x, int y) {
+        super.renderTooltip(matrices, stack, x, y);
     }
     
     public void drawFluid(FluidVolume fluid, int x, int y, int mX, int mY) {
@@ -197,7 +205,7 @@ public class GuiBase extends Screen {
     }
     
     public void drawIcon(ItemStack stack, int x, int y) {
-        itemRenderer.renderGuiItemOverlay(font, stack, x, y, null);
+        itemRenderer.renderGuiItemOverlay(textRenderer, stack, x, y, null);
         //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
     
@@ -243,21 +251,11 @@ public class GuiBase extends Screen {
             RenderSystem.translatef(getLeft() + x, getTop() + y, 0);
             
             MinecraftClient.getInstance().getItemRenderer().renderGuiItem(stack, 0, 0);
-            MinecraftClient.getInstance().getItemRenderer().renderGuiItemOverlay(minecraft.textRenderer, stack, 0, 0, null);
+            MinecraftClient.getInstance().getItemRenderer().renderGuiItemOverlay(textRenderer, stack, 0, 0, null);
             
             RenderSystem.popMatrix();
         } catch (Exception ignored) {
         }
-    }
-    
-    @Override
-    public int getBlitOffset() {
-        return super.getBlitOffset();
-    }
-    
-    @Override
-    public void setBlitOffset(int i) {
-        super.setBlitOffset(i);
     }
     
     public int getLeft() {
@@ -268,130 +266,150 @@ public class GuiBase extends Screen {
         return top;
     }
     
-    
     public int getStringWidth(String txt) {
-        return font.getStringWidth(txt);
+        return textRenderer.getStringWidth(txt);
     }
     
-    
-    public void drawString(String str, int x, int y, int color) {
-        drawString(str, x, y, 1F, color);
+    public int getStringWidth(StringRenderable txt) {
+        return textRenderer.getWidth(txt);
     }
     
-    public void drawString(String str, int x, int y, float mult, int color) {
-        RenderSystem.pushMatrix();
-        RenderSystem.scalef(mult, mult, 1F);
-        font.draw(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+    public void drawString(MatrixStack matrices, StringRenderable str, int x, int y, int color) {
+        drawString(matrices, str, x, y, 1F, color);
+    }
+    
+    public void drawString(MatrixStack matrices, StringRenderable str, int x, int y, float mult, int color) {
+        matrices.push();
+        matrices.scale(mult, mult, 1F);
+        textRenderer.draw(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        matrices.pop();
+    }
+    
+    public void drawStringWithShadow(MatrixStack matrices, StringRenderable str, int x, int y, float mult, int color) {
+        matrices.push();
+        matrices.scale(mult, mult, 1F);
+        textRenderer.drawWithShadow(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
         
-        RenderSystem.popMatrix();
+        matrices.pop();
     }
     
-    public void drawStringWithShadow(String str, int x, int y, float mult, int color) {
-        RenderSystem.pushMatrix();
-        RenderSystem.scalef(mult, mult, 1F);
-        font.drawWithShadow(str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+    public void drawString(MatrixStack matrices, String str, int x, int y, int color) {
+        drawString(matrices, str, x, y, 1F, color);
+    }
+    
+    public void drawString(MatrixStack matrices, String str, int x, int y, float mult, int color) {
+        matrices.push();
+        matrices.scale(mult, mult, 1F);
+        textRenderer.draw(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        matrices.pop();
+    }
+    
+    public void drawStringWithShadow(MatrixStack matrices, String str, int x, int y, float mult, int color) {
+        matrices.push();
+        matrices.scale(mult, mult, 1F);
+        textRenderer.drawWithShadow(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
         
-        RenderSystem.popMatrix();
+        matrices.pop();
     }
     
     public boolean inBounds(int x, int y, int w, int h, double mX, double mY) {
         return x <= mX && mX <= x + w && y <= mY && mY <= y + h;
     }
     
-    public void drawCursor(int x, int y, int z, float size, int color) {
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef(0, 0, z);
+    public void drawCursor(MatrixStack matrices, int x, int y, int z, float size, int color) {
+        matrices.push();
+        matrices.translate(0, 0, z);
         x += left;
         y += top;
-        RenderSystem.translatef(x, y, 0);
-        RenderSystem.scalef(size, size, 0);
-        RenderSystem.translatef(-x, -y, 0);
-        DrawableHelper.fill(x, y + 1, x + 1, y + 10, color);
-        RenderSystem.popMatrix();
+        matrices.translate(x, y, 0);
+        matrices.scale(size, size, 0);
+        matrices.translate(-x, -y, 0);
+        DrawableHelper.fill(matrices, x, y + 1, x + 1, y + 10, color);
+        matrices.pop();
     }
     
-    public void drawString(List<String> str, int x, int y, float mult, int color) {
-        drawString(str, 0, str.size(), x, y, mult, color);
+    public void drawString(MatrixStack matrices, List<StringRenderable> str, int x, int y, float mult, int color) {
+        drawString(matrices, str, 0, str.size(), x, y, mult, color);
     }
     
-    public void drawString(List<String> str, int start, int length, int x, int y, float mult, int color) {
-        RenderSystem.pushMatrix();
-        RenderSystem.scalef(mult, mult, 1F);
+    public void drawString(MatrixStack matrices, List<StringRenderable> str, int start, int length, int x, int y, float mult, int color) {
+        matrices.push();
+        matrices.scale(mult, mult, 1F);
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
-            font.draw(str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-            y += font.fontHeight;
+            textRenderer.draw(matrices, str.get(i), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+            y += textRenderer.fontHeight;
         }
-        RenderSystem.popMatrix();
+        matrices.pop();
     }
     
-    public void drawCenteredString(String str, int x, int y, float mult, int width, int height, int color) {
-        drawString(str, x + (width - (int) (font.getStringWidth(str) * mult)) / 2, y + (height - (int) ((font.fontHeight - 2) * mult)) / 2, mult, color);
+    public void drawCenteredString(MatrixStack matrices, StringRenderable str, int x, int y, float mult, int width, int height, int color) {
+        drawString(matrices, str, x + (width - (int) (textRenderer.getWidth(str) * mult)) / 2, y + (height - (int) ((textRenderer.fontHeight - 2) * mult)) / 2, mult, color);
     }
     
-    public List<String> getLinesFromText(String str, float mult, int width) {
-        List<String> lst = new ArrayList<String>();
+    public List<StringRenderable> getLinesFromText(StringRenderable str, float mult, int width) {
+//        List<StringRenderable> lst = new ArrayList<>();
         if (str == null) {
-            str = "Missing info";
+            str = Translator.plain("Missing info");
         }
-        String[] lines = str.split("\n");
-        for (String line : lines) {
-            
-            List<String> words = new ArrayList<String>();
-            Collections.addAll(words, line.split(" "));
-            
-            if (line.endsWith(" ")) {
-                String spaceTail = ""; //the split removes tailing spaces
-                for (int i = line.length() - 1; i >= 0; i--) {
-                    char c = line.charAt(i);
-                    if (c == ' ') {
-                        spaceTail += c;
-                    } else {
-                        break;
-                    }
-                }
-                words.add(spaceTail);
-            }
-            
-            for (int i = 0; i < words.size(); i++) {
-                String word = words.get(i);
-                String other = "";
-                while (font.getStringWidth(word + " ") * mult >= width) {
-                    other = word.charAt(word.length() - 1) + other;
-                    word = word.substring(0, word.length() - 1);
-                }
-                
-                if (!other.isEmpty()) {
-                    words.set(i, word);
-                    words.add(i + 1, other);
-                } else {
-                    words.set(i, word + " ");
-                }
-                
-            }
-            
-            
-            String currentLine = null;
-            for (String word : words) {
-                
-                String newLine;
-                if (currentLine == null) {
-                    newLine = word;
-                } else {
-                    newLine = currentLine + word;
-                }
-                if (font.getStringWidth(newLine) * mult < width) {
-                    currentLine = newLine;
-                } else {
-                    lst.add(currentLine);
-                    currentLine = word;
-                }
-            }
-            lst.add(currentLine);
-        }
-        
-        
-        return lst;
+//        String[] lines = str.split("\n");
+//        for (String line : lines) {
+//            
+//            List<String> words = new ArrayList<String>();
+//            Collections.addAll(words, line.split(" "));
+//            
+//            if (line.endsWith(" ")) {
+//                String spaceTail = ""; //the split removes tailing spaces
+//                for (int i = line.length() - 1; i >= 0; i--) {
+//                    char c = line.charAt(i);
+//                    if (c == ' ') {
+//                        spaceTail += c;
+//                    } else {
+//                        break;
+//                    }
+//                }
+//                words.add(spaceTail);
+//            }
+//            
+//            for (int i = 0; i < words.size(); i++) {
+//                String word = words.get(i);
+//                StringBuilder other = new StringBuilder();
+//                while (textRenderer.getStringWidth(word + " ") * mult >= width) {
+//                    other.insert(0, word.charAt(word.length() - 1));
+//                    word = word.substring(0, word.length() - 1);
+//                }
+//                
+//                if (other.length() > 0) {
+//                    words.set(i, word);
+//                    words.add(i + 1, other.toString());
+//                } else {
+//                    words.set(i, word + " ");
+//                }
+//                
+//            }
+//            
+//            
+//            String currentLine = null;
+//            for (String word : words) {
+//                
+//                String newLine;
+//                if (currentLine == null) {
+//                    newLine = word;
+//                } else {
+//                    newLine = currentLine + word;
+//                }
+//                if (textRenderer.getStringWidth(newLine) * mult < width) {
+//                    currentLine = newLine;
+//                } else {
+//                    lst.add(Translator.plain(currentLine));
+//                    currentLine = word;
+//                }
+//            }
+//            lst.add(Translator.plain(currentLine));
+//        }
+//        
+//        
+        return textRenderer.getTextHandler().wrapLines(str, (int) (width / mult), Style.EMPTY);
     }
 }

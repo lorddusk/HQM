@@ -3,39 +3,42 @@ package hardcorequesting.event;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.world.WorldSaveHandler;
+import net.minecraft.util.ProgressListener;
+import net.minecraft.util.WorldSavePath;
+import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.io.File;
 
 public class WorldEventListener {
     
-    public static void onLoad(WorldSaveHandler saveHandler, ServerWorld world) {
-        if (!world.isClient && world.dimension.getType() == DimensionType.OVERWORLD) {
+    public static void onLoad(RegistryKey<World> worldRegistryKey, ServerWorld world) {
+        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
             QuestLine.reset();
             if (Quest.useDefault) { // reloads all quest lines (rewrites existing ones and creates new ones, does not remove old ones)
-                QuestLine.copyDefaults(getWorldPath(saveHandler, world));
+                QuestLine.copyDefaults(getWorldPath(world));
             }
-            QuestLine.loadWorldData(getWorldPath(saveHandler, world), world.isClient);
+            QuestLine.loadWorldData(getWorldPath(world), world.isClient);
         }
     }
     
-    public static void onSave(ServerWorld world) {
-        if (!world.isClient && world.dimension.getType() == DimensionType.OVERWORLD) {
+    public static void onSave(ServerWorld world, ProgressListener listener, boolean flush) {
+        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
             QuestLine.saveAll();
         }
     }
     
-    public static void onCreate(WorldSaveHandler saveHandler, ServerWorld world) {
-        if (!world.isClient && world.dimension.getType() == DimensionType.OVERWORLD) {
+    public static void onCreate(ServerWorld world) {
+        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
             QuestLine.reset();
-            QuestLine.copyDefaults(getWorldPath(saveHandler, world));
-            QuestLine.loadWorldData(getWorldPath(saveHandler, world), world.isClient); // Reload because the defaults wouldn't have been loaded in
+            QuestLine.copyDefaults(getWorldPath(world));
+            QuestLine.loadWorldData(getWorldPath(world), world.isClient); // Reload because the defaults wouldn't have been loaded in
         }
     }
     
-    private static File getWorldPath(WorldSaveHandler saveHandler, ServerWorld world) {
-        return saveHandler.getWorldDir();
+    private static File getWorldPath(ServerWorld world) {
+        return world.getServer().session.getDirectory(WorldSavePath.ROOT).toAbsolutePath().normalize().toFile();
     }
     
 }

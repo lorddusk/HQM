@@ -3,6 +3,8 @@ package hardcorequesting.client.interfaces;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +32,10 @@ public class TextBoxGroup {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(GuiBase gui) {
+    public void draw(MatrixStack matrices, GuiBase gui) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible()) {
-                textBox.draw(gui, selectedTextBox == textBox);
+                textBox.draw(matrices, gui, selectedTextBox == textBox);
             }
         }
     }
@@ -78,15 +80,14 @@ public class TextBoxGroup {
         }
         
         @Environment(EnvType.CLIENT)
-        protected void draw(GuiBase gui, boolean selected) {
-            
+        protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
-            gui.drawString(scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
+            gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
             if (selected) {
-                gui.drawCursor(x + getCursorPositionX(gui) + 2, y + getCursorPositionY(gui), 10, 1F, 0xFF909090);
+                gui.drawCursor(matrices, x + getCursorPositionX(gui) + 2, y + getCursorPositionY(gui), 10, 1F, 0xFF909090);
             }
         }
         

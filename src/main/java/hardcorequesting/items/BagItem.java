@@ -52,7 +52,7 @@ public class BagItem extends Item {
                             group.open(player);
                             player.inventory.markDirty();
                             openClientInterface(player, group.getId(), tierOrdinal);
-                            world.playSound(player, player.getBlockPos(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
+                            world.playSound(player, player.getSenseCenterPos(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
                             break;
                         } else {
                             rng -= weight;

@@ -1,17 +1,18 @@
 package hardcorequesting.util;
 
 
+import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import hardcorequesting.client.interfaces.GuiColor;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
-import java.util.HashMap;
-import java.util.IllegalFormatException;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -737,43 +738,189 @@ public class Translator {
         return storageTranslator.apply(id, args);
     }
     
-    public static String translate(String id) {
+    public static String commonTranslate(String id) {
         return storageTranslate(id).replace("\\n", "\n");
     }
     
-    public static String translate(String id, Object... args) {
+    public static StringRenderable translated(String translationKey) {
+        return Translator.plain(translate(translationKey));
+    }
+    
+    public static StringRenderable translated(String translationKey, Object... args) {
+        return Translator.plain(translate(translationKey, args));
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, TextColor color) {
+        return colored(translate(translationKey), color);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, TextColor color, Object... args) {
+        return colored(translate(translationKey, args), color);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, Formatting formatting) {
+        return translated(translationKey, TextColor.fromFormatting(formatting));
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, Formatting formatting, Object... args) {
+        return translated(translationKey, TextColor.fromFormatting(formatting), args);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, GuiColor color) {
+        return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable translated(String translationKey, GuiColor color, Object... args) {
+        return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF), args);
+    }
+    
+    private static String translate(String id, Object... args) {
         return storageTranslate(id, args).replace("\\n", "\n");
     }
     
-    public static String translate(boolean plural, String id, Object... args) {
-        return format(translate(id, args), plural);
+    public static StringRenderable pluralTranslated(boolean plural, String id, Object... args) {
+        return format(translated(id, args), plural);
     }
     
-    public static Text translateToIChatComponent(String id, Object... args) {
-        return translateToIChatComponent(Formatting.WHITE, id, args);
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
+        return format(translated(id, args), color, plural);
     }
     
-    public static Text translateToIChatComponent(Formatting colour, String id, Object... args) {
-        return translateToIChatComponent(colour, false, id, args);
+    public static MutableText translatable(String id, Object... args) {
+        return translatable(Formatting.WHITE, id, args);
     }
     
-    public static Text translateToIChatComponent(Formatting colour, boolean plural, String id, Object... args) {
-        Text iChatComponent = new LiteralText(Translator.translate(plural, id, args));
-        iChatComponent.getStyle().setColor(colour);
-        return iChatComponent;
+    public static MutableText translatable(Formatting formatting, String id, Object... args) {
+        return new TranslatableText(id, args).formatted(formatting);
     }
     
-    public static String format(String s, boolean plural, Object... args) {
-        if (s == null) return s;
+    public static MutableText translatable(boolean plural, String id, Object... args) {
+        return translatable(Formatting.RESET, plural, id, args);
+    }
+    
+    public static MutableText translatable(Formatting formatting, boolean plural, String id, Object... args) {
+        return new LiteralText(rawString(Translator.pluralTranslated(plural, id, args))).formatted(formatting);
+    }
+    
+    public static StringRenderable format(StringRenderable text, boolean plural) {
+        if (text == null) return StringRenderable.EMPTY;
         try {
-            Matcher matcher = pluralPattern.matcher(s);
-            while (matcher.find()) {
-                s = matcher.replaceFirst(matcher.group(plural ? 2 : 1));
-                matcher = pluralPattern.matcher(s);
-            }
-            return String.format(s, args);
+            TextCollector collector = new TextCollector();
+            text.visit(asString -> {
+                Matcher matcher = pluralPattern.matcher(asString);
+                while (matcher.find()) {
+                    asString = matcher.replaceFirst(matcher.group(plural ? 2 : 1));
+                    matcher = pluralPattern.matcher(asString);
+                }
+                collector.add(Translator.plain(asString));
+                return Optional.empty();
+            });
+            return collector.getCombined();
         } catch (IllegalFormatException e) {
-            return "Format Exception: " + s;
+            return concat(Translator.plain("Format Exception: "), text);
         }
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable format(StringRenderable text, GuiColor color, boolean plural) {
+        if (text == null) return StringRenderable.EMPTY;
+        try {
+            TextCollector collector = new TextCollector();
+            text.visit(asString -> {
+                Matcher matcher = pluralPattern.matcher(asString);
+                while (matcher.find()) {
+                    asString = matcher.replaceFirst(matcher.group(plural ? 2 : 1));
+                    matcher = pluralPattern.matcher(asString);
+                }
+                collector.add(Translator.colored(asString, color));
+                return Optional.empty();
+            });
+            return collector.getCombined();
+        } catch (IllegalFormatException e) {
+            return concat(Translator.plain("Format Exception: "), text);
+        }
+    }
+    
+    public static class TextCollector {
+        private final List<StringRenderable> texts = Lists.newArrayList();
+        
+        public void add(StringRenderable stringRenderable) {
+            this.texts.add(stringRenderable);
+        }
+        
+        public StringRenderable getRawCombined() {
+            if (this.texts.isEmpty()) {
+                return null;
+            } else {
+                return this.texts.size() == 1 ? this.texts.get(0) : concat(this.texts);
+            }
+        }
+        
+        public StringRenderable getCombined() {
+            StringRenderable stringRenderable = this.getRawCombined();
+            return stringRenderable != null ? stringRenderable : StringRenderable.EMPTY;
+        }
+    }
+    
+    static StringRenderable concat(final StringRenderable... visitables) {
+        return concat(Arrays.asList(visitables));
+    }
+    
+    static StringRenderable concat(final List<StringRenderable> visitables) {
+        return new StringRenderable() {
+            @Override
+            public <T> Optional<T> visit(StringRenderable.Visitor<T> visitor) {
+                Iterator var2 = visitables.iterator();
+                
+                Optional optional;
+                do {
+                    if (!var2.hasNext()) {
+                        return Optional.empty();
+                    }
+                    
+                    StringRenderable stringRenderable = (StringRenderable) var2.next();
+                    optional = stringRenderable.visit(visitor);
+                } while (!optional.isPresent());
+                
+                return optional;
+            }
+            
+            @Environment(EnvType.CLIENT)
+            @Override
+            public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style) {
+                return Optional.empty();
+            }
+        };
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable colored(String s, TextColor color) {
+        return StringRenderable.styled(s, Style.EMPTY.withColor(color));
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static StringRenderable colored(String s, GuiColor color) {
+        return colored(s, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
+    }
+    
+    public static String rawString(StringRenderable text) {
+        StringBuilder builder = new StringBuilder();
+        text.visit((asString) -> {
+            builder.append(asString);
+            return Optional.empty();
+        });
+        return builder.toString();
+    }
+    
+    public static StringRenderable plain(String s) {
+        if (s == null) return StringRenderable.EMPTY;
+        return StringRenderable.plain(s);
     }
 }

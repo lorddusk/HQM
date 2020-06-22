@@ -2,10 +2,13 @@ package hardcorequesting.client;
 
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 
+@Environment(EnvType.CLIENT)
 public class KeyboardHandler {
     
     private static Map<Integer, Set<EditMode>> keyMap;

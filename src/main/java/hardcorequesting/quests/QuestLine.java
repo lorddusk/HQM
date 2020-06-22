@@ -19,6 +19,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class QuestLine {
     public List<QuestSet> questSets;
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public String mainDescription = "No description";
-    public List<String> cachedMainDescription;
+    public List<StringRenderable> cachedMainDescription;
     public String mainPath;
     @Environment(EnvType.CLIENT)
     public Identifier front;

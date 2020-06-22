@@ -7,6 +7,7 @@ import hardcorequesting.quests.RepeatInfo;
 import hardcorequesting.quests.RepeatType;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiEditMenuRepeat extends GuiEditMenuExtended {
@@ -37,10 +38,10 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         
         textBoxes.add(new TextBoxHidden(gui, 1, "hqm.repeatMenu.hours") {
             @Override
-            protected void draw(GuiBase gui, boolean selected) {
-                super.draw(gui, selected);
+            protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+                super.draw(matrices, gui, selected);
                 
-                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), BOX_X, BOX_Y + BOX_OFFSET * 2 + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), BOX_X, BOX_Y + BOX_OFFSET * 2 + TEXT_OFFSET, 0.7F, 0x404040);
             }
             
             @Override

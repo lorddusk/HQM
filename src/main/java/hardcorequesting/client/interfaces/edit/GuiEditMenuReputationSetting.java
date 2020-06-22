@@ -7,7 +7,10 @@ import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,31 +81,31 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         if (reputation != null) {
             
             String info = null;
             
-            gui.drawString(Translator.translate("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
+            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
             
-            gui.drawString(Translator.translate("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
+            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
             
-            gui.drawString(Translator.translate("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw((GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
+            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
             
             
             if (info != null) {
-                gui.renderTooltip(info, mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
             }
         }
     }
@@ -150,16 +153,16 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     @Override
     protected String getArrowText() {
         if (Reputation.getReputations().isEmpty()) {
-            return Translator.translate("hqm.repSetting.invalid");
+            return I18n.translate("hqm.repSetting.invalid");
         } else {
-            return reputation != null ? reputation.getName() : Translator.translate("hqm.repSetting.invalid");
+            return reputation != null ? reputation.getName() : I18n.translate("hqm.repSetting.invalid");
         }
     }
     
     @Override
     protected String getArrowDescription() {
         if (Reputation.getReputations().isEmpty()) {
-            return Translator.translate("hqm.repReward.noValidReps");
+            return I18n.translate("hqm.repReward.noValidReps");
         } else {
             return null;
         }

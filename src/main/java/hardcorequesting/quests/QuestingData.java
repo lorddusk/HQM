@@ -17,6 +17,7 @@ import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.team.TeamUpdateSize;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -27,6 +28,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -193,17 +195,6 @@ public class QuestingData {
         return data.get(uuid);
     }
     
-    public static void disableVanillaHardcore(ServerCommandSource sender) {
-        if (sender.getWorld().getLevelProperties().isHardcore()) {
-            sender.sendFeedback(new TranslatableText("hqm.message.vanillaHardcore"), true);
-            sender.getWorld().getLevelProperties().setHardcore(false);
-            
-            if (!sender.getWorld().getLevelProperties().isHardcore()) {
-                sender.sendFeedback(new TranslatableText("hqm.message.vanillaHardcoreOverride"), true);
-            }
-        }
-    }
-    
     public static void spawnBook(PlayerEntity player) {
         if (!Quest.canQuestsBeEdited() && !player.world.isClient && HQMConfig.getInstance().SPAWN_BOOK && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
@@ -338,15 +329,15 @@ public class QuestingData {
     public void removeLifeAndSendMessage(@NotNull PlayerEntity player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.sendMessage(new TranslatableText(Translator.translate(getLives() != 1, "hqm.message.lostLife", getLives())));
+            player.sendMessage(Translator.translatable(getLives() != 1, "hqm.message.lostLife", getLives()), Util.NIL_UUID);
         }
         if (getTeam().isSharingLives()) {
             for (PlayerEntry entry : getTeam().getPlayers()) {
                 if (entry.isInTeam() && !entry.getUUID().equals(player.getUuid())) {
                     PlayerEntity other = getPlayer(entry.getUUID());
                     if (other != null) {
-                        other.sendMessage(new LiteralText(
-                                Translator.translate(getLives() != 1, "hqm.message.lostTeamLife", player.getEntityName(), (isDead ? " " + Translator.translate("hqm.message.andBanned") : ""), getLives())));
+                        other.sendMessage(
+                                Translator.translatable(getLives() != 1, "hqm.message.lostTeamLife", player.getEntityName(), (isDead ? " " + Translator.rawString(Translator.translated("hqm.message.andBanned")) : ""), getLives()), Util.NIL_UUID);
                     }
                 }
             }
@@ -436,7 +427,7 @@ public class QuestingData {
         MinecraftServer mcServer = player.getServer();
         
         if (mcServer.isSinglePlayer()) {
-            player.addChatMessage(new TranslatableText("hqm.message.singlePlayerHardcore"), true);
+            player.addMessage(new TranslatableText("hqm.message.singlePlayerHardcore"), true);
         } else {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";

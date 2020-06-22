@@ -10,7 +10,9 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.List;
 
@@ -69,17 +71,17 @@ public class ReputationBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(GuiQuestBook gui, int mX, int mY, PlayerEntity player) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, int mX, int mY, PlayerEntity player) {
         Reputation reputation = Reputation.getReputation(this.repId);
         if (reputation == null) return;
         
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        String info = reputation.draw(gui, this.x, this.y, mX, mY, null, player, false, null, null, false, null, null, false);
+        String info = reputation.draw(matrices, gui, this.x, this.y, mX, mY, null, player, false, null, null, false, null, null, false);
         
         if (info != null) {
-            gui.renderTooltip(info, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
@@ -132,7 +134,7 @@ public class ReputationBar {
         
         @Override
         @Environment(EnvType.CLIENT)
-        public void draw(GuiBase guiB, int mX, int mY) {
+        public void draw(MatrixStack matrices, GuiBase guiB, int mX, int mY) {
             GuiQuestBook gui = (GuiQuestBook) guiB;
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());
@@ -145,9 +147,9 @@ public class ReputationBar {
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY);
                 boolean selected = reputationList.get(i).equals(Reputation.getReputation(bar.repId));
                 
-                gui.drawString(str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
-            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
         }
         
         @Environment(EnvType.CLIENT)

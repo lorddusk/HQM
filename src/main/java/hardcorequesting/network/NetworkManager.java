@@ -11,9 +11,9 @@ import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.PacketByteBuf;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 
@@ -130,7 +130,7 @@ public class NetworkManager {
         buf.writeInt(pair.getRight());
         message.toBytes(buf);
         Packet<?> packet = ServerSidePacketRegistry.INSTANCE.toPacket(S2C, buf);
-        HardcoreQuesting.getServer().getPlayerManager().sendToAround(null, pos.getX(), pos.getY(), pos.getZ(), radius, te.getWorld().dimension.getType(), packet);
+        HardcoreQuesting.getServer().getPlayerManager().sendToAround(null, pos.getX(), pos.getY(), pos.getZ(), radius, te.getWorld().getRegistryKey(), packet);
     }
     
     public static <T extends BlockEntity & IBlockSync> void sendBlockUpdate(T block, PlayerEntity player, int type) {

@@ -6,6 +6,7 @@ import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.client.interfaces.TextBoxGroup;
 import hardcorequesting.quests.task.QuestTaskLocation;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class GuiEditMenuLocation extends GuiEditMenuExtended {
@@ -85,10 +86,10 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
             }
             
             @Override
-            protected void draw(GuiBase gui, boolean selected) {
-                super.draw(gui, selected);
+            protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+                super.draw(matrices, gui, selected);
                 
-                gui.drawString(gui.getLinesFromText(Translator.translate("hqm.locationMenu.negRadius"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET * 5 + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.locationMenu.negRadius"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET * 5 + TEXT_OFFSET, 0.7F, 0x404040);
             }
         });
         
@@ -109,7 +110,7 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
                 location.setX((int) player.getX());
                 location.setY((int) player.getY());
                 location.setZ((int) player.getZ());
-                location.setDimension(player.world.dimension.getType());
+                location.setDimension(player.world.getDimensionRegistryKey());
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
                     textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
                 }

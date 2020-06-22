@@ -7,7 +7,9 @@ import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private static final int OFFSET = 15;
     private List<ReputationReward> rewards;
     private ReputationReward selectedReward;
-    private List<String> error;
+    private List<StringRenderable> error;
     
     public GuiEditMenuReputationReward(GuiBase gui, PlayerEntity player, List<ReputationReward> rewards) {
         super(gui, player, true, 185, 25, 185, 55);
@@ -91,22 +93,22 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
-                String str = rewards.get(i).getLabel();
+                StringRenderable str = Translator.plain(rewards.get(i).getLabel());
                 boolean hover = gui.inBounds(START_X, START_Y + i * OFFSET, gui.getStringWidth(str), 9, mX, mY);
                 boolean selected = rewards.get(i).equals(selectedReward);
-                gui.drawString(str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(matrices, str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
         } else {
             if (error == null) {
-                error = gui.getLinesFromText(Translator.translate("hqm.repReward.noValidReps"), 0.7F, 140);
+                error = gui.getLinesFromText(Translator.translated("hqm.repReward.noValidReps"), 0.7F, 140);
             }
             
-            gui.drawString(error, START_X, ERROR_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);
         }
     }
     

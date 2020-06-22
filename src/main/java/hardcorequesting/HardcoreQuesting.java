@@ -14,6 +14,9 @@ import hardcorequesting.proxies.CommonProxy;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.Executor;
 import hardcorequesting.util.RegisterHelper;
+import me.shedaniel.cloth.api.common.events.v1.PlayerJoinCallback;
+import me.shedaniel.cloth.api.common.events.v1.WorldLoadCallback;
+import me.shedaniel.cloth.api.common.events.v1.WorldSaveCallback;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -24,6 +27,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
@@ -130,6 +134,13 @@ public class HardcoreQuesting implements ModInitializer {
         Sounds.registerSounds();
         
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> CommandHandler.register(dispatcher));
+        ServerStartCallback.EVENT.register(this::serverStarting);
+        WorldLoadCallback.EVENT.register(WorldEventListener::onLoad);
+        WorldSaveCallback.EVENT.register(WorldEventListener::onSave);
+        PlayerJoinCallback.EVENT.register((connection, playerEntity) -> {
+            PlayerTracker.instance.onPlayerLogin(playerEntity);
+            EventTrigger.instance().onPlayerLogin(playerEntity);
+        });
     }
     
     public void serverStarting(MinecraftServer server) {

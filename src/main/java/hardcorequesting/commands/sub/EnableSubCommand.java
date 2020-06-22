@@ -14,7 +14,6 @@ public class EnableSubCommand implements CommandHandler.SubCommand {
         return builder
                 .requires(source -> source.hasPermissionLevel(4))
                 .executes(context -> {
-                    QuestingData.disableVanillaHardcore(context.getSource());
                     if (context.getSource().getWorld().getLevelProperties().isHardcore())
                         context.getSource().sendFeedback(new TranslatableText("hqm.message.vanillaHardcoreOn"), true);
                     else

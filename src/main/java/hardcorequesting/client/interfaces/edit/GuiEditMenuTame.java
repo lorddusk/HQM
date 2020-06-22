@@ -4,8 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskTame;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
@@ -84,8 +87,8 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -97,13 +100,13 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
             boolean selected = tames.get(i).equals(tame.getTame());
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
-            gui.drawString(tames.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Translator.plain(tames.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
-        gui.drawString(Translator.translate("hqm.tameTask.search"), 180, 20, 0x404040);
-        gui.drawString(Translator.translate("hqm.tameTask." + (tame.getTame() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(matrices, Translator.translated("hqm.tameTask.search"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.translated("hqm.tameTask." + (tame.getTame() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (tame.getTame() != null) {
-            gui.drawString(tame.getTame(), 180, 50, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.plain(tame.getTame()), 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -142,12 +145,12 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return Translator.translate("hqm.tameTask." + "type" + "Match.title");
+        return I18n.translate("hqm.tameTask." + "type" + "Match.title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return Translator.translate("hqm.tameTask." + "exact" + "Match.desc");
+        return I18n.translate("hqm.tameTask." + "exact" + "Match.desc");
     }
     
     @Override

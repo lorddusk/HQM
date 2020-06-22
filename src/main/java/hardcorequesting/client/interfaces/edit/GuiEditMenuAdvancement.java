@@ -4,8 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskAdvancement;
+import hardcorequesting.util.Translator;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,8 +77,8 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -87,13 +90,13 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
             boolean selected = advancementNames.get(i).equals(advancement.getName());
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
-            gui.drawString(advancementNames.get(i), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Translator.plain(advancementNames.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
-        gui.drawString("Search", 180, 20, 0x404040);
-        gui.drawString(((advancement.getAdvancement() == null) ? "Nothing" : "Currently") + "Selected", 180, 40, 0x404040);
+        gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.plain(((advancement.getAdvancement() == null) ? "Nothing" : "Currently") + "Selected"), 180, 40, 0x404040);
         if (advancement.getAdvancement() != null) {
-            gui.drawString(advancement.getAdvancement(), 180, 50, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.plain(advancement.getAdvancement()), 180, 50, 0.7F, 0x404040);
         }
     }
     

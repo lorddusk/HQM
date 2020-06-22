@@ -1,6 +1,7 @@
 package hardcorequesting.tileentity;
 
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
@@ -13,8 +14,8 @@ public class BaseBlockEntity extends BlockEntity implements BlockEntityClientSer
     }
     
     @Override
-    public final void fromTag(CompoundTag compound) {
-        super.fromTag(compound);
+    public final void fromTag(BlockState state, CompoundTag compound) {
+        super.fromTag(state, compound);
         this.readTile(compound, NBTType.SAVE);
     }
     
@@ -37,7 +38,7 @@ public class BaseBlockEntity extends BlockEntity implements BlockEntityClientSer
     
     @Override
     public void fromClientTag(@NotNull CompoundTag tag) {
-        this.fromTag(tag);
+        this.fromTag(null, tag);
     }
     
     protected void receiveSyncPacket(@NotNull CompoundTag nbt) {

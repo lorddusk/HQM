@@ -13,6 +13,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
@@ -38,13 +39,13 @@ public class TrackerBlock extends BlockWithEntity {
                     BlockEntity tile = world.getBlockEntity(pos);
                     if (tile instanceof TrackerBlockEntity) {
                         if (!Quest.canQuestsBeEdited()) {
-                            player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.sendMessage(Translator.translatable("tile.hqm:quest_tracker.offLimit"), Util.NIL_UUID);
                         } else {
                             ((TrackerBlockEntity) tile).setCurrentQuest();
                             if (((TrackerBlockEntity) tile).getCurrentQuest() != null) {
-                                player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.bindTo", ((TrackerBlockEntity) tile).getCurrentQuest().getName()));
+                                player.sendMessage(Translator.translatable("tile.hqm:quest_tracker.bindTo", ((TrackerBlockEntity) tile).getCurrentQuest().getName()), Util.NIL_UUID);
                             } else {
-                                player.sendMessage(Translator.translateToIChatComponent("hqm.message.noTaskSelected"));
+                                player.sendMessage(Translator.translatable("hqm.message.noTaskSelected"), Util.NIL_UUID);
                             }
                         }
                         
@@ -55,7 +56,7 @@ public class TrackerBlock extends BlockWithEntity {
                     BlockEntity tile = world.getBlockEntity(pos);
                     if (tile instanceof TrackerBlockEntity) {
                         if (!Quest.canQuestsBeEdited()) {
-                            player.sendMessage(Translator.translateToIChatComponent("tile.hqm:quest_tracker.offLimit"));
+                            player.sendMessage(Translator.translatable("tile.hqm:quest_tracker.offLimit"), Util.NIL_UUID);
                         } else {
                             ((TrackerBlockEntity) tile).openInterface(player);
                         }

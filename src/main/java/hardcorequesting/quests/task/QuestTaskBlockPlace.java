@@ -6,8 +6,8 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
 

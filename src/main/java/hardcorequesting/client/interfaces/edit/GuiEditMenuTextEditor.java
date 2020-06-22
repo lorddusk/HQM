@@ -12,14 +12,19 @@ import hardcorequesting.quests.task.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
-import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
+
+import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class GuiEditMenuTextEditor extends GuiEditMenu {
@@ -148,7 +153,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     }
     
     public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, Group group) {
-        this(gui, player, group.getName(), true);
+        this(gui, player, group.getDisplayName(), true);
         this.group = group;
     }
     
@@ -194,11 +199,11 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
         int page = text.getCursorLine(gui) / LINES_PER_PAGE;
-        gui.drawString(text.getLines(), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
-        gui.drawCursor(START_X + text.getCursorPositionX(gui) - 1, START_Y + text.getCursorPositionY(gui) - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
+        gui.drawString(matrices, text.getLines().stream().map(StringRenderable::plain).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
+        gui.drawCursor(matrices, START_X + text.getCursorPositionX(gui) - 1, START_Y + text.getCursorPositionY(gui) - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     
     @Override
@@ -211,7 +216,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     public void save(GuiBase gui) {
         String str = text.getText();
         if (str == null || str.isEmpty()) {
-            str = Translator.translate("hqm.textEditor.unnamed");
+            str = I18n.translate("hqm.textEditor.unnamed");
         }
         
         if (!isName && group == null && groupTier == null) {
@@ -253,7 +258,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         } else if (questSet != null) {
             if (isName) {
                 if (!questSet.setName(str)) {
-                    player.sendMessage(new TranslatableText("hqm.editMode.rename.invalid_set").setStyle(new Style().setBold(true).setColor(Formatting.RED)));
+                    player.sendMessage(new TranslatableText("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.setBold(true).setColor(Formatting.RED)), Util.NIL_UUID);
                 }
             } else {
                 questSet.setDescription(str);

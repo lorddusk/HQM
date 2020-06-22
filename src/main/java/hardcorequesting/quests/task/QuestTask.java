@@ -21,16 +21,16 @@ import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,7 +49,7 @@ public abstract class QuestTask {
     private List<QuestTask> requirements;
     private String longDescription;
     private int id;
-    private List<String> cachedDescription;
+    private List<StringRenderable> cachedDescription;
     
     public QuestTask(Quest parent, String description, String longDescription) {
         this.parent = parent;
@@ -187,7 +187,7 @@ public abstract class QuestTask {
     }
     
     public String getDescription() {
-        return Translator.translate(description);
+        return Translator.commonTranslate(description);
     }
     
     public void setDescription(String description) {
@@ -199,7 +199,7 @@ public abstract class QuestTask {
     }
     
     public String getLongDescription() {
-        return Translator.translate(longDescription);
+        return Translator.commonTranslate(longDescription);
     }
     
     public void setLongDescription(String longDescription) {
@@ -208,9 +208,9 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public List<String> getCachedLongDescription(GuiBase gui) {
+    public List<StringRenderable> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.translate(longDescription), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(Translator.translated(longDescription), 0.7F, 130);
         }
         
         return cachedDescription;
@@ -222,7 +222,7 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY);
+    public abstract void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY);
     
     @Environment(EnvType.CLIENT)
     public abstract void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b);
@@ -316,10 +316,10 @@ public abstract class QuestTask {
     public void onQuestSelected(EventTrigger.QuestSelectedEvent event) {
     }
     
-    public void onBlockPlaced(BlockItem item, ItemUsageContext context) {
+    public void onBlockPlaced(ItemStack item, World world, BlockState state, LivingEntity entity) {
     }
     
-    public void onBlockBroken(BlockPos blockPos, BlockState blockState, ServerPlayerEntity player) {
+    public void onBlockBroken(BlockPos blockPos, BlockState blockState, PlayerEntity player) {
     }
     
     public void onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {

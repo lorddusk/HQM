@@ -13,16 +13,19 @@ import hardcorequesting.items.ModItems;
 import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.EmptyFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DefaultedList;
+import net.minecraft.text.StringRenderable;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
 import java.util.*;
@@ -47,7 +50,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private static final int SEARCH_LINES = 9;
     private static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
     private static final int PLAYER_LINES = 6;
-    public static ThreadingHandler HANDLER = new ThreadingHandler();
+    public static final ThreadingHandler HANDLER = new ThreadingHandler();
     protected Element<?> selected;
     private int id;
     private UUID questId;
@@ -184,17 +187,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
     
     @Override
-    public void draw(GuiBase gui, int mX, int mY) {
-        super.draw(gui, mX, mY);
-        gui.drawString("Selected", 20, 20, 0x404040);
+    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
+        gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
         selected.draw(gui, 70, 15, mX, mY);
-        gui.drawString("Search", 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
         drawList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         
-        gui.drawString("Player inventory", 20, 70, 0x404040);
+        gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
         drawList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
-        textBoxes.draw(gui);
+        textBoxes.draw(matrices, gui);
         
         if (usePrecision()) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -203,17 +206,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
             
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);
-            gui.drawCenteredString(precision.getName(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(matrices, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         }
         
     }
     
     @Override
-    public void renderTooltip(GuiBase gui, int mX, int mY) {
-        super.renderTooltip(gui, mX, mY);
+    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        super.renderTooltip(matrices, gui, mX, mY);
         
-        drawListMouseOver(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
-        drawListMouseOver(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+        drawListMouseOver(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+        drawListMouseOver(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
     }
     
     @Override
@@ -283,7 +286,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
     }
     
-    private void drawListMouseOver(GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private void drawListMouseOver(MatrixStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             Element<?> element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
@@ -291,7 +294,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             
             if (gui.inBounds(x + xI * OFFSET, y + yI * OFFSET, SIZE, SIZE, mX, mY)) {
                 if (element != null) {
-                    gui.renderTooltip(element.getName(gui), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltip(matrices, element.getName(gui), mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
@@ -365,7 +368,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
         
-        public abstract List<String> getName(GuiBase gui);
+        public abstract List<StringRenderable> getName(GuiBase gui);
         
         public abstract int getAmount();
         
@@ -399,13 +402,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<String> getName(GuiBase gui) {
+        public List<StringRenderable> getName(GuiBase gui) {
             if (stack != null && !stack.isEmpty()) {
-                return gui.getTooltipFromItem(stack);
+                return (List) gui.getTooltipFromItem(stack);
             } else {
-                List<String> ret = new ArrayList<>();
-                ret.add("Unknown");
-                return ret;
+                return Collections.singletonList(Translator.plain("Unknown"));
             }
         }
         
@@ -445,11 +446,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<String> getName(GuiBase gui) {
+        public List<StringRenderable> getName(GuiBase gui) {
             if (stack != null) {
-                List<String> ret = new ArrayList<>();
-                ret.add(stack.getName().asFormattedString());
-                return ret;
+                return Collections.singletonList(stack.getName());
             }
             return Collections.emptyList();
         }
@@ -527,7 +526,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     if (fluid instanceof EmptyFluid) continue;
                     if (!fluid.getDefaultState().isStill()) continue;
                     FluidVolume fluidVolume = FluidKeys.get(fluid).withAmount(FluidAmount.ofWhole(1));
-                    String search = fluidVolume.getName().asFormattedString();
+                    String search = fluidVolume.getName().getString();
                     searchFluids.add(new SearchEntry(search, search, new ElementFluid(fluidVolume)));
                 }
             }
@@ -590,7 +589,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     HANDLER.handle.put(menu, search);
             }
             
-            public void renderEvent(float delta) {
+            public void renderEvent(MatrixStack matrices, float delta) {
                 if (!handle.isEmpty()) {
                     for (Map.Entry<GuiEditMenuItem, Search> entry : handle.entrySet()) {
                         entry.getKey().searchItems = entry.getValue().elements;

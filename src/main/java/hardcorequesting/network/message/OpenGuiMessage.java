@@ -5,7 +5,7 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.util.PacketByteBuf;
+import net.minecraft.network.PacketByteBuf;
 
 public class OpenGuiMessage implements IMessage {
     private String data;

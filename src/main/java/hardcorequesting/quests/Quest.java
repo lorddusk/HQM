@@ -31,10 +31,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Style;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -92,7 +93,7 @@ public class Quest {
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
     private List<QuestTask> tasks;
-    private List<String> cachedDescription;
+    private List<StringRenderable> cachedDescription;
     private List<ReputationReward> reputationRewards;
     private QuestTask selectedTask;
     private ItemStackRewardList rewards;
@@ -236,13 +237,14 @@ public class Quest {
                 return selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
             }
             
+            @Environment(EnvType.CLIENT)
             @Override
             public void onClick(GuiBase gui, PlayerEntity player) {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
                 QuestingData.getQuestingData(player).selectedQuestId = getQuestId();
                 QuestingData.getQuestingData(player).selectedTask = selectedTask.getId();
                 
-                player.sendMessage(new TranslatableText("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).setStyle(new Style().setColor(Formatting.GREEN)));
+                player.addMessage(new TranslatableText("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).formatted(Formatting.GREEN), false);
                 
                 //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
                 GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
@@ -257,6 +259,7 @@ public class Quest {
                     return true;
                 }
                 
+                @Environment(EnvType.CLIENT)
                 @Override
                 public boolean isVisible(GuiBase gui, PlayerEntity player) {
                     return canQuestsBeEdited() && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
@@ -329,12 +332,14 @@ public class Quest {
     
     {
         scrollBars.add(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
+            @Environment(EnvType.CLIENT)
             @Override
             public boolean isVisible(GuiBase gui) {
                 return getCachedDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
         scrollBars.add(taskDescriptionScroll = new ScrollBar(312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
+            @Environment(EnvType.CLIENT)
             @Override
             public boolean isVisible(GuiBase gui) {
                 return selectedTask != null && selectedTask.getCachedLongDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
@@ -342,6 +347,7 @@ public class Quest {
         });
         
         scrollBars.add(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
+            @Environment(EnvType.CLIENT)
             @Override
             public boolean isVisible(GuiBase gui) {
                 return tasks.size() > VISIBLE_TASKS && getVisibleTasks(gui) > VISIBLE_TASKS;
@@ -380,9 +386,9 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public static List<String> getMainDescription(GuiBase gui) {
+    public static List<StringRenderable> getMainDescription(GuiBase gui) {
         if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
-            QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(QuestLine.getActiveQuestLine().mainDescription, 0.7F, 130);
+            QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(Translator.plain(QuestLine.getActiveQuestLine().mainDescription), 0.7F, 130);
         }
         
         return QuestLine.getActiveQuestLine().cachedMainDescription;
@@ -738,10 +744,12 @@ public class Quest {
         return y;
     }
     
+    @Environment(EnvType.CLIENT)
     public int getGuiU() {
         return isBig ? GuiQuestBook.PAGE_WIDTH + 25 : GuiQuestBook.PAGE_WIDTH;
     }
     
+    @Environment(EnvType.CLIENT)
     public int getGuiV(PlayerEntity player, int x, int y) {
         return isEnabled(player) && isMouseInObject(x, y) ? getGuiH() : 0;
     }
@@ -861,15 +869,15 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private List<String> getCachedDescription(GuiBase gui) {
+    private List<StringRenderable> getCachedDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(description, 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
         }
         return cachedDescription;
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawMenu(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void drawMenu(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         if (!canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
             if (tasks.size() > 0) {
                 selectedTask = tasks.get(0);
@@ -878,10 +886,10 @@ public class Quest {
             }
         }
         
-        gui.drawString(name, START_X, TITLE_START_Y, 0x404040);
+        gui.drawString(matrices, Translator.plain(name), START_X, TITLE_START_Y, 0x404040);
         
         int startLine = descriptionScroll.isVisible(gui) ? Math.round((getCachedDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-        gui.drawString(getCachedDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
+        gui.drawString(matrices, getCachedDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
         
         int id = 0;
         int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
@@ -894,7 +902,7 @@ public class Quest {
                 int yPos = getTaskY(gui, id);
                 boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(task.getDescription(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(matrices, Translator.plain(task.getDescription()), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
                 id++;
             }
@@ -904,19 +912,19 @@ public class Quest {
             selectedReward = -1;
         }
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            gui.drawString(Translator.translate("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewards.toArray(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                gui.drawString(Translator.translate("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
+                gui.drawString(matrices, Translator.translated("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
                 drawRewards(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
         } else if (!rewardChoices.isEmpty()) {
-            gui.drawString(Translator.translate("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(matrices, Translator.translated("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
         
         for (LargeButton button : buttons) {
-            button.draw(gui, player, mX, mY);
+            button.draw(matrices, gui, player, mX, mY);
         }
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -971,47 +979,47 @@ public class Quest {
                     gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 }
             } else {*/
-            List<String> description = selectedTask.getCachedLongDescription(gui);
+            List<StringRenderable> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
-            gui.drawString(description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
-            selectedTask.draw(gui, player, mX, mY);
+            selectedTask.draw(matrices, gui, player, mX, mY);
             //}
         } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         /*} else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
         }
         
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            drawRewardMouseOver(gui, rewards.toArray(), REWARD_Y, -1, mX, mY);
+            drawRewardMouseOver(matrices, gui, rewards.toArray(), REWARD_Y, -1, mX, mY);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                drawRewardMouseOver(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
+                drawRewardMouseOver(matrices, gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
             }
         } else if (!rewardChoices.isEmpty()) {
-            drawRewardMouseOver(gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY);
+            drawRewardMouseOver(matrices, gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY);
         }
         for (LargeButton button : buttons) {
-            button.renderTooltip(gui, player, mX, mY);
+            button.renderTooltip(matrices, gui, player, mX, mY);
         }
         
         if (reputationRewards != null && hover) {
-            List<String> str = new ArrayList<String>();
+            List<StringRenderable> str = new ArrayList<>();
             for (ReputationReward reputationReward : reputationRewards) {
                 if (reputationReward.getValue() != 0 && reputationReward.getReward() != null && reputationReward.getReward().isValid()) {
-                    str.add(reputationReward.getLabel());
+                    str.add(Translator.plain(reputationReward.getLabel()));
                 }
                 
             }
             
-            List<String> commentLines = gui.getLinesFromText(Translator.translate("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
+            List<StringRenderable> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
-                str.add("");
-                for (String commentLine : commentLines) {
-                    str.add(GuiColor.GRAY + commentLine);
+                str.add(StringRenderable.EMPTY);
+                for (StringRenderable commentLine : commentLines) {
+                    str.add(Translator.colored(Translator.rawString(commentLine), GuiColor.GRAY));
                 }
             }
-            gui.renderTooltip(str, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
@@ -1049,22 +1057,22 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawRewardMouseOver(GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
+    private void drawRewardMouseOver(MatrixStack matrices, GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
         if (rewards != null) {
             for (int i = 0; i < rewards.length; i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (rewards[i] != null) {
                         GuiQuestBook.setSelectedStack(rewards[i]);
                         List<Text> str = rewards[i].getTooltip(MinecraftClient.getInstance().player, MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
-                        List<String> list2 = Lists.newArrayList();
+                        List<StringRenderable> list2 = Lists.newArrayList();
                         for (Text text : str) {
-                            list2.add(text.asFormattedString());
+                            list2.add(text);
                         }
                         if (selected == i) {
-                            list2.add("");
-                            list2.add(GuiColor.GREEN + Translator.translate("hqm.quest.selected"));
+                            list2.add(StringRenderable.EMPTY);
+                            list2.add(Translator.translated("hqm.quest.selected", GuiColor.GREEN));
                         }
-                        gui.renderTooltip(list2, gui.getLeft() + mX, gui.getTop() + mY);
+                        gui.renderTooltip(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
                     }
                     break;
                 }
@@ -1449,6 +1457,7 @@ public class Quest {
         cachedDescription = null;
     }
     
+    @Environment(EnvType.CLIENT)
     @SuppressWarnings("rawtypes")
     public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, PlayerEntity player) {
         if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
@@ -1703,11 +1712,11 @@ public class Quest {
         }
         
         public String getDescription() {
-            return Translator.translate(getLangKeyDescription());
+            return Translator.commonTranslate(getLangKeyDescription());
         }
         
         public String getName() {
-            return Translator.translate(getLangKeyName());
+            return Translator.commonTranslate(getLangKeyName());
         }
     }
     

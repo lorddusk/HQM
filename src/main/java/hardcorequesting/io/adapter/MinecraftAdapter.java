@@ -9,8 +9,8 @@ import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.mojang.datafixers.Dynamic;
-import com.mojang.datafixers.types.JsonOps;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
@@ -32,7 +32,7 @@ public class MinecraftAdapter {
         }
         
         @Override
-        public CompoundTag read(JsonReader in) throws IOException {
+        public CompoundTag read(JsonReader in) {
             return (CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, Streams.parse(in));
         }
     };

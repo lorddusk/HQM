@@ -9,10 +9,12 @@ import hardcorequesting.quests.data.QuestDataTaskDeath;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.StringRenderable;
 
 import java.util.UUID;
 
@@ -35,9 +37,9 @@ public class QuestTaskDeath extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         int died = ((QuestDataTaskDeath) getData(player)).deaths;
-        gui.drawString(gui.getLinesFromText(died == deaths ? GuiColor.GREEN + Translator.translate(deaths != 0, "hqm.deathMenu.deaths", deaths) : Translator.translate(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        gui.drawString(matrices, gui.getLinesFromText(Translator.plain(died == deaths ? GuiColor.GREEN + Translator.translatable(deaths != 0, "hqm.deathMenu.deaths", deaths).getString() : Translator.translatable(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths).getString()), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)

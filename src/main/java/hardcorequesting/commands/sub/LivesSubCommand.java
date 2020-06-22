@@ -116,25 +116,25 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
     
     private void removeLivesFrom(ServerCommandSource source, PlayerEntity player, int amount) {
         QuestingData.getQuestingData(player).removeLives(player, amount);
-        sendChat(source, amount != 1, "hqm.message.removeLivesFrom", amount, player.getEntityName());
+        sendTranslatableChat(source, amount != 1, "hqm.message.removeLivesFrom", amount, player.getEntityName());
         if (source.getEntity() != player)
-            sendChat(player.getCommandSource(), amount != 1, "hqm.message.removeLivesBy", amount, source.getName());
+            sendTranslatableChat(player.getCommandSource(), amount != 1, "hqm.message.removeLivesBy", amount, source.getName());
         currentLives(player);
     }
     
     private void addLivesTo(ServerCommandSource source, PlayerEntity player, int amount) {
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(source, amount != 1, "hqm.message.addLivesTo", amount, player.getEntityName());
+            sendTranslatableChat(source, amount != 1, "hqm.message.addLivesTo", amount, player.getEntityName());
             if (source.getEntity() != player)
-                sendChat(player.getCommandSource(), amount != 1, "hqm.message.addLivesBy", amount, source.getName());
+                sendTranslatableChat(player.getCommandSource(), amount != 1, "hqm.message.addLivesBy", amount, source.getName());
             currentLives(player);
         } else {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendChat(source, "hqm.message.cantGiveMoreLives", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
-            sendChat(source, "hqm.massage.setLivesInstead", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
+            sendTranslatableChat(source, "hqm.message.cantGiveMoreLives", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
+            sendTranslatableChat(source, "hqm.massage.setLivesInstead", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
             if (source.getEntity() != player)
-                sendChat(player.getCommandSource(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getName());
+                sendTranslatableChat(player.getCommandSource(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getName());
             currentLives(player);
         }
     }
@@ -143,7 +143,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
         PlayerEntity player = HardcoreQuesting.getServer().getPlayerManager().getPlayer(playerName);
         if (player != null) {
             int lives = QuestingData.getQuestingData(player).getLives();
-            sendChat(source, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);
+            sendTranslatableChat(source, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);
         } else {
             throw new CommandException(new TranslatableText("hqm.message.noPlayer"));
         }

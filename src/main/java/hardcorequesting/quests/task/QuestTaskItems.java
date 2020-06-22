@@ -1,7 +1,6 @@
 package hardcorequesting.quests.task;
 
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
-import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -17,12 +16,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
+import net.minecraft.text.StringRenderable;
 import net.minecraft.text.Text;
-import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public abstract class QuestTaskItems extends QuestTask {
         setPositions(this.items);
     }
     
+    @Environment(EnvType.CLIENT)
     public void setItem(GuiEditMenuItem.Element element, int id, ItemPrecision precision) {
         if (element.getStack() == null) return;
         
@@ -68,9 +70,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem) element;
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                ItemStack stack = item.getStack().copy();
-                stack.setCount(1);
-                items[id].stack = stack;
+                items[id].stack = item.getStack().copy();
             } else {
                 GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
                 items[id].hasItem = false;
@@ -185,7 +185,7 @@ public abstract class QuestTaskItems extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
         ItemRequirement[] items = getEditFriendlyItems(this.items);
         
         for (int i = 0; i < items.length; i++) {
@@ -196,12 +196,12 @@ public abstract class QuestTaskItems extends QuestTask {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
             
-            String str = (getProgress(player, i) * 100 / item.required) + "%";
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(0, 0, 200);// magic z value to write over stack render
+            StringRenderable str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
+            matrices.push();
+            matrices.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
-            gui.drawStringWithShadow(str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
-            RenderSystem.popMatrix();
+            gui.drawStringWithShadow(matrices, str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
+            matrices.pop();
         }
         
         for (int i = 0; i < items.length; i++) {
@@ -209,7 +209,7 @@ public abstract class QuestTaskItems extends QuestTask {
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
                 ItemStack stack = item.getStack();
-                List<String> str = new ArrayList<>();
+                List<StringRenderable> str = new ArrayList<>();
                 if (item.fluid != null) {
                     List<Text> list = new ArrayList<>();
                     list.add(item.fluid.getName());
@@ -217,26 +217,24 @@ public abstract class QuestTaskItems extends QuestTask {
                         String entryId = Registry.FLUID.getId(item.fluid.getRawFluid()).toString();
                         list.add(new LiteralText(entryId).formatted(Formatting.DARK_GRAY));
                     }
-                    for (Text text : list) {
-                        str.add(text.asFormattedString());
-                    }
+                    str.addAll(list);
                 } else if (stack != null && !stack.isEmpty()) {
                     str.addAll(gui.getTooltipFromItem(stack));
                 }
                 
-                str.add(Translator.translate("hqm.questBook.itemRequirementProgress") + ": " + getProgress(player, i) + "/" + item.required);
+                str.add(StringRenderable.concat(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
                 if (item.fluid == null && Quest.canQuestsBeEdited()) {
-                    str.add("");
-                    str.add(GuiColor.GRAY + item.getPrecision().getName());
+                    str.add(StringRenderable.EMPTY);
+                    str.add(Translator.colored(item.getPrecision().getName(), GuiColor.GRAY));
                 }
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (getProgress(player, i) == item.required) {
-                        str.addAll(Arrays.asList("", "", GuiColor.RED + Translator.translate("hqm.questBook.resetTask")));
+                        str.addAll(Arrays.asList(StringRenderable.EMPTY, StringRenderable.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
                     } else {
-                        str.addAll(Arrays.asList("", "", GuiColor.ORANGE + Translator.translate("hqm.questBook.completeTask")));
+                        str.addAll(Arrays.asList(StringRenderable.EMPTY, StringRenderable.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
                     }
                 }
-                gui.renderTooltip(str, mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltip(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
                 break;
             }
         }
@@ -419,19 +417,6 @@ public abstract class QuestTaskItems extends QuestTask {
                     cycleAt += CYCLE_TIME;
             }
             return permutations[current];
-        }
-        
-        public String getDisplayName() {
-            ItemStack stack = getPermutatedItem();
-            if (hasItem) {
-                if (!stack.isEmpty()) {
-                    return stack.getName().asFormattedString();
-                } else {
-                    return "Nothing";
-                }
-            } else {
-                return fluid.getName().asFormattedString();
-            }
         }
     }
 }

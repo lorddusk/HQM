@@ -1,6 +1,9 @@
 package hardcorequesting.team;
 
 import hardcorequesting.util.Translator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.resource.language.I18n;
 
 public enum RewardSetting {
     ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
@@ -20,11 +23,13 @@ public enum RewardSetting {
         return isAllModeEnabled ? ALL : ANY;
     }
     
+    @Environment(EnvType.CLIENT)
     public String getTitle() {
-        return Translator.translate(title);
+        return I18n.translate(title);
     }
     
+    @Environment(EnvType.CLIENT)
     public String getDescription() {
-        return Translator.translate(description);
+        return I18n.translate(description);
     }
 }

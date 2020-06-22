@@ -2,6 +2,7 @@ package hardcorequesting.death;
 
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
@@ -127,7 +128,7 @@ public enum DeathType {
     abstract boolean isSourceValid(DamageSource source);
     
     public String getName() {
-        return Translator.translate("hqm.deathType." + name);
+        return I18n.translate("hqm.deathType." + name);
     }
 
     /*Fire: inFire, onFire, fireball

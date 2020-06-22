@@ -13,11 +13,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.Util;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -38,27 +37,27 @@ public class ItemHeart extends Item {
             ItemStack stack = player.getStackInHand(hand);
             if (value == 3) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.sendMessage(new TranslatableText("hqm.message.noHardcoreYet"));
+                    player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
                 } else if (QuestingData.getQuestingData(player).getRawLives() < HQMConfig.getInstance().Hardcore.MAX_LIVES) {
                     QuestingData.getQuestingData(player).addLives(player, 1);
-                    player.sendMessage(new TranslatableText("hqm.message.addOne"));
+                    player.sendMessage(Translator.translatable("hqm.message.addOne"), Util.NIL_UUID);
                     int lives = QuestingData.getQuestingData(player).getLives();
-                    player.sendMessage(new TranslatableText("hqm.message.haveRemaining", lives));
+                    player.sendMessage(Translator.translatable("hqm.message.haveRemaining", lives), Util.NIL_UUID);
                     SoundHandler.play(Sounds.LIFE, player);
                     if (!player.abilities.creativeMode) {
                         stack.decrement(1);
                         
                     }
                 } else {
-                    player.sendMessage(new TranslatableText("hqm.message.haveMaxLives"));
+                    player.sendMessage(Translator.translatable("hqm.message.haveMaxLives"), Util.NIL_UUID);
                 }
             }
             if (value == 4) {
                 if (!QuestingData.isHardcoreActive()) {
-                    player.sendMessage(new TranslatableText("hqm.message.noHardcoreYet"));
+                    player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
                 } else {
                     SoundHandler.play(Sounds.ROTTEN, player);
-                    player.sendMessage(new TranslatableText("hqm.message.eatRottenHearth"));
+                    player.sendMessage(Translator.translatable("hqm.message.eatRottenHearth"), Util.NIL_UUID);
                     QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
                     
@@ -91,7 +90,7 @@ public class ItemHeart extends Item {
                     if (newRot <= 0) {
                         // TODO who wrote this code lmao -bikeshedaniel
                         stack = new ItemStack(ModItems.rottenHeart);
-                        entityPlayer.sendMessage(new TranslatableText("hqm.message.hearthDecay"));
+                        entityPlayer.sendMessage(Translator.translatable("hqm.message.hearthDecay"), Util.NIL_UUID);
                     } else {
                         tagCompound.putInt("RotTime", newRot - 1);
                     }
@@ -105,7 +104,7 @@ public class ItemHeart extends Item {
         super.appendTooltip(stack, world, tooltip, context);
         
         if (value == 3) {
-            tooltip.add(new LiteralText(Translator.translate("item.hqm:hearts_heart.tooltip")));
+            tooltip.add(Translator.translatable("item.hqm:hearts_heart.tooltip"));
             if (HQMConfig.getInstance().Hardcore.HEART_ROT_ENABLE) {
                 CompoundTag tagCompound = stack.getTag();
                 if (tagCompound == null) {
@@ -116,12 +115,12 @@ public class ItemHeart extends Item {
                     int rot = tagCompound.getInt("RotTime");
                     int maxRot = tagCompound.getInt("MaxRot");
                     float percentage = (float) ((rot * 100) / maxRot);
-                    tooltip.add(new LiteralText(Translator.translate("item.hqm:hearts_heart.freshness", percentage)));
+                    tooltip.add(Translator.translatable("item.hqm:hearts_heart.freshness", percentage));
                 }
             }
         }
         if (value == 4) {
-            tooltip.add(new LiteralText(Translator.translate("item.hqm:hearts_rottenheart.tooltip")));
+            tooltip.add(Translator.translatable("item.hqm:hearts_rottenheart.tooltip"));
         }
     }
     

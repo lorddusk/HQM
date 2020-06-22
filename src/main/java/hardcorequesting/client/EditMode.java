@@ -1,6 +1,6 @@
 package hardcorequesting.client;
 
-import hardcorequesting.util.Translator;
+import net.minecraft.client.resource.language.I18n;
 
 public enum EditMode {
     NORMAL("normal"),
@@ -40,10 +40,10 @@ public enum EditMode {
     }
     
     public String getName() {
-        return Translator.translate("hqm.editMode." + id + ".title");
+        return I18n.translate("hqm.editMode." + id + ".title");
     }
     
     public String getDescription() {
-        return Translator.translate("hqm.editMode." + id + ".desc");
+        return I18n.translate("hqm.editMode." + id + ".desc");
     }
 }

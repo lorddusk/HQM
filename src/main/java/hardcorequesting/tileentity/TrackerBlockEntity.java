@@ -10,6 +10,7 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
@@ -64,8 +65,8 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
     }
     
     @Override
-    public void fromTag(CompoundTag compound) {
-        super.fromTag(compound);
+    public void fromTag(BlockState state, CompoundTag compound) {
+        super.fromTag(state, compound);
         
         // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
         if (compound.contains(NBT_QUEST)) {
