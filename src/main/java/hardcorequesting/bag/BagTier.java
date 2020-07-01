@@ -2,6 +2,8 @@ package hardcorequesting.bag;
 
 
 import hardcorequesting.client.interfaces.GuiColor;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 
 public enum BagTier {
@@ -22,6 +24,7 @@ public enum BagTier {
         return color;
     }
     
+    @Environment(EnvType.CLIENT)
     public String getName() {
         return I18n.translate("hqm.bag." + this.name().toLowerCase());
     }

@@ -17,6 +17,7 @@ import hardcorequesting.util.RegisterHelper;
 import me.shedaniel.cloth.api.common.events.v1.PlayerJoinCallback;
 import me.shedaniel.cloth.api.common.events.v1.WorldLoadCallback;
 import me.shedaniel.cloth.api.common.events.v1.WorldSaveCallback;
+import me.shedaniel.cloth.api.utils.v1.GameInstanceUtils;
 import nerdhub.cardinal.components.api.ComponentRegistry;
 import nerdhub.cardinal.components.api.ComponentType;
 import nerdhub.cardinal.components.api.component.Component;
@@ -81,7 +82,7 @@ public class HardcoreQuesting implements ModInitializer {
     }
     
     public static MinecraftServer getServer() {
-        return proxy.getServerInstance();
+        return GameInstanceUtils.getServer();
     }
     
     public static final ComponentType<CompoundTagComponent> PLAYER_EXTRA_DATA;

@@ -13,6 +13,8 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -130,7 +132,7 @@ public enum ClientChange {
         public IMessage build(Sounds data) throws IOException {
             return new SoundMessage(SOUND, data.ordinal() + "");
         }
-        
+    
         @Override
         public void parse(PlayerEntity player, String data) {
             SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);

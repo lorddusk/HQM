@@ -109,12 +109,17 @@ public class GroupTier {
         questLine.tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
     }
     
+    @Environment(EnvType.CLIENT)
     public String getName() {
         return name == null || name.equals("") ? I18n.translate("hqm.bag.unknown") : name;
     }
     
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getRawName() {
+        return name;
     }
     
     public GuiColor getColor() {

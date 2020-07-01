@@ -84,7 +84,7 @@ public class BagAdapter {
         @Override
         public void write(JsonWriter out, GroupTier value) throws IOException {
             out.beginObject();
-            out.name(NAME).value(value.getName());
+            out.name(NAME).value(value.getRawName());
             out.name(COLOUR).value(value.getColor().name());
             out.name(WEIGHTS).beginArray();
             for (int i : value.getWeights()) {

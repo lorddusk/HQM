@@ -25,8 +25,8 @@ dependencies {
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}") 
-    depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}") 
-    depend("me.shedaniel.cloth.api:cloth-api:${project.cloth}") 
+    depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
+    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}") 
 }
 
 def depend(String string) {

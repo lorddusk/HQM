@@ -91,12 +91,4 @@ public class ClientProxy extends CommonProxy {
     public PlayerEntity getPlayer(PacketContext ctx) {
         return ctx.getPacketEnvironment() == EnvType.CLIENT ? MinecraftClient.getInstance().player : super.getPlayer(ctx);
     }
-    
-    @Override
-    public MinecraftServer getServerInstance() {
-        IntegratedServer server = MinecraftClient.getInstance().getServer();
-        if (server != null)
-            return server;
-        return super.getServerInstance();
-    }
 }

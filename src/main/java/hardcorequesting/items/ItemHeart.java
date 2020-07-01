@@ -7,6 +7,8 @@ import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -99,6 +101,7 @@ public class ItemHeart extends Item {
         }
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);

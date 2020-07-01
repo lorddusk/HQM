@@ -105,6 +105,7 @@ public class SoundHandler {
         return soundObj;
     }
     
+    @Environment(EnvType.CLIENT)
     public static void stopLoreMusic() {
         if (isLorePlaying()) {
             new Thread(() ->
@@ -117,6 +118,7 @@ public class SoundHandler {
         }
     }
     
+    @Environment(EnvType.CLIENT)
     public static boolean isLorePlaying() {
         boolean value = loreSound != null && MinecraftClient.getInstance().getSoundManager().isPlaying(loreSound);
         
@@ -134,6 +136,7 @@ public class SoundHandler {
         play(sound.getSoundName(), 1F, 1F);
     }
     
+    @Environment(EnvType.CLIENT)
     public static void triggerFirstLore() {
         NetworkManager.sendToServer(ClientChange.LORE.build(null));
         playLoreMusic();

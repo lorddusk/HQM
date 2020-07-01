@@ -71,6 +71,7 @@ public class ScrollBar {
         }
     }
     
+    @Environment(EnvType.CLIENT)
     private void updateScroll(int mY) {
         if (isScrolling) {
             setScroll(mY - y - SCROLL_BAR_HEIGHT / 2);
@@ -85,6 +86,7 @@ public class ScrollBar {
         return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
     }
     
+    @Environment(EnvType.CLIENT)
     private void setScroll(int newScroll) {
         int old = scroll;
         scroll = newScroll;
@@ -102,6 +104,7 @@ public class ScrollBar {
         scroll = 0;
     }
     
+    @Environment(EnvType.CLIENT)
     public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
         if (isVisible(gui) && gui.inBounds(left, y, x + SCROLL_WIDTH - left, h, mX, mY)) {
             setScroll((int) (this.scroll - scroll / 20));

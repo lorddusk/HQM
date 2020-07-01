@@ -1,5 +1,7 @@
 package hardcorequesting.client;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 
 public enum EditMode {
@@ -39,10 +41,12 @@ public enum EditMode {
         this.id = id;
     }
     
+    @Environment(EnvType.CLIENT)
     public String getName() {
         return I18n.translate("hqm.editMode." + id + ".title");
     }
     
+    @Environment(EnvType.CLIENT)
     public String getDescription() {
         return I18n.translate("hqm.editMode." + id + ".desc");
     }
