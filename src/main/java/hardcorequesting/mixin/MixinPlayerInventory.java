@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinPlayerInventory {
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z"))
     private boolean isEmpty(ItemStack stack) {
-        return stack.isEmpty() || !(stack.getItem() instanceof QuestBookItem) && HQMConfig.getInstance().LOSE_QUEST_BOOK;
+        return stack.isEmpty() || (stack.getItem() instanceof QuestBookItem && HQMConfig.getInstance().LOSE_QUEST_BOOK);
     }
 }
