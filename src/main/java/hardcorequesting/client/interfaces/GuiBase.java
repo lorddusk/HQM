@@ -250,7 +250,7 @@ public class GuiBase extends Screen {
             RenderSystem.enableRescaleNormal();
             RenderSystem.translatef(getLeft() + x, getTop() + y, 0);
             
-            MinecraftClient.getInstance().getItemRenderer().renderGuiItem(stack, 0, 0);
+            MinecraftClient.getInstance().getItemRenderer().renderInGui(stack, 0, 0);
             MinecraftClient.getInstance().getItemRenderer().renderGuiItemOverlay(textRenderer, stack, 0, 0, null);
             
             RenderSystem.popMatrix();

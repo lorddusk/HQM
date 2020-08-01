@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinCraftingResultSlot", "MixinHorseBondWithPlayerGoal", "MixinMinecraftServer", "MixinPlayerAdvancementTracker",
-    "MixinPlayerEntity", "MixinPlayerInventory"
+    "MixinPlayerEntity", "MixinPlayerInventory", "MixinServerPlayerEntity"
   ],
   "client": [
   ],
