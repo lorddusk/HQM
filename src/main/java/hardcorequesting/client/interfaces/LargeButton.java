@@ -6,8 +6,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
+import net.minecraft.util.Language;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public abstract class LargeButton {
     private String description;
     private int x;
     private int y;
-    private List<StringRenderable> lines;
+    private List<StringVisitable> lines;
     
     public LargeButton(String name, int x, int y) {
         this.name = name;
@@ -69,15 +70,15 @@ public abstract class LargeButton {
                 lines = gui.getLinesFromText(getDescription(), 1, 200);
             }
             
-            gui.renderTooltip(matrices, lines, mX + gui.left, mY + gui.top);
+            gui.renderOrderedTooltip(matrices, Language.getInstance().reorder(lines), mX + gui.left, mY + gui.top);
         }
     }
     
-    protected StringRenderable getName() {
+    protected StringVisitable getName() {
         return Translator.translated(name);
     }
     
-    protected StringRenderable getDescription() {
+    protected StringVisitable getDescription() {
         return Translator.translated(description);
     }
     

@@ -24,7 +24,7 @@ import net.minecraft.fluid.EmptyFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 
@@ -294,7 +294,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             
             if (gui.inBounds(x + xI * OFFSET, y + yI * OFFSET, SIZE, SIZE, mX, mY)) {
                 if (element != null) {
-                    gui.renderTooltip(matrices, element.getName(gui), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(matrices, element.getName(gui), mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
@@ -368,7 +368,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
         
-        public abstract List<StringRenderable> getName(GuiBase gui);
+        public abstract List<StringVisitable> getName(GuiBase gui);
         
         public abstract int getAmount();
         
@@ -402,7 +402,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<StringRenderable> getName(GuiBase gui) {
+        public List<StringVisitable> getName(GuiBase gui) {
             if (stack != null && !stack.isEmpty()) {
                 return (List) gui.getTooltipFromItem(stack);
             } else {
@@ -446,7 +446,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<StringRenderable> getName(GuiBase gui) {
+        public List<StringVisitable> getName(GuiBase gui) {
             if (stack != null) {
                 return Collections.singletonList(stack.getName());
             }

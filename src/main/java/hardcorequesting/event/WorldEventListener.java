@@ -14,7 +14,7 @@ import java.io.File;
 public class WorldEventListener {
     
     public static void onLoad(RegistryKey<World> worldRegistryKey, ServerWorld world) {
-        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
+        if (!world.isClient && world.getRegistryKey().equals(World.OVERWORLD)) {
             QuestLine.reset();
             if (Quest.useDefault) { // reloads all quest lines (rewrites existing ones and creates new ones, does not remove old ones)
                 QuestLine.copyDefaults(getWorldPath(world));
@@ -24,13 +24,14 @@ public class WorldEventListener {
     }
     
     public static void onSave(ServerWorld world, ProgressListener listener, boolean flush) {
-        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
+        if (!world.isClient && world.getRegistryKey().equals(World.OVERWORLD)) {
             QuestLine.saveAll();
+            System.out.println("adwad");
         }
     }
     
     public static void onCreate(ServerWorld world) {
-        if (!world.isClient && world.getDimension() == DimensionType.getOverworldDimensionType()) {
+        if (!world.isClient && world.getRegistryKey().equals(World.OVERWORLD)) {
             QuestLine.reset();
             QuestLine.copyDefaults(getWorldPath(world));
             QuestLine.loadWorldData(getWorldPath(world), world.isClient); // Reload because the defaults wouldn't have been loaded in

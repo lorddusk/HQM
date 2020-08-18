@@ -19,25 +19,31 @@ dependencies {
     mappings("me.shedaniel:legacy-yarn:${project.yarn_mappings}:v2")
     modCompile("net.fabricmc:fabric-loader:${project.loader_version}")
     modCompile("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
-    modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
     depend("org.jetbrains:annotations:19.0.0")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}") 
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
-    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}") 
+    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}")  {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
 }
 
 def depend(String string) {
     dependencies.modApi(string) {
-        exclude(module: "fabric")
+        exclude(group: "net.fabricmc.fabric-api")
     }
     dependencies.include(string)
 }
 
 minecraft {
-    accessWidener(file("src/main/resources/hqm.accesswidener"))
+    accessWidener = file("src/main/resources/hqm.accesswidener")
 }
 
 processResources {

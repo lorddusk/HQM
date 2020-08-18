@@ -35,7 +35,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -93,7 +93,7 @@ public class Quest {
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
     private List<QuestTask> tasks;
-    private List<StringRenderable> cachedDescription;
+    private List<StringVisitable> cachedDescription;
     private List<ReputationReward> reputationRewards;
     private QuestTask selectedTask;
     private ItemStackRewardList rewards;
@@ -227,7 +227,7 @@ public class Quest {
             public boolean isEnabled(GuiBase gui, PlayerEntity player) {
                 QuestingData data = QuestingData.getQuestingData(player);
                 if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(getQuestId())) {
-                    return data.selectedTask == selectedTask.getId();
+                    return data.selectedTask != selectedTask.getId();
                 }
                 return false;
             }
@@ -386,7 +386,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public static List<StringRenderable> getMainDescription(GuiBase gui) {
+    public static List<StringVisitable> getMainDescription(GuiBase gui) {
         if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
             QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(Translator.plain(QuestLine.getActiveQuestLine().mainDescription), 0.7F, 130);
         }
@@ -869,7 +869,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private List<StringRenderable> getCachedDescription(GuiBase gui) {
+    private List<StringVisitable> getCachedDescription(GuiBase gui) {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
         }
@@ -979,7 +979,7 @@ public class Quest {
                     gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 }
             } else {*/
-            List<StringRenderable> description = selectedTask.getCachedLongDescription(gui);
+            List<StringVisitable> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
@@ -1004,7 +1004,7 @@ public class Quest {
         }
         
         if (reputationRewards != null && hover) {
-            List<StringRenderable> str = new ArrayList<>();
+            List<StringVisitable> str = new ArrayList<>();
             for (ReputationReward reputationReward : reputationRewards) {
                 if (reputationReward.getValue() != 0 && reputationReward.getReward() != null && reputationReward.getReward().isValid()) {
                     str.add(Translator.plain(reputationReward.getLabel()));
@@ -1012,14 +1012,14 @@ public class Quest {
                 
             }
             
-            List<StringRenderable> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
+            List<StringVisitable> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
-                str.add(StringRenderable.EMPTY);
-                for (StringRenderable commentLine : commentLines) {
+                str.add(StringVisitable.EMPTY);
+                for (StringVisitable commentLine : commentLines) {
                     str.add(Translator.colored(Translator.rawString(commentLine), GuiColor.GRAY));
                 }
             }
-            gui.renderTooltip(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
@@ -1064,15 +1064,12 @@ public class Quest {
                     if (rewards[i] != null) {
                         GuiQuestBook.setSelectedStack(rewards[i]);
                         List<Text> str = rewards[i].getTooltip(MinecraftClient.getInstance().player, MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
-                        List<StringRenderable> list2 = Lists.newArrayList();
-                        for (Text text : str) {
-                            list2.add(text);
-                        }
+                        List<StringVisitable> list2 = Lists.newArrayList(str);
                         if (selected == i) {
-                            list2.add(StringRenderable.EMPTY);
+                            list2.add(StringVisitable.EMPTY);
                             list2.add(Translator.translated("hqm.quest.selected", GuiColor.GREEN));
                         }
-                        gui.renderTooltip(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
+                        gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
                     }
                     break;
                 }

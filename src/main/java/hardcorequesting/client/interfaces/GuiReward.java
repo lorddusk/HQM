@@ -14,11 +14,9 @@ import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringRenderable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +115,7 @@ public class GuiReward extends GuiBase {
             title = I18n.translate("hqm.rewardGui.tierReward", group.getTier().getName());
         }
         
-        drawCenteredString(matrices, StringRenderable.styled(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
+        drawCenteredString(matrices, StringVisitable.styled(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
         drawCenteredString(matrices, Translator.plain(statisticsText), 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
         drawCenteredString(matrices, Translator.translated("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
@@ -136,16 +134,16 @@ public class GuiReward extends GuiBase {
                     if (Screen.hasShiftDown()) {
                         renderTooltip(matrices, reward.stack, mX0, mY0);
                     } else {
-                        List<StringRenderable> str = new ArrayList<>();
+                        List<OrderedText> str = new ArrayList<>();
                         try {
                             List<Text> info = reward.stack.getTooltip(MinecraftClient.getInstance().player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
                             if (info.size() > 0) {
-                                str.add(info.get(0));
+                                str.add(Language.getInstance().reorder(info.get(0)));
                                 if (info.size() > 1) {
-                                    str.add(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY));
+                                    str.add(Language.getInstance().reorder(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
                                 }
                             }
-                            renderTooltip(matrices, str, mX0, mY0);
+                            renderOrderedTooltip(matrices, str, mX0, mY0);
                         } catch (Throwable ignored) {
                         }
                     }

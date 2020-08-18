@@ -8,7 +8,7 @@ import hardcorequesting.util.Translator;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.Collections;

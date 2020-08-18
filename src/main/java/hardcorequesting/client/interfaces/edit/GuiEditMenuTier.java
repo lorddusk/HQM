@@ -8,7 +8,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     

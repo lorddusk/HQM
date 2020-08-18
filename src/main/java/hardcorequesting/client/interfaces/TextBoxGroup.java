@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.List;

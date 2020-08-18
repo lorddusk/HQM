@@ -8,9 +8,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.font.TextVisitFactory;
 import net.minecraft.client.util.TextCollector;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Language;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,7 @@ public class EditButton {
     private int x;
     private int y;
     private EditMode mode;
-    private List<StringRenderable> text;
+    private List<OrderedText> text;
     
     public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id) {
         this.guiQuestBook = guiQuestBook;
@@ -64,18 +66,19 @@ public class EditButton {
     public void drawInfo(MatrixStack matrices, int mX, int mY) {
         if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             if (text == null) {
-                text = guiQuestBook.getLinesFromText(Translator.plain(mode.getName() + "\n\n" + mode.getDescription()), 1F, 150);
+                List<StringVisitable> text = guiQuestBook.getLinesFromText(Translator.plain(mode.getName() + "\n\n" + mode.getDescription()), 1F, 150);
                 for (int i = 1; i < text.size(); i++) {
                     TextCollector collector = new TextCollector();
                     text.get(i).visit((style, string) -> {
-                        collector.add(StringRenderable.styled(string, style));
+                        collector.add(StringVisitable.styled(string, style));
                         return Optional.empty();
                     }, Style.EMPTY);
                     text.set(i, collector.getCombined());
                 }
+                this.text = Language.getInstance().reorder(text);
             }
             
-            guiQuestBook.renderTooltip(matrices, text, mX + guiQuestBook.getLeft(), mY + guiQuestBook.getTop());
+            guiQuestBook.renderOrderedTooltip(matrices, text, mX + guiQuestBook.getLeft(), mY + guiQuestBook.getTop());
         }
     }
     

@@ -151,7 +151,7 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(Z)) {
                     result.setZ(in.nextInt());
                 } else if (name.equalsIgnoreCase(DIM)) {
-                    result.setDimension(RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new Identifier(in.nextString())));
+                    result.setDimension(RegistryKey.of(Registry.DIMENSION, new Identifier(in.nextString())));
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {

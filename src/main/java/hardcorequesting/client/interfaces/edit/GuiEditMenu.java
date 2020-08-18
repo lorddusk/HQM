@@ -9,7 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +146,7 @@ public abstract class GuiEditMenu {
         private int x;
         private int y;
         private String name;
-        private List<StringRenderable> cached;
+        private List<StringVisitable> cached;
         private int width = Integer.MAX_VALUE;
         
         protected CheckBox(String name, int x, int y) {

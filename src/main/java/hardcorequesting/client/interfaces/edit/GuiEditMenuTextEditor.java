@@ -18,7 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
@@ -202,7 +202,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         int page = text.getCursorLine(gui) / LINES_PER_PAGE;
-        gui.drawString(matrices, text.getLines().stream().map(StringRenderable::plain).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
+        gui.drawString(matrices, text.getLines().stream().map(StringVisitable::plain).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
         gui.drawCursor(matrices, START_X + text.getCursorPositionX(gui) - 1, START_Y + text.getCursorPositionY(gui) - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     

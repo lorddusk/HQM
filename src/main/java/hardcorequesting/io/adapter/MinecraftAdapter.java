@@ -11,10 +11,10 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.datafixer.NbtOps;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 

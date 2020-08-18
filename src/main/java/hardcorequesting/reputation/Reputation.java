@@ -21,7 +21,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.io.IOException;
 import java.util.*;
@@ -142,7 +142,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            StringRenderable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            StringVisitable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
             int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.markers.size() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
@@ -216,7 +216,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            StringRenderable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            StringVisitable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));

@@ -1,5 +1,7 @@
 package hardcorequesting.blocks;
 
+import alexiil.mc.lib.attributes.fluid.FluidAttributes;
+import alexiil.mc.lib.attributes.fluid.FluidExtractable;
 import hardcorequesting.items.QuestBookItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.BarrelBlockEntity;

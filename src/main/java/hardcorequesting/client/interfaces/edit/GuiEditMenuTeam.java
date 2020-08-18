@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +152,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            protected StringRenderable getName() {
+            protected StringVisitable getName() {
                 return Translator.translated(selectedEntry.isInTeam() ? "hqm.party.kickPlayer" : "hqm.party.removeInvite");
             }
         });
@@ -384,15 +384,15 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
         
         if (TeamError.latestError != null) {
             if (inviteButton.inButtonBounds(gui, mX, mY)) {
-                gui.renderTooltip(matrices, gui.getLinesFromText(Translator.plain(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
             } else {
                 TeamError.latestError = null;
             }

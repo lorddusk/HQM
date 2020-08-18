@@ -20,7 +20,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
@@ -196,7 +196,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
             
-            StringRenderable str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
+            StringVisitable str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
             matrices.push();
             matrices.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
@@ -209,7 +209,7 @@ public abstract class QuestTaskItems extends QuestTask {
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
                 ItemStack stack = item.getStack();
-                List<StringRenderable> str = new ArrayList<>();
+                List<StringVisitable> str = new ArrayList<>();
                 if (item.fluid != null) {
                     List<Text> list = new ArrayList<>();
                     list.add(item.fluid.getName());
@@ -222,19 +222,19 @@ public abstract class QuestTaskItems extends QuestTask {
                     str.addAll(gui.getTooltipFromItem(stack));
                 }
                 
-                str.add(StringRenderable.concat(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
+                str.add(StringVisitable.concat(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
                 if (item.fluid == null && Quest.canQuestsBeEdited()) {
-                    str.add(StringRenderable.EMPTY);
+                    str.add(StringVisitable.EMPTY);
                     str.add(Translator.colored(item.getPrecision().getName(), GuiColor.GRAY));
                 }
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (getProgress(player, i) == item.required) {
-                        str.addAll(Arrays.asList(StringRenderable.EMPTY, StringRenderable.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
+                        str.addAll(Arrays.asList(StringVisitable.EMPTY, StringVisitable.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
                     } else {
-                        str.addAll(Arrays.asList(StringRenderable.EMPTY, StringRenderable.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
+                        str.addAll(Arrays.asList(StringVisitable.EMPTY, StringVisitable.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
                     }
                 }
-                gui.renderTooltip(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
                 break;
             }
         }

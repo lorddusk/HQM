@@ -6,7 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,7 +136,7 @@ public final class SaveHelper {
         return !isLarge && gui.inBounds(X + SAVE_X, Y + SAVE_Y, SAVE_SIZE, SAVE_SIZE, mX, mY);
     }
     
-    private static StringRenderable formatTime(int minutes) {
+    private static StringVisitable formatTime(int minutes) {
         int hours = minutes / 60;
         minutes -= hours * 60;
         

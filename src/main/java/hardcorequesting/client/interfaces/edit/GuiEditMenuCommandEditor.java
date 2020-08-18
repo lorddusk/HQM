@@ -6,11 +6,12 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
+import net.minecraft.CharacterVisitor;
 import net.minecraft.client.font.TextVisitFactory;
 import net.minecraft.client.util.TextCollector;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Style;
 
 import java.util.Optional;
@@ -132,23 +133,23 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         }
     }
     
-    private void drawStringTrimmed(MatrixStack matrices, GuiBase gui, StringRenderable text, int x, int y, int colour) {
+    private void drawStringTrimmed(MatrixStack matrices, GuiBase gui, StringVisitable text, int x, int y, int colour) {
         CharacterLimitingVisitor characterLimitingVisitor = new CharacterLimitingVisitor(25);
-        text = text.visit(new StringRenderable.StyledVisitor<StringRenderable>() {
+        text = text.visit(new StringVisitable.StyledVisitor<StringVisitable>() {
             private final TextCollector collector = new TextCollector();
             
-            public Optional<StringRenderable> accept(Style style, String string) {
+            public Optional<StringVisitable> accept(Style style, String string) {
                 characterLimitingVisitor.resetLength();
                 if (!TextVisitFactory.visitFormatted(string, style, characterLimitingVisitor)) {
                     String string2 = string.substring(0, characterLimitingVisitor.getLength());
                     if (!string2.isEmpty()) {
-                        this.collector.add(StringRenderable.styled(string2, style));
+                        this.collector.add(StringVisitable.styled(string2, style));
                     }
                     
                     return Optional.of(this.collector.getCombined());
                 } else {
                     if (!string.isEmpty()) {
-                        this.collector.add(StringRenderable.styled(string, style));
+                        this.collector.add(StringVisitable.styled(string, style));
                     }
                     
                     return Optional.empty();
@@ -158,7 +159,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         gui.drawString(matrices, text, x, y, colour);
     }
     
-    static class CharacterLimitingVisitor implements TextVisitFactory.CharacterVisitor {
+    static class CharacterLimitingVisitor implements CharacterVisitor {
         private int widthLeft;
         private int length;
         
@@ -166,7 +167,8 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
             this.widthLeft = maxWidth;
         }
         
-        public boolean onChar(int i, Style style, int j) {
+        @Override
+        public boolean accept(int i, Style style, int j) {
             this.widthLeft--;
             if (this.widthLeft >= 0.0F) {
                 this.length = i + Character.charCount(j);

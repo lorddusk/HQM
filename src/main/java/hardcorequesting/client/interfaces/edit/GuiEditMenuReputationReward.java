@@ -9,7 +9,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private static final int OFFSET = 15;
     private List<ReputationReward> rewards;
     private ReputationReward selectedReward;
-    private List<StringRenderable> error;
+    private List<StringVisitable> error;
     
     public GuiEditMenuReputationReward(GuiBase gui, PlayerEntity player, List<ReputationReward> rewards) {
         super(gui, player, true, 185, 25, 185, 55);
@@ -98,7 +98,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
-                StringRenderable str = Translator.plain(rewards.get(i).getLabel());
+                StringVisitable str = Translator.plain(rewards.get(i).getLabel());
                 boolean hover = gui.inBounds(START_X, START_Y + i * OFFSET, gui.getStringWidth(str), 9, mX, mY);
                 boolean selected = rewards.get(i).equals(selectedReward);
                 gui.drawString(matrices, str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);

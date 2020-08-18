@@ -18,13 +18,13 @@ public abstract class ItemPrecision {
     public static final ItemPrecision PRECISE = new ItemPrecision("precise") {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            return stack1.getItem() == stack2.getItem() && stack1.getCount() == stack2.getCount() && ItemStack.areTagsEqual(stack1, stack2);
+            return stack1.getItem() == stack2.getItem() && ItemStack.areTagsEqual(stack1, stack2);
         }
     };
     public static final ItemPrecision NBT_FUZZY = new ItemPrecision("nbtFuzzy") {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            return stack1.getItem() == stack2.getItem() && stack1.getCount() == stack2.getCount();
+            return stack1.getItem() == stack2.getItem();
         }
     };
     public static final ItemPrecision FUZZY = new ItemPrecision("fuzzy", true) {
@@ -36,11 +36,9 @@ public abstract class ItemPrecision {
     public static final ItemPrecision TAG_NBT_FUZZY = new ItemPrecision("tagNbtFuzzy", true) {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            if (stack1.getCount() != stack2.getCount())
-                return false;
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().items().getEntries().entrySet()) {
+            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().getItems().getTags().entrySet()) {
                 if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
                     return true;
             }
@@ -52,7 +50,7 @@ public abstract class ItemPrecision {
         protected boolean same(ItemStack stack1, ItemStack stack2) {
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().items().getEntries().entrySet()) {
+            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().getItems().getTags().entrySet()) {
                 if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
                     return false;
             }

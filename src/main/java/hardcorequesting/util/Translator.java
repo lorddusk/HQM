@@ -742,41 +742,41 @@ public class Translator {
         return storageTranslate(id).replace("\\n", "\n");
     }
     
-    public static StringRenderable translated(String translationKey) {
+    public static StringVisitable translated(String translationKey) {
         return Translator.plain(translate(translationKey));
     }
     
-    public static StringRenderable translated(String translationKey, Object... args) {
+    public static StringVisitable translated(String translationKey, Object... args) {
         return Translator.plain(translate(translationKey, args));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, TextColor color) {
+    public static StringVisitable translated(String translationKey, TextColor color) {
         return colored(translate(translationKey), color);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, TextColor color, Object... args) {
+    public static StringVisitable translated(String translationKey, TextColor color, Object... args) {
         return colored(translate(translationKey, args), color);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, Formatting formatting) {
+    public static StringVisitable translated(String translationKey, Formatting formatting) {
         return translated(translationKey, TextColor.fromFormatting(formatting));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, Formatting formatting, Object... args) {
+    public static StringVisitable translated(String translationKey, Formatting formatting, Object... args) {
         return translated(translationKey, TextColor.fromFormatting(formatting), args);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, GuiColor color) {
+    public static StringVisitable translated(String translationKey, GuiColor color) {
         return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable translated(String translationKey, GuiColor color, Object... args) {
+    public static StringVisitable translated(String translationKey, GuiColor color, Object... args) {
         return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF), args);
     }
     
@@ -784,12 +784,12 @@ public class Translator {
         return storageTranslate(id, args).replace("\\n", "\n");
     }
     
-    public static StringRenderable pluralTranslated(boolean plural, String id, Object... args) {
+    public static StringVisitable pluralTranslated(boolean plural, String id, Object... args) {
         return format(translated(id, args), plural);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
+    public static StringVisitable pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
         return format(translated(id, args), color, plural);
     }
     
@@ -809,8 +809,8 @@ public class Translator {
         return new LiteralText(rawString(Translator.pluralTranslated(plural, id, args))).formatted(formatting);
     }
     
-    public static StringRenderable format(StringRenderable text, boolean plural) {
-        if (text == null) return StringRenderable.EMPTY;
+    public static StringVisitable format(StringVisitable text, boolean plural) {
+        if (text == null) return StringVisitable.EMPTY;
         try {
             TextCollector collector = new TextCollector();
             text.visit(asString -> {
@@ -829,8 +829,8 @@ public class Translator {
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable format(StringRenderable text, GuiColor color, boolean plural) {
-        if (text == null) return StringRenderable.EMPTY;
+    public static StringVisitable format(StringVisitable text, GuiColor color, boolean plural) {
+        if (text == null) return StringVisitable.EMPTY;
         try {
             TextCollector collector = new TextCollector();
             text.visit(asString -> {
@@ -849,13 +849,13 @@ public class Translator {
     }
     
     public static class TextCollector {
-        private final List<StringRenderable> texts = Lists.newArrayList();
+        private final List<StringVisitable> texts = Lists.newArrayList();
         
-        public void add(StringRenderable stringRenderable) {
+        public void add(StringVisitable stringRenderable) {
             this.texts.add(stringRenderable);
         }
         
-        public StringRenderable getRawCombined() {
+        public StringVisitable getRawCombined() {
             if (this.texts.isEmpty()) {
                 return null;
             } else {
@@ -863,20 +863,20 @@ public class Translator {
             }
         }
         
-        public StringRenderable getCombined() {
-            StringRenderable stringRenderable = this.getRawCombined();
-            return stringRenderable != null ? stringRenderable : StringRenderable.EMPTY;
+        public StringVisitable getCombined() {
+            StringVisitable stringRenderable = this.getRawCombined();
+            return stringRenderable != null ? stringRenderable : StringVisitable.EMPTY;
         }
     }
     
-    static StringRenderable concat(final StringRenderable... visitables) {
+    static StringVisitable concat(final StringVisitable... visitables) {
         return concat(Arrays.asList(visitables));
     }
     
-    static StringRenderable concat(final List<StringRenderable> visitables) {
-        return new StringRenderable() {
+    static StringVisitable concat(final List<StringVisitable> visitables) {
+        return new StringVisitable() {
             @Override
-            public <T> Optional<T> visit(StringRenderable.Visitor<T> visitor) {
+            public <T> Optional<T> visit(StringVisitable.Visitor<T> visitor) {
                 Iterator var2 = visitables.iterator();
                 
                 Optional optional;
@@ -885,7 +885,7 @@ public class Translator {
                         return Optional.empty();
                     }
                     
-                    StringRenderable stringRenderable = (StringRenderable) var2.next();
+                    StringVisitable stringRenderable = (StringVisitable) var2.next();
                     optional = stringRenderable.visit(visitor);
                 } while (!optional.isPresent());
                 
@@ -901,16 +901,16 @@ public class Translator {
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable colored(String s, TextColor color) {
-        return StringRenderable.styled(s, Style.EMPTY.withColor(color));
+    public static StringVisitable colored(String s, TextColor color) {
+        return StringVisitable.styled(s, Style.EMPTY.withColor(color));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringRenderable colored(String s, GuiColor color) {
+    public static StringVisitable colored(String s, GuiColor color) {
         return colored(s, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
     }
     
-    public static String rawString(StringRenderable text) {
+    public static String rawString(StringVisitable text) {
         StringBuilder builder = new StringBuilder();
         text.visit((asString) -> {
             builder.append(asString);
@@ -919,8 +919,8 @@ public class Translator {
         return builder.toString();
     }
     
-    public static StringRenderable plain(String s) {
-        if (s == null) return StringRenderable.EMPTY;
-        return StringRenderable.plain(s);
+    public static StringVisitable plain(String s) {
+        if (s == null) return StringVisitable.EMPTY;
+        return StringVisitable.plain(s);
     }
 }

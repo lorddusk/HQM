@@ -9,7 +9,7 @@ import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.arguments.EntityArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;

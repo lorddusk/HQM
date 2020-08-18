@@ -35,7 +35,7 @@ import net.minecraft.client.util.NarratorManager;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
@@ -535,7 +535,7 @@ public class GuiQuestBook extends GuiBase {
         }
         
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
-            renderTooltip(matrices, StringRenderable.concat(
+            renderTooltip(matrices, StringVisitable.concat(
                     Translator.translated("hqm.questBook.goBack"),
                     Translator.plain("\n"),
                     Translator.translated("hqm.questBook.rightClick", GuiColor.GRAY)
@@ -802,7 +802,7 @@ public class GuiQuestBook extends GuiBase {
         drawString(matrices, Translator.translated("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         
-        StringRenderable str;
+        StringVisitable str;
         Team team = QuestingData.getQuestingData(player).getTeam();
         if (team.isSingle()) {
             int invites = team.getInvites() == null ? 0 : team.getInvites().size();

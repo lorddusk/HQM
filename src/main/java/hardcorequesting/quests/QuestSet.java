@@ -21,7 +21,7 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -40,7 +40,7 @@ public class QuestSet {
     private static QuestSet lastLastQuestSet = null;
     private String name;
     private String description;
-    private List<StringRenderable> cachedDescription;
+    private List<StringVisitable> cachedDescription;
     private Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     private List<ReputationBar> reputationBars;
     private int id;
@@ -178,7 +178,7 @@ public class QuestSet {
             }
             gui.drawString(matrices, Translator.plain(questSet.getName(i)), GuiQuestBook.LIST_X, setY, color);
             
-            StringRenderable info;
+            StringVisitable info;
             if (enabled) {
                 if (completed)
                     info = Translator.translated("hqm.questBook.allQuests");
@@ -188,7 +188,7 @@ public class QuestSet {
                 info = Translator.translated("hqm.questBook.locked");
             gui.drawString(matrices, info, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
-                StringRenderable toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
+                StringVisitable toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
                 gui.drawString(matrices, toClaim, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
         }
@@ -239,7 +239,7 @@ public class QuestSet {
             }
         }
         
-        List<StringRenderable> info = new ArrayList<>();
+        List<StringVisitable> info = new ArrayList<>();
         info.add(Translator.pluralTranslated(total != 1, "hqm.questBook.totalQuests", GuiColor.GRAY, total));
         info.add(Translator.pluralTranslated(enabled != 1, "hqm.questBook.unlockedQuests", GuiColor.CYAN, enabled));
         info.add(Translator.pluralTranslated(completed != 1, "hqm.questBook.completedQuests", GuiColor.GREEN, completed));
@@ -380,7 +380,7 @@ public class QuestSet {
     }
     
     @Environment(EnvType.CLIENT)
-    public List<StringRenderable> getDescription(GuiBase gui) {
+    public List<StringVisitable> getDescription(GuiBase gui) {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
         }
@@ -795,7 +795,7 @@ public class QuestSet {
                 }
                 
                 if (shouldDrawText && gui.getCurrentMode() != EditMode.MOVE) {
-                    gui.renderTooltip(matrices, Stream.of(txt.split("\n")).map(StringRenderable::plain).collect(Collectors.toList()), x0, y0);
+                    gui.renderTooltipL(matrices, Stream.of(txt.split("\n")).map(StringVisitable::plain).collect(Collectors.toList()), x0, y0);
                 }
                 break;
             }

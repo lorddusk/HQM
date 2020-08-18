@@ -12,7 +12,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.UUID;
 
@@ -108,7 +108,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int x = i % 3;
                 int y = i / 3;
     
-                StringRenderable text = Translator.plain(stats.getDeaths(i) + "");
+                StringVisitable text = Translator.plain(stats.getDeaths(i) + "");
                 String str = Translator.rawString(text);
                 if (str.length() > 5)
                     text = Translator.translated("hqm.deathMenu.lots");

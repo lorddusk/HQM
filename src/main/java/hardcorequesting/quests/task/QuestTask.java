@@ -30,7 +30,7 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -49,7 +49,7 @@ public abstract class QuestTask {
     private List<QuestTask> requirements;
     private String longDescription;
     private int id;
-    private List<StringRenderable> cachedDescription;
+    private List<StringVisitable> cachedDescription;
     
     public QuestTask(Quest parent, String description, String longDescription) {
         this.parent = parent;
@@ -208,7 +208,7 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public List<StringRenderable> getCachedLongDescription(GuiBase gui) {
+    public List<StringVisitable> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.translated(longDescription), 0.7F, 130);
         }

@@ -19,7 +19,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringRenderable;
+import net.minecraft.text.StringVisitable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -99,7 +99,7 @@ public class Group {
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
             
-            StringRenderable str = Translator.plain(group.getDisplayName());
+            StringVisitable str = Translator.plain(group.getDisplayName());
             int yPos = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(GuiQuestBook.GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, x, y);
             int color = group.getTier().getColor().getHexColor();
