@@ -1115,39 +1115,41 @@ public class Quest {
                         selectedReward = i;
                     }
                 } else if (canQuestsBeEdited()) {
-                    if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
+                    if (gui.getCurrentMode() == EditMode.DELETE) {
+                        if (rewards[i] != null) {
+                            ItemStack[] newRewards;
+                            if (rawRewards.length == 1) {
+                                newRewards = null;
+                                if (canSelect) {
+                                    selectedReward = -1;
+                                }
+                            } else {
+                                newRewards = new ItemStack[rawRewards.length - 1];
+                                int id = 0;
+                                for (int j = 0; j < rawRewards.length; j++) {
+                                    if (j != i) {
+                                        newRewards[id] = rawRewards[j];
+                                        id++;
+                                    }
+                                }
+                                if (canSelect && selectedReward != -1) {
+                                    if (selectedReward == i) {
+                                        selectedReward = -1;
+                                    } else if (selectedReward > i) {
+                                        selectedReward--;
+                                    }
+                                }
+                            }
+                            if (canSelect) {
+                                this.rewardChoices.set(newRewards);
+                            } else {
+                                this.rewards.set(newRewards);
+                            }
+                            SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
+                        }
+                    } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
                     }
-                } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.DELETE && rewards[i] != null) {
-                    ItemStack[] newRewards;
-                    if (rawRewards.length == 1) {
-                        newRewards = null;
-                        if (canSelect) {
-                            selectedReward = -1;
-                        }
-                    } else {
-                        newRewards = new ItemStack[rawRewards.length - 1];
-                        int id = 0;
-                        for (int j = 0; j < rawRewards.length; j++) {
-                            if (j != i) {
-                                newRewards[id] = rawRewards[j];
-                                id++;
-                            }
-                        }
-                        if (canSelect && selectedReward != -1) {
-                            if (selectedReward == i) {
-                                selectedReward = -1;
-                            } else if (selectedReward > i) {
-                                selectedReward--;
-                            }
-                        }
-                    }
-                    if (canSelect) {
-                        this.rewardChoices.set(newRewards);
-                    } else {
-                        this.rewards.set(newRewards);
-                    }
-                    SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
                 }
                 
                 break;

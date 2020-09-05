@@ -9,7 +9,7 @@ public class TeamStats {
     
     private static Map<String, TeamStats> clientTeams;
     private static TeamStats[] clientTeamsList;
-    private static TeamComparator teamComparator = new TeamComparator();
+    private static Comparator<TeamStats> teamComparator = Comparator.comparingDouble(TeamStats::getProgress).reversed();
     private String name;
     private int players;
     private int lives;
@@ -71,13 +71,5 @@ public class TeamStats {
     
     public float getProgress() {
         return progress;
-    }
-    
-    private static class TeamComparator implements Comparator<TeamStats> {
-        
-        @Override
-        public int compare(TeamStats o1, TeamStats o2) {
-            return ((Float) o2.progress).compareTo(o1.progress);
-        }
     }
 }
