@@ -518,8 +518,8 @@ public class GuiQuestBook extends GuiBase {
             if (currentMode == EditMode.DELETE) {
                 matrices.pushPose();
                 matrices.translate(0, 0, 200);
-                drawCenteredString(matrices, Translator.translated("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                drawCenteredString(matrices, Translator.translated("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(matrices, Translator.translatable("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(matrices, Translator.translatable("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
                 applyColor(0xFFFFFFFF);
                 ResourceHelper.bindResource(MAP_TEXTURE);
                 matrices.popPose();
@@ -536,12 +536,12 @@ public class GuiQuestBook extends GuiBase {
         
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             renderTooltip(matrices, FormattedText.composite(
-                    Translator.translated("hqm.questBook.goBack"),
+                    Translator.translatable("hqm.questBook.goBack"),
                     Translator.plain("\n"),
-                    Translator.translated("hqm.questBook.rightClick", GuiColor.GRAY)
+                    Translator.translatable("hqm.questBook.rightClick", GuiColor.GRAY)
             ), x + left, y + top);
         } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
-            renderTooltip(matrices, Translator.translated("hqm.questBook.backToMenu"), x + left, y + top);
+            renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
         }
     }
     
@@ -761,18 +761,18 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private void drawMenuPage(PoseStack matrices, int x, int y) {
-        drawString(matrices, Translator.translated("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
-        drawString(matrices, Translator.translated("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
-        drawString(matrices, Translator.translated("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
-        drawString(matrices, Translator.translated("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
+        drawString(matrices, Translator.translatable("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
+        drawString(matrices, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
+        drawString(matrices, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
+        drawString(matrices, Translator.translatable("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
         
         QuestSet.drawQuestInfo(matrices, this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
-        drawString(matrices, Translator.translated("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
+        drawString(matrices, Translator.translatable("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         if (QuestingData.isHardcoreActive()) {
             boolean almostOut = QuestingData.getQuestingData(player).getLives() == QuestingData.getQuestingData(player).getLivesToStayAlive();
             if (almostOut) {
-                drawString(matrices, Translator.translated("hqm.questBook.deadOut", GuiColor.RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
+                drawString(matrices, Translator.translatable("hqm.questBook.deadOut", GuiColor.RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
             
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -793,13 +793,13 @@ public class GuiQuestBook extends GuiBase {
                 drawItemStack(new ItemStack(ModItems.heart, 1), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
             }
         } else {
-            drawString(matrices, getLinesFromText(Translator.translated("hqm.questBook.infiniteLives"), 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
+            drawString(matrices, getLinesFromText(Translator.translatable("hqm.questBook.infiniteLives"), 0.5F, PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
         }
         
         
         int deaths = DeathStats.getDeathStats(this.getPlayer().getUUID()).getTotalDeaths();
         drawString(matrices, Translator.pluralTranslated(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
-        drawString(matrices, Translator.translated("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
+        drawString(matrices, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         
         FormattedText str;
@@ -809,7 +809,7 @@ public class GuiQuestBook extends GuiBase {
             if (invites > 0) {
                 str = Translator.pluralTranslated(invites != 1, "hqm.questBook.invites", invites);
             } else {
-                str = Translator.translated("hqm.questBook.notInParty");
+                str = Translator.translatable("hqm.questBook.notInParty");
             }
         } else {
             int players = 0;
@@ -822,11 +822,11 @@ public class GuiQuestBook extends GuiBase {
         }
         
         drawString(matrices, str, INFO_RIGHT_X, INFO_TEAM_Y + TEAM_TEXT_Y, 0.7F, 0x404040);
-        drawString(matrices, Translator.translated("hqm.questBook.openParty"), INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, 0x707070);
+        drawString(matrices, Translator.translatable("hqm.questBook.openParty"), INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         if (isOpBook) {
-            drawString(matrices, Translator.translated("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
-            drawString(matrices, getLinesFromText(Translator.translated("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
+            drawString(matrices, Translator.translatable("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
+            drawString(matrices, getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
         }
         
         
@@ -836,12 +836,12 @@ public class GuiQuestBook extends GuiBase {
     private void drawMainPage(PoseStack matrices) {
         int startLine = mainDescriptionScroll.isVisible(this) ? Math.round((Quest.getMainDescription(this).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
         drawString(matrices, Quest.getMainDescription(this), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
-        drawCenteredString(matrices, Translator.translated("hqm.questBook.start"), 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
+        drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-            drawCenteredString(matrices, Translator.translated("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
+            drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
         }
         if (QuestLine.getActiveQuestLine().front == null && QuestLine.getActiveQuestLine().mainPath != null) {
-            File file = new File(HardcoreQuesting.configDir, "front.png");
+            File file = new File(HardcoreQuesting.configDir.toFile(), "front.png");
             if (file.exists()) {
                 try {
                     NativeImage img = NativeImage.read(new FileInputStream(file));

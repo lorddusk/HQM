@@ -103,7 +103,7 @@ public class QuestTaskAdvancement extends QuestTask {
             gui.drawString(matrices, Translator.plain(advancement.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             if (advanced(i, player)) {
-                gui.drawString(matrices, Translator.translated("hqm.advancementMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         }
     }
@@ -272,11 +272,11 @@ public class QuestTaskAdvancement extends QuestTask {
         
         // TODO: fix these
         public String getName() {
-            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".title");
+            return Translator.get("hqm.locationMenu.vis" + id + ".title");
         }
         
         public String getDescription() {
-            return Translator.commonTranslate("hqm.locationMenu.vis" + id + ".desc");
+            return Translator.get("hqm.locationMenu.vis" + id + ".desc");
         }
     }
     

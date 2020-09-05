@@ -74,11 +74,11 @@ public abstract class LargeButton {
     }
     
     protected FormattedText getName() {
-        return Translator.translated(name);
+        return Translator.translatable(name);
     }
     
     protected FormattedText getDescription() {
-        return Translator.translated(description);
+        return Translator.translatable(description);
     }
     
 }

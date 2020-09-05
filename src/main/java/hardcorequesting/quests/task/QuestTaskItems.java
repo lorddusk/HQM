@@ -222,16 +222,16 @@ public abstract class QuestTaskItems extends QuestTask {
                     str.addAll(gui.getTooltipFromItem(stack));
                 }
                 
-                str.add(FormattedText.composite(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
+                str.add(FormattedText.composite(Translator.translatable("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
                 if (item.fluid == null && Quest.canQuestsBeEdited()) {
                     str.add(FormattedText.EMPTY);
-                    str.add(Translator.colored(item.getPrecision().getName(), GuiColor.GRAY));
+                    str.add(Translator.text(item.getPrecision().getName(), GuiColor.GRAY));
                 }
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (getProgress(player, i) == item.required) {
-                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
+                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.resetTask", GuiColor.RED)));
                     } else {
-                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
+                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.completeTask", GuiColor.ORANGE)));
                     }
                 }
                 gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());

@@ -105,7 +105,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         } else {
             if (error == null) {
-                error = gui.getLinesFromText(Translator.translated("hqm.repReward.noValidReps"), 0.7F, 140);
+                error = gui.getLinesFromText(Translator.translatable("hqm.repReward.noValidReps"), 0.7F, 140);
             }
             
             gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);

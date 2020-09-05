@@ -148,7 +148,7 @@ public class ReputationBar {
                 
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
         }
         
         @Environment(EnvType.CLIENT)

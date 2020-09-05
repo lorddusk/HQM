@@ -1,9 +1,5 @@
 package hardcorequesting.client.interfaces;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
 public enum GuiColor {
     BLACK(0, 0x000000),
     BLUE(1, 0x0000aa),
@@ -47,9 +43,16 @@ public enum GuiColor {
         this.blue = hex & 0xFF;
     }
     
-    @Environment(EnvType.CLIENT)
-    public void applyColor() {
-        RenderSystem.color4f(red, green, blue, 1F);
+    public float getRed() {
+        return red;
+    }
+    
+    public float getGreen() {
+        return green;
+    }
+    
+    public float getBlue() {
+        return blue;
     }
     
     public int getHexColor() {

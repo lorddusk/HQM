@@ -911,14 +911,14 @@ public class Quest {
             selectedReward = -1;
         }
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            gui.drawString(matrices, Translator.translated("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewards.toArray(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                gui.drawString(matrices, Translator.translated("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
                 drawRewards(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
         } else if (!rewardChoices.isEmpty()) {
-            gui.drawString(matrices, Translator.translated("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
         
@@ -985,7 +985,7 @@ public class Quest {
             selectedTask.draw(matrices, gui, player, mX, mY);
             //}
         } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         /*} else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
         }
@@ -1011,11 +1011,11 @@ public class Quest {
                 
             }
             
-            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
+            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translatable("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
                 str.add(FormattedText.EMPTY);
                 for (FormattedText commentLine : commentLines) {
-                    str.add(Translator.colored(Translator.rawString(commentLine), GuiColor.GRAY));
+                    str.add(Translator.text(Translator.rawString(commentLine), GuiColor.GRAY));
                 }
             }
             gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
@@ -1066,7 +1066,7 @@ public class Quest {
                         List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
                             list2.add(FormattedText.EMPTY);
-                            list2.add(Translator.translated("hqm.quest.selected", GuiColor.GREEN));
+                            list2.add(Translator.translatable("hqm.quest.selected", GuiColor.GREEN));
                         }
                         gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
                     }
@@ -1710,11 +1710,11 @@ public class Quest {
         }
         
         public String getDescription() {
-            return Translator.commonTranslate(getLangKeyDescription());
+            return Translator.get(getLangKeyDescription());
         }
         
         public String getName() {
-            return Translator.commonTranslate(getLangKeyName());
+            return Translator.get(getLangKeyName());
         }
     }
     

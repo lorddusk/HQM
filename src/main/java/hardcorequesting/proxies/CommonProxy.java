@@ -5,12 +5,10 @@ import hardcorequesting.quests.QuestTicker;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.world.entity.player.Player;
 
+import java.nio.file.Path;
+
 public class CommonProxy {
-    public void initSounds(String path) {
-        
-    }
-    
-    public void initRenderers() {
+    public void initSounds(Path path) {
         
     }
     

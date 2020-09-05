@@ -5,10 +5,9 @@ import hardcorequesting.quests.task.QuestTask;
 import me.shedaniel.cloth.api.common.events.v1.BlockBreakCallback;
 import me.shedaniel.cloth.api.common.events.v1.BlockPlaceCallback;
 import me.shedaniel.cloth.api.common.events.v1.ItemPickupCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.event.server.ServerTickCallback;
-import net.fabricmc.fabric.api.event.world.WorldTickCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -40,8 +39,8 @@ public class EventTrigger {
         for (int i = 0; i < registeredTasks.length; i++) {
             registeredTasks[i] = new CopyOnWriteArrayList<>();
         }
-        ServerTickCallback.EVENT.register(this::onServerTick);
-        WorldTickCallback.EVENT.register(world -> {
+        ServerTickEvents.START_SERVER_TICK.register(this::onServerTick);
+        ServerTickEvents.START_WORLD_TICK.register(world -> {
             for (Player player : world.players()) {
                 if (player instanceof ServerPlayer) {
                     onPlayerTick((ServerPlayer) player);

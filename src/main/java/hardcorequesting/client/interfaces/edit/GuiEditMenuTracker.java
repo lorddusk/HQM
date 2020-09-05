@@ -21,7 +21,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
-                gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
             
             @Override
@@ -40,7 +40,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
-        gui.drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translated("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
+        gui.drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     }
     
     @Override

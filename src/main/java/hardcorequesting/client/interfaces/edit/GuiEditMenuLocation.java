@@ -89,7 +89,7 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
-                gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.locationMenu.negRadius"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET * 5 + TEXT_OFFSET, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET * 5 + TEXT_OFFSET, 0.7F, 0x404040);
             }
         });
         

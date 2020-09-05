@@ -71,14 +71,14 @@ public class GuiEditMenuTier extends GuiEditMenu {
         
         gui.drawString(matrices, Translator.plain(tier.getName()), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
         
-        gui.drawString(matrices, Translator.translated("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
         
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             BagTier bagTier = values[i];
             
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(matrices, Translator.colored(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(matrices, Translator.text(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
         }
         
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

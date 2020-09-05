@@ -83,8 +83,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
         }
         
-        gui.drawString(matrices, Translator.translated(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
-        gui.drawString(matrices, Translator.translated(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
+        gui.drawString(matrices, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
+        gui.drawString(matrices, Translator.translatable(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
         
         DeathStats stats = getStats();
         
@@ -102,7 +102,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             }
             
             gui.drawString(matrices, Translator.plain(stats.getName()), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
-            gui.drawString(matrices, Translator.translated("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
             
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
@@ -111,7 +111,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 FormattedText text = Translator.plain(stats.getDeaths(i) + "");
                 String str = Translator.rawString(text);
                 if (str.length() > 5)
-                    text = Translator.translated("hqm.deathMenu.lots");
+                    text = Translator.translatable("hqm.deathMenu.lots");
                 str = Translator.rawString(text);
                 float f = DIGIT_TEXT_SIZE[str.length() - 1];
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
@@ -148,11 +148,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
         scrollBar.onClick(gui, mX, mY);
         
-        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translated(BEST_LABEL)), 9, mX, mY)) {
+        if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translatable(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
             showTotal = false;
             playerId = null;
-        } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translated(TOTAL_LABEL)), 9, mX, mY)) {
+        } else if (gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(Translator.translatable(TOTAL_LABEL)), 9, mX, mY)) {
             showBest = false;
             showTotal = !showTotal;
             playerId = null;

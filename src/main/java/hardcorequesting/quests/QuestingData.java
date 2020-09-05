@@ -3,6 +3,7 @@ package hardcorequesting.quests;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupData;
+import hardcorequesting.capabilities.ModCapabilities;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.HQMConfig;
@@ -137,7 +138,7 @@ public class QuestingData {
         try {
             SaveHandler.saveQuestingState(SaveHandler.getLocalFile("state"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to save questing state!", e);
+            HardcoreQuesting.LOGGER.error("Failed to save questing state!", e);
         }
     }
     
@@ -145,7 +146,7 @@ public class QuestingData {
         try {
             SaveHandler.loadQuestingState(SaveHandler.getFile("state", remote));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to load questing state!", e);
+            HardcoreQuesting.LOGGER.error("Failed to load questing state!", e);
         }
     }
     
@@ -153,7 +154,7 @@ public class QuestingData {
         try {
             SaveHandler.saveQuestingData(SaveHandler.getLocalFile("data"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to save questing data!", e);
+            HardcoreQuesting.LOGGER.error("Failed to save questing data!", e);
         }
     }
     
@@ -166,7 +167,7 @@ public class QuestingData {
             data.clear();
             SaveHandler.loadQuestingData(SaveHandler.getFile("data", remote)).forEach(qData -> data.put(qData.getPlayerId(), qData));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to load questing data!", e);
+            HardcoreQuesting.LOGGER.error("Failed to load questing data!", e);
         }
     }
     
@@ -196,11 +197,11 @@ public class QuestingData {
         if (!Quest.canQuestsBeEdited() && !player.level.isClientSide && HQMConfig.getInstance().SPAWN_BOOK && !QuestingData.getQuestingData(player).receivedBook && QuestingData.isQuestActive()) {
             QuestingData.getQuestingData(player).receivedBook = true;
             CompoundTag hqmTag = new CompoundTag();
-            HardcoreQuesting.CompoundTagComponent extraTag = HardcoreQuesting.PLAYER_EXTRA_DATA.get(player);
-            if (extraTag.tag.contains(PlayerTracker.HQ_TAG))
-                hqmTag = extraTag.tag.getCompound(PlayerTracker.HQ_TAG);
+            CompoundTag extraTag = ModCapabilities.PLAYER_EXTRA_DATA.get(player).tag;
+            if (extraTag.contains(PlayerTracker.HQ_TAG))
+                hqmTag = extraTag.getCompound(PlayerTracker.HQ_TAG);
             hqmTag.putBoolean(PlayerTracker.RECEIVED_BOOK, true);
-            extraTag.tag.put(PlayerTracker.HQ_TAG, hqmTag);
+            extraTag.put(PlayerTracker.HQ_TAG, hqmTag);
             ItemStack stack = new ItemStack(ModItems.book);
             if (!player.inventory.add(stack)) {
                 spawnItemAtPlayer(player, stack);
@@ -326,7 +327,7 @@ public class QuestingData {
     public void removeLifeAndSendMessage(@NotNull Player player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.sendMessage(Translator.translatable(getLives() != 1, "hqm.message.lostLife", getLives()), Util.NIL_UUID);
+            player.sendMessage(Translator.pluralTranslated(getLives() != 1, "hqm.message.lostLife", getLives()), Util.NIL_UUID);
         }
         if (getTeam().isSharingLives()) {
             for (PlayerEntry entry : getTeam().getPlayers()) {
@@ -334,7 +335,7 @@ public class QuestingData {
                     Player other = getPlayer(entry.getUUID());
                     if (other != null) {
                         other.sendMessage(
-                                Translator.translatable(getLives() != 1, "hqm.message.lostTeamLife", player.getScoreboardName(), (isDead ? " " + Translator.rawString(Translator.translated("hqm.message.andBanned")) : ""), getLives()), Util.NIL_UUID);
+                                Translator.pluralTranslated(getLives() != 1, "hqm.message.lostTeamLife", player.getScoreboardName(), (isDead ? " " + Translator.get("hqm.message.andBanned") : ""), getLives()), Util.NIL_UUID);
                     }
                 }
             }
@@ -433,7 +434,7 @@ public class QuestingData {
             mcServer.getPlayerList().getBans().add(userlistbansentry);
             
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
-            ((ServerPlayer) player).connection.disconnect(Translator.translateComponent("hqm.message.gameOver"));
+            ((ServerPlayer) player).connection.disconnect(Translator.translatable("hqm.message.gameOver"));
             SoundHandler.playToAll(Sounds.DEATH);
         }
         

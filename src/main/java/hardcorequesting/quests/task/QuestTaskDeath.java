@@ -38,7 +38,7 @@ public class QuestTaskDeath extends QuestTask {
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         int died = ((QuestDataTaskDeath) getData(player)).deaths;
-        gui.drawString(matrices, gui.getLinesFromText(Translator.plain(died == deaths ? GuiColor.GREEN + Translator.translatable(deaths != 0, "hqm.deathMenu.deaths", deaths).getString() : Translator.translatable(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths).getString()), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        gui.drawString(matrices, gui.getLinesFromText(Translator.plain(died == deaths ? GuiColor.GREEN + Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deaths", deaths).getString() : Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths).getString()), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)

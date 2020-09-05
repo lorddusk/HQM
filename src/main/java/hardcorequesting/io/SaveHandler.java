@@ -62,25 +62,25 @@ public class SaveHandler {
     private static final String HARDCORE = "hardcore";
     
     public static File getExportFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, EXPORTS), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir.toFile(), EXPORTS), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
     
     public static File getLocalFile(String name) throws IOException {
-        File file = new File(new File(QuestLine.getActiveQuestLine().mainPath), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(QuestLine.getActiveQuestLine().mainPath.toFile(), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
     
     public static File getRemoteFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, REMOTE), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir.toFile(), REMOTE), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
     
     public static File getDefaultFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir, DEFAULT), name.endsWith(".txt") ? name : name + ".json");
+        File file = new File(new File(HardcoreQuesting.configDir.toFile(), DEFAULT), name.endsWith(".txt") ? name : name + ".json");
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
         return file;
     }
@@ -90,19 +90,19 @@ public class SaveHandler {
     }
     
     public static File getExportFolder() {
-        return new File(HardcoreQuesting.configDir, EXPORTS);
+        return new File(HardcoreQuesting.configDir.toFile(), EXPORTS);
     }
     
     public static File getLocalFolder() {
-        return new File(QuestLine.getActiveQuestLine().mainPath);
+        return QuestLine.getActiveQuestLine().mainPath.toFile();
     }
     
     public static File getRemoteFolder() {
-        return new File(HardcoreQuesting.configDir, REMOTE);
+        return new File(HardcoreQuesting.configDir.toFile(), REMOTE);
     }
     
     public static File getDefaultFolder() {
-        return new File(HardcoreQuesting.configDir, DEFAULT);
+        return new File(HardcoreQuesting.configDir.toFile(), DEFAULT);
     }
     
     public static File getFolder(boolean remote) {
@@ -113,7 +113,7 @@ public class SaveHandler {
         try {
             FileUtils.copyDirectory(from, to);
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Couldn't copy default files");
+            HardcoreQuesting.LOGGER.info("Couldn't copy default files");
         }
     }
     

@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class QuestLine {
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public String mainDescription = "No description";
     public List<FormattedText> cachedMainDescription;
-    public String mainPath;
+    public Path mainPath;
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
     
@@ -81,7 +82,7 @@ public class QuestLine {
     public static void sendServerSync(Player player) {
         if (player instanceof ServerPlayer) {
             ServerPlayer playerMP = (ServerPlayer) player;
-            boolean side = HardcoreQuesting.loadingSide == EnvType.SERVER;
+            boolean side = HardcoreQuesting.LOADING_SIDE == EnvType.SERVER;
             if (HardcoreQuesting.getServer().isSingleplayer()) // Integrated server
                 NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
             else {
@@ -95,17 +96,16 @@ public class QuestLine {
     
     public static void loadWorldData(File worldPath, boolean isClient) {
         File pathFile = new File(worldPath, "hqm");
-        String path = pathFile.getAbsolutePath() + File.separator;
         if (!pathFile.exists()) pathFile.mkdirs();
         world = new QuestLine();
-        init(path, isClient);
+        init(pathFile.toPath(), isClient);
     }
     
     public static void saveDescription() {
         try {
             SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to load local questing state from descriptions.txt");
+            HardcoreQuesting.LOGGER.error("Failed to load local questing state from descriptions.txt");
         }
     }
     
@@ -113,7 +113,7 @@ public class QuestLine {
         try {
             SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to load default questing state from description.txt");
+            HardcoreQuesting.LOGGER.error("Failed to load default questing state from description.txt");
         }
     }
     
@@ -122,7 +122,7 @@ public class QuestLine {
             QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
             QuestLine.getActiveQuestLine().cachedMainDescription = null;
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Failed to load remote questing state from description.txt");
+            HardcoreQuesting.LOGGER.error("Failed to load remote questing state from description.txt");
         }
     }
     
@@ -158,13 +158,13 @@ public class QuestLine {
             GuiEditMenuItem.Search.initItems();
     }
     
-    public static void init(String path) {
+    public static void init(Path path) {
         QuestLine.getActiveQuestLine().mainPath = path;
         QuestLine.getActiveQuestLine().quests.clear();
         QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
     }
     
-    public static void init(String path, boolean isClient) {
+    public static void init(Path path, boolean isClient) {
         init(path);
         loadAll(isClient, false);
     }

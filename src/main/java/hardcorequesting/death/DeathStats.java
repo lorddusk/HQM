@@ -66,12 +66,12 @@ public class DeathStats {
         try {
             SaveHandler.saveDeaths(SaveHandler.getLocalFile("deaths"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.log(Level.INFO, "Failed saving bags");
+            HardcoreQuesting.LOGGER.log(Level.INFO, "Failed saving bags");
         }
     }
     
     public static void resync() {
-        NetworkManager.sendToAllPlayers(new DeathStatsMessage(HardcoreQuesting.loadingSide == EnvType.CLIENT));
+        NetworkManager.sendToAllPlayers(new DeathStatsMessage(HardcoreQuesting.LOADING_SIDE == EnvType.CLIENT));
     }
     
     private static void updateClientDeathList() {

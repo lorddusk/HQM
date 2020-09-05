@@ -103,11 +103,11 @@ public class QuestTaskTame extends QuestTask {
             
             int tamed = tamed(i, player);
             if (tamed == tame.count) {
-                gui.drawString(matrices, Translator.translated("hqm.tameTask.allTamed", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             } else {
-                gui.drawString(matrices, Translator.translated("hqm.tameTask.partTames", tamed, (100 * tamed / tame.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / tame.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
-            gui.drawString(matrices, Translator.translated("hqm.tameTask.totalTames", tame.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", tame.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
         }
     }
     

@@ -127,7 +127,7 @@ public class PlayerEntry {
     }
     
     public ServerPlayer getPlayerMP() {
-        if (HardcoreQuesting.loadingSide == EnvType.SERVER) {
+        if (HardcoreQuesting.LOADING_SIDE == EnvType.SERVER) {
             return HardcoreQuesting.getServer().getPlayerList().getPlayer(this.getUUID());
         } else {
             if (Minecraft.getInstance().hasSingleplayerServer()) {

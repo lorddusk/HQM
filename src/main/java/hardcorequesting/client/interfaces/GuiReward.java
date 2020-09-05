@@ -121,7 +121,7 @@ public class GuiReward extends GuiBase {
         
         drawCenteredString(matrices, FormattedText.of(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
         drawCenteredString(matrices, Translator.plain(statisticsText), 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
-        drawCenteredString(matrices, Translator.translated("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
+        drawCenteredString(matrices, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
         for (Reward reward : rewards) {
             try {
@@ -144,7 +144,7 @@ public class GuiReward extends GuiBase {
                             if (info.size() > 0) {
                                 str.add(Language.getInstance().getVisualOrder(info.get(0)));
                                 if (info.size() > 1) {
-                                    str.add(Language.getInstance().getVisualOrder(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
+                                    str.add(Language.getInstance().getVisualOrder(Translator.translatable("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
                                 }
                             }
                             renderTooltip(matrices, str, mX0, mY0);

@@ -1,6 +1,5 @@
 package hardcorequesting.items;
 
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.client.sounds.SoundHandler;
@@ -30,7 +29,7 @@ public class BagItem extends Item {
     public int tierOrdinal;
     
     public BagItem(BagTier tier) {
-        super(new Item.Properties().durability(0).stacksTo(64).tab(HardcoreQuesting.HQMTab));
+        super(new Item.Properties().durability(0).stacksTo(64).tab(ModCreativeTabs.HQMTab));
         this.tier = tier;
         this.tierOrdinal = tier.ordinal();
     }

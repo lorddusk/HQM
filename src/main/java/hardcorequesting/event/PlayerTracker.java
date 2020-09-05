@@ -1,6 +1,6 @@
 package hardcorequesting.event;
 
-import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.capabilities.ModCapabilities;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.Quest;
@@ -9,7 +9,6 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,7 +44,7 @@ public class PlayerTracker {
             Quest.setEditMode(false);
         }
         
-        CompoundTag tags = HardcoreQuesting.PLAYER_EXTRA_DATA.get(player).tag;
+        CompoundTag tags = ModCapabilities.PLAYER_EXTRA_DATA.get(player).tag;
         if (tags.contains(HQ_TAG)) {
             if (tags.getCompound(HQ_TAG).getBoolean(RECEIVED_BOOK)) {
                 QuestingData.getQuestingData(player).receivedBook = true;
@@ -63,6 +62,6 @@ public class PlayerTracker {
     
     private void sendLoginMessage(Player player) {
         player.sendMessage(Translator.translatable("hqm.message.hardcore").append(" ")
-                .append(Translator.translatable(ChatFormatting.RESET, getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))), Util.NIL_UUID);
+                .append(Translator.pluralTranslated(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))), Util.NIL_UUID);
     }
 }

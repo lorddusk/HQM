@@ -102,8 +102,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             gui.drawString(matrices, Translator.plain(mobs.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
-        gui.drawString(matrices, Translator.translated("hqm.mobTask.search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translated("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.mobTask.search"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (mob.getMob() != null) {
             gui.drawString(matrices, Translator.plain(mob.getMob()), 180, 50, 0.7F, 0x404040);
         }

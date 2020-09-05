@@ -45,7 +45,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
                 if (this.commands[i].isEmpty()) {
-                    drawStringTrimmed(matrices, gui, Translator.translated("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
+                    drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
                 } else {
                     drawStringTrimmed(matrices, gui, Translator.plain(this.commands[i]), 190, 65 + (i * 10), edited[i] ? 0xFF4500 : 0x000000);
                 }
@@ -93,7 +93,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
             for (; i < this.commands.length; i++) {
                 if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
                     if (this.commands[i].isEmpty()) {
-                        drawStringTrimmed(matrices, gui, Translator.translated("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xF76767);
+                        drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xF76767);
                     } else {
                         drawStringTrimmed(matrices, gui, Translator.plain(this.commands[i]), 190, 65 + (i * 10), edited[i] ? 0xF9AB7A : 0x969696);
                     }

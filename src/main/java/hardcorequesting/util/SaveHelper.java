@@ -93,15 +93,15 @@ public final class SaveHelper {
         
         if (isLarge) {
             if (total == 0) {
-                gui.drawString(matrices, Translator.translated("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.editType.allSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
             } else {
                 if (saveTime == 0) {
-                    gui.drawString(matrices, Translator.translated("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translatable("hqm.editType.neverSaved"), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 } else {
                     gui.drawString(matrices, formatTime((int) ((System.currentTimeMillis() - saveTime) / 60000)), X + START_X, Y + START_Y, 0.7F, 0x404040);
                 }
                 
-                gui.drawString(matrices, Translator.translated("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.editType.unsaved", total), X + START_X, Y + START_Y + 2 * FONT_HEIGHT, 0.7F, 0x404040);
                 int others = total;
                 for (int i = 0; i < LISTED_TYPES; i++) {
                     ListElement element = sortedList.get(i);
@@ -113,7 +113,7 @@ public final class SaveHelper {
                     others -= element.count;
                 }
                 if (others > 0) {
-                    gui.drawString(matrices, Translator.translated("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.translatable("hqm.editType.other", others), X + START_X + INDENT, Y + START_Y + (LISTED_TYPES + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                 }
             }
         } else {
@@ -142,7 +142,7 @@ public final class SaveHelper {
         
         if (hours == 0) {
             if (minutes == 0) {
-                return Translator.translated("hqm.editType.savedRecent");
+                return Translator.translatable("hqm.editType.savedRecent");
             } else {
                 return Translator.pluralTranslated(minutes != 1, "hqm.editType.savedMinutes", minutes);
             }

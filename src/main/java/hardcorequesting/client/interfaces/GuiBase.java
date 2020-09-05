@@ -249,7 +249,7 @@ public class GuiBase extends Screen {
             RenderSystem.translatef(getLeft() + x, getTop() + y, 0);
             
             Minecraft.getInstance().getItemRenderer().renderAndDecorateFakeItem(stack, 0, 0);
-            Minecraft.getInstance().getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, null);
+            Minecraft.getInstance().getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, "");
             
             RenderSystem.popMatrix();
         } catch (Exception ignored) {

@@ -187,7 +187,7 @@ public abstract class QuestTask {
     }
     
     public String getDescription() {
-        return Translator.commonTranslate(description);
+        return Translator.get(description);
     }
     
     public void setDescription(String description) {
@@ -199,7 +199,7 @@ public abstract class QuestTask {
     }
     
     public String getLongDescription() {
-        return Translator.commonTranslate(longDescription);
+        return Translator.get(longDescription);
     }
     
     public void setLongDescription(String longDescription) {
@@ -210,7 +210,7 @@ public abstract class QuestTask {
     @Environment(EnvType.CLIENT)
     public List<FormattedText> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.translated(longDescription), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(Translator.translatable(longDescription), 0.7F, 130);
         }
         
         return cachedDescription;

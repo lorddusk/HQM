@@ -63,7 +63,7 @@ public class QuestSet {
             QuestAdapter.postLoad();
             orderAll(remote);
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed loading quest sets for remote");
+            HardcoreQuesting.LOGGER.info("Failed loading quest sets for remote");
         }
     }
     
@@ -75,7 +75,7 @@ public class QuestSet {
                 SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
             }
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed saving quest sets for local and/or default");
+            HardcoreQuesting.LOGGER.info("Failed saving quest sets for local and/or default");
         }
     }
     
@@ -83,7 +83,7 @@ public class QuestSet {
         try {
             SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed saving all quest sets to the default folder");
+            HardcoreQuesting.LOGGER.info("Failed saving all quest sets to the default folder");
         }
     }
     
@@ -107,7 +107,7 @@ public class QuestSet {
                 });
             }
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed ordering quest sets");
+            HardcoreQuesting.LOGGER.info("Failed ordering quest sets");
         }
     }
     
@@ -181,11 +181,11 @@ public class QuestSet {
             FormattedText info;
             if (enabled) {
                 if (completed)
-                    info = Translator.translated("hqm.questBook.allQuests");
+                    info = Translator.translatable("hqm.questBook.allQuests");
                 else
-                    info = Translator.translated("hqm.questBook.percentageQuests", ((completedCount * 100) / total));
+                    info = Translator.translatable("hqm.questBook.percentageQuests", ((completedCount * 100) / total));
             } else
-                info = Translator.translated("hqm.questBook.locked");
+                info = Translator.translatable("hqm.questBook.locked");
             gui.drawString(matrices, info, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
                 FormattedText toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
@@ -194,7 +194,7 @@ public class QuestSet {
         }
         
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (GuiQuestBook.selectedSet != null) {
                 int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - GuiQuestBook.VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
@@ -471,7 +471,7 @@ public class QuestSet {
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int x0, int y0, int x, int y) {
         if (gui.isOpBook) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
         }
         
         Player player = gui.getPlayer();

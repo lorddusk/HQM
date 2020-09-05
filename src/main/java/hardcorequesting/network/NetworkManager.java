@@ -55,7 +55,7 @@ public class NetworkManager {
         registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, EnvType.CLIENT);
         registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, EnvType.SERVER);
         
-        if (HardcoreQuesting.loadingSide == EnvType.CLIENT) {
+        if (HardcoreQuesting.LOADING_SIDE == EnvType.CLIENT) {
             ClientSidePacketRegistry.INSTANCE.register(S2C, (packetContext, packetByteBuf) -> {
                 int id = packetByteBuf.readInt();
                 for (Map.Entry<Class<? extends IMessage>, Tuple<Class<? extends IMessageHandler>, Integer>> entry : PACKET_HANDLERS.entrySet()) {
@@ -71,7 +71,7 @@ public class NetworkManager {
                         return;
                     }
                 }
-                HardcoreQuesting.LOG.error("Invalid Packet ID: " + id);
+                HardcoreQuesting.LOGGER.error("Invalid Packet ID: " + id);
             });
         }
         ServerSidePacketRegistry.INSTANCE.register(C2S, (packetContext, packetByteBuf) -> {
@@ -89,7 +89,7 @@ public class NetworkManager {
                     return;
                 }
             }
-            HardcoreQuesting.LOG.error("Invalid Packet ID: " + id);
+            HardcoreQuesting.LOGGER.error("Invalid Packet ID: " + id);
         });
     }
     

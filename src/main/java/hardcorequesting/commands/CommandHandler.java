@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.commands.sub.*;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -68,7 +67,7 @@ public class CommandHandler {
         }
         
         default void sendTranslatableChat(CommandSourceStack sender, boolean plural, String key, Object... args) {
-            sender.sendSuccess(Translator.translatable(ChatFormatting.RESET, plural, key, args), false);
+            sender.sendSuccess(Translator.pluralTranslated(plural, key, args), false);
         }
     }
 }

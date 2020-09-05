@@ -26,7 +26,7 @@ public class KeyboardHandler {
     }
     
     public static void clear() {
-        keyMap.clear();
+        if (keyMap != null) keyMap.clear();
     }
     
     private static void addKeymap(int key, EditMode mode) {
@@ -72,11 +72,12 @@ public class KeyboardHandler {
     }
     
     public static void fromConfig(String[] config) {
+        clear();
         for (String entry : config) {
-            String[] splitted = entry.split(":");
-            if (splitted.length != 2) continue;
-            int key = Integer.parseInt(splitted[0]);
-            EditMode mode = EditMode.valueOf(splitted[1].toUpperCase());
+            String[] split = entry.split(":");
+            if (split.length != 2) continue;
+            int key = Integer.parseInt(split[0]);
+            EditMode mode = EditMode.valueOf(split[1].toUpperCase());
             if (mode == null) continue;
             addKeymap(key, mode);
         }

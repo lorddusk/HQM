@@ -142,7 +142,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
             int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.markers.size() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
@@ -216,7 +216,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
@@ -269,7 +269,7 @@ public class Reputation {
         try {
             SaveHandler.loadReputations(SaveHandler.getFile("reputations", remote)).forEach(Reputation::addReputation);
         } catch (IOException ignored) {
-            HardcoreQuesting.LOG.info("Failed loading reputations from remote");
+            HardcoreQuesting.LOGGER.info("Failed loading reputations from remote");
         }
     }
     
@@ -277,7 +277,7 @@ public class Reputation {
         try {
             SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed saving reputations to local file");
+            HardcoreQuesting.LOGGER.info("Failed saving reputations to local file");
         }
     }
     
@@ -285,7 +285,7 @@ public class Reputation {
         try {
             SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed saving reputations to the default file");
+            HardcoreQuesting.LOGGER.info("Failed saving reputations to the default file");
         }
     }
     

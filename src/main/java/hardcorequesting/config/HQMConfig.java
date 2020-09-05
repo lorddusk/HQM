@@ -1,6 +1,9 @@
 package hardcorequesting.config;
 
-import com.google.common.collect.Lists;
+import blue.endless.jankson.Comment;
+import blue.endless.jankson.Jankson;
+import blue.endless.jankson.JsonGrammar;
+import blue.endless.jankson.api.SyntaxError;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.items.BagItem;
@@ -8,21 +11,17 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.RewardSetting;
-import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
-import me.sargunvohra.mcmods.autoconfig1u.serializer.JanksonConfigSerializer;
-import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
+import org.apache.commons.compress.utils.Charsets;
+import org.apache.commons.io.IOUtils;
 
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
-@Config(name = "hqm/config")
-public class HQMConfig implements ConfigData {
-    
-    static {
-        AutoConfig.register(HQMConfig.class, JanksonConfigSerializer::new);
-    }
+public class HQMConfig {
+    private static transient HQMConfig instance;
     
     @Comment("Settings related to hardcore mode")
     //@Name("Hardcore settings")
@@ -99,7 +98,26 @@ public class HQMConfig implements ConfigData {
     public static int QUEST_AVAILABLE = 0x554286f4;
     
     public static HQMConfig getInstance() {
-        return AutoConfig.getConfigHolder(HQMConfig.class).getConfig();
+        if (instance == null) {
+            try {
+                Jankson jankson = Jankson.builder().build();
+                Path path = HardcoreQuesting.configDir.resolve("config.json5");
+                if (!Files.exists(path.getParent()))
+                    Files.createDirectories(path.getParent());
+                if (Files.exists(path)) {
+                    instance = jankson.fromJson(IOUtils.toString(Files.newInputStream(path), Charsets.UTF_8), HQMConfig.class);
+                } else {
+                    instance = new HQMConfig();
+                }
+                try (BufferedWriter writer = Files.newBufferedWriter(path, Charsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                    writer.write(jankson.toJson(instance).toJson(JsonGrammar.JSON5).toCharArray());
+                }
+            } catch (IOException | SyntaxError e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        return instance;
     }
     
     public static void parseSetColours() {
@@ -110,7 +128,7 @@ public class HQMConfig implements ConfigData {
             UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET = Long.decode(getInstance().Interface.QuestSets.UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET.toLowerCase()).intValue();
             DISABLED_SET = Long.decode(getInstance().Interface.QuestSets.DISABLED_SET.toLowerCase()).intValue();
         } catch (NumberFormatException e) {
-            HardcoreQuesting.LOG.error("Unable to parse set colours", e);
+            HardcoreQuesting.LOGGER.error("Unable to parse set colours", e);
         }
     }
     
@@ -122,7 +140,7 @@ public class HQMConfig implements ConfigData {
             QUEST_COMPLETE_REPEATABLE = Long.decode(getInstance().Interface.Quests.QUEST_COMPLETE_REPEATABLE.toLowerCase()).intValue();
             QUEST_AVAILABLE = Long.decode(getInstance().Interface.Quests.QUEST_AVAILABLE.toLowerCase()).intValue();
         } catch (NumberFormatException e) {
-            HardcoreQuesting.LOG.error("Unable to parse quest colours", e);
+            HardcoreQuesting.LOGGER.error("Unable to parse quest colours", e);
         }
     }
     
@@ -146,14 +164,13 @@ public class HQMConfig implements ConfigData {
         Quest.isEditing = getInstance().Editing.USE_EDITOR;
         Quest.saveDefault = getInstance().Editing.SAVE_DEFAULT;
         if (HardcoreQuesting.proxy.isClient()) {
-            KeyboardHandler.fromConfig(getInstance().Editing.HOTKEYS.toArray(new String[0]));
+            KeyboardHandler.fromConfig(getInstance().Editing.HOTKEYS);
         }
     }
     
     public static class Hardcore {
         //@Name("Default lives")
         @Comment("How many lives players should start with.")
-        @ConfigEntry.BoundedDiscrete(min = 1, max = 256)
         public int DEFAULT_LIVES = 3;
         
         //@Name("Heart Rot Timer in Seconds")
@@ -167,7 +184,6 @@ public class HQMConfig implements ConfigData {
         
         //@Name("Maximum lives obtainable")
         @Comment("Use this to set the maximum lives obtainable")
-        @ConfigEntry.BoundedDiscrete(min = 0, max = 256)
         public int MAX_LIVES = 20;
     }
     
@@ -213,7 +229,7 @@ public class HQMConfig implements ConfigData {
         
         //@Name("Hotkeys")
         @Comment("Hotkeys used in the book, one entry per line(Format: [key]:[mode]")
-        public List<String> HOTKEYS = Lists.newArrayList("68:delete", "78:create", "77:move", "260:create", "82:rename", "261:delete", "32:normal", "83:swap", "83:swap_select");
+        public String[] HOTKEYS = new String[]{"68:delete", "78:create", "77:move", "260:create", "82:rename", "261:delete", "32:normal", "83:swap", "83:swap_select"};
     }
     
     public static class Interface {

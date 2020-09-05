@@ -50,7 +50,7 @@ public class Team {
             if (isClient)
                 TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Can't load teams!", e);
+            HardcoreQuesting.LOGGER.error("Can't load teams!", e);
         }
     }
     
@@ -58,7 +58,7 @@ public class Team {
         try {
             SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.error("Saving teams failed!", e);
+            HardcoreQuesting.LOGGER.error("Saving teams failed!", e);
         }
     }
     

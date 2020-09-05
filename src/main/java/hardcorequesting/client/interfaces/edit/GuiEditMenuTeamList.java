@@ -50,14 +50,14 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
             gui.drawString(matrices, Translator.plain(teamStat.getName()), x, y, 0x404040);
-            gui.drawString(matrices, Translator.translated("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
-            gui.drawString(matrices, Translator.translated("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
-            gui.drawString(matrices, Translator.translated("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
         }
         
-        gui.drawCenteredString(matrices, Translator.translated("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
+        gui.drawCenteredString(matrices, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
         if (end - start > TEAMS_PER_PAGE) {
-            gui.drawCenteredString(matrices, Translator.translated("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
+            gui.drawCenteredString(matrices, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
         }
     }
     

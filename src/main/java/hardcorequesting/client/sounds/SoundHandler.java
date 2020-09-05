@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class SoundHandler {
     }
     
     @Environment(EnvType.CLIENT)
-    public static boolean loadLoreReading(String path) {
+    public static boolean loadLoreReading(Path path) {
         /*
         loreMusic = false;
         loreNumber = -1;
@@ -95,7 +96,7 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     private static SoundInstance play(String sound, float volume, float pitch) {
-        return play(new ResourceLocation(HardcoreQuesting.SOUNDLOC, sound), volume, pitch);
+        return play(new ResourceLocation(HardcoreQuesting.ID, sound), volume, pitch);
     }
     
     @Environment(EnvType.CLIENT)

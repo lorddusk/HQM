@@ -1,6 +1,7 @@
 package hardcorequesting.blocks;
 
 import hardcorequesting.HardcoreQuesting;
+import hardcorequesting.items.ModCreativeTabs;
 import hardcorequesting.tileentity.BarrelBlockEntity;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.util.RegisterHelper;
@@ -22,8 +23,8 @@ public class ModBlocks {
     }
     
     public static void init() {
-        RegisterHelper.registerBlock(blockBarrel, BlockInfo.ITEMBARREL_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Properties().tab(HardcoreQuesting.HQMTab)));
-        RegisterHelper.registerBlock(blockTracker, BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Properties().tab(HardcoreQuesting.HQMTab)));
+        RegisterHelper.registerBlock(blockBarrel, BlockInfo.ITEMBARREL_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Properties().tab(ModCreativeTabs.HQMTab)));
+        RegisterHelper.registerBlock(blockTracker, BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME, block -> new BlockItem(block, new Item.Properties().tab(ModCreativeTabs.HQMTab)));
 //        RegisterHelper.registerBlock(blockPortal, BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME, block -> new PortalBlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
     }
     

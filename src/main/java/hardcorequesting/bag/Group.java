@@ -87,7 +87,7 @@ public class Group {
             
             for (int j = 0; j < BagTier.values().length; j++) {
                 BagTier bagTier = BagTier.values()[j];
-                gui.drawCenteredString(matrices, Translator.colored(groupTier.getWeights()[j] + "", bagTier.getColor()),
+                gui.drawCenteredString(matrices, Translator.text(groupTier.getWeights()[j] + "", bagTier.getColor()),
                         GuiQuestBook.TIERS_X + GuiQuestBook.TIERS_SECOND_LINE_X + j * GuiQuestBook.WEIGHT_SPACING,
                         yPos + GuiQuestBook.TIERS_SECOND_LINE_Y, 0.7F,
                         GuiQuestBook.WEIGHT_SPACING, 0, 0x404040);
@@ -120,7 +120,7 @@ public class Group {
                 RenderSystem.disableBlend();
             }
             
-            gui.drawString(matrices, Translator.translated("hqm.questBook.items", group.getItems().size()),
+            gui.drawString(matrices, Translator.translatable("hqm.questBook.items", group.getItems().size()),
                     GuiQuestBook.GROUPS_X + GuiQuestBook.GROUPS_SECOND_LINE_X,
                     yPos + GuiQuestBook.GROUPS_SECOND_LINE_Y,
                     0.7F, 0x404040);
@@ -301,8 +301,8 @@ public class Group {
             }
         }
         
-        gui.drawString(matrices, Translator.translated("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translated("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)

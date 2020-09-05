@@ -166,7 +166,7 @@ public abstract class GuiEditMenu {
             }
             
             if (cached == null) {
-                cached = gui.getLinesFromText(Translator.translated(name), 0.7F, width);
+                cached = gui.getLinesFromText(Translator.translatable(name), 0.7F, width);
             }
             
             boolean selected = getValue();

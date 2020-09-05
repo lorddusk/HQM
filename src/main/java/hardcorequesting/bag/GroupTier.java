@@ -37,7 +37,7 @@ public class GroupTier {
         try {
             SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed to save bags to local file");
+            HardcoreQuesting.LOGGER.info("Failed to save bags to local file");
         }
     }
     
@@ -45,7 +45,7 @@ public class GroupTier {
         try {
             SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed to save bags to the default file");
+            HardcoreQuesting.LOGGER.info("Failed to save bags to the default file");
         }
     }
     
@@ -55,7 +55,7 @@ public class GroupTier {
             GroupTier.getTiers().clear();
             GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getFile("bags", remote)));
         } catch (IOException e) {
-            HardcoreQuesting.LOG.info("Failed to load bags from the remote folder");
+            HardcoreQuesting.LOGGER.info("Failed to load bags from the remote folder");
         }
     }
     

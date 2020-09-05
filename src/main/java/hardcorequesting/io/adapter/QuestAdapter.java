@@ -3,7 +3,6 @@ package hardcorequesting.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.*;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.quests.task.QuestTask;
@@ -371,13 +370,13 @@ public class QuestAdapter {
                 optionalAdd(optionMapping, options.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 optionalAdd(prerequisiteMapping, prerequisites.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 optionalAdd(optionLinkMapping, optionLinks.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
-                try {
-                    if (HardcoreQuesting.getPlayer() != null) {
-                        QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    if (HardcoreQuesting.getPlayer() != null) {
+//                        QUEST.addTaskData(QUEST.getQuestData(HardcoreQuesting.getPlayer()));
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
                 return QUEST;
             }
             QuestLine.getActiveQuestLine().quests.remove(QUEST.getQuestId());

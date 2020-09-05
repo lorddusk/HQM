@@ -1,6 +1,5 @@
 package hardcorequesting.items;
 
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.HQMConfig;
@@ -29,7 +28,7 @@ public class ItemHeart extends Item {
     public ItemHeart(int value) {
         super(new Item.Properties()
                 .stacksTo(64)
-                .tab(HardcoreQuesting.HQMTab));
+                .tab(ModCreativeTabs.HQMTab));
         this.value = value;
     }
     

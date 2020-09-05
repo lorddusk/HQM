@@ -29,6 +29,7 @@ dependencies {
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
+    depend("blue.endless:jankson:1.2.0")
     modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
