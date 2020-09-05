@@ -1,18 +1,15 @@
 package hardcorequesting.client;
 
-import hardcorequesting.client.interfaces.GuiColor;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.font.TextVisitFactory;
-import net.minecraft.client.util.TextCollector;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Language;
+import net.minecraft.client.ComponentCollector;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +27,7 @@ public class EditButton {
     private int x;
     private int y;
     private EditMode mode;
-    private List<OrderedText> text;
+    private List<FormattedCharSequence> text;
     
     public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id) {
         this.guiQuestBook = guiQuestBook;
@@ -63,22 +60,22 @@ public class EditButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawInfo(MatrixStack matrices, int mX, int mY) {
+    public void drawInfo(PoseStack matrices, int mX, int mY) {
         if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             if (text == null) {
-                List<StringVisitable> text = guiQuestBook.getLinesFromText(Translator.plain(mode.getName() + "\n\n" + mode.getDescription()), 1F, 150);
+                List<FormattedText> text = guiQuestBook.getLinesFromText(Translator.plain(mode.getName() + "\n\n" + mode.getDescription()), 1F, 150);
                 for (int i = 1; i < text.size(); i++) {
-                    TextCollector collector = new TextCollector();
+                    ComponentCollector collector = new ComponentCollector();
                     text.get(i).visit((style, string) -> {
-                        collector.add(StringVisitable.styled(string, style));
+                        collector.append(FormattedText.of(string, style));
                         return Optional.empty();
                     }, Style.EMPTY);
-                    text.set(i, collector.getCombined());
+                    text.set(i, collector.getResultOrEmpty());
                 }
-                this.text = Language.getInstance().reorder(text);
+                this.text = Language.getInstance().getVisualOrder(text);
             }
             
-            guiQuestBook.renderOrderedTooltip(matrices, text, mX + guiQuestBook.getLeft(), mY + guiQuestBook.getTop());
+            guiQuestBook.renderTooltip(matrices, text, mX + guiQuestBook.getLeft(), mY + guiQuestBook.getTop());
         }
     }
     

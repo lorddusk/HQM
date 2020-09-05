@@ -1,6 +1,7 @@
 package hardcorequesting.quests.task;
 
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -14,17 +15,16 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +83,7 @@ public abstract class QuestTaskItems extends QuestTask {
         }
     }
     
-    private int getProgress(PlayerEntity player, int id) {
+    private int getProgress(Player player, int id) {
         if (id >= items.length) {
             return 0;
         }
@@ -128,7 +128,7 @@ public abstract class QuestTaskItems extends QuestTask {
     @Environment(EnvType.CLIENT)
     protected abstract GuiEditMenuItem.Type getMenuTypeId();
     
-    public boolean increaseItems(DefaultedList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
+    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
         if (!parent.isAvailable(playerId)) return false;
         
         boolean updated = false;
@@ -144,7 +144,7 @@ public abstract class QuestTaskItems extends QuestTask {
                 if (item.precision.areItemsSame(stack, item.stack)) {
                     int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
                     if (amount > 0) {
-                        stack.decrement(amount);
+                        stack.shrink(amount);
                         if (stack.getCount() == 0) {
                             itemsToConsume.set(j, ItemStack.EMPTY);
                         }
@@ -185,7 +185,7 @@ public abstract class QuestTaskItems extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         ItemRequirement[] items = getEditFriendlyItems(this.items);
         
         for (int i = 0; i < items.length; i++) {
@@ -196,12 +196,12 @@ public abstract class QuestTaskItems extends QuestTask {
                 gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
             }
             
-            StringVisitable str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
-            matrices.push();
+            FormattedText str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
+            matrices.pushPose();
             matrices.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
             gui.drawStringWithShadow(matrices, str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
-            matrices.pop();
+            matrices.popPose();
         }
         
         for (int i = 0; i < items.length; i++) {
@@ -209,29 +209,29 @@ public abstract class QuestTaskItems extends QuestTask {
             if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
                 ItemStack stack = item.getStack();
-                List<StringVisitable> str = new ArrayList<>();
+                List<FormattedText> str = new ArrayList<>();
                 if (item.fluid != null) {
-                    List<Text> list = new ArrayList<>();
-                    list.add(item.fluid.getName());
-                    if (MinecraftClient.getInstance().options.advancedItemTooltips) {
-                        String entryId = Registry.FLUID.getId(item.fluid.getRawFluid()).toString();
-                        list.add(new LiteralText(entryId).formatted(Formatting.DARK_GRAY));
+                    List<Component> list = new ArrayList<>();
+                    str.add(new TextComponent(item.fluid.getName().getString()));
+                    if (Minecraft.getInstance().options.advancedItemTooltips) {
+                        String entryId = Registry.FLUID.getKey(item.fluid.getRawFluid()).toString();
+                        list.add(new TextComponent(entryId).withStyle(ChatFormatting.DARK_GRAY));
                     }
                     str.addAll(list);
                 } else if (stack != null && !stack.isEmpty()) {
                     str.addAll(gui.getTooltipFromItem(stack));
                 }
                 
-                str.add(StringVisitable.concat(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
+                str.add(FormattedText.composite(Translator.translated("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + getProgress(player, i) + "/" + item.required)));
                 if (item.fluid == null && Quest.canQuestsBeEdited()) {
-                    str.add(StringVisitable.EMPTY);
+                    str.add(FormattedText.EMPTY);
                     str.add(Translator.colored(item.getPrecision().getName(), GuiColor.GRAY));
                 }
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (getProgress(player, i) == item.required) {
-                        str.addAll(Arrays.asList(StringVisitable.EMPTY, StringVisitable.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
+                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translated("hqm.questBook.resetTask", GuiColor.RED)));
                     } else {
-                        str.addAll(Arrays.asList(StringVisitable.EMPTY, StringVisitable.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
+                        str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translated("hqm.questBook.completeTask", GuiColor.ORANGE)));
                     }
                 }
                 gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
@@ -242,7 +242,7 @@ public abstract class QuestTaskItems extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();
         boolean doubleClick = false;
         if (Quest.canQuestsBeEdited() || isOpBookWithShiftKeyDown) {
@@ -251,13 +251,13 @@ public abstract class QuestTaskItems extends QuestTask {
             for (int i = 0; i < items.length; i++) {
                 ItemRequirement item = items[i];
                 if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
-                    int lastDiff = player.age - lastClicked;
+                    int lastDiff = player.tickCount - lastClicked;
                     if (lastDiff < 0) {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     } else if (lastDiff < 6) {
                         doubleClick = true;
                     } else {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     }
                     
                     if (isOpBookWithShiftKeyDown) {

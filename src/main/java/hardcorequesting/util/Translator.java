@@ -8,9 +8,9 @@ import com.google.gson.JsonObject;
 import hardcorequesting.client.interfaces.GuiColor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -718,12 +718,12 @@ public class Translator {
     
     private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)\\]\\]");
     
-    public static LiteralText translateComponent(String id) {
-        return new LiteralText(translate(id));
+    public static TextComponent translateComponent(String id) {
+        return new TextComponent(translate(id));
     }
     
     @SuppressWarnings("Convert2MethodRef")
-    private static final BiFunction<String, Object[], String> storageTranslator = Executor.call(() -> () -> (s, args) -> I18n.translate(s, args), () -> () -> (s, args) -> {
+    private static final BiFunction<String, Object[], String> storageTranslator = Executor.call(() -> () -> (s, args) -> I18n.get(s, args), () -> () -> (s, args) -> {
         String s1 = MAP.get(s);
         if (s1 == null) s1 = s;
         
@@ -742,41 +742,41 @@ public class Translator {
         return storageTranslate(id).replace("\\n", "\n");
     }
     
-    public static StringVisitable translated(String translationKey) {
+    public static FormattedText translated(String translationKey) {
         return Translator.plain(translate(translationKey));
     }
     
-    public static StringVisitable translated(String translationKey, Object... args) {
+    public static FormattedText translated(String translationKey, Object... args) {
         return Translator.plain(translate(translationKey, args));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, TextColor color) {
+    public static FormattedText translated(String translationKey, TextColor color) {
         return colored(translate(translationKey), color);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, TextColor color, Object... args) {
+    public static FormattedText translated(String translationKey, TextColor color, Object... args) {
         return colored(translate(translationKey, args), color);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, Formatting formatting) {
-        return translated(translationKey, TextColor.fromFormatting(formatting));
+    public static FormattedText translated(String translationKey, ChatFormatting formatting) {
+        return translated(translationKey, TextColor.fromLegacyFormat(formatting));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, Formatting formatting, Object... args) {
-        return translated(translationKey, TextColor.fromFormatting(formatting), args);
+    public static FormattedText translated(String translationKey, ChatFormatting formatting, Object... args) {
+        return translated(translationKey, TextColor.fromLegacyFormat(formatting), args);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, GuiColor color) {
+    public static FormattedText translated(String translationKey, GuiColor color) {
         return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable translated(String translationKey, GuiColor color, Object... args) {
+    public static FormattedText translated(String translationKey, GuiColor color, Object... args) {
         return translated(translationKey, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF), args);
     }
     
@@ -784,33 +784,33 @@ public class Translator {
         return storageTranslate(id, args).replace("\\n", "\n");
     }
     
-    public static StringVisitable pluralTranslated(boolean plural, String id, Object... args) {
+    public static FormattedText pluralTranslated(boolean plural, String id, Object... args) {
         return format(translated(id, args), plural);
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
+    public static FormattedText pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
         return format(translated(id, args), color, plural);
     }
     
-    public static MutableText translatable(String id, Object... args) {
-        return translatable(Formatting.WHITE, id, args);
+    public static MutableComponent translatable(String id, Object... args) {
+        return translatable(ChatFormatting.WHITE, id, args);
     }
     
-    public static MutableText translatable(Formatting formatting, String id, Object... args) {
-        return new TranslatableText(id, args).formatted(formatting);
+    public static MutableComponent translatable(ChatFormatting formatting, String id, Object... args) {
+        return new TranslatableComponent(id, args).withStyle(formatting);
     }
     
-    public static MutableText translatable(boolean plural, String id, Object... args) {
-        return translatable(Formatting.RESET, plural, id, args);
+    public static MutableComponent translatable(boolean plural, String id, Object... args) {
+        return translatable(ChatFormatting.RESET, plural, id, args);
     }
     
-    public static MutableText translatable(Formatting formatting, boolean plural, String id, Object... args) {
-        return new LiteralText(rawString(Translator.pluralTranslated(plural, id, args))).formatted(formatting);
+    public static MutableComponent translatable(ChatFormatting formatting, boolean plural, String id, Object... args) {
+        return new TextComponent(rawString(Translator.pluralTranslated(plural, id, args))).withStyle(formatting);
     }
     
-    public static StringVisitable format(StringVisitable text, boolean plural) {
-        if (text == null) return StringVisitable.EMPTY;
+    public static FormattedText format(FormattedText text, boolean plural) {
+        if (text == null) return FormattedText.EMPTY;
         try {
             TextCollector collector = new TextCollector();
             text.visit(asString -> {
@@ -829,8 +829,8 @@ public class Translator {
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable format(StringVisitable text, GuiColor color, boolean plural) {
-        if (text == null) return StringVisitable.EMPTY;
+    public static FormattedText format(FormattedText text, GuiColor color, boolean plural) {
+        if (text == null) return FormattedText.EMPTY;
         try {
             TextCollector collector = new TextCollector();
             text.visit(asString -> {
@@ -849,13 +849,13 @@ public class Translator {
     }
     
     public static class TextCollector {
-        private final List<StringVisitable> texts = Lists.newArrayList();
+        private final List<FormattedText> texts = Lists.newArrayList();
         
-        public void add(StringVisitable stringRenderable) {
+        public void add(FormattedText stringRenderable) {
             this.texts.add(stringRenderable);
         }
         
-        public StringVisitable getRawCombined() {
+        public FormattedText getRawCombined() {
             if (this.texts.isEmpty()) {
                 return null;
             } else {
@@ -863,20 +863,20 @@ public class Translator {
             }
         }
         
-        public StringVisitable getCombined() {
-            StringVisitable stringRenderable = this.getRawCombined();
-            return stringRenderable != null ? stringRenderable : StringVisitable.EMPTY;
+        public FormattedText getCombined() {
+            FormattedText stringRenderable = this.getRawCombined();
+            return stringRenderable != null ? stringRenderable : FormattedText.EMPTY;
         }
     }
     
-    static StringVisitable concat(final StringVisitable... visitables) {
+    static FormattedText concat(final FormattedText... visitables) {
         return concat(Arrays.asList(visitables));
     }
     
-    static StringVisitable concat(final List<StringVisitable> visitables) {
-        return new StringVisitable() {
+    static FormattedText concat(final List<FormattedText> visitables) {
+        return new FormattedText() {
             @Override
-            public <T> Optional<T> visit(StringVisitable.Visitor<T> visitor) {
+            public <T> Optional<T> visit(FormattedText.ContentConsumer<T> visitor) {
                 Iterator var2 = visitables.iterator();
                 
                 Optional optional;
@@ -885,7 +885,7 @@ public class Translator {
                         return Optional.empty();
                     }
                     
-                    StringVisitable stringRenderable = (StringVisitable) var2.next();
+                    FormattedText stringRenderable = (FormattedText) var2.next();
                     optional = stringRenderable.visit(visitor);
                 } while (!optional.isPresent());
                 
@@ -894,23 +894,23 @@ public class Translator {
             
             @Environment(EnvType.CLIENT)
             @Override
-            public <T> Optional<T> visit(StyledVisitor<T> styledVisitor, Style style) {
+            public <T> Optional<T> visit(StyledContentConsumer<T> styledVisitor, Style style) {
                 return Optional.empty();
             }
         };
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable colored(String s, TextColor color) {
-        return StringVisitable.styled(s, Style.EMPTY.withColor(color));
+    public static FormattedText colored(String s, TextColor color) {
+        return FormattedText.of(s, Style.EMPTY.withColor(color));
     }
     
     @Environment(EnvType.CLIENT)
-    public static StringVisitable colored(String s, GuiColor color) {
+    public static FormattedText colored(String s, GuiColor color) {
         return colored(s, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
     }
     
-    public static String rawString(StringVisitable text) {
+    public static String rawString(FormattedText text) {
         StringBuilder builder = new StringBuilder();
         text.visit((asString) -> {
             builder.append(asString);
@@ -919,8 +919,8 @@ public class Translator {
         return builder.toString();
     }
     
-    public static StringVisitable plain(String s) {
-        if (s == null) return StringVisitable.EMPTY;
-        return StringVisitable.plain(s);
+    public static FormattedText plain(String s) {
+        if (s == null) return FormattedText.EMPTY;
+        return FormattedText.of(s);
     }
 }

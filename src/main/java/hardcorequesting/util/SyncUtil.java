@@ -1,7 +1,7 @@
 package hardcorequesting.util;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +42,9 @@ public class SyncUtil {
         
         int count = buf.readInt();
         
-        PacketByteBuf packetByteBuf = new PacketByteBuf(buf);
+        FriendlyByteBuf packetByteBuf = new FriendlyByteBuf(buf);
         for (int i = 0; i < count; i++) {
-            data.add(packetByteBuf.readString(32767));
+            data.add(packetByteBuf.readUtf(32767));
         }
     }
     
@@ -58,9 +58,9 @@ public class SyncUtil {
     
     public static void deconstructString(List<String> input, ByteBuf output) {
         output.writeInt(input.size());
-        PacketByteBuf packetByteBuf = new PacketByteBuf(output);
+        FriendlyByteBuf packetByteBuf = new FriendlyByteBuf(output);
         for (String chunk : input) {
-            packetByteBuf.writeString(chunk);
+            packetByteBuf.writeUtf(chunk);
         }
     }
     

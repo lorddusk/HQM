@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -12,9 +13,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -46,13 +45,13 @@ public abstract class QuestTaskReputation extends QuestTask {
         settings[id] = setting;
     }
     
-    protected boolean isPlayerInRange(PlayerEntity player) {
+    protected boolean isPlayerInRange(Player player) {
         if (settings.length > 0) {
             
             QuestDataTask data = getData(player);
-            if (!data.completed && !player.getEntityWorld().isClient) {
+            if (!data.completed && !player.getCommandSenderWorld().isClientSide) {
                 for (ReputationSetting setting : settings) {
-                    if (!setting.isValid(player.getUuid())) {
+                    if (!setting.isValid(player.getUUID())) {
                         return false;
                     }
                 }
@@ -65,7 +64,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
         int size = Quest.canQuestsBeEdited() ? settings.length + 1 : settings.length;
         for (int i = 0; i < size; i++) {
@@ -87,7 +86,7 @@ public abstract class QuestTaskReputation extends QuestTask {
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             int size = settings.length + 1;
             for (int i = 0; i < size; i++) {
@@ -133,7 +132,7 @@ public abstract class QuestTaskReputation extends QuestTask {
         getData(playerID).completed = status;
     }
     
-    protected PlayerEntity getPlayerForRender(PlayerEntity player) {
+    protected Player getPlayerForRender(Player player) {
         return player;
     }
     

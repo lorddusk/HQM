@@ -8,8 +8,8 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.message.OpenGuiMessage;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,7 +23,7 @@ public enum GuiType {
         }
         
         @Override
-        public void open(PlayerEntity player, String data) {
+        public void open(Player player, String data) {
             
         }
     },
@@ -52,10 +52,10 @@ public enum GuiType {
         }
         
         @Override
-        public void open(PlayerEntity player, String data) {
+        public void open(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
+            BlockPos pos = BlockPos.of(root.get(BLOCK_POS).getAsLong());
             JsonElement quest = root.get(QUEST);
             UUID questId = quest.isJsonNull() ? null : UUID.fromString(root.getAsString());
             int radius = root.get(RADIUS).getAsInt();
@@ -70,12 +70,12 @@ public enum GuiType {
         }
         
         @Override
-        public void open(PlayerEntity player, String data) {
+        public void open(Player player, String data) {
             GuiQuestBook.displayGui(player, Boolean.parseBoolean(data));
         }
     };
     
     public abstract IMessage build(String... data);
     
-    public abstract void open(PlayerEntity player, String data);
+    public abstract void open(Player player, String data);
 }

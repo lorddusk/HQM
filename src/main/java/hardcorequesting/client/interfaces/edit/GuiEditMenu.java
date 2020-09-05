@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
@@ -7,9 +8,8 @@ import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,35 +21,35 @@ public abstract class GuiEditMenu {
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
     protected List<LargeButton> buttons;
-    protected PlayerEntity player;
+    protected Player player;
     protected List<CheckBox> checkboxes;
     private boolean hasButtons;
     
-    protected GuiEditMenu(final GuiBase gui, PlayerEntity player) {
+    protected GuiEditMenu(final GuiBase gui, Player player) {
         buttons = new ArrayList<>();
         this.player = player;
         
         checkboxes = new ArrayList<>();
     }
     
-    protected GuiEditMenu(final GuiBase gui, PlayerEntity player, boolean isControlOnFirstPage) {
+    protected GuiEditMenu(final GuiBase gui, Player player, boolean isControlOnFirstPage) {
         this(gui, player);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
         
         buttons.add(new LargeButton("hqm.edit.ok", xOffset + 40, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 save(gui);
                 close(gui);
             }
@@ -57,23 +57,23 @@ public abstract class GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.edit.cancel", xOffset + 100, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 close(gui);
             }
         });
     }
     
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible(gui, null)) {
                 button.draw(matrices, gui, player, mX, mY);
@@ -84,7 +84,7 @@ public abstract class GuiEditMenu {
         }
     }
     
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible(gui, null)) {
                 button.renderTooltip(matrices, gui, player, mX, mY);
@@ -146,7 +146,7 @@ public abstract class GuiEditMenu {
         private int x;
         private int y;
         private String name;
-        private List<StringVisitable> cached;
+        private List<FormattedText> cached;
         private int width = Integer.MAX_VALUE;
         
         protected CheckBox(String name, int x, int y) {
@@ -160,7 +160,7 @@ public abstract class GuiEditMenu {
             this.width = width;
         }
         
-        protected void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+        protected void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
             if (!isVisible()) {
                 return;
             }

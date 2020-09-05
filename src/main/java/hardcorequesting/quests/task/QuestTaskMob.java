@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -15,16 +16,14 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -45,17 +44,17 @@ public class QuestTaskMob extends QuestTask {
         register(EventTrigger.Type.DEATH);
     }
     
-    public static PlayerEntity getKiller(DamageSource source) {
-        Entity entity = source.getAttacker();
+    public static Player getKiller(DamageSource source) {
+        Entity entity = source.getEntity();
         
-        if (entity instanceof PlayerEntity) {
-            return (PlayerEntity) entity;
+        if (entity instanceof Player) {
+            return (Player) entity;
         }
         
         return null;
     }
     
-    public void setMob(int id, Mob mob, PlayerEntity player) {
+    public void setMob(int id, Mob mob, Player player) {
         if (id >= mobs.length) {
             mobs = Arrays.copyOf(mobs, mobs.length + 1);
             QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
@@ -68,14 +67,14 @@ public class QuestTaskMob extends QuestTask {
         mobs[id] = mob;
     }
     
-    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
+    public void setIcon(int id, ItemStack stack, Player player) {
         System.out.println(stack);
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
         
         mobs[id].iconStack = stack;
     }
     
-    public void setName(int id, String str, PlayerEntity player) {
+    public void setName(int id, String str, Player player) {
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
         
         mobs[id].name = str;
@@ -92,7 +91,7 @@ public class QuestTaskMob extends QuestTask {
         }
     }
     
-    private int killed(int id, PlayerEntity player) {
+    private int killed(int id, Player player) {
         return id < mobs.length ? ((QuestDataTaskMob) getData(player)).killed[id] : 0;
     }
     
@@ -103,7 +102,7 @@ public class QuestTaskMob extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         Mob[] mobs = getEditFriendlyMobs(this.mobs);
         for (int i = 0; i < mobs.length; i++) {
             Mob mob = mobs[i];
@@ -125,7 +124,7 @@ public class QuestTaskMob extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Mob[] mobs = getEditFriendlyMobs(this.mobs);
             for (int i = 0; i < mobs.length; i++) {
@@ -169,7 +168,7 @@ public class QuestTaskMob extends QuestTask {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     
@@ -225,14 +224,14 @@ public class QuestTaskMob extends QuestTask {
     
     @Override
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
-        PlayerEntity killer = getKiller(source);
+        Player killer = getKiller(source);
         
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
             boolean updated = false;
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
                 if (mob.count > ((QuestDataTaskMob) getData(killer)).killed[i]) {
-                    EntityType<?> type = Registry.ENTITY_TYPE.get(new Identifier(mob.mob));
+                    EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(mob.mob));
                     if (type != null) {
                         if (type.equals(entity.getType())) {
                             ((QuestDataTaskMob) getData(killer)).killed[i]++;
@@ -254,7 +253,7 @@ public class QuestTaskMob extends QuestTask {
                 }
                 
                 if (done) {
-                    completeTask(killer.getUuid());
+                    completeTask(killer.getUUID());
                 }
                 
                 parent.sendUpdatedDataToTeam(killer);

@@ -4,6 +4,7 @@ import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -15,18 +16,17 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.EmptyFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.material.EmptyFluid;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -64,15 +64,15 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private int lastClicked;
     
     
-    public GuiEditMenuItem(GuiBase gui, PlayerEntity player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
         this(gui, player, Element.create(obj), null, id, type, amount, precision);
     }
     
-    public GuiEditMenuItem(GuiBase gui, PlayerEntity player, Object obj, UUID questId, Type type, int amount, ItemPrecision precision) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, UUID questId, Type type, int amount, ItemPrecision precision) {
         this(gui, player, Element.create(obj), questId, -1, type, amount, precision);
     }
     
-    public GuiEditMenuItem(GuiBase gui, PlayerEntity player, Element<?> element, UUID questId, int id, final Type type, final int amount, ItemPrecision precision) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, UUID questId, int id, final Type type, final int amount, ItemPrecision precision) {
         super(gui, player, true);
         this.selected = element;
         this.id = id;
@@ -82,16 +82,16 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         playerItems = new ArrayList<>();
         searchItems = new ArrayList<>();
-        PlayerInventory inventory = MinecraftClient.getInstance().player.inventory;
-        int itemLength = inventory.getInvSize();
+        Inventory inventory = Minecraft.getInstance().player.inventory;
+        int itemLength = inventory.getContainerSize();
         for (int i = 0; i < itemLength; i++) {
-            ItemStack stack = inventory.getInvStack(i);
+            ItemStack stack = inventory.getItem(i);
             if (!stack.isEmpty()) {
                 stack = stack.copy();
                 stack.setCount(1);
                 boolean exists = false;
                 for (Element<?> other : playerItems) {
-                    if (ItemStack.areEqualIgnoreDamage(stack, (ItemStack) other.getStack())) {
+                    if (ItemStack.matches(stack, (ItemStack) other.getStack())) {
                         exists = true;
                         break;
                     }
@@ -187,7 +187,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
         selected.draw(gui, 70, 15, mX, mY);
@@ -212,7 +212,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.renderTooltip(matrices, gui, mX, mY);
         
         drawListMouseOver(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
@@ -286,7 +286,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
     }
     
-    private void drawListMouseOver(MatrixStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private void drawListMouseOver(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             Element<?> element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
@@ -316,15 +316,15 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     } else {
                         selected.setAmount(1);
                     }
-                    int lastDiff = player.age - lastClicked;
+                    int lastDiff = player.tickCount - lastClicked;
                     if (lastDiff < 0) {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     } else if (lastDiff < 6 && !selected.isEmpty()) {
                         save(gui);
                         close(gui);
                         return true;
                     } else {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     }
                 }
                 break;
@@ -368,7 +368,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
         
-        public abstract List<StringVisitable> getName(GuiBase gui);
+        public abstract List<FormattedText> getName(GuiBase gui);
         
         public abstract int getAmount();
         
@@ -402,7 +402,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<StringVisitable> getName(GuiBase gui) {
+        public List<FormattedText> getName(GuiBase gui) {
             if (stack != null && !stack.isEmpty()) {
                 return (List) gui.getTooltipFromItem(stack);
             } else {
@@ -446,7 +446,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public List<StringVisitable> getName(GuiBase gui) {
+        public List<FormattedText> getName(GuiBase gui) {
             if (stack != null) {
                 return Collections.singletonList(stack.getName());
             }
@@ -499,17 +499,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public static void initItems() {
             clear();
             if (searchItems.isEmpty()) {
-                DefaultedList<ItemStack> stacks = DefaultedList.of();
+                NonNullList<ItemStack> stacks = NonNullList.create();
                 for (Item item : Registry.ITEM) {
                     try {
-                        item.appendStacks(item.getGroup(), stacks);
+                        item.fillItemCategory(item.getItemCategory(), stacks);
                     } catch (Exception ignore) {
                     }
                 }
-                PlayerEntity player = MinecraftClient.getInstance().player;
+                Player player = Minecraft.getInstance().player;
                 for (ItemStack stack : stacks) {
-                    List tooltipList = stack.getTooltip(player, TooltipContext.Default.NORMAL);
-                    List advTooltipList = stack.getTooltip(player, TooltipContext.Default.ADVANCED);
+                    List tooltipList = stack.getTooltipLines(player, TooltipFlag.Default.NORMAL);
+                    List advTooltipList = stack.getTooltipLines(player, TooltipFlag.Default.ADVANCED);
                     StringBuilder searchString = new StringBuilder();
                     for (Object string : tooltipList) {
                         if (string != null)
@@ -524,7 +524,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 }
                 for (Fluid fluid : Registry.FLUID) {
                     if (fluid instanceof EmptyFluid) continue;
-                    if (!fluid.getDefaultState().isStill()) continue;
+                    if (!fluid.defaultFluidState().isSource()) continue;
                     FluidVolume fluidVolume = FluidKeys.get(fluid).withAmount(FluidAmount.ofWhole(1));
                     String search = fluidVolume.getName().getString();
                     searchFluids.add(new SearchEntry(search, search, new ElementFluid(fluidVolume)));
@@ -541,7 +541,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public void run() {
             elements = new ArrayList<>();
             Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
-            boolean advanced = MinecraftClient.getInstance().options.advancedItemTooltips;
+            boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
             for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
                 SearchEntry entry = searchItems.get(i);
                 entry.search(pattern, elements, advanced);
@@ -562,9 +562,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public static class SearchEntry {
             private String toolTip;
             private String advToolTip;
-            private GuiEditMenuItem.Element<?> element;
+            private Element<?> element;
             
-            public SearchEntry(String searchString, String advSearchString, GuiEditMenuItem.Element<?> element) {
+            public SearchEntry(String searchString, String advSearchString, Element<?> element) {
                 this.toolTip = searchString;
                 this.advToolTip = advSearchString;
                 this.element = element;
@@ -589,7 +589,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     HANDLER.handle.put(menu, search);
             }
             
-            public void renderEvent(MatrixStack matrices, float delta) {
+            public void renderEvent(PoseStack matrices, float delta) {
                 if (!handle.isEmpty()) {
                     for (Map.Entry<GuiEditMenuItem, Search> entry : handle.entrySet()) {
                         entry.getKey().searchItems = entry.getValue().elements;

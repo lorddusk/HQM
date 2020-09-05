@@ -1,15 +1,14 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskMob;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.Registry;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private List<String> rawMobs;
     private List<String> mobs;
     
-    public GuiEditMenuMob(GuiQuestBook gui, QuestTaskMob task, final QuestTaskMob.Mob mob, int id, PlayerEntity player) {
+    public GuiEditMenuMob(GuiQuestBook gui, QuestTaskMob task, final QuestTaskMob.Mob mob, int id, Player player) {
         super(gui, player, false, 180, 70, 180, 150);
         this.task = task;
         this.mob = mob;
@@ -65,8 +64,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         mobs = new ArrayList<>();
         
         for (EntityType type : Registry.ENTITY_TYPE) {
-            if (type.isSummonable()) {
-                rawMobs.add(type.getName().getString());
+            if (type.canSummon()) {
+                rawMobs.add(type.getDescription().getString());
             }
         }
         
@@ -87,7 +86,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -144,12 +143,12 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return I18n.translate("hqm.mobTask." + "type" + "Match.title");
+        return I18n.get("hqm.mobTask." + "type" + "Match.title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return I18n.translate("hqm.mobTask." + "type" + "Match.desc");
+        return I18n.get("hqm.mobTask." + "type" + "Match.desc");
     }
     
     @Override

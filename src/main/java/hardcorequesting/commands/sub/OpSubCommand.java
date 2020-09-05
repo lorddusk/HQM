@@ -5,30 +5,30 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.items.QuestBookItem;
 import hardcorequesting.quests.QuestingData;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 public class OpSubCommand implements CommandHandler.SubCommand {
     @Override
-    public ArgumentBuilder<ServerCommandSource, ?> build(LiteralArgumentBuilder<ServerCommandSource> builder) {
+    public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermissionLevel(4) && source.getEntity() instanceof PlayerEntity)
-                .then(CommandManager.argument("targets", EntityArgumentType.player())
+                .requires(source -> source.hasPermission(4) && source.getEntity() instanceof Player)
+                .then(Commands.argument("targets", EntityArgument.player())
                         .executes(context -> {
-                            PlayerEntity player = EntityArgumentType.getPlayer(context, "targets");
+                            Player player = EntityArgument.getPlayer(context, "targets");
                             if (QuestingData.hasData(player)) {
-                                player.inventory.insertStack(QuestBookItem.getOPBook(player));
-                            } else context.getSource().sendError(new TranslatableText("hqm.message.noPlayer"));
+                                player.inventory.add(QuestBookItem.getOPBook(player));
+                            } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
-                    PlayerEntity player = (PlayerEntity) context.getSource().getEntity();
+                    Player player = (Player) context.getSource().getEntity();
                     if (QuestingData.hasData(player)) {
-                        player.inventory.insertStack(QuestBookItem.getOPBook(player));
-                    } else context.getSource().sendError(new TranslatableText("hqm.message.noPlayer"));
+                        player.inventory.add(QuestBookItem.getOPBook(player));
+                    } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                     return 1;
                 });
     }

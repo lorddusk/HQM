@@ -1,10 +1,9 @@
 package hardcorequesting.client.interfaces;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.StringVisitable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class TextBoxGroup {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(MatrixStack matrices, GuiBase gui) {
+    public void draw(PoseStack matrices, GuiBase gui) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible()) {
                 textBox.draw(matrices, gui, selectedTextBox == textBox);
@@ -80,7 +79,7 @@ public class TextBoxGroup {
         }
         
         @Environment(EnvType.CLIENT)
-        protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+        protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

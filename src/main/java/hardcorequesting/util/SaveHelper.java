@@ -1,12 +1,12 @@
 package hardcorequesting.util;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +80,7 @@ public final class SaveHelper {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void render(MatrixStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public static void render(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (isLarge) {
             gui.drawRect(X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
         } else {
@@ -136,7 +136,7 @@ public final class SaveHelper {
         return !isLarge && gui.inBounds(X + SAVE_X, Y + SAVE_Y, SAVE_SIZE, SAVE_SIZE, mX, mY);
     }
     
-    private static StringVisitable formatTime(int minutes) {
+    private static FormattedText formatTime(int minutes) {
         int hours = minutes / 60;
         minutes -= hours * 60;
         
@@ -249,7 +249,7 @@ public final class SaveHelper {
             }
             
             private String translate() {
-                return I18n.translate("hqm.editType." + id);
+                return I18n.get("hqm.editType." + id);
             }
         }
         
@@ -294,7 +294,7 @@ public final class SaveHelper {
             }
             
             private String translate() {
-                return I18n.translate("hqm.editType." + id);
+                return I18n.get("hqm.editType." + id);
             }
         }
     }

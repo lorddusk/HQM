@@ -1,7 +1,7 @@
 package hardcorequesting.quests;
 
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class RepeatInfo {
     
@@ -27,7 +27,7 @@ public class RepeatInfo {
         return type;
     }
     
-    public String getMessage(Quest quest, PlayerEntity player) {
+    public String getMessage(Quest quest, Player player) {
         return type.getMessage(quest, player, days, hours);
     }
     

@@ -4,12 +4,12 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.world.World;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class QuestTaskBlockPlace extends QuestTaskItems {
     public QuestTaskBlockPlace(Quest parent, String description, String longDescription) {
@@ -23,24 +23,24 @@ public class QuestTaskBlockPlace extends QuestTaskItems {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
     }
     
     @Override
-    public void onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {
-        handleRightClick(hand, playerEntity, playerEntity.getStackInHand(hand));
+    public void onItemUsed(Player playerEntity, Level world, InteractionHand hand) {
+        handleRightClick(hand, playerEntity, playerEntity.getItemInHand(hand));
     }
     
     @Override
-    public void onBlockUsed(PlayerEntity playerEntity, World world, Hand hand, BlockHitResult hitResult) {
-        handleRightClick(hand, playerEntity, playerEntity.getStackInHand(hand));
+    public void onBlockUsed(Player playerEntity, Level world, InteractionHand hand, BlockHitResult hitResult) {
+        handleRightClick(hand, playerEntity, playerEntity.getItemInHand(hand));
     }
     
-    private void handleRightClick(Hand hand, PlayerEntity player, ItemStack itemStack) {
-        if (hand != Hand.MAIN_HAND) return;
+    private void handleRightClick(InteractionHand hand, Player player, ItemStack itemStack) {
+        if (hand != InteractionHand.MAIN_HAND) return;
         
-        DefaultedList<ItemStack> consume = DefaultedList.ofSize(1, itemStack);
-        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUuid());
+        NonNullList<ItemStack> consume = NonNullList.withSize(1, itemStack);
+        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUUID());
     }
 }
 

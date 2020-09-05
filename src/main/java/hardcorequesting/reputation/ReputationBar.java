@@ -1,5 +1,6 @@
 package hardcorequesting.reputation;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -10,9 +11,7 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class ReputationBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(MatrixStack matrices, GuiQuestBook gui, int mX, int mY, PlayerEntity player) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY, Player player) {
         Reputation reputation = Reputation.getReputation(this.repId);
         if (reputation == null) return;
         
@@ -103,7 +102,7 @@ public class ReputationBar {
                     SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new ReputationBar.EditGui(gui, gui.getPlayer(), this));
+                    gui.setEditMenu(new EditGui(gui, gui.getPlayer(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
@@ -120,13 +119,13 @@ public class ReputationBar {
         private ReputationBar bar;
         private boolean isNew;
         
-        public EditGui(GuiBase guiBase, PlayerEntity player, ReputationBar bar) {
+        public EditGui(GuiBase guiBase, Player player, ReputationBar bar) {
             super(guiBase, player);
             this.bar = bar;
             this.isNew = false;
         }
         
-        public EditGui(GuiBase guiBase, PlayerEntity player, int x, int y, int selectedSet) {
+        public EditGui(GuiBase guiBase, Player player, int x, int y, int selectedSet) {
             super(guiBase, player);
             this.bar = new ReputationBar(null, x, y, selectedSet);
             this.isNew = true;
@@ -134,7 +133,7 @@ public class ReputationBar {
         
         @Override
         @Environment(EnvType.CLIENT)
-        public void draw(MatrixStack matrices, GuiBase guiB, int mX, int mY) {
+        public void draw(PoseStack matrices, GuiBase guiB, int mX, int mY) {
             GuiQuestBook gui = (GuiQuestBook) guiB;
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());

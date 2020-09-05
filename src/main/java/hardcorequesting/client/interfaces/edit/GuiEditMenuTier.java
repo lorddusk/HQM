@@ -1,14 +1,13 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     
@@ -32,7 +31,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private boolean clicked;
     
-    public GuiEditMenuTier(GuiQuestBook gui, PlayerEntity player, GroupTier original) {
+    public GuiEditMenuTier(GuiQuestBook gui, Player player, GroupTier original) {
         super(gui, player, true);
         this.original = original;
         this.tier = original.copy();
@@ -67,7 +66,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         gui.drawString(matrices, Translator.plain(tier.getName()), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());

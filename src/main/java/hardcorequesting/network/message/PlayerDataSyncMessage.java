@@ -10,9 +10,9 @@ import hardcorequesting.util.SyncUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +26,7 @@ public class PlayerDataSyncMessage implements IMessage {
     public PlayerDataSyncMessage() {
     }
     
-    public PlayerDataSyncMessage(boolean local, boolean serverWorld, PlayerEntity player) {
+    public PlayerDataSyncMessage(boolean local, boolean serverWorld, Player player) {
         this.local = local;
         this.serverWorld = serverWorld;
         this.questing = QuestingData.isQuestActive();
@@ -36,22 +36,22 @@ public class PlayerDataSyncMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
         this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
-        this.team = buf.readString(32767);
+        this.team = buf.readUtf(32767);
         this.data = SyncUtil.readLargeString(buf);
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(this.local);
         buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
-        buf.writeString(team);
+        buf.writeUtf(team);
         SyncUtil.writeLargeString(this.data, buf);
     }
     
@@ -87,7 +87,7 @@ public class PlayerDataSyncMessage implements IMessage {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            QuestLine.receiveServerSync(MinecraftClient.getInstance().player, message.local, message.serverWorld);
+            QuestLine.receiveServerSync(Minecraft.getInstance().player, message.local, message.serverWorld);
         }
     }
 }

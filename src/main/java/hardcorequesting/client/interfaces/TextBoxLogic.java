@@ -4,7 +4,6 @@ import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
-import net.minecraft.text.StringVisitable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -185,7 +184,7 @@ public class TextBoxLogic {
     }
     
     protected boolean isCharacterValid(char c) {
-        return SharedConstants.isValidChar(c);
+        return SharedConstants.isAllowedChatCharacter(c);
     }
     
     private void updateCursor() {

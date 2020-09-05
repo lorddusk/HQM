@@ -9,11 +9,11 @@ import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public class PlayerTracker {
     
@@ -25,11 +25,11 @@ public class PlayerTracker {
         instance = this;
     }
     
-    public int getRemainingLives(PlayerEntity sender) {
+    public int getRemainingLives(Player sender) {
         return QuestingData.getQuestingData(sender).getLives();
     }
     
-    public void onPlayerLogin(ServerPlayerEntity player) {
+    public void onPlayerLogin(ServerPlayer player) {
         if (!QuestingData.hasData(player)) {
             DeathStats.resync();
         }
@@ -61,8 +61,8 @@ public class PlayerTracker {
     }
     
     
-    private void sendLoginMessage(PlayerEntity player) {
+    private void sendLoginMessage(Player player) {
         player.sendMessage(Translator.translatable("hqm.message.hardcore").append(" ")
-                .append(Translator.translatable(Formatting.RESET, getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))), Util.NIL_UUID);
+                .append(Translator.translatable(ChatFormatting.RESET, getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))), Util.NIL_UUID);
     }
 }

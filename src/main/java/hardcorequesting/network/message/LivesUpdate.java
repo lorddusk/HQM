@@ -4,7 +4,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestingData;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.UUID;
 
@@ -22,15 +22,15 @@ public class LivesUpdate implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.lives = buf.readInt();
-        uuid = buf.readUuid();
+        uuid = buf.readUUID();
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.lives);
-        buf.writeUuid(this.uuid);
+        buf.writeUUID(this.uuid);
     }
     
     public static class Handler implements IMessageHandler<LivesUpdate, IMessage> {

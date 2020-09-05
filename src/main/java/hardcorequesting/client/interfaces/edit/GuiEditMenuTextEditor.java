@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiBase;
@@ -14,15 +15,14 @@ import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Util;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.stream.Collectors;
 
@@ -47,7 +47,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     private int advancementId = -1;
     private boolean isName;
     
-    protected GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, String txt, boolean isName) {
+    protected GuiEditMenuTextEditor(GuiQuestBook gui, Player player, String txt, boolean isName) {
         super(gui, player, false);
         if (txt != null && !txt.isEmpty()) {
             txt = txt.replace("\n", "\\n");
@@ -57,35 +57,35 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         this.isName = isName;
         buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
-                MinecraftClient.getInstance().keyboard.setClipboard(text.getText());
+            public void onClick(GuiBase gui, Player player) {
+                Minecraft.getInstance().keyboardHandler.setClipboard(text.getText());
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.paste", 245, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
-                String clip = MinecraftClient.getInstance().keyboard.getClipboard();
+            public void onClick(GuiBase gui, Player player) {
+                String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
                 }
@@ -95,35 +95,35 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.textEditor.clear", 185, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 text.setTextAndCursor(gui, "");
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.clearPaste", 245, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
-                String clip = MinecraftClient.getInstance().keyboard.getClipboard();
+            public void onClick(GuiBase gui, Player player) {
+                String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
                 }
@@ -132,77 +132,77 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         });
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestTask task, boolean isName) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestTask task, boolean isName) {
         this(gui, player, isName ? task.getDescription() : task.getLongDescription(), isName);
         this.task = task;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, Quest quest, boolean isName) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, Quest quest, boolean isName) {
         this(gui, player, isName ? quest.getName() : quest.getDescription(), isName);
         this.quest = quest;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestSet questSet, boolean isName) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestSet questSet, boolean isName) {
         this(gui, player, isName ? questSet.getName() : questSet.getDescription(), isName);
         this.questSet = questSet;
     }
     
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player) {
         this(gui, player, Quest.getRawMainDescription(), false);
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, Group group) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, Group group) {
         this(gui, player, group.getDisplayName(), true);
         this.group = group;
     }
     
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, GroupTier groupTier) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, GroupTier groupTier) {
         this(gui, player, groupTier.getName(), true);
         this.groupTier = groupTier;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestTaskLocation task, int id, QuestTaskLocation.Location location) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestTaskLocation task, int id, QuestTaskLocation.Location location) {
         this(gui, player, location.getName(), true);
         this.task = task;
         this.location = id;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestTaskAdvancement task, int id, QuestTaskAdvancement.AdvancementTask advancement) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestTaskAdvancement task, int id, QuestTaskAdvancement.AdvancementTask advancement) {
         this(gui, player, advancement.getName(), true);
         this.task = task;
         this.advancementId = id;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestTaskTame task, int id, QuestTaskTame.Tame tame) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestTaskTame task, int id, QuestTaskTame.Tame tame) {
         this(gui, player, tame.getName(), true);
         this.task = task;
         this.tame = id;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, QuestTaskMob task, int id, QuestTaskMob.Mob mob) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, QuestTaskMob task, int id, QuestTaskMob.Mob mob) {
         this(gui, player, mob.getName(), true);
         this.task = task;
         this.mob = id;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, Reputation reputation) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, Reputation reputation) {
         this(gui, player, reputation.getName(), true);
         this.reputation = reputation;
     }
     
-    public GuiEditMenuTextEditor(GuiQuestBook gui, PlayerEntity player, ReputationMarker reputationMarker) {
+    public GuiEditMenuTextEditor(GuiQuestBook gui, Player player, ReputationMarker reputationMarker) {
         this(gui, player, reputationMarker.getName(), true);
         this.reputationMarker = reputationMarker;
     }
     
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         int page = text.getCursorLine(gui) / LINES_PER_PAGE;
-        gui.drawString(matrices, text.getLines().stream().map(StringVisitable::plain).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
+        gui.drawString(matrices, text.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
         gui.drawCursor(matrices, START_X + text.getCursorPositionX(gui) - 1, START_Y + text.getCursorPositionY(gui) - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     
@@ -216,7 +216,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     public void save(GuiBase gui) {
         String str = text.getText();
         if (str == null || str.isEmpty()) {
-            str = I18n.translate("hqm.textEditor.unnamed");
+            str = I18n.get("hqm.textEditor.unnamed");
         }
         
         if (!isName && group == null && groupTier == null) {
@@ -258,7 +258,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         } else if (questSet != null) {
             if (isName) {
                 if (!questSet.setName(str)) {
-                    player.sendMessage(new TranslatableText("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.setBold(true).setColor(Formatting.RED)), Util.NIL_UUID);
+                    player.sendMessage(new TranslatableComponent("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)), Util.NIL_UUID);
                 }
             } else {
                 questSet.setDescription(str);

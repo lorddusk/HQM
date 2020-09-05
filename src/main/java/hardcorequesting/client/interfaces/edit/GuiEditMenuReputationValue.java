@@ -4,14 +4,14 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.SaveHelper;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     
     private ReputationMarker marker;
     private int value;
     
-    public GuiEditMenuReputationValue(GuiBase gui, PlayerEntity player, ReputationMarker marker) {
+    public GuiEditMenuReputationValue(GuiBase gui, Player player, ReputationMarker marker) {
         super(gui, player, true, -1, -1, 25, 30);
         
         this.marker = marker;

@@ -11,12 +11,12 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 import java.io.IOException;
 
@@ -48,7 +48,7 @@ public class MinecraftAdapter {
                 out.nullValue();
                 return;
             }
-            Streams.write(Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, stack.toTag(new CompoundTag())), out);
+            Streams.write(Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, stack.save(new CompoundTag())), out);
         }
         
         @Override
@@ -57,14 +57,14 @@ public class MinecraftAdapter {
                 in.nextNull();
                 return ItemStack.EMPTY;
             }
-            return ItemStack.fromTag((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, Streams.parse(in)));
+            return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, Streams.parse(in)));
         }
     };
     public static final TypeAdapter<FluidVolume> FLUID = new TypeAdapter<FluidVolume>() {
         @Override
         public void write(JsonWriter out, FluidVolume value) throws IOException {
             JsonObject object = new JsonObject();
-            object.addProperty("fluid", Registry.FLUID.getId(value.getRawFluid()).toString());
+            object.addProperty("fluid", Registry.FLUID.getKey(value.getRawFluid()).toString());
             object.add("volume", Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, value.getAmount_F().toNbt()));
             Streams.write(object, out);
         }
@@ -72,7 +72,7 @@ public class MinecraftAdapter {
         @Override
         public FluidVolume read(JsonReader in) throws IOException {
             JsonObject object = Streams.parse(in).getAsJsonObject();
-            Fluid fluid = Registry.FLUID.get(new Identifier(object.get("fluid").getAsString()));
+            Fluid fluid = Registry.FLUID.get(new ResourceLocation(object.get("fluid").getAsString()));
             FluidAmount amount = FluidAmount.fromNbt((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, object.get("volume")));
             return FluidKeys.get(fluid).withAmount(amount);
         }

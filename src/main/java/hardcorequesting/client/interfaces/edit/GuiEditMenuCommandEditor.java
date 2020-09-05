@@ -1,18 +1,18 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.CharacterVisitor;
-import net.minecraft.client.font.TextVisitFactory;
-import net.minecraft.client.util.TextCollector;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
+import net.minecraft.client.ComponentCollector;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSink;
+import net.minecraft.util.StringDecomposer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     private boolean[] edited;
     private String added;
     
-    public GuiEditMenuCommandEditor(GuiQuestBook gui, PlayerEntity player) {
+    public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
         super(gui, player, "", false);
         this.quest = GuiQuestBook.selectedQuest;
         this.commands = this.quest.getCommandRewardsAsStrings();
@@ -39,7 +39,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
@@ -86,7 +86,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     }
     
     @Override
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.renderTooltip(matrices, gui, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
@@ -133,23 +133,23 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         }
     }
     
-    private void drawStringTrimmed(MatrixStack matrices, GuiBase gui, StringVisitable text, int x, int y, int colour) {
+    private void drawStringTrimmed(PoseStack matrices, GuiBase gui, FormattedText text, int x, int y, int colour) {
         CharacterLimitingVisitor characterLimitingVisitor = new CharacterLimitingVisitor(25);
-        text = text.visit(new StringVisitable.StyledVisitor<StringVisitable>() {
-            private final TextCollector collector = new TextCollector();
+        text = text.visit(new FormattedText.StyledContentConsumer<FormattedText>() {
+            private final ComponentCollector collector = new ComponentCollector();
             
-            public Optional<StringVisitable> accept(Style style, String string) {
+            public Optional<FormattedText> accept(Style style, String string) {
                 characterLimitingVisitor.resetLength();
-                if (!TextVisitFactory.visitFormatted(string, style, characterLimitingVisitor)) {
+                if (!StringDecomposer.iterateFormatted(string, style, characterLimitingVisitor)) {
                     String string2 = string.substring(0, characterLimitingVisitor.getLength());
                     if (!string2.isEmpty()) {
-                        this.collector.add(StringVisitable.styled(string2, style));
+                        this.collector.append(FormattedText.of(string2, style));
                     }
                     
-                    return Optional.of(this.collector.getCombined());
+                    return Optional.of(this.collector.getResultOrEmpty());
                 } else {
                     if (!string.isEmpty()) {
-                        this.collector.add(StringVisitable.styled(string, style));
+                        this.collector.append(FormattedText.of(string, style));
                     }
                     
                     return Optional.empty();
@@ -159,7 +159,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         gui.drawString(matrices, text, x, y, colour);
     }
     
-    static class CharacterLimitingVisitor implements CharacterVisitor {
+    static class CharacterLimitingVisitor implements FormattedCharSink {
         private int widthLeft;
         private int length;
         

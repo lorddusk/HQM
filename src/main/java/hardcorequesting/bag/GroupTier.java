@@ -11,7 +11,7 @@ import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -111,7 +111,7 @@ public class GroupTier {
     
     @Environment(EnvType.CLIENT)
     public String getName() {
-        return name == null || name.equals("") ? I18n.translate("hqm.bag.unknown") : name;
+        return name == null || name.equals("") ? I18n.get("hqm.bag.unknown") : name;
     }
     
     public void setName(String name) {

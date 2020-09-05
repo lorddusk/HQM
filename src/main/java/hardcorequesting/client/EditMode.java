@@ -2,7 +2,7 @@ package hardcorequesting.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 public enum EditMode {
     NORMAL("normal"),
@@ -43,11 +43,11 @@ public enum EditMode {
     
     @Environment(EnvType.CLIENT)
     public String getName() {
-        return I18n.translate("hqm.editMode." + id + ".title");
+        return I18n.get("hqm.editMode." + id + ".title");
     }
     
     @Environment(EnvType.CLIENT)
     public String getDescription() {
-        return I18n.translate("hqm.editMode." + id + ".desc");
+        return I18n.get("hqm.editMode." + id + ".desc");
     }
 }

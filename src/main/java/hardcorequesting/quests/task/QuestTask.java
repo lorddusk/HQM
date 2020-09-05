@@ -3,6 +3,7 @@ package hardcorequesting.quests.task;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -20,21 +21,20 @@ import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -49,7 +49,7 @@ public abstract class QuestTask {
     private List<QuestTask> requirements;
     private String longDescription;
     private int id;
-    private List<StringVisitable> cachedDescription;
+    private List<FormattedText> cachedDescription;
     
     public QuestTask(Quest parent, String description, String longDescription) {
         this.parent = parent;
@@ -94,10 +94,10 @@ public abstract class QuestTask {
             quest.reset(uuid);
         }
         
-        PlayerEntity player = QuestingData.getPlayer(uuid);
-        if (player instanceof ServerPlayerEntity && !quest.hasReward(player)) {
+        Player player = QuestingData.getPlayer(uuid);
+        if (player instanceof ServerPlayer && !quest.hasReward(player)) {
             // when there is no reward and it just completes the quest play the music
-            NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (ServerPlayerEntity) player);
+            NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (ServerPlayer) player);
         }
         
         if (player != null) {
@@ -117,7 +117,7 @@ public abstract class QuestTask {
         return false;
     }
     
-    public boolean isCompleted(PlayerEntity player) {
+    public boolean isCompleted(Player player) {
         return getData(player).completed;
     }
     
@@ -125,7 +125,7 @@ public abstract class QuestTask {
         return getData(uuid).completed;
     }
     
-    public boolean isVisible(PlayerEntity player) {
+    public boolean isVisible(Player player) {
         Iterator<QuestTask> itr = this.requirements.iterator();
         QuestTask requirement;
         do {
@@ -147,8 +147,8 @@ public abstract class QuestTask {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
-    public QuestDataTask getData(PlayerEntity player) {
-        return getData(player.getUuid());
+    public QuestDataTask getData(Player player) {
+        return getData(player.getUUID());
     }
     
     public QuestDataTask getData(UUID uuid) {
@@ -208,7 +208,7 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public List<StringVisitable> getCachedLongDescription(GuiBase gui) {
+    public List<FormattedText> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.translated(longDescription), 0.7F, 130);
         }
@@ -222,12 +222,12 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY);
+    public abstract void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY);
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b);
+    public abstract void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b);
     
-    public abstract void onUpdate(PlayerEntity player);
+    public abstract void onUpdate(Player player);
     
     public int getId() {
         return id;
@@ -286,16 +286,16 @@ public abstract class QuestTask {
     public void onServerTick(MinecraftServer server) {
     }
     
-    public void onPlayerTick(ServerPlayerEntity playerEntity) {
+    public void onPlayerTick(ServerPlayer playerEntity) {
     }
     
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
     }
     
-    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
+    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
     }
     
-    public void onItemPickUp(PlayerEntity playerEntity, ItemStack stack) {
+    public void onItemPickUp(Player playerEntity, ItemStack stack) {
     }
     
     public void onOpenBook(EventTrigger.BookOpeningEvent event) {
@@ -304,10 +304,10 @@ public abstract class QuestTask {
     public void onReputationChange(EventTrigger.ReputationEvent event) {
     }
     
-    public void onAnimalTame(PlayerEntity tamer, Entity entity) {
+    public void onAnimalTame(Player tamer, Entity entity) {
     }
     
-    public void onAdvancement(ServerPlayerEntity playerEntity) {
+    public void onAdvancement(ServerPlayer playerEntity) {
     }
     
     public void onQuestCompleted(EventTrigger.QuestCompletedEvent event) {
@@ -316,15 +316,15 @@ public abstract class QuestTask {
     public void onQuestSelected(EventTrigger.QuestSelectedEvent event) {
     }
     
-    public void onBlockPlaced(ItemStack item, World world, BlockState state, LivingEntity entity) {
+    public void onBlockPlaced(ItemStack item, Level world, BlockState state, LivingEntity entity) {
     }
     
-    public void onBlockBroken(BlockPos blockPos, BlockState blockState, PlayerEntity player) {
+    public void onBlockBroken(BlockPos blockPos, BlockState blockState, Player player) {
     }
     
-    public void onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {
+    public void onItemUsed(Player playerEntity, Level world, InteractionHand hand) {
     }
     
-    public void onBlockUsed(PlayerEntity playerEntity, World world, Hand hand, BlockHitResult hitResult) {
+    public void onBlockUsed(Player playerEntity, Level world, InteractionHand hand, BlockHitResult hitResult) {
     }
 }

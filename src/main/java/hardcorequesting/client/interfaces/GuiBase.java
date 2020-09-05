@@ -2,25 +2,21 @@ package hardcorequesting.client.interfaces;
 
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
@@ -28,13 +24,13 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class GuiBase extends Screen {
-    public static final Identifier MAP_TEXTURE = ResourceHelper.getResource("questmap");
+    public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
     public static final int ITEM_SIZE = 18;
     protected static final int ITEM_SRC_Y = 235;
-    protected static ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
+    protected static ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
     protected int left, top;
     
-    protected GuiBase(Text title) {
+    protected GuiBase(Component title) {
         super(title);
     }
     
@@ -123,23 +119,23 @@ public class GuiBase extends Screen {
                 break;
         }
         
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(7, VertexFormats.POSITION_TEXTURE);
-        bufferBuilder.vertex(x, y + targetH, this.getZOffset()).texture((float) pt1[0], (float) pt1[1]).next();
-        bufferBuilder.vertex(x + targetW, y + targetH, this.getZOffset()).texture((float) pt2[0], (float) pt2[1]).next();
-        bufferBuilder.vertex(x + targetW, y, this.getZOffset()).texture((float) pt3[0], (float) pt3[1]).next();
-        bufferBuilder.vertex(x, y, this.getZOffset()).texture((float) pt4[0], (float) pt4[1]).next();
+        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        bufferBuilder.begin(7, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
+        bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
+        bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
+        bufferBuilder.vertex(x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
         bufferBuilder.end();
         RenderSystem.enableAlphaTest();
-        BufferRenderer.draw(bufferBuilder);
+        BufferUploader.end(bufferBuilder);
     }
     
-    public void renderTooltip(MatrixStack matrices, StringVisitable stringRenderable, int x, int y) {
-        renderTooltipL(matrices, textRenderer.getTextHandler().wrapLines(stringRenderable, Integer.MAX_VALUE, Style.EMPTY), x, y);
+    public void renderTooltip(PoseStack matrices, FormattedText stringRenderable, int x, int y) {
+        renderTooltipL(matrices, font.getSplitter().splitLines(stringRenderable, Integer.MAX_VALUE, Style.EMPTY), x, y);
     }
     
-    public void renderTooltipL(MatrixStack matrices, List<StringVisitable> stringRenderables, int x, int y) {
-        renderOrderedTooltip(matrices, Language.getInstance().reorder(stringRenderables), x, y);
+    public void renderTooltipL(PoseStack matrices, List<FormattedText> stringRenderables, int x, int y) {
+        renderTooltip(matrices, Language.getInstance().getVisualOrder(stringRenderables), x, y);
     }
     
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
@@ -158,7 +154,7 @@ public class GuiBase extends Screen {
     }
     
     @Override
-    public void renderTooltip(MatrixStack matrices, ItemStack stack, int x, int y) {
+    public void renderTooltip(PoseStack matrices, ItemStack stack, int x, int y) {
         super.renderTooltip(matrices, stack, x, y);
     }
     
@@ -207,7 +203,7 @@ public class GuiBase extends Screen {
     }
     
     public void drawIcon(ItemStack stack, int x, int y) {
-        itemRenderer.renderGuiItemOverlay(textRenderer, stack, x, y, null);
+        itemRenderer.renderGuiItemDecorations(font, stack, x, y, null);
         //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
     
@@ -252,8 +248,8 @@ public class GuiBase extends Screen {
             RenderSystem.enableRescaleNormal();
             RenderSystem.translatef(getLeft() + x, getTop() + y, 0);
             
-            MinecraftClient.getInstance().getItemRenderer().renderInGui(stack, 0, 0);
-            MinecraftClient.getInstance().getItemRenderer().renderGuiItemOverlay(textRenderer, stack, 0, 0, null);
+            Minecraft.getInstance().getItemRenderer().renderAndDecorateFakeItem(stack, 0, 0);
+            Minecraft.getInstance().getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, null);
             
             RenderSystem.popMatrix();
         } catch (Exception ignored) {
@@ -269,88 +265,88 @@ public class GuiBase extends Screen {
     }
     
     public int getStringWidth(String txt) {
-        return textRenderer.getStringWidth(txt);
+        return font.width(txt);
     }
     
-    public int getStringWidth(StringVisitable txt) {
-        return textRenderer.getWidth(txt);
+    public int getStringWidth(FormattedText txt) {
+        return font.width(txt);
     }
     
-    public void drawString(MatrixStack matrices, StringVisitable str, int x, int y, int color) {
+    public void drawString(PoseStack matrices, FormattedText str, int x, int y, int color) {
         drawString(matrices, str, x, y, 1F, color);
     }
     
-    public void drawString(MatrixStack matrices, StringVisitable str, int x, int y, float mult, int color) {
-        matrices.push();
+    public void drawString(PoseStack matrices, FormattedText str, int x, int y, float mult, int color) {
+        matrices.pushPose();
         matrices.scale(mult, mult, 1F);
-        textRenderer.draw(matrices, Language.getInstance().reorder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-        matrices.pop();
+        font.draw(matrices, Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        matrices.popPose();
     }
     
-    public void drawStringWithShadow(MatrixStack matrices, StringVisitable str, int x, int y, float mult, int color) {
-        matrices.push();
+    public void drawStringWithShadow(PoseStack matrices, FormattedText str, int x, int y, float mult, int color) {
+        matrices.pushPose();
         matrices.scale(mult, mult, 1F);
-        textRenderer.drawWithShadow(matrices, Language.getInstance().reorder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        font.drawShadow(matrices, Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
         
-        matrices.pop();
+        matrices.popPose();
     }
     
-    public void drawString(MatrixStack matrices, String str, int x, int y, int color) {
+    public void drawString(PoseStack matrices, String str, int x, int y, int color) {
         drawString(matrices, str, x, y, 1F, color);
     }
     
-    public void drawString(MatrixStack matrices, String str, int x, int y, float mult, int color) {
-        matrices.push();
+    public void drawString(PoseStack matrices, String str, int x, int y, float mult, int color) {
+        matrices.pushPose();
         matrices.scale(mult, mult, 1F);
-        textRenderer.draw(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-        matrices.pop();
+        font.draw(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        matrices.popPose();
     }
     
-    public void drawStringWithShadow(MatrixStack matrices, String str, int x, int y, float mult, int color) {
-        matrices.push();
+    public void drawStringWithShadow(PoseStack matrices, String str, int x, int y, float mult, int color) {
+        matrices.pushPose();
         matrices.scale(mult, mult, 1F);
-        textRenderer.drawWithShadow(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        font.drawShadow(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
         
-        matrices.pop();
+        matrices.popPose();
     }
     
     public boolean inBounds(int x, int y, int w, int h, double mX, double mY) {
         return x <= mX && mX <= x + w && y <= mY && mY <= y + h;
     }
     
-    public void drawCursor(MatrixStack matrices, int x, int y, int z, float size, int color) {
-        matrices.push();
+    public void drawCursor(PoseStack matrices, int x, int y, int z, float size, int color) {
+        matrices.pushPose();
         matrices.translate(0, 0, z);
         x += left;
         y += top;
         matrices.translate(x, y, 0);
         matrices.scale(size, size, 0);
         matrices.translate(-x, -y, 0);
-        DrawableHelper.fill(matrices, x, y + 1, x + 1, y + 10, color);
-        matrices.pop();
+        GuiComponent.fill(matrices, x, y + 1, x + 1, y + 10, color);
+        matrices.popPose();
     }
     
-    public void drawString(MatrixStack matrices, List<StringVisitable> str, int x, int y, float mult, int color) {
+    public void drawString(PoseStack matrices, List<FormattedText> str, int x, int y, float mult, int color) {
         drawString(matrices, str, 0, str.size(), x, y, mult, color);
     }
     
-    public void drawString(MatrixStack matrices, List<StringVisitable> str, int start, int length, int x, int y, float mult, int color) {
-        matrices.push();
+    public void drawString(PoseStack matrices, List<FormattedText> str, int start, int length, int x, int y, float mult, int color) {
+        matrices.pushPose();
         matrices.scale(mult, mult, 1F);
         start = Math.max(start, 0);
         int end = Math.min(start + length, str.size());
         for (int i = start; i < end; i++) {
-            textRenderer.draw(matrices, Language.getInstance().reorder(str.get(i)), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-            y += textRenderer.fontHeight;
+            font.draw(matrices, Language.getInstance().getVisualOrder(str.get(i)), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+            y += font.lineHeight;
         }
-        matrices.pop();
+        matrices.popPose();
     }
     
-    public void drawCenteredString(MatrixStack matrices, StringVisitable str, int x, int y, float mult, int width, int height, int color) {
-        drawString(matrices, str, x + (width - (int) (textRenderer.getWidth(str) * mult)) / 2, y + (height - (int) ((textRenderer.fontHeight - 2) * mult)) / 2, mult, color);
+    public void drawCenteredString(PoseStack matrices, FormattedText str, int x, int y, float mult, int width, int height, int color) {
+        drawString(matrices, str, x + (width - (int) (font.width(str) * mult)) / 2, y + (height - (int) ((font.lineHeight - 2) * mult)) / 2, mult, color);
     }
     
-    public List<StringVisitable> getLinesFromText(StringVisitable str, float mult, int width) {
+    public List<FormattedText> getLinesFromText(FormattedText str, float mult, int width) {
 //        List<StringVisitable> lst = new ArrayList<>();
         if (str == null) {
             str = Translator.plain("Missing info");
@@ -412,6 +408,6 @@ public class GuiBase extends Screen {
 //        }
 //        
 //        
-        return textRenderer.getTextHandler().wrapLines(str, (int) (width / mult), Style.EMPTY);
+        return font.getSplitter().splitLines(str, (int) (width / mult), Style.EMPTY);
     }
 }

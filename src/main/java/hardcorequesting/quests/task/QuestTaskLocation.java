@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -15,15 +16,13 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.registry.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,14 +47,14 @@ public class QuestTaskLocation extends QuestTask {
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
     
-    private void tick(PlayerEntity player, boolean isPlayerEvent) {
+    private void tick(Player player, boolean isPlayerEvent) {
         if (!isPlayerEvent) {
             delay++;
         } else if (this.delay >= 0) {
             delay = 0;
             
-            World world = player.getEntityWorld();
-            if (!world.isClient) {
+            Level world = player.getCommandSenderWorld();
+            if (!world.isClientSide) {
                 boolean[] visited = ((QuestDataTaskLocation) this.getData(player)).visited;
                 boolean all = true;
                 boolean updated = false;
@@ -68,8 +67,8 @@ public class QuestTaskLocation extends QuestTask {
                         System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
                         ((QuestDataTaskLocation) this.getData(player)).visited = visited;
                     }
-                    if (!visited[i] && player.getEntityWorld().getRegistryKey() == location.dimension) {
-                        int current = (int) player.squaredDistanceTo((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
+                    if (!visited[i] && player.getCommandSenderWorld().dimension() == location.dimension) {
+                        int current = (int) player.distanceToSqr((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
                             all = false;
@@ -84,7 +83,7 @@ public class QuestTaskLocation extends QuestTask {
                 
                 if (updated) {
                     if (all) {
-                        completeTask(player.getUuid());
+                        completeTask(player.getUUID());
                     }
                     parent.sendUpdatedDataToTeam(player);
                 }
@@ -103,11 +102,11 @@ public class QuestTaskLocation extends QuestTask {
         }
     }
     
-    private boolean visited(int id, PlayerEntity player) {
+    private boolean visited(int id, Player player) {
         return id < locations.length && ((QuestDataTaskLocation) getData(player)).visited[id];
     }
     
-    public void setLocation(int id, Location location, PlayerEntity player) {
+    public void setLocation(int id, Location location, Player player) {
         if (id >= locations.length) {
             locations = Arrays.copyOf(locations, locations.length + 1);
             QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
@@ -120,13 +119,13 @@ public class QuestTaskLocation extends QuestTask {
         locations[id] = location;
     }
     
-    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
+    public void setIcon(int id, ItemStack stack, Player player) {
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
         locations[id].iconStack = stack;
     }
     
-    public void setName(int id, String str, PlayerEntity player) {
+    public void setName(int id, String str, Player player) {
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
         locations[id].name = str;
@@ -139,7 +138,7 @@ public class QuestTaskLocation extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         Location[] locations = getEditFriendlyLocations(this.locations);
         for (int i = 0; i < locations.length; i++) {
             Location location = locations[i];
@@ -156,13 +155,13 @@ public class QuestTaskLocation extends QuestTask {
                     gui.drawString(matrices, Translator.plain("(" + location.x + ", " + location.y + ", " + location.z + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
                 
-                if (player.getEntityWorld().getRegistryKey() == location.dimension) {
+                if (player.getCommandSenderWorld().dimension() == location.dimension) {
                     if (location.radius >= 0) {
-                        StringVisitable str;
-                        int distance = (int) player.squaredDistanceTo(location.x + 0.5, location.y + 0.5, location.z + 0.5);
+                        FormattedText str;
+                        int distance = (int) player.distanceToSqr(location.x + 0.5, location.y + 0.5, location.z + 0.5);
                         str = Translator.translated("hqm.locationMenu.mAway", distance);
                         if (location.visible.doShowRadius()) {
-                            str = StringVisitable.concat(str, Translator.plain(" ["), Translator.translated("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
+                            str = FormattedText.composite(str, Translator.plain(" ["), Translator.translated("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
                         }
                         gui.drawString(matrices, str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
                     }
@@ -178,7 +177,7 @@ public class QuestTaskLocation extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Location[] locations = getEditFriendlyLocations(this.locations);
             for (int i = 0; i < locations.length; i++) {
@@ -222,7 +221,7 @@ public class QuestTaskLocation extends QuestTask {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     
@@ -278,8 +277,8 @@ public class QuestTaskLocation extends QuestTask {
     }
     
     @Override
-    public void onPlayerTick(ServerPlayerEntity playerEntity) {
-        if (!playerEntity.world.isClient) {
+    public void onPlayerTick(ServerPlayer playerEntity) {
+        if (!playerEntity.level.isClientSide) {
             tick(playerEntity, true);
         }
     }
@@ -325,7 +324,7 @@ public class QuestTaskLocation extends QuestTask {
         private int z;
         private int radius = 3;
         private Visibility visible = Visibility.LOCATION;
-        private RegistryKey<World> dimension;
+        private ResourceKey<Level> dimension;
         
         private Location copy() {
             Location location = new Location();
@@ -397,11 +396,11 @@ public class QuestTaskLocation extends QuestTask {
             this.visible = visible;
         }
         
-        public RegistryKey<World> getDimension() {
+        public ResourceKey<Level> getDimension() {
             return dimension;
         }
         
-        public void setDimension(RegistryKey<World> dimension) {
+        public void setDimension(ResourceKey<Level> dimension) {
             this.dimension = dimension;
         }
     }

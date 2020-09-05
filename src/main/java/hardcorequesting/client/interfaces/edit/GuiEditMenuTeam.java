@@ -1,17 +1,17 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamError;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,56 +44,56 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private TextBoxGroup.TextBox inviteName;
     private PlayerEntry selectedEntry;
     
-    public GuiEditMenuTeam(GuiQuestBook gui, PlayerEntity player) {
+    public GuiEditMenuTeam(GuiQuestBook gui, Player player) {
         super(gui, player);
         
         buttons.add(new LargeButton("hqm.party.create", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return teamName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return inviteTeam == null && getTeam().isSingle();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 getTeam().create(teamName.getText());
             }
         });
         
         buttons.add(inviteButton = new LargeButton("hqm.party.invitePlayer", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return inviteName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 getTeam().invite(inviteName.getText());
             }
         });
         
         buttons.add(new LargeButton("hqm.party.accept", 180, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 inviteTeam.accept();
                 inviteTeam = null;
             }
@@ -101,17 +101,17 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decline", 240, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 inviteTeam.decline();
                 inviteTeam = null;
             }
@@ -119,74 +119,74 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decideLater", 180, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 inviteTeam = null;
             }
         });
         
         buttons.add(new LargeButton(null, 250, 50) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return !selectedEntry.isOwner();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedEntry != null && getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 getTeam().kick(selectedEntry.getUUID());
                 selectedEntry = null;
             }
             
             @Override
-            protected StringVisitable getName() {
+            protected FormattedText getName() {
                 return Translator.translated(selectedEntry.isInTeam() ? "hqm.party.kickPlayer" : "hqm.party.removeInvite");
             }
         });
         
         buttons.add(new LargeButton("hqm.party.leave", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return Screen.hasShiftDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return !getTeam().isSingle() && !getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 getTeam().leave();
             }
         });
         
         buttons.add(new LargeButton("hqm.party.disband", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return !getTeam().isSingle() && selectedEntry != null && selectedEntry.isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 getTeam().disband();
                 selectedEntry = null;
             }
@@ -195,17 +195,17 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.list", 250, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 gui.setEditMenu(new GuiEditMenuTeamList((GuiQuestBook) gui, player, self));
             }
         });
@@ -243,7 +243,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         
         
         Team team = getTeam();
@@ -309,10 +309,10 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 String str = player.getDisplayName();
                 
                 if (player.isOwner()) {
-                    str += GuiColor.ORANGE + " [" + I18n.translate("hqm.party.owner") + "]";
+                    str += GuiColor.ORANGE + " [" + I18n.get("hqm.party.owner") + "]";
                 } else if (!player.isInTeam()) {
                     if (isOwner) {
-                        str += GuiColor.LIGHT_GRAY + " [" + I18n.translate("hqm.party.invite") + "]";
+                        str += GuiColor.LIGHT_GRAY + " [" + I18n.get("hqm.party.invite") + "]";
                     } else {
                         continue;
                     }
@@ -373,7 +373,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.renderTooltip(matrices, gui, mX, mY);
         
         Team team = getTeam();
@@ -384,9 +384,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.translate("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
         
@@ -498,7 +498,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     private PlayerEntry getEntry(Team team) {
-        return team.getEntry(this.player.getUuid());
+        return team.getEntry(this.player.getUUID());
     }
     
     private class TextBoxName extends TextBoxGroup.TextBox {

@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
@@ -7,9 +8,8 @@ import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,9 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private static final int OFFSET = 15;
     private List<ReputationReward> rewards;
     private ReputationReward selectedReward;
-    private List<StringVisitable> error;
+    private List<FormattedText> error;
     
-    public GuiEditMenuReputationReward(GuiBase gui, PlayerEntity player, List<ReputationReward> rewards) {
+    public GuiEditMenuReputationReward(GuiBase gui, Player player, List<ReputationReward> rewards) {
         super(gui, player, true, 185, 25, 185, 55);
         
         this.rewards = new ArrayList<>();
@@ -58,34 +58,34 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.repReward.create", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return isValid();
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputationList().get(0), 0));
             }
         });
         
         buttons.add(new LargeButton("hqm.repReward.delete", 80, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return isValid() && selectedReward != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 GuiEditMenuReputationReward.this.rewards.remove(selectedReward);
                 selectedReward = null;
             }
@@ -93,12 +93,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
-                StringVisitable str = Translator.plain(rewards.get(i).getLabel());
+                FormattedText str = Translator.plain(rewards.get(i).getLabel());
                 boolean hover = gui.inBounds(START_X, START_Y + i * OFFSET, gui.getStringWidth(str), 9, mX, mY);
                 boolean selected = rewards.get(i).equals(selectedReward);
                 gui.drawString(matrices, str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);

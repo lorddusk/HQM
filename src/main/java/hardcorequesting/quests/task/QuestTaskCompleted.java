@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -11,11 +12,9 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
@@ -46,11 +45,11 @@ public class QuestTaskCompleted extends QuestTask {
         }
     }
     
-    private boolean completed(int id, PlayerEntity player) {
+    private boolean completed(int id, Player player) {
         return id < quests.length && ((QuestDataTaskCompleted) getData(player)).quests[id];
     }
     
-    public void setTask(int id, CompletedQuestTask task, PlayerEntity player) {
+    public void setTask(int id, CompletedQuestTask task, Player player) {
         if (id >= quests.length) {
             quests = Arrays.copyOf(quests, quests.length + 1);
             QuestDataTaskCompleted data = (QuestDataTaskCompleted) getData(player);
@@ -64,7 +63,7 @@ public class QuestTaskCompleted extends QuestTask {
     }
     
     @SuppressWarnings("unused")
-    public void setQuest(int id, UUID quest, PlayerEntity player) {
+    public void setQuest(int id, UUID quest, Player player) {
         setTask(id, id >= quests.length ? new CompletedQuestTask() : quests[id], player);
         
         quests[id].setQuest(quest);
@@ -77,7 +76,7 @@ public class QuestTaskCompleted extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
         for (int i = 0; i < completed_quests.length; i++) {
             CompletedQuestTask completed = completed_quests[i];
@@ -101,7 +100,7 @@ public class QuestTaskCompleted extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited()) {
             CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
             for (int i = 0; i < completed_quests.length; i++) {
@@ -147,13 +146,13 @@ public class QuestTaskCompleted extends QuestTask {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         checkCompleted(player);
     }
     
-    private void checkCompleted(PlayerEntity player) {
-        World world = player.getEntityWorld();
-        if (!world.isClient && !this.isCompleted(player) && player.getServer() != null) {
+    private void checkCompleted(Player player) {
+        Level world = player.getCommandSenderWorld();
+        if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
             boolean[] other_completed_quests = ((QuestDataTaskCompleted) this.getData(player)).quests;
             
             if (other_completed_quests.length < this.quests.length) {
@@ -185,7 +184,7 @@ public class QuestTaskCompleted extends QuestTask {
             }
             
             if (completed && this.quests.length > 0) {
-                completeTask(player.getUuid());
+                completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
         }

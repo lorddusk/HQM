@@ -1,15 +1,14 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskTame;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.Registry;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,7 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     private List<String> rawTames;
     private List<String> tames;
     
-    public GuiEditMenuTame(GuiQuestBook gui, QuestTaskTame task, final QuestTaskTame.Tame tame, int id, PlayerEntity player) {
+    public GuiEditMenuTame(GuiQuestBook gui, QuestTaskTame task, final QuestTaskTame.Tame tame, int id, Player player) {
         super(gui, player, false, 180, 70, 180, 150);
         this.task = task;
         this.tame = tame;
@@ -65,8 +64,8 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         tames = new ArrayList<>();
         
         for (EntityType<?> entityType : Registry.ENTITY_TYPE) {
-            if (entityType.isSummonable())
-                rawTames.add(Registry.ENTITY_TYPE.getId(entityType).toString());
+            if (entityType.canSummon())
+                rawTames.add(Registry.ENTITY_TYPE.getKey(entityType).toString());
         }
         
         rawTames.add("minecraft:abstracthorse");
@@ -87,7 +86,7 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -145,12 +144,12 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return I18n.translate("hqm.tameTask." + "type" + "Match.title");
+        return I18n.get("hqm.tameTask." + "type" + "Match.title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return I18n.translate("hqm.tameTask." + "exact" + "Match.desc");
+        return I18n.get("hqm.tameTask." + "exact" + "Match.desc");
     }
     
     @Override

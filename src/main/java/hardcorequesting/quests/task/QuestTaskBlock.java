@@ -4,10 +4,10 @@ import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.quests.data.QuestDataTaskItems;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.lang.reflect.Method;
 
@@ -27,13 +27,13 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     public abstract GuiEditMenuItem.Type getMenuTypeId();
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
     }
     
-    public void checkProgress(BlockState state, PlayerEntity player) {
+    public void checkProgress(BlockState state, Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
-        DefaultedList<ItemStack> consume = DefaultedList.ofSize(1, drop);
-        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUuid());
+        NonNullList<ItemStack> consume = NonNullList.withSize(1, drop);
+        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUUID());
     }
 }
 

@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.event.EventTrigger;
@@ -9,10 +10,9 @@ import hardcorequesting.quests.data.QuestDataTaskReputationKill;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -28,7 +28,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         super.draw(matrices, gui, player, mX, mY);
         int killCount = ((QuestDataTaskReputationKill) getData(player)).kills;
         if (Quest.canQuestsBeEdited()) {
@@ -62,7 +62,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
     
     @Override
-    protected PlayerEntity getPlayerForRender(PlayerEntity player) {
+    protected Player getPlayerForRender(Player player) {
         return null;
     }
     
@@ -72,7 +72,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     
@@ -85,15 +85,15 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     
     @Override
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
-        PlayerEntity killer = QuestTaskMob.getKiller(source);
+        Player killer = QuestTaskMob.getKiller(source);
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
-            if (entity instanceof PlayerEntity && isPlayerInRange((PlayerEntity) entity)) {
+            if (entity instanceof Player && isPlayerInRange((Player) entity)) {
                 QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill) getData(killer);
                 if (killData.kills < kills) {
                     killData.kills += 1;
                     
                     if (killData.kills == kills) {
-                        completeTask(killer.getUuid());
+                        completeTask(killer.getUUID());
                     }
                     
                     parent.sendUpdatedDataToTeam(killer);

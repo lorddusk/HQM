@@ -2,12 +2,11 @@ package hardcorequesting.team;
 
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.TeamErrorMessage;
-import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public enum TeamError {
     INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
@@ -26,16 +25,16 @@ public enum TeamError {
     
     @Environment(EnvType.CLIENT)
     public String getMessage() {
-        return I18n.translate(message);
+        return I18n.get(message);
     }
     
     @Environment(EnvType.CLIENT)
     public String getHeader() {
-        return I18n.translate(header);
+        return I18n.get(header);
     }
     
-    public void sendToClient(PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity)
-            NetworkManager.sendToPlayer(new TeamErrorMessage(this), (ServerPlayerEntity) player);
+    public void sendToClient(Player player) {
+        if (player instanceof ServerPlayer)
+            NetworkManager.sendToPlayer(new TeamErrorMessage(this), (ServerPlayer) player);
     }
 }

@@ -1,6 +1,7 @@
 package hardcorequesting.bag;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
@@ -14,12 +15,11 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,7 +65,7 @@ public class Group {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawOverview(MatrixStack matrices, GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y) {
+    public static void drawOverview(PoseStack matrices, GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y) {
         List<GroupTier> tiers = GroupTier.getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
@@ -99,7 +99,7 @@ public class Group {
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
             
-            StringVisitable str = Translator.plain(group.getDisplayName());
+            FormattedText str = Translator.plain(group.getDisplayName());
             int yPos = GuiQuestBook.GROUPS_Y + GuiQuestBook.GROUPS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(GuiQuestBook.GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, x, y);
             int color = group.getTier().getColor().getHexColor();
@@ -169,7 +169,7 @@ public class Group {
     
     @Environment(EnvType.CLIENT)
     public String getDisplayName() {
-        return hasName() ? name : I18n.translate("hqm.bag.group", tier.getName());
+        return hasName() ? name : I18n.get("hqm.bag.group", tier.getName());
     }
     
     public String getName() {
@@ -198,7 +198,7 @@ public class Group {
         }
     }
     
-    public void open(PlayerEntity player) {
+    public void open(Player player) {
         if (limit > 0) {
             GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
             if (data != null) {
@@ -211,8 +211,8 @@ public class Group {
         Quest.addItems(player, itemsToAdd);
         
         itemsToAdd.stream().filter(item -> item.getCount() > 0).forEach(item -> {
-            ItemEntity entityItem = new ItemEntity(player.getEntityWorld(), player.getX() + 0.5D, player.getY() + 0.5D, player.getZ() + 0.5D, item);
-            player.getEntityWorld().spawnEntity(entityItem);
+            ItemEntity entityItem = new ItemEntity(player.getCommandSenderWorld(), player.getX() + 0.5D, player.getY() + 0.5D, player.getZ() + 0.5D, item);
+            player.getCommandSenderWorld().addFreshEntity(entityItem);
         });
     }
     
@@ -234,19 +234,19 @@ public class Group {
         this.limit = limit;
     }
     
-    public int getRetrievalCount(PlayerEntity player) {
+    public int getRetrievalCount(Player player) {
         GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
         return data != null ? data.retrieved : 0;
     }
     
-    public void setRetrievalCount(PlayerEntity player, int count) {
+    public void setRetrievalCount(Player player, int count) {
         GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
         if (data != null) {
             data.retrieved = count;
         }
     }
     
-    public boolean isValid(PlayerEntity player) {
+    public boolean isValid(Player player) {
         return limit == 0 || getRetrievalCount(player) < limit;
     }
     
@@ -265,13 +265,13 @@ public class Group {
     
     private boolean listContains(ItemStack stack, List<ItemStack> stacks) {
         for (ItemStack stack2 : stacks) {
-            if (ItemStack.areEqualIgnoreDamage(stack, stack2)) return true;
+            if (ItemStack.matches(stack, stack2)) return true;
         }
         return false;
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(MatrixStack matrices, GuiQuestBook gui, int x, int y) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y) {
         gui.drawString(matrices, Translator.plain(this.getDisplayName()), GuiQuestBook.GROUPS_X, GuiQuestBook.GROUPS_Y, this.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(this.getItems());
         items.add(ItemStack.EMPTY);

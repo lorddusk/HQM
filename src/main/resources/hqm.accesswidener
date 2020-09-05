@@ -1,5 +1,4 @@
 accessWidener   v1  named
-accessible field net/minecraft/item/Item recipeRemainder Lnet/minecraft/item/Item;
-mutable field net/minecraft/item/Item recipeRemainder Lnet/minecraft/item/Item;
-accessible method net/minecraft/client/gui/screen/Screen renderTooltip (Lnet/minecraft/item/ItemStack;II)V
-accessible field net/minecraft/server/MinecraftServer session Lnet/minecraft/world/level/storage/LevelStorage$Session;
+accessible field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/Item;
+mutable field net/minecraft/world/item/Item craftingRemainingItem Lnet/minecraft/world/item/Item;
+accessible field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;

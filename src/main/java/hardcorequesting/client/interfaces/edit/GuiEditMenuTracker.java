@@ -1,25 +1,24 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuTracker extends GuiEditMenuExtended {
     
     private TrackerBlockEntity tracker;
     
-    public GuiEditMenuTracker(GuiBase gui, PlayerEntity player, final TrackerBlockEntity tracker) {
+    public GuiEditMenuTracker(GuiBase gui, Player player, final TrackerBlockEntity tracker) {
         super(gui, player, true, 20, 30, 20, 130);
         
         this.tracker = tracker;
         
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTracker.radius.title") {
             @Override
-            protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
                 gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.menuTracker.radius.desc"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
@@ -38,7 +37,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         gui.drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translated("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);

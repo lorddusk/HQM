@@ -5,9 +5,9 @@ import com.google.gson.stream.JsonWriter;
 import hardcorequesting.HardcoreQuesting;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -74,9 +74,9 @@ public class PlayerEntry {
     @Environment(EnvType.CLIENT)
     public String getDisplayName() {
         if (this.playername == null) {
-            PlayerEntity entry = MinecraftClient.getInstance().world.getPlayerByUuid(this.getUUID());
+            Player entry = Minecraft.getInstance().level.getPlayerByUUID(this.getUUID());
             if (entry != null) {
-                this.playername = entry.getEntityName();
+                this.playername = entry.getScoreboardName();
             }
         }
         return playername;
@@ -126,12 +126,12 @@ public class PlayerEntry {
         out.endObject();
     }
     
-    public ServerPlayerEntity getPlayerMP() {
+    public ServerPlayer getPlayerMP() {
         if (HardcoreQuesting.loadingSide == EnvType.SERVER) {
-            return HardcoreQuesting.getServer().getPlayerManager().getPlayer(this.getUUID());
+            return HardcoreQuesting.getServer().getPlayerList().getPlayer(this.getUUID());
         } else {
-            if (MinecraftClient.getInstance().isIntegratedServerRunning()) {
-                return MinecraftClient.getInstance().getServer().getPlayerManager().getPlayer(this.getUUID());
+            if (Minecraft.getInstance().hasSingleplayerServer()) {
+                return Minecraft.getInstance().getSingleplayerServer().getPlayerList().getPlayer(this.getUUID());
             }
         }
         return null;

@@ -11,12 +11,11 @@ group = project.maven_group
 repositories {
     maven { url "https://dl.bintray.com/ladysnake/libs" }
     maven { url "https://mod-buildcraft.com/maven" }
-    maven { url "https://dl.bintray.com/shedaniel/legacy-yarn-updated" }
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.minecraft_version}")
-    mappings("me.shedaniel:legacy-yarn:${project.yarn_mappings}:v2")
+    mappings(minecraft.officialMojangMappings())
     modCompile("net.fabricmc:fabric-loader:${project.loader_version}")
     modCompile("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
@@ -28,9 +27,9 @@ dependencies {
     depend("org.jetbrains:annotations:19.0.0")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
-    depend("alexiil.mc.lib:libblockattributes-core:${project.lba}") 
+    depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
-    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}")  {
+    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }

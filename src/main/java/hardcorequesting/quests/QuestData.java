@@ -4,7 +4,7 @@ package hardcorequesting.quests;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class QuestData {
     
@@ -20,24 +20,24 @@ public class QuestData {
     }
     
     
-    public boolean getReward(PlayerEntity player) {
+    public boolean getReward(Player player) {
         int id = getId(player);
         return (id >= 0 && id < reward.length) && reward[id];
     }
     
-    public void claimReward(PlayerEntity player) {
+    public void claimReward(Player player) {
         int id = getId(player);
         if (id >= 0 && id < reward.length) {
             reward[id] = false;
         }
     }
     
-    private int getId(PlayerEntity player) {
+    private int getId(Player player) {
         Team team = QuestingData.getQuestingData(player).getTeam();
         int id = 0;
         for (PlayerEntry entry : team.getPlayers()) {
             if (entry.isInTeam()) {
-                if (entry.getUUID().equals(player.getUuid())) {
+                if (entry.getUUID().equals(player.getUUID())) {
                     return id;
                 }
                 id++;

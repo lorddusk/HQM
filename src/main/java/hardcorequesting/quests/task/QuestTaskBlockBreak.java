@@ -3,9 +3,9 @@ package hardcorequesting.quests.task;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class QuestTaskBlockBreak extends QuestTaskBlock {
     public QuestTaskBlockBreak(Quest parent, String description, String longDescription) {
@@ -19,11 +19,11 @@ public class QuestTaskBlockBreak extends QuestTaskBlock {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
     }
     
     @Override
-    public void onBlockBroken(BlockPos blockPos, BlockState blockState, PlayerEntity player) {
+    public void onBlockBroken(BlockPos blockPos, BlockState blockState, Player player) {
         checkProgress(blockState, player);
     }
 }

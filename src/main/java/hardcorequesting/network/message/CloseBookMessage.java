@@ -4,7 +4,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestingData;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.UUID;
 
@@ -20,13 +20,13 @@ public class CloseBookMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
-        this.playerID = buf.readUuid();
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
+        this.playerID = buf.readUUID();
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
-        buf.writeUuid(this.playerID);
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeUUID(this.playerID);
     }
     
     public static class Handler implements IMessageHandler<CloseBookMessage, IMessage> {

@@ -10,7 +10,7 @@ import hardcorequesting.quests.QuestData;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -167,8 +167,8 @@ public class Team {
         players.add(entry);
     }
     
-    public void removePlayer(PlayerEntity player) {
-        removePlayer(player.getUuid());
+    public void removePlayer(Player player) {
+        removePlayer(player.getUUID());
     }
     
     public void removePlayer(UUID uuid) {
@@ -295,9 +295,9 @@ public class Team {
         NetworkManager.sendToAllPlayers(TeamUpdateType.REMOVE_TEAM.build(this));
         
         //refresh all clients with open books
-        for (PlayerEntity player : HardcoreQuesting.getServer().getPlayerManager().getPlayerList()) {
+        for (Player player : HardcoreQuesting.getServer().getPlayerList().getPlayers()) {
             Team team = QuestingData.getQuestingData(player).getTeam();
-            PlayerEntry entry = team.getEntry(player.getUuid());
+            PlayerEntry entry = team.getEntry(player.getUUID());
             if (entry != null) {
                 team.refreshTeamData(entry, TeamUpdateSize.ALL);
             }
@@ -348,8 +348,8 @@ public class Team {
         NetworkManager.sendToServer(new TeamMessage(TeamAction.NEXT_REWARD_SETTING, ""));
     }
     
-    public boolean isOwner(@NotNull PlayerEntity player) {
-        return isOwner(player.getUuid());
+    public boolean isOwner(@NotNull Player player) {
+        return isOwner(player.getUUID());
     }
     
     public boolean isOwner(@Nullable UUID uuid) {
@@ -439,7 +439,7 @@ public class Team {
         this.players = team.players;
     }
     
-    public static String saveTeam(PlayerEntity entity) {
+    public static String saveTeam(Player entity) {
         Team team = QuestingData.getQuestingData(entity).getTeam();
         if (team.isSingle()) return ""; // return an empty string when the team is single
         return SaveHandler.saveTeam(team);

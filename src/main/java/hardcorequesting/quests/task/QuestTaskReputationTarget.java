@@ -2,7 +2,7 @@ package hardcorequesting.quests.task;
 
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.quests.Quest;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class QuestTaskReputationTarget extends QuestTaskReputation {
     
@@ -12,10 +12,10 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
         register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);
     }
     
-    private void checkReputation(PlayerEntity player) {
+    private void checkReputation(Player player) {
         if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !this.isCompleted(player)) {
             if (isPlayerInRange(player)) {
-                completeTask(player.getUuid());
+                completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
             
@@ -23,7 +23,7 @@ public class QuestTaskReputationTarget extends QuestTaskReputation {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     

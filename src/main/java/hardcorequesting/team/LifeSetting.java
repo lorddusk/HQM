@@ -2,7 +2,7 @@ package hardcorequesting.team;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 public enum LifeSetting {
     SHARE("hqm.team.sharedLives.title", "hqm.team.sharedLives.desc"),
@@ -18,11 +18,11 @@ public enum LifeSetting {
     
     @Environment(EnvType.CLIENT)
     public String getTitle() {
-        return I18n.translate(title);
+        return I18n.get(title);
     }
     
     @Environment(EnvType.CLIENT)
     public String getDescription() {
-        return I18n.translate(description);
+        return I18n.get(description);
     }
 }

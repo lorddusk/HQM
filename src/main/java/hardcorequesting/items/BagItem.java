@@ -8,16 +8,16 @@ import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
@@ -30,15 +30,15 @@ public class BagItem extends Item {
     public int tierOrdinal;
     
     public BagItem(BagTier tier) {
-        super(new Item.Settings().maxDamage(0).maxCount(64).group(HardcoreQuesting.HQMTab));
+        super(new Item.Properties().durability(0).stacksTo(64).tab(HardcoreQuesting.HQMTab));
         this.tier = tier;
         this.tierOrdinal = tier.ordinal();
     }
     
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
-        if (!world.isClient) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!world.isClientSide) {
             int totalWeight = 0;
             for (Group group : Group.getGroups().values()) {
                 if (group.isValid(player)) {
@@ -52,9 +52,9 @@ public class BagItem extends Item {
                         int weight = group.getTier().getWeights()[tierOrdinal];
                         if (rng < weight) {
                             group.open(player);
-                            player.inventory.markDirty();
+                            player.inventory.setChanged();
                             openClientInterface(player, group.getId(), tierOrdinal);
-                            world.playSound(player, player.getSenseCenterPos(), Sounds.BAG.getSound(), SoundCategory.MASTER, 1, 1);
+                            world.playSound(player, player.blockPosition(), Sounds.BAG.getSound(), SoundSource.MASTER, 1, 1);
                             break;
                         } else {
                             rng -= weight;
@@ -65,23 +65,23 @@ public class BagItem extends Item {
             
             //doing this makes sure the inventory is updated on the client, and the creative mode thingy is already handled by the calling code
             //if(!player.capabilities.isCreativeMode) {
-            stack.decrement(1);
+            stack.shrink(1);
             //}
-            return TypedActionResult.success(stack);
+            return InteractionResultHolder.success(stack);
         }
         
-        return TypedActionResult.consume(stack);
+        return InteractionResultHolder.consume(stack);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
+        super.appendHoverText(stack, world, tooltip, context);
         
-        tooltip.add(new LiteralText(tier.getColor() + tier.getName()));
+        tooltip.add(new TextComponent(tier.getColor() + tier.getName()));
     }
     
-    private void openClientInterface(PlayerEntity player, UUID groupId, int bag) {
+    private void openClientInterface(Player player, UUID groupId, int bag) {
         /* legacy code
         List<String> data = new ArrayList<>();
         data.add(groupId.toString());

@@ -10,21 +10,21 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -35,38 +35,38 @@ public class QuestBookItem extends Item {
     private boolean enabled;
     
     public QuestBookItem(boolean enabled) {
-        super(new Item.Settings().maxCount(1).group(HardcoreQuesting.HQMTab));
+        super(new Item.Properties().stacksTo(1).tab(HardcoreQuesting.HQMTab));
         this.enabled = enabled;
     }
     
-    public static ItemStack getOPBook(PlayerEntity player) {
+    public static ItemStack getOPBook(Player player) {
         ItemStack stack = new ItemStack(ModItems.enabledBook);
-        CompoundTag nbt = stack.getOrCreateSubTag("hqm");
-        nbt.putString(NBT_PLAYER, player.getUuid().toString());
-        stack.putSubTag("hqm", nbt);
+        CompoundTag nbt = stack.getOrCreateTagElement("hqm");
+        nbt.putString(NBT_PLAYER, player.getUUID().toString());
+        stack.addTagElement("hqm", nbt);
         return stack;
     }
     
     @NotNull
     @Override
     @SuppressWarnings("deprecation")
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, @NotNull Hand hand) {
-        if (world.isClient && Quest.isEditing && !HQMUtil.isGameSingleplayer()) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, @NotNull InteractionHand hand) {
+        if (world.isClientSide && Quest.isEditing && !HQMUtil.isGameSingleplayer()) {
             Quest.setEditMode(false);
         }
         
-        if (!world.isClient && Quest.isEditing && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
-            player.sendMessage(Translator.translatable("hqm.command.editMode.disableSync").fillStyle(Style.EMPTY.setColor(Formatting.RED).setBold(true)), Util.NIL_UUID);
+        if (!world.isClientSide && Quest.isEditing && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
+            player.sendMessage(Translator.translatable("hqm.command.editMode.disableSync").withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)), Util.NIL_UUID);
             Quest.setEditMode(false);
         }
         
-        if (!world.isClient && player instanceof ServerPlayerEntity) {
-            ItemStack stack = player.getStackInHand(hand);
+        if (!world.isClientSide && player instanceof ServerPlayer) {
+            ItemStack stack = player.getItemInHand(hand);
             if (!QuestingData.isQuestActive()) {
                 player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
             } else {
                 if (stack.getItem() == ModItems.enabledBook) {
-                    CompoundTag compound = stack.getSubTag("hqm");
+                    CompoundTag compound = stack.getTagElement("hqm");
                     if (compound != null && compound.contains(NBT_PLAYER)) {
                         String uuidS = compound.getString(NBT_PLAYER);
                         UUID uuid;
@@ -74,14 +74,14 @@ public class QuestBookItem extends Item {
                             uuid = UUID.fromString(uuidS);
                         } catch (IllegalArgumentException e) {
                             compound.remove(NBT_PLAYER);
-                            return TypedActionResult.fail(stack);
+                            return InteractionResultHolder.fail(stack);
                         }
                         if (QuestingData.hasData(uuid)) {
-                            if (HardcoreQuesting.getServer().getPermissionLevel(player.getGameProfile()) >= 4) {
-                                PlayerEntity subject = QuestingData.getPlayer(uuid);
-                                if (subject instanceof ServerPlayerEntity) {
-                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getEntityName(), true, false));
-                                    PlayerEntry entry = QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUuid());
+                            if (HardcoreQuesting.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
+                                Player subject = QuestingData.getPlayer(uuid);
+                                if (subject instanceof ServerPlayer) {
+                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getScoreboardName(), true, false));
+                                    PlayerEntry entry = QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
                                     if (entry != null) {
                                         entry.setBookOpen(true);
                                         GeneralUsage.sendOpenBook(player, true);
@@ -97,35 +97,35 @@ public class QuestBookItem extends Item {
                         }
                     }
                 } else {
-                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getEntityName(), false, true));
-                    PlayerEntry entry = QuestingData.getQuestingData(player).getTeam().getEntry(player.getUuid());
+                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getScoreboardName(), false, true));
+                    PlayerEntry entry = QuestingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
                     if (entry != null) {
                         entry.setBookOpen(true);
                         GeneralUsage.sendOpenBook(player, false);
                     } else {
-                        player.sendMessage(new TranslatableText("hqm.message.bookNoPlayer"), Util.NIL_UUID);
+                        player.sendMessage(new TranslatableComponent("hqm.message.bookNoPlayer"), Util.NIL_UUID);
                     }
                 }
             }
-            return TypedActionResult.success(stack);
+            return InteractionResultHolder.success(stack);
         }
         return super.use(world, player, hand);
     }
     
     @Override
-    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
+    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
         if (stack.getItem() == ModItems.enabledBook) {
-            CompoundTag compound = stack.getSubTag("hqm");
+            CompoundTag compound = stack.getTagElement("hqm");
             if (compound != null && compound.contains(NBT_PLAYER)) {
-                PlayerEntity useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
-                tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getEntityName()));
+                Player useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getScoreboardName()));
             } else
-                tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").fillStyle(Style.EMPTY.withColor(TextColor.fromRgb(GuiColor.RED.getHexColor() & 0xFFFFFF))));
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(GuiColor.RED.getHexColor() & 0xFFFFFF))));
         }
     }
     
     @Override
-    public boolean hasEnchantmentGlint(ItemStack stack) {
+    public boolean isFoil(ItemStack stack) {
         return stack.getItem() == ModItems.enabledBook;
     }
 }

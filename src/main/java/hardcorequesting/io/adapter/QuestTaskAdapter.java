@@ -8,12 +8,13 @@ import hardcorequesting.quests.ItemPrecision;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.*;
 import hardcorequesting.quests.task.*;
+import hardcorequesting.quests.task.QuestTaskMob.Mob;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.util.*;
@@ -129,7 +130,7 @@ public class QuestTaskAdapter {
             out.name(X).value(value.getX());
             out.name(Y).value(value.getY());
             out.name(Z).value(value.getZ());
-            out.name(DIM).value(value.getDimension().getValue().toString());
+            out.name(DIM).value(value.getDimension().location().toString());
             out.name(RADIUS).value(value.getRadius());
             if (value.getVisible() != QuestTaskLocation.Visibility.LOCATION)
                 out.name(VISIBLE).value(value.getVisible().name());
@@ -151,7 +152,7 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(Z)) {
                     result.setZ(in.nextInt());
                 } else if (name.equalsIgnoreCase(DIM)) {
-                    result.setDimension(RegistryKey.of(Registry.DIMENSION, new Identifier(in.nextString())));
+                    result.setDimension(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(in.nextString())));
                 } else if (name.equalsIgnoreCase(RADIUS)) {
                     result.setRadius(in.nextInt());
                 } else if (name.equalsIgnoreCase(ICON)) {
@@ -333,14 +334,14 @@ public class QuestTaskAdapter {
     };
     
     public static QuestTask TASK;
-    protected static final TypeAdapter<QuestTaskMob.Mob> MOB_ADAPTER = new TypeAdapter<QuestTaskMob.Mob>() {
+    protected static final TypeAdapter<Mob> MOB_ADAPTER = new TypeAdapter<Mob>() {
         private final String KILLS = "kills";
         private final String MOB = "mob";
         private final String ICON = "icon";
         private final String NAME = "name";
         
         @Override
-        public void write(JsonWriter out, QuestTaskMob.Mob value) throws IOException {
+        public void write(JsonWriter out, Mob value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
             ItemStack stack = value.getIconStack();
@@ -353,9 +354,9 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskMob.Mob read(JsonReader in) throws IOException {
+        public Mob read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskMob.Mob result = ((QuestTaskMob) TASK).new Mob();
+            Mob result = ((QuestTaskMob) TASK).new Mob();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
@@ -440,7 +441,7 @@ public class QuestTaskAdapter {
                 out.endArray();
             } else if (value instanceof QuestTaskMob) {
                 out.name(MOBS).beginArray();
-                for (QuestTaskMob.Mob requirement : ((QuestTaskMob) value).mobs) {
+                for (Mob requirement : ((QuestTaskMob) value).mobs) {
                     MOB_ADAPTER.write(out, requirement);
                 }
                 out.endArray();
@@ -533,14 +534,14 @@ public class QuestTaskAdapter {
                     in.endArray();
                     ((QuestTaskTame) TASK).tames = list.toArray(new QuestTaskTame.Tame[list.size()]);
                 } else if (TASK instanceof QuestTaskMob && name.equalsIgnoreCase(MOBS)) {
-                    List<QuestTaskMob.Mob> list = new ArrayList<QuestTaskMob.Mob>();
+                    List<Mob> list = new ArrayList<Mob>();
                     in.beginArray();
                     while (in.hasNext()) {
-                        QuestTaskMob.Mob entry = MOB_ADAPTER.read(in);
+                        Mob entry = MOB_ADAPTER.read(in);
                         if (entry != null) list.add(entry);
                     }
                     in.endArray();
-                    ((QuestTaskMob) TASK).mobs = list.toArray(new QuestTaskMob.Mob[list.size()]);
+                    ((QuestTaskMob) TASK).mobs = list.toArray(new Mob[list.size()]);
                 } else if (TASK instanceof QuestTaskReputation && name.equalsIgnoreCase(REPUTATION)) {
                     List<ReputationSettingConstructor> list = new ArrayList<>();
                     in.beginArray();

@@ -5,21 +5,21 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.util.Translator;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Material;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class TrackerBlock extends BlockWithEntity {
+public class TrackerBlock extends BaseEntityBlock {
     
     public TrackerBlock() {
         super(FabricBlockSettings.of(Material.WOOD)
@@ -27,15 +27,15 @@ public class TrackerBlock extends BlockWithEntity {
     }
     
     @Override
-    public BlockEntity createBlockEntity(BlockView view) {
+    public BlockEntity newBlockEntity(BlockGetter view) {
         return new TrackerBlockEntity();
     }
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (player != null) {
-            if (!player.getStackInHand(hand).isEmpty() && player.getStackInHand(hand).getItem() == ModItems.book) {
-                if (!world.isClient) {
+            if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() == ModItems.book) {
+                if (!world.isClientSide) {
                     BlockEntity tile = world.getBlockEntity(pos);
                     if (tile instanceof TrackerBlockEntity) {
                         if (!Quest.canQuestsBeEdited()) {
@@ -52,7 +52,7 @@ public class TrackerBlock extends BlockWithEntity {
                     }
                 }
             } else {
-                if (!world.isClient) {
+                if (!world.isClientSide) {
                     BlockEntity tile = world.getBlockEntity(pos);
                     if (tile instanceof TrackerBlockEntity) {
                         if (!Quest.canQuestsBeEdited()) {
@@ -63,20 +63,20 @@ public class TrackerBlock extends BlockWithEntity {
                     }
                 }
             }
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
     
     @SuppressWarnings("deprecation")
     @Override
-    public boolean emitsRedstonePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
     
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
 //    @Override

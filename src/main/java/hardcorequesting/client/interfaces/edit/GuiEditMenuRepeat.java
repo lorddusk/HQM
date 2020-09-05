@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.quests.Quest;
@@ -7,8 +8,7 @@ import hardcorequesting.quests.RepeatInfo;
 import hardcorequesting.quests.RepeatType;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     
@@ -17,7 +17,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     private int days;
     private int hours;
     
-    public GuiEditMenuRepeat(GuiQuestBook gui, PlayerEntity player, Quest quest) {
+    public GuiEditMenuRepeat(GuiQuestBook gui, Player player, Quest quest) {
         super(gui, player, true, 25, 20, 25, 100);
         this.quest = quest;
         this.type = quest.getRepeatInfo().getType();
@@ -38,7 +38,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         
         textBoxes.add(new TextBoxHidden(gui, 1, "hqm.repeatMenu.hours") {
             @Override
-            protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
                 gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), BOX_X, BOX_Y + BOX_OFFSET * 2 + TEXT_OFFSET, 0.7F, 0x404040);

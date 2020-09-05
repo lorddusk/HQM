@@ -5,10 +5,8 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 
 
 public class ClientProxy extends CommonProxy {
@@ -88,7 +86,7 @@ public class ClientProxy extends CommonProxy {
     }
     
     @Override
-    public PlayerEntity getPlayer(PacketContext ctx) {
-        return ctx.getPacketEnvironment() == EnvType.CLIENT ? MinecraftClient.getInstance().player : super.getPlayer(ctx);
+    public Player getPlayer(PacketContext ctx) {
+        return ctx.getPacketEnvironment() == EnvType.CLIENT ? Minecraft.getInstance().player : super.getPlayer(ctx);
     }
 }

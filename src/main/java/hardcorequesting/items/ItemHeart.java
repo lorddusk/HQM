@@ -9,17 +9,17 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.Util;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -27,16 +27,16 @@ public class ItemHeart extends Item {
     private int value;
     
     public ItemHeart(int value) {
-        super(new Item.Settings()
-                .maxCount(64)
-                .group(HardcoreQuesting.HQMTab));
+        super(new Item.Properties()
+                .stacksTo(64)
+                .tab(HardcoreQuesting.HQMTab));
         this.value = value;
     }
     
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        if (!world.isClient) {
-            ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        if (!world.isClientSide) {
+            ItemStack stack = player.getItemInHand(hand);
             if (value == 3) {
                 if (!QuestingData.isHardcoreActive()) {
                     player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
@@ -46,8 +46,8 @@ public class ItemHeart extends Item {
                     int lives = QuestingData.getQuestingData(player).getLives();
                     player.sendMessage(Translator.translatable("hqm.message.haveRemaining", lives), Util.NIL_UUID);
                     SoundHandler.play(Sounds.LIFE, player);
-                    if (!player.abilities.creativeMode) {
-                        stack.decrement(1);
+                    if (!player.abilities.instabuild) {
+                        stack.shrink(1);
                         
                     }
                 } else {
@@ -63,20 +63,20 @@ public class ItemHeart extends Item {
                     QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
                     
-                    if (!player.abilities.creativeMode)
-                        stack.increment(1);
+                    if (!player.abilities.instabuild)
+                        stack.grow(1);
                 }
                 
             }
-            return TypedActionResult.success(stack);
+            return InteractionResultHolder.success(stack);
         }
         return super.use(world, player, hand);
     }
     
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity entityPlayer = (PlayerEntity) entity;
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        if (entity instanceof Player) {
+            Player entityPlayer = (Player) entity;
             if (value == 3 && HQMConfig.getInstance().Hardcore.HEART_ROT_ENABLE) {
                 CompoundTag tagCompound = stack.getTag();
                 if (tagCompound == null) {
@@ -103,8 +103,8 @@ public class ItemHeart extends Item {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(stack, world, tooltip, context);
+    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
+        super.appendHoverText(stack, world, tooltip, context);
         
         if (value == 3) {
             tooltip.add(Translator.translatable("item.hqm:hearts_heart.tooltip"));
@@ -128,7 +128,7 @@ public class ItemHeart extends Item {
     }
     
     @Override
-    public boolean hasEnchantmentGlint(ItemStack stack) {
+    public boolean isFoil(ItemStack stack) {
         return value == 3 || value == 4;
     }
 }

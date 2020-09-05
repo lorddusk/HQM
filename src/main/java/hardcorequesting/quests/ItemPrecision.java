@@ -4,11 +4,11 @@ import com.google.common.collect.ImmutableList;
 import hardcorequesting.HardcoreQuesting;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tag.Tag;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public abstract class ItemPrecision {
     public static final ItemPrecision PRECISE = new ItemPrecision("precise") {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            return stack1.getItem() == stack2.getItem() && ItemStack.areTagsEqual(stack1, stack2);
+            return stack1.getItem() == stack2.getItem() && ItemStack.tagMatches(stack1, stack2);
         }
     };
     public static final ItemPrecision NBT_FUZZY = new ItemPrecision("nbtFuzzy") {
@@ -38,7 +38,7 @@ public abstract class ItemPrecision {
         protected boolean same(ItemStack stack1, ItemStack stack2) {
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().getItems().getTags().entrySet()) {
+            for (Map.Entry<ResourceLocation, Tag<Item>> entry : HardcoreQuesting.getServer().getTags().getItems().getAllTags().entrySet()) {
                 if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
                     return true;
             }
@@ -50,7 +50,7 @@ public abstract class ItemPrecision {
         protected boolean same(ItemStack stack1, ItemStack stack2) {
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<Identifier, Tag<Item>> entry : HardcoreQuesting.getServer().getTagManager().getItems().getTags().entrySet()) {
+            for (Map.Entry<ResourceLocation, Tag<Item>> entry : HardcoreQuesting.getServer().getTags().getItems().getAllTags().entrySet()) {
                 if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
                     return false;
             }
@@ -147,7 +147,7 @@ public abstract class ItemPrecision {
     
     @Environment(EnvType.CLIENT)
     public String getName() {
-        return I18n.translate(getLocalizationTag());
+        return I18n.get(getLocalizationTag());
     }
     
     // For backwards compatibility

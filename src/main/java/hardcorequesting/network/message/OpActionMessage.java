@@ -5,7 +5,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.util.OPBookHelper;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class OpActionMessage implements IMessage {
     
@@ -21,15 +21,15 @@ public class OpActionMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.action = OPBookHelper.OpAction.values()[buf.readInt()];
-        this.data = buf.readString(32767);
+        this.data = buf.readUtf(32767);
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.action.ordinal());
-        buf.writeString(data);
+        buf.writeUtf(data);
     }
     
     public static class Handler implements IMessageHandler<OpActionMessage, IMessage> {

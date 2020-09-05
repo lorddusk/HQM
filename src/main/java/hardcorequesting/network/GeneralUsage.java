@@ -7,10 +7,10 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -29,22 +29,22 @@ public enum GeneralUsage {
     
     BOOK_OPEN {
         @Override
-        public void receiveData(PlayerEntity player, CompoundTag nbt) {
-            MinecraftClient.getInstance().execute(() -> GuiQuestBook.displayGui(player, nbt.getBoolean("OP")));
+        public void receiveData(Player player, CompoundTag nbt) {
+            Minecraft.getInstance().execute(() -> GuiQuestBook.displayGui(player, nbt.getBoolean("OP")));
         }
     },
     BOOK_SELECT_TASK {
         @Override
-        public void receiveData(PlayerEntity player, CompoundTag nbt) {
+        public void receiveData(Player player, CompoundTag nbt) {
             QuestingData data = QuestingData.getQuestingData(player);
-            data.selectedQuestId = nbt.getUuid("QuestId");
+            data.selectedQuestId = nbt.getUUID("QuestId");
             data.selectedTask = nbt.getInt("TaskId");
         }
     },
     BAG_OPENED {
         @Override
-        public void receiveData(PlayerEntity player, CompoundTag nbt) {
-            UUID groupId = nbt.getUuid("GroupId");
+        public void receiveData(Player player, CompoundTag nbt) {
+            UUID groupId = nbt.getUUID("GroupId");
             int bag = nbt.getInt("Bag");
             int[] limits = nbt.getIntArray("Limits");
             
@@ -53,7 +53,7 @@ public enum GeneralUsage {
     };
     
     // server -> client
-    public static void sendOpenBook(PlayerEntity player, boolean op) {
+    public static void sendOpenBook(Player player, boolean op) {
         CompoundTag nbt = new CompoundTag();
         nbt.putBoolean("OP", op);
         BOOK_OPEN.sendMessageToPlayer(nbt, player);
@@ -63,30 +63,30 @@ public enum GeneralUsage {
     @Environment(EnvType.CLIENT)
     public static void sendBookSelectTaskUpdate(QuestTask task) {
         CompoundTag nbt = new CompoundTag();
-        nbt.putUuid("QuestId", task.getParent().getQuestId());
+        nbt.putUUID("QuestId", task.getParent().getQuestId());
         nbt.putInt("TaskId", task.getId());
         BOOK_SELECT_TASK.sendMessageToServer(nbt);
     }
     
     // server -> client
-    public static void sendOpenBagUpdate(PlayerEntity player, UUID groupId, int bag, int[] limits) {
+    public static void sendOpenBagUpdate(Player player, UUID groupId, int bag, int[] limits) {
         CompoundTag nbt = new CompoundTag();
-        nbt.putUuid("GroupId", groupId);
+        nbt.putUUID("GroupId", groupId);
         nbt.putInt("Bag", bag);
         nbt.putIntArray("Limits", limits);
         BAG_OPENED.sendMessageToPlayer(nbt, player);
     }
     
-    public abstract void receiveData(PlayerEntity player, CompoundTag nbt);
+    public abstract void receiveData(Player player, CompoundTag nbt);
     
     @Environment(EnvType.CLIENT)
     public void sendMessageToServer(CompoundTag data) {
-        NetworkManager.sendToServer(new GeneralUpdateMessage(MinecraftClient.getInstance().player, data, ordinal()));
+        NetworkManager.sendToServer(new GeneralUpdateMessage(Minecraft.getInstance().player, data, ordinal()));
     }
     
-    public void sendMessageToPlayer(CompoundTag data, PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity) {
-            NetworkManager.sendToPlayer(new GeneralUpdateMessage(player, data, ordinal()), (ServerPlayerEntity) player);
+    public void sendMessageToPlayer(CompoundTag data, Player player) {
+        if (player instanceof ServerPlayer) {
+            NetworkManager.sendToPlayer(new GeneralUpdateMessage(player, data, ordinal()), (ServerPlayer) player);
         }
     }
     

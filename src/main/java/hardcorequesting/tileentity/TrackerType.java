@@ -5,10 +5,9 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
-import hardcorequesting.util.Translator;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public enum TrackerType {
     TEAM("team") {
@@ -40,7 +39,7 @@ public enum TrackerType {
                         if (entry.isInTeam()) {
                             boolean valid = radius == 0;
                             if (!valid) {
-                                PlayerEntity player = QuestingData.getPlayer(entry.getUUID());
+                                Player player = QuestingData.getPlayer(entry.getUUID());
                                 if (player != null && isPlayerWithinRadius(tracker, player, radius)) {
                                     valid = true;
                                 }
@@ -80,9 +79,9 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             double closest = 0;
-            PlayerEntity closestPlayer = null;
-            for (ServerPlayerEntity player : HardcoreQuesting.getServer().getPlayerManager().getPlayerList()) {
-                double distance = player.squaredDistanceTo(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5);
+            Player closestPlayer = null;
+            for (ServerPlayer player : HardcoreQuesting.getServer().getPlayerList().getPlayers()) {
+                double distance = player.distanceToSqr(tracker.getBlockPos().getX() + 0.5, tracker.getBlockPos().getY() + 0.5, tracker.getBlockPos().getZ() + 0.5);
                 if (closestPlayer == null || distance < closest) {
                     closest = distance;
                     closestPlayer = player;
@@ -104,15 +103,15 @@ public enum TrackerType {
         this.id = name;
     }
     
-    private static boolean isPlayerWithinRadius(TrackerBlockEntity tracker, PlayerEntity player, int radius) {
-        return player.squaredDistanceTo(tracker.getPos().getX() + 0.5, tracker.getPos().getY() + 0.5, tracker.getPos().getZ() + 0.5) < radius * radius;
+    private static boolean isPlayerWithinRadius(TrackerBlockEntity tracker, Player player, int radius) {
+        return player.distanceToSqr(tracker.getBlockPos().getX() + 0.5, tracker.getBlockPos().getY() + 0.5, tracker.getBlockPos().getZ() + 0.5) < radius * radius;
     }
     
     private static boolean isValid(boolean valid, Team team, TrackerBlockEntity tracker, int radius) {
         if (!valid) {
             for (PlayerEntry entry : team.getPlayers()) {
                 if (entry.isInTeam()) {
-                    PlayerEntity player = QuestingData.getPlayer(entry.getUUID());
+                    Player player = QuestingData.getPlayer(entry.getUUID());
                     if (player != null && isPlayerWithinRadius(tracker, player, radius))
                         return true;
                 }
@@ -122,11 +121,11 @@ public enum TrackerType {
     }
     
     public String getName() {
-        return I18n.translate("hqm.tracker." + id + ".title");
+        return I18n.get("hqm.tracker." + id + ".title");
     }
     
     public String getDescription() {
-        return I18n.translate("hqm.tracker." + id + ".desc");
+        return I18n.get("hqm.tracker." + id + ".desc");
     }
     
     public abstract int getMeta(TrackerBlockEntity tracker, Quest quest, int radius);

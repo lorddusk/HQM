@@ -30,12 +30,12 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +54,7 @@ public class HardcoreQuesting implements ModInitializer {
     
     @SuppressWarnings("Convert2MethodRef")
     public static CommonProxy proxy = Executor.call(() -> () -> new ClientProxy(), () -> () -> new CommonProxy());
-    public static ItemGroup HQMTab = FabricItemGroupBuilder.create(new Identifier("hardcorequesting", "hardcorequesting"))
+    public static CreativeModeTab HQMTab = FabricItemGroupBuilder.create(new ResourceLocation("hardcorequesting", "hardcorequesting"))
             .icon(() -> new ItemStack(ModItems.book))
             .build();
     
@@ -67,13 +67,13 @@ public class HardcoreQuesting implements ModInitializer {
     public static final String NAME = "Hardcore Questing Mode";
     public static final Logger LOG = LogManager.getFormatterLogger(NAME);
     
-    private static PlayerEntity commandUser;
+    private static Player commandUser;
     
-    public static PlayerEntity getPlayer() {
+    public static Player getPlayer() {
         return commandUser;
     }
     
-    public static void setPlayer(PlayerEntity player) {
+    public static void setPlayer(Player player) {
         commandUser = player;
     }
     
@@ -89,8 +89,8 @@ public class HardcoreQuesting implements ModInitializer {
     
     static {
         PLAYER_EXTRA_DATA = ComponentRegistry.INSTANCE
-                .registerIfAbsent(new Identifier(ID, "player_extra_data"), CompoundTagComponent.class)
-                .attach(EntityComponentCallback.event(PlayerEntity.class), player -> new CompoundTagComponent());
+                .registerIfAbsent(new ResourceLocation(ID, "player_extra_data"), CompoundTagComponent.class)
+                .attach(EntityComponentCallback.event(Player.class), player -> new CompoundTagComponent());
         EntityComponents.setRespawnCopyStrategy(PLAYER_EXTRA_DATA, RespawnCopyStrategy.ALWAYS_COPY);
     }
     

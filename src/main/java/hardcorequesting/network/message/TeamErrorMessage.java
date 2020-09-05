@@ -4,7 +4,7 @@ import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.TeamError;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class TeamErrorMessage implements IMessage {
     
@@ -18,12 +18,12 @@ public class TeamErrorMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.error = TeamError.values()[buf.readInt()];
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.error.ordinal());
     }
     

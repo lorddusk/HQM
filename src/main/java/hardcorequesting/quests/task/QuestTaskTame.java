@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -15,15 +16,13 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.passive.HorseBaseEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -44,7 +43,7 @@ public class QuestTaskTame extends QuestTask {
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     
-    public void setTame(int id, Tame tame, PlayerEntity player) {
+    public void setTame(int id, Tame tame, Player player) {
         if (id >= tames.length) {
             tames = Arrays.copyOf(tames, tames.length + 1);
             QuestDataTaskTame data = (QuestDataTaskTame) getData(player);
@@ -57,14 +56,14 @@ public class QuestTaskTame extends QuestTask {
         tames[id] = tame;
     }
     
-    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
+    public void setIcon(int id, ItemStack stack, Player player) {
         System.out.println(stack);
         setTame(id, id >= tames.length ? new Tame() : tames[id], player);
         
         tames[id].iconStack = stack;
     }
     
-    public void setName(int id, String str, PlayerEntity player) {
+    public void setName(int id, String str, Player player) {
         setTame(id, id >= tames.length ? new Tame() : tames[id], player);
         
         tames[id].name = str;
@@ -81,7 +80,7 @@ public class QuestTaskTame extends QuestTask {
         }
     }
     
-    private int tamed(int id, PlayerEntity player) {
+    private int tamed(int id, Player player) {
         return id < tames.length ? ((QuestDataTaskTame) getData(player)).tamed[id] : 0;
     }
     
@@ -92,7 +91,7 @@ public class QuestTaskTame extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         Tame[] tames = getEditFriendlyTames(this.tames);
         for (int i = 0; i < tames.length; i++) {
             Tame tame = tames[i];
@@ -114,7 +113,7 @@ public class QuestTaskTame extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             Tame[] tames = getEditFriendlyTames(this.tames);
             for (int i = 0; i < tames.length; i++) {
@@ -158,7 +157,7 @@ public class QuestTaskTame extends QuestTask {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     
@@ -216,19 +215,19 @@ public class QuestTaskTame extends QuestTask {
     }
     
     @Override
-    public void onAnimalTame(PlayerEntity tamer, Entity entity) {
+    public void onAnimalTame(Player tamer, Entity entity) {
         if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
             boolean updated = false;
             for (int i = 0; i < tames.length; i++) {
                 Tame tame = tames[i];
                 if (tame.count > ((QuestDataTaskTame) getData(tamer)).tamed[i] && tame.tame != null) {
                     if (tame.tame.equals("minecraft:abstracthorse")) {
-                        if (entity instanceof HorseBaseEntity) {
+                        if (entity instanceof AbstractHorse) {
                             ((QuestDataTaskTame) getData(tamer)).tamed[i]++;
                             updated = true;
                         }
                     } else {
-                        EntityType<?> type = Registry.ENTITY_TYPE.get(new Identifier(tame.tame));
+                        EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(tame.tame));
                         if (type != null) {
                             if (type.equals(entity.getType())) {
                                 ((QuestDataTaskTame) getData(tamer)).tamed[i]++;
@@ -251,7 +250,7 @@ public class QuestTaskTame extends QuestTask {
                 }
                 
                 if (done) {
-                    completeTask(tamer.getUuid());
+                    completeTask(tamer.getUUID());
                 }
                 
                 parent.sendUpdatedDataToTeam(tamer);

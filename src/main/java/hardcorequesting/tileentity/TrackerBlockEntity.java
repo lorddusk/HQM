@@ -10,19 +10,19 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Tickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
-public class TrackerBlockEntity extends BlockEntity implements Tickable {
+public class TrackerBlockEntity extends BlockEntity implements TickableBlockEntity {
     
     private static final String NBT_QUEST = "Quest";
     private static final String NBT_RADIUS = "Radius";
@@ -37,14 +37,14 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
         super(ModBlocks.typeTracker);
     }
     
-    private static TrackerBlockEntity getTracker(World world, BlockPos pos) {
+    private static TrackerBlockEntity getTracker(Level world, BlockPos pos) {
         BlockEntity te = world.getBlockEntity(pos);
         return (te instanceof TrackerBlockEntity) ? (TrackerBlockEntity) te : null;
     }
     
     @Environment(EnvType.CLIENT)
-    public static void openInterface(PlayerEntity player, BlockPos pos, UUID questId, int radius, TrackerType type) {
-        TrackerBlockEntity tracker = getTracker(player.world, pos);
+    public static void openInterface(Player player, BlockPos pos, UUID questId, int radius, TrackerType type) {
+        TrackerBlockEntity tracker = getTracker(player.level, pos);
         if (tracker != null) {
             tracker.questId = questId;
             tracker.quest = null;
@@ -52,12 +52,12 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
             tracker.type = type;
             GuiBase gui = new GuiWrapperEditMenu();
             gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
-            MinecraftClient.getInstance().openScreen(gui);
+            Minecraft.getInstance().setScreen(gui);
         }
     }
     
-    public static void saveToServer(PlayerEntity player, BlockPos pos, int radius, TrackerType type) {
-        TrackerBlockEntity tracker = getTracker(player.world, pos);
+    public static void saveToServer(Player player, BlockPos pos, int radius, TrackerType type) {
+        TrackerBlockEntity tracker = getTracker(player.level, pos);
         if (Quest.canQuestsBeEdited() && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;
@@ -65,20 +65,20 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
     }
     
     @Override
-    public void fromTag(BlockState state, CompoundTag compound) {
-        super.fromTag(state, compound);
+    public void load(BlockState state, CompoundTag compound) {
+        super.load(state, compound);
         
         // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
         if (compound.contains(NBT_QUEST)) {
             try {
-                compound.putUuid(NBT_QUEST, UUID.fromString(compound.getString(NBT_QUEST)));
+                compound.putUUID(NBT_QUEST, UUID.fromString(compound.getString(NBT_QUEST)));
             } catch (IllegalArgumentException ignored) {
             }
             compound.remove(NBT_QUEST);
         }
         
         if (compound.contains(NBT_QUEST + "Most")) {
-            questId = compound.getUuid(NBT_QUEST);
+            questId = compound.getUUID(NBT_QUEST);
         } else {
             quest = null;
         }
@@ -87,11 +87,11 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
     }
     
     @Override
-    public CompoundTag toTag(CompoundTag compound) {
-        super.toTag(compound);
+    public CompoundTag save(CompoundTag compound) {
+        super.save(compound);
         
         if (quest != null) {
-            compound.putUuid(NBT_QUEST, quest.getQuestId());
+            compound.putUUID(NBT_QUEST, quest.getQuestId());
         }
         compound.putInt(NBT_RADIUS, radius);
         compound.putByte(NBT_TYPE, (byte) type.ordinal());
@@ -125,8 +125,8 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
     }
     
     private void notifyUpdate(int x, int y, int z, int i) {
-        if (i == 2 || x != pos.getX() || y != pos.getY() || z != pos.getZ()) {
-            world.updateNeighborsAlways(pos, getCachedState().getBlock());
+        if (i == 2 || x != worldPosition.getX() || y != worldPosition.getY() || z != worldPosition.getZ()) {
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
             
             if (i > 0) {
                 notifyUpdate(x - 1, y, z, i - 1);
@@ -163,14 +163,14 @@ public class TrackerBlockEntity extends BlockEntity implements Tickable {
         return quest;
     }
     
-    public void openInterface(PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity)
-            NetworkManager.sendToPlayer(GuiType.TRACKER.build(build()), (ServerPlayerEntity) player);
+    public void openInterface(Player player) {
+        if (player instanceof ServerPlayer)
+            NetworkManager.sendToPlayer(GuiType.TRACKER.build(build()), (ServerPlayer) player);
     }
     
     private String[] build() {
         String[] data = new String[4];
-        data[0] = "" + pos.asLong();
+        data[0] = "" + worldPosition.asLong();
         data[1] = quest != null ? quest.getQuestId().toString() : null;
         data[2] = "" + radius;
         data[3] = "" + type.ordinal();

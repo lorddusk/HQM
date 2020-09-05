@@ -6,12 +6,11 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.Level;
 
 import java.io.IOException;
@@ -104,12 +103,12 @@ public class DeathStats {
     
     @Environment(EnvType.CLIENT)
     public String getName() throws IllegalArgumentException {
-        if (MinecraftClient.getInstance().world != null) {
-            PlayerEntity player = MinecraftClient.getInstance().world.getPlayerByUuid(this.uuid);
+        if (Minecraft.getInstance().level != null) {
+            Player player = Minecraft.getInstance().level.getPlayerByUUID(this.uuid);
             if (player == null) {
                 return "<invalid>";
             }
-            return player.getEntityName();
+            return player.getScoreboardName();
         }
         return this.uuid.toString();
     }
@@ -174,7 +173,7 @@ public class DeathStats {
                 Arrays.sort(clientDeathList, deathTypeComparator[i]);
                 if (clientDeathList.length < 1) {
                     deaths[i] = 0;
-                    messages[i] = GuiColor.RED + I18n.translate("hqm.deathStat.noOneDied");
+                    messages[i] = GuiColor.RED + I18n.get("hqm.deathStat.noOneDied");
                 } else {
                     deaths[i] = clientDeathList[0].getDeaths(i);
                     messages[i] = "";
@@ -192,7 +191,7 @@ public class DeathStats {
                         if (j != 0) {
                             messages[i] += "\n";
                         }
-                        messages[i] += colourPrefixes[standing] + I18n.translate("hqm.deathStat." + placePrefixes[standing]);
+                        messages[i] += colourPrefixes[standing] + I18n.get("hqm.deathStat." + placePrefixes[standing]);
                         messages[i] += GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
                     }
                     
@@ -202,7 +201,7 @@ public class DeathStats {
         
         @Override
         public String getName() {
-            return I18n.translate("hqm.deathStat.worstPlayers");
+            return I18n.get("hqm.deathStat.worstPlayers");
         }
         
         @Override
@@ -232,13 +231,13 @@ public class DeathStats {
         public String getDescription(int id) {
             return super.getDescription(id) + "\n\n" +
                    (count[id] == 0 ?
-                           GuiColor.RED + I18n.translate("hqm.deathStat.noOneDied") :
-                           GuiColor.GREEN.toString() + count[id] + " " + I18n.translate("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + I18n.translate("hqm.deathStat.diedThisWay"));
+                           GuiColor.RED + I18n.get("hqm.deathStat.noOneDied") :
+                           GuiColor.GREEN.toString() + count[id] + " " + I18n.get("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
         }
         
         @Override
         public String getName() {
-            return I18n.translate("hqm.deathStat.everyone");
+            return I18n.get("hqm.deathStat.everyone");
         }
     }
 }

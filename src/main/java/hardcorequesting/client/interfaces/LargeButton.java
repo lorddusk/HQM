@@ -1,14 +1,13 @@
 package hardcorequesting.client.interfaces;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.util.Language;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public abstract class LargeButton {
     private String description;
     private int x;
     private int y;
-    private List<StringVisitable> lines;
+    private List<FormattedText> lines;
     
     public LargeButton(String name, int x, int y) {
         this.name = name;
@@ -42,16 +41,16 @@ public abstract class LargeButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isEnabled(GuiBase gui, PlayerEntity player);
+    public abstract boolean isEnabled(GuiBase gui, Player player);
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isVisible(GuiBase gui, PlayerEntity player);
+    public abstract boolean isVisible(GuiBase gui, Player player);
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiBase gui, PlayerEntity player);
+    public abstract void onClick(GuiBase gui, Player player);
     
     @Environment(EnvType.CLIENT)
-    public void draw(MatrixStack matrices, GuiBase gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, Player player, int mX, int mY) {
         if (isVisible(gui, player)) {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -64,21 +63,21 @@ public abstract class LargeButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, PlayerEntity player, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, Player player, int mX, int mY) {
         if (isVisible(gui, player) && description != null && inButtonBounds(gui, mX, mY)) {
             if (lines == null) {
                 lines = gui.getLinesFromText(getDescription(), 1, 200);
             }
             
-            gui.renderOrderedTooltip(matrices, Language.getInstance().reorder(lines), mX + gui.left, mY + gui.top);
+            gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + gui.left, mY + gui.top);
         }
     }
     
-    protected StringVisitable getName() {
+    protected FormattedText getName() {
         return Translator.translated(name);
     }
     
-    protected StringVisitable getDescription() {
+    protected FormattedText getDescription() {
         return Translator.translated(description);
     }
     

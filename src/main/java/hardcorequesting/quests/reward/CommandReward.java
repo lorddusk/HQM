@@ -1,6 +1,6 @@
 package hardcorequesting.quests.reward;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class CommandReward extends QuestReward<CommandReward.Command> {
     
@@ -8,7 +8,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         super(command);
     }
     
-    public void execute(PlayerEntity player) {
+    public void execute(Player player) {
         getReward().execute(player);
     }
     
@@ -19,8 +19,8 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
             this.commandString = commandString;
         }
         
-        public void execute(PlayerEntity player) {
-            player.getServer().getCommandManager().execute(player.getCommandSource(), commandString.replaceAll("@p", player.getEntityName()));
+        public void execute(Player player) {
+            player.getServer().getCommands().performCommand(player.createCommandSourceStack(), commandString.replaceAll("@p", player.getScoreboardName()));
         }
         
         public String asString() {

@@ -1,5 +1,6 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -7,10 +8,8 @@ import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private QuestTaskReputation task;
     private int id;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, PlayerEntity player, QuestTaskReputation task, int id, QuestTaskReputation.ReputationSetting setting) {
+    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, QuestTaskReputation task, int id, QuestTaskReputation.ReputationSetting setting) {
         super(gui, player, true, 25, 25, -1, -1);
         
         this.task = task;
@@ -81,7 +80,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         if (reputation != null) {
@@ -153,16 +152,16 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     @Override
     protected String getArrowText() {
         if (Reputation.getReputations().isEmpty()) {
-            return I18n.translate("hqm.repSetting.invalid");
+            return I18n.get("hqm.repSetting.invalid");
         } else {
-            return reputation != null ? reputation.getName() : I18n.translate("hqm.repSetting.invalid");
+            return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
         }
     }
     
     @Override
     protected String getArrowDescription() {
         if (Reputation.getReputations().isEmpty()) {
-            return I18n.translate("hqm.repReward.noValidReps");
+            return I18n.get("hqm.repReward.noValidReps");
         } else {
             return null;
         }

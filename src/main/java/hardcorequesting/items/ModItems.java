@@ -22,9 +22,9 @@ public class ModItems {
     
     public static void init() {
         RegisterHelper.registerItem(book, "quest_book");
-        book.recipeRemainder = book;
+        book.craftingRemainingItem = book;
         RegisterHelper.registerItem(enabledBook, "enabled_quest_book");
-        enabledBook.recipeRemainder = enabledBook;
+        enabledBook.craftingRemainingItem = enabledBook;
         RegisterHelper.registerItem(basicBag, "basic_bag");
         RegisterHelper.registerItem(goodBag, "good_bag");
         RegisterHelper.registerItem(greaterBag, "greater_bag");

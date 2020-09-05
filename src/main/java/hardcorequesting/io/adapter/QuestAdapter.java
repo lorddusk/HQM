@@ -11,7 +11,7 @@ import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.util.SaveHelper;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.util.*;

@@ -5,7 +5,7 @@ import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamStats;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +28,11 @@ public class TeamStatsMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         int size = buf.readInt();
         stats = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            String name = buf.readString(32767);
+            String name = buf.readUtf(32767);
             if (name.equals("NULL"))
                 name = null;
             
@@ -44,13 +44,13 @@ public class TeamStatsMessage implements IMessage {
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(stats.size());
         for (TeamStats teamStats : stats) {
             if (teamStats.getName() != null) {
-                buf.writeString(teamStats.getName());
+                buf.writeUtf(teamStats.getName());
             } else
-                buf.writeString("NULL");
+                buf.writeUtf("NULL");
             buf.writeInt(teamStats.getPlayers());
             buf.writeInt(teamStats.getLives());
             buf.writeFloat(teamStats.getProgress());

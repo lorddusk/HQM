@@ -11,16 +11,16 @@ import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskItems;
 import hardcorequesting.quests.task.QuestTaskItemsConsume;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, FluidInsertable {
+public class BarrelBlockEntity extends BaseBlockEntity implements Container, FluidInsertable {
     
     private static final String NBT_PLAYER_UUID = "Player";
     private static final String NBT_QUEST = "Quest";
@@ -34,38 +34,38 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     }
     
     @Override
-    public int getInvSize() {
+    public int getContainerSize() {
         return 1;
     }
     
     @Override
-    public boolean isInvEmpty() {
+    public boolean isEmpty() {
         return false;
     }
     
     @NotNull
     @Override
-    public ItemStack getInvStack(int i) {
+    public ItemStack getItem(int i) {
         return ItemStack.EMPTY;
     }
     
     @NotNull
     @Override
-    public ItemStack takeInvStack(int i, int j) {
+    public ItemStack removeItem(int i, int j) {
         return ItemStack.EMPTY;
     }
     
     @NotNull
     @Override
-    public ItemStack removeInvStack(int index) {
+    public ItemStack removeItemNoUpdate(int index) {
         return ItemStack.EMPTY;
     }
     
     @Override
-    public void setInvStack(int i, @NotNull ItemStack stack) {
+    public void setItem(int i, @NotNull ItemStack stack) {
         QuestTask task = getCurrentTask();
         if (task instanceof QuestTaskItemsConsume) {
-            DefaultedList<ItemStack> list = DefaultedList.of();
+            NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
             if (((QuestTaskItemsConsume) task).increaseItems(list, (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
                 this.updateState();
@@ -75,23 +75,23 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     }
     
     @Override
-    public int getInvMaxStackAmount() {
+    public int getMaxStackSize() {
         return 64;
     }
     
     @Override
-    public boolean canPlayerUseInv(@NotNull PlayerEntity player) {
+    public boolean stillValid(@NotNull Player player) {
         return true;
     }
     
     @Override
-    public void onInvOpen(@NotNull PlayerEntity player) {}
+    public void startOpen(@NotNull Player player) {}
     
     @Override
-    public void onInvClose(@NotNull PlayerEntity player) {}
+    public void stopOpen(@NotNull Player player) {}
     
     @Override
-    public boolean isValidInvStack(int index, @NotNull ItemStack stack) {
+    public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
         QuestTask task = getCurrentTask();
         if (task instanceof QuestTaskItemsConsume) {
             for (int i = 0; i < ((QuestTaskItemsConsume) task).getItems().length; i++) {
@@ -110,17 +110,17 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     }
     
     @Override
-    public void clear() {}
+    public void clearContent() {}
     
     private void doSync() {
-        if (!this.world.isClient) {
+        if (!this.level.isClientSide) {
             // sync tile to client
             this.syncToClientsNearby();
             
             //sync the quest line progress
             QuestTask task = getCurrentTask();
             if (task != null) {
-                PlayerEntity player = QuestingData.getPlayer(this.getPlayerUUID());
+                Player player = QuestingData.getPlayer(this.getPlayerUUID());
                 if (player != null) {
                     task.getParent().sendUpdatedDataToTeam(player);
                 }
@@ -129,13 +129,13 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     }
     
     private void updateState() {
-        if (!this.world.isClient) {
+        if (!this.level.isClientSide) {
             QuestTask task = this.getCurrentTask();
             boolean bound = false;
             if (task != null && !task.isCompleted(this.getPlayerUUID())) {
                 bound = true;
             }
-            world.setBlockState(pos, ModBlocks.blockBarrel.getDefaultState().with(DeliveryBlock.BOUND, bound), 3);
+            level.setBlock(worldPosition, ModBlocks.blockBarrel.defaultBlockState().setValue(DeliveryBlock.BOUND, bound), 3);
         }
     }
     
@@ -149,8 +149,8 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
         return null;
     }
     
-    public void storeSettings(PlayerEntity player) {
-        this.setPlayerUUID(player.getUuid());
+    public void storeSettings(Player player) {
+        this.setPlayerUUID(player.getUUID());
         QuestingData data = QuestingData.getQuestingData(this.getPlayerUUID());
         this.setQuestUUID(data.selectedQuestId);
         this.selectedTask = data.selectedTask;
@@ -216,8 +216,8 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     @Override
     public void writeTile(CompoundTag nbt, NBTType type) {
         if (this.getPlayerUUID() != null && selectedQuestId != null) {
-            nbt.putUuid(NBT_PLAYER_UUID, this.getPlayerUUID());
-            nbt.putUuid(NBT_QUEST, this.getQuestUUID());
+            nbt.putUUID(NBT_PLAYER_UUID, this.getPlayerUUID());
+            nbt.putUUID(NBT_QUEST, this.getQuestUUID());
             nbt.putByte(NBT_TASK, (byte) selectedTask);
         }
     }
@@ -225,8 +225,8 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Inventory, Flu
     @Override
     public void readTile(CompoundTag nbt, NBTType type) {
         if (nbt.contains(NBT_PLAYER_UUID + "Most")) {
-            this.setPlayerUUID(nbt.getUuid(NBT_PLAYER_UUID));
-            this.setQuestUUID(nbt.getUuid(NBT_QUEST));
+            this.setPlayerUUID(nbt.getUUID(NBT_PLAYER_UUID));
+            this.setQuestUUID(nbt.getUUID(NBT_QUEST));
             selectedTask = nbt.getByte(NBT_TASK);
         }
     }

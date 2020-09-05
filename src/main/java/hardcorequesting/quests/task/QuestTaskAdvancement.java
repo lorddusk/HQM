@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
@@ -15,17 +16,15 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.advancement.PlayerAdvancementTracker;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.ServerAdvancementLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.PlayerAdvancements;
+import net.minecraft.server.ServerAdvancementManager;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,11 +56,11 @@ public class QuestTaskAdvancement extends QuestTask {
         }
     }
     
-    private boolean advanced(int id, PlayerEntity player) {
+    private boolean advanced(int id, Player player) {
         return id < advancements.length && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
     }
     
-    public void setAdvancement(int id, AdvancementTask advancement, PlayerEntity player) {
+    public void setAdvancement(int id, AdvancementTask advancement, Player player) {
         if (id >= advancements.length) {
             advancements = Arrays.copyOf(advancements, advancements.length + 1);
             QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
@@ -74,13 +73,13 @@ public class QuestTaskAdvancement extends QuestTask {
         advancements[id] = advancement;
     }
     
-    public void setIcon(int id, ItemStack stack, PlayerEntity player) {
+    public void setIcon(int id, ItemStack stack, Player player) {
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
         advancements[id].iconStack = stack;
     }
     
-    public void setName(int id, String str, PlayerEntity player) {
+    public void setName(int id, String str, Player player) {
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
         advancements[id].name = str;
@@ -93,7 +92,7 @@ public class QuestTaskAdvancement extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
         for (int i = 0; i < advancements.length; i++) {
             AdvancementTask advancement = advancements[i];
@@ -111,7 +110,7 @@ public class QuestTaskAdvancement extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
             for (int i = 0; i < advancements.length; i++) {
@@ -155,18 +154,18 @@ public class QuestTaskAdvancement extends QuestTask {
     }
     
     @Override
-    public void onAdvancement(ServerPlayerEntity playerEntity) {
+    public void onAdvancement(ServerPlayer playerEntity) {
         checkAdvancement(playerEntity);
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         checkAdvancement(player);
     }
     
-    private void checkAdvancement(PlayerEntity player) {
-        World world = player.getEntityWorld();
-        if (!world.isClient && !this.isCompleted(player) && player.getServer() != null) {
+    private void checkAdvancement(Player player) {
+        Level world = player.getCommandSenderWorld();
+        if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
             boolean[] advanced = ((QuestDataTaskAdvancement) this.getData(player)).advanced;
             
             if (advanced.length < advancements.length) {
@@ -177,8 +176,8 @@ public class QuestTaskAdvancement extends QuestTask {
             }
             
             boolean completed = true;
-            ServerAdvancementLoader manager = player.getServer().getAdvancementLoader();
-            PlayerAdvancementTracker playerAdvancements = player.getServer().getPlayerManager().getAdvancementTracker((ServerPlayerEntity) player);
+            ServerAdvancementManager manager = player.getServer().getAdvancements();
+            PlayerAdvancements playerAdvancements = player.getServer().getPlayerList().getPlayerAdvancements((ServerPlayer) player);
             
             for (int i = 0; i < advancements.length; i++) {
                 if (advanced[i]) continue;
@@ -186,14 +185,14 @@ public class QuestTaskAdvancement extends QuestTask {
                 AdvancementTask advancement = this.advancements[i];
                 if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
                 
-                Identifier advResource = new Identifier(advancement.getAdvancement());
+                ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
                 
-                Advancement advAdvancement = manager.get(advResource);
+                Advancement advAdvancement = manager.getAdvancement(advResource);
                 
                 if (advAdvancement == null) {
                     completed = false;
                 } else {
-                    AdvancementProgress progress = playerAdvancements.getProgress(advAdvancement);
+                    AdvancementProgress progress = playerAdvancements.getOrStartProgress(advAdvancement);
                     
                     if (progress.isDone()) {
                         advanced[i] = true;
@@ -204,7 +203,7 @@ public class QuestTaskAdvancement extends QuestTask {
             }
             
             if (completed && advancements.length > 0) {
-                completeTask(player.getUuid());
+                completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
         }
@@ -330,7 +329,7 @@ public class QuestTaskAdvancement extends QuestTask {
             return this.adv_name;
         }
         
-        public void setAdvancement(Identifier name) {
+        public void setAdvancement(ResourceLocation name) {
             setAdvancement(name.toString());
         }
         

@@ -6,7 +6,7 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -44,9 +44,9 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
-        if (increaseItems(player.inventory.main, (QuestDataTaskItems) getData(player), player.getUuid())) {
-            player.inventory.markDirty();
+    public void onUpdate(Player player) {
+        if (increaseItems(player.inventory.items, (QuestDataTaskItems) getData(player), player.getUUID())) {
+            player.inventory.setChanged();
         }
     }
     

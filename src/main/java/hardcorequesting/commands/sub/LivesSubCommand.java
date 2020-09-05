@@ -8,144 +8,144 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.commands.CommandRuntimeException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class LivesSubCommand implements CommandHandler.SubCommand {
     @Override
-    public ArgumentBuilder<ServerCommandSource, ?> build(LiteralArgumentBuilder<ServerCommandSource> builder) {
+    public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermissionLevel(4))
+                .requires(source -> source.hasPermission(4))
                 .then(literal("add")
-                        .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                .then(CommandManager.argument("amount", IntegerArgumentType.integer(1))
+                        .then(Commands.argument("targets", EntityArgument.players())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
                                             if (!QuestingData.isHardcoreActive()) {
-                                                context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
-                                            for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
                                                 addLivesTo(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
                                             }
                                             return 1;
                                         }))
                                 .executes(context -> {
                                     if (!QuestingData.isHardcoreActive()) {
-                                        context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
-                                    for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
                                         addLivesTo(context.getSource(), player, 1);
                                     }
                                     return 1;
                                 }))
                         .executes(context -> {
                             if (!QuestingData.isHardcoreActive()) {
-                                context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            if (context.getSource().getEntity() instanceof PlayerEntity)
-                                addLivesTo(context.getSource(), (PlayerEntity) context.getSource().getEntity(), 1);
+                            if (context.getSource().getEntity() instanceof Player)
+                                addLivesTo(context.getSource(), (Player) context.getSource().getEntity(), 1);
                             return 1;
                         })
                 )
                 .then(literal("remove")
-                        .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                .then(CommandManager.argument("amount", IntegerArgumentType.integer(1))
+                        .then(Commands.argument("targets", EntityArgument.players())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
                                             if (!QuestingData.isHardcoreActive()) {
-                                                context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
-                                            for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
                                                 removeLivesFrom(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
                                             }
                                             return 1;
                                         }))
                                 .executes(context -> {
                                     if (!QuestingData.isHardcoreActive()) {
-                                        context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
-                                    for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
+                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
                                         removeLivesFrom(context.getSource(), player, 1);
                                     }
                                     return 1;
                                 }))
                         .executes(context -> {
                             if (!QuestingData.isHardcoreActive()) {
-                                context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            if (context.getSource().getEntity() instanceof PlayerEntity)
-                                removeLivesFrom(context.getSource(), (PlayerEntity) context.getSource().getEntity(), 1);
+                            if (context.getSource().getEntity() instanceof Player)
+                                removeLivesFrom(context.getSource(), (Player) context.getSource().getEntity(), 1);
                             return 1;
                         })
                 )
-                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                .then(Commands.argument("targets", EntityArgument.players())
                         .executes(context -> {
                             if (!QuestingData.isHardcoreActive()) {
-                                context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            currentLives(context.getSource(), EntityArgumentType.getPlayer(context, "targets"));
+                            currentLives(context.getSource(), EntityArgument.getPlayer(context, "targets"));
                             return 1;
                         }))
                 .executes(context -> {
                     if (!QuestingData.isHardcoreActive()) {
-                        context.getSource().sendError(new TranslatableText("hqm.message.noHardcoreYet"));
+                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                         return 1;
                     }
-                    if (context.getSource().getEntity() instanceof PlayerEntity)
-                        currentLives((PlayerEntity) context.getSource().getEntity());
+                    if (context.getSource().getEntity() instanceof Player)
+                        currentLives((Player) context.getSource().getEntity());
                     return 1;
                 });
     }
     
     @Override
-    public int[] getSyntaxOptions(CommandContext<ServerCommandSource> context) {
+    public int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
         return new int[]{0, 1, 2, 3};
     }
     
-    private void removeLivesFrom(ServerCommandSource source, PlayerEntity player, int amount) {
+    private void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
         QuestingData.getQuestingData(player).removeLives(player, amount);
-        sendTranslatableChat(source, amount != 1, "hqm.message.removeLivesFrom", amount, player.getEntityName());
+        sendTranslatableChat(source, amount != 1, "hqm.message.removeLivesFrom", amount, player.getScoreboardName());
         if (source.getEntity() != player)
-            sendTranslatableChat(player.getCommandSource(), amount != 1, "hqm.message.removeLivesBy", amount, source.getName());
+            sendTranslatableChat(player.createCommandSourceStack(), amount != 1, "hqm.message.removeLivesBy", amount, source.getTextName());
         currentLives(player);
     }
     
-    private void addLivesTo(ServerCommandSource source, PlayerEntity player, int amount) {
+    private void addLivesTo(CommandSourceStack source, Player player, int amount) {
         if (QuestingData.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendTranslatableChat(source, amount != 1, "hqm.message.addLivesTo", amount, player.getEntityName());
+            sendTranslatableChat(source, amount != 1, "hqm.message.addLivesTo", amount, player.getScoreboardName());
             if (source.getEntity() != player)
-                sendTranslatableChat(player.getCommandSource(), amount != 1, "hqm.message.addLivesBy", amount, source.getName());
+                sendTranslatableChat(player.createCommandSourceStack(), amount != 1, "hqm.message.addLivesBy", amount, source.getTextName());
             currentLives(player);
         } else {
             QuestingData.getQuestingData(player).addLives(player, amount);
-            sendTranslatableChat(source, "hqm.message.cantGiveMoreLives", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
-            sendTranslatableChat(source, "hqm.massage.setLivesInstead", player.getEntityName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
+            sendTranslatableChat(source, "hqm.message.cantGiveMoreLives", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
+            sendTranslatableChat(source, "hqm.massage.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
             if (source.getEntity() != player)
-                sendTranslatableChat(player.getCommandSource(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getName());
+                sendTranslatableChat(player.createCommandSourceStack(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName());
             currentLives(player);
         }
     }
     
-    private void getPlayerLives(ServerCommandSource source, String playerName) throws CommandException {
-        PlayerEntity player = HardcoreQuesting.getServer().getPlayerManager().getPlayer(playerName);
+    private void getPlayerLives(CommandSourceStack source, String playerName) throws CommandRuntimeException {
+        Player player = HardcoreQuesting.getServer().getPlayerList().getPlayerByName(playerName);
         if (player != null) {
             int lives = QuestingData.getQuestingData(player).getLives();
             sendTranslatableChat(source, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);
         } else {
-            throw new CommandException(new TranslatableText("hqm.message.noPlayer"));
+            throw new CommandRuntimeException(new TranslatableComponent("hqm.message.noPlayer"));
         }
     }
 }

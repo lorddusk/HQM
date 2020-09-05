@@ -7,7 +7,7 @@ import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,17 +29,17 @@ public class QuestDataUpdateMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.players = buf.readInt();
-        this.questId = buf.readUuid();
+        this.questId = buf.readUUID();
         int charLength = buf.readInt();
         this.data = buf.readCharSequence(charLength, StandardCharsets.UTF_8).toString();
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.players);
-        buf.writeUuid(this.questId);
+        buf.writeUUID(this.questId);
         buf.writeInt(this.data.length());
         buf.writeCharSequence(this.data, StandardCharsets.UTF_8);
     }

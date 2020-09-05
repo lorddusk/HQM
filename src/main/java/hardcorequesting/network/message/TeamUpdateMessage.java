@@ -7,7 +7,7 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.TeamUpdateType;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class TeamUpdateMessage implements IMessage {
     
@@ -23,13 +23,13 @@ public class TeamUpdateMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.type = TeamUpdateType.values()[buf.readInt()];
         this.data = SyncUtil.readLargeString(buf);
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.type.ordinal());
         
         SyncUtil.writeLargeString(this.data, buf);

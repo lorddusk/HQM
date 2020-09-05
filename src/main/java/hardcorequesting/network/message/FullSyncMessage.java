@@ -7,7 +7,7 @@ import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class FullSyncMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
         this.serverWorld = buf.readBoolean();
         this.questing = buf.readBoolean();
@@ -66,14 +66,14 @@ public class FullSyncMessage implements IMessage {
         this.questSetNames = new String[size];
         this.questsSets = new String[size];
         for (int i = 0; i < size; i++) {
-            questSetNames[i] = buf.readString(32767);
-            questsSets[i] = buf.readString(32767);
+            questSetNames[i] = buf.readUtf(32767);
+            questsSets[i] = buf.readUtf(32767);
         }
         
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(this.local);
         buf.writeBoolean(this.serverWorld);
         buf.writeBoolean(this.questing);
@@ -88,8 +88,8 @@ public class FullSyncMessage implements IMessage {
         
         buf.writeInt(this.questsSets.length);
         for (int i = 0; i < this.questsSets.length; i++) {
-            buf.writeString(questSetNames[i]);
-            buf.writeString(questsSets[i]);
+            buf.writeUtf(questSetNames[i]);
+            buf.writeUtf(questsSets[i]);
         }
     }
     

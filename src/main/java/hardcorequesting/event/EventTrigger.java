@@ -9,22 +9,22 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerTickCallback;
 import net.fabricmc.fabric.api.event.world.WorldTickCallback;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,9 +42,9 @@ public class EventTrigger {
         }
         ServerTickCallback.EVENT.register(this::onServerTick);
         WorldTickCallback.EVENT.register(world -> {
-            for (PlayerEntity player : world.getPlayers()) {
-                if (player instanceof ServerPlayerEntity) {
-                    onPlayerTick((ServerPlayerEntity) player);
+            for (Player player : world.players()) {
+                if (player instanceof ServerPlayer) {
+                    onPlayerTick((ServerPlayer) player);
                 }
             }
         });
@@ -78,7 +78,7 @@ public class EventTrigger {
         }
     }
     
-    public void onPlayerLogin(ServerPlayerEntity entity) {
+    public void onPlayerLogin(ServerPlayer entity) {
         for (List<QuestTask> list : registeredTasks) {
             list.removeIf((q) -> !q.isValid());
         }
@@ -93,7 +93,7 @@ public class EventTrigger {
         }
     }
     
-    public void onPlayerTick(ServerPlayerEntity playerEntity) {
+    public void onPlayerTick(ServerPlayer playerEntity) {
         for (QuestTask task : getTasks(Type.PLAYER)) {
             task.onPlayerTick(playerEntity);
         }
@@ -105,7 +105,7 @@ public class EventTrigger {
         }
     }
     
-    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
+    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
         for (QuestTask task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack, craftingInv);
         }
@@ -131,7 +131,7 @@ public class EventTrigger {
 //        }
 //    }
     
-    public void onItemPickUp(PlayerEntity playerEntity, ItemStack stack) {
+    public void onItemPickUp(Player playerEntity, ItemStack stack) {
         for (QuestTask task : getTasks(Type.PICK_UP)) {
             task.onItemPickUp(playerEntity, stack);
         }
@@ -161,43 +161,43 @@ public class EventTrigger {
         }
     }
     
-    public void onAnimalTame(PlayerEntity tamer, Entity entity) {
+    public void onAnimalTame(Player tamer, Entity entity) {
         for (QuestTask task : getTasks(Type.ANIMAL_TAME)) {
             task.onAnimalTame(tamer, entity);
         }
     }
     
-    public void onAdvancement(ServerPlayerEntity playerEntity) {
+    public void onAdvancement(ServerPlayer playerEntity) {
         for (QuestTask task : getTasks(Type.ADVANCEMENT)) {
             task.onAdvancement(playerEntity);
         }
     }
     
-    public void onBlockBreak(IWorld world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public void onBlockBreak(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
         for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
             task.onBlockBroken(pos, state, player);
         }
     }
     
-    public ActionResult onBlockPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+    public InteractionResult onBlockPlaced(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         for (QuestTask task : getTasks(Type.BLOCK_PLACED)) {
             task.onBlockPlaced(itemStack, world, state, placer);
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
     
-    private TypedActionResult<ItemStack> onItemUsed(PlayerEntity playerEntity, World world, Hand hand) {
+    private InteractionResultHolder<ItemStack> onItemUsed(Player playerEntity, Level world, InteractionHand hand) {
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
             task.onItemUsed(playerEntity, world, hand);
         }
-        return TypedActionResult.pass(playerEntity.getStackInHand(hand));
+        return InteractionResultHolder.pass(playerEntity.getItemInHand(hand));
     }
     
-    private ActionResult onBlockUsed(PlayerEntity playerEntity, World world, Hand hand, BlockHitResult blockHitResult) {
+    private InteractionResult onBlockUsed(Player playerEntity, Level world, InteractionHand hand, BlockHitResult blockHitResult) {
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
             task.onBlockUsed(playerEntity, world, hand, blockHitResult);
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
     
     private List<QuestTask> getTasks(Type type) {
@@ -246,29 +246,29 @@ public class EventTrigger {
             return isRealName;
         }
         
-        public PlayerEntity getPlayer() {
+        public Player getPlayer() {
             return QuestingData.getPlayerFromUsername(playerName);
         }
     }
     
     public static class QuestCompletedEvent {
         private UUID questCompleted;
-        private PlayerEntity player;
+        private Player player;
         
-        public QuestCompletedEvent(PlayerEntity player, UUID questCompleted) {
+        public QuestCompletedEvent(Player player, UUID questCompleted) {
             this.player = player;
             this.questCompleted = questCompleted;
         }
         
         public UUID getQuestCompleted() { return questCompleted; }
         
-        public PlayerEntity getPlayer() {
+        public Player getPlayer() {
             return player;
         }
     }
     
     public static class QuestSelectedEvent extends QuestCompletedEvent {
-        public QuestSelectedEvent(PlayerEntity player, UUID questSelected) {
+        public QuestSelectedEvent(Player player, UUID questSelected) {
             super(player, questSelected);
         }
         
@@ -276,13 +276,13 @@ public class EventTrigger {
     }
     
     public static class ReputationEvent {
-        private PlayerEntity player;
+        private Player player;
         
-        public ReputationEvent(PlayerEntity player) {
+        public ReputationEvent(Player player) {
             this.player = player;
         }
         
-        public PlayerEntity getPlayer() {
+        public Player getPlayer() {
             return player;
         }
     }

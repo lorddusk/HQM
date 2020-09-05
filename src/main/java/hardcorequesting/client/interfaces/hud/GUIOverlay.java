@@ -3,15 +3,15 @@ package hardcorequesting.client.interfaces.hud;
 import hardcorequesting.quests.QuestingData;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 
 @Environment(EnvType.CLIENT)
-public class GUIOverlay extends DrawableHelper {
+public class GUIOverlay extends GuiComponent {
     
-    private MinecraftClient mc;
+    private Minecraft mc;
     
-    public GUIOverlay(MinecraftClient mc) {
+    public GUIOverlay(Minecraft mc) {
         this.mc = mc;
     }
     

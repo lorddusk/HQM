@@ -3,10 +3,10 @@ package hardcorequesting.client.sounds;
 
 import com.google.common.collect.Sets;
 import hardcorequesting.HardcoreQuesting;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Tuple;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public enum Sounds {
     private static Map<Sounds, SoundEvent> sounds = new HashMap<>();
     private String sound;
     
-    static Set<Pair<SoundEvent, Identifier>> registeredSounds = Sets.newHashSet();
+    static Set<Tuple<SoundEvent, ResourceLocation>> registeredSounds = Sets.newHashSet();
     
     Sounds(String sound) {
         this.sound = sound;
@@ -30,15 +30,15 @@ public enum Sounds {
     
     public static void initSounds() {
         for (Sounds sound : Sounds.values()) {
-            Identifier identifier = new Identifier(HardcoreQuesting.ID, sound.getSoundName());
+            ResourceLocation identifier = new ResourceLocation(HardcoreQuesting.ID, sound.getSoundName());
             SoundEvent event = registerSound(identifier);
             sounds.put(sound, event);
         }
     }
     
-    private static SoundEvent registerSound(Identifier identifier) {
+    private static SoundEvent registerSound(ResourceLocation identifier) {
         SoundEvent event = new SoundEvent(identifier);
-        registeredSounds.add(new Pair<>(event, identifier));
+        registeredSounds.add(new Tuple<>(event, identifier));
         return event;
     }
     
@@ -51,8 +51,8 @@ public enum Sounds {
     }
     
     public static void registerSounds() {
-        for (Pair<SoundEvent, Identifier> pair : registeredSounds) {
-            Registry.register(Registry.SOUND_EVENT, pair.getRight(), pair.getLeft());
+        for (Tuple<SoundEvent, ResourceLocation> pair : registeredSounds) {
+            Registry.register(Registry.SOUND_EVENT, pair.getB(), pair.getA());
         }
     }
 }

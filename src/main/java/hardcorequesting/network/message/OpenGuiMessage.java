@@ -5,7 +5,7 @@ import hardcorequesting.client.interfaces.GuiType;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class OpenGuiMessage implements IMessage {
     private String data;
@@ -21,17 +21,17 @@ public class OpenGuiMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.gui = GuiType.values()[buf.readInt()];
         if (this.gui == GuiType.NONE) return;
-        data = buf.readString(32767);
+        data = buf.readUtf(32767);
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(this.gui.ordinal());
         if (this.gui == GuiType.NONE) return;
-        buf.writeString(data);
+        buf.writeUtf(data);
     }
     
     public static class Handler implements IMessageHandler<OpenGuiMessage, IMessage> {

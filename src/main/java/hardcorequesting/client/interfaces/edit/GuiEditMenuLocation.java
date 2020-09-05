@@ -1,23 +1,23 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.client.interfaces.TextBoxGroup;
 import hardcorequesting.quests.task.QuestTaskLocation;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuLocation extends GuiEditMenuExtended {
     
     private int id;
     private QuestTaskLocation task;
     private QuestTaskLocation.Location location;
-    private PlayerEntity player;
+    private Player player;
     
     
-    public GuiEditMenuLocation(GuiQuestBook gui, QuestTaskLocation task, final QuestTaskLocation.Location location, int id, PlayerEntity player) {
+    public GuiEditMenuLocation(GuiQuestBook gui, QuestTaskLocation task, final QuestTaskLocation.Location location, int id, Player player) {
         super(gui, player, true, 180, 30, 20, 30);
         this.id = id;
         this.task = task;
@@ -86,7 +86,7 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
             }
             
             @Override
-            protected void draw(MatrixStack matrices, GuiBase gui, boolean selected) {
+            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
                 gui.drawString(matrices, gui.getLinesFromText(Translator.translated("hqm.locationMenu.negRadius"), 0.7F, 130), BOX_X, BOX_Y + BOX_OFFSET * 5 + TEXT_OFFSET, 0.7F, 0x404040);
@@ -96,21 +96,21 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.locationMenu.location", 100, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 location.setX((int) player.getX());
                 location.setY((int) player.getY());
                 location.setZ((int) player.getZ());
-                location.setDimension(player.world.getRegistryKey());
+                location.setDimension(player.level.dimension());
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
                     textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
                 }
@@ -142,7 +142,7 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         task.setLocation(id, location, player);
     }
     
-    private abstract class TextBoxNumberNegative extends GuiEditMenuExtended.TextBoxNumber {
+    private abstract class TextBoxNumberNegative extends TextBoxNumber {
         public TextBoxNumberNegative(GuiQuestBook gui, int id, String title) {
             super(gui, id, title);
         }

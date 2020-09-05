@@ -5,7 +5,7 @@ import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,17 +25,17 @@ public class DeathStatsMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
         if (this.local) return;
-        deaths = buf.readString(32767);
+        deaths = buf.readUtf(32767);
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(this.local);
         if (local) return;
-        buf.writeString(deaths);
+        buf.writeUtf(deaths);
     }
     
     public static class Handler implements IMessageHandler<DeathStatsMessage, IMessage> {

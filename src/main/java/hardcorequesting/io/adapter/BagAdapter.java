@@ -7,7 +7,7 @@ import hardcorequesting.bag.BagTier;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
 import hardcorequesting.client.interfaces.GuiColor;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.util.ArrayList;

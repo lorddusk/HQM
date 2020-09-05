@@ -13,10 +13,8 @@ import hardcorequesting.quests.QuestingData;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -42,7 +40,7 @@ public enum ClientChange {
         }
         
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             QuestingData.getQuestingData(player).selectedQuestId = UUID.fromString(root.get(PARENT).getAsString());
@@ -66,7 +64,7 @@ public enum ClientChange {
         }
         
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
@@ -92,7 +90,7 @@ public enum ClientChange {
         }
         
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
             Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
@@ -110,7 +108,7 @@ public enum ClientChange {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(BLOCK_POS).value(data.getPos().asLong());
+            writer.name(BLOCK_POS).value(data.getBlockPos().asLong());
             writer.name(RADIUS).value(data.getRadius());
             writer.name(TYPE).value(data.getTrackerType().ordinal());
             writer.endObject();
@@ -118,10 +116,10 @@ public enum ClientChange {
         }
         
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            BlockPos pos = BlockPos.fromLong(root.get(BLOCK_POS).getAsLong());
+            BlockPos pos = BlockPos.of(root.get(BLOCK_POS).getAsLong());
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
             TrackerBlockEntity.saveToServer(player, pos, radius, type);
@@ -134,7 +132,7 @@ public enum ClientChange {
         }
     
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
         }
     }),
@@ -145,7 +143,7 @@ public enum ClientChange {
         }
         
         @Override
-        public void parse(PlayerEntity player, String data) {
+        public void parse(Player player, String data) {
             SoundHandler.handleLorePacket(player);
         }
     });
@@ -156,7 +154,7 @@ public enum ClientChange {
         this.updater = updater;
     }
     
-    public void parse(PlayerEntity player, String data) {
+    public void parse(Player player, String data) {
         updater.parse(player, data);
     }
     
@@ -173,7 +171,7 @@ public enum ClientChange {
         
         IMessage build(T data) throws IOException;
         
-        void parse(PlayerEntity player, String data);
+        void parse(Player player, String data);
     }
     
     public static class Tuple<A, B> {

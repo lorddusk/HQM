@@ -2,21 +2,25 @@ package hardcorequesting.client.interfaces;
 
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.bag.Group;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.items.BagItem;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.*;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +28,8 @@ import java.util.UUID;
 
 public class GuiReward extends GuiBase {
     
-    public static final Identifier TEXTURE = ResourceHelper.getResource("reward");
-    public static final Identifier C_TEXTURE = ResourceHelper.getResource("c_reward");
+    public static final ResourceLocation TEXTURE = ResourceHelper.getResource("reward");
+    public static final ResourceLocation C_TEXTURE = ResourceHelper.getResource("c_reward");
     private static final int ITEMS_PER_LINE = 7;
     private static final int ITEM_SIZE = 16;
     private static final int ITEM_MARGIN = 5;
@@ -42,8 +46,8 @@ public class GuiReward extends GuiBase {
     private List<Reward> rewards;
     private String statisticsText;
     
-    public GuiReward(Group group, int bagTier, PlayerEntity player) {
-        super(NarratorManager.EMPTY);
+    public GuiReward(Group group, int bagTier, Player player) {
+        super(NarratorChatListener.NO_TITLE);
         this.group = group;
         this.rewards = new ArrayList<>();
         
@@ -58,7 +62,7 @@ public class GuiReward extends GuiBase {
         int myWeight = group.getTier().getWeights()[bagTier];
         float chance = ((float) myWeight / totalWeight);
         
-        statisticsText = I18n.translate("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
+        statisticsText = I18n.get("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
         
         
         lines = (int) Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
@@ -75,7 +79,7 @@ public class GuiReward extends GuiBase {
         }
     }
     
-    public static void open(PlayerEntity player, UUID groupId, int bag, int[] limits) {
+    public static void open(Player player, UUID groupId, int bag, int[] limits) {
         Group rewardGroup = Group.getGroups().get(groupId);
         int i = 0;
         for (Group group : Group.getGroups().values())
@@ -83,12 +87,12 @@ public class GuiReward extends GuiBase {
                 group.setRetrievalCount(player, limits[i++]);
         
         if (BagItem.displayGui) {
-            MinecraftClient.getInstance().openScreen(new GuiReward(rewardGroup, bag, player));
+            Minecraft.getInstance().setScreen(new GuiReward(rewardGroup, bag, player));
         }
     }
     
     @Override
-    public void render(MatrixStack matrices, int mX0, int mY0, float f) {
+    public void render(PoseStack matrices, int mX0, int mY0, float f) {
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(TEXTURE);
         
@@ -112,10 +116,10 @@ public class GuiReward extends GuiBase {
         // fall back to the tier's name if this particular bag has no title,
         // or if the user explicitly asked us to do so.
         if (HQMConfig.getInstance().Loot.ALWAYS_USE_TIER || title == null || title.isEmpty()) {
-            title = I18n.translate("hqm.rewardGui.tierReward", group.getTier().getName());
+            title = I18n.get("hqm.rewardGui.tierReward", group.getTier().getName());
         }
         
-        drawCenteredString(matrices, StringVisitable.styled(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
+        drawCenteredString(matrices, FormattedText.of(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
         drawCenteredString(matrices, Translator.plain(statisticsText), 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
         drawCenteredString(matrices, Translator.translated("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
@@ -123,7 +127,7 @@ public class GuiReward extends GuiBase {
             try {
                 drawItemStack(reward.stack, reward.x, reward.y, true);
                 //itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, MinecraftClient.getInstance().getTextureManager(), reward.stack, reward.x + left + 1, reward.y + top + 1);
-                itemRenderer.renderGuiItemOverlay(textRenderer, reward.stack, (reward.x + left + 1), (reward.y + top + 1), "");
+                itemRenderer.renderGuiItemDecorations(font, reward.stack, (reward.x + left + 1), (reward.y + top + 1), "");
             } catch (Throwable ignored) {
             }
         }
@@ -134,16 +138,16 @@ public class GuiReward extends GuiBase {
                     if (Screen.hasShiftDown()) {
                         renderTooltip(matrices, reward.stack, mX0, mY0);
                     } else {
-                        List<OrderedText> str = new ArrayList<>();
+                        List<FormattedCharSequence> str = new ArrayList<>();
                         try {
-                            List<Text> info = reward.stack.getTooltip(MinecraftClient.getInstance().player, client.options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
+                            List<Component> info = reward.stack.getTooltipLines(Minecraft.getInstance().player, minecraft.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                             if (info.size() > 0) {
-                                str.add(Language.getInstance().reorder(info.get(0)));
+                                str.add(Language.getInstance().getVisualOrder(info.get(0)));
                                 if (info.size() > 1) {
-                                    str.add(Language.getInstance().reorder(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
+                                    str.add(Language.getInstance().getVisualOrder(Translator.translated("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
                                 }
                             }
-                            renderOrderedTooltip(matrices, str, mX0, mY0);
+                            renderTooltip(matrices, str, mX0, mY0);
                         } catch (Throwable ignored) {
                         }
                     }
@@ -155,7 +159,7 @@ public class GuiReward extends GuiBase {
     
     @Override
     public boolean mouseClicked(double mX0, double mY0, int b) {
-        MinecraftClient.getInstance().openScreen(null);
+        Minecraft.getInstance().setScreen(null);
         return true;
     }
     

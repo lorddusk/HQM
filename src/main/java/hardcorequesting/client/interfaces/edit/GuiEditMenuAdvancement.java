@@ -1,14 +1,13 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.quests.task.QuestTaskAdvancement;
 import hardcorequesting.util.Translator;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,7 +27,7 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
     private List<String> rawAdvancemenNames;
     private List<String> advancementNames;
     
-    public GuiEditMenuAdvancement(GuiQuestBook gui, QuestTaskAdvancement task, final QuestTaskAdvancement.AdvancementTask advancement, int id, PlayerEntity player) {
+    public GuiEditMenuAdvancement(GuiQuestBook gui, QuestTaskAdvancement task, final QuestTaskAdvancement.AdvancementTask advancement, int id, Player player) {
         super(gui, player, false, 180, 70, 180, 150);
         this.task = task;
         this.advancement = advancement;
@@ -53,7 +52,7 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
         advancementNames = new ArrayList<>();
         
         // Just using this to gain access to the advancement manager
-        for (Advancement a : HardcoreQuesting.getServer().getAdvancementLoader().getAdvancements()) {
+        for (Advancement a : HardcoreQuesting.getServer().getAdvancements().getAllAdvancements()) {
             String adv = a.getId().toString();
             rawAdvancemenNames.add(adv);
             advancementNames.add(adv);
@@ -77,7 +76,7 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);

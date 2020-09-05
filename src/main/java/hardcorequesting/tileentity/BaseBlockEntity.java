@@ -1,10 +1,10 @@
 package hardcorequesting.tileentity;
 
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 public class BaseBlockEntity extends BlockEntity implements BlockEntityClientSerializable {
@@ -14,14 +14,14 @@ public class BaseBlockEntity extends BlockEntity implements BlockEntityClientSer
     }
     
     @Override
-    public final void fromTag(BlockState state, CompoundTag compound) {
-        super.fromTag(state, compound);
+    public final void load(BlockState state, CompoundTag compound) {
+        super.load(state, compound);
         this.readTile(compound, NBTType.SAVE);
     }
     
     @Override
-    public final CompoundTag toTag(CompoundTag compound) {
-        compound = super.toTag(compound);
+    public final CompoundTag save(CompoundTag compound) {
+        compound = super.save(compound);
         this.writeTile(compound, NBTType.SAVE);
         return compound;
     }
@@ -33,12 +33,12 @@ public class BaseBlockEntity extends BlockEntity implements BlockEntityClientSer
     @NotNull
     @Override
     public CompoundTag toClientTag(CompoundTag tag) {
-        return this.toTag(tag);
+        return this.save(tag);
     }
     
     @Override
     public void fromClientTag(@NotNull CompoundTag tag) {
-        this.fromTag(null, tag);
+        this.load(null, tag);
     }
     
     protected void receiveSyncPacket(@NotNull CompoundTag nbt) {

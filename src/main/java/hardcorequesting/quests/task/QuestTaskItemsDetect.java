@@ -6,10 +6,10 @@ import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,17 +47,17 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         countItems(player, ItemStack.EMPTY);
     }
     
     @Override
-    public void onCrafting(PlayerEntity player, ItemStack stack, CraftingInventory craftingInv) {
+    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
         onCrafting(player, stack);
     }
     
     @Override
-    public void onItemPickUp(PlayerEntity playerEntity, ItemStack stack) {
+    public void onItemPickUp(Player playerEntity, ItemStack stack) {
         countItems(playerEntity, stack);
     }
     
@@ -68,7 +68,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
     }
     
-    public void onCrafting(PlayerEntity player, ItemStack stack) {
+    public void onCrafting(Player player, ItemStack stack) {
         if (player != null) {
             stack = stack.copy();
             if (stack.getCount() == 0) {
@@ -78,18 +78,18 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
     }
     
-    private void countItems(PlayerEntity player, ItemStack stack) {
-        if (!player.getEntityWorld().isClient) {
-            DefaultedList<ItemStack> items = DefaultedList.ofSize(player.inventory.main.size() + 1, ItemStack.EMPTY);
-            Collections.copy(items, player.inventory.main);
+    private void countItems(Player player, ItemStack stack) {
+        if (!player.getCommandSenderWorld().isClientSide) {
+            NonNullList<ItemStack> items = NonNullList.withSize(player.inventory.items.size() + 1, ItemStack.EMPTY);
+            Collections.copy(items, player.inventory.items);
             if (!stack.isEmpty()) {
                 items.set(items.size() - 1, stack);
             }
-            countItems(items, (QuestDataTaskItems) getData(player), player.getUuid());
+            countItems(items, (QuestDataTaskItems) getData(player), player.getUUID());
         }
     }
     
-    public void countItems(DefaultedList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
+    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
         if (!parent.isAvailable(playerID)) return;
         
         

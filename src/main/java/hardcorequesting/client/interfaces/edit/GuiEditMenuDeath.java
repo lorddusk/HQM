@@ -1,6 +1,7 @@
 package hardcorequesting.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
@@ -10,9 +11,8 @@ import hardcorequesting.death.DeathType;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -51,10 +51,10 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private boolean showBest;
     private ScrollBar scrollBar;
     
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, PlayerEntity player) {
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, Player player) {
         super(guiQuestBook, player);
         
-        playerId = player.getUuid();
+        playerId = player.getUUID();
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
@@ -65,7 +65,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         scrollBar.draw(gui);
@@ -108,7 +108,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int x = i % 3;
                 int y = i / 3;
     
-                StringVisitable text = Translator.plain(stats.getDeaths(i) + "");
+                FormattedText text = Translator.plain(stats.getDeaths(i) + "");
                 String str = Translator.rawString(text);
                 if (str.length() > 5)
                     text = Translator.translated("hqm.deathMenu.lots");
@@ -124,7 +124,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.renderTooltip(matrices, gui, mX, mY);
         
         DeathStats stats = getStats();

@@ -17,10 +17,10 @@ import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,10 +42,10 @@ public class QuestLine {
     public List<QuestSet> questSets;
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public String mainDescription = "No description";
-    public List<StringVisitable> cachedMainDescription;
+    public List<FormattedText> cachedMainDescription;
     public String mainPath;
     @Environment(EnvType.CLIENT)
-    public Identifier front;
+    public ResourceLocation front;
     
     public QuestLine() {
         GroupTier.initBaseTiers(this);
@@ -56,7 +56,7 @@ public class QuestLine {
     }
     
     // client side only
-    public static void receiveServerSync(PlayerEntity receiver, boolean local, boolean remote) {
+    public static void receiveServerSync(Player receiver, boolean local, boolean remote) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(config.mainPath);
             hasLoadedMainSound = true;
@@ -78,11 +78,11 @@ public class QuestLine {
         world = null;
     }
     
-    public static void sendServerSync(PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+    public static void sendServerSync(Player player) {
+        if (player instanceof ServerPlayer) {
+            ServerPlayer playerMP = (ServerPlayer) player;
             boolean side = HardcoreQuesting.loadingSide == EnvType.SERVER;
-            if (HardcoreQuesting.getServer().isSinglePlayer()) // Integrated server
+            if (HardcoreQuesting.getServer().isSingleplayer()) // Integrated server
                 NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
             else {
                 if (QuestLine.doServerSync) // Send actual data to player on server sync

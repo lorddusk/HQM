@@ -3,7 +3,7 @@
   "package": "hardcorequesting.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinCraftingResultSlot", "MixinHorseBondWithPlayerGoal", "MixinMinecraftServer", "MixinPlayerAdvancementTracker",
+    "MixinResultSlot", "MixinRunAroundLikeCrazyGoal", "MixinMinecraftServer", "MixinPlayerAdvancements",
     "MixinPlayerEntity", "MixinPlayerInventory", "MixinServerPlayerEntity"
   ],
   "client": [

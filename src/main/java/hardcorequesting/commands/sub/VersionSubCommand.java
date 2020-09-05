@@ -5,15 +5,15 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.util.Translator;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
 
 public class VersionSubCommand implements CommandHandler.SubCommand {
     @Override
-    public ArgumentBuilder<ServerCommandSource, ?> build(LiteralArgumentBuilder<ServerCommandSource> builder) {
+    public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .executes(context -> {
-                    sendChat(context.getSource(), Translator.translatable("hqm.message.version", HardcoreQuesting.VERSION).formatted(Formatting.GREEN));
+                    sendChat(context.getSource(), Translator.translatable("hqm.message.version", HardcoreQuesting.VERSION).withStyle(ChatFormatting.GREEN));
                     return 1;
                 });
     }

@@ -6,11 +6,11 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.quests.QuestingData;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,9 +84,9 @@ public class SoundHandler {
     }
     
     
-    public static void play(Sounds sound, PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity)
-            NetworkManager.sendToPlayer(ClientChange.SOUND.build(sound), (ServerPlayerEntity) player);
+    public static void play(Sounds sound, Player player) {
+        if (player instanceof ServerPlayer)
+            NetworkManager.sendToPlayer(ClientChange.SOUND.build(sound), (ServerPlayer) player);
     }
     
     public static void playToAll(Sounds sound) {
@@ -95,13 +95,13 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     private static SoundInstance play(String sound, float volume, float pitch) {
-        return play(new Identifier(HardcoreQuesting.SOUNDLOC, sound), volume, pitch);
+        return play(new ResourceLocation(HardcoreQuesting.SOUNDLOC, sound), volume, pitch);
     }
     
     @Environment(EnvType.CLIENT)
-    private static SoundInstance play(Identifier resource, float volume, float pitch) {
+    private static SoundInstance play(ResourceLocation resource, float volume, float pitch) {
         SoundInstance soundObj = new ClientSound(resource, volume, pitch);
-        MinecraftClient.getInstance().getSoundManager().play(soundObj);
+        Minecraft.getInstance().getSoundManager().play(soundObj);
         return soundObj;
     }
     
@@ -111,7 +111,7 @@ public class SoundHandler {
             new Thread(() ->
             {
                 while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
-                    MinecraftClient.getInstance().getSoundManager().stop(loreSound);
+                    Minecraft.getInstance().getSoundManager().stop(loreSound);
                 }
                 loreSound = null;
             }).start();
@@ -120,7 +120,7 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     public static boolean isLorePlaying() {
-        boolean value = loreSound != null && MinecraftClient.getInstance().getSoundManager().isPlaying(loreSound);
+        boolean value = loreSound != null && Minecraft.getInstance().getSoundManager().isActive(loreSound);
         
         if (!value)
             loreSound = null;
@@ -142,7 +142,7 @@ public class SoundHandler {
         playLoreMusic();
     }
     
-    public static void handleLorePacket(PlayerEntity player) {
+    public static void handleLorePacket(Player player) {
         QuestingData.getQuestingData(player).playedLore = true;
     }
 }

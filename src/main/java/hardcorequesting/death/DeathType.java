@@ -1,18 +1,17 @@
 package hardcorequesting.death;
 
 import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.Translator;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 
 public enum DeathType {
     LAVA("lava") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("lava");
+            return source.msgId.equals("lava");
         }
     },
     FIRE("fire") {
@@ -24,67 +23,67 @@ public enum DeathType {
     SUFFOCATION("suffocation") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("inWall");
+            return source.msgId.equals("inWall");
         }
     },
     THORNS("thorns") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("thorns") || source.name.equals("cactus");
+            return source.msgId.equals("thorns") || source.msgId.equals("cactus");
         }
     },
     DROWNING("drowning") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("drown");
+            return source.msgId.equals("drown");
         }
     },
     STARVATION("starvation") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("starve");
+            return source.msgId.equals("starve");
         }
     },
     FALL("fall") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("fall");
+            return source.msgId.equals("fall");
         }
     },
     VOID("void") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("outOfWorld");
+            return source.msgId.equals("outOfWorld");
         }
     },
     CRUSHED("crushed") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("anvil") || source.name.equals("fallingBlock");
+            return source.msgId.equals("anvil") || source.msgId.equals("fallingBlock");
         }
     },
     EXPLOSION("explosions") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.isExplosive();
+            return source.isExplosion();
         }
     },
     MONSTER("monsters") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("mob") || source.getAttacker() instanceof LivingEntity;
+            return source.msgId.equals("mob") || source.getEntity() instanceof LivingEntity;
         }
     },
     PLAYER("otherPlayers") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.name.equals("player") || source.getAttacker() instanceof PlayerEntity;
+            return source.msgId.equals("player") || source.getEntity() instanceof Player;
         }
     },
     MAGIC("magic") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMagic();
+            return source.isMagic();
         }
     },
     HQM("rottenHearts") {
@@ -106,8 +105,8 @@ public enum DeathType {
         this.name = name;
     }
     
-    public static void onDeath(PlayerEntity player, DamageSource source) {
-        if (source != null && source.name != null) {
+    public static void onDeath(Player player, DamageSource source) {
+        if (source != null && source.msgId != null) {
             for (DeathType deathType : values()) {
                 if (deathType.isSourceValid(source)) {
                     deathType.onDeath(player);
@@ -120,7 +119,7 @@ public enum DeathType {
         
     }
     
-    public void onDeath(PlayerEntity player) {
+    public void onDeath(Player player) {
         QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
     }
     
@@ -128,7 +127,7 @@ public enum DeathType {
     abstract boolean isSourceValid(DamageSource source);
     
     public String getName() {
-        return I18n.translate("hqm.deathType." + name);
+        return I18n.get("hqm.deathType." + name);
     }
 
     /*Fire: inFire, onFire, fireball

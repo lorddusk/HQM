@@ -3,14 +3,14 @@ package hardcorequesting.client.interfaces.edit;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.quests.task.QuestTaskReputationKill;
 import hardcorequesting.util.SaveHelper;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
     
     private int kills;
     private QuestTaskReputationKill task;
     
-    public GuiEditMenuReputationKillTask(GuiBase gui, PlayerEntity player, QuestTaskReputationKill task) {
+    public GuiEditMenuReputationKillTask(GuiBase gui, Player player, QuestTaskReputationKill task) {
         super(gui, player, true, -1, -1, 25, 30);
         
         kills = task.getKills();

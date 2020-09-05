@@ -1,5 +1,6 @@
 package hardcorequesting.quests.task;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.event.EventTrigger;
@@ -9,12 +10,10 @@ import hardcorequesting.quests.data.QuestDataTaskDeath;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -37,19 +36,19 @@ public class QuestTaskDeath extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         int died = ((QuestDataTaskDeath) getData(player)).deaths;
         gui.drawString(matrices, gui.getLinesFromText(Translator.plain(died == deaths ? GuiColor.GREEN + Translator.translatable(deaths != 0, "hqm.deathMenu.deaths", deaths).getString() : Translator.translatable(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths).getString()), 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         
     }
     
     @Override
-    public void onUpdate(PlayerEntity player) {
+    public void onUpdate(Player player) {
         
     }
     
@@ -85,17 +84,17 @@ public class QuestTaskDeath extends QuestTask {
     
     @Override
     public void onLivingDeath(LivingEntity player, DamageSource source) {
-        if (player instanceof ServerPlayerEntity) {
-            if (parent.isEnabled((PlayerEntity) player) && parent.isAvailable((PlayerEntity) player) && this.isVisible((PlayerEntity) player) && !isCompleted((PlayerEntity) player)) {
-                QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData((PlayerEntity) player);
+        if (player instanceof ServerPlayer) {
+            if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible((Player) player) && !isCompleted((Player) player)) {
+                QuestDataTaskDeath deathData = (QuestDataTaskDeath) getData((Player) player);
                 if (deathData.deaths < deaths) {
                     deathData.deaths += 1;
                     
                     if (deathData.deaths == deaths) {
-                        completeTask(player.getUuid());
+                        completeTask(player.getUUID());
                     }
                     
-                    parent.sendUpdatedDataToTeam((PlayerEntity) player);
+                    parent.sendUpdatedDataToTeam((Player) player);
                 }
             }
         }

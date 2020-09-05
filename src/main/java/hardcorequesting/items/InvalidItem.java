@@ -1,7 +1,7 @@
 package hardcorequesting.items;
 
 import hardcorequesting.HardcoreQuesting;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 /**
  * @author Tim
@@ -9,8 +9,8 @@ import net.minecraft.item.Item;
 public class InvalidItem extends Item {
     
     public InvalidItem() {
-        super(new Item.Settings()
-                .maxCount(1)
-                .group(HardcoreQuesting.HQMTab));
+        super(new Item.Properties()
+                .stacksTo(1)
+                .tab(HardcoreQuesting.HQMTab));
     }
 }

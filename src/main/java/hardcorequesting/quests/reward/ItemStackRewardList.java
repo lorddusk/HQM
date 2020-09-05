@@ -1,6 +1,6 @@
 package hardcorequesting.quests.reward;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;

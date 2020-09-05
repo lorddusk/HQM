@@ -16,7 +16,7 @@ public class HQMUtil {
      */
     public static boolean isGameSingleplayer() {
         MinecraftServer server = HardcoreQuesting.getServer();
-        return server != null && server.isSinglePlayer();
+        return server != null && server.isSingleplayer();
     }
 }
     

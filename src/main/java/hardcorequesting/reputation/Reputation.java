@@ -1,5 +1,6 @@
 package hardcorequesting.reputation;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
@@ -17,11 +18,10 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.util.*;
@@ -103,7 +103,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawAll(MatrixStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final PlayerEntity player) {
+    public static void drawAll(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final Player player) {
         String info = null;
         
         List<Reputation> reputations = getReputationList();
@@ -124,7 +124,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawEditPage(MatrixStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public static void drawEditPage(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
@@ -142,7 +142,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            StringVisitable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            FormattedText neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
             int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.markers.size() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
@@ -159,7 +159,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void onClick(GuiQuestBook gui, int mX, int mY, PlayerEntity player) {
+    public static void onClick(GuiQuestBook gui, int mX, int mY, Player player) {
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
@@ -216,7 +216,7 @@ public class Reputation {
         }
         
         if (selectedReputation != null) {
-            StringVisitable neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
+            FormattedText neutralName = Translator.translated("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
                     gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
@@ -305,8 +305,8 @@ public class Reputation {
         neutral.setId(markers.size());
     }
     
-    public int getValue(PlayerEntity player) {
-        return getValue(player.getUuid());
+    public int getValue(Player player) {
+        return getValue(player.getUUID());
     }
     
     public int getValue(UUID playerID) {
@@ -314,7 +314,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String draw(MatrixStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, PlayerEntity player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public String draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
         String error = getError();
         
         if (error != null) {
@@ -440,7 +440,7 @@ public class Reputation {
             str = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                str = GuiColor.RED + I18n.translate("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
+                str = GuiColor.RED + I18n.get("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -455,7 +455,7 @@ public class Reputation {
                         }
                     } else {
                         if (inverted) {
-                            str = I18n.translate("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
+                            str = I18n.get("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
                         } else {
                             str = lowerName + " <= " + name + " <= " + upperName;
                         }
@@ -500,7 +500,7 @@ public class Reputation {
             }
         }
         
-        return error == null ? null : I18n.translate("hqm.rep." + error);
+        return error == null ? null : I18n.get("hqm.rep." + error);
     }
     
     public ReputationMarker getCurrentMarker(int value) {

@@ -1,13 +1,12 @@
 package hardcorequesting.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.RenderRotation;
 import hardcorequesting.team.TeamStats;
 import hardcorequesting.util.Translator;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.StringVisitable;
+import net.minecraft.world.entity.player.Player;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
     
@@ -29,13 +28,13 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private GuiEditMenuTeam parent;
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiQuestBook gui, PlayerEntity player, GuiEditMenuTeam parent) {
+    protected GuiEditMenuTeamList(GuiQuestBook gui, Player player, GuiEditMenuTeam parent) {
         super(gui, player);
         this.parent = parent;
     }
     
     @Override
-    public void draw(MatrixStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
         drawArrow(gui, mX, mY, true);

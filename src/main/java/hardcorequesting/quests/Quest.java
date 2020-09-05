@@ -2,6 +2,7 @@ package hardcorequesting.quests;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
@@ -28,21 +29,19 @@ import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.StringVisitable;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 
-import java.awt.*;
+import java.awt.Polygon;
 import java.lang.reflect.Constructor;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,7 +92,7 @@ public class Quest {
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
     private List<QuestTask> tasks;
-    private List<StringVisitable> cachedDescription;
+    private List<FormattedText> cachedDescription;
     private List<ReputationReward> reputationRewards;
     private QuestTask selectedTask;
     private ItemStackRewardList rewards;
@@ -132,51 +131,51 @@ public class Quest {
     {
         buttons.add(new LargeButton("hqm.quest.claim", 100, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return canPlayerClaimReward(player);
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return hasReward(player);
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new ClientChange.Tuple<>(getQuestId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
             }
         });
         
         buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return selectedTask.allowManual();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedTask != null && selectedTask.allowManual() && !selectedTask.isCompleted(player);
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
         
         buttons.add(new LargeButton("hqm.quest.manualDetect", 185, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return selectedTask.allowDetect();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedTask != null && selectedTask.allowDetect() && !selectedTask.isCompleted(player);
             }
             
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
@@ -184,19 +183,19 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.requirement", 185, 200) {
             @Override
             @Environment(EnvType.CLIENT)
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
             @Environment(EnvType.CLIENT)
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedTask != null && selectedTask instanceof QuestTaskDeath && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 gui.setEditMenu(new GuiEditMenuDeathTask(gui, player, (QuestTaskDeath) selectedTask));
             }
         });
@@ -204,19 +203,19 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.requirement", 250, 95) {
             @Override
             @Environment(EnvType.CLIENT)
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
             }
             
             @Override
             @Environment(EnvType.CLIENT)
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedTask != null && selectedTask instanceof QuestTaskReputationKill && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 gui.setEditMenu(new GuiEditMenuReputationKillTask(gui, player, (QuestTaskReputationKill) selectedTask));
             }
         });
@@ -224,7 +223,7 @@ public class Quest {
         
         buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+            public boolean isEnabled(GuiBase gui, Player player) {
                 QuestingData data = QuestingData.getQuestingData(player);
                 if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(getQuestId())) {
                     return data.selectedTask != selectedTask.getId();
@@ -233,18 +232,18 @@ public class Quest {
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, PlayerEntity player) {
+            public boolean isVisible(GuiBase gui, Player player) {
                 return selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
             }
             
             @Environment(EnvType.CLIENT)
             @Override
-            public void onClick(GuiBase gui, PlayerEntity player) {
+            public void onClick(GuiBase gui, Player player) {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
                 QuestingData.getQuestingData(player).selectedQuestId = getQuestId();
                 QuestingData.getQuestingData(player).selectedTask = selectedTask.getId();
                 
-                player.addMessage(new TranslatableText("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).formatted(Formatting.GREEN), false);
+                player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).withStyle(ChatFormatting.GREEN), false);
                 
                 //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
                 GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
@@ -255,18 +254,18 @@ public class Quest {
         for (final TaskType taskType : TaskType.values()) {
             buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
-                public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+                public boolean isEnabled(GuiBase gui, Player player) {
                     return true;
                 }
                 
                 @Environment(EnvType.CLIENT)
                 @Override
-                public boolean isVisible(GuiBase gui, PlayerEntity player) {
+                public boolean isVisible(GuiBase gui, Player player) {
                     return canQuestsBeEdited() && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
                 }
                 
                 @Override
-                public void onClick(GuiBase gui, PlayerEntity player) {
+                public void onClick(GuiBase gui, Player player) {
                     taskType.addTask(Quest.this);
                 }
             });
@@ -274,17 +273,17 @@ public class Quest {
             if (QuestTaskItems.class.isAssignableFrom(taskType.clazz)) {
                 buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (itemIds % 2) * 65, 50 + (itemIds / 2) * 35) {
                     @Override
-                    public boolean isEnabled(GuiBase gui, PlayerEntity player) {
+                    public boolean isEnabled(GuiBase gui, Player player) {
                         return selectedTask instanceof QuestTaskItems;
                     }
                     
                     @Override
-                    public boolean isVisible(GuiBase gui, PlayerEntity player) {
+                    public boolean isVisible(GuiBase gui, Player player) {
                         return false; // canQuestsBeEdited() && selectedTask != null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.CHANGE_TASK;
                     }
                     
                     @Override
-                    public void onClick(GuiBase gui, PlayerEntity player) {
+                    public void onClick(GuiBase gui, Player player) {
                         TaskType oldTaskType = TaskType.getType(selectedTask.getClass());
                         if (oldTaskType == null) return;
                         
@@ -386,7 +385,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public static List<StringVisitable> getMainDescription(GuiBase gui) {
+    public static List<FormattedText> getMainDescription(GuiBase gui) {
         if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
             QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(Translator.plain(QuestLine.getActiveQuestLine().mainDescription), 0.7F, 130);
         }
@@ -409,27 +408,27 @@ public class Quest {
         return QuestLine.getActiveQuestLine().quests.get(questId);
     }
     
-    public static void addItems(PlayerEntity player, List<ItemStack> itemsToAdd) {
-        for (int i = 0; i < player.inventory.main.size(); i++) {
+    public static void addItems(Player player, List<ItemStack> itemsToAdd) {
+        for (int i = 0; i < player.inventory.items.size(); i++) {
             Iterator<ItemStack> iterator = itemsToAdd.iterator();
             while (iterator.hasNext()) {
                 ItemStack nextStack = iterator.next();
-                ItemStack stack = player.inventory.main.get(i);
+                ItemStack stack = player.inventory.items.get(i);
                 
                 if (stack.isEmpty()) {
-                    int amount = Math.min(nextStack.getMaxCount(), nextStack.getCount());
+                    int amount = Math.min(nextStack.getMaxStackSize(), nextStack.getCount());
                     ItemStack copyStack = nextStack.copy();
                     copyStack.setCount(amount);
-                    player.inventory.main.set(i, copyStack);
-                    nextStack.decrement(amount);
+                    player.inventory.items.set(i, copyStack);
+                    nextStack.shrink(amount);
                     if (nextStack.getCount() <= 0) {
                         iterator.remove();
                     }
                     break;
-                } else if (stack.isItemEqual(nextStack) && ItemStack.areTagsEqual(nextStack, stack)) {
-                    int amount = Math.min(nextStack.getMaxCount() - stack.getCount(), nextStack.getCount());
-                    stack.increment(amount);
-                    nextStack.decrement(amount);
+                } else if (stack.sameItemStackIgnoreDurability(nextStack) && ItemStack.tagMatches(nextStack, stack)) {
+                    int amount = Math.min(nextStack.getMaxStackSize() - stack.getCount(), nextStack.getCount());
+                    stack.grow(amount);
+                    nextStack.shrink(amount);
                     if (nextStack.getCount() <= 0) {
                         iterator.remove();
                     }
@@ -586,7 +585,7 @@ public class Quest {
         optionLinks.clear();
     }
     
-    public QuestData getQuestData(PlayerEntity player) {
+    public QuestData getQuestData(Player player) {
         return QuestingData.getQuestingData(player).getQuestData(getQuestId());
     }
     
@@ -594,7 +593,7 @@ public class Quest {
         return QuestingData.getQuestingData(uuid).getQuestData(getQuestId());
     }
     
-    public void setQuestData(PlayerEntity player, QuestData data) {
+    public void setQuestData(Player player, QuestData data) {
         QuestingData.getQuestingData(player).setQuestData(getQuestId(), data);
     }
     
@@ -620,12 +619,12 @@ public class Quest {
         this.name = name;
     }
     
-    public boolean isVisible(PlayerEntity player) {
-        return isVisible(player.getUuid());
+    public boolean isVisible(Player player) {
+        return isVisible(player.getUUID());
     }
     
-    boolean isVisible(PlayerEntity player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-        return isVisible(player.getUuid(), isVisibleCache, isLinkFreeCache);
+    boolean isVisible(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        return isVisible(player.getUUID(), isVisibleCache, isLinkFreeCache);
     }
     
     public boolean isVisible(UUID uuid) {
@@ -643,12 +642,12 @@ public class Quest {
         return result;
     }
     
-    public boolean isEnabled(PlayerEntity player) {
-        return isEnabled(player.getUuid());
+    public boolean isEnabled(Player player) {
+        return isEnabled(player.getUUID());
     }
     
-    boolean isEnabled(PlayerEntity player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
-        return isEnabled(player.getUuid(), true, isVisibleCache, isLinkFreeCache);
+    boolean isEnabled(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+        return isEnabled(player.getUUID(), true, isVisibleCache, isLinkFreeCache);
     }
     
     public boolean isEnabled(UUID playerId) {
@@ -663,12 +662,12 @@ public class Quest {
         return !(set == null || !isLinkFree(playerId, isLinkFreeCache) || (requiresVisible && !triggerType.doesWorkAsInvisible() && !isVisible(playerId, isVisibleCache, isLinkFreeCache))) && enabledParentEvaluator.isValid(playerId, isVisibleCache, isLinkFreeCache);
     }
     
-    public boolean isLinkFree(PlayerEntity player) {
-        return isLinkFree(player.getUuid(), new HashMap<>());
+    public boolean isLinkFree(Player player) {
+        return isLinkFree(player.getUUID(), new HashMap<>());
     }
     
-    boolean isLinkFree(PlayerEntity player, Map<Quest, Boolean> cache) {
-        return isLinkFree(player.getUuid(), cache);
+    boolean isLinkFree(Player player, Map<Quest, Boolean> cache) {
+        return isLinkFree(player.getUUID(), cache);
     }
     
     public boolean isLinkFree(UUID uuid) {
@@ -713,12 +712,12 @@ public class Quest {
         this.reputationRewards = reputationRewards;
     }
     
-    public boolean isAvailable(PlayerEntity player) {
-        return isAvailable(player.getUuid());
+    public boolean isAvailable(Player player) {
+        return isAvailable(player.getUUID());
     }
     
-    public boolean isCompleted(PlayerEntity player) {
-        return isCompleted(player.getUuid());
+    public boolean isCompleted(Player player) {
+        return isCompleted(player.getUUID());
     }
     
     public boolean isAvailable(UUID playerId) {
@@ -750,7 +749,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public int getGuiV(PlayerEntity player, int x, int y) {
+    public int getGuiV(Player player, int x, int y) {
         return isEnabled(player) && isMouseInObject(x, y) ? getGuiH() : 0;
     }
     
@@ -811,7 +810,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public int getColorFilter(PlayerEntity player, int tick) {
+    public int getColorFilter(Player player, int tick) {
         if (canQuestsBeEdited() && !isVisible(player)) {
             return HQMConfig.QUEST_INVISIBLE;
         } else if (!isEnabled(player)) {
@@ -869,7 +868,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private List<StringVisitable> getCachedDescription(GuiBase gui) {
+    private List<FormattedText> getCachedDescription(GuiBase gui) {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
         }
@@ -877,7 +876,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawMenu(MatrixStack matrices, GuiQuestBook gui, PlayerEntity player, int mX, int mY) {
+    public void drawMenu(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         if (!canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
             if (tasks.size() > 0) {
                 selectedTask = tasks.get(0);
@@ -979,7 +978,7 @@ public class Quest {
                     gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
                 }
             } else {*/
-            List<StringVisitable> description = selectedTask.getCachedLongDescription(gui);
+            List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
@@ -1004,7 +1003,7 @@ public class Quest {
         }
         
         if (reputationRewards != null && hover) {
-            List<StringVisitable> str = new ArrayList<>();
+            List<FormattedText> str = new ArrayList<>();
             for (ReputationReward reputationReward : reputationRewards) {
                 if (reputationReward.getValue() != 0 && reputationReward.getReward() != null && reputationReward.getReward().isValid()) {
                     str.add(Translator.plain(reputationReward.getLabel()));
@@ -1012,10 +1011,10 @@ public class Quest {
                 
             }
             
-            List<StringVisitable> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
+            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translated("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
-                str.add(StringVisitable.EMPTY);
-                for (StringVisitable commentLine : commentLines) {
+                str.add(FormattedText.EMPTY);
+                for (FormattedText commentLine : commentLines) {
                     str.add(Translator.colored(Translator.rawString(commentLine), GuiColor.GRAY));
                 }
             }
@@ -1038,11 +1037,11 @@ public class Quest {
         return count;
     }
     
-    private boolean canPlayerClaimReward(PlayerEntity player) {
+    private boolean canPlayerClaimReward(Player player) {
         return hasReward(player) && (rewardChoices.isEmpty() || selectedReward != -1) && isEnabled(player);
     }
     
-    public boolean hasReward(PlayerEntity player) {
+    public boolean hasReward(Player player) {
         return (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
     }
     
@@ -1057,16 +1056,16 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawRewardMouseOver(MatrixStack matrices, GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
+    private void drawRewardMouseOver(PoseStack matrices, GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
         if (rewards != null) {
             for (int i = 0; i < rewards.length; i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (rewards[i] != null) {
                         GuiQuestBook.setSelectedStack(rewards[i]);
-                        List<Text> str = rewards[i].getTooltip(MinecraftClient.getInstance().player, MinecraftClient.getInstance().options.advancedItemTooltips ? TooltipContext.Default.ADVANCED : TooltipContext.Default.NORMAL);
-                        List<StringVisitable> list2 = Lists.newArrayList(str);
+                        List<Component> str = rewards[i].getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+                        List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
-                            list2.add(StringVisitable.EMPTY);
+                            list2.add(FormattedText.EMPTY);
                             list2.add(Translator.translated("hqm.quest.selected", GuiColor.GREEN));
                         }
                         gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
@@ -1091,7 +1090,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private void handleRewardClick(GuiQuestBook gui, PlayerEntity player, ItemStack[] rawRewards, int y, boolean canSelect, int mX, int mY) {
+    private void handleRewardClick(GuiQuestBook gui, Player player, ItemStack[] rawRewards, int y, boolean canSelect, int mX, int mY) {
         ItemStack[] rewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
         
         boolean doubleClick = false;
@@ -1099,13 +1098,13 @@ public class Quest {
         for (int i = 0; i < rewards.length; i++) {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.NORMAL) {
-                    int lastDiff = player.age - lastClicked;
+                    int lastDiff = player.tickCount - lastClicked;
                     if (lastDiff < 0) {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     } else if (lastDiff < 6) {
                         doubleClick = true;
                     } else {
-                        lastClicked = player.age;
+                        lastClicked = player.tickCount;
                     }
                 }
                 if (canSelect && (!canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
@@ -1163,7 +1162,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onClick(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (b == 1) {
             gui.loadMap();
         } else {
@@ -1269,14 +1268,14 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onDrag(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onDrag(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onDrag(gui, mX, mY);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void onRelease(GuiQuestBook gui, PlayerEntity player, int mX, int mY, int b) {
+    public void onRelease(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onRelease(gui, mX, mY);
         }
@@ -1314,7 +1313,7 @@ public class Quest {
         return tasks;
     }
     
-    public void sendUpdatedDataToTeam(PlayerEntity player) {
+    public void sendUpdatedDataToTeam(Player player) {
         sendUpdatedDataToTeam(QuestingData.getQuestingData(player).getTeam());
     }
     
@@ -1328,7 +1327,7 @@ public class Quest {
         }
     }
     
-    private void sendUpdatedData(ServerPlayerEntity player) {
+    private void sendUpdatedData(ServerPlayer player) {
         if (player == null) return; // Don't send to nobody you silly goose
         IMessage update = new QuestDataUpdateMessage(
                 getQuestId(),
@@ -1338,7 +1337,7 @@ public class Quest {
         NetworkManager.sendToPlayer(update, player);
     }
     
-    public void claimReward(PlayerEntity player, int selectedReward) {
+    public void claimReward(Player player, int selectedReward) {
         if (hasReward(player)) {
             boolean sentInfo = false;
             if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
@@ -1360,8 +1359,8 @@ public class Quest {
                 for (ItemStack stack : items) {
                     boolean added = false;
                     for (ItemStack stack1 : itemsToAdd) {
-                        if (stack.isItemEqual(stack1) && ItemStack.areTagsEqual(stack, stack1)) {
-                            stack1.increment(stack.getCount());
+                        if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack, stack1)) {
+                            stack1.grow(stack.getCount());
                             added = true;
                             break;
                         }
@@ -1376,15 +1375,15 @@ public class Quest {
                 for (ItemStack stack : itemsToAdd) {
                     itemsToCheck.add(stack.copy());
                 }
-                for (int i = 0; i < player.inventory.main.size(); i++) {
+                for (int i = 0; i < player.inventory.items.size(); i++) {
                     for (ItemStack stack1 : itemsToCheck) {
                         if (stack1.getCount() > 0) {
-                            ItemStack stack = player.inventory.main.get(i);
+                            ItemStack stack = player.inventory.items.get(i);
                             if (stack == ItemStack.EMPTY) {
-                                stack1.decrement(stack1.getMaxCount());
+                                stack1.shrink(stack1.getMaxStackSize());
                                 break;
-                            } else if (stack.isItemEqual(stack1) && ItemStack.areTagsEqual(stack1, stack)) {
-                                stack1.decrement(stack1.getMaxCount() - stack.getCount());
+                            } else if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack1, stack)) {
+                                stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
                                 break;
                             }
                         }
@@ -1403,7 +1402,7 @@ public class Quest {
                 
                 if (valid) {
                     addItems(player, itemsToAdd);
-                    player.inventory.markDirty();
+                    player.inventory.setChanged();
                     QuestData data = getQuestData(player);
                     Team team = QuestingData.getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
@@ -1413,8 +1412,8 @@ public class Quest {
                         sendUpdatedDataToTeam(player);
                     } else {
                         data.claimReward(player);
-                        if (player instanceof ServerPlayerEntity)
-                            sendUpdatedData((ServerPlayerEntity) player);
+                        if (player instanceof ServerPlayer)
+                            sendUpdatedData((ServerPlayer) player);
                     }
                     sentInfo = true;
                 } else {
@@ -1458,7 +1457,7 @@ public class Quest {
     
     @Environment(EnvType.CLIENT)
     @SuppressWarnings("rawtypes")
-    public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, PlayerEntity player) {
+    public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, Player player) {
         if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
             if (element instanceof GuiEditMenuItem.ElementItem) {
                 ItemStack stack = ((GuiEditMenuItem.ElementItem) element).getStack();
@@ -1504,7 +1503,7 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onOpen(GuiQuestBook gui, PlayerEntity player) {
+    public void onOpen(GuiQuestBook gui, Player player) {
         if (selectedTask == null) {
             for (QuestTask task : tasks) {
                 if (!task.isCompleted(player)) {
@@ -1560,12 +1559,12 @@ public class Quest {
         }
     }
     
-    public void completeQuest(PlayerEntity player) {
+    public void completeQuest(Player player) {
         for (QuestTask task : tasks) {
-            task.autoComplete(player.getUuid());
+            task.autoComplete(player.getUUID());
             task.getData(player).completed = true;
         }
-        QuestTask.completeQuest(this, player.getUuid());
+        QuestTask.completeQuest(this, player.getUUID());
     }
     
     public void reset(UUID playerId) {

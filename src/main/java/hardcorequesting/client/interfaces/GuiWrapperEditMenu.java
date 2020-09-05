@@ -1,24 +1,24 @@
 package hardcorequesting.client.interfaces;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.edit.GuiEditMenu;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class GuiWrapperEditMenu extends GuiBase {
     
-    public static final Identifier BG_TEXTURE = ResourceHelper.getResource("wrapper");
-    public static final Identifier C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
+    public static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("wrapper");
+    public static final ResourceLocation C_BG_TEXTURE = ResourceHelper.getResource("c_wrapper");
     private static final int TEXTURE_WIDTH = 170;
     private static final int TEXTURE_HEIGHT = 234;
     private GuiEditMenu editMenu;
     
     public GuiWrapperEditMenu() {
-        super(NarratorManager.EMPTY);
+        super(NarratorChatListener.NO_TITLE);
     }
     
     @Override
@@ -26,12 +26,12 @@ public class GuiWrapperEditMenu extends GuiBase {
         if (editMenu != null) {
             this.editMenu = editMenu;
         } else {
-            this.client.openScreen(null);
+            this.minecraft.setScreen(null);
         }
     }
     
     @Override
-    public void render(MatrixStack matrices, int mX0, int mY0, float f) {
+    public void render(PoseStack matrices, int mX0, int mY0, float f) {
         boolean doublePage = editMenu.doesRequiredDoublePage();
         
         this.left = (this.width - (doublePage ? TEXTURE_WIDTH * 2 : TEXTURE_WIDTH)) / 2;

@@ -6,7 +6,7 @@ import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class QuestLineSyncMessage implements IMessage {
     }
     
     @Override
-    public void fromBytes(PacketByteBuf buf, PacketContext context) {
+    public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         mainDesc = SyncUtil.readLargeString(buf);
         reputations = SyncUtil.readLargeString(buf);
         bags = SyncUtil.readLargeString(buf);
@@ -47,7 +47,7 @@ public class QuestLineSyncMessage implements IMessage {
     }
     
     @Override
-    public void toBytes(PacketByteBuf buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         SyncUtil.writeLargeString(mainDesc, buf);
         SyncUtil.writeLargeString(reputations, buf);
         SyncUtil.writeLargeString(bags, buf);

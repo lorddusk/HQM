@@ -3,7 +3,7 @@ package hardcorequesting.proxies;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestTicker;
 import net.fabricmc.fabric.api.network.PacketContext;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class CommonProxy {
     public void initSounds(String path) {
@@ -26,7 +26,7 @@ public class CommonProxy {
         return true;
     }
     
-    public PlayerEntity getPlayer(PacketContext ctx) {
+    public Player getPlayer(PacketContext ctx) {
         return ctx.getPlayer();
     }
 }
