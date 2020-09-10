@@ -11,13 +11,10 @@ import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.event.EventTrigger;
 import hardcorequesting.io.adapter.QuestTaskAdapter;
 import hardcorequesting.network.NetworkManager;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestData;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.quests.RepeatType;
+import hardcorequesting.quests.*;
 import hardcorequesting.quests.data.QuestDataTask;
 import hardcorequesting.team.RewardSetting;
-import hardcorequesting.team.TeamStats;
+import hardcorequesting.team.TeamLiteStat;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -74,7 +71,7 @@ public abstract class QuestTask {
         data.time = Quest.serverTicker.getHours();
         
         
-        if (QuestingData.getQuestingData(uuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
+        if (QuestingDataManager.getInstance().getQuestingData(uuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
             int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
         } else {
@@ -83,7 +80,7 @@ public abstract class QuestTask {
             }
         }
         quest.sendUpdatedDataToTeam(uuid);
-        TeamStats.refreshTeam(QuestingData.getQuestingData(uuid).getTeam());
+        TeamLiteStat.refreshTeam(QuestingDataManager.getInstance().getQuestingData(uuid).getTeam());
         
         for (Quest child : quest.getReversedRequirement()) {
             completeQuest(child, uuid);
@@ -155,7 +152,7 @@ public abstract class QuestTask {
         if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
-        QuestData questData = QuestingData.getQuestingData(uuid).getQuestData(parent.getQuestId());
+        QuestData questData = QuestingDataManager.getInstance().getQuestingData(uuid).getQuestData(parent.getQuestId());
         if (id >= questData.tasks.length) {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();

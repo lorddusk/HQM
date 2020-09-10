@@ -7,6 +7,7 @@ import hardcorequesting.network.GeneralUsage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
@@ -62,7 +63,8 @@ public class QuestBookItem extends Item {
         
         if (!world.isClientSide && player instanceof ServerPlayer) {
             ItemStack stack = player.getItemInHand(hand);
-            if (!QuestingData.isQuestActive()) {
+            QuestingDataManager questingData = QuestingDataManager.getInstance();
+            if (!questingData.isQuestActive()) {
                 player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
             } else {
                 if (stack.getItem() == ModItems.enabledBook) {
@@ -76,12 +78,12 @@ public class QuestBookItem extends Item {
                             compound.remove(NBT_PLAYER);
                             return InteractionResultHolder.fail(stack);
                         }
-                        if (QuestingData.hasData(uuid)) {
+                        if (questingData.hasData(uuid)) {
                             if (HardcoreQuesting.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
                                 Player subject = QuestingData.getPlayer(uuid);
                                 if (subject instanceof ServerPlayer) {
-                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getScoreboardName(), true, false));
-                                    PlayerEntry entry = QuestingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
+                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
+                                    PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
                                     if (entry != null) {
                                         entry.setBookOpen(true);
                                         GeneralUsage.sendOpenBook(player, true);
@@ -97,8 +99,8 @@ public class QuestBookItem extends Item {
                         }
                     }
                 } else {
-                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getScoreboardName(), false, true));
-                    PlayerEntry entry = QuestingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
+                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
+                    PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
                     if (entry != null) {
                         entry.setBookOpen(true);
                         GeneralUsage.sendOpenBook(player, false);

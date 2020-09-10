@@ -1,7 +1,7 @@
 package hardcorequesting.event;
 
 import hardcorequesting.death.DeathType;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +16,7 @@ public class PlayerDeathEventListener {
     public void onLivingDeath(Player entity, DamageSource source) {
         if (entity instanceof ServerPlayer) {
             ServerPlayer player = (ServerPlayer) entity;
-            QuestingData.getQuestingData(player).die(player);
+            QuestingDataManager.getInstance().getQuestingData(player).die(player);
             DeathType.onDeath(player, source);
         }
     }

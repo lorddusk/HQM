@@ -3,7 +3,7 @@ package hardcorequesting.client.sounds;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.ClientChange;
 import hardcorequesting.network.NetworkManager;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -30,6 +30,7 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     public static boolean loadLoreReading(Path path) {
+        // TODO read lore
         /*
         loreMusic = false;
         loreNumber = -1;
@@ -144,7 +145,7 @@ public class SoundHandler {
     }
     
     public static void handleLorePacket(Player player) {
-        QuestingData.getQuestingData(player).playedLore = true;
+        QuestingDataManager.getInstance().getQuestingData(player).playedLore = true;
     }
 }
 

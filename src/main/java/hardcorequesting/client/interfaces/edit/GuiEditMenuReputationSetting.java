@@ -6,6 +6,7 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.util.Translator;
 import net.minecraft.client.resources.language.I18n;
@@ -34,9 +35,10 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         
         this.task = task;
         this.id = id;
+        ReputationManager reputationManager = ReputationManager.getInstance();
         if (setting == null || setting.getReputation() == null) {
-            if (!Reputation.getReputations().isEmpty()) {
-                reputation = Reputation.getReputationList().get(0);
+            if (!reputationManager.getReputations().isEmpty()) {
+                reputation = reputationManager.getReputationList().get(0);
                 reputationId = 0;
             } else {
                 reputationId = -1;
@@ -44,7 +46,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         } else {
             reputation = setting.getReputation();
             id = -1;
-            List<Reputation> reputationList = new ArrayList<>(Reputation.getReputations().values());
+            List<Reputation> reputationList = new ArrayList<>(reputationManager.getReputations().values());
             for (int i = 0; i < reputationList.size(); i++) {
                 Reputation element = reputationList.get(i);
                 if (element.equals(reputation)) {
@@ -137,21 +139,22 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (reputation != null) {
+            ReputationManager reputationManager = ReputationManager.getInstance();
             reputationId += left ? -1 : 1;
             if (reputationId < 0) {
-                reputationId = Reputation.getReputations().size() - 1;
-            } else if (reputationId >= Reputation.getReputations().size()) {
+                reputationId = reputationManager.getReputations().size() - 1;
+            } else if (reputationId >= reputationManager.getReputations().size()) {
                 reputationId = 0;
             }
             lower = null;
             upper = null;
-            reputation = Reputation.getReputationList().get(reputationId);
+            reputation = reputationManager.getReputationList().get(reputationId);
         }
     }
     
     @Override
     protected String getArrowText() {
-        if (Reputation.getReputations().isEmpty()) {
+        if (ReputationManager.getInstance().getReputations().isEmpty()) {
             return I18n.get("hqm.repSetting.invalid");
         } else {
             return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
@@ -160,7 +163,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowDescription() {
-        if (Reputation.getReputations().isEmpty()) {
+        if (ReputationManager.getInstance().getReputations().isEmpty()) {
             return I18n.get("hqm.repReward.noValidReps");
         } else {
             return null;

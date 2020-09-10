@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -18,8 +19,8 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
             if (context.getSource().getLevel().getLevelData().isHardcore())
                 context.getSource().sendSuccess(new TranslatableComponent("hqm.message.vanillaHardcoreOn"), true);
             else
-                context.getSource().sendSuccess(new TranslatableComponent(QuestingData.isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
-            QuestingData.activateHardcore();
+                context.getSource().sendSuccess(new TranslatableComponent(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
+            QuestingDataManager.getInstance().activateHardcore();
             if (context.getSource().getEntity() instanceof Player)
                 currentLives((Player) context.getSource().getEntity());
             return 1;
@@ -29,7 +30,7 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
                 .then(literal("enable").executes(enable))
                 .then(literal("disable")
                         .executes(context -> {
-                            QuestingData.disableHardcore();
+                            QuestingDataManager.getInstance().disableHardcore();
                             context.getSource().sendSuccess(new TranslatableComponent("hqm.message.hardcoreDisabled"), true);
                             return 1;
                         })

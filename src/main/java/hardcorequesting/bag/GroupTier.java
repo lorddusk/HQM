@@ -29,39 +29,9 @@ public class GroupTier {
         this.weights = Arrays.copyOf(weights, weights.length);
     }
     
-    public static List<GroupTier> getTiers() {
-        return QuestLine.getActiveQuestLine().tiers;
-    }
-    
-    public static void saveAll() {
-        try {
-            SaveHandler.saveBags(SaveHandler.getLocalFile("bags"));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed to save bags to local file");
-        }
-    }
-    
-    public static void saveAllDefault() {
-        try {
-            SaveHandler.saveBags(SaveHandler.getDefaultFile("bags"));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed to save bags to the default file");
-        }
-    }
-    
-    public static void loadAll(boolean remote) {
-        try {
-            Group.getGroups().clear();
-            GroupTier.getTiers().clear();
-            GroupTier.getTiers().addAll(SaveHandler.loadBags(SaveHandler.getFile("bags", remote)));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed to load bags from the remote folder");
-        }
-    }
-    
     @Environment(EnvType.CLIENT)
     public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar tierScroll, int x, int y) {
-        List<GroupTier> tiers = GroupTier.getTiers();
+        List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
             GroupTier groupTier = tiers.get(i);
@@ -101,12 +71,13 @@ public class GroupTier {
     }
     
     public static void initBaseTiers(QuestLine questLine) {
-        questLine.tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
-        questLine.tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
-        questLine.tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
-        questLine.tiers.add(new GroupTier("Uncommon", GuiColor.BLUE, 5, 10, 15, 20, 25));
-        questLine.tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
-        questLine.tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
+        List<GroupTier> tiers = questLine.groupTierManager.getTiers();
+        tiers.add(new GroupTier("Crap", GuiColor.RED, 50, 50, 50, 5, 0));
+        tiers.add(new GroupTier("Plain", GuiColor.GRAY, 50, 50, 50, 30, 10));
+        tiers.add(new GroupTier("Common", GuiColor.GREEN, 20, 30, 40, 30, 20));
+        tiers.add(new GroupTier("Uncommon", GuiColor.BLUE, 5, 10, 15, 20, 25));
+        tiers.add(new GroupTier("Rare", GuiColor.ORANGE, 3, 6, 12, 18, 21));
+        tiers.add(new GroupTier("Unique", GuiColor.PURPLE, 1, 2, 3, 4, 30));
     }
     
     @Environment(EnvType.CLIENT)

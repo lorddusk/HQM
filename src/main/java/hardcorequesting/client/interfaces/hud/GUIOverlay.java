@@ -1,6 +1,7 @@
 package hardcorequesting.client.interfaces.hud;
 
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.death.DeathStatsManager;
+import hardcorequesting.quests.QuestingDataManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -50,11 +51,11 @@ public class GUIOverlay extends GuiComponent {
     }*/
     
     public int getLives() {
-        return QuestingData.getQuestingData(mc.player).getLives();
+        return QuestingDataManager.getInstance().getQuestingData(mc.player).getLives();
     }
     
     public int getDeaths() {
-        return QuestingData.getQuestingData(mc.player).getDeathStat().getTotalDeaths();
+        return DeathStatsManager.getInstance().getDeathStat(mc.player).getTotalDeaths();
     }
     
 }

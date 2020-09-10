@@ -6,21 +6,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
+import hardcorequesting.bag.GroupTierManager;
 import hardcorequesting.client.EditButton;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.KeyboardHandler;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.client.sounds.SoundHandler;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStatsManager;
 import hardcorequesting.items.ModItems;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.CloseBookMessage;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestSet;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.reputation.ReputationMarker;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
@@ -187,7 +186,7 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && GroupTier.getTiers().size() > VISIBLE_TIERS;
+                return !isReputationPage && isBagPage && selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
             }
         });
         
@@ -201,14 +200,14 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && Reputation.getReputations().size() > VISIBLE_REPUTATIONS;
+                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
             }
         });
         
         scrollBars.add(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isMenuPageOpen && !isMainPageOpen && Reputation.getReputations().size() > VISIBLE_DISPLAY_REPUTATIONS;
+                return isMenuPageOpen && !isMainPageOpen && ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
             }
         });
     }
@@ -329,7 +328,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public void onClick(GuiBase gui, Player player) {
-                GroupTier.getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
+                GroupTierManager.getInstance().getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
                 SaveHelper.add(SaveHelper.EditType.TIER_CREATE);
             }
         });
@@ -364,7 +363,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public void onClick(GuiBase gui, Player player) {
-                Reputation.addReputation(new Reputation("Unnamed", "Neutral"));
+                ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
                 SaveHelper.add(SaveHelper.EditType.REPUTATION_ADD);
             }
         });
@@ -396,7 +395,7 @@ public class GuiQuestBook extends GuiBase {
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
         }
-        QuestingData data = QuestingData.getQuestingData(player);
+        QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
         if (!data.playedLore && SoundHandler.hasLoreMusic()) {
             SoundHandler.triggerFirstLore();
             data.playedLore = true;
@@ -761,6 +760,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private void drawMenuPage(PoseStack matrices, int x, int y) {
+        QuestingDataManager manager = QuestingDataManager.getInstance();
         drawString(matrices, Translator.translatable("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
@@ -769,14 +769,14 @@ public class GuiQuestBook extends GuiBase {
         QuestSet.drawQuestInfo(matrices, this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
         drawString(matrices, Translator.translatable("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
         
-        if (QuestingData.isHardcoreActive()) {
-            boolean almostOut = QuestingData.getQuestingData(player).getLives() == QuestingData.getQuestingData(player).getLivesToStayAlive();
+        if (manager.isHardcoreActive()) {
+            boolean almostOut = manager.getQuestingData(player).getLives() == manager.getQuestingData(player).getLivesToStayAlive();
             if (almostOut) {
                 drawString(matrices, Translator.translatable("hqm.questBook.deadOut", GuiColor.RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
             
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            int lives = QuestingData.getQuestingData(player).getLives();
+            int lives = manager.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X;
@@ -797,13 +797,13 @@ public class GuiQuestBook extends GuiBase {
         }
         
         
-        int deaths = DeathStats.getDeathStats(this.getPlayer().getUUID()).getTotalDeaths();
+        int deaths = DeathStatsManager.getInstance().getDeathStat(this.getPlayer().getUUID()).getTotalDeaths();
         drawString(matrices, Translator.pluralTranslated(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         
         FormattedText str;
-        Team team = QuestingData.getQuestingData(player).getTeam();
+        Team team = manager.getQuestingData(player).getTeam();
         if (team.isSingle()) {
             int invites = team.getInvites() == null ? 0 : team.getInvites().size();
             if (invites > 0) {
@@ -834,29 +834,30 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private void drawMainPage(PoseStack matrices) {
+        QuestLine questLine = QuestLine.getActiveQuestLine();
         int startLine = mainDescriptionScroll.isVisible(this) ? Math.round((Quest.getMainDescription(this).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
         drawString(matrices, Quest.getMainDescription(this), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
             drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
         }
-        if (QuestLine.getActiveQuestLine().front == null && QuestLine.getActiveQuestLine().mainPath != null) {
+        if (questLine.front == null) {
             File file = new File(HardcoreQuesting.configDir.toFile(), "front.png");
             if (file.exists()) {
                 try {
                     NativeImage img = NativeImage.read(new FileInputStream(file));
                     DynamicTexture dm = new DynamicTexture(img);
-                    QuestLine.getActiveQuestLine().front = Minecraft.getInstance().getTextureManager().register(FRONT_KEY, dm);
+                    questLine.front = Minecraft.getInstance().getTextureManager().register(FRONT_KEY, dm);
                 } catch (IOException ignored) {
-                    QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
+                    questLine.front = ResourceHelper.getResource("front");
                 }
             } else {
-                QuestLine.getActiveQuestLine().front = ResourceHelper.getResource("front");
+                questLine.front = ResourceHelper.getResource("front");
             }
         }
         
-        if (QuestLine.getActiveQuestLine().front != null) {
-            ResourceHelper.bindResource(QuestLine.getActiveQuestLine().front);
+        if (questLine.front != null) {
+            ResourceHelper.bindResource(questLine.front);
             applyColor(0xFFFFFFFF);
             drawRect(20, 20, 0, 0, 140, 180);
         }
@@ -971,7 +972,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void save() {
-        QuestLine.saveAll();
+        QuestLine.getActiveQuestLine().saveAll();
         SaveHelper.onSave();
     }
     

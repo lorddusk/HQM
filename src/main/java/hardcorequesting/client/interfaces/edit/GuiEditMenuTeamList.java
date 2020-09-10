@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.RenderRotation;
-import hardcorequesting.team.TeamStats;
+import hardcorequesting.team.TeamLiteStat;
 import hardcorequesting.util.Translator;
 import net.minecraft.world.entity.player.Player;
 
@@ -40,12 +40,12 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         drawArrow(gui, mX, mY, true);
         drawArrow(gui, mX, mY, false);
         
-        TeamStats[] teamStats = TeamStats.getTeamStats();
+        TeamLiteStat[] teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
         int end = Math.min(start + TEAMS_PER_PAIR, teamStats.length);
         
         for (int i = start; i < end; i++) {
-            TeamStats teamStat = teamStats[i];
+            TeamLiteStat teamStat = teamStats[i];
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
@@ -93,6 +93,6 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     private boolean isArrowEnabled(boolean left) {
-        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamStats.getTeamStats().length / TEAMS_PER_PAIR) - 1);
+        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamLiteStat.getTeamStats().length / TEAMS_PER_PAIR) - 1);
     }
 }

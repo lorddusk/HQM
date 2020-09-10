@@ -6,10 +6,13 @@ import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.HQMUtil;
+import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Style;
+
+import java.util.Arrays;
 
 public class EditSubCommand implements CommandHandler.SubCommand {
     @Override
@@ -32,6 +35,9 @@ public class EditSubCommand implements CommandHandler.SubCommand {
                         context.getSource().sendSuccess(Translator.translatable("hqm.command.editMode.server"), false);
                         Quest.setEditMode(false);
                     }
+                    
+                    if (Arrays.stream(SaveHelper.list).anyMatch(element -> element.count > 0))
+                        context.getSource().sendSuccess(Translator.text("You still have unsaved changes! Caution!", ChatFormatting.RED), false);
                     return 1;
                 });
     }

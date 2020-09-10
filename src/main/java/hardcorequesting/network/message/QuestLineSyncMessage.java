@@ -1,62 +1,62 @@
 package hardcorequesting.network.message;
 
+import com.google.common.collect.Maps;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestLine;
+import hardcorequesting.quests.QuestSet;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class QuestLineSyncMessage implements IMessage {
     
-    private String reputations, bags, setOrder, mainDesc;
-    private String[] questsSets, questSetNames;
+    private String reputations, bags, mainDescription;
+    private Map<String, String> questsSets;
     
     public QuestLineSyncMessage() {
-        this.mainDesc = QuestLine.getActiveQuestLine().mainDescription;
-        this.reputations = SaveHandler.saveReputations();
-        this.bags = SaveHandler.saveBags();
-        List<String> names = new ArrayList<>();
-        List<String> questSets = new ArrayList<>();
-        this.setOrder = SaveHandler.saveAllQuestSets(names, questSets);
-        this.questSetNames = names.toArray(new String[0]);
-        this.questsSets = questSets.toArray(new String[0]);
+    }
+    
+    public QuestLineSyncMessage(QuestLine questLine) {
+        this.mainDescription = questLine.mainDescription;
+        this.reputations = questLine.reputationManager.saveToString();
+        this.bags = questLine.groupTierManager.saveToString();
+        this.questsSets = Maps.newLinkedHashMap();
+        for (QuestSet set : questLine.questSetsManager.questSets) {
+            questsSets.put(set.getFilename(), SaveHandler.save(set, QuestSet.class));
+        }
     }
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        mainDesc = SyncUtil.readLargeString(buf);
+        mainDescription = SyncUtil.readLargeString(buf);
         reputations = SyncUtil.readLargeString(buf);
         bags = SyncUtil.readLargeString(buf);
-        setOrder = SyncUtil.readLargeString(buf);
         
         int size = buf.readInt();
-        this.questSetNames = new String[size];
-        this.questsSets = new String[size];
+        this.questsSets = Maps.newLinkedHashMap();
         for (int i = 0; i < size; i++) {
-            questSetNames[i] = SyncUtil.readLargeString(buf);
-            questsSets[i] = SyncUtil.readLargeString(buf);
+            String fileName = SyncUtil.readLargeString(buf);
+            String questSetString = SyncUtil.readLargeString(buf);
+            this.questsSets.put(fileName, questSetString);
         }
     }
     
     @Override
     public void toBytes(FriendlyByteBuf buf) {
-        SyncUtil.writeLargeString(mainDesc, buf);
+        SyncUtil.writeLargeString(mainDescription, buf);
         SyncUtil.writeLargeString(reputations, buf);
         SyncUtil.writeLargeString(bags, buf);
-        SyncUtil.writeLargeString(setOrder, buf);
         
-        buf.writeInt(this.questsSets.length);
-        for (int i = 0; i < this.questsSets.length; i++) {
-            SyncUtil.writeLargeString(questSetNames[i], buf);
-            SyncUtil.writeLargeString(questsSets[i], buf);
+        buf.writeInt(this.questsSets.size());
+        for (Map.Entry<String, String> entry : this.questsSets.entrySet()) {
+            SyncUtil.writeLargeString(entry.getKey(), buf);
+            SyncUtil.writeLargeString(entry.getValue(), buf);
         }
     }
     
@@ -69,28 +69,19 @@ public class QuestLineSyncMessage implements IMessage {
         }
         
         private void handle(QuestLineSyncMessage message, PacketContext ctx) {
-            try {
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("description.txt"))) {
-                    out.print(message.mainDesc);
-                }
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("reputations"))) {
-                    out.print(message.reputations);
-                }
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("bags"))) {
-                    out.print(message.bags);
-                }
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("sets"))) {
-                    out.print(message.setOrder);
-                }
-                SaveHandler.removeQuestSetFiles(SaveHandler.getRemoteFolder());
-                for (int i = 0; i < message.questsSets.length; i++) {
-                    try (PrintWriter out = new PrintWriter(new File(SaveHandler.getRemoteFolder(), message.questSetNames[i]))) {
-                        out.print(message.questsSets[i]);
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            QuestLine questLine = QuestLine.getActiveQuestLine();
+            questLine.provideTemp("description.txt", message.mainDescription);
+            questLine.provideTemp(questLine.reputationManager, message.reputations);
+            questLine.provideTemp(questLine.groupTierManager, message.bags);
+            JsonObject object = new JsonObject();
+            JsonArray sets = new JsonArray();
+            for (String s : message.questsSets.keySet()) sets.add(s);
+            object.add("sets", sets);
+            questLine.provideTemp("sets.json", object.toString());
+            for (Map.Entry<String, String> entry : message.questsSets.entrySet()) {
+                questLine.provideTemp("sets/" + entry.getKey() + ".json", entry.getValue());
             }
+            questLine.loadAll();
         }
     }
 }

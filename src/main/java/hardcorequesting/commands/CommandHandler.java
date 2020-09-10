@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.commands.sub.*;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.util.Translator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -51,11 +52,11 @@ public class CommandHandler {
         }
         
         default void currentLives(Player player) {
-            player.createCommandSourceStack().sendSuccess(new TextComponent("You currently have " + QuestingData.getQuestingData(player).getLives() + " live(s) left."), false);
+            player.createCommandSourceStack().sendSuccess(new TextComponent("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void currentLives(CommandSourceStack source, Player player) {
-            source.sendSuccess(new TextComponent(player.getScoreboardName() + " currently has " + QuestingData.getQuestingData(player).getLives() + " live(s) left."), false);
+            source.sendSuccess(new TextComponent(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void sendChat(CommandSourceStack sender, Component text) {

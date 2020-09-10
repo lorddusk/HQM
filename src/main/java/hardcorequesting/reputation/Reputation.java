@@ -1,16 +1,14 @@
 package hardcorequesting.reputation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.GuiColor;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuReputationValue;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.io.SaveHandler;
 import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskReputation;
@@ -23,7 +21,6 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.IOException;
 import java.util.*;
 
 import static hardcorequesting.client.interfaces.GuiQuestBook.selectedReputation;
@@ -53,13 +50,13 @@ public class Reputation {
     private static final int ARROW_SIZE = 5;
     private static final int TEXT_X = 5;
     private static final int TEXT_Y = 14;
-    private static Map<String, Reputation> reputationMap = new HashMap<>();
     private String uuid;
     private String name;
     private ReputationMarker neutral;
     private List<ReputationMarker> markers;
     
     public Reputation(String name, String neutralName) {
+        Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         do {
             this.uuid = UUID.randomUUID().toString();
         } while (reputationMap.containsKey(this.uuid));
@@ -69,6 +66,7 @@ public class Reputation {
     }
     
     public Reputation(String id, String name, String neutralName) {
+        Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         this.uuid = id;
         while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
             this.uuid = UUID.randomUUID().toString();
@@ -78,37 +76,13 @@ public class Reputation {
         this.markers = new ArrayList<>();
     }
     
-    public static Map<String, Reputation> getReputations() {
-        return reputationMap;
-    }
-    
-    public static List<Reputation> getReputationList() {
-        return new ArrayList<>(reputationMap.values());
-    }
-    
-    public static Reputation getReputation(String id) {
-        return reputationMap.get(id);
-    }
-    
-    public static void clear() {
-        reputationMap.clear();
-    }
-    
-    public static void addReputation(Reputation reputation) {
-        reputationMap.put(reputation.getId(), reputation);
-    }
-    
-    public static int size() {
-        return reputationMap.size();
-    }
-    
     @Environment(EnvType.CLIENT)
     public static void drawAll(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final Player player) {
         String info = null;
         
-        List<Reputation> reputations = getReputationList();
+        List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
         
-        Collections.sort(reputations, (reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(player)), Math.abs(reputation1.getValue(player))));
+        reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(player)), Math.abs(reputation1.getValue(player))));
         
         int start = gui.reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * gui.reputationDisplayScroll.getScroll()) : 0;
         int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
@@ -125,10 +99,12 @@ public class Reputation {
     
     @Environment(EnvType.CLIENT)
     public static void drawEditPage(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        ReputationManager reputationManager = ReputationManager.getInstance();
+        Map<String, Reputation> reputationMap = reputationManager.reputationMap;
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
-            List<Reputation> reputationList = getReputationList();
+            List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
                 int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
@@ -160,10 +136,12 @@ public class Reputation {
     
     @Environment(EnvType.CLIENT)
     public static void onClick(GuiQuestBook gui, int mX, int mY, Player player) {
+        ReputationManager reputationManager = ReputationManager.getInstance();
+        Map<String, Reputation> reputationMap = reputationManager.reputationMap;
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
             int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
-            List<Reputation> reputationList = getReputationList();
+            List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
                 int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
@@ -196,12 +174,7 @@ public class Reputation {
                             
                             List<ReputationReward> rewards = quest.getReputationRewards();
                             if (rewards != null) {
-                                for (Iterator<ReputationReward> iterator = rewards.iterator(); iterator.hasNext(); ) {
-                                    ReputationReward reward = iterator.next();
-                                    if (reputation.equals(reward.getReward())) {
-                                        iterator.remove();
-                                    }
-                                }
+                                rewards.removeIf(reward -> reputation.equals(reward.getReward()));
                             }
                             
                         }
@@ -264,31 +237,6 @@ public class Reputation {
         }
     }
     
-    public static void loadAll(boolean remote) {
-        reputationMap.clear();
-        try {
-            SaveHandler.loadReputations(SaveHandler.getFile("reputations", remote)).forEach(Reputation::addReputation);
-        } catch (IOException ignored) {
-            HardcoreQuesting.LOGGER.info("Failed loading reputations from remote");
-        }
-    }
-    
-    public static void saveAll() {
-        try {
-            SaveHandler.saveReputations(SaveHandler.getLocalFile("reputations"));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed saving reputations to local file");
-        }
-    }
-    
-    public static void saveAllDefault() {
-        try {
-            SaveHandler.saveReputations(SaveHandler.getDefaultFile("reputations"));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed saving reputations to the default file");
-        }
-    }
-    
     public String getId() {
         return uuid;
     }
@@ -310,7 +258,7 @@ public class Reputation {
     }
     
     public int getValue(UUID playerID) {
-        return QuestingData.getQuestingData(playerID).getTeam().getReputation(this);
+        return QuestingDataManager.getInstance().getQuestingData(playerID).getTeam().getReputation(this);
     }
     
     @Environment(EnvType.CLIENT)

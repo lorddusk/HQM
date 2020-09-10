@@ -3,7 +3,7 @@ package hardcorequesting.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.client.interfaces.*;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import hardcorequesting.team.TeamError;
@@ -494,7 +494,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     private Team getTeam() {
-        return QuestingData.getQuestingData(player).getTeam();
+        return QuestingDataManager.getInstance().getQuestingData(player).getTeam();
     }
     
     private PlayerEntry getEntry(Team team) {

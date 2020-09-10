@@ -10,6 +10,7 @@ import hardcorequesting.network.message.ClientUpdateMessage;
 import hardcorequesting.network.message.SoundMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.tileentity.TrackerBlockEntity;
 import hardcorequesting.tileentity.TrackerType;
@@ -43,8 +44,8 @@ public enum ClientChange {
         public void parse(Player player, String data) {
             JsonParser parser = new JsonParser();
             JsonObject root = parser.parse(data).getAsJsonObject();
-            QuestingData.getQuestingData(player).selectedQuestId = UUID.fromString(root.get(PARENT).getAsString());
-            QuestingData.getQuestingData(player).selectedTask = root.get(TASK).getAsInt();
+            QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = UUID.fromString(root.get(PARENT).getAsString());
+            QuestingDataManager.getInstance().getQuestingData(player).selectedTask = root.get(TASK).getAsInt();
         }
     }),
     UPDATE_TASK(new ClientUpdater<QuestTask>() {

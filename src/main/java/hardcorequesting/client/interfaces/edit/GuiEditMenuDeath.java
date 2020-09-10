@@ -6,7 +6,8 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ResourceHelper;
 import hardcorequesting.client.interfaces.ScrollBar;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStat;
+import hardcorequesting.death.DeathStatsManager;
 import hardcorequesting.death.DeathType;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -59,7 +60,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return DeathStats.getDeathStats().length > VISIBLE_PLAYERS;
+                return DeathStatsManager.getInstance().getDeathStats().length > VISIBLE_PLAYERS;
             }
         };
     }
@@ -70,11 +71,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
         scrollBar.draw(gui);
         
-        DeathStats[] deathStats = DeathStats.getDeathStats();
+        DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
         int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
         int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
         for (int i = start; i < end; i++) {
-            DeathStats stats = deathStats[i];
+            DeathStat stats = deathStats[i];
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
@@ -86,7 +87,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         gui.drawString(matrices, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
         gui.drawString(matrices, Translator.translatable(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
         
-        DeathStats stats = getStats();
+        DeathStat stats = getDeathStat();
         
         if (stats != null) {
             
@@ -107,7 +108,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
-    
+                
                 FormattedText text = Translator.plain(stats.getDeaths(i) + "");
                 String str = Translator.rawString(text);
                 if (str.length() > 5)
@@ -127,7 +128,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.renderTooltip(matrices, gui, mX, mY);
         
-        DeathStats stats = getStats();
+        DeathStat stats = getDeathStat();
         if (stats != null) {
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
@@ -158,11 +159,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             playerId = null;
         } else {
             showBest = showTotal = false;
-            DeathStats[] deathStats = DeathStats.getDeathStats();
+            DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
             int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
             int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
             for (int i = start; i < end; i++) {
-                DeathStats stats = deathStats[i];
+                DeathStat stats = deathStats[i];
                 
                 if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {
@@ -195,13 +196,14 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
     }
     
-    private DeathStats getStats() {
+    private DeathStat getDeathStat() {
+        DeathStatsManager manager = DeathStatsManager.getInstance();
         if (showBest) {
-            return DeathStats.getBest();
+            return manager.getBest();
         } else if (showTotal) {
-            return DeathStats.getTotal();
+            return manager.getTotal();
         } else if (playerId != null) {
-            return DeathStats.getDeathStats(playerId);
+            return manager.getDeathStat(playerId);
         } else {
             return null;
         }

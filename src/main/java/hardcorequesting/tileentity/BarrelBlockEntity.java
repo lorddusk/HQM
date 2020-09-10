@@ -7,6 +7,7 @@ import hardcorequesting.blocks.DeliveryBlock;
 import hardcorequesting.blocks.ModBlocks;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskItems;
@@ -151,7 +152,7 @@ public class BarrelBlockEntity extends BaseBlockEntity implements Container, Flu
     
     public void storeSettings(Player player) {
         this.setPlayerUUID(player.getUUID());
-        QuestingData data = QuestingData.getQuestingData(this.getPlayerUUID());
+        QuestingData data = QuestingDataManager.getInstance().getQuestingData(this.getPlayerUUID());
         this.setQuestUUID(data.selectedQuestId);
         this.selectedTask = data.selectedTask;
         

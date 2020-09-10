@@ -6,22 +6,22 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.bag.GroupTier;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStat;
 import hardcorequesting.io.adapter.*;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestSet;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.*;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.team.Team;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class SaveHandler {
@@ -30,12 +30,14 @@ public class SaveHandler {
             .registerTypeAdapter(Reputation.class, ReputationAdapter.REPUTATION_ADAPTER)
             .registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER)
             .registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
-            .registerTypeAdapter(DeathStats.class, DeathAdapter.DEATH_STATS_ADAPTER)
+            .registerTypeAdapter(DeathStat.class, DeathAdapter.DEATH_STATS_ADAPTER)
             .registerTypeAdapter(Team.class, TeamAdapter.TEAM_ADAPTER)
             .registerTypeAdapter(QuestingData.class, QuestingAdapter.QUESTING_DATA_ADAPTER)
             .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
-            //.setPrettyPrinting() // TODO: make this dynamic
+//            .setPrettyPrinting()
             .create();
+    
+    public static final JsonParser JSON_PARSER = new JsonParser();
     
     public static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
     public static final Pattern BAGS = Pattern.compile("^bags\\.json$", Pattern.CASE_INSENSITIVE);
@@ -55,59 +57,8 @@ public class SaveHandler {
                         && !SETS.matcher(pathname.getName()).find()
                         && !DEATHS.matcher(pathname.getName()).find();
     
-    public static final String EXPORTS = "exports";
-    public static final String REMOTE = "remote";
-    public static final String DEFAULT = "default";
-    private static final String QUESTING = "questing";
-    private static final String HARDCORE = "hardcore";
-    
-    public static File getExportFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir.toFile(), EXPORTS), name.endsWith(".txt") ? name : name + ".json");
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return file;
-    }
-    
-    public static File getLocalFile(String name) throws IOException {
-        File file = new File(QuestLine.getActiveQuestLine().mainPath.toFile(), name.endsWith(".txt") ? name : name + ".json");
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return file;
-    }
-    
-    public static File getRemoteFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir.toFile(), REMOTE), name.endsWith(".txt") ? name : name + ".json");
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return file;
-    }
-    
-    public static File getDefaultFile(String name) throws IOException {
-        File file = new File(new File(HardcoreQuesting.configDir.toFile(), DEFAULT), name.endsWith(".txt") ? name : name + ".json");
-        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        return file;
-    }
-    
-    public static File getFile(String name, boolean remote) throws IOException {
-        return remote ? getRemoteFile(name) : getLocalFile(name);
-    }
-    
-    public static File getExportFolder() {
-        return new File(HardcoreQuesting.configDir.toFile(), EXPORTS);
-    }
-    
-    public static File getLocalFolder() {
-        return QuestLine.getActiveQuestLine().mainPath.toFile();
-    }
-    
-    public static File getRemoteFolder() {
-        return new File(HardcoreQuesting.configDir.toFile(), REMOTE);
-    }
-    
-    public static File getDefaultFolder() {
-        return new File(HardcoreQuesting.configDir.toFile(), DEFAULT);
-    }
-    
-    public static File getFolder(boolean remote) {
-        return remote ? getRemoteFolder() : getLocalFolder();
-    }
+    public static final String QUESTING = "questing";
+    public static final String HARDCORE = "hardcore";
     
     public static void copyFolder(File from, File to) {
         try {
@@ -117,153 +68,62 @@ public class SaveHandler {
         }
     }
     
-    public static void clearRemoteFolder() {
-        if (getRemoteFolder().exists()) {
-            getRemoteFolder().delete();
-            getRemoteFolder().mkdirs();
+    public static <T> Optional<T> load(File file, Type type) {
+        return load(file.toPath(), type);
+    }
+    
+    public static <T> Optional<T> load(Path file, Type type) {
+        if (!Files.exists(file)) return Optional.empty();
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            Object o = GSON.fromJson(reader, type);
+            return (Optional<T>) Optional.ofNullable(o);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
     
-    public static void removeFile(File file) {
-        if (!file.exists()) return;
-        file.delete();
+    public static <T> Optional<T> load(String str, Type type) {
+        Object o = GSON.fromJson(str, type);
+        return (Optional<T>) Optional.ofNullable(o);
     }
     
-    public static void removeQuestSetFiles(File folder) {
-        if (!folder.exists() || !folder.isDirectory()) return;
-        for (File file : folder.listFiles(QUEST_SET_FILTER))
-            removeFile(file);
+    public static <T> Optional<T> load(File file, Class<T> type) {
+        return load(file.toPath(), type);
     }
     
-    public static void saveAllQuestSets(File folder) throws IOException {
-        removeQuestSetFiles(folder);
-        saveQuestSetList(Quest.getQuestSets(), new File(folder, "sets.json"));
-        List<QuestSet> setsToSave = new ArrayList<>(); // possible fix for #251
-        setsToSave.addAll(Quest.getQuestSets());
-        for (QuestSet set : setsToSave) {
-            saveQuestSet(set, new File(folder, set.getFilename() + ".json"));
+    public static <T> Optional<T> load(Path file, Class<T> type) {
+        if (!Files.exists(file)) return Optional.empty();
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            Object o = GSON.fromJson(reader, type);
+            return (Optional<T>) Optional.ofNullable(o);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
     }
     
-    public static String saveAllQuestSets(List<String> names, List<String> questSets) {
-        for (QuestSet set : Quest.getQuestSets()) {
-            names.add(set.getFilename() + ".json");
-            questSets.add(saveQuestSet(set));
+    public static <T> Optional<T> load(String str, Class<T> type) {
+        Object o = GSON.fromJson(str, type);
+        return (Optional<T>) Optional.ofNullable(o);
+    }
+    
+    public static Optional<String> load(File file) {
+        return load(file.toPath());
+    }
+    
+    public static Optional<String> load(Path file) {
+        if (!Files.exists(file)) return Optional.empty();
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            return Optional.ofNullable(IOUtils.toString(reader));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
         }
-        return saveQuestSetList(Quest.getQuestSets());
-    }
-    
-    public static void saveQuestSetList(List<QuestSet> sets, File file) throws IOException {
-        if (!file.exists()) file.createNewFile();
-        FileWriter fileWriter = new FileWriter(file);
-        JsonWriter writer = new JsonWriter(fileWriter);
-        writer.beginArray();
-        for (QuestSet set : sets)
-            writer.value(set.getName());
-        writer.endArray();
-        writer.close();
-    }
-    
-    public static String saveQuestSetList(List<QuestSet> sets) {
-        StringWriter stringWriter = new StringWriter();
-        try {
-            JsonWriter writer = new JsonWriter(stringWriter);
-            writer.beginArray();
-            for (QuestSet set : sets)
-                writer.value(set.getName());
-            writer.endArray();
-            writer.close();
-        } catch (IOException ignored) {
-        }
-        return stringWriter.toString();
-    }
-    
-    public static void saveQuestSet(QuestSet set, File file) throws IOException {
-        save(file, set, new TypeToken<QuestSet>() {
-        }.getType());
-    }
-    
-    public static String saveQuestSet(QuestSet set) {
-        return save(set, new TypeToken<QuestSet>() {
-        }.getType());
-    }
-    
-    public static List<String> loadQuestSetOrder(File file) throws IOException {
-        List<String> order = new ArrayList<>();
-        if (!file.exists()) return order;
-        JsonParser parser = new JsonParser();
-        JsonArray array = parser.parse(new FileReader(file)).getAsJsonArray();
-        for (JsonElement elem : array)
-            order.add(elem.getAsString());
-        return order;
-    }
-    
-    public static void loadAllQuestSets(File folder) throws IOException {
-        File[] files = folder.listFiles(QUEST_SET_FILTER);
-        if (files != null)
-            for (File file : files)
-                loadQuestSet(file);
-    }
-    
-    public static QuestSet loadQuestSet(File file) throws IOException {
-        if (!file.exists()) return null;
-        JsonReader reader = new JsonReader(new FileReader(file));
-        QuestSet set = GSON.fromJson(reader, QuestSet.class);
-        reader.close();
-        return set;
-    }
-    
-    public static void saveReputations(File file) throws IOException {
-        save(file, Reputation.getReputationList(), new TypeToken<List<Reputation>>() {
-        }.getType());
-    }
-    
-    public static String saveReputations() {
-        return save(Reputation.getReputationList(), new TypeToken<List<Reputation>>() {
-        }.getType());
-    }
-    
-    public static List<Reputation> loadReputations(File file) throws IOException {
-        if (!file.exists()) return new ArrayList<>();
-        JsonReader reader = new JsonReader(new FileReader(file));
-        List<Reputation> reputations = GSON.fromJson(reader, new TypeToken<List<Reputation>>() {
-        }.getType());
-        reader.close();
-        return reputations == null ? new ArrayList<>() : reputations;
-    }
-    
-    public static void saveTeams(File file) throws IOException {
-        save(file, QuestingData.getTeams(), new TypeToken<List<Team>>() {
-        }.getType());
-    }
-    
-    public static String saveTeams() {
-        return save(QuestingData.getTeams(), new TypeToken<List<Team>>() {
-        }.getType());
     }
     
     public static String saveTeam(Team team) {
-        return save(team, new TypeToken<Team>() {
-        }.getType());
-    }
-    
-    public static List<Team> loadTeams(File file) throws IOException {
-        if (!file.exists()) return new ArrayList<>();
-        JsonReader reader = new JsonReader(new FileReader(file));
-        List<Team> teams = GSON.fromJson(reader, new TypeToken<List<Team>>() {
-        }.getType());
-        reader.close();
-        return teams == null ? new ArrayList<>() : teams;
-    }
-    
-    public static void saveBags(File file) throws IOException {
-        save(file, GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
-        }.getType());
-    }
-    
-    public static String saveBags() {
-        return save(GroupTier.getTiers(), new TypeToken<List<GroupTier>>() {
-        }.getType());
+        return save(team, new TypeToken<Team>() {}.getType());
     }
     
     public static List<GroupTier> loadBags(File file) throws IOException {
@@ -275,105 +135,28 @@ public class SaveHandler {
         return bags == null ? new ArrayList<>() : bags;
     }
     
-    public static void saveDeaths(File file) throws IOException {
-        save(file, DeathStats.getDeathStatsList(), new TypeToken<List<DeathStats>>() {
-        }.getType());
+    public static void save(Path file, Object object, Type type) {
+        save(file.toAbsolutePath().toFile(), save(object, type));
     }
     
-    public static String saveDeaths() {
-        return save(DeathStats.getDeathStatsList(), new TypeToken<List<DeathStats>>() {
-        }.getType());
+    public static void save(File file, Object object, Type type) {
+        save(file, save(object, type));
     }
     
-    public static List<DeathStats> loadDeaths(File file) throws IOException {
-        if (!file.exists()) return new ArrayList<>();
-        JsonReader reader = new JsonReader(new FileReader(file));
-        List<DeathStats> deaths = GSON.fromJson(reader, new TypeToken<List<DeathStats>>() {
-        }.getType());
-        reader.close();
-        return deaths == null ? new ArrayList<>() : deaths;
+    public static void save(Path file, String s) {
+        save(file.toAbsolutePath().toFile(), s);
     }
     
-    public static void saveQuestingData(File file) throws IOException {
-        save(file, QuestingData.getData().values(), new TypeToken<List<QuestingData>>() {
-        }.getType());
-    }
-    
-    public static String saveQuestingData() {
-        return save(QuestingData.getData().values(), new TypeToken<List<QuestingData>>() {
-        }.getType());
-    }
-    
-    public static String saveQuestingData(QuestingData questingData) {
-        return save(questingData, new TypeToken<QuestingData>() {
-        }.getType());
-    }
-    
-    public static List<QuestingData> loadQuestingData(File file) throws IOException {
-        if (!file.exists()) return new ArrayList<>();
-        JsonReader reader = new JsonReader(new FileReader(file));
-        List<QuestingData> data = GSON.fromJson(reader, new TypeToken<List<QuestingData>>() {
-        }.getType());
-        reader.close();
-        return data == null ? new ArrayList<>() : data;
-    }
-    
-    public static File save(File file, Object object, Type type) throws IOException {
-        if (!file.exists()) file.createNewFile();
-        FileWriter fileWriter = new FileWriter(file);
-        SaveHandler.GSON.toJson(object, type, fileWriter);
-        fileWriter.close();
-        return file;
+    public static void save(File file, String s) {
+        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            fileWriter.write(s);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public static String save(Object object, Type type) {
         return SaveHandler.GSON.toJson(object, type);
-    }
-    
-    public static void saveQuestingState(File file) throws IOException {
-        if (!file.exists()) file.createNewFile();
-        FileWriter fileWriter = new FileWriter(file);
-        JsonWriter writer = new JsonWriter(fileWriter);
-        writer.beginObject();
-        writer.name(QUESTING).value(QuestingData.isQuestActive());
-        writer.name(HARDCORE).value(QuestingData.isHardcoreActive());
-        writer.endObject();
-        writer.close();
-    }
-    
-    public static String saveQuestingState(boolean questing, boolean hardcore) throws IOException {
-        StringWriter stringWriter = new StringWriter();
-        JsonWriter writer = new JsonWriter(stringWriter);
-        writer.beginObject();
-        writer.name(QUESTING).value(questing);
-        writer.name(HARDCORE).value(hardcore);
-        writer.endObject();
-        writer.close();
-        return stringWriter.toString();
-    }
-    
-    public static void loadQuestingState(File file) throws IOException {
-        if (file.exists()) {
-            JsonParser parser = new JsonParser();
-            FileReader reader = new FileReader(file);
-            JsonObject object = parser.parse(reader).getAsJsonObject();
-            QuestingData.deactivate();
-            if (object.get(QUESTING).getAsBoolean() || QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
-            if (object.get(HARDCORE).getAsBoolean() || QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
-            reader.close();
-        } else { // when there is no file use the defaults anyway
-            if (QuestingData.autoQuestActivate) QuestingData.activateQuest(false);
-            if (QuestingData.autoHardcoreActivate) QuestingData.activateHardcore();
-        }
-    }
-    
-    public static void saveDescription(File file, String description) throws IOException {
-        FileWriter writer = new FileWriter(file);
-        writer.write(description);
-        writer.close();
-    }
-    
-    public static String loadDescription(File file) throws IOException {
-        return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
     }
 }

@@ -7,10 +7,7 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.ScrollBar;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.quests.ItemPrecision;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.*;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -37,19 +34,19 @@ public class Group {
             this.groupId = UUID.randomUUID();
         }
         if (groupId == null) {
-            if (GroupTier.getTiers().size() < 1)
+            if (GroupTierManager.getInstance().getTiers().size() < 1)
                 GroupTier.initBaseTiers(QuestLine.getActiveQuestLine());
-            this.tier = GroupTier.getTiers().get(0);
+            this.tier = GroupTierManager.getInstance().getTiers().get(0);
         }
         items = new ArrayList<>();
     }
     
     public static int size() {
-        return QuestLine.getActiveQuestLine().groups.size();
+        return GroupTierManager.getInstance().groups.size();
     }
     
     public static Map<UUID, Group> getGroups() {
-        return QuestLine.getActiveQuestLine().groups;
+        return GroupTierManager.getInstance().groups;
     }
     
     public static void remove(UUID groupId) {
@@ -66,7 +63,7 @@ public class Group {
     
     @Environment(EnvType.CLIENT)
     public static void drawOverview(PoseStack matrices, GuiQuestBook gui, ScrollBar tierScroll, ScrollBar groupScroll, int x, int y) {
-        List<GroupTier> tiers = GroupTier.getTiers();
+        List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - GuiQuestBook.VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_TIERS, tiers.size()); i++) {
             GroupTier groupTier = tiers.get(i);
@@ -200,7 +197,7 @@ public class Group {
     
     public void open(Player player) {
         if (limit > 0) {
-            GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
+            GroupData data = QuestingDataManager.getInstance().getQuestingData(player).getGroupData(getId());
             if (data != null) {
                 data.retrieved++;
             }
@@ -235,12 +232,12 @@ public class Group {
     }
     
     public int getRetrievalCount(Player player) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
+        GroupData data = QuestingDataManager.getInstance().getQuestingData(player).getGroupData(getId());
         return data != null ? data.retrieved : 0;
     }
     
     public void setRetrievalCount(Player player, int count) {
-        GroupData data = QuestingData.getQuestingData(player).getGroupData(getId());
+        GroupData data = QuestingDataManager.getInstance().getQuestingData(player).getGroupData(getId());
         if (data != null) {
             data.retrieved = count;
         }

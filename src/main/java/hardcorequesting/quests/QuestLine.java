@@ -1,20 +1,24 @@
 package hardcorequesting.quests;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.bag.Group;
 import hardcorequesting.bag.GroupTier;
+import hardcorequesting.bag.GroupTierManager;
+import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
-import hardcorequesting.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.client.sounds.SoundHandler;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStatsManager;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.DeathStatsMessage;
 import hardcorequesting.network.message.PlayerDataSyncMessage;
 import hardcorequesting.network.message.QuestLineSyncMessage;
-import hardcorequesting.reputation.Reputation;
+import hardcorequesting.network.message.TeamStatsMessage;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.team.Team;
 import hardcorequesting.util.SaveHelper;
+import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
@@ -22,156 +26,246 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class QuestLine {
     
+    private static QuestLine activeQuestLine;
     public static boolean doServerSync;
-    private static QuestLine config = new QuestLine();
-    private static QuestLine server;
-    private static QuestLine world;
     private static boolean hasLoadedMainSound;
-    public final List<GroupTier> tiers = new ArrayList<>();
-    public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
-    public List<QuestSet> questSets;
-    public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
+    
+    public final ReputationManager reputationManager;
+    public final GroupTierManager groupTierManager;
+    public final QuestingDataManager questingDataManager;
+    public final DeathStatsManager deathStatsManager;
+    public final QuestSetsManager questSetsManager;
+    public final Team.Manager teamManager;
     public String mainDescription = "No description";
-    public List<FormattedText> cachedMainDescription;
-    public Path mainPath;
+    private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
+    @Deprecated
+    public final Optional<Path> basePath;
+    @Deprecated
+    public final Optional<Path> dataPath;
+    private final List<Serializable> serializables = Lists.newArrayList();
+    private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
     
-    public QuestLine() {
+    private QuestLine(Optional<Path> basePath, Optional<Path> dataPath) {
+        if (HardcoreQuesting.LOADING_SIDE == EnvType.CLIENT) {
+            resetClient();
+        }
+        this.basePath = basePath;
+        this.dataPath = dataPath;
+        this.reputationManager = new ReputationManager(this);
+        this.groupTierManager = new GroupTierManager(this);
+        this.questingDataManager = new QuestingDataManager(this);
+        this.deathStatsManager = new DeathStatsManager(this);
+        this.questSetsManager = new QuestSetsManager(this);
+        this.teamManager = new Team.Manager(this);
         GroupTier.initBaseTiers(this);
+        
+        try {
+            if (this.basePath.isPresent()) {
+                if (!Files.exists(this.basePath.get())) {
+                    Files.createDirectories(this.basePath.get());
+                }
+            }
+            if (this.dataPath.isPresent()) {
+                if (!Files.exists(this.dataPath.get())) {
+                    Files.createDirectories(this.dataPath.get());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        add(new Serializable() {
+            @Override
+            public void save() {
+                resolve("description.txt", provider -> provider.set(mainDescription));
+            }
+            
+            @Override
+            public void load() {
+                if (!resolve("description.txt", provider -> setMainDescription(provider.get().orElse("No description")))) {
+                    setMainDescription("No description");
+                }
+            }
+            
+            @Override
+            public boolean isData() {
+                return false;
+            }
+        });
+        add(this.questingDataManager.state);
+        add(this.deathStatsManager);
+        add(this.reputationManager);
+        add(this.groupTierManager);
+        add(this.questSetsManager);
+        add(this.teamManager);
+        add(this.questingDataManager.data);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void resetClient() {
+        GuiQuestBook.resetBookPosition();
+    }
+    
+    public void add(Serializable serializable) {
+        this.serializables.add(serializable);
     }
     
     public static QuestLine getActiveQuestLine() {
-        return server != null ? server : world != null ? world : config;
+        return activeQuestLine;
     }
     
-    // client side only
-    public static void receiveServerSync(Player receiver, boolean local, boolean remote) {
+    @Environment(EnvType.CLIENT)
+    public static void receiveDataFromServer(Player receiver, boolean remote) {
         if (!hasLoadedMainSound) {
-            SoundHandler.loadLoreReading(config.mainPath);
+            SoundHandler.loadLoreReading(HardcoreQuesting.configDir);
             hasLoadedMainSound = true;
         }
-        GuiQuestBook.resetBookPosition();
-        if (!local) {
-            reset();
-            server = new QuestLine();
-            server.mainPath = config.mainPath;
-            server.quests.clear();
-            server.questSets = new ArrayList<>();
-        }
-        loadAll(true, remote);
-        SoundHandler.loadLoreReading(getActiveQuestLine().mainPath);
+        QuestLine questLine = reset(Optional.empty(), Optional.empty());
+        questLine.loadAll();
+        SoundHandler.loadLoreReading(HardcoreQuesting.configDir);
     }
     
-    public static void reset() {
-        server = null;
-        world = null;
+    public static QuestLine reset(Optional<Path> basePath, Optional<Path> dataPath) {
+        return activeQuestLine = new QuestLine(basePath, dataPath);
     }
     
-    public static void sendServerSync(Player player) {
+    public static void sendDataToClient(Player player) {
         if (player instanceof ServerPlayer) {
-            ServerPlayer playerMP = (ServerPlayer) player;
+            ServerPlayer serverPlayer = (ServerPlayer) player;
             boolean side = HardcoreQuesting.LOADING_SIDE == EnvType.SERVER;
+            QuestLine questLine = getActiveQuestLine();
             if (HardcoreQuesting.getServer().isSingleplayer()) // Integrated server
-                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(true, false, player), playerMP);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, true, false, player), serverPlayer);
             else {
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, false, side, player), serverPlayer);
                 if (QuestLine.doServerSync) // Send actual data to player on server sync
-                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(), playerMP);
-                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(false, side, player), playerMP);
+                    NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), serverPlayer);
             }
-            NetworkManager.sendToPlayer(new DeathStatsMessage(side), playerMP);
+            NetworkManager.sendToPlayer(new DeathStatsMessage(side), serverPlayer);
+            NetworkManager.sendToPlayer(new TeamStatsMessage(questLine.questingDataManager.getTeams()), serverPlayer);
         }
     }
     
-    public static void loadWorldData(File worldPath, boolean isClient) {
-        File pathFile = new File(worldPath, "hqm");
-        if (!pathFile.exists()) pathFile.mkdirs();
-        world = new QuestLine();
-        init(pathFile.toPath(), isClient);
+    public void setMainDescription(String mainDescription) {
+        this.mainDescription = mainDescription;
+        this.cachedMainDescription = null;
     }
     
-    public static void saveDescription() {
-        try {
-            SaveHandler.saveDescription(SaveHandler.getLocalFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.error("Failed to load local questing state from descriptions.txt");
-        }
-    }
-    
-    public static void saveDescriptionDefault() {
-        try {
-            SaveHandler.saveDescription(SaveHandler.getDefaultFile("description.txt"), QuestLine.getActiveQuestLine().mainDescription);
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.error("Failed to load default questing state from description.txt");
-        }
-    }
-    
-    public static void loadDescription(boolean remote) {
-        try {
-            QuestLine.getActiveQuestLine().mainDescription = SaveHandler.loadDescription(SaveHandler.getFile("description.txt", remote));
-            QuestLine.getActiveQuestLine().cachedMainDescription = null;
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.error("Failed to load remote questing state from description.txt");
-        }
-    }
-    
-    public static void saveAll() {
-        QuestingData.saveState();
-        QuestLine.saveDescription();
-        DeathStats.saveAll();
-        Reputation.saveAll();
-        GroupTier.saveAll();
-        QuestSet.saveAll();
-        Team.saveAll();
-        QuestingData.saveQuestingData();
-        if (Quest.saveDefault && Quest.isEditing) { // Save the needed defaults during edit mode
-            QuestLine.saveDescriptionDefault();
-            Reputation.saveAllDefault();
-            GroupTier.saveAllDefault();
-            QuestSet.saveAllDefault();
+    public void saveAll() {
+        for (Serializable serializable : serializables) {
+            serializable.save();
         }
         SaveHelper.onSave();
     }
     
-    public static void loadAll(boolean isClient, boolean remote) {
-        QuestingData.loadState(remote);
-        QuestLine.loadDescription(remote);
-        DeathStats.loadAll(isClient, remote);
-        Reputation.loadAll(remote);
-        GroupTier.loadAll(remote);
-        Team.loadAll(isClient, remote);
-        QuestSet.loadAll(remote);
-        QuestingData.loadQuestingData(remote);
+    public void saveData() {
+        for (Serializable serializable : serializables) {
+            if (serializable.isData())
+                serializable.save();
+        }
+    }
+    
+    public void loadAll() {
+        HardcoreQuesting.LOGGER.info("[HQM] Loading Quest Line, with %d temp paths. (%s)", tempPaths.size(), tempPaths.keySet().stream().sorted().collect(Collectors.joining(", ")));
+        for (Serializable serializable : serializables) {
+            serializable.load();
+        }
         SaveHelper.onLoad();
-        if (isClient)
-            GuiEditMenuItem.Search.initItems();
+    
+        if (HardcoreQuesting.LOADING_SIDE == EnvType.CLIENT) {
+            resetClient();
+        }
     }
     
-    public static void init(Path path) {
-        QuestLine.getActiveQuestLine().mainPath = path;
-        QuestLine.getActiveQuestLine().quests.clear();
-        QuestLine.getActiveQuestLine().questSets = new ArrayList<>();
+    @Environment(EnvType.CLIENT)
+    public List<FormattedText> getMainDescription(GuiBase gui) {
+        if (cachedMainDescription == null) {
+            cachedMainDescription = gui.getLinesFromText(Translator.plain(mainDescription), 0.7F, 130);
+        }
+        
+        return cachedMainDescription;
     }
     
-    public static void init(Path path, boolean isClient) {
-        init(path);
-        loadAll(isClient, false);
+    public boolean resolve(String name, Consumer<FileProvider> pathConsumer) {
+        Optional<FileProvider> provider = resolve(name);
+        provider.ifPresent(pathConsumer);
+        return provider.isPresent();
     }
     
-    public static void copyDefaults(File worldPath) {
-        File path = new File(worldPath, "hqm");
-        if (!path.exists()) path.mkdirs();
-        SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), path);
+    public boolean resolveData(String name, Consumer<FileProvider> pathConsumer) {
+        Optional<FileProvider> provider = resolveData(name);
+        provider.ifPresent(pathConsumer);
+        return provider.isPresent();
+    }
+    
+    public Optional<FileProvider> resolve(String name) {
+        Optional<FileProvider> provider = basePath.map(path -> new PathProvider(path.resolve(name)));
+        if (!provider.isPresent() && tempPaths.containsKey(name))
+            provider = Optional.of(tempPaths.get(name));
+        return provider;
+    }
+    
+    public Optional<FileProvider> resolveData(String name) {
+        Optional<FileProvider> provider = dataPath.map(path -> new PathProvider(path.resolve(name)));
+        if (!provider.isPresent() && tempPaths.containsKey(name))
+            provider = Optional.of(tempPaths.get(name));
+        return provider;
+    }
+    
+    public void provideTemp(SimpleSerializable serializable, String str) {
+        provideTemp(serializable.filePath(), str);
+    }
+    
+    public void provideTemp(String path, String str) {
+        tempPaths.put(path, new FileProvider() {
+            String s = str;
+            
+            @Override
+            public Optional<String> get() {
+                return Optional.of(s);
+            }
+            
+            @Override
+            public void set(String str) {
+                s = str;
+            }
+        });
+    }
+    
+    public interface FileProvider {
+        Optional<String> get();
+        
+        void set(String str);
+    }
+    
+    public static class PathProvider implements FileProvider {
+        private final Path path;
+        
+        public PathProvider(Path path) {
+            this.path = path;
+        }
+        
+        @Override
+        public Optional<String> get() {
+            return SaveHandler.load(path);
+        }
+        
+        @Override
+        public void set(String str) {
+            SaveHandler.save(path, str);
+        }
     }
 }

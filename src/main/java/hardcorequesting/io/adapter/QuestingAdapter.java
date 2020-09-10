@@ -1,13 +1,16 @@
 package hardcorequesting.io.adapter;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.bag.GroupData;
-import hardcorequesting.death.DeathStats;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.team.Team;
+import net.minecraft.util.GsonHelper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,7 +28,6 @@ public class QuestingAdapter {
         public static final String KEY_SELECTED_QUEST = "selectedQuest";
         public static final String KEY_PLAYER_LORE = "playedLore";
         public static final String KEY_RECEIVED_BOOK = "receivedBook";
-        public static final String KEY_DEATHS = "deaths";
         
         @Override
         public void write(JsonWriter out, QuestingData value) throws IOException {
@@ -41,67 +43,31 @@ public class QuestingAdapter {
             out.name(KEY_SELECTED_QUEST).value(value.selectedQuestId != null ? value.selectedQuestId.toString() : null);
             out.name(KEY_PLAYER_LORE).value(value.playedLore);
             out.name(KEY_RECEIVED_BOOK).value(value.receivedBook);
-            out.name(KEY_GROUP_DATA).beginObject();
+            out.name(KEY_GROUP_DATA);
+            out.beginObject();
             for (Map.Entry<UUID, GroupData> entry : value.getGroupData().entrySet())
                 if (entry.getKey() != null)
                     out.name(entry.getKey().toString()).value(entry.getValue().retrieved);
             out.endObject();
-            out.name(KEY_DEATHS);
-            DeathAdapter.DEATH_STATS_ADAPTER.write(out, value.getDeathStat());
             out.endObject();
         }
         
         @Override
-        public QuestingData read(JsonReader in) throws IOException {
-            boolean playerLore = false, receivedBook = false;
-            String uuid = null, selectedQuest = null;
-            int lives = 0, teamId = -1;
-            Team team = null;
+        public QuestingData read(JsonReader in) {
+            JsonObject object = Streams.parse(in).getAsJsonObject();
+            String uuid = object.get(KEY_UUID).getAsString();
+            int lives = GsonHelper.getAsInt(object, KEY_LIVES, 0);
+            int teamId = object.get(KEY_TEAM).isJsonPrimitive() ? object.get(KEY_TEAM).getAsInt() : -1;
+            Team team = teamId != -1 ? null : TeamAdapter.TEAM_ADAPTER.fromJsonTree(object.get(KEY_TEAM));
+            String selectedQuest = GsonHelper.getAsString(object, KEY_SELECTED_QUEST, null);
+            boolean playerLore = GsonHelper.getAsBoolean(object, KEY_PLAYER_LORE, false);
+            boolean receivedBook = GsonHelper.getAsBoolean(object, KEY_RECEIVED_BOOK, false);
             Map<UUID, GroupData> data = new HashMap<>();
-            DeathStats deathStats = null;
-            
-            in.beginObject();
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case KEY_UUID:
-                        uuid = in.nextString();
-                        break;
-                    case KEY_NAME:
-                        in.nextString();
-                        break;
-                    case KEY_LIVES:
-                        lives = in.nextInt();
-                        break;
-                    case KEY_TEAM:
-                        if (in.peek() == JsonToken.NUMBER)
-                            teamId = in.nextInt();
-                        else
-                            team = TeamAdapter.TEAM_ADAPTER.read(in);
-                        break;
-                    case KEY_SELECTED_QUEST:
-                        selectedQuest = in.nextString();
-                        break;
-                    case KEY_PLAYER_LORE:
-                        playerLore = in.nextBoolean();
-                        break;
-                    case KEY_RECEIVED_BOOK:
-                        receivedBook = in.nextBoolean();
-                        break;
-                    case KEY_GROUP_DATA:
-                        in.beginObject();
-                        while (in.hasNext())
-                            data.put(UUID.fromString(in.nextName()), new GroupData(in.nextInt()));
-                        in.endObject();
-                        break;
-                    case KEY_DEATHS:
-                        deathStats = DeathAdapter.DEATH_STATS_ADAPTER.read(in);
-                    default:
-                        break;
-                }
+            for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(object, KEY_GROUP_DATA, new JsonObject()).entrySet()) {
+                data.put(UUID.fromString(entry.getKey()), new GroupData(entry.getValue().getAsInt()));
             }
-            in.endObject();
             
-            QuestingData questingData = new QuestingData(UUID.fromString(uuid), lives, teamId, data, deathStats);
+            QuestingData questingData = new QuestingData(QuestingDataManager.getInstance(), UUID.fromString(uuid), lives, teamId, data);
             questingData.playedLore = playerLore;
             questingData.receivedBook = receivedBook;
             if (selectedQuest != null) {

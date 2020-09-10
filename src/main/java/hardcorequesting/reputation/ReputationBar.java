@@ -62,7 +62,7 @@ public class ReputationBar {
     }
     
     public boolean isValid() {
-        return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && Reputation.getReputation(this.repId) != null;
+        return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && ReputationManager.getInstance().getReputation(this.repId) != null;
     }
     
     public boolean sameLocation(ReputationBar reputationBar) {
@@ -71,7 +71,7 @@ public class ReputationBar {
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY, Player player) {
-        Reputation reputation = Reputation.getReputation(this.repId);
+        Reputation reputation = ReputationManager.getInstance().getReputation(this.repId);
         if (reputation == null) return;
         
         gui.applyColor(0xFFFFFFFF);
@@ -134,17 +134,18 @@ public class ReputationBar {
         @Override
         @Environment(EnvType.CLIENT)
         public void draw(PoseStack matrices, GuiBase guiB, int mX, int mY) {
+            ReputationManager reputationManager = ReputationManager.getInstance();
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());
-            List<Reputation> reputationList = Reputation.getReputationList();
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
+            List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = Reputation.REPUTATION_LIST_X;
                 int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;
                 String str = reputationList.get(i).getName();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY);
-                boolean selected = reputationList.get(i).equals(Reputation.getReputation(bar.repId));
+                boolean selected = reputationList.get(i).equals(reputationManager.getReputation(bar.repId));
                 
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
@@ -154,10 +155,12 @@ public class ReputationBar {
         @Environment(EnvType.CLIENT)
         public void onClick(GuiBase guiB, int mX, int mY, int b) {
             super.onClick(guiB, mX, mY, b);
+            ReputationManager reputationManager = ReputationManager.getInstance();
+            
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((Reputation.getReputations().size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, Reputation.getReputations().size());
-            List<Reputation> reputationList = Reputation.getReputationList();
+            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
+            List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = Reputation.REPUTATION_LIST_X;
                 int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;

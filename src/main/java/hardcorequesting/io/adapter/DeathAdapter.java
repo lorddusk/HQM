@@ -3,7 +3,7 @@ package hardcorequesting.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStat;
 import hardcorequesting.death.DeathType;
 
 import java.io.IOException;
@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public class DeathAdapter {
     
-    public static final TypeAdapter<DeathStats> DEATH_STATS_ADAPTER = new TypeAdapter<DeathStats>() {
+    public static final TypeAdapter<DeathStat> DEATH_STATS_ADAPTER = new TypeAdapter<DeathStat>() {
         @Override
-        public void write(JsonWriter out, DeathStats value) throws IOException {
+        public void write(JsonWriter out, DeathStat value) throws IOException {
             out.beginObject();
             out.name(value.getUuid().toString());
             out.beginArray();
@@ -24,12 +24,12 @@ public class DeathAdapter {
         }
         
         @Override
-        public DeathStats read(JsonReader in) throws IOException {
+        public DeathStat read(JsonReader in) throws IOException {
             in.beginObject();
-            DeathStats stats = null;
+            DeathStat stats = null;
             if (in.hasNext()) {
                 String uuid = in.nextName();
-                stats = new DeathStats(UUID.fromString(uuid));
+                stats = new DeathStat(UUID.fromString(uuid));
                 in.beginArray();
                 int i = 0;
                 while (in.hasNext())

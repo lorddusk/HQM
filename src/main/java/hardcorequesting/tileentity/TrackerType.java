@@ -3,6 +3,7 @@ package hardcorequesting.tileentity;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.Team;
 import net.minecraft.client.resources.language.I18n;
@@ -14,7 +15,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingData.getAllTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     boolean valid = radius == 0;
                     valid = isValid(valid, team, tracker, radius);
@@ -32,7 +33,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingData.getAllTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     
                     for (PlayerEntry entry : team.getPlayers()) {
@@ -63,7 +64,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingData.getAllTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams()) {
                 int newMeta = (int) (quest.getProgress(team) * 15);
                 if (newMeta > meta) {
                     boolean valid = radius == 0;
@@ -89,7 +90,7 @@ public enum TrackerType {
             }
             
             if (closestPlayer != null) {
-                return (int) (quest.getProgress(QuestingData.getQuestingData(closestPlayer).getTeam()) * 15);
+                return (int) (quest.getProgress(QuestingDataManager.getInstance().getQuestingData(closestPlayer).getTeam()) * 15);
             } else {
                 return 0;
             }

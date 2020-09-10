@@ -3,28 +3,28 @@ package hardcorequesting.network.message;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.team.Team;
-import hardcorequesting.team.TeamStats;
+import hardcorequesting.team.TeamLiteStat;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TeamStatsMessage implements IMessage {
     
-    private List<TeamStats> stats;
+    private List<TeamLiteStat> stats;
     
     public TeamStatsMessage() {
     }
     
     public TeamStatsMessage(Team team) {
-        stats = new ArrayList<>();
-        stats.add(team.toStat());
+        stats = Collections.singletonList(team.toLiteStat());
     }
     
     public TeamStatsMessage(List<Team> teams) {
-        stats = teams.stream().map(Team::toStat).collect(Collectors.toList());
+        stats = teams.stream().map(Team::toLiteStat).collect(Collectors.toList());
     }
     
     @Override
@@ -39,21 +39,21 @@ public class TeamStatsMessage implements IMessage {
             int players = buf.readInt();
             int lives = buf.readInt();
             float progress = buf.readFloat();
-            stats.add(new TeamStats(name, players, lives, progress));
+            stats.add(new TeamLiteStat(name, players, lives, progress));
         }
     }
     
     @Override
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(stats.size());
-        for (TeamStats teamStats : stats) {
-            if (teamStats.getName() != null) {
-                buf.writeUtf(teamStats.getName());
+        for (TeamLiteStat teamLiteStat : stats) {
+            if (teamLiteStat.getName() != null) {
+                buf.writeUtf(teamLiteStat.getName());
             } else
                 buf.writeUtf("NULL");
-            buf.writeInt(teamStats.getPlayers());
-            buf.writeInt(teamStats.getLives());
-            buf.writeFloat(teamStats.getProgress());
+            buf.writeInt(teamLiteStat.getPlayers());
+            buf.writeInt(teamLiteStat.getLives());
+            buf.writeFloat(teamLiteStat.getProgress());
         }
     }
     
@@ -67,9 +67,9 @@ public class TeamStatsMessage implements IMessage {
         
         private void handle(TeamStatsMessage message, PacketContext ctx) {
             if (message.stats.size() == 1)
-                TeamStats.updateTeam(message.stats.get(0));
+                TeamLiteStat.updateTeam(message.stats.get(0));
             else
-                TeamStats.updateTeams(message.stats);
+                TeamLiteStat.updateTeams(message.stats);
         }
     }
 }

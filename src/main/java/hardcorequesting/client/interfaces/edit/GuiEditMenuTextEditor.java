@@ -8,6 +8,7 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.client.interfaces.TextBoxLogic;
 import hardcorequesting.quests.Quest;
+import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestSet;
 import hardcorequesting.quests.task.*;
 import hardcorequesting.reputation.Reputation;
@@ -275,7 +276,7 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         } else if (reputationMarker != null) {
             reputationMarker.setName(str);
         } else {
-            Quest.setMainDescription(str);
+            QuestLine.getActiveQuestLine().setMainDescription(str);
         }
         
         if (isName) {

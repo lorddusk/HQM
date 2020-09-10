@@ -1,6 +1,5 @@
 package hardcorequesting.death;
 
-import hardcorequesting.quests.QuestingData;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -120,7 +119,7 @@ public enum DeathType {
     }
     
     public void onDeath(Player player) {
-        QuestingData.getQuestingData(player).getDeathStat().increaseDeath(ordinal());
+        DeathStatsManager.getInstance().getDeathStat(player).increaseDeath(ordinal());
     }
     
     //is only accurate if called in the values() order

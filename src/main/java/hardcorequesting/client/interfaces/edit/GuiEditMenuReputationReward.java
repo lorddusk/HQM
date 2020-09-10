@@ -5,7 +5,7 @@ import hardcorequesting.client.interfaces.GuiBase;
 import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.LargeButton;
 import hardcorequesting.quests.reward.ReputationReward;
-import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.util.SaveHelper;
 import hardcorequesting.util.Translator;
 import net.minecraft.network.chat.FormattedText;
@@ -69,7 +69,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             
             @Override
             public void onClick(GuiBase gui, Player player) {
-                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(Reputation.getReputationList().get(0), 0));
+                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
             }
         });
         
@@ -139,15 +139,16 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (selectedReward != null && selectedReward.getReward() != null) {
-            for (int i = 0; i < Reputation.getReputationList().size(); i++) {
-                if (Reputation.getReputationList().get(i).equals(selectedReward.getReward())) {
+            ReputationManager reputationManager = ReputationManager.getInstance();
+            for (int i = 0; i < reputationManager.getReputationList().size(); i++) {
+                if (reputationManager.getReputationList().get(i).equals(selectedReward.getReward())) {
                     int id = i + (left ? -1 : 1);
                     if (id < 0) {
-                        id = Reputation.getReputationList().size() - 1;
-                    } else if (id >= Reputation.getReputationList().size()) {
+                        id = reputationManager.getReputationList().size() - 1;
+                    } else if (id >= reputationManager.getReputationList().size()) {
                         id = 0;
                     }
-                    selectedReward.setReward(Reputation.getReputationList().get(id));
+                    selectedReward.setReward(reputationManager.getReputationList().get(id));
                     break;
                 }
             }
@@ -165,7 +166,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     private boolean isValid() {
-        return !Reputation.getReputationList().isEmpty();
+        return !ReputationManager.getInstance().getReputationList().isEmpty();
     }
     
     @Override

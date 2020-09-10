@@ -3,7 +3,7 @@ package hardcorequesting.commands.sub;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.commands.CommandHandler;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 
 public class QuestSubCommand implements CommandHandler.SubCommand {
@@ -12,8 +12,8 @@ public class QuestSubCommand implements CommandHandler.SubCommand {
         return builder
                 .requires(source -> source.hasPermission(4))
                 .executes(context -> {
-                    sendTranslatableChat(context.getSource(), QuestingData.isQuestActive() ? "hqm.message.questAlreadyActivated" : "hqm.message.questActivated");
-                    QuestingData.activateQuest(true);
+                    sendTranslatableChat(context.getSource(), QuestingDataManager.getInstance().isQuestActive() ? "hqm.message.questAlreadyActivated" : "hqm.message.questActivated");
+                    QuestingDataManager.getInstance().activateQuest(true);
                     return 1;
                 });
     }

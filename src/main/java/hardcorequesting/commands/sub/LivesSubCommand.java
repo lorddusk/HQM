@@ -8,6 +8,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -27,7 +28,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
-                                            if (!QuestingData.isHardcoreActive()) {
+                                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                                 context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
@@ -37,7 +38,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                             return 1;
                                         }))
                                 .executes(context -> {
-                                    if (!QuestingData.isHardcoreActive()) {
+                                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                         context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
@@ -47,7 +48,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                     return 1;
                                 }))
                         .executes(context -> {
-                            if (!QuestingData.isHardcoreActive()) {
+                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                 context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
@@ -60,7 +61,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
-                                            if (!QuestingData.isHardcoreActive()) {
+                                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                                 context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
@@ -70,7 +71,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                             return 1;
                                         }))
                                 .executes(context -> {
-                                    if (!QuestingData.isHardcoreActive()) {
+                                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                         context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
@@ -80,7 +81,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                     return 1;
                                 }))
                         .executes(context -> {
-                            if (!QuestingData.isHardcoreActive()) {
+                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                 context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
@@ -91,7 +92,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                 )
                 .then(Commands.argument("targets", EntityArgument.players())
                         .executes(context -> {
-                            if (!QuestingData.isHardcoreActive()) {
+                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                                 context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
@@ -99,7 +100,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                             return 1;
                         }))
                 .executes(context -> {
-                    if (!QuestingData.isHardcoreActive()) {
+                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
                         context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
                         return 1;
                     }
@@ -115,7 +116,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
     }
     
     private void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
-        QuestingData.getQuestingData(player).removeLives(player, amount);
+        QuestingDataManager.getInstance().getQuestingData(player).removeLives(player, amount);
         sendTranslatableChat(source, amount != 1, "hqm.message.removeLivesFrom", amount, player.getScoreboardName());
         if (source.getEntity() != player)
             sendTranslatableChat(player.createCommandSourceStack(), amount != 1, "hqm.message.removeLivesBy", amount, source.getTextName());
@@ -123,26 +124,26 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
     }
     
     private void addLivesTo(CommandSourceStack source, Player player, int amount) {
-        if (QuestingData.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
-            QuestingData.getQuestingData(player).addLives(player, amount);
+        QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
+        if (questingDataManager.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
+            questingDataManager.getQuestingData(player).addLives(player, amount);
             sendTranslatableChat(source, amount != 1, "hqm.message.addLivesTo", amount, player.getScoreboardName());
             if (source.getEntity() != player)
                 sendTranslatableChat(player.createCommandSourceStack(), amount != 1, "hqm.message.addLivesBy", amount, source.getTextName());
-            currentLives(player);
         } else {
-            QuestingData.getQuestingData(player).addLives(player, amount);
+            questingDataManager.getQuestingData(player).addLives(player, amount);
             sendTranslatableChat(source, "hqm.message.cantGiveMoreLives", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
             sendTranslatableChat(source, "hqm.massage.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
             if (source.getEntity() != player)
                 sendTranslatableChat(player.createCommandSourceStack(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName());
-            currentLives(player);
         }
+        currentLives(player);
     }
     
     private void getPlayerLives(CommandSourceStack source, String playerName) throws CommandRuntimeException {
         Player player = HardcoreQuesting.getServer().getPlayerList().getPlayerByName(playerName);
         if (player != null) {
-            int lives = QuestingData.getQuestingData(player).getLives();
+            int lives = QuestingDataManager.getInstance().getQuestingData(player).getLives();
             sendTranslatableChat(source, lives != 1, "hqm.message.hasLivesRemaining", playerName, lives);
         } else {
             throw new CommandRuntimeException(new TranslatableComponent("hqm.message.noPlayer"));

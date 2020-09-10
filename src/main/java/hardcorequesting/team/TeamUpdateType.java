@@ -8,7 +8,7 @@ import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.message.TeamUpdateMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestData;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.reward.ReputationReward;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public enum TeamUpdateType {
         public void update(Team team, String data) {
             try {
                 Team newTeam = TeamAdapter.TEAM_ADAPTER.fromJson(data);
-                QuestingData.getTeams().add(newTeam);
+                QuestingDataManager.getInstance().getTeams().add(newTeam);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,7 +111,7 @@ public enum TeamUpdateType {
             String uuid = data.substring(0, 36);
             String teamJson = data.substring(36);
             try {
-                QuestingData.getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+                QuestingDataManager.getInstance().getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -128,7 +128,7 @@ public enum TeamUpdateType {
             String uuid = data.substring(0, 36);
             String teamJson = data.substring(36);
             try {
-                QuestingData.getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
+                QuestingDataManager.getInstance().getQuestingData(UUID.fromString(uuid)).setTeam(TeamAdapter.TEAM_ADAPTER.fromJson(teamJson));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -143,7 +143,7 @@ public enum TeamUpdateType {
         @Override
         public void update(Team clientTeam, String data) {
             int id = Integer.parseInt(data);
-            List<Team> teams = QuestingData.getTeams();
+            List<Team> teams = QuestingDataManager.getInstance().getTeams();
             teams.remove(id);
             
             for (int i = id; i < teams.size(); i++) {
@@ -162,7 +162,7 @@ public enum TeamUpdateType {
         public void update(Team clientTeam, String data) {
             try {
                 Team team = TeamAdapter.TEAM_ADAPTER.fromJson(data);
-                QuestingData.getTeams().add(team.getId(), team);
+                QuestingDataManager.getInstance().getTeams().add(team.getId(), team);
                 clientTeam.getInvites().add(team);
             } catch (IOException e) {
                 e.printStackTrace();

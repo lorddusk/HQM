@@ -4,7 +4,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.commands.CommandHandler;
 import hardcorequesting.items.QuestBookItem;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -19,14 +19,14 @@ public class OpSubCommand implements CommandHandler.SubCommand {
                 .then(Commands.argument("targets", EntityArgument.player())
                         .executes(context -> {
                             Player player = EntityArgument.getPlayer(context, "targets");
-                            if (QuestingData.hasData(player)) {
+                            if (QuestingDataManager.getInstance().hasData(player)) {
                                 player.inventory.add(QuestBookItem.getOPBook(player));
                             } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
                     Player player = (Player) context.getSource().getEntity();
-                    if (QuestingData.hasData(player)) {
+                    if (QuestingDataManager.getInstance().hasData(player)) {
                         player.inventory.add(QuestBookItem.getOPBook(player));
                     } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                     return 1;

@@ -497,8 +497,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         @SuppressWarnings("rawtypes")
         public static void initItems() {
-            clear();
-            if (searchItems.isEmpty()) {
+            if (searchItems.isEmpty() || searchFluids.isEmpty()) {
+                clear();
                 NonNullList<ItemStack> stacks = NonNullList.create();
                 for (Item item : Registry.ITEM) {
                     try {
@@ -539,6 +539,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         @Override
         public void run() {
+            initItems();
             elements = new ArrayList<>();
             Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
             boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;

@@ -4,6 +4,7 @@ import hardcorequesting.client.interfaces.GuiQuestBook;
 import hardcorequesting.client.interfaces.GuiReward;
 import hardcorequesting.network.message.GeneralUpdateMessage;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.task.QuestTask;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,7 +37,7 @@ public enum GeneralUsage {
     BOOK_SELECT_TASK {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            QuestingData data = QuestingData.getQuestingData(player);
+            QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
             data.selectedQuestId = nbt.getUUID("QuestId");
             data.selectedTask = nbt.getInt("TaskId");
         }

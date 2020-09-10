@@ -39,7 +39,7 @@ public final class SaveHelper {
     private static boolean isLarge = true;
     private static long saveTime;
     private static int total;
-    private static ListElement[] list;
+    public static ListElement[] list;
     private static List<ListElement> sortedList;
     
     static {
@@ -302,7 +302,7 @@ public final class SaveHelper {
     public static class ListElement implements Comparable<ListElement> {
         
         private EditType type;
-        private int count;
+        public int count;
         
         private ListElement(EditType type) {
             this.type = type;

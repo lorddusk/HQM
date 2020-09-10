@@ -15,6 +15,7 @@ import hardcorequesting.quests.QuestLine;
 import hardcorequesting.util.Executor;
 import hardcorequesting.util.RegisterHelper;
 import me.shedaniel.cloth.api.common.events.v1.PlayerJoinCallback;
+import me.shedaniel.cloth.api.common.events.v1.PlayerLeaveCallback;
 import me.shedaniel.cloth.api.common.events.v1.WorldLoadCallback;
 import me.shedaniel.cloth.api.common.events.v1.WorldSaveCallback;
 import me.shedaniel.cloth.api.utils.v1.GameInstanceUtils;
@@ -23,10 +24,14 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class HardcoreQuesting implements ModInitializer {
     public static final String ID = "hardcorequesting";
@@ -36,6 +41,8 @@ public class HardcoreQuesting implements ModInitializer {
     public static CommonProxy proxy = Executor.call(() -> () -> new ClientProxy(), () -> () -> new CommonProxy());
     
     public static Path configDir;
+    public static Path dataDir;
+    public static Path packDir;
     
     public static final Logger LOGGER = LogManager.getFormatterLogger("Hardcore Questing Mode");
     
@@ -49,12 +56,19 @@ public class HardcoreQuesting implements ModInitializer {
         new EventTrigger();
         
         configDir = FabricLoader.getInstance().getConfigDir().resolve("hqm");
-        QuestLine.init(configDir);
+        packDir = configDir.resolve("default");
+        dataDir = configDir.resolve("data");
+        try {
+            FileUtils.deleteDirectory(configDir.resolve("remote").toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        QuestLine.reset(Optional.of(packDir), Optional.of(dataDir)).loadAll();
         
         HQMConfig.loadConfig();
         
         proxy.init();
-        proxy.initSounds(configDir);
+        proxy.initSounds();
         
         new PlayerDeathEventListener();
         new PlayerTracker();

@@ -4,7 +4,7 @@ import hardcorequesting.client.sounds.SoundHandler;
 import hardcorequesting.client.sounds.Sounds;
 import hardcorequesting.config.HQMConfig;
 import hardcorequesting.death.DeathType;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -35,14 +35,15 @@ public class ItemHeart extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         if (!world.isClientSide) {
+            QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
             ItemStack stack = player.getItemInHand(hand);
             if (value == 3) {
-                if (!QuestingData.isHardcoreActive()) {
+                if (!questingDataManager.isHardcoreActive()) {
                     player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
-                } else if (QuestingData.getQuestingData(player).getRawLives() < HQMConfig.getInstance().Hardcore.MAX_LIVES) {
-                    QuestingData.getQuestingData(player).addLives(player, 1);
+                } else if (questingDataManager.getQuestingData(player).getRawLives() < HQMConfig.getInstance().Hardcore.MAX_LIVES) {
+                    questingDataManager.getQuestingData(player).addLives(player, 1);
                     player.sendMessage(Translator.translatable("hqm.message.addOne"), Util.NIL_UUID);
-                    int lives = QuestingData.getQuestingData(player).getLives();
+                    int lives = questingDataManager.getQuestingData(player).getLives();
                     player.sendMessage(Translator.translatable("hqm.message.haveRemaining", lives), Util.NIL_UUID);
                     SoundHandler.play(Sounds.LIFE, player);
                     if (!player.abilities.instabuild) {
@@ -54,12 +55,12 @@ public class ItemHeart extends Item {
                 }
             }
             if (value == 4) {
-                if (!QuestingData.isHardcoreActive()) {
+                if (!questingDataManager.isHardcoreActive()) {
                     player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
                 } else {
                     SoundHandler.play(Sounds.ROTTEN, player);
                     player.sendMessage(Translator.translatable("hqm.message.eatRottenHearth"), Util.NIL_UUID);
-                    QuestingData.getQuestingData(player).removeLifeAndSendMessage(player);
+                    questingDataManager.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
                     
                     if (!player.abilities.instabuild)

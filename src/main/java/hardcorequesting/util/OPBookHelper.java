@@ -9,6 +9,7 @@ import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.OpActionMessage;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.data.QuestDataTaskItems;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskItems;
@@ -44,7 +45,7 @@ public final class OPBookHelper {
             @Override
             public void process(String data) {
                 fromJson(data);
-                QuestingData.getQuestingData(subject).getTeam().clearProgress();
+                QuestingDataManager.getInstance().getQuestingData(subject).getTeam().clearProgress();
             }
         },
         QUEST_COMPLETION {
@@ -53,7 +54,7 @@ public final class OPBookHelper {
                 fromJson(data);
                 if (quest != null) {
                     if (quest.isCompleted(subject)) {
-                        QuestingData.getQuestingData(subject).getTeam().resetProgress(quest);
+                        QuestingDataManager.getInstance().getQuestingData(subject).getTeam().resetProgress(quest);
                     } else {
                         quest.completeQuest(subject);
                     }
@@ -71,7 +72,7 @@ public final class OPBookHelper {
                     if (task.isCompleted(subject)) {
                         task.getData(subject).completed = false;
                         task.uncomplete(subject.getUUID());
-                        QuestingData.getQuestingData(subject).getTeam().resetCompletion(quest); // automatically reset progress
+                        QuestingDataManager.getInstance().getQuestingData(subject).getTeam().resetCompletion(quest); // automatically reset progress
                     } else {
                         task.completeTask(subject.getUUID());
                     }
@@ -93,7 +94,7 @@ public final class OPBookHelper {
                         if (qData.progress[requirement] == requirements[requirement].required) {
                             qData.progress[requirement] = 0;
                             itemTask.getData(subject.getUUID()).completed = false;
-                            QuestingData.getQuestingData(subject).getTeam().refreshData();
+                            QuestingDataManager.getInstance().getQuestingData(subject).getTeam().refreshData();
                         } else {
                             qData.progress[requirement] = requirements[requirement].required;
                             itemTask.doCompletionCheck(qData, subject.getUUID());

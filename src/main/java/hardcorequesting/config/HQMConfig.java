@@ -6,19 +6,16 @@ import blue.endless.jankson.JsonGrammar;
 import blue.endless.jankson.api.SyntaxError;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.KeyboardHandler;
+import hardcorequesting.io.SaveHandler;
 import hardcorequesting.items.BagItem;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestingData;
 import hardcorequesting.team.RewardSetting;
-import org.apache.commons.compress.utils.Charsets;
-import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.Optional;
 
 public class HQMConfig {
     private static transient HQMConfig instance;
@@ -104,15 +101,16 @@ public class HQMConfig {
                 Path path = HardcoreQuesting.configDir.resolve("config.json5");
                 if (!Files.exists(path.getParent()))
                     Files.createDirectories(path.getParent());
-                if (Files.exists(path)) {
-                    instance = jankson.fromJson(IOUtils.toString(Files.newInputStream(path), Charsets.UTF_8), HQMConfig.class);
-                } else {
-                    instance = new HQMConfig();
-                }
-                try (BufferedWriter writer = Files.newBufferedWriter(path, Charsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-                    writer.write(jankson.toJson(instance).toJson(JsonGrammar.JSON5).toCharArray());
-                }
-            } catch (IOException | SyntaxError e) {
+                instance = SaveHandler.load(path).flatMap(s -> {
+                    try {
+                        return Optional.of(jankson.fromJson(s, HQMConfig.class));
+                    } catch (SyntaxError syntaxError) {
+                        syntaxError.printStackTrace();
+                    }
+                    return Optional.empty();
+                }).orElse(new HQMConfig());
+                SaveHandler.save(path, jankson.toJson(instance).toJson(JsonGrammar.JSON5));
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -149,20 +147,11 @@ public class HQMConfig {
         parseSetColours();
         parseQuestColours();
         
-        int maxlives = getInstance().Hardcore.MAX_LIVES;
-        int lives = getInstance().Hardcore.DEFAULT_LIVES;
-        
-        if (lives > maxlives) lives = maxlives;
-        
-        QuestingData.defaultLives = lives;
-        QuestingData.autoHardcoreActivate = getInstance().Starting.AUTO_HARDCORE;
-        QuestingData.autoQuestActivate = getInstance().Starting.AUTO_QUESTING;
         RewardSetting.isAllModeEnabled = getInstance().MULTI_REWARD;
         BagItem.displayGui = getInstance().Loot.REWARD_INTERFACE;
         QuestLine.doServerSync = getInstance().Starting.SERVER_SYNC;
         
         Quest.isEditing = getInstance().Editing.USE_EDITOR;
-        Quest.saveDefault = getInstance().Editing.SAVE_DEFAULT;
         if (HardcoreQuesting.proxy.isClient()) {
             KeyboardHandler.fromConfig(getInstance().Editing.HOTKEYS);
         }
@@ -219,10 +208,6 @@ public class HQMConfig {
     }
     
     public static class Editing {
-        //@Name("Save quests in default folder")
-        @Comment("Set to true to save work-in-progress quests in the default folder of the configuration")
-        public boolean SAVE_DEFAULT = true;
-        
         //@Name("Enable edit mode by default")
         @Comment("Set to true to automatically enable edit mode when entering worlds in single-player. Has no effect in multiplayer.")
         public boolean USE_EDITOR = false;

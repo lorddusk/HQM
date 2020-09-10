@@ -4,8 +4,9 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.quests.QuestData;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.team.LifeSetting;
 import hardcorequesting.team.PlayerEntry;
 import hardcorequesting.team.RewardSetting;
@@ -41,12 +42,14 @@ public class TeamAdapter {
             out.name(NAME).value(value.getName());
             out.name(LIFE_SETTING).value(value.getLifeSetting().name());
             out.name(REWARD_SETTING).value(value.getRewardSetting().name());
-            out.name(PLAYERS).beginArray();
+            out.name(PLAYERS);
+            out.beginArray();
             for (PlayerEntry entry : value.getPlayers())
                 entry.write(out);
             out.endArray();
-            out.name(REPUTATIONS).beginArray();
-            for (Reputation reputation : Reputation.getReputations().values()) {
+            out.name(REPUTATIONS);
+            out.beginArray();
+            for (Reputation reputation : ReputationManager.getInstance().getReputations().values()) {
                 out.beginObject();
                 out.name(REP_ID).value(reputation.getId());
                 out.name(REP_VAL).value(value.getReputation(reputation));
@@ -170,12 +173,11 @@ public class TeamAdapter {
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
             Map<Integer, Team> tempMap = new HashMap<>();
-            QuestingData.getTeams().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
-            for (Team team : QuestingData.getTeams()) {
+            QuestingDataManager.getInstance().getTeams().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
+            for (Team team : QuestingDataManager.getInstance().getTeams()) {
                 List<Integer> invites = invitesMap.get(team);
                 if (invites != null)
-                    invites.forEach(id ->
-                    {
+                    invites.forEach(id -> {
                         if (tempMap.containsKey(id))
                             team.getInvites().add(tempMap.get(id));
                     });

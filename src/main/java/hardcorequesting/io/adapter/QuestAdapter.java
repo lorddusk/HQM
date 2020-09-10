@@ -9,6 +9,7 @@ import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.quests.task.QuestTaskReputation;
 import hardcorequesting.reputation.Reputation;
 import hardcorequesting.reputation.ReputationBar;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.util.SaveHelper;
 import net.minecraft.world.item.ItemStack;
 
@@ -360,7 +361,7 @@ public class QuestAdapter {
                         QUEST.setCommandRewards(commands.toArray(new String[commands.size()]));
                         break;
                     default:
-                        QuestLine.getActiveQuestLine().quests.remove(QUEST.getQuestId());
+                        QuestSetsManager.getInstance().quests.remove(QUEST.getQuestId());
                         return null;
                 }
             }
@@ -379,7 +380,7 @@ public class QuestAdapter {
 //                }
                 return QUEST;
             }
-            QuestLine.getActiveQuestLine().quests.remove(QUEST.getQuestId());
+            QuestSetsManager.getInstance().quests.remove(QUEST.getQuestId());
             return null;
         }
         
@@ -394,7 +395,7 @@ public class QuestAdapter {
         
         private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
-                QuestLine.getActiveQuestLine().quests.remove(quest.getQuestId());
+                QuestSetsManager.getInstance().quests.remove(quest.getQuestId());
             }
             return null;
         }
@@ -506,7 +507,7 @@ public class QuestAdapter {
         optionLinkMapping.clear();
         for (Map.Entry<ReputationReward, String> entry : reputationRewardMapping.entrySet()) {
             String rep = entry.getValue();
-            Reputation reputation = Reputation.getReputations().get(rep);
+            Reputation reputation = ReputationManager.getInstance().getReputations().get(rep);
             if (reputation == null)
                 throw new IOException("Failed to load reputation " + rep);
             entry.getKey().setReward(reputation);

@@ -1,14 +1,16 @@
 package hardcorequesting.event;
 
+import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.capabilities.ModCapabilities;
 import hardcorequesting.config.HQMConfig;
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStatsManager;
 import hardcorequesting.quests.Quest;
 import hardcorequesting.quests.QuestLine;
 import hardcorequesting.quests.QuestSet;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.util.HQMUtil;
 import hardcorequesting.util.Translator;
+import net.fabricmc.api.EnvType;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,17 +27,19 @@ public class PlayerTracker {
     }
     
     public int getRemainingLives(Player sender) {
-        return QuestingData.getQuestingData(sender).getLives();
+        return QuestingDataManager.getInstance().getQuestingData(sender).getLives();
     }
     
     public void onPlayerLogin(ServerPlayer player) {
-        if (!QuestingData.hasData(player)) {
-            DeathStats.resync();
+        if (HardcoreQuesting.LOADING_SIDE == EnvType.SERVER)
+            QuestLine.sendDataToClient(player);
+        
+        QuestingDataManager questingData = QuestingDataManager.getInstance();
+        if (!questingData.hasData(player)) {
+            DeathStatsManager.getInstance().resync();
         }
         
-        QuestLine.sendServerSync(player);
-        
-        if (QuestingData.isHardcoreActive())
+        if (questingData.isHardcoreActive())
             sendLoginMessage(player);
         else if (HQMConfig.getInstance().Message.NO_HARDCORE_MESSAGE)
             player.sendMessage(Translator.translatable("hqm.message.noHardcore"), Util.NIL_UUID);
@@ -47,16 +51,16 @@ public class PlayerTracker {
         CompoundTag tags = ModCapabilities.PLAYER_EXTRA_DATA.get(player).tag;
         if (tags.contains(HQ_TAG)) {
             if (tags.getCompound(HQ_TAG).getBoolean(RECEIVED_BOOK)) {
-                QuestingData.getQuestingData(player).receivedBook = true;
+                questingData.getQuestingData(player).receivedBook = true;
             }
-            if (!QuestingData.isQuestActive()) {
+            if (!questingData.isQuestActive()) {
                 tags.remove(HQ_TAG);
             }
         }
         
         QuestSet.loginReset();
         
-        QuestingData.spawnBook(player);
+        questingData.spawnBook(player);
     }
     
     

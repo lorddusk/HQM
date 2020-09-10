@@ -10,6 +10,7 @@ import hardcorequesting.quests.data.*;
 import hardcorequesting.quests.task.*;
 import hardcorequesting.quests.task.QuestTaskMob.Mob;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationManager;
 import hardcorequesting.reputation.ReputationMarker;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -197,7 +198,7 @@ public class QuestTaskAdapter {
             while (in.hasNext()) {
                 switch (in.nextName()) {
                     case REPUTATION:
-                        reputation = Reputation.getReputation(in.nextString());
+                        reputation = ReputationManager.getInstance().getReputation(in.nextString());
                         break;
                     case LOWER:
                         if (reputation != null)
@@ -625,7 +626,7 @@ public class QuestTaskAdapter {
         }
         
         public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
-            Reputation reputation = Reputation.getReputations().get(this.reputation);
+            Reputation reputation = ReputationManager.getInstance().getReputations().get(this.reputation);
             if (reputation != null) {
                 ReputationMarker lower = null, upper = null;
                 if (this.lower >= 0 && this.lower < reputation.getMarkerCount())

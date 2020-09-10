@@ -2,7 +2,7 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -41,7 +41,7 @@ public class LivesUpdate implements IMessage {
         }
         
         private void handle(LivesUpdate message, PacketContext ctx) {
-            QuestingData.getQuestingData(message.uuid).setRawLives(message.lives);
+            QuestingDataManager.getInstance().getQuestingData(message.uuid).setRawLives(message.lives);
         }
     }
 }

@@ -73,8 +73,6 @@ public class Quest {
     private static final int MAX_SELECT_REWARD_SLOTS = 4;
     @Deprecated
     public static boolean isEditing = false;
-    public static boolean saveDefault = true;
-    public static boolean useDefault = true;
     public static UUID speciallySelectedQuestId = null;
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
@@ -224,7 +222,7 @@ public class Quest {
         buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
-                QuestingData data = QuestingData.getQuestingData(player);
+                QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
                 if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(getQuestId())) {
                     return data.selectedTask != selectedTask.getId();
                 }
@@ -240,8 +238,8 @@ public class Quest {
             @Override
             public void onClick(GuiBase gui, Player player) {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
-                QuestingData.getQuestingData(player).selectedQuestId = getQuestId();
-                QuestingData.getQuestingData(player).selectedTask = selectedTask.getId();
+                QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = getQuestId();
+                QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask.getId();
                 
                 player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).withStyle(ChatFormatting.GREEN), false);
                 
@@ -373,39 +371,30 @@ public class Quest {
         rewardChoices = new ItemStackRewardList();
         commandRewardList = new CommandRewardList();
         
-        QuestLine.getActiveQuestLine().quests.put(getQuestId(), this);
+        QuestSetsManager.getInstance().quests.put(getQuestId(), this);
     }
     
     public static Map<UUID, Quest> getQuests() {
-        return QuestLine.getActiveQuestLine().quests;
+        return QuestSetsManager.getInstance().quests;
     }
     
     public static List<QuestSet> getQuestSets() {
-        return QuestLine.getActiveQuestLine().questSets;
+        return QuestLine.getActiveQuestLine().questSetsManager.questSets;
     }
     
     @Environment(EnvType.CLIENT)
     public static List<FormattedText> getMainDescription(GuiBase gui) {
-        if (QuestLine.getActiveQuestLine().cachedMainDescription == null) {
-            QuestLine.getActiveQuestLine().cachedMainDescription = gui.getLinesFromText(Translator.plain(QuestLine.getActiveQuestLine().mainDescription), 0.7F, 130);
-        }
-        
-        return QuestLine.getActiveQuestLine().cachedMainDescription;
+        return QuestLine.getActiveQuestLine().getMainDescription(gui);
     }
     
     public static String getRawMainDescription() {
         return QuestLine.getActiveQuestLine().mainDescription;
     }
     
-    public static void setMainDescription(String mainDescription) {
-        QuestLine.getActiveQuestLine().mainDescription = mainDescription;
-        QuestLine.getActiveQuestLine().cachedMainDescription = null;
-    }
-    
     public static Quest getQuest(UUID questId) {
         if (questId == null) return null;
         
-        return QuestLine.getActiveQuestLine().quests.get(questId);
+        return QuestSetsManager.getInstance().quests.get(questId);
     }
     
     public static void addItems(Player player, List<ItemStack> itemsToAdd) {
@@ -449,9 +438,9 @@ public class Quest {
         quest.tasks.forEach(QuestTask::onDelete);
         
         quest.setQuestSet(null);
-        QuestLine.getActiveQuestLine().quests.remove(quest.getQuestId());
+        QuestSetsManager.getInstance().quests.remove(quest.getQuestId());
         
-        for (Quest other : QuestLine.getActiveQuestLine().quests.values()) {
+        for (Quest other : QuestSetsManager.getInstance().quests.values()) {
             Iterator<UUID> iterator = other.requirement.iterator();
             while (iterator.hasNext()) {
                 UUID element = iterator.next();
@@ -527,7 +516,7 @@ public class Quest {
         
         if (lookForId(requirementQuestId, false) || lookForId(requirementQuestId, true)) return;
         
-        Quest quest = QuestLine.getActiveQuestLine().quests.get(requirementQuestId);
+        Quest quest = QuestSetsManager.getInstance().quests.get(requirementQuestId);
         if (quest != null) {
             requirement.add(quest.getQuestId());
             quest.reversedRequirement.add(this.getQuestId());
@@ -538,7 +527,7 @@ public class Quest {
     private boolean lookForId(UUID questId, boolean reversed) {
         List<UUID> currentRequirements = reversed ? reversedRequirement : requirement;
         for (UUID id : currentRequirements)
-            if (id.equals(questId) || QuestLine.getActiveQuestLine().quests.get(id).lookForId(questId, reversed))
+            if (id.equals(questId) || QuestSetsManager.getInstance().quests.get(id).lookForId(questId, reversed))
                 return true;
         return false;
     }
@@ -546,7 +535,7 @@ public class Quest {
     public void clearRequirements() {
         SaveHelper.add(SaveHelper.EditType.REQUIREMENT_REMOVE, requirement.size());
         for (UUID questId : requirement)
-            QuestLine.getActiveQuestLine().quests.get(questId).reversedRequirement.remove(getQuestId());
+            QuestSetsManager.getInstance().quests.get(questId).reversedRequirement.remove(getQuestId());
         requirement.clear();
     }
     
@@ -564,7 +553,7 @@ public class Quest {
             }
         }
         
-        Quest quest = QuestLine.getActiveQuestLine().quests.get(optionLinkId);
+        Quest quest = QuestSetsManager.getInstance().quests.get(optionLinkId);
         if (quest != null) {
             SaveHelper.add(SaveHelper.EditType.OPTION_CHANGE);
             optionLinks.add(quest.getQuestId());
@@ -575,26 +564,26 @@ public class Quest {
     public void clearOptionLinks() {
         SaveHelper.add(SaveHelper.EditType.OPTION_REMOVE, optionLinks.size());
         for (UUID questId : reversedOptionLinks) {
-            QuestLine.getActiveQuestLine().quests.get(questId).optionLinks.remove(getQuestId());
+            QuestSetsManager.getInstance().quests.get(questId).optionLinks.remove(getQuestId());
         }
         
         for (UUID questId : optionLinks) {
-            QuestLine.getActiveQuestLine().quests.get(questId).reversedOptionLinks.remove(getQuestId());
+            QuestSetsManager.getInstance().quests.get(questId).reversedOptionLinks.remove(getQuestId());
         }
         reversedRequirement.clear();
         optionLinks.clear();
     }
     
     public QuestData getQuestData(Player player) {
-        return QuestingData.getQuestingData(player).getQuestData(getQuestId());
+        return QuestingDataManager.getInstance().getQuestingData(player).getQuestData(getQuestId());
     }
     
     public QuestData getQuestData(UUID uuid) {
-        return QuestingData.getQuestingData(uuid).getQuestData(getQuestId());
+        return QuestingDataManager.getInstance().getQuestingData(uuid).getQuestData(getQuestId());
     }
     
     public void setQuestData(Player player, QuestData data) {
-        QuestingData.getQuestingData(player).setQuestData(getQuestId(), data);
+        QuestingDataManager.getInstance().getQuestingData(player).setQuestData(getQuestId(), data);
     }
     
     public UUID getQuestId() {
@@ -680,7 +669,7 @@ public class Quest {
         
         boolean result = true;
         for (UUID optionLinkId : optionLinks) {
-            if (QuestLine.getActiveQuestLine().quests.get(optionLinkId).isCompleted(playerId)) {
+            if (QuestSetsManager.getInstance().quests.get(optionLinkId).isCompleted(playerId)) {
                 result = false;
                 break;
             }
@@ -688,7 +677,7 @@ public class Quest {
         
         if (result) {
             for (UUID optionLinkId : reversedOptionLinks) {
-                if (QuestLine.getActiveQuestLine().quests.get(optionLinkId).isCompleted(playerId)) {
+                if (QuestSetsManager.getInstance().quests.get(optionLinkId).isCompleted(playerId)) {
                     result = false;
                     break;
                 }
@@ -731,7 +720,7 @@ public class Quest {
     }
     
     public List<Quest> getRequirements() {
-        return this.requirement.stream().map(QuestLine.getActiveQuestLine().quests::get).collect(Collectors.toList());
+        return this.requirement.stream().map(QuestSetsManager.getInstance().quests::get).collect(Collectors.toList());
     }
     
     //interface stuff
@@ -1314,11 +1303,11 @@ public class Quest {
     }
     
     public void sendUpdatedDataToTeam(Player player) {
-        sendUpdatedDataToTeam(QuestingData.getQuestingData(player).getTeam());
+        sendUpdatedDataToTeam(QuestingDataManager.getInstance().getQuestingData(player).getTeam());
     }
     
     public void sendUpdatedDataToTeam(UUID playerId) {
-        sendUpdatedDataToTeam(QuestingData.getQuestingData(playerId).getTeam());
+        sendUpdatedDataToTeam(QuestingDataManager.getInstance().getQuestingData(playerId).getTeam());
     }
     
     public void sendUpdatedDataToTeam(Team team) {
@@ -1331,8 +1320,8 @@ public class Quest {
         if (player == null) return; // Don't send to nobody you silly goose
         IMessage update = new QuestDataUpdateMessage(
                 getQuestId(),
-                QuestingData.getQuestingData(player).getTeam().getPlayerCount(),
-                QuestingData.getQuestingData(player).getQuestData(getQuestId())
+                QuestingDataManager.getInstance().getQuestingData(player).getTeam().getPlayerCount(),
+                QuestingDataManager.getInstance().getQuestingData(player).getQuestData(getQuestId())
         );
         NetworkManager.sendToPlayer(update, player);
     }
@@ -1404,7 +1393,7 @@ public class Quest {
                     addItems(player, itemsToAdd);
                     player.inventory.setChanged();
                     QuestData data = getQuestData(player);
-                    Team team = QuestingData.getQuestingData(player).getTeam();
+                    Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
                         for (int i = 0; i < data.reward.length; i++) {
                             data.reward[i] = false;
@@ -1424,7 +1413,7 @@ public class Quest {
             
             if (reputationRewards != null && getQuestData(player).canClaim()) {
                 getQuestData(player).claimed = true;
-                QuestingData.getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
+                QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
                 EventTrigger.instance().onEvent(new EventTrigger.ReputationEvent(player));
                 sentInfo = true;
             }
@@ -1516,8 +1505,8 @@ public class Quest {
         if (selectedTask == null && tasks.size() > 0)
             selectedTask = tasks.get(0);
         
-        QuestingData.getQuestingData(player).selectedQuestId = getQuestId();
-        QuestingData.getQuestingData(player).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
+        QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = getQuestId();
+        QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
         if (selectedTask != null) {
             //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
             GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
@@ -1577,7 +1566,7 @@ public class Quest {
     }
     
     public void resetAll() {
-        for (Team team : QuestingData.getAllTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available) {
                 reset(data);
@@ -1587,7 +1576,7 @@ public class Quest {
     }
     
     public void resetOnTime(int time) {
-        for (Team team : QuestingData.getAllTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available && data.time <= time) {
                 reset(data);
@@ -1607,11 +1596,11 @@ public class Quest {
     }
     
     public List<Quest> getOptionLinks() {
-        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> optionLinks.contains(quest.getQuestId())).collect(Collectors.toList());
+        return QuestSetsManager.getInstance().quests.values().stream().filter(quest -> optionLinks.contains(quest.getQuestId())).collect(Collectors.toList());
     }
     
     public List<Quest> getReversedOptionLinks() {
-        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedOptionLinks.contains(quest.getQuestId())).collect(Collectors.toList());
+        return QuestSetsManager.getInstance().quests.values().stream().filter(quest -> reversedOptionLinks.contains(quest.getQuestId())).collect(Collectors.toList());
     }
     
     public boolean getUseModifiedParentRequirement() {
@@ -1639,7 +1628,7 @@ public class Quest {
     }
     
     public List<Quest> getReversedRequirement() {
-        return QuestLine.getActiveQuestLine().quests.values().stream().filter(quest -> reversedRequirement.contains(quest.getQuestId())).collect(Collectors.toList());
+        return QuestSetsManager.getInstance().quests.values().stream().filter(quest -> reversedRequirement.contains(quest.getQuestId())).collect(Collectors.toList());
     }
     
     public static boolean canQuestsBeEdited() {

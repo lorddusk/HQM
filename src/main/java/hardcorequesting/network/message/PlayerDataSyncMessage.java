@@ -1,11 +1,9 @@
 package hardcorequesting.network.message;
 
-import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestLine;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.team.Team;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -14,44 +12,45 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
 public class PlayerDataSyncMessage implements IMessage {
     
-    private boolean local, serverWorld, questing, hardcore;
-    private String team;
+    private boolean local, remote, questing, hardcore;
+    private String teams;
     private String data;
+    private String deaths;
     
     public PlayerDataSyncMessage() {
     }
     
-    public PlayerDataSyncMessage(boolean local, boolean serverWorld, Player player) {
+    public PlayerDataSyncMessage(QuestLine questLine, boolean local, boolean remote, Player player) {
         this.local = local;
-        this.serverWorld = serverWorld;
-        this.questing = QuestingData.isQuestActive();
-        this.hardcore = QuestingData.isHardcoreActive();
-        this.team = Team.saveTeam(player);
-        this.data = QuestingData.saveQuestingData(player);
+        this.remote = remote;
+        this.questing = questLine.questingDataManager.isQuestActive();
+        this.hardcore = questLine.questingDataManager.isHardcoreActive();
+        this.teams = questLine.teamManager.saveToString();
+        this.deaths = questLine.deathStatsManager.saveToString();
+        this.data = questLine.questingDataManager.data.saveToString(player);
     }
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
         this.local = buf.readBoolean();
-        this.serverWorld = buf.readBoolean();
+        this.remote = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
-        this.team = buf.readUtf(32767);
+        this.teams = buf.readUtf(32767);
+        this.deaths = SyncUtil.readLargeString(buf);
         this.data = SyncUtil.readLargeString(buf);
     }
     
     @Override
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(this.local);
-        buf.writeBoolean(this.serverWorld);
+        buf.writeBoolean(this.remote);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
-        buf.writeUtf(team);
+        buf.writeUtf(this.teams);
+        SyncUtil.writeLargeString(this.deaths, buf);
         SyncUtil.writeLargeString(this.data, buf);
     }
     
@@ -66,28 +65,13 @@ public class PlayerDataSyncMessage implements IMessage {
         
         @Environment(EnvType.CLIENT)
         private void handle(PlayerDataSyncMessage message, PacketContext ctx) {
-            /* Why copying our files if we get all quests from the server anyway? It could lead to wrong questlines
-            if (!QuestLine.doServerSync) // Copy defaults when server sync is off
-                SaveHandler.copyFolder(SaveHandler.getDefaultFolder(), SaveHandler.getRemoteFolder());
-                */
-            try {
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("teams"))) {
-                    out.print("[");
-                    out.print(message.team);
-                    out.print("]");
-                }
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("data"))) {
-                    out.print("[");
-                    out.print(message.data);
-                    out.print("]");
-                }
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("state"))) {
-                    out.print(SaveHandler.saveQuestingState(message.questing, message.hardcore));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            QuestLine.receiveServerSync(Minecraft.getInstance().player, message.local, message.serverWorld);
+            QuestLine.receiveDataFromServer(Minecraft.getInstance().player, message.remote);
+            QuestLine questLine = QuestLine.getActiveQuestLine();
+            questLine.provideTemp(questLine.teamManager, message.teams);
+            questLine.provideTemp(questLine.questingDataManager.data, message.data);
+            questLine.provideTemp(questLine.questingDataManager.state, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
+            questLine.provideTemp(questLine.deathStatsManager, message.deaths);
+            questLine.loadAll();
         }
     }
 }

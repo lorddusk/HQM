@@ -33,7 +33,7 @@ public class QuestData {
     }
     
     private int getId(Player player) {
-        Team team = QuestingData.getQuestingData(player).getTeam();
+        Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
         int id = 0;
         for (PlayerEntry entry : team.getPlayers()) {
             if (entry.isInTeam()) {

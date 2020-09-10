@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinMinecraftServer {
     @Inject(at = @At(value = "HEAD"), method = "setInitialSpawn", locals = LocalCapture.CAPTURE_FAILHARD)
     private static void setupSpawn(ServerLevel serverWorld, ServerLevelData serverWorldProperties, boolean bl, boolean bl2, boolean bl3, CallbackInfo ci) {
-        WorldEventListener.onCreate(serverWorld);
+//        WorldEventListener.onCreate(serverWorld);
     }
 }

@@ -2,7 +2,7 @@ package hardcorequesting.network.message;
 
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -38,7 +38,7 @@ public class CloseBookMessage implements IMessage {
         }
         
         private void handle(CloseBookMessage message, PacketContext ctx) {
-            QuestingData.getQuestingData(message.playerID).getTeam().getEntry(message.playerID).setBookOpen(false);
+            QuestingDataManager.getInstance().getQuestingData(message.playerID).getTeam().getEntry(message.playerID).setBookOpen(false);
         }
     }
 }

@@ -3,13 +3,10 @@ package hardcorequesting.quests;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.client.EditMode;
 import hardcorequesting.client.interfaces.*;
 import hardcorequesting.client.interfaces.edit.*;
 import hardcorequesting.config.HQMConfig;
-import hardcorequesting.io.SaveHandler;
-import hardcorequesting.io.adapter.QuestAdapter;
 import hardcorequesting.quests.task.QuestTask;
 import hardcorequesting.reputation.ReputationBar;
 import hardcorequesting.util.OPBookHelper;
@@ -25,7 +22,6 @@ import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -55,60 +51,6 @@ public class QuestSet {
     public static void loginReset() {
         lastClicked = -1;
         lastLastQuestSet = null;
-    }
-    
-    public static void loadAll(boolean remote) {
-        try {
-            SaveHandler.loadAllQuestSets(SaveHandler.getFolder(remote));
-            QuestAdapter.postLoad();
-            orderAll(remote);
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed loading quest sets for remote");
-        }
-    }
-    
-    @SuppressWarnings("deprecation")
-    public static void saveAll() {
-        try {
-            SaveHandler.saveAllQuestSets(SaveHandler.getLocalFolder());
-            if (Quest.isEditing && Quest.saveDefault) {
-                SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
-            }
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed saving quest sets for local and/or default");
-        }
-    }
-    
-    public static void saveAllDefault() {
-        try {
-            SaveHandler.saveAllQuestSets(SaveHandler.getDefaultFolder());
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed saving all quest sets to the default folder");
-        }
-    }
-    
-    public static void orderAll(boolean remote) {
-        try {
-            final List<String> order = SaveHandler.loadQuestSetOrder(SaveHandler.getFile("sets", remote));
-            if (!order.isEmpty()) {
-                Quest.getQuestSets().sort(new Comparator<QuestSet>() {
-                    @Override
-                    public int compare(QuestSet s1, QuestSet s2) {
-                        if (s1.equals(s2)) return 0;
-                        int is1 = order.indexOf(s1.getName());
-                        int is2 = order.indexOf(s2.getName());
-                        if (is1 == -1) {
-                            return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
-                        }
-                        if (is2 == -1) return -1;
-                        if (is1 == is2) return 0;
-                        return is1 < is2 ? -1 : 1;
-                    }
-                });
-            }
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.info("Failed ordering quest sets");
-        }
     }
     
     @Environment(EnvType.CLIENT)

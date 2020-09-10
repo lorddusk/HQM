@@ -4,6 +4,7 @@ import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.team.TeamUpdateType;
 import hardcorequesting.util.SyncUtil;
 import net.fabricmc.fabric.api.network.PacketContext;
@@ -44,7 +45,7 @@ public class TeamUpdateMessage implements IMessage {
         }
         
         private void handle(TeamUpdateMessage message, PacketContext ctx) {
-            message.type.update(QuestingData.getQuestingData(HardcoreQuesting.proxy.getPlayer(ctx)).getTeam(), message.data);
+            message.type.update(QuestingDataManager.getInstance().getQuestingData(HardcoreQuesting.proxy.getPlayer(ctx)).getTeam(), message.data);
         }
     }
 }

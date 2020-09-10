@@ -1,6 +1,7 @@
 package hardcorequesting.event;
 
 import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.QuestingDataManager;
 import hardcorequesting.quests.task.QuestTask;
 import me.shedaniel.cloth.api.common.events.v1.BlockBreakCallback;
 import me.shedaniel.cloth.api.common.events.v1.BlockPlaceCallback;
@@ -81,8 +82,9 @@ public class EventTrigger {
         for (List<QuestTask> list : registeredTasks) {
             list.removeIf((q) -> !q.isValid());
         }
-        if (QuestingData.isQuestActive()) {
-            QuestingData.spawnBook(entity);
+        QuestingDataManager questingData = QuestingDataManager.getInstance();
+        if (questingData.isQuestActive()) {
+            questingData.spawnBook(entity);
         }
     }
     
@@ -223,18 +225,18 @@ public class EventTrigger {
     
     public static class BookOpeningEvent {
         
-        private String playerName;
+        private UUID playerUUID;
         private boolean isOpBook;
         private boolean isRealName;
         
-        public BookOpeningEvent(String playerName, boolean isOpBook, boolean isRealName) {
-            this.playerName = playerName;
+        public BookOpeningEvent(UUID playerUUID, boolean isOpBook, boolean isRealName) {
+            this.playerUUID = playerUUID;
             this.isOpBook = isOpBook;
             this.isRealName = isRealName;
         }
         
-        public String getPlayerName() {
-            return playerName;
+        public UUID getPlayerUUID() {
+            return playerUUID;
         }
         
         public boolean isOpBook() {
@@ -246,7 +248,7 @@ public class EventTrigger {
         }
         
         public Player getPlayer() {
-            return QuestingData.getPlayerFromUsername(playerName);
+            return QuestingData.getPlayer(playerUUID);
         }
     }
     

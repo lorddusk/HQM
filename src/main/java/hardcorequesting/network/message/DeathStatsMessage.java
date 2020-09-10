@@ -1,14 +1,12 @@
 package hardcorequesting.network.message;
 
-import hardcorequesting.death.DeathStats;
+import hardcorequesting.death.DeathStatsManager;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.network.IMessage;
 import hardcorequesting.network.IMessageHandler;
+import hardcorequesting.quests.QuestLine;
 import net.fabricmc.fabric.api.network.PacketContext;
 import net.minecraft.network.FriendlyByteBuf;
-
-import java.io.IOException;
-import java.io.PrintWriter;
 
 public class DeathStatsMessage implements IMessage {
     
@@ -20,8 +18,8 @@ public class DeathStatsMessage implements IMessage {
     
     public DeathStatsMessage(boolean local) {
         this.local = local;
-        if (local) DeathStats.saveAll();
-        this.deaths = SaveHandler.saveDeaths();
+        if (local) DeathStatsManager.getInstance().save();
+        this.deaths = DeathStatsManager.getInstance().saveToString();
     }
     
     @Override
@@ -48,13 +46,9 @@ public class DeathStatsMessage implements IMessage {
         
         private void handle(DeathStatsMessage message, PacketContext ctx) {
             if (!message.local) {
-                try (PrintWriter out = new PrintWriter(SaveHandler.getRemoteFile("deaths"))) {
-                    out.print(message.deaths);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                QuestLine.getActiveQuestLine().provideTemp(DeathStatsManager.getInstance(), message.deaths);
             }
-            DeathStats.loadAll(true, !message.local);
+            DeathStatsManager.getInstance().load();
         }
     }
 }

@@ -1,20 +1,21 @@
 package hardcorequesting.team;
 
+import com.google.common.collect.Lists;
+import com.google.gson.reflect.TypeToken;
 import hardcorequesting.HardcoreQuesting;
 import hardcorequesting.io.SaveHandler;
 import hardcorequesting.io.adapter.TeamAdapter;
 import hardcorequesting.network.NetworkManager;
 import hardcorequesting.network.message.TeamMessage;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestData;
-import hardcorequesting.quests.QuestingData;
+import hardcorequesting.quests.*;
 import hardcorequesting.quests.reward.ReputationReward;
 import hardcorequesting.reputation.Reputation;
+import hardcorequesting.reputation.ReputationManager;
+import net.fabricmc.api.EnvType;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,32 +39,45 @@ public class Team {
         this.invites = new ArrayList<>();
     }
     
-    public static void loadAll(boolean isClient, boolean remote) {
-        try {
-            QuestingData.getTeams().clear();
-            TeamAdapter.clearInvitesMap();
-            List<Team> teams = SaveHandler.loadTeams(SaveHandler.getFile("teams", remote));
-            for (int i = 0; i < teams.size(); i++)
-                QuestingData.getTeams().add(null);
-            teams.stream().filter(team -> !team.isSingle()).forEach(team -> QuestingData.getTeams().set(team.getId(), team));
-            TeamAdapter.commitInvitesMap();
-            if (isClient)
-                TeamStats.updateTeams(QuestingData.getTeams().stream().map(Team::toStat).collect(Collectors.toList()));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.error("Can't load teams!", e);
+    public static class Manager extends SimpleSerializable {
+        public Manager(QuestLine parent) {
+            super(parent);
         }
-    }
+        
+        @Override
+        public String filePath() {
+            return "teams.json";
+        }
     
-    public static void saveAll() {
-        try {
-            SaveHandler.saveTeams(SaveHandler.getLocalFile("teams"));
-        } catch (IOException e) {
-            HardcoreQuesting.LOGGER.error("Saving teams failed!", e);
+        @Override
+        public boolean isData() {
+            return true;
+        }
+    
+        @Override
+        public void loadFromString(Optional<String> string) {
+            QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
+            questingDataManager.getTeams().clear();
+            TeamAdapter.clearInvitesMap();
+            List<Team> teams = string
+                    .flatMap(s -> SaveHandler.<List<Team>>load(s, new TypeToken<List<Team>>() {}.getType()))
+                    .orElseGet(Lists::newArrayList);
+            for (int i = 0; i < teams.size(); i++)
+                questingDataManager.getTeams().add(null);
+            teams.stream().filter(team -> !team.isSingle()).forEach(team -> questingDataManager.getTeams().set(team.getId(), team));
+            TeamAdapter.commitInvitesMap();
+            if (HardcoreQuesting.LOADING_SIDE == EnvType.CLIENT)
+                TeamLiteStat.updateTeams(questingDataManager.getTeams().stream().map(Team::toLiteStat).collect(Collectors.toList()));
+        }
+        
+        @Override
+        public String saveToString() {
+            return SaveHandler.save(QuestingDataManager.getInstance().getTeams(), new TypeToken<List<Team>>() {}.getType());
         }
     }
     
     public static void declineAll(UUID playerID) {
-        for (Team team : QuestingData.getTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams()) {
             for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
                 PlayerEntry playerEntry = iterator.next();
                 if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerID)) {
@@ -92,8 +106,8 @@ public class Team {
         return this.questData;
     }
     
-    public TeamStats toStat() {
-        return new TeamStats(name, getPlayerCount(), getSharedLives(), getProgress());
+    public TeamLiteStat toLiteStat() {
+        return new TeamLiteStat(name, getPlayerCount(), getSharedLives(), getProgress());
     }
     
     public float getProgress() {
@@ -153,7 +167,7 @@ public class Team {
         int lives = 0;
         for (PlayerEntry entry : getPlayers()) {
             if (entry.isInTeam()) {
-                lives += QuestingData.getQuestingData(entry.getUUID()).getRawLives();
+                lives += QuestingDataManager.getInstance().getQuestingData(entry.getUUID()).getRawLives();
             }
         }
         return lives;
@@ -205,14 +219,15 @@ public class Team {
                         }
                     }
                     
-                    for (String i : Reputation.getReputations().keySet()) {
-                        Reputation reputation = Reputation.getReputation(i);
+                    ReputationManager reputationManager = ReputationManager.getInstance();
+                    for (String i : reputationManager.getReputations().keySet()) {
+                        Reputation reputation = reputationManager.getReputation(i);
                         if (reputation != null) {
                             leaveTeam.setReputation(reputation, this.getReputation(reputation));
                         }
                     }
                     
-                    QuestingData.getQuestingData(uuid).setTeam(leaveTeam);
+                    QuestingDataManager.getInstance().getQuestingData(uuid).setTeam(leaveTeam);
                     refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
                     leaveTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
                     NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID(), leaveTeam), player.getPlayerMP());
@@ -284,7 +299,8 @@ public class Team {
             }
         }
         
-        List<Team> teams = QuestingData.getTeams();
+        QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
+        List<Team> teams = questingDataManager.getTeams();
         teams.remove(id);
         
         for (int i = id; i < teams.size(); i++) {
@@ -296,7 +312,7 @@ public class Team {
         
         //refresh all clients with open books
         for (Player player : HardcoreQuesting.getServer().getPlayerList().getPlayers()) {
-            Team team = QuestingData.getQuestingData(player).getTeam();
+            Team team = questingDataManager.getQuestingData(player).getTeam();
             PlayerEntry entry = team.getEntry(player.getUUID());
             if (entry != null) {
                 team.refreshTeamData(entry, TeamUpdateSize.ALL);
@@ -369,7 +385,7 @@ public class Team {
     
     private void createReputation() {
         reputation = new HashMap<>();
-        for (Reputation reputation : Reputation.getReputations().values())
+        for (Reputation reputation : ReputationManager.getInstance().getReputations().values())
             createReputation(reputation.getId());
     }
     
@@ -440,7 +456,7 @@ public class Team {
     }
     
     public static String saveTeam(Player entity) {
-        Team team = QuestingData.getQuestingData(entity).getTeam();
+        Team team = QuestingDataManager.getInstance().getQuestingData(entity).getTeam();
         if (team.isSingle()) return ""; // return an empty string when the team is single
         return SaveHandler.saveTeam(team);
     }

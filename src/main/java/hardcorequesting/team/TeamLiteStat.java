@@ -5,17 +5,17 @@ import hardcorequesting.network.message.TeamStatsMessage;
 
 import java.util.*;
 
-public class TeamStats {
+public class TeamLiteStat {
     
-    private static Map<String, TeamStats> clientTeams;
-    private static TeamStats[] clientTeamsList;
-    private static Comparator<TeamStats> teamComparator = Comparator.comparingDouble(TeamStats::getProgress).reversed();
+    private static final Map<String, TeamLiteStat> clientTeams = new HashMap<>();
+    private static TeamLiteStat[] clientTeamsList;
+    private static Comparator<TeamLiteStat> teamComparator = Comparator.comparingDouble(TeamLiteStat::getProgress).reversed();
     private String name;
     private int players;
     private int lives;
     private float progress;
     
-    public TeamStats(String name, int players, int lives, float progress) {
+    public TeamLiteStat(String name, int players, int lives, float progress) {
         this.name = name;
         this.players = players;
         this.lives = lives;
@@ -26,17 +26,16 @@ public class TeamStats {
         NetworkManager.sendToAllPlayers(new TeamStatsMessage(team));
     }
     
-    public static void updateTeams(List<TeamStats> stats) {
-        clientTeams = new HashMap<>();
-        for (TeamStats stat : stats) {
+    public static void updateTeams(List<TeamLiteStat> stats) {
+        clientTeams.clear();
+        for (TeamLiteStat stat : stats) {
             if (stat.getPlayers() > 0)
                 clientTeams.put(stat.name, stat);
         }
         updateTeams();
     }
     
-    public static void updateTeam(TeamStats stat) {
-        if (clientTeams == null) clientTeams = new HashMap<>();
+    public static void updateTeam(TeamLiteStat stat) {
         if (stat.getPlayers() > 0)
             clientTeams.put(stat.name, stat);
         else
@@ -45,15 +44,15 @@ public class TeamStats {
     }
     
     private static void updateTeams() {
-        clientTeamsList = new TeamStats[clientTeams.size()];
+        clientTeamsList = new TeamLiteStat[clientTeams.size()];
         int id = 0;
-        for (TeamStats teamStats : clientTeams.values())
-            clientTeamsList[id++] = teamStats;
+        for (TeamLiteStat teamLiteStat : clientTeams.values())
+            clientTeamsList[id++] = teamLiteStat;
         
         Arrays.sort(clientTeamsList, teamComparator);
     }
     
-    public static TeamStats[] getTeamStats() {
+    public static TeamLiteStat[] getTeamStats() {
         return clientTeamsList;
     }
     

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 public class ClientProxy extends CommonProxy {
     @Override
-    public void initSounds(Path path) {
+    public void initSounds() {
         Sounds.initSounds();
     }
     
