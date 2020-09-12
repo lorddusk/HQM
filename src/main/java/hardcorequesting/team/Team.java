@@ -48,12 +48,12 @@ public class Team {
         public String filePath() {
             return "teams.json";
         }
-    
+        
         @Override
         public boolean isData() {
             return true;
         }
-    
+        
         @Override
         public void loadFromString(Optional<String> string) {
             QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
@@ -73,6 +73,12 @@ public class Team {
         @Override
         public String saveToString() {
             return SaveHandler.save(QuestingDataManager.getInstance().getTeams(), new TypeToken<List<Team>>() {}.getType());
+        }
+        
+        public String saveToString(Player player) {
+            Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+            if (team.isSingle()) return "[]";
+            return "[" + SaveHandler.save(team, Team.class) + "]";
         }
     }
     

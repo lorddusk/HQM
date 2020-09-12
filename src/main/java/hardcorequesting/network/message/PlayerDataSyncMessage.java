@@ -27,7 +27,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.remote = remote;
         this.questing = questLine.questingDataManager.isQuestActive();
         this.hardcore = questLine.questingDataManager.isHardcoreActive();
-        this.teams = questLine.teamManager.saveToString();
+        this.teams = questLine.teamManager.saveToString(player);
         this.deaths = questLine.deathStatsManager.saveToString();
         this.data = questLine.questingDataManager.data.saveToString(player);
     }
@@ -38,7 +38,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.remote = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
-        this.teams = buf.readUtf(32767);
+        this.teams = SyncUtil.readLargeString(buf);
         this.deaths = SyncUtil.readLargeString(buf);
         this.data = SyncUtil.readLargeString(buf);
     }
@@ -49,7 +49,7 @@ public class PlayerDataSyncMessage implements IMessage {
         buf.writeBoolean(this.remote);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
-        buf.writeUtf(this.teams);
+        SyncUtil.writeLargeString(this.teams, buf);
         SyncUtil.writeLargeString(this.deaths, buf);
         SyncUtil.writeLargeString(this.data, buf);
     }
