@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "bound=false": {
+      "model": "hardcorequesting:block/item_barrel_empty"
+    },
+    "bound=true": {
+      "model": "hardcorequesting:block/item_barrel"
+    }
+  }
+}

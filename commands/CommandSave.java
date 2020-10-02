@@ -1,12 +1,12 @@
-package hardcorequesting.commands;
+package hardcorequesting.common.commands;
 
 import com.google.gson.reflect.TypeToken;
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.io.SaveHandler;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestSet;
-import hardcorequesting.reputation.Reputation;
+import hardcorequesting.common.bag.GroupTier;
+import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestSet;
+import hardcorequesting.common.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.text.TextComponentTranslation;

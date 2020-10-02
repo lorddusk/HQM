@@ -1,0 +1,6 @@
+{
+  "parent":"hardcorequesting:item/base_item",
+  "textures": {
+    "layer0":"hardcorequesting:items/threequarts"
+  }
+}

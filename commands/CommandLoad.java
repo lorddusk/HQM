@@ -1,13 +1,13 @@
-package hardcorequesting.commands;
+package hardcorequesting.common.commands;
 
 import hardcorequesting.HardcoreQuesting;
-import hardcorequesting.bag.GroupTier;
-import hardcorequesting.io.SaveHandler;
-import hardcorequesting.io.adapter.QuestAdapter;
-import hardcorequesting.quests.Quest;
-import hardcorequesting.quests.QuestSet;
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.reputation.Reputation;
+import hardcorequesting.common.bag.GroupTier;
+import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.io.adapter.QuestAdapter;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestSet;
+import hardcorequesting.common.quests.QuestingData;
+import hardcorequesting.common.reputation.Reputation;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.PlayerEntity;

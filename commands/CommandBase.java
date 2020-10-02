@@ -1,7 +1,7 @@
-package hardcorequesting.commands;
+package hardcorequesting.common.commands;
 
-import hardcorequesting.quests.QuestingData;
-import hardcorequesting.util.Translator;
+import hardcorequesting.common.quests.QuestingData;
+import hardcorequesting.common.util.Translator;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.TextComponentTranslation;

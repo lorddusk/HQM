@@ -9,4 +9,10 @@ pluginManagement {
     }
 }
 
+includeBuild("architectPlugin")
+
 rootProject.name="HQM"
+
+include("common")
+include("fabric")
+include("forge")

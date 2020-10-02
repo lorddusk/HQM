@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "hardcorequesting",
+  "version": "${version}",
+  "name": "Hardcore Questing Mode",
+  "description": "This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.",
+  "authors": [
+    "Vswe",
+    "Lorddusk",
+    "Newcastlegeek",
+    "Way2muchnoise",
+    "McJty",
+    "canitzp",
+    "ArclightTW",
+    "shedaniel"
+  ],
+  "contact": {
+    "sources": "https://github.com/shedaniel/HQM",
+    "issues": "https://github.com/shedaniel/HQM/issues"
+  },
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "hardcorequesting.fabric.HardcoreQuestingFabric"
+    ]
+  },
+  "mixins": [
+    "hardcorequesting.mixins.json"
+  ],
+  "accessWidener": "hqm.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.8.2",
+    "fabric": "*"
+  }
+}

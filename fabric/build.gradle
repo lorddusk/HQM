@@ -1,0 +1,87 @@
+plugins {
+    id "fabric-loom"
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+}
+
+repositories {
+    maven { url "https://dl.bintray.com/ladysnake/libs" }
+    maven { url "https://mod-buildcraft.com/maven" }
+}
+
+configurations {
+    shadow
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${rootProject.architect.minecraft}")
+    mappings(minecraft.officialMojangMappings())
+    modCompile("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
+    modCompile("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    depend("org.jetbrains:annotations:19.0.0")
+    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
+    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
+    depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
+    depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
+    depend("blue.endless:jankson:1.2.0")
+    modCompile("me.shedaniel.cloth.api:cloth-api:${project.cloth}") {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+
+    compile(project(":common")) {
+        transitive = false
+    }
+    shadow(project(":common")) {
+        transitive = false
+    }
+}
+
+shadowJar {
+    relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
+    exclude "META-INF/mods.toml"
+    
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archivePath)
+}
+
+def depend(String string) {
+    dependencies.modApi(string) {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+    dependencies.include(string)
+}
+
+minecraft {
+    accessWidener = file("src/main/resources/hqm.accesswidener")
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        expand "version": project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+jar {
+    from "LICENSE"
+}
