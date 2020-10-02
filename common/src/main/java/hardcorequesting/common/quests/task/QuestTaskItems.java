@@ -193,7 +193,7 @@ public abstract class QuestTaskItems extends QuestTask {
             if (item.hasItem) {
                 gui.drawItemStack(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
             } else if (item.fluid != null) {
-                gui.drawFluid(item.fluid, item.x, item.y, mX, mY);
+                gui.drawFluid(item.fluid, matrices, item.x, item.y, mX, mY);
             }
             
             FormattedText str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");

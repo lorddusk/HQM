@@ -103,7 +103,8 @@ public interface AbstractPlatform {
     
     FluidStack createFluidStack(Fluid fluid, Fraction amount);
     
-    void renderFluidStack(FluidStack fluid, int x1, int y1, int x2, int y2);
+    @Environment(EnvType.CLIENT)
+    void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2);
     
     Fraction getBucketAmount();
 }

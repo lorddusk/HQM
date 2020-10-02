@@ -159,15 +159,15 @@ public class GuiBase extends Screen {
         super.renderTooltip(matrices, stack, x, y);
     }
     
-    public void drawFluid(FluidStack fluid, int x, int y, int mX, int mY) {
+    public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y, int mX, int mY) {
         drawItemBackground(x, y, mX, mY, false);
         if (fluid != null) {
-            drawFluid(fluid, x + 1, y + 1);
+            drawFluid(fluid, stack, x + 1, y + 1);
         }
     }
     
-    public void drawFluid(FluidStack fluid, int x, int y) {
-        HardcoreQuestingCore.platform.renderFluidStack(fluid, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
+    public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
+        HardcoreQuestingCore.platform.renderFluidStack(fluid, stack, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
         /*//IIcon icon = fluid.getIconStack();
         Item stack = null;
 

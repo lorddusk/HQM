@@ -1,6 +1,8 @@
 package hardcorequesting.fabric;
 
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
+import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -197,11 +199,11 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public FluidStack createFluidStack(Fluid fluid, Fraction amount) {
-        return null;
+        return new FabricFluidStack(FluidKeys.get(fluid).withAmount(FluidAmount.of(amount.getNumerator(), amount.getDenominator())));
     }
     
     @Override
-    public void renderFluidStack(FluidStack fluid, int x1, int y1, int x2, int y2) {
+    public void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2) {
         ((FabricFluidStack) fluid)._volume.renderGuiRect(x1, y1, x2, y2);
     }
     

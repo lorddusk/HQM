@@ -189,12 +189,12 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
-        selected.draw(gui, 70, 15, mX, mY);
+        selected.draw(matrices, gui, 70, 15, mX, mY);
         gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
-        drawList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+        drawList(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         
         gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
-        drawList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+        drawList(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
         textBoxes.draw(matrices, gui);
         
@@ -275,13 +275,13 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
     }
     
-    private void drawList(GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             Element<?> element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
             
-            element.draw(gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
+            element.draw(matrices, gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
         }
     }
     
@@ -365,7 +365,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         protected Element() {
         }
         
-        public abstract void draw(GuiBase gui, int x, int y, int mX, int mY);
+        public abstract void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY);
         
         public abstract List<FormattedText> getName(GuiBase gui);
         
@@ -394,7 +394,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
+        public void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
             if (stack != null && !stack.isEmpty()) {
                 gui.drawItemStack(stack, x, y, mX, mY, false);
             }
@@ -440,8 +440,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         @Override
-        public void draw(GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawFluid(stack, x, y, mX, mY);
+        public void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
+            gui.drawFluid(stack, matrices, x, y, mX, mY);
         }
         
         @Override
