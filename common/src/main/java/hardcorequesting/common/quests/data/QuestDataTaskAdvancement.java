@@ -1,12 +1,12 @@
 package hardcorequesting.common.quests.data;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskAdvancement;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskAdvancement extends QuestDataTask {
     
@@ -24,32 +24,15 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
         this.advanced = new boolean[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskAdvancement taskData = new QuestDataTaskAdvancement();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.advanced = new boolean[count];
-                        break;
-                    case ADVANCED:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.advanced[i] = in.nextBoolean();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskAdvancement data = new QuestDataTaskAdvancement();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.advanced = new boolean[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, ADVANCED);
+        for (int i = 0; i < array.size(); i++) {
+            data.advanced[i] = array.get(i).getAsBoolean();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -58,13 +41,10 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(advanced.length);
-        out.name(ADVANCED).beginArray();
-        for (boolean i : advanced)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, advanced.length);
+        builder.add(ADVANCED, Adapter.array(advanced).build());
     }
     
     @Override

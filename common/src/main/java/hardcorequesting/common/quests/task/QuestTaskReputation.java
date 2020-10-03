@@ -1,10 +1,15 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationSetting;
+import hardcorequesting.common.io.adapter.Adapter;
+import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.reputation.Reputation;
@@ -13,14 +18,17 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class QuestTaskReputation extends QuestTask {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
-    
+    private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
     public ReputationSetting[] settings = new ReputationSetting[0];
@@ -146,6 +154,24 @@ public abstract class QuestTaskReputation extends QuestTask {
             }
         }
         this.settings = settings;
+    }
+    
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (ReputationSetting setting : settings) {
+            array.add(QuestTaskAdapter.REPUTATION_TASK_ADAPTER.toJsonTree(setting));
+        }
+        builder.add(REPUTATION, array.build());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        List<QuestTaskAdapter.ReputationSettingConstructor> list = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(object, REPUTATION, new JsonArray())) {
+            list.add(QuestTaskAdapter.ReputationSettingConstructor.read(element));
+        }
+        QuestTaskAdapter.taskReputationListMap.put(this, list);
     }
     
     public static class ReputationSetting {

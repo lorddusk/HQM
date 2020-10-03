@@ -1,13 +1,14 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskItems;
+import net.minecraft.util.GsonHelper;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class QuestDataTaskItems extends QuestDataTask {
@@ -26,32 +27,15 @@ public class QuestDataTaskItems extends QuestDataTask {
         this.progress = new int[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskItems taskData = new QuestDataTaskItems();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.progress = new int[count];
-                        break;
-                    case PROGRESS:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.progress[i] = in.nextInt();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskItems data = new QuestDataTaskItems();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.progress = new int[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, PROGRESS);
+        for (int i = 0; i < array.size(); i++) {
+            data.progress[i] = array.get(i).getAsInt();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -60,13 +44,10 @@ public class QuestDataTaskItems extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(progress.length);
-        out.name(PROGRESS).beginArray();
-        for (int i : progress)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, progress.length);
+        builder.add(PROGRESS, Adapter.array(progress).build());
     }
     
     @Override

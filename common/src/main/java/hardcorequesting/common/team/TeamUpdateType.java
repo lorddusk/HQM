@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.reward.ReputationReward;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public enum TeamUpdateType {
@@ -94,7 +95,7 @@ public enum TeamUpdateType {
         public void update(Team team, String data) {
             try {
                 Team newTeam = TeamAdapter.TEAM_ADAPTER.fromJson(data);
-                QuestingDataManager.getInstance().getTeams().add(newTeam);
+                QuestingDataManager.getInstance().getTeams().put(newTeam.getId(), newTeam);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -142,14 +143,9 @@ public enum TeamUpdateType {
     REMOVE_TEAM {
         @Override
         public void update(Team clientTeam, String data) {
-            int id = Integer.parseInt(data);
-            List<Team> teams = QuestingDataManager.getInstance().getTeams();
+            UUID id = UUID.fromString(data);
+            Map<UUID, Team> teams = QuestingDataManager.getInstance().getTeams();
             teams.remove(id);
-            
-            for (int i = id; i < teams.size(); i++) {
-                Team team = teams.get(i);
-                team.setId(team.getId() - 1);
-            }
         }
         
         @Override
@@ -162,7 +158,7 @@ public enum TeamUpdateType {
         public void update(Team clientTeam, String data) {
             try {
                 Team team = TeamAdapter.TEAM_ADAPTER.fromJson(data);
-                QuestingDataManager.getInstance().getTeams().add(team.getId(), team);
+                QuestingDataManager.getInstance().getTeams().put(team.getId(), team);
                 clientTeam.getInvites().add(team);
             } catch (IOException e) {
                 e.printStackTrace();

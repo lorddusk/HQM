@@ -1,142 +1,114 @@
 package hardcorequesting.common.io.adapter;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.client.interfaces.GuiColor;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class BagAdapter {
     
-    public static final TypeAdapter<Group> GROUP_ADAPTER = new TypeAdapter<Group>() {
-        private final String ID = "id";
-        private final String ITEMS = "items";
-        private final String NAME = "name";
-        private final String LIMIT = "limit";
+    public static final Adapter<Group> GROUP_ADAPTER = new Adapter<Group>() {
+        private static final String ID = "id";
+        private static final String ITEMS = "items";
+        private static final String NAME = "name";
+        private static final String LIMIT = "limit";
         
         @Override
-        public void write(JsonWriter out, Group value) throws IOException {
-            out.beginObject();
-            out.name(ID).value(value.getId().toString());
-            if (value.hasName())
-                out.name(NAME).value(value.getName());
-            out.name(LIMIT).value(value.getLimit());
-            out.name(ITEMS).beginArray();
-            for (ItemStack stack : value.getItems())
-                MinecraftAdapter.ITEM_STACK.write(out, stack);
-            out.endArray();
-            out.endObject();
+        public JsonElement serialize(Group src) {
+            return object()
+                    .add(ID, src.getId().toString())
+                    .use(builder -> {
+                        if (src.hasName())
+                            builder.add(NAME, src.getName());
+                    })
+                    .add(LIMIT, src.getLimit())
+                    .add(ITEMS, array()
+                            .use(builder -> {
+                                for (ItemStack stack : src.getItems())
+                                    builder.add(MinecraftAdapter.ITEM_STACK.serialize(stack));
+                            })
+                            .build())
+                    .build();
         }
         
         @Override
-        public Group read(JsonReader in) throws IOException {
-            in.beginObject();
-            String name = null, id = null;
-            int limit = 0;
-            List<ItemStack> items = new ArrayList<>();
-            while (in.hasNext()) {
-                switch (in.nextName().toLowerCase()) {
-                    case ID:
-                        id = in.nextString();
-                        break;
-                    case NAME:
-                        name = in.nextString();
-                        break;
-                    case LIMIT:
-                        limit = in.nextInt();
-                        break;
-                    case ITEMS:
-                        in.beginArray();
-                        while (in.hasNext()) {
-                            ItemStack stack = MinecraftAdapter.ITEM_STACK.read(in);
-                            if (!stack.isEmpty()) {
-                                items.add(stack);
-                            }
-                        }
-                        in.endArray();
-                        break;
+        public Group deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
+            
+            Group group = new Group(UUID.fromString(GsonHelper.getAsString(object, ID)));
+            group.setName(GsonHelper.getAsString(object, NAME));
+            group.setLimit(GsonHelper.getAsInt(object, LIMIT));
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray())) {
+                ItemStack stack = MinecraftAdapter.ITEM_STACK.deserialize(element);
+                if (!stack.isEmpty()) {
+                    group.getItems().add(stack);
                 }
             }
-            in.endObject();
-            Group group = new Group(UUID.fromString(id));
-            group.setName(name);
-            group.setLimit(limit);
-            group.getItems().addAll(items);
             if (!Group.getGroups().containsKey(group.getId()))
                 Group.add(group);
             return group;
         }
     };
-    public static final TypeAdapter<GroupTier> GROUP_TIER_ADAPTER = new TypeAdapter<GroupTier>() {
-        private final String NAME = "name";
-        private final String COLOUR = "colour";
-        private final String WEIGHTS = "weights";
-        private final String GROUPS = "groups";
+    public static final Adapter<GroupTier> GROUP_TIER_ADAPTER = new Adapter<GroupTier>() {
+        private static final String NAME = "name";
+        private static final String COLOUR = "colour";
+        private static final String WEIGHTS = "weights";
+        private static final String GROUPS = "groups";
         
         @Override
-        public void write(JsonWriter out, GroupTier value) throws IOException {
-            out.beginObject();
-            out.name(NAME).value(value.getRawName());
-            out.name(COLOUR).value(value.getColor().name());
-            out.name(WEIGHTS).beginArray();
-            for (int i : value.getWeights()) {
-                out.value(i);
+        public JsonElement serialize(GroupTier src) {
+            JsonArrayBuilder weights = array();
+            for (int weight : src.getWeights()) {
+                weights.add(weight);
             }
-            out.endArray();
-            out.name(GROUPS).beginArray();
+            JsonArrayBuilder groups = array();
             for (Group group : Group.getGroups().values())
-                if (group.getTier() == value)
-                    GROUP_ADAPTER.write(out, group);
-            out.endArray();
-            out.endObject();
+                if (group.getTier() == src)
+                    groups.add(GROUP_ADAPTER.serialize(group));
+            
+            return object()
+                    .add(NAME, src.getRawName())
+                    .add(COLOUR, src.getColor().name())
+                    .add(WEIGHTS, weights.build())
+                    .add(GROUPS, groups.build())
+                    .build();
         }
         
         @Override
-        public GroupTier read(JsonReader in) throws IOException {
-            in.beginObject();
-            String name = "";
-            GuiColor colour = GuiColor.GRAY;
+        public GroupTier deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
             int[] weights = new int[BagTier.values().length];
-            List<Group> groups = new ArrayList<>();
-            while (in.hasNext()) {
-                switch (in.nextName().toLowerCase()) {
-                    case NAME:
-                        name = in.nextString();
-                        break;
-                    case COLOUR:
-                        colour = GuiColor.valueOf(in.nextString());
-                        break;
-                    case WEIGHTS:
-                        in.beginArray();
-                        for (int i = 0; i < weights.length && in.hasNext(); i++) {
-                            weights[i] = in.nextInt();
-                        }
-                        in.endArray();
-                        break;
-                    case GROUPS:
-                        in.beginArray();
-                        while (in.hasNext()) {
-                            Group group = GROUP_ADAPTER.read(in);
-                            if (group != null)
-                                groups.add(group);
-                        }
-                        in.endArray();
-                        break;
+            
+            JsonArray weightsArray = GsonHelper.getAsJsonArray(object, WEIGHTS, null);
+            if (weightsArray != null) {
+                for (int i = 0; i < weights.length && i < weightsArray.size(); i++) {
+                    weights[i] = weightsArray.get(i).getAsInt();
                 }
             }
-            in.endObject();
-            GroupTier tier = new GroupTier(name, colour, weights);
-            for (Group group : groups) {
-                group.setTier(tier);
+            
+            GroupTier tier = new GroupTier(
+                    GsonHelper.getAsString(object, NAME, ""),
+                    GuiColor.valueOf(GsonHelper.getAsString(object, COLOUR, "GRAY")),
+                    weights
+            );
+            
+            JsonArray groupsArray = GsonHelper.getAsJsonArray(object, GROUPS, null);
+            if (groupsArray != null) {
+                for (JsonElement element : groupsArray) {
+                    Group group = GROUP_ADAPTER.deserialize(element);
+                    if (group != null) {
+                        group.setTier(tier);
+                    }
+                }
             }
+            
             return tier;
         }
     };

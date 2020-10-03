@@ -1,13 +1,13 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskTame;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskTame extends QuestDataTask {
     
@@ -25,32 +25,15 @@ public class QuestDataTaskTame extends QuestDataTask {
         this.tamed = new int[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskTame taskData = new QuestDataTaskTame();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.tamed = new int[count];
-                        break;
-                    case TAMED:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.tamed[i] = in.nextInt();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskTame data = new QuestDataTaskTame();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.tamed = new int[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, TAMED);
+        for (int i = 0; i < array.size(); i++) {
+            data.tamed[i] = array.get(i).getAsInt();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -59,13 +42,10 @@ public class QuestDataTaskTame extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(tamed.length);
-        out.name(TAMED).beginArray();
-        for (int i : tamed)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, tamed.length);
+        builder.add(TAMED, Adapter.array(tamed).build());
     }
     
     @Override

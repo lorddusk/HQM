@@ -13,17 +13,22 @@ import net.fabricmc.tinyremapper.TinyRemapper
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Opcodes
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
+import kotlin.collections.LinkedHashSet
 
 
 open class RemapMCPTask : Jar() {
     private val fromM: String = "named"
     private val toM: String = "official"
+    var fakeMod = false
     val input: RegularFileProperty = GradleSupport.getfileProperty(project)
 
     @TaskAction
@@ -55,14 +60,31 @@ open class RemapMCPTask : Jar() {
         val architectFolder = project.rootProject.buildDir.resolve("tmp/architect")
         architectFolder.deleteRecursively()
         architectFolder.mkdirs()
-        val manifestFile = architectFolder.resolve("META-INF/MANIFEST.MF")
+        val fakeModId = "generated_" + UUID.randomUUID().toString().filterNot { it == '-' }.take(7)
+        if (fakeMod) {
+            val modsToml = architectFolder.resolve("META-INF/mods.toml")
+            modsToml.parentFile.mkdirs()
+            modsToml.writeText("""
+modLoader = "javafml"
+loaderVersion = "[33,)"
+license = "Generated"
+[[mods]]
+modId = "$fakeModId"
+        """.trimIndent())
+            val mcmeta = architectFolder.resolve("pack.mcmeta")
+            mcmeta.parentFile.mkdirs()
+            mcmeta.writeText("""
+{"pack":{"description":"Generated","pack_format":4}}
+        """.trimIndent())
+        }
+        /*val manifestFile = architectFolder.resolve("META-INF/MANIFEST.MF")
         manifestFile.parentFile.mkdirs()
         manifestFile.writeText("""
 Manifest-Version: 1.0
 FMLModType: LIBRARY
 
-        """.trimIndent())
-        
+        """.trimIndent())*/
+
         val remapper = remapperBuilder.build()
 
         try {
@@ -72,6 +94,24 @@ FMLModType: LIBRARY
                 remapper.readClassPath(*classpath)
                 remapper.readInputs(input)
                 remapper.apply(outputConsumer)
+
+                if (fakeMod) {
+                    val className = "generated/$fakeModId"
+                    val classWriter = ClassWriter(0)
+                    classWriter.visit(52, Opcodes.ACC_PUBLIC, className, null, "java/lang/Object", null)
+                    val mixinAnnotation = classWriter.visitAnnotation("Lnet/minecraftforge/fml/common/Mod;", false)
+                    mixinAnnotation.visit("value", fakeModId)
+                    mixinAnnotation.visitEnd()
+                    classWriter.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, arrayOf()).also {
+                        it.visitVarInsn(Opcodes.ALOAD, 0)
+                        it.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false)
+                        it.visitInsn(Opcodes.RETURN)
+                        it.visitMaxs(1, 1)
+                        it.visitEnd()
+                    }
+                    classWriter.visitEnd()
+                    outputConsumer.accept(className, classWriter.toByteArray())
+                }
             }
         } catch (e: Exception) {
             remapper.finish()
@@ -87,10 +127,10 @@ FMLModType: LIBRARY
     }
 
     private fun remapToMcp(parent: IMappingProvider, mojmapToMcpClass: Map<String, String>): IMappingProvider = IMappingProvider {
-        it.acceptClass("net/fabricmc/api/Environment", "net/minecraftforge/api/distmarker/OnlyIn") 
-        it.acceptClass("net/fabricmc/api/EnvType", "net/minecraftforge/api/distmarker/Dist") 
-        it.acceptField(IMappingProvider.Member("net/fabricmc/api/EnvType", "SERVER", "Lnet/fabricmc/api/EnvType;"), "DEDICATED_SERVER") 
-        
+        it.acceptClass("net/fabricmc/api/Environment", "net/minecraftforge/api/distmarker/OnlyIn")
+        it.acceptClass("net/fabricmc/api/EnvType", "net/minecraftforge/api/distmarker/Dist")
+        it.acceptField(IMappingProvider.Member("net/fabricmc/api/EnvType", "SERVER", "Lnet/fabricmc/api/EnvType;"), "DEDICATED_SERVER")
+
         parent.load(object : IMappingProvider.MappingAcceptor {
             override fun acceptClass(srcName: String?, dstName: String?) {
                 it.acceptClass(srcName, mojmapToMcpClass[srcName] ?: srcName)

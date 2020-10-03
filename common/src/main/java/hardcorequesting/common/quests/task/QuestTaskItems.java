@@ -1,10 +1,15 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.io.adapter.Adapter;
+import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
@@ -23,6 +28,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -33,6 +39,7 @@ import java.util.UUID;
 
 public abstract class QuestTaskItems extends QuestTask {
     
+    private static final String ITEMS = "items";
     private static final int MAX_X = 300;
     private static final int OFFSET = 20;
     private static final int SIZE = 18;
@@ -43,6 +50,24 @@ public abstract class QuestTaskItems extends QuestTask {
     public QuestTaskItems(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         setItems(new ItemRequirement[0]);
+    }
+    
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (ItemRequirement item : getItems()) {
+            array.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.toJsonTree(item));
+        }
+        builder.add(ITEMS, array.build());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        List<ItemRequirement> list = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray())) {
+            list.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element));
+        }
+        setItems(list.toArray(new ItemRequirement[0]));
     }
     
     public ItemRequirement[] getItems() {

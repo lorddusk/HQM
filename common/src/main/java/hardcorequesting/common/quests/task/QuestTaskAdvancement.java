@@ -1,5 +1,8 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
@@ -8,6 +11,8 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuAdvancement;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.adapter.Adapter;
+import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
@@ -22,16 +27,20 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.PlayerAdvancements;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskAdvancement extends QuestTask {
+    private static final String ADVANCEMENTS = "advancements";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
@@ -258,6 +267,24 @@ public class QuestTaskAdvancement extends QuestTask {
     @Override
     public boolean allowDetect() {
         return true;
+    }
+    
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (AdvancementTask advancement : advancements) {
+            array.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.toJsonTree(advancement));
+        }
+        builder.add(ADVANCEMENTS, array.build());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        List<AdvancementTask> list = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray())) {
+            list.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element));
+        }
+        advancements = list.toArray(new AdvancementTask[0]);
     }
     
     public enum Visibility {

@@ -1,43 +1,56 @@
 package hardcorequesting.common.io.adapter;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathType;
+import net.minecraft.util.GsonHelper;
 
-import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
 
 public class DeathAdapter {
     
-    public static final TypeAdapter<DeathStat> DEATH_STATS_ADAPTER = new TypeAdapter<DeathStat>() {
+    public static final Adapter<DeathStat> DEATH_STATS_ADAPTER = new Adapter<DeathStat>() {
+        private static final String DEATHS = "deaths";
+        private static final String NAME = "name";
+        
         @Override
-        public void write(JsonWriter out, DeathStat value) throws IOException {
-            out.beginObject();
-            out.name(value.getUuid().toString());
-            out.beginArray();
-            for (DeathType type : DeathType.values())
-                out.value(value.getDeaths(type.ordinal()));
-            out.endArray();
-            out.endObject();
+        public JsonElement serialize(DeathStat src) {
+            return object()
+                    .add(src.getUuid().toString(), object()
+                            .add(DEATHS, array()
+                                    .use(builder -> {
+                                        for (DeathType type : DeathType.values())
+                                            builder.add(src.getDeaths(type.ordinal()));
+                                    })
+                                    .build())
+                            .add(NAME, src.getCachedName())
+                            .build())
+                    .build();
         }
         
         @Override
-        public DeathStat read(JsonReader in) throws IOException {
-            in.beginObject();
-            DeathStat stats = null;
-            if (in.hasNext()) {
-                String uuid = in.nextName();
-                stats = new DeathStat(UUID.fromString(uuid));
-                in.beginArray();
+        public DeathStat deserialize(JsonElement json) throws JsonParseException {
+            JsonObject object = json.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+                DeathStat stat = new DeathStat(UUID.fromString(entry.getKey()));
+                JsonArray array = new JsonArray();
+                if (entry.getValue().isJsonArray()) array = entry.getValue().getAsJsonArray();
+                if (entry.getValue().isJsonObject()) {
+                    JsonObject jsonObject = entry.getValue().getAsJsonObject();
+                    stat.setCachedName(GsonHelper.getAsString(jsonObject, NAME, null));
+                    array = GsonHelper.getAsJsonArray(jsonObject, DEATHS, array);
+                }
                 int i = 0;
-                while (in.hasNext())
-                    stats.increaseDeath(i++, in.nextInt(), false);
-                in.endArray();
+                for (JsonElement element : array) {
+                    stat.increaseDeath(i++, element.getAsInt(), false);
+                }
+                return stat;
             }
-            in.endObject();
-            return stats; // Should never be null
+            throw new NullPointerException("Failed to get DeathStat!");
         }
     };
 }

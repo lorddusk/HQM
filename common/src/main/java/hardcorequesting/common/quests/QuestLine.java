@@ -155,7 +155,7 @@ public class QuestLine {
                     NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), serverPlayer);
             }
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), serverPlayer);
-            NetworkManager.sendToPlayer(new TeamStatsMessage(questLine.questingDataManager.getTeams()), serverPlayer);
+            NetworkManager.sendToPlayer(new TeamStatsMessage(questLine.questingDataManager.getTeams().values().stream()), serverPlayer);
         }
     }
     

@@ -1,13 +1,13 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskMob;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskMob extends QuestDataTask {
     
@@ -25,32 +25,15 @@ public class QuestDataTaskMob extends QuestDataTask {
         this.killed = new int[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskMob taskData = new QuestDataTaskMob();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.killed = new int[count];
-                        break;
-                    case KILLED:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.killed[i] = in.nextInt();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskMob data = new QuestDataTaskMob();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.killed = new int[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, KILLED);
+        for (int i = 0; i < array.size(); i++) {
+            data.killed[i] = array.get(i).getAsInt();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -59,13 +42,10 @@ public class QuestDataTaskMob extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(killed.length);
-        out.name(KILLED).beginArray();
-        for (int i : killed)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, killed.length);
+        builder.add(KILLED, Adapter.array(killed).build());
     }
     
     @Override

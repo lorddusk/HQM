@@ -10,13 +10,33 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 public class QuestSetsManager implements Serializable {
+    private static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BAGS = Pattern.compile("^bags\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DEATHS = Pattern.compile("^deaths\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern REPUTATIONS = Pattern.compile("^reputations\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TEAMS = Pattern.compile("^teams\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern STATE = Pattern.compile("^state\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DATA = Pattern.compile("^data\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SETS = Pattern.compile("^sets\\.json$", Pattern.CASE_INSENSITIVE);
+    private static final FileFilter QUEST_SET_FILTER =
+            pathname -> JSON.matcher(pathname.getName()).find()
+                        && !REPUTATIONS.matcher(pathname.getName()).find()
+                        && !BAGS.matcher(pathname.getName()).find()
+                        && !TEAMS.matcher(pathname.getName()).find()
+                        && !STATE.matcher(pathname.getName()).find()
+                        && !DATA.matcher(pathname.getName()).find()
+                        && !SETS.matcher(pathname.getName()).find()
+                        && !DEATHS.matcher(pathname.getName()).find();
+    
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public final List<QuestSet> questSets = Lists.newArrayList();
     private final QuestLine parent;
@@ -64,7 +84,7 @@ public class QuestSetsManager implements Serializable {
                             order.add(element.getAsString());
                         }
                         parent.basePath.ifPresent(path -> {
-                            for (File file : path.toFile().listFiles(SaveHandler.QUEST_SET_FILTER)) {
+                            for (File file : path.toFile().listFiles(QUEST_SET_FILTER)) {
                                 SaveHandler.load(file.toPath())
                                         .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
                                         .filter(Predicates.not(questSets::contains))

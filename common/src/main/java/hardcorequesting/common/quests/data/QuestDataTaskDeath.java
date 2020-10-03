@@ -1,12 +1,11 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskDeath extends QuestDataTask {
     
@@ -21,24 +20,11 @@ public class QuestDataTaskDeath extends QuestDataTask {
         super();
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskDeath taskData = new QuestDataTaskDeath();
-        try {
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case DEATHS:
-                        taskData.deaths = in.nextInt();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
-        }
-        return taskData;
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskDeath data = new QuestDataTaskDeath();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.deaths = GsonHelper.getAsInt(in, DEATHS);
+        return data;
     }
     
     @Override
@@ -47,9 +33,9 @@ public class QuestDataTaskDeath extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(DEATHS).value(deaths);
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(DEATHS, deaths);
     }
     
     @Override

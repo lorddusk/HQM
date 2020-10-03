@@ -1,16 +1,17 @@
 package hardcorequesting.common.team;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.io.adapter.Adapter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,32 +38,13 @@ public class PlayerEntry {
         this.bookOpen = false;
     }
     
-    public static PlayerEntry read(JsonReader in) throws IOException {
+    public static PlayerEntry read(JsonElement element) {
+        JsonObject object = element.getAsJsonObject();
         PlayerEntry playerEntry = new PlayerEntry();
-        in.beginObject();
-        while (in.hasNext()) {
-            switch (in.nextName()) {
-                case ENTRY_UUID:
-                    try {
-                        playerEntry.uuid = UUID.fromString(in.nextString());
-                    } catch (IllegalArgumentException e) {
-                        e.printStackTrace(); // todo error print
-                    }
-                    break;
-                case ENTRY_OWNER:
-                    playerEntry.owner = in.nextBoolean();
-                    break;
-                case ENTRY_BOOK:
-                    playerEntry.bookOpen = in.nextBoolean();
-                    break;
-                case ENTRY_IN_TEAM:
-                    playerEntry.inTeam = in.nextBoolean();
-                    break;
-                default:
-                    break;
-            }
-        }
-        in.endObject();
+        playerEntry.uuid = UUID.fromString(GsonHelper.getAsString(object, ENTRY_UUID));
+        playerEntry.owner = GsonHelper.getAsBoolean(object, ENTRY_OWNER);
+        playerEntry.bookOpen = GsonHelper.getAsBoolean(object, ENTRY_BOOK);
+        playerEntry.inTeam = GsonHelper.getAsBoolean(object, ENTRY_IN_TEAM);
         return playerEntry;
     }
     
@@ -117,13 +99,13 @@ public class PlayerEntry {
         this.bookOpen = bookOpen;
     }
     
-    public void write(JsonWriter out) throws IOException {
-        out.beginObject();
-        out.name(ENTRY_UUID).value(uuid.toString());
-        out.name(ENTRY_OWNER).value(owner);
-        out.name(ENTRY_BOOK).value(bookOpen);
-        out.name(ENTRY_IN_TEAM).value(inTeam);
-        out.endObject();
+    public JsonElement toJson() {
+        return Adapter.object()
+                .add(ENTRY_UUID, uuid.toString())
+                .add(ENTRY_OWNER, owner)
+                .add(ENTRY_BOOK, bookOpen)
+                .add(ENTRY_IN_TEAM, inTeam)
+                .build();
     }
     
     public ServerPlayer getPlayerMP() {

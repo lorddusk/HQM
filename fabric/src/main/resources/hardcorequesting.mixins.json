@@ -6,8 +6,6 @@
     "MixinLanguage", "MixinPlayerAdvancements", "MixinPlayerEntity", "MixinPlayerInventory", "MixinResultSlot",
     "MixinRunAroundLikeCrazyGoal", "MixinServerPlayerEntity"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   }

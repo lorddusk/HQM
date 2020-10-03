@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
+import net.minecraft.Util;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class Team {
     public static boolean reloadedInvites;
-    private int id = -1;
+    private UUID id = Util.NIL_UUID;
     private List<PlayerEntry> players = new ArrayList<>();
     private List<Team> invites;
     private String name;
@@ -61,17 +62,15 @@ public class Team {
             List<Team> teams = string
                     .flatMap(s -> SaveHandler.<List<Team>>load(s, new TypeToken<List<Team>>() {}.getType()))
                     .orElseGet(Lists::newArrayList);
-            for (int i = 0; i < teams.size(); i++)
-                questingDataManager.getTeams().add(null);
-            teams.stream().filter(team -> !team.isSingle()).forEach(team -> questingDataManager.getTeams().set(team.getId(), team));
+            teams.stream().filter(team -> !team.isSingle()).forEach(team -> questingDataManager.getTeams().put(team.getId(), team));
             TeamAdapter.commitInvitesMap();
             if (HardcoreQuestingCore.platform.isClient())
-                TeamLiteStat.updateTeams(questingDataManager.getTeams().stream().map(Team::toLiteStat).collect(Collectors.toList()));
+                TeamLiteStat.updateTeams(questingDataManager.getTeams().values().stream().map(Team::toLiteStat).collect(Collectors.toList()));
         }
         
         @Override
         public String saveToString() {
-            return SaveHandler.save(QuestingDataManager.getInstance().getTeams(), new TypeToken<List<Team>>() {}.getType());
+            return SaveHandler.save(QuestingDataManager.getInstance().getTeams().values(), new TypeToken<Collection<Team>>() {}.getType());
         }
         
         public String saveToString(Player player) {
@@ -82,7 +81,7 @@ public class Team {
     }
     
     public static void declineAll(UUID playerID) {
-        for (Team team : QuestingDataManager.getInstance().getTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
             for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
                 PlayerEntry playerEntry = iterator.next();
                 if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerID)) {
@@ -152,11 +151,11 @@ public class Team {
         this.lifeSetting = lifeSetting;
     }
     
-    public int getId() {
+    public UUID getId() {
         return id;
     }
     
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     
@@ -305,13 +304,8 @@ public class Team {
         }
         
         QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
-        List<Team> teams = questingDataManager.getTeams();
+        Map<UUID, Team> teams = questingDataManager.getTeams();
         teams.remove(id);
-        
-        for (int i = id; i < teams.size(); i++) {
-            Team team = teams.get(i);
-            team.id--;
-        }
         
         NetworkManager.sendToAllPlayers(TeamUpdateType.REMOVE_TEAM.build(this));
         
@@ -436,7 +430,7 @@ public class Team {
     }
     
     public boolean isSingle() {
-        return id == -1;
+        return id.getLeastSignificantBits() == 0 && id.getMostSignificantBits() == 0;
     }
     
     public String getName() {

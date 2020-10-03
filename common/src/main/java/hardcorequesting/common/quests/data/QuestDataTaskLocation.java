@@ -1,13 +1,13 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskLocation;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskLocation extends QuestDataTask {
     
@@ -25,32 +25,15 @@ public class QuestDataTaskLocation extends QuestDataTask {
         this.visited = new boolean[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskLocation taskData = new QuestDataTaskLocation();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.visited = new boolean[count];
-                        break;
-                    case VISITED:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.visited[i] = in.nextBoolean();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskLocation data = new QuestDataTaskLocation();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.visited = new boolean[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, VISITED);
+        for (int i = 0; i < array.size(); i++) {
+            data.visited[i] = array.get(i).getAsBoolean();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -59,13 +42,10 @@ public class QuestDataTaskLocation extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(visited.length);
-        out.name(VISITED).beginArray();
-        for (boolean i : visited)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, visited.length);
+        builder.add(VISITED, Adapter.array(visited).build());
     }
     
     @Override

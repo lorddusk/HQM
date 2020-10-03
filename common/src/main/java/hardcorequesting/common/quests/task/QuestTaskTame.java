@@ -1,5 +1,8 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
@@ -8,6 +11,8 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTame;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.adapter.Adapter;
+import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
@@ -18,6 +23,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -25,12 +31,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskTame extends QuestTask {
-    
-    
+    private static final String TAME = "tame";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
@@ -256,6 +263,24 @@ public class QuestTaskTame extends QuestTask {
                 parent.sendUpdatedDataToTeam(tamer);
             }
         }
+    }
+    
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (Tame tame : tames) {
+            array.add(QuestTaskAdapter.TAME_ADAPTER.toJsonTree(tame));
+        }
+        builder.add(TAME, array.build());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        List<Tame> list = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(object, TAME, new JsonArray())) {
+            list.add(QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element));
+        }
+        tames = list.toArray(new Tame[0]);
     }
     
     public static class Tame {

@@ -1,12 +1,11 @@
 package hardcorequesting.common.quests.data;
 
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTask {
     
@@ -20,18 +19,9 @@ public class QuestDataTask {
         
     }
     
-    public static QuestDataTask construct(JsonReader in) {
+    public static QuestDataTask construct(JsonObject in) {
         QuestDataTask data = new QuestDataTask();
-        try {
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case COMPLETED:
-                        data.completed = in.nextBoolean();
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
-        }
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         return data;
     }
     
@@ -39,8 +29,8 @@ public class QuestDataTask {
         return QuestTaskAdapter.QuestDataType.GENERIC;
     }
     
-    public void write(JsonWriter out) throws IOException {
-        out.name(COMPLETED).value(completed);
+    public void write(Adapter.JsonObjectBuilder builder) {
+        builder.add(COMPLETED, completed);
     }
     
     public void update(QuestDataTask taskData) {

@@ -1,12 +1,12 @@
 package hardcorequesting.common.quests.data;
 
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskCompleted;
-
-import java.io.IOException;
+import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskCompleted extends QuestDataTask {
     private static final String COUNT = "count";
@@ -23,32 +23,15 @@ public class QuestDataTaskCompleted extends QuestDataTask {
         this.quests = new boolean[0];
     }
     
-    public static QuestDataTask construct(JsonReader in) {
-        QuestDataTaskCompleted taskData = new QuestDataTaskCompleted();
-        try {
-            int count = 0;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case QuestDataTask.COMPLETED:
-                        taskData.completed = in.nextBoolean();
-                        break;
-                    case COUNT:
-                        count = in.nextInt();
-                        taskData.quests = new boolean[count];
-                        break;
-                    case QUESTS:
-                        in.beginArray();
-                        for (int i = 0; i < count; i++)
-                            taskData.quests[i] = in.nextBoolean();
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException ignored) {
+    public static QuestDataTask construct(JsonObject in) {
+        QuestDataTaskCompleted data = new QuestDataTaskCompleted();
+        data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
+        data.quests = new boolean[GsonHelper.getAsInt(in, COUNT)];
+        JsonArray array = GsonHelper.getAsJsonArray(in, QUESTS);
+        for (int i = 0; i < array.size(); i++) {
+            data.quests[i] = array.get(i).getAsBoolean();
         }
-        return taskData;
+        return data;
     }
     
     @Override
@@ -57,13 +40,10 @@ public class QuestDataTaskCompleted extends QuestDataTask {
     }
     
     @Override
-    public void write(JsonWriter out) throws IOException {
-        super.write(out);
-        out.name(COUNT).value(quests.length);
-        out.name(QUESTS).beginArray();
-        for (boolean i : quests)
-            out.value(i);
-        out.endArray();
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(COUNT, quests.length);
+        builder.add(QUESTS, Adapter.array(quests).build());
     }
     
     @Override

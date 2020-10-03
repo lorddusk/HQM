@@ -1,5 +1,7 @@
 package hardcorequesting.common.io.adapter;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -15,42 +17,42 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
 
 public class QuestTaskAdapter {
     
-    public static final TypeAdapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new TypeAdapter<QuestDataTask>() {
+    public static final Adapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new Adapter<QuestDataTask>() {
         private static final String TYPE = "type";
         
         @Override
-        public void write(JsonWriter out, QuestDataTask value) throws IOException {
-            out.beginObject();
-            out.name(TYPE).value(String.valueOf(value.getDataType()));
-            value.write(out);
-            out.endObject();
+        public JsonElement serialize(QuestDataTask src) {
+            JsonObjectBuilder builder = object()
+                    .add(TYPE, String.valueOf(src.getDataType()));
+            src.write(builder);
+            return builder.build();
         }
         
         @Override
-        public QuestDataTask read(JsonReader in) throws IOException {
-            in.beginObject();
-            QuestDataTask dataTask = null;
-            if (in.hasNext() && in.nextName().equals(TYPE))
-                dataTask = QuestDataType.valueOf(in.nextString()).construct(in);
-            in.endObject();
-            return dataTask; // should never be null
+        public QuestDataTask deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
+            return QuestDataType.valueOf(GsonHelper.getAsString(object, TYPE)).construct(object);
         }
     };
-    protected static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
-        private final String ITEM = "item";
-        private final String FLUID = "fluid";
-        private final String REQUIRED = "required";
-        private final String PRECISION = "precision";
+    public static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
+        private static final String ITEM = "item";
+        private static final String FLUID = "fluid";
+        private static final String REQUIRED = "required";
+        private static final String PRECISION = "precision";
         
         @Override
         public void write(JsonWriter out, QuestTaskItems.ItemRequirement value) throws IOException {
@@ -110,15 +112,15 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    protected static final TypeAdapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new TypeAdapter<QuestTaskLocation.Location>() {
-        private final String X = "x";
-        private final String Y = "y";
-        private final String Z = "z";
-        private final String DIM = "dim";
-        private final String ICON = "icon";
-        private final String RADIUS = "radius";
-        private final String VISIBLE = "visible";
-        private final String NAME = "name";
+    public static final TypeAdapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new TypeAdapter<QuestTaskLocation.Location>() {
+        private static final String X = "x";
+        private static final String Y = "y";
+        private static final String Z = "z";
+        private static final String DIM = "dim";
+        private static final String ICON = "icon";
+        private static final String RADIUS = "radius";
+        private static final String VISIBLE = "visible";
+        private static final String NAME = "name";
         
         @Override
         public void write(JsonWriter out, QuestTaskLocation.Location value) throws IOException {
@@ -169,62 +171,48 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    protected static final TypeAdapter<QuestTaskReputation.ReputationSetting> REPUTATION_TASK_ADAPTER = new TypeAdapter<QuestTaskReputation.ReputationSetting>() {
-        private final String REPUTATION = "reputation";
-        private final String LOWER = "lower";
-        private final String UPPER = "upper";
-        private final String INVERTED = "inverted";
+    public static final Adapter<QuestTaskReputation.ReputationSetting> REPUTATION_TASK_ADAPTER = new Adapter<QuestTaskReputation.ReputationSetting>() {
+        private static final String REPUTATION = "reputation";
+        private static final String LOWER = "lower";
+        private static final String UPPER = "upper";
+        private static final String INVERTED = "inverted";
         
         @Override
-        public void write(JsonWriter out, QuestTaskReputation.ReputationSetting value) throws IOException {
-            out.beginObject();
-            out.name(REPUTATION).value(value.getReputation().getId());
-            if (value.getLower() != null) {
-                out.name(LOWER).value(value.getLower().getId());
-            }
-            if (value.getUpper() != null) {
-                out.name(UPPER).value(value.getUpper().getId());
-            }
-            out.name(INVERTED).value(value.isInverted());
-            out.endObject();
+        public JsonElement serialize(QuestTaskReputation.ReputationSetting src) {
+            JsonObjectBuilder builder = object()
+                    .add(REPUTATION, src.getReputation().getId())
+                    .add(INVERTED, src.isInverted());
+            if (src.getLower() != null)
+                builder.add(LOWER, src.getLower().getId());
+            if (src.getUpper() != null)
+                builder.add(UPPER, src.getUpper().getId());
+            return builder.build();
         }
         
         @Override
-        public QuestTaskReputation.ReputationSetting read(JsonReader in) throws IOException {
-            in.beginObject();
-            Reputation reputation = null;
-            ReputationMarker lower = null, upper = null;
-            boolean inverted = false;
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case REPUTATION:
-                        reputation = ReputationManager.getInstance().getReputation(in.nextString());
-                        break;
-                    case LOWER:
-                        if (reputation != null)
-                            lower = reputation.getMarker(in.nextInt());
-                        break;
-                    case UPPER:
-                        if (reputation != null)
-                            upper = reputation.getMarker(in.nextInt());
-                        break;
-                    case INVERTED:
-                        inverted = in.nextBoolean();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
+        public QuestTaskReputation.ReputationSetting deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
+            Reputation reputation = ReputationManager.getInstance().getReputation(GsonHelper.getAsString(object, REPUTATION, null));
+            ReputationMarker lower = null;
+            ReputationMarker upper = null;
+            if (object.has(LOWER)) lower = reputation.getMarker(GsonHelper.getAsInt(object, LOWER));
+            if (object.has(UPPER)) upper = reputation.getMarker(GsonHelper.getAsInt(object, UPPER));
+            if (reputation == null) return null;
+            return new QuestTaskReputation.ReputationSetting(
+                    reputation,
+                    lower,
+                    upper,
+                    GsonHelper.getAsBoolean(object, INVERTED, false)
+            );
         }
     };
     
-    protected static final TypeAdapter<QuestTaskTame.Tame> TAME_ADAPTER = new TypeAdapter<QuestTaskTame.Tame>() {
-        private final String TAMES = "tames";
-        private final String EXACT = "exact";
-        private final String TAME = "tame";
-        private final String ICON = "icon";
-        private final String NAME = "name";
+    public static final TypeAdapter<QuestTaskTame.Tame> TAME_ADAPTER = new TypeAdapter<QuestTaskTame.Tame>() {
+        private static final String TAMES = "tames";
+        private static final String EXACT = "exact";
+        private static final String TAME = "tame";
+        private static final String ICON = "icon";
+        private static final String NAME = "name";
         
         @Override
         public void write(JsonWriter out, QuestTaskTame.Tame value) throws IOException {
@@ -263,7 +251,7 @@ public class QuestTaskAdapter {
         }
     };
     
-    protected static final TypeAdapter<QuestTaskAdvancement.AdvancementTask> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<QuestTaskAdvancement.AdvancementTask>() {
+    public static final TypeAdapter<QuestTaskAdvancement.AdvancementTask> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<QuestTaskAdvancement.AdvancementTask>() {
         private final String ICON = "icon";
         private final String VISIBLE = "visible";
         private final String NAME = "name";
@@ -306,7 +294,7 @@ public class QuestTaskAdapter {
         }
     };
     
-    protected static final TypeAdapter<QuestTaskCompleted.CompletedQuestTask> QUEST_COMPLETED_ADAPTER = new TypeAdapter<QuestTaskCompleted.CompletedQuestTask>() {
+    public static final TypeAdapter<QuestTaskCompleted.CompletedQuestTask> QUEST_COMPLETED_ADAPTER = new TypeAdapter<QuestTaskCompleted.CompletedQuestTask>() {
         private final String VISIBLE = "visible";
         private final String QUEST_UUID = "quest_uuid";
         
@@ -334,8 +322,7 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static QuestTask TASK;
-    protected static final TypeAdapter<Mob> MOB_ADAPTER = new TypeAdapter<Mob>() {
+    public static final TypeAdapter<Mob> MOB_ADAPTER = new TypeAdapter<Mob>() {
         private final String KILLS = "kills";
         private final String MOB = "mob";
         private final String ICON = "icon";
@@ -357,7 +344,7 @@ public class QuestTaskAdapter {
         @Override
         public Mob read(JsonReader in) throws IOException {
             in.beginObject();
-            Mob result = ((QuestTaskMob) TASK).new Mob();
+            Mob result = new Mob();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
@@ -377,190 +364,35 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    protected static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
-    protected static final TypeAdapter<QuestTask> TASK_ADAPTER = new TypeAdapter<QuestTask>() {
-        private final String TYPE = "type";
-        private final String DESCRIPTION = "description";
-        private final String LONG_DESCRIPTION = "longDescription";
-        private final String ITEMS = "items";
-        private final String DEATHS = "deaths";
-        private final String LOCATIONS = "locations";
-        private final String MOBS = "mobs";
-        private final String REPUTATION = "reputation";
-        private final String KILLS = "kills";
-        private final String TAME = "tame";
-        private final String ADVANCEMENTS = "advancements";
-        private final String COMPLETED_QUESTS = "completed_quests";
-        private final String BLOCKS = "blocks";
+    public static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
+    protected static final Adapter<QuestTask> TASK_ADAPTER = new Adapter<QuestTask>() {
+        private static final String TYPE = "type";
+        private static final String DESCRIPTION = "description";
+        private static final String LONG_DESCRIPTION = "longDescription";
         
         @Override
-        public void write(JsonWriter out, QuestTask value) throws IOException {
-            out.beginObject();
-            Quest.TaskType type = Quest.TaskType.getType(value.getClass());
-            out.name(TYPE).value(type.name());
-            if (!value.getDescription().equals(type.getName()))
-                out.name(DESCRIPTION).value(value.getDescription());
-            if (!value.getLongDescription().equals(type.getDescription()))
-                out.name(LONG_DESCRIPTION).value(value.getLongDescription());
-            if (value instanceof QuestTaskBlock) {
-                out.name(BLOCKS).beginArray();
-                for (QuestTaskItems.ItemRequirement requirement : ((QuestTaskBlock) value).getItems()) {
-                    ITEM_REQUIREMENT_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskItems) {
-                out.name(ITEMS).beginArray();
-                for (QuestTaskItems.ItemRequirement requirement : ((QuestTaskItems) value).getItems()) {
-                    ITEM_REQUIREMENT_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskDeath) {
-                out.name(DEATHS).value(((QuestTaskDeath) value).getDeaths());
-            } else if (value instanceof QuestTaskLocation) {
-                out.name(LOCATIONS).beginArray();
-                for (QuestTaskLocation.Location requirement : ((QuestTaskLocation) value).locations) {
-                    LOCATION_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskTame) {
-                out.name(TAME).beginArray();
-                for (QuestTaskTame.Tame requirement : ((QuestTaskTame) value).tames) {
-                    TAME_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskAdvancement) {
-                out.name(ADVANCEMENTS).beginArray();
-                for (QuestTaskAdvancement.AdvancementTask requirement : ((QuestTaskAdvancement) value).advancements) {
-                    ADVANCEMENT_TASK_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskCompleted) {
-                out.name(COMPLETED_QUESTS).beginArray();
-                for (QuestTaskCompleted.CompletedQuestTask requirement : ((QuestTaskCompleted) value).quests) {
-                    QUEST_COMPLETED_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskMob) {
-                out.name(MOBS).beginArray();
-                for (Mob requirement : ((QuestTaskMob) value).mobs) {
-                    MOB_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-            } else if (value instanceof QuestTaskReputation) {
-                out.name(REPUTATION).beginArray();
-                for (QuestTaskReputation.ReputationSetting requirement : ((QuestTaskReputation) value).getSettings()) {
-                    REPUTATION_TASK_ADAPTER.write(out, requirement);
-                }
-                out.endArray();
-                if (value instanceof QuestTaskReputationKill) {
-                    out.name(KILLS).value(((QuestTaskReputationKill) value).getKills());
-                }
-            }
-            out.endObject();
+        public JsonElement serialize(QuestTask src) {
+            Quest.TaskType type = Quest.TaskType.getType(src.getClass());
+            
+            JsonObjectBuilder builder = object()
+                    .add(TYPE, type.name());
+            if (!src.getDescription().equals(type.getName()))
+                builder.add(DESCRIPTION, src.getDescription());
+            if (!src.getLongDescription().equals(type.getDescription()))
+                builder.add(LONG_DESCRIPTION, src.getLongDescription());
+            src.write(builder);
+            return builder.build();
         }
         
         @Override
-        public QuestTask read(JsonReader in) throws IOException {
-            in.beginObject();
-            if (!in.nextName().equalsIgnoreCase(TYPE)) {
-                throw new IOException("Tasks *MUST* start with the type");
-            }
-            String task = in.nextString();
-            Quest.TaskType type = Quest.TaskType.valueOf(task);
-            if (type == null) {
-                throw new IOException("Invalid Task Type: " + task);
-            }
-            TASK = type.addTask(QUEST);
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(DESCRIPTION)) {
-                    TASK.description = in.nextString();
-                } else if (name.equalsIgnoreCase(LONG_DESCRIPTION)) {
-                    TASK.setLongDescription(in.nextString());
-                } else if (TASK instanceof QuestTaskBlock && name.equalsIgnoreCase(BLOCKS)) {
-                    List<QuestTaskItems.ItemRequirement> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskItems.ItemRequirement entry = ITEM_REQUIREMENT_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskBlock) TASK).setItems(list.toArray(new QuestTaskItems.ItemRequirement[0]));
-                } else if (TASK instanceof QuestTaskItems && name.equalsIgnoreCase(ITEMS)) {
-                    List<QuestTaskItems.ItemRequirement> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskItems.ItemRequirement entry = ITEM_REQUIREMENT_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskItems) TASK).setItems(list.toArray(new QuestTaskItems.ItemRequirement[list.size()]));
-                } else if (TASK instanceof QuestTaskDeath && name.equalsIgnoreCase(DEATHS)) {
-                    int death = in.nextInt();
-                    ((QuestTaskDeath) TASK).setDeaths(death);
-                } else if (TASK instanceof QuestTaskLocation && name.equalsIgnoreCase(LOCATIONS)) {
-                    List<QuestTaskLocation.Location> list = new ArrayList<QuestTaskLocation.Location>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskLocation.Location entry = LOCATION_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskLocation) TASK).locations = list.toArray(new QuestTaskLocation.Location[list.size()]);
-                } else if (TASK instanceof QuestTaskAdvancement && name.equalsIgnoreCase(ADVANCEMENTS)) {
-                    List<QuestTaskAdvancement.AdvancementTask> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskAdvancement.AdvancementTask entry = ADVANCEMENT_TASK_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskAdvancement) TASK).advancements = list.toArray(new QuestTaskAdvancement.AdvancementTask[list.size()]);
-                } else if (TASK instanceof QuestTaskCompleted && name.equalsIgnoreCase(COMPLETED_QUESTS)) {
-                    List<QuestTaskCompleted.CompletedQuestTask> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskCompleted.CompletedQuestTask entry = QUEST_COMPLETED_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskCompleted) TASK).quests = list.toArray(new QuestTaskCompleted.CompletedQuestTask[0]);
-                } else if (TASK instanceof QuestTaskTame && name.equalsIgnoreCase(TAME)) {
-                    List<QuestTaskTame.Tame> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        QuestTaskTame.Tame entry = TAME_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskTame) TASK).tames = list.toArray(new QuestTaskTame.Tame[list.size()]);
-                } else if (TASK instanceof QuestTaskMob && name.equalsIgnoreCase(MOBS)) {
-                    List<Mob> list = new ArrayList<Mob>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        Mob entry = MOB_ADAPTER.read(in);
-                        if (entry != null) list.add(entry);
-                    }
-                    in.endArray();
-                    ((QuestTaskMob) TASK).mobs = list.toArray(new Mob[list.size()]);
-                } else if (TASK instanceof QuestTaskReputation && name.equalsIgnoreCase(REPUTATION)) {
-                    List<ReputationSettingConstructor> list = new ArrayList<>();
-                    in.beginArray();
-                    while (in.hasNext()) {
-                        ReputationSettingConstructor constructor = ReputationSettingConstructor.read(in);
-                        if (constructor != null) {
-                            list.add(constructor);
-                        }
-                    }
-                    in.endArray();
-                    taskReputationListMap.put((QuestTaskReputation) TASK, list);
-//                    ReflectionHelper.setPrivateValue(QuestTaskReputation.class, (QuestTaskReputation) TASK, list.toArray(new QuestTaskReputation.ReputationSetting[list.size()]), "settings");
-                } else if (name.equalsIgnoreCase(KILLS) && TASK instanceof QuestTaskReputationKill) {
-                    ((QuestTaskReputationKill) TASK).setKills(in.nextInt());
-                }
-            }
-            in.endObject();
-            return null;
+        public QuestTask deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
+            Quest.TaskType type = Quest.TaskType.valueOf(GsonHelper.getAsString(object, TYPE));
+            QuestTask TASK = type.addTask(QUEST);
+            if (object.has(DESCRIPTION)) TASK.setDescription(GsonHelper.getAsString(object, DESCRIPTION));
+            if (object.has(LONG_DESCRIPTION)) TASK.setLongDescription(GsonHelper.getAsString(object, LONG_DESCRIPTION));
+            TASK.read(object);
+            return TASK;
         }
     };
     
@@ -575,19 +407,18 @@ public class QuestTaskAdapter {
         ADVANCEMENT(QuestDataTaskAdvancement::construct),
         COMPLETED(QuestDataTaskCompleted::construct);
         
-        private Function<JsonReader, QuestDataTask> func;
+        private Function<JsonObject, QuestDataTask> func;
         
-        QuestDataType(Function<JsonReader, QuestDataTask> func) {
+        QuestDataType(Function<JsonObject, QuestDataTask> func) {
             this.func = func;
         }
         
-        public QuestDataTask construct(JsonReader in) {
+        public QuestDataTask construct(JsonObject in) {
             return func.apply(in);
         }
     }
     
-    protected static class ReputationSettingConstructor {
-        
+    public static class ReputationSettingConstructor {
         private static final String REPUTATION = "reputation";
         private static final String LOWER = "lower";
         private static final String UPPER = "upper";
@@ -603,29 +434,19 @@ public class QuestTaskAdapter {
             this.inverted = inverted;
         }
         
-        public static ReputationSettingConstructor read(JsonReader in) throws IOException {
-            in.beginObject();
-            int low = Integer.MIN_VALUE, high = Integer.MIN_VALUE;
-            String reputation = null;
-            boolean inverted = false;
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(REPUTATION)) {
-                    reputation = in.nextString();
-                } else if (name.equalsIgnoreCase(UPPER)) {
-                    high = in.nextInt();
-                } else if (name.equalsIgnoreCase(LOWER)) {
-                    low = in.nextInt();
-                } else if (name.equalsIgnoreCase(INVERTED)) {
-                    inverted = in.nextBoolean();
-                }
-            }
-            in.endObject();
+        public static ReputationSettingConstructor read(JsonElement in) {
+            JsonObject object = in.getAsJsonObject();
+            String reputation = GsonHelper.getAsString(object, REPUTATION, null);
             if (reputation == null) return null;
-            return new ReputationSettingConstructor(reputation, low, high, inverted);
+            return new ReputationSettingConstructor(
+                    reputation,
+                    GsonHelper.getAsInt(object, LOWER, Integer.MIN_VALUE),
+                    GsonHelper.getAsInt(object, UPPER, Integer.MIN_VALUE),
+                    GsonHelper.getAsBoolean(object, INVERTED, false)
+            );
         }
         
-        public QuestTaskReputation.ReputationSetting constructReuptationSetting() {
+        public QuestTaskReputation.ReputationSetting constructReputationSetting() {
             Reputation reputation = ReputationManager.getInstance().getReputations().get(this.reputation);
             if (reputation != null) {
                 ReputationMarker lower = null, upper = null;

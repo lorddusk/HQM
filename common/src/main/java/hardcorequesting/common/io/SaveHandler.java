@@ -25,7 +25,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 public class SaveHandler {
     
@@ -37,28 +36,10 @@ public class SaveHandler {
             .registerTypeAdapter(Team.class, TeamAdapter.TEAM_ADAPTER)
             .registerTypeAdapter(QuestingData.class, QuestingAdapter.QUESTING_DATA_ADAPTER)
             .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE_WITH_SPACES)
-//            .setPrettyPrinting()
+            .setPrettyPrinting()
             .create();
     
     public static final JsonParser JSON_PARSER = new JsonParser();
-    
-    public static final Pattern JSON = Pattern.compile(".*\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern BAGS = Pattern.compile("^bags\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern DEATHS = Pattern.compile("^deaths\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern REPUTATIONS = Pattern.compile("^reputations\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern TEAMS = Pattern.compile("^teams\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern STATE = Pattern.compile("^state\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern DATA = Pattern.compile("^data\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final Pattern SETS = Pattern.compile("^sets\\.json$", Pattern.CASE_INSENSITIVE);
-    public static final FileFilter QUEST_SET_FILTER =
-            pathname -> JSON.matcher(pathname.getName()).find()
-                        && !REPUTATIONS.matcher(pathname.getName()).find()
-                        && !BAGS.matcher(pathname.getName()).find()
-                        && !TEAMS.matcher(pathname.getName()).find()
-                        && !STATE.matcher(pathname.getName()).find()
-                        && !DATA.matcher(pathname.getName()).find()
-                        && !SETS.matcher(pathname.getName()).find()
-                        && !DEATHS.matcher(pathname.getName()).find();
     
     public static final String QUESTING = "questing";
     public static final String HARDCORE = "hardcore";

@@ -53,7 +53,7 @@ dependencies {
 
     compile("blue.endless:jankson:1.2.0")
     shadow("blue.endless:jankson:1.2.0")
-    compile(project(path: ":common", configuration: "mcp")) {
+    compile(project(path: ":common", configuration: "mcpGenerateMod")) {
         transitive = false
     }
     shadow(project(path: ":common", configuration: "mcp")) {
@@ -63,6 +63,7 @@ dependencies {
 
 shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.forge"
+    relocate "blue.endless.jankson", "hardcorequesting.common.forge.blue.endless.jankson"
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadow]

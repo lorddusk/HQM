@@ -10,6 +10,9 @@ import hardcorequesting.common.event.PlayerTracker;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.team.Team;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +29,7 @@ public class QuestingDataManager {
     private boolean hardcoreActive;
     private boolean questActive;
     public Map<UUID, QuestingData> questingData = new ConcurrentHashMap<>();
-    private List<Team> teams = new ArrayList<>();
+    private Map<UUID, Team> teams = new ConcurrentHashMap<>();
     
     public QuestingDataManager(QuestLine parent) {
         this.parent = parent;
@@ -38,7 +41,7 @@ public class QuestingDataManager {
         return QuestLine.getActiveQuestLine().questingDataManager;
     }
     
-    public List<Team> getTeams() {
+    public Map<UUID, Team> getTeams() {
         return teams;
     }
     
@@ -104,7 +107,7 @@ public class QuestingDataManager {
             questActive = false;
             //debugActive = false;
             questingData = new HashMap<>();
-            teams = new ArrayList<>();
+            teams = new ConcurrentHashMap<>();
         }
     }
     
@@ -218,7 +221,7 @@ public class QuestingDataManager {
     }
     
     public void addTeam(Team team) {
-        team.setId(teams.size());
-        teams.add(team);
+        team.setId(UUID.randomUUID());
+        teams.put(team.getId(), team);
     }
 }

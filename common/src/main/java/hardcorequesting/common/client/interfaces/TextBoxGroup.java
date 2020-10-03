@@ -2,8 +2,10 @@ package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.util.Points;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +85,8 @@ public class TextBoxGroup {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
+            Vec2 mouse = Points.ofMouse();
+            gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mouse.x - gui.left, mouse.y - gui.top) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
             gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
             if (selected) {
                 gui.drawCursor(matrices, x + getCursorPositionX(gui) + 2, y + getCursorPositionY(gui), 10, 1F, 0xFF909090);

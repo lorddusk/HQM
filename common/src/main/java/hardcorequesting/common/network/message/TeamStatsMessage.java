@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TeamStatsMessage implements IMessage {
     
@@ -23,8 +24,8 @@ public class TeamStatsMessage implements IMessage {
         stats = Collections.singletonList(team.toLiteStat());
     }
     
-    public TeamStatsMessage(List<Team> teams) {
-        stats = teams.stream().map(Team::toLiteStat).collect(Collectors.toList());
+    public TeamStatsMessage(Stream<Team> teams) {
+        stats = teams.map(Team::toLiteStat).collect(Collectors.toList());
     }
     
     @Override

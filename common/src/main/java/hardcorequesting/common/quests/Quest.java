@@ -1566,7 +1566,7 @@ public class Quest {
     }
     
     public void resetAll() {
-        for (Team team : QuestingDataManager.getInstance().getTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available) {
                 reset(data);
@@ -1576,7 +1576,7 @@ public class Quest {
     }
     
     public void resetOnTime(int time) {
-        for (Team team : QuestingDataManager.getInstance().getTeams()) {
+        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available && data.time <= time) {
                 reset(data);

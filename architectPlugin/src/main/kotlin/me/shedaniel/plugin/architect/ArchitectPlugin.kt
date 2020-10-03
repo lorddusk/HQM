@@ -13,16 +13,17 @@ class ArchitectPlugin : Plugin<Project> {
                 "plugin" to "idea"
         ))
         project.extensions.create("architect", ArchitectPluginExtension::class.java, project)
-        
+
         project.afterEvaluate {
             project.extensions.getByType(JavaPluginExtension::class.java).apply {
                 sourceCompatibility = JavaVersion.VERSION_1_8
                 targetCompatibility = JavaVersion.VERSION_1_8
             }
         }
-        
-        project.tasks.register("remapMcp", RemapMCPTask::class.java) {
-            
+
+        project.tasks.register("remapMcp", RemapMCPTask::class.java)
+        project.tasks.register("remapMcpFakeMod", RemapMCPTask::class.java) {
+            it.fakeMod = true
         }
     }
 }

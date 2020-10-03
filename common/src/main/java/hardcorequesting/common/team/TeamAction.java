@@ -22,7 +22,7 @@ public enum TeamAction {
                     return;
                 }
                 
-                for (Team t : manager.getTeams()) {
+                for (Team t : manager.getTeams().values()) {
                     if (t.getName().equals(teamName)) {
                         TeamError.USED_NAME.sendToClient(player);
                         return;

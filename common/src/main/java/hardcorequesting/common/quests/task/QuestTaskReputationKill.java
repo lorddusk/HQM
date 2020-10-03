@@ -1,15 +1,18 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskReputationKill;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 public class QuestTaskReputationKill extends QuestTaskReputation {
-    
+    private static final String KILLS = "kills";
     private int kills;
     
     public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
@@ -108,5 +111,17 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     
     public void setKills(int kills) {
         this.kills = kills;
+    }
+    
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        super.write(builder);
+        builder.add(KILLS, getKills());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        super.read(object);
+        setKills(GsonHelper.getAsInt(object, KILLS, 0));
     }
 }

@@ -22,6 +22,7 @@ public class DeathStat {
     
     protected int[] deaths = new int[DeathType.values().length];
     private UUID uuid;
+    private String cachedName;
     int totalDeaths = -1;
     
     public DeathStat(UUID uuid) {
@@ -36,12 +37,24 @@ public class DeathStat {
     public String getName() throws IllegalArgumentException {
         if (Minecraft.getInstance().level != null) {
             Player player = Minecraft.getInstance().level.getPlayerByUUID(this.uuid);
-            if (player == null) {
-                return "<invalid>";
+            if (player != null) {
+                return cachedName = player.getScoreboardName();
             }
-            return player.getScoreboardName();
         }
-        return this.uuid.toString();
+    
+        if (cachedName != null) {
+            return cachedName;
+        }
+        
+        return "<invalid>";
+    }
+    
+    public String getCachedName() {
+        return cachedName;
+    }
+    
+    public void setCachedName(String cachedName) {
+        this.cachedName = cachedName;
     }
     
     public String getDescription(int id) {

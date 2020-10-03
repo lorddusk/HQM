@@ -1,5 +1,8 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
@@ -8,6 +11,8 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuMob;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.adapter.Adapter;
+import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
@@ -18,6 +23,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -26,12 +32,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskMob extends QuestTask {
-    
-    
+    private static final String MOBS = "mobs";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
@@ -262,7 +269,25 @@ public class QuestTaskMob extends QuestTask {
         
     }
     
-    public class Mob {
+    @Override
+    public void write(Adapter.JsonObjectBuilder builder) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (Mob mob : mobs) {
+            array.add(QuestTaskAdapter.MOB_ADAPTER.toJsonTree(mob));
+        }
+        builder.add(MOBS, array.build());
+    }
+    
+    @Override
+    public void read(JsonObject object) {
+        List<Mob> list = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(object, MOBS, new JsonArray())) {
+            list.add(QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element));
+        }
+        mobs = list.toArray(new Mob[0]);
+    }
+    
+    public static class Mob {
         
         private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";

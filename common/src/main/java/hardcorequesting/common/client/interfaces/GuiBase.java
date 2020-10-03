@@ -1,5 +1,6 @@
 package hardcorequesting.common.client.interfaces;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -11,12 +12,14 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
@@ -278,18 +281,26 @@ public class GuiBase extends Screen {
     }
     
     public void drawString(PoseStack matrices, FormattedText str, int x, int y, float mult, int color) {
+        drawString(matrices, str, x, y, false, mult, color);
+    }
+    
+    public void drawString(PoseStack matrices, FormattedText str, int x, int y, boolean shadow, float mult, int color) {
+        RenderSystem.pushMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         matrices.pushPose();
         matrices.scale(mult, mult, 1F);
-        font.draw(matrices, Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
+        
+        MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        font.drawInBatch(str.getString().isEmpty() ? FormattedCharSequence.EMPTY : Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color, shadow, matrices.last().pose(), immediate, false, 0, 15728880);
+        immediate.endBatch();
+        
         matrices.popPose();
+        RenderSystem.popMatrix();
     }
     
     public void drawStringWithShadow(PoseStack matrices, FormattedText str, int x, int y, float mult, int color) {
-        matrices.pushPose();
-        matrices.scale(mult, mult, 1F);
-        font.drawShadow(matrices, Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-        
-        matrices.popPose();
+        drawString(matrices, str, x, y, true, mult, color);
     }
     
     public void drawString(PoseStack matrices, String str, int x, int y, int color) {
@@ -297,18 +308,11 @@ public class GuiBase extends Screen {
     }
     
     public void drawString(PoseStack matrices, String str, int x, int y, float mult, int color) {
-        matrices.pushPose();
-        matrices.scale(mult, mult, 1F);
-        font.draw(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-        matrices.popPose();
+        drawString(matrices, str == null ? FormattedText.EMPTY : FormattedText.of(str), x, y, mult, color);
     }
     
     public void drawStringWithShadow(PoseStack matrices, String str, int x, int y, float mult, int color) {
-        matrices.pushPose();
-        matrices.scale(mult, mult, 1F);
-        font.drawShadow(matrices, str, (int) ((x + left) / mult), (int) ((y + top) / mult), color);
-        
-        matrices.popPose();
+        drawStringWithShadow(matrices, str == null ? FormattedText.EMPTY : FormattedText.of(str), x, y, mult, color);
     }
     
     public boolean inBounds(int x, int y, int w, int h, double mX, double mY) {

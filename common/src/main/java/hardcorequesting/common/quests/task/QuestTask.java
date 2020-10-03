@@ -1,14 +1,15 @@
 package hardcorequesting.common.quests.task;
 
 
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.*;
@@ -101,6 +102,10 @@ public abstract class QuestTask {
         }
     }
     
+    public abstract void write(Adapter.JsonObjectBuilder builder);
+    
+    public abstract void read(JsonObject object);
+    
     public void updateId() {
         this.id = parent.nextTaskId++;
     }
@@ -135,8 +140,8 @@ public abstract class QuestTask {
         return QuestDataTask.class;
     }
     
-    public void write(QuestDataTask task, JsonWriter out) throws IOException {
-        task.write(out);
+    public void write(QuestDataTask task, JsonObject out) {
+        task.write(new Adapter.JsonObjectBuilder(out));
     }
     
     public void read(QuestDataTask task, JsonReader in) throws IOException {

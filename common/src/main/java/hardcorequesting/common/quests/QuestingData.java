@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -46,11 +45,10 @@ public class QuestingData {
         createGroupData();
     }
     
-    public QuestingData(QuestingDataManager manager, UUID playerId, int lives, int teamId, Map<UUID, GroupData> groupData) {
+    public QuestingData(QuestingDataManager manager, UUID playerId, int lives, UUID teamId, Map<UUID, GroupData> groupData) {
         this.playerId = playerId;
         this.lives = lives;
-        if (teamId > -1 && teamId < manager.getTeams().size())
-            this.team = manager.getTeams().get(teamId);
+        this.team = manager.getTeams().get(teamId);
         if (team == null) team = new Team(playerId);
         createGroupData();
         this.groupData.putAll(groupData);
@@ -263,8 +261,8 @@ public class QuestingData {
     @NotNull
     public Team getTeam() {
         if (!this.team.isSingle()) {
-            List<Team> teams = QuestingDataManager.getInstance().getTeams();
-            if (teams.size() > this.team.getId()) {
+            Map<UUID, Team> teams = QuestingDataManager.getInstance().getTeams();
+            if (teams.containsKey(this.team.getId())) {
                 this.team = teams.get(this.team.getId());
             }
         }

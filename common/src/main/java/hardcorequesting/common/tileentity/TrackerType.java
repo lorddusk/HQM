@@ -15,7 +15,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     boolean valid = radius == 0;
                     valid = isValid(valid, team, tracker, radius);
@@ -33,7 +33,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     
                     for (PlayerEntry entry : team.getPlayers()) {
@@ -64,7 +64,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams()) {
+            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
                 int newMeta = (int) (quest.getProgress(team) * 15);
                 if (newMeta > meta) {
                     boolean valid = radius == 0;

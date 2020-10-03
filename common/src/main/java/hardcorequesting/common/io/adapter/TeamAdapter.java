@@ -1,8 +1,8 @@
 package hardcorequesting.common.io.adapter;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import hardcorequesting.common.quests.QuestData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.reputation.Reputation;
@@ -11,14 +11,15 @@ import hardcorequesting.common.team.LifeSetting;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
+import net.minecraft.Util;
+import net.minecraft.util.GsonHelper;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TeamAdapter {
     
-    private static Map<Team, List<Integer>> invitesMap = new HashMap<>();
-    public static final TypeAdapter<Team> TEAM_ADAPTER = new TypeAdapter<Team>() {
+    private static Map<Team, List<UUID>> invitesMap = new HashMap<>();
+    public static final Adapter<Team> TEAM_ADAPTER = new Adapter<Team>() {
         private static final String ID = "id";
         private static final String NAME = "name";
         private static final String LIFE_SETTING = "lifeSetting";
@@ -33,133 +34,79 @@ public class TeamAdapter {
         private static final String INVITES = "invites";
         
         @Override
-        public void write(JsonWriter out, Team value) throws IOException {
-            if (value == null)
-                return;
-            
-            out.beginObject();
-            out.name(ID).value(value.getId());
-            out.name(NAME).value(value.getName());
-            out.name(LIFE_SETTING).value(value.getLifeSetting().name());
-            out.name(REWARD_SETTING).value(value.getRewardSetting().name());
-            out.name(PLAYERS);
-            out.beginArray();
-            for (PlayerEntry entry : value.getPlayers())
-                entry.write(out);
-            out.endArray();
-            out.name(REPUTATIONS);
-            out.beginArray();
-            for (Reputation reputation : ReputationManager.getInstance().getReputations().values()) {
-                out.beginObject();
-                out.name(REP_ID).value(reputation.getId());
-                out.name(REP_VAL).value(value.getReputation(reputation));
-                out.endObject();
-            }
-            out.endArray();
-            out.name(QUEST_DATA_LIST).beginArray();
-            for (Map.Entry<UUID, QuestData> data : value.getQuestData().entrySet()) {
-                out.beginObject();
-                out.name(QUEST_ID).value(data.getKey().toString());
-                out.name(QUEST_DATA);
-                QuestDataAdapter.QUEST_DATA_ADAPTER.write(out, data.getValue());
-                out.endObject();
-            }
-            out.endArray();
-            out.name(INVITES).beginArray();
-            for (Team team : value.getInvites())
-                out.value(team.getId());
-            out.endArray();
-            out.endObject();
+        public JsonElement serialize(Team src) {
+            return object()
+                    .add(ID, src.getId().toString())
+                    .add(NAME, src.getName())
+                    .add(LIFE_SETTING, src.getLifeSetting().name())
+                    .add(REWARD_SETTING, src.getRewardSetting().name())
+                    .add(PLAYERS, array()
+                            .use(builder -> {
+                                for (PlayerEntry entry : src.getPlayers())
+                                    builder.add(entry.toJson());
+                            })
+                            .build())
+                    .add(REPUTATIONS, array()
+                            .use(builder -> {
+                                for (Reputation reputation : ReputationManager.getInstance().getReputations().values()) {
+                                    builder.add(object()
+                                            .add(REP_ID, reputation.getId())
+                                            .add(REP_VAL, src.getReputation(reputation))
+                                            .build());
+                                }
+                            })
+                            .build())
+                    .add(QUEST_DATA_LIST, array()
+                            .use(builder -> {
+                                for (Map.Entry<UUID, QuestData> data : src.getQuestData().entrySet()) {
+                                    builder.add(object()
+                                            .add(QUEST_ID, data.getKey().toString())
+                                            .add(QUEST_DATA, QuestDataAdapter.QUEST_DATA_ADAPTER.toJsonTree(data.getValue()))
+                                            .build());
+                                }
+                            })
+                            .build())
+                    .add(INVITES, array()
+                            .use(builder -> {
+                                for (Team team : src.getInvites())
+                                    builder.add(team.getId().toString());
+                            })
+                            .build())
+                    .build();
         }
         
         @Override
-        public Team read(JsonReader in) throws IOException {
-            in.beginObject();
+        public Team deserialize(JsonElement json) throws JsonParseException {
+            List<UUID> invites = new ArrayList<>();
+            JsonObject object = json.getAsJsonObject();
             Team team = new Team(null);
-            List<Integer> invites = new ArrayList<>();
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case ID:
-                        team.setId(in.nextInt());
-                        break;
-                    case NAME:
-                        if (team.getId() == -1) {
-                            in.nextNull();
-                            team.setName(null);
-                        } else {
-                            team.setName(in.nextString());
-                        }
-                        break;
-                    case LIFE_SETTING:
-                        team.setLifeSetting(LifeSetting.valueOf(in.nextString()));
-                        break;
-                    case REWARD_SETTING:
-                        team.setRewardSetting(RewardSetting.valueOf(in.nextString()));
-                        break;
-                    case PLAYERS:
-                        in.beginArray();
-                        while (in.hasNext())
-                            team.addPlayer(PlayerEntry.read(in));
-                        in.endArray();
-                        break;
-                    case REPUTATIONS:
-                        in.beginArray();
-                        while (in.hasNext()) {
-                            in.beginObject();
-                            String id = null;
-                            int val = 0;
-                            while (in.hasNext()) {
-                                switch (in.nextName()) {
-                                    case REP_ID:
-                                        id = in.nextString();
-                                        break;
-                                    case REP_VAL:
-                                        val = in.nextInt();
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            team.setReputation(id, val);
-                            in.endObject();
-                        }
-                        in.endArray();
-                        break;
-                    case QUEST_DATA_LIST:
-                        in.beginArray();
-                        while (in.hasNext()) {
-                            in.beginObject();
-                            String id = null;
-                            QuestData data = null;
-                            while (in.hasNext()) {
-                                switch (in.nextName()) {
-                                    case QUEST_ID:
-                                        id = in.nextString();
-                                        break;
-                                    case QUEST_DATA:
-                                        data = QuestDataAdapter.QUEST_DATA_ADAPTER.read(in);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                            if (id != null && data != null)
-                                team.getQuestData().put(UUID.fromString(id), data);
-                            in.endObject();
-                        }
-                        in.endArray();
-                        break;
-                    case INVITES:
-                        in.beginArray();
-                        while (in.hasNext())
-                            invites.add(in.nextInt());
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
+            if (object.has(ID) && object.get(ID).getAsJsonPrimitive().isString())
+                team.setId(UUID.fromString(GsonHelper.getAsString(object, ID)));
+            if (!team.getId().equals(Util.NIL_UUID))
+                team.setName(GsonHelper.getAsString(object, NAME));
+            team.setLifeSetting(LifeSetting.valueOf(GsonHelper.getAsString(object, LIFE_SETTING)));
+            team.setRewardSetting(RewardSetting.valueOf(GsonHelper.getAsString(object, REWARD_SETTING)));
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, PLAYERS)) {
+                team.addPlayer(PlayerEntry.read(element));
             }
-            in.endObject();
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, REPUTATIONS)) {
+                JsonObject reputationObject = element.getAsJsonObject();
+                team.setReputation(
+                        GsonHelper.getAsString(reputationObject, REP_ID),
+                        GsonHelper.getAsInt(reputationObject, REP_VAL)
+                );
+            }
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, QUEST_DATA_LIST)) {
+                JsonObject questDataObject = element.getAsJsonObject();
+                team.getQuestData().put(
+                        UUID.fromString(GsonHelper.getAsString(questDataObject, QUEST_ID)),
+                        QuestDataAdapter.QUEST_DATA_ADAPTER.fromJsonTree(questDataObject.get(QUEST_DATA))
+                );
+            }
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, INVITES)) {
+                if (element.getAsJsonPrimitive().isString())
+                    invites.add(UUID.fromString(element.getAsString()));
+            }
             if (invites.size() > 0)
                 invitesMap.put(team, invites);
             return team;
@@ -172,10 +119,10 @@ public class TeamAdapter {
     
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
-            Map<Integer, Team> tempMap = new HashMap<>();
-            QuestingDataManager.getInstance().getTeams().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
-            for (Team team : QuestingDataManager.getInstance().getTeams()) {
-                List<Integer> invites = invitesMap.get(team);
+            Map<UUID, Team> tempMap = new HashMap<>();
+            QuestingDataManager.getInstance().getTeams().values().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
+            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+                List<UUID> invites = invitesMap.get(team);
                 if (invites != null)
                     invites.forEach(id -> {
                         if (tempMap.containsKey(id))
