@@ -1,5 +1,5 @@
 plugins {
-    id "me.shedaniel.plugin.architect"
+    id "architect-plugin" version "1.0.6"
 }
 
 architect {
@@ -8,7 +8,7 @@ architect {
 
 allprojects {
     apply plugin: "java"
-    apply plugin: "me.shedaniel.plugin.architect"
+    apply plugin: "architect-plugin"
     
     archivesBaseName = project.archives_base_name
     version = project.mod_version
