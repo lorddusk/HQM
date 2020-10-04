@@ -229,10 +229,7 @@ public class QuestAdapter {
             if (object.has(REPEAT)) QUEST.setRepeatInfo(REPEAT_INFO_ADAPTER.deserialize(object.get(REPEAT)));
             if (object.has(TRIGGER)) QUEST.setTriggerType(TriggerType.valueOf(GsonHelper.getAsString(object, TRIGGER)));
             for (JsonElement element : GsonHelper.getAsJsonArray(object, TASKS, EMPTY_ARRAY)) {
-                QuestTask task = QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
-                if (task != null) {
-                    QUEST.getTasks().add(task);
-                }
+                QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
             }
             QUEST.setReward(readItemStackArray(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
             QUEST.setRewardChoice(readItemStackArray(GsonHelper.getAsJsonArray(object, REWARDS_CHOICE, EMPTY_ARRAY)));

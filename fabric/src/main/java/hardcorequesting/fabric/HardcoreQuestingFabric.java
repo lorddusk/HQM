@@ -3,6 +3,7 @@ package hardcorequesting.fabric;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -27,6 +28,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
@@ -38,6 +40,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -50,11 +55,16 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform {
+    public static final List<BiConsumer<LivingEntity, DamageSource>> LIVING_DEATH = Lists.newArrayList();
+    public static final List<BiConsumer<Player, ItemStack>> CRAFTING = Lists.newArrayList();
+    public static final List<BiConsumer<ServerPlayer, Advancement>> ADVANCEMENT = Lists.newArrayList();
+    public static final List<BiConsumer<Player, Entity>> ANIMAL_TAME = Lists.newArrayList();
     private final NetworkManager networkManager = new FabricNetworkManager();
     
     @Override
@@ -160,6 +170,36 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> consumer) {
         ItemPickupCallback.EVENT.register(consumer::accept);
+    }
+    
+    @Override
+    public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> consumer) {
+        LIVING_DEATH.add(consumer);
+    }
+    
+    @Override
+    public void registerOnCrafting(BiConsumer<Player, ItemStack> consumer) {
+        CRAFTING.add(consumer);
+    }
+    
+    @Override
+    public void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> consumer) {
+        CRAFTING.add(consumer);
+    }
+    
+    @Override
+    public void registerOnSmelting(BiConsumer<Player, ItemStack> consumer) {
+        CRAFTING.add(consumer);
+    }
+    
+    @Override
+    public void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> consumer) {
+        ADVANCEMENT.add(consumer);
+    }
+    
+    @Override
+    public void registerOnAnimalTame(BiConsumer<Player, Entity> consumer) {
+        ANIMAL_TAME.add(consumer);
     }
     
     @Override

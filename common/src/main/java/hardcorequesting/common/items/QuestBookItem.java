@@ -82,7 +82,7 @@ public class QuestBookItem extends Item {
                             if (HardcoreQuestingCore.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
                                 Player subject = QuestingData.getPlayer(uuid);
                                 if (subject instanceof ServerPlayer) {
-                                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
+                                    EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
                                     PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
                                     if (entry != null) {
                                         entry.setBookOpen(true);
@@ -99,7 +99,7 @@ public class QuestBookItem extends Item {
                         }
                     }
                 } else {
-                    EventTrigger.instance().onEvent(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
+                    EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
                     PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
                     if (entry != null) {
                         entry.setBookOpen(true);

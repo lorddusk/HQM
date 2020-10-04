@@ -7,6 +7,7 @@ import hardcorequesting.common.quests.task.QuestTaskMob;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 
@@ -24,8 +25,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private QuestTaskMob.Mob mob;
     private int id;
     private ScrollBar scrollBar;
-    private List<String> rawMobs;
-    private List<String> mobs;
+    private List<ResourceLocation> rawMobs;
+    private List<ResourceLocation> mobs;
     
     public GuiEditMenuMob(GuiQuestBook gui, QuestTaskMob task, final QuestTaskMob.Mob mob, int id, Player player) {
         super(gui, player, false, 180, 70, 180, 150);
@@ -63,9 +64,9 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         rawMobs = new ArrayList<>();
         mobs = new ArrayList<>();
         
-        for (EntityType type : Registry.ENTITY_TYPE) {
+        for (EntityType<?> type : Registry.ENTITY_TYPE) {
             if (type.canSummon()) {
-                rawMobs.add(type.getDescription().getString());
+                rawMobs.add(Registry.ENTITY_TYPE.getKey(type));
             }
         }
         
@@ -77,8 +78,8 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private void updateMobs(String search) {
         if (mobs != null) {
             mobs.clear();
-            for (String rawMob : rawMobs) {
-                if (rawMob.toLowerCase().contains(search.toLowerCase())) {
+            for (ResourceLocation rawMob : rawMobs) {
+                if (Registry.ENTITY_TYPE.get(rawMob).getDescription().toString().toLowerCase().contains(search.toLowerCase())) {
                     mobs.add(rawMob);
                 }
             }
@@ -99,13 +100,13 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             boolean selected = mobs.get(i).equals(mob.getMob());
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
-            gui.drawString(matrices, Translator.plain(mobs.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mobs.get(i)).getDescription(), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
         gui.drawString(matrices, Translator.translatable("hqm.mobTask.search"), 180, 20, 0x404040);
         gui.drawString(matrices, Translator.translatable("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (mob.getMob() != null) {
-            gui.drawString(matrices, Translator.plain(mob.getMob()), 180, 50, 0.7F, 0x404040);
+            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mob.getMob()).getDescription(), 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -166,14 +167,6 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         mob.setCount(Math.max(1, mob.getCount()));
-
-//        if ((mob.getIconStack() == null || mob.getIconStack().getItem() == Items.SPAWN_EGG) && mob.getMob() != null) {
-//            if (EntityList.ENTITY_EGGS.containsKey(new Identifier(mob.getMob()))) {
-//                ItemStack stack = new ItemStack(Items.SPAWN_EGG);
-//                ItemMonsterPlacer.applyEntityIdToItemStack(stack, new Identifier(mob.getMob()));
-//            }
-//        }
-        
         task.setMob(id, mob, player);
     }
 }

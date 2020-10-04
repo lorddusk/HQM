@@ -4,12 +4,15 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.mojang.brigadier.CommandDispatcher;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.platform.NetworkManager;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -20,7 +23,9 @@ import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -29,11 +34,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.SaveFormat;
@@ -43,8 +50,14 @@ import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.AnimalTameEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.AdvancementEvent;
+import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -59,6 +72,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -70,6 +84,47 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     public HardcoreQuestingForge() {
         NetworkingManager.init();
         HardcoreQuestingCore.initialize(this);
+        
+        MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
+            if (event.getEntityLiving() instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+                if (player instanceof FakePlayer
+                    || event.isCanceled()
+                    || player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                    || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
+                    return;
+                }
+                
+                Iterator<ItemEntity> iter = event.getDrops().iterator();
+                while (iter.hasNext()) {
+                    ItemEntity entityItem = iter.next();
+                    ItemStack stack = entityItem.getItem();
+                    if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
+                        player.inventory.add(stack);
+                        iter.remove();
+                    }
+                }
+            }
+        });
+        MinecraftForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
+            if (event.getPlayer() == null || event.getPlayer() instanceof FakePlayer
+                || !event.isWasDeath() || event.isCanceled()
+                || event.getPlayer().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
+                return;
+            }
+            
+            if (event.getOriginal().inventory.contains(new ItemStack(ModItems.book))) {
+                ItemStack bookStack = new ItemStack(ModItems.book);
+                for (ItemStack stack : event.getOriginal().inventory.armor) {
+                    if (bookStack.sameItem(stack)) {
+                        bookStack = stack.copy();
+                        break;
+                    }
+                }
+                event.getPlayer().inventory.add(bookStack);
+            }
+        });
     }
     
     @Override
@@ -177,6 +232,49 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     public void registerOnItemPickup(BiConsumer<PlayerEntity, ItemStack> biConsumer) {
         MinecraftForge.EVENT_BUS.<PlayerEvent.ItemPickupEvent>addListener(event -> {
             biConsumer.accept(event.getPlayer(), event.getStack());
+        });
+    }
+    
+    @Override
+    public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> biConsumer) {
+        MinecraftForge.EVENT_BUS.<LivingDeathEvent>addListener(event -> {
+            biConsumer.accept(event.getEntityLiving(), event.getSource());
+        });
+    }
+    
+    @Override
+    public void registerOnCrafting(BiConsumer<PlayerEntity, ItemStack> triConsumer) {
+        MinecraftForge.EVENT_BUS.<PlayerEvent.ItemCraftedEvent>addListener(event -> {
+            triConsumer.accept(event.getPlayer(), event.getCrafting());
+        });
+    }
+    
+    @Override
+    public void registerOnAnvilCrafting(BiConsumer<PlayerEntity, ItemStack> triConsumer) {
+        MinecraftForge.EVENT_BUS.<AnvilRepairEvent>addListener(event -> {
+            triConsumer.accept(event.getPlayer(), event.getItemResult());
+        });
+    }
+    
+    @Override
+    public void registerOnSmelting(BiConsumer<PlayerEntity, ItemStack> triConsumer) {
+        MinecraftForge.EVENT_BUS.<PlayerEvent.ItemSmeltedEvent>addListener(event -> {
+            triConsumer.accept(event.getPlayer(), event.getSmelting());
+        });
+    }
+    
+    @Override
+    public void registerOnAdvancement(BiConsumer<ServerPlayerEntity, Advancement> biConsumer) {
+        MinecraftForge.EVENT_BUS.<AdvancementEvent>addListener(event -> {
+            if (event.getPlayer() instanceof ServerPlayerEntity)
+                biConsumer.accept((ServerPlayerEntity) event.getPlayer(), event.getAdvancement());
+        });
+    }
+    
+    @Override
+    public void registerOnAnimalTame(BiConsumer<PlayerEntity, Entity> biConsumer) {
+        MinecraftForge.EVENT_BUS.<AnimalTameEvent>addListener(event -> {
+            biConsumer.accept(event.getTamer(), event.getAnimal());
         });
     }
     

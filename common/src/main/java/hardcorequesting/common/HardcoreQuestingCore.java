@@ -75,5 +75,9 @@ public class HardcoreQuestingCore {
             PlayerTracker.instance.onPlayerLogin(playerEntity);
             EventTrigger.instance().onPlayerLogin(playerEntity);
         });
+        platform.registerOnLivingDeath((livingEntity, source) -> {
+            PlayerDeathEventListener.instance.onLivingDeath(livingEntity, source);
+            EventTrigger.instance().onLivingDeath(livingEntity, source);
+        });
     }
 }

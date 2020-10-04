@@ -6,6 +6,7 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -17,6 +18,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -86,6 +89,18 @@ public interface AbstractPlatform {
     }
     
     void registerOnItemPickup(BiConsumer<Player, ItemStack> consumer);
+    
+    void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> consumer);
+    
+    void registerOnCrafting(BiConsumer<Player, ItemStack> consumer);
+    
+    void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> consumer);
+    
+    void registerOnSmelting(BiConsumer<Player, ItemStack> consumer);
+    
+    void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> consumer);
+    
+    void registerOnAnimalTame(BiConsumer<Player, Entity> consumer);
     
     CompoundTag getPlayerExtraTag(Player player);
     

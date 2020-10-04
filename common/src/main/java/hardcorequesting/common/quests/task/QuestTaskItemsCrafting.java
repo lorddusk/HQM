@@ -8,7 +8,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
 public class QuestTaskItemsCrafting extends QuestTaskItems {
@@ -24,7 +23,7 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
     }
     
     @Override
-    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
+    public void onCrafting(Player player, ItemStack stack) {
         create(player, stack);
     }
     

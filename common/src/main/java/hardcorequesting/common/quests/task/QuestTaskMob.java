@@ -238,7 +238,7 @@ public class QuestTaskMob extends QuestTask {
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
                 if (mob.count > ((QuestDataTaskMob) getData(killer)).killed[i]) {
-                    EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(mob.mob));
+                    EntityType<?> type = Registry.ENTITY_TYPE.get(mob.mob);
                     if (type != null) {
                         if (type.equals(entity.getType())) {
                             ((QuestDataTaskMob) getData(killer)).killed[i]++;
@@ -291,9 +291,8 @@ public class QuestTaskMob extends QuestTask {
         
         private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
-        private String mob;
+        private ResourceLocation mob = Registry.ENTITY_TYPE.getDefaultKey();
         private int count = 1;
-        private boolean exact;
         
         public Mob copy() {
             Mob other = new Mob();
@@ -301,7 +300,6 @@ public class QuestTaskMob extends QuestTask {
             other.name = name;
             other.mob = mob;
             other.count = count;
-            other.exact = exact;
             
             return other;
         }
@@ -322,12 +320,16 @@ public class QuestTaskMob extends QuestTask {
             this.name = name;
         }
         
-        public String getMob() {
+        public ResourceLocation getMob() {
             return mob;
         }
         
-        public void setMob(String mob) {
-            this.mob = mob;
+        public void setMob(ResourceLocation mob) {
+            if (Registry.ENTITY_TYPE.getOptional(mob).isPresent()) {
+                this.mob = mob;
+            } else {
+                this.mob = Registry.ENTITY_TYPE.getDefaultKey();
+            }
         }
         
         public int getCount() {

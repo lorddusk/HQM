@@ -1414,7 +1414,7 @@ public class Quest {
             if (reputationRewards != null && getQuestData(player).canClaim()) {
                 getQuestData(player).claimed = true;
                 QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
-                EventTrigger.instance().onEvent(new EventTrigger.ReputationEvent(player));
+                EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
                 sentInfo = true;
             }
             
@@ -1512,7 +1512,7 @@ public class Quest {
             GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
         }
         
-        EventTrigger.instance().onEvent(new EventTrigger.QuestSelectedEvent(player, this.getQuestId()));
+        EventTrigger.instance().onQuestSelected(new EventTrigger.QuestSelectedEvent(player, this.getQuestId()));
     }
     
     public boolean hasSet(QuestSet selectedSet) {

@@ -322,45 +322,40 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<Mob> MOB_ADAPTER = new TypeAdapter<Mob>() {
-        private final String KILLS = "kills";
-        private final String MOB = "mob";
-        private final String ICON = "icon";
-        private final String NAME = "name";
+    public static final Adapter<Mob> MOB_ADAPTER = new Adapter<Mob>() {
+        private static final String KILLS = "kills";
+        private static final String MOB = "mob";
+        private static final String ICON = "icon";
+        private static final String NAME = "name";
         
         @Override
-        public void write(JsonWriter out, Mob value) throws IOException {
-            out.beginObject();
-            out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIconStack();
-            if (stack != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
-            }
-            out.name(MOB).value(value.getMob());
-            out.name(KILLS).value(value.getCount());
-            out.endObject();
+        public JsonElement serialize(Mob src) {
+            return object()
+                    .add(NAME, src.getName())
+                    .use(builder -> {
+                        ItemStack stack = src.getIconStack();
+                        if (stack != null) {
+                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.toJsonTree(stack));
+                        }
+                    })
+                    .add(MOB, src.getMob().toString())
+                    .add(KILLS, src.getCount())
+                    .build();
         }
         
         @Override
-        public Mob read(JsonReader in) throws IOException {
-            in.beginObject();
+        public Mob deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
             Mob result = new Mob();
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(NAME)) {
-                    result.setName(in.nextString());
-                } else if (name.equalsIgnoreCase(ICON)) {
-                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
-                    if (!icon.isEmpty()) {
-                        result.setIconStack(icon);
-                    }
-                } else if (name.equalsIgnoreCase(MOB)) {
-                    result.setMob(in.nextString());
-                } else if (name.equalsIgnoreCase(KILLS)) {
-                    result.setCount(in.nextInt());
+            result.setName(GsonHelper.getAsString(object, NAME, result.getName()));
+            result.setMob(new ResourceLocation(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
+            result.setCount(GsonHelper.getAsInt(object, KILLS, result.getCount()));
+            if (object.has(ICON)) {
+                ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));
+                if (!icon.isEmpty()) {
+                    result.setIconStack(icon);
                 }
             }
-            in.endObject();
             return result;
         }
     };

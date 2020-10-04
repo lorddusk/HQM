@@ -28,7 +28,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -98,7 +97,7 @@ public abstract class QuestTask {
         }
         
         if (player != null) {
-            EventTrigger.instance().onEvent(new EventTrigger.QuestCompletedEvent(player, quest.getQuestId()));
+            EventTrigger.instance().onQuestComplete(new EventTrigger.QuestCompletedEvent(player, quest.getQuestId()));
         }
     }
     
@@ -293,7 +292,7 @@ public abstract class QuestTask {
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
     }
     
-    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
+    public void onCrafting(Player player, ItemStack stack) {
     }
     
     public void onItemPickUp(Player playerEntity, ItemStack stack) {

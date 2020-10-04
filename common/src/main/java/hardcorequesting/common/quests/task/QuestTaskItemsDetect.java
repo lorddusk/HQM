@@ -8,7 +8,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
@@ -52,11 +51,6 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     }
     
     @Override
-    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
-        onCrafting(player, stack);
-    }
-    
-    @Override
     public void onItemPickUp(Player playerEntity, ItemStack stack) {
         countItems(playerEntity, stack);
     }
@@ -68,6 +62,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         }
     }
     
+    @Override
     public void onCrafting(Player player, ItemStack stack) {
         if (player != null) {
             stack = stack.copy();

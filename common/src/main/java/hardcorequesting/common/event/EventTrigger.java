@@ -4,6 +4,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
@@ -13,7 +14,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -46,6 +46,11 @@ public class EventTrigger {
         HardcoreQuestingCore.platform.registerOnBlockPlace(this::onBlockPlaced);
         HardcoreQuestingCore.platform.registerOnBlockBreak(this::onBlockBreak);
         HardcoreQuestingCore.platform.registerOnItemPickup(this::onItemPickUp);
+        HardcoreQuestingCore.platform.registerOnCrafting(this::onCrafting);
+        HardcoreQuestingCore.platform.registerOnAnvilCrafting(this::onAnvilCrafting);
+        HardcoreQuestingCore.platform.registerOnSmelting(this::onSmelting);
+        HardcoreQuestingCore.platform.registerOnAdvancement(this::onAdvancement);
+        HardcoreQuestingCore.platform.registerOnAnimalTame(this::onAnimalTame);
         instance = this;
     }
     
@@ -99,31 +104,23 @@ public class EventTrigger {
         }
     }
     
-    public void onCrafting(Player player, ItemStack stack, CraftingContainer craftingInv) {
+    public void onCrafting(Player player, ItemStack stack) {
         for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(player, stack, craftingInv);
+            task.onCrafting(player, stack);
         }
     }
     
-    // TODO Anvil
-//    @SubscribeEvent
-//    public void onEvent(AnvilRepairEvent event) {
-//        CraftEventWrapper wrapper = new CraftEventWrapper(event.getEntityPlayer(), event);
-//        
-//        for (QuestTask task : getTasks(Type.CRAFTING)) {
-//            task.onCrafting(wrapper);
-//        }
-//    }
+    public void onAnvilCrafting(Player player, ItemStack stack) {
+        for (QuestTask task : getTasks(Type.CRAFTING)) {
+            task.onCrafting(player, stack);
+        }
+    }
     
-    // TODO Furnace
-//    @SubscribeEvent
-//    public void onEvent(PlayerEvent.ItemSmeltedEvent event) {
-//        CraftEventWrapper wrapper = new CraftEventWrapper(event.player, event);
-//        
-//        for (QuestTask task : getTasks(Type.CRAFTING)) {
-//            task.onCrafting(wrapper);
-//        }
-//    }
+    public void onSmelting(Player player, ItemStack stack) {
+        for (QuestTask task : getTasks(Type.CRAFTING)) {
+            task.onCrafting(player, stack);
+        }
+    }
     
     public void onItemPickUp(Player playerEntity, ItemStack stack) {
         for (QuestTask task : getTasks(Type.PICK_UP)) {
@@ -131,25 +128,25 @@ public class EventTrigger {
         }
     }
     
-    public void onEvent(BookOpeningEvent event) {
+    public void onBookOpening(BookOpeningEvent event) {
         for (QuestTask task : getTasks(Type.OPEN_BOOK)) {
             task.onOpenBook(event);
         }
     }
     
-    public void onEvent(QuestCompletedEvent event) {
+    public void onQuestComplete(QuestCompletedEvent event) {
         for (QuestTask task : getTasks(Type.QUEST_COMPLETED)) {
             task.onQuestCompleted(event);
         }
     }
     
-    public void onEvent(QuestSelectedEvent event) {
+    public void onQuestSelected(QuestSelectedEvent event) {
         for (QuestTask task : getTasks(Type.QUEST_SELECTED)) {
             task.onQuestSelected(event);
         }
     }
     
-    public void onEvent(ReputationEvent event) {
+    public void onReputationChange(ReputationEvent event) {
         for (QuestTask task : getTasks(Type.REPUTATION_CHANGE)) {
             task.onReputationChange(event);
         }
@@ -161,7 +158,7 @@ public class EventTrigger {
         }
     }
     
-    public void onAdvancement(ServerPlayer playerEntity) {
+    public void onAdvancement(ServerPlayer playerEntity, Advancement advancement) {
         for (QuestTask task : getTasks(Type.ADVANCEMENT)) {
             task.onAdvancement(playerEntity);
         }

@@ -30,12 +30,12 @@ public class MixinLanguage {
     private static void loadDefault(CallbackInfoReturnable<Language> cir, ImmutableMap.Builder<String, String> builder, BiConsumer biConsumer) {
         String s = FabricLoader.getInstance().isDevelopmentEnvironment() ? "hardcorequesting-core" : HardcoreQuestingCore.ID;
         try {
-            Path path = FabricLoader.getInstance().getModContainer(s).get().getPath("assets/" + s + "/lang/en_us.json");
+            Path path = FabricLoader.getInstance().getModContainer(s).get().getPath("assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json");
             try (InputStream inputStream = Files.newInputStream(path)) {
                 Language.loadFromJson(inputStream, biConsumer);
             }
         } catch (JsonParseException | IOException var15) {
-            LOGGER.error("Couldn't read strings from /assets/" + s + "/lang/en_us.json", var15);
+            LOGGER.error("Couldn't read strings from /assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json", var15);
         }
     }
 }
