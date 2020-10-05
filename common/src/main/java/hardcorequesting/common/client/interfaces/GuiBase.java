@@ -352,67 +352,9 @@ public class GuiBase extends Screen {
     }
     
     public List<FormattedText> getLinesFromText(FormattedText str, float mult, int width) {
-//        List<StringVisitable> lst = new ArrayList<>();
         if (str == null) {
             str = Translator.plain("Missing info");
         }
-//        String[] lines = str.split("\n");
-//        for (String line : lines) {
-//            
-//            List<String> words = new ArrayList<String>();
-//            Collections.addAll(words, line.split(" "));
-//            
-//            if (line.endsWith(" ")) {
-//                String spaceTail = ""; //the split removes tailing spaces
-//                for (int i = line.length() - 1; i >= 0; i--) {
-//                    char c = line.charAt(i);
-//                    if (c == ' ') {
-//                        spaceTail += c;
-//                    } else {
-//                        break;
-//                    }
-//                }
-//                words.add(spaceTail);
-//            }
-//            
-//            for (int i = 0; i < words.size(); i++) {
-//                String word = words.get(i);
-//                StringBuilder other = new StringBuilder();
-//                while (textRenderer.getStringWidth(word + " ") * mult >= width) {
-//                    other.insert(0, word.charAt(word.length() - 1));
-//                    word = word.substring(0, word.length() - 1);
-//                }
-//                
-//                if (other.length() > 0) {
-//                    words.set(i, word);
-//                    words.add(i + 1, other.toString());
-//                } else {
-//                    words.set(i, word + " ");
-//                }
-//                
-//            }
-//            
-//            
-//            String currentLine = null;
-//            for (String word : words) {
-//                
-//                String newLine;
-//                if (currentLine == null) {
-//                    newLine = word;
-//                } else {
-//                    newLine = currentLine + word;
-//                }
-//                if (textRenderer.getStringWidth(newLine) * mult < width) {
-//                    currentLine = newLine;
-//                } else {
-//                    lst.add(Translator.plain(currentLine));
-//                    currentLine = word;
-//                }
-//            }
-//            lst.add(Translator.plain(currentLine));
-//        }
-//        
-//        
         return font.getSplitter().splitLines(str, (int) (width / mult), Style.EMPTY);
     }
 }

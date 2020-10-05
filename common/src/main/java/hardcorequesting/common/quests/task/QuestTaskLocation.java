@@ -158,7 +158,7 @@ public class QuestTaskLocation extends QuestTask {
             
             if (visited(i, player)) {
                 gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            } else if (location.visible.doShowCoordinate()) {
+            } else if (location.visibility.doShowCoordinate()) {
                 if (location.radius >= 0) {
                     gui.drawString(matrices, Translator.plain("(" + location.x + ", " + location.y + ", " + location.z + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
@@ -168,7 +168,7 @@ public class QuestTaskLocation extends QuestTask {
                         FormattedText str;
                         int distance = (int) player.distanceToSqr(location.x + 0.5, location.y + 0.5, location.z + 0.5);
                         str = Translator.translatable("hqm.locationMenu.mAway", distance);
-                        if (location.visible.doShowRadius()) {
+                        if (location.visibility.doShowRadius()) {
                             str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
                         }
                         gui.drawString(matrices, str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
@@ -349,7 +349,7 @@ public class QuestTaskLocation extends QuestTask {
         private int y;
         private int z;
         private int radius = 3;
-        private Visibility visible = Visibility.LOCATION;
+        private Visibility visibility = Visibility.LOCATION;
         private ResourceKey<Level> dimension;
         
         private Location copy() {
@@ -360,7 +360,7 @@ public class QuestTaskLocation extends QuestTask {
             location.y = y;
             location.z = z;
             location.radius = radius;
-            location.visible = visible;
+            location.visibility = visibility;
             location.dimension = dimension;
             
             return location;
@@ -414,12 +414,12 @@ public class QuestTaskLocation extends QuestTask {
             this.radius = radius;
         }
         
-        public Visibility getVisible() {
-            return visible;
+        public Visibility getVisibility() {
+            return visibility;
         }
         
-        public void setVisible(Visibility visible) {
-            this.visible = visible;
+        public void setVisibility(Visibility visibility) {
+            this.visibility = visibility;
         }
         
         public ResourceKey<Level> getDimension() {

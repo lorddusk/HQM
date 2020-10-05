@@ -153,7 +153,8 @@ public class HQMConfig {
         
         Quest.isEditing = getInstance().Editing.USE_EDITOR;
         if (HardcoreQuestingCore.proxy.isClient()) {
-            KeyboardHandler.fromConfig(getInstance().Editing.HOTKEYS);
+            KeyboardHandler.clear();
+            KeyboardHandler.initDefault();
         }
     }
     
@@ -211,10 +212,6 @@ public class HQMConfig {
         //@Name("Enable edit mode by default")
         @Comment("Set to true to automatically enable edit mode when entering worlds in single-player. Has no effect in multiplayer.")
         public boolean USE_EDITOR = false;
-        
-        //@Name("Hotkeys")
-        @Comment("Hotkeys used in the book, one entry per line(Format: [key]:[mode]")
-        public String[] HOTKEYS = new String[]{"68:delete", "78:create", "77:move", "260:create", "82:rename", "261:delete", "32:normal", "83:swap", "83:swap_select"};
     }
     
     public static class Interface {

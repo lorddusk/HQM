@@ -121,20 +121,20 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (left) {
-            location.setVisible(QuestTaskLocation.Visibility.values()[(location.getVisible().ordinal() + QuestTaskLocation.Visibility.values().length - 1) % QuestTaskLocation.Visibility.values().length]);
+            location.setVisibility(QuestTaskLocation.Visibility.values()[(location.getVisibility().ordinal() + QuestTaskLocation.Visibility.values().length - 1) % QuestTaskLocation.Visibility.values().length]);
         } else {
-            location.setVisible(QuestTaskLocation.Visibility.values()[(location.getVisible().ordinal() + 1) % QuestTaskLocation.Visibility.values().length]);
+            location.setVisibility(QuestTaskLocation.Visibility.values()[(location.getVisibility().ordinal() + 1) % QuestTaskLocation.Visibility.values().length]);
         }
     }
     
     @Override
     protected String getArrowText() {
-        return location.getVisible().getName();
+        return location.getVisibility().getName();
     }
     
     @Override
     protected String getArrowDescription() {
-        return location.getVisible().getDescription();
+        return location.getVisibility().getDescription();
     }
     
     @Override

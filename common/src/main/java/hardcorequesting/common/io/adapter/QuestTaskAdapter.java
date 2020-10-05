@@ -112,7 +112,7 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static final TypeAdapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new TypeAdapter<QuestTaskLocation.Location>() {
+    public static final Adapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new Adapter<QuestTaskLocation.Location>() {
         private static final String X = "x";
         private static final String Y = "y";
         private static final String Z = "z";
@@ -123,51 +123,40 @@ public class QuestTaskAdapter {
         private static final String NAME = "name";
         
         @Override
-        public void write(JsonWriter out, QuestTaskLocation.Location value) throws IOException {
-            out.beginObject();
-            out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIconStack();
-            if (stack != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
-            }
-            out.name(X).value(value.getX());
-            out.name(Y).value(value.getY());
-            out.name(Z).value(value.getZ());
-            out.name(DIM).value(value.getDimension().location().toString());
-            out.name(RADIUS).value(value.getRadius());
-            if (value.getVisible() != QuestTaskLocation.Visibility.LOCATION)
-                out.name(VISIBLE).value(value.getVisible().name());
-            out.endObject();
+        public JsonElement serialize(QuestTaskLocation.Location src) {
+            return object()
+                    .add(NAME, src.getName())
+                    .add(X, src.getX())
+                    .add(Y, src.getY())
+                    .add(Z, src.getZ())
+                    .add(DIM, src.getDimension().location().toString())
+                    .add(RADIUS, src.getRadius())
+                    .add(VISIBLE, src.getVisibility().name())
+                    .use(builder -> {
+                        ItemStack stack = src.getIconStack();
+                        if (stack != null) {
+                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(stack));
+                        } else {
+                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(ItemStack.EMPTY));
+                        }
+                    })
+                    .build();
         }
         
         @Override
-        public QuestTaskLocation.Location read(JsonReader in) throws IOException {
-            in.beginObject();
+        public QuestTaskLocation.Location deserialize(JsonElement json) {
+            JsonObject object = json.getAsJsonObject();
             QuestTaskLocation.Location result = new QuestTaskLocation.Location();
-            while (in.hasNext()) {
-                String name = in.nextName();
-                if (name.equalsIgnoreCase(NAME)) {
-                    result.setName(in.nextString());
-                } else if (name.equalsIgnoreCase(X)) {
-                    result.setX(in.nextInt());
-                } else if (name.equalsIgnoreCase(Y)) {
-                    result.setY(in.nextInt());
-                } else if (name.equalsIgnoreCase(Z)) {
-                    result.setZ(in.nextInt());
-                } else if (name.equalsIgnoreCase(DIM)) {
-                    result.setDimension(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(in.nextString())));
-                } else if (name.equalsIgnoreCase(RADIUS)) {
-                    result.setRadius(in.nextInt());
-                } else if (name.equalsIgnoreCase(ICON)) {
-                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
-                    if (!icon.isEmpty()) {
-                        result.setIconStack(icon);
-                    }
-                } else if (name.equalsIgnoreCase(VISIBLE)) {
-                    result.setVisible(QuestTaskLocation.Visibility.valueOf(in.nextString()));
-                }
+            result.setName(GsonHelper.getAsString(object, NAME));
+            result.setX(GsonHelper.getAsInt(object, X));
+            result.setY(GsonHelper.getAsInt(object, Y));
+            result.setZ(GsonHelper.getAsInt(object, Z));
+            result.setDimension(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(GsonHelper.getAsString(object, DIM))));
+            result.setRadius(GsonHelper.getAsInt(object, RADIUS));
+            result.setVisibility(QuestTaskLocation.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
+            if (object.has(ICON)) {
+                result.setIconStack(MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON)));
             }
-            in.endObject();
             return result;
         }
     };

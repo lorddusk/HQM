@@ -1,5 +1,6 @@
 package hardcorequesting.common.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.util.Translator;
@@ -10,8 +11,11 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class EditButton {
@@ -63,7 +67,18 @@ public class EditButton {
     public void drawInfo(PoseStack matrices, int mX, int mY) {
         if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             if (text == null) {
-                List<FormattedText> text = guiQuestBook.getLinesFromText(Translator.plain(mode.getName() + "\n\n" + mode.getDescription()), 1F, 150);
+                List<FormattedText> text = new ArrayList<>();
+                if (KeyboardHandler.keyMap.containsValue(mode)) {
+                    List<String> builder = new ArrayList<>();
+                    for (Map.Entry<Integer, EditMode> entry : KeyboardHandler.keyMap.entries()) {
+                        if (entry.getValue() == mode)
+                            builder.add("§7" + StringUtils.capitalize(InputConstants.Type.KEYSYM.getOrCreate(entry.getKey()).getDisplayName().getString()));
+                    }
+                    text.add(Translator.translatable("hqm.editMode.keybind", mode.getName(), String.join(", ", builder)));
+                } else {
+                    text.add(FormattedText.of(mode.getName()));
+                }
+                text.addAll(guiQuestBook.getLinesFromText(Translator.plain("\n" + mode.getDescription()), 1F, 150));
                 for (int i = 1; i < text.size(); i++) {
                     ComponentCollector collector = new ComponentCollector();
                     text.get(i).visit((style, string) -> {

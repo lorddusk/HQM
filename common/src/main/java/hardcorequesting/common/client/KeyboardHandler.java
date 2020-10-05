@@ -1,28 +1,46 @@
 package hardcorequesting.common.client;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class KeyboardHandler {
     
-    private static Map<Integer, Set<EditMode>> keyMap;
+    public static Multimap<Integer, EditMode> keyMap = Multimaps.newMultimap(Maps.newHashMap(), Lists::newArrayList);
     
     public static void initDefault() {
         addKeymap(GLFW.GLFW_KEY_M, EditMode.MOVE);
         addKeymap(GLFW.GLFW_KEY_R, EditMode.RENAME);
         addKeymap(GLFW.GLFW_KEY_N, EditMode.CREATE);
         addKeymap(GLFW.GLFW_KEY_INSERT, EditMode.CREATE);
+        
+        addKeymap(GLFW.GLFW_KEY_N, EditMode.TASK);
+        addKeymap(GLFW.GLFW_KEY_INSERT, EditMode.TASK);
+        
         addKeymap(GLFW.GLFW_KEY_DELETE, EditMode.DELETE);
         addKeymap(GLFW.GLFW_KEY_D, EditMode.DELETE);
         addKeymap(GLFW.GLFW_KEY_S, EditMode.SWAP_SELECT);
         addKeymap(GLFW.GLFW_KEY_S, EditMode.SWAP);
+        addKeymap(GLFW.GLFW_KEY_R, EditMode.REQUIREMENT);
+        addKeymap(GLFW.GLFW_KEY_O, EditMode.QUEST_OPTION);
+        addKeymap(GLFW.GLFW_KEY_I, EditMode.ITEM);
+        addKeymap(GLFW.GLFW_KEY_L, EditMode.LOCATION);
+        addKeymap(GLFW.GLFW_KEY_C, EditMode.MOB);
         addKeymap(GLFW.GLFW_KEY_SPACE, EditMode.NORMAL);
+        addKeymap(GLFW.GLFW_KEY_B, EditMode.BAG);
+        addKeymap(GLFW.GLFW_KEY_R, EditMode.REPUTATION);
     }
     
     public static void clear() {
@@ -30,11 +48,7 @@ public class KeyboardHandler {
     }
     
     private static void addKeymap(int key, EditMode mode) {
-        if (keyMap == null) keyMap = new HashMap<>();
-        Set<EditMode> set = keyMap.get(key);
-        if (set == null) set = new HashSet<>();
-        set.add(mode);
-        keyMap.put(key, set);
+        keyMap.put(key, mode);
     }
     
     public static boolean pressedHotkey(GuiQuestBook gui, int key, EditButton[] buttons) {
@@ -49,7 +63,7 @@ public class KeyboardHandler {
                     return true;
                 }
             } else if (keyMap.containsKey(key)) {
-                Set<EditMode> modes = keyMap.get(key);
+                Collection<EditMode> modes = keyMap.get(key);
                 for (EditButton button : buttons) {
                     for (EditMode mode : modes) {
                         if (button.matchesMode(mode)) {
@@ -65,9 +79,8 @@ public class KeyboardHandler {
     
     public static String[] toConfig() {
         List<String> list = new ArrayList<>();
-        for (Map.Entry<Integer, Set<EditMode>> entry : keyMap.entrySet())
-            for (EditMode mode : entry.getValue())
-                list.add(entry.getKey() + ":" + mode.name().toLowerCase());
+        for (Map.Entry<Integer, EditMode> entry : keyMap.entries())
+            list.add(entry.getKey() + ":" + entry.getValue().name().toLowerCase());
         return list.toArray(new String[0]);
     }
     
