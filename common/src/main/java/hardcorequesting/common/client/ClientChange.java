@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
@@ -82,8 +83,8 @@ public enum ClientChange {
             StringWriter sWriter = new StringWriter();
             JsonWriter writer = new JsonWriter(sWriter);
             writer.beginObject();
-            writer.name(QUEST).value(data.getFirst().toString());
-            writer.name(REWARD).value(data.getSecond());
+            writer.name(QUEST).value(data.getA().toString());
+            writer.name(REWARD).value(data.getB());
             writer.endObject();
             writer.close();
             return new ClientUpdateMessage(CLAIM_QUEST, sWriter.toString());
@@ -130,7 +131,7 @@ public enum ClientChange {
         public IMessage build(Sounds data) throws IOException {
             return new SoundMessage(SOUND, data.ordinal() + "");
         }
-    
+        
         @Override
         public void parse(Player player, String data) {
             SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
@@ -172,23 +173,5 @@ public enum ClientChange {
         IMessage build(T data) throws IOException;
         
         void parse(Player player, String data);
-    }
-    
-    public static class Tuple<A, B> {
-        private A first;
-        private B second;
-        
-        public Tuple(A first, B second) {
-            this.first = first;
-            this.second = second;
-        }
-        
-        public A getFirst() {
-            return first;
-        }
-        
-        public B getSecond() {
-            return second;
-        }
     }
 }

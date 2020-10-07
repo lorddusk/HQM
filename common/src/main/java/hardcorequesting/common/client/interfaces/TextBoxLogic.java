@@ -127,7 +127,7 @@ public class TextBoxLogic {
         return cursorPositionY;
     }
     
-    protected void recalculateCursor(GuiBase gui) {
+    public void recalculateCursor(GuiBase gui) {
         if (updatedCursor) {
             if (multiLine) {
                 int tmpCursor = cursor;

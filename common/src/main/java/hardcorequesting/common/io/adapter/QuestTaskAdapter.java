@@ -14,8 +14,6 @@ import hardcorequesting.common.quests.task.QuestTaskMob.Mob;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -129,7 +127,7 @@ public class QuestTaskAdapter {
                     .add(X, src.getX())
                     .add(Y, src.getY())
                     .add(Z, src.getZ())
-                    .add(DIM, src.getDimension().location().toString())
+                    .add(DIM, src.getDimension())
                     .add(RADIUS, src.getRadius())
                     .add(VISIBLE, src.getVisibility().name())
                     .use(builder -> {
@@ -151,7 +149,7 @@ public class QuestTaskAdapter {
             result.setX(GsonHelper.getAsInt(object, X));
             result.setY(GsonHelper.getAsInt(object, Y));
             result.setZ(GsonHelper.getAsInt(object, Z));
-            result.setDimension(ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(GsonHelper.getAsString(object, DIM))));
+            result.setDimension(GsonHelper.getAsString(object, DIM));
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
             result.setVisibility(QuestTaskLocation.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
             if (object.has(ICON)) {

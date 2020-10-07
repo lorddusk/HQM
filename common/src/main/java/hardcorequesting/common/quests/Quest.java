@@ -36,6 +36,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -140,7 +141,7 @@ public class Quest {
             
             @Override
             public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new ClientChange.Tuple<>(getQuestId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
+                NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<>(getQuestId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
             }
         });
         

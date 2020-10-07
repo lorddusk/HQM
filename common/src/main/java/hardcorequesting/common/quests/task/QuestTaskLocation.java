@@ -22,7 +22,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
@@ -32,10 +31,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class QuestTaskLocation extends QuestTask {
     private static final String LOCATIONS = "locations";
@@ -75,7 +71,7 @@ public class QuestTaskLocation extends QuestTask {
                         System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
                         ((QuestDataTaskLocation) this.getData(player)).visited = visited;
                     }
-                    if (!visited[i] && player.getCommandSenderWorld().dimension() == location.dimension) {
+                    if (!visited[i] && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
                         int current = (int) player.distanceToSqr((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
@@ -163,7 +159,7 @@ public class QuestTaskLocation extends QuestTask {
                     gui.drawString(matrices, Translator.plain("(" + location.x + ", " + location.y + ", " + location.z + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
                 
-                if (player.getCommandSenderWorld().dimension() == location.dimension) {
+                if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
                     if (location.radius >= 0) {
                         FormattedText str;
                         int distance = (int) player.distanceToSqr(location.x + 0.5, location.y + 0.5, location.z + 0.5);
@@ -350,7 +346,7 @@ public class QuestTaskLocation extends QuestTask {
         private int z;
         private int radius = 3;
         private Visibility visibility = Visibility.LOCATION;
-        private ResourceKey<Level> dimension;
+        private String dimension;
         
         private Location copy() {
             Location location = new Location();
@@ -422,11 +418,11 @@ public class QuestTaskLocation extends QuestTask {
             this.visibility = visibility;
         }
         
-        public ResourceKey<Level> getDimension() {
+        public String getDimension() {
             return dimension;
         }
         
-        public void setDimension(ResourceKey<Level> dimension) {
+        public void setDimension(String dimension) {
             this.dimension = dimension;
         }
     }

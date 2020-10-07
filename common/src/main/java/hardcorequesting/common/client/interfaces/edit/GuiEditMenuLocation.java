@@ -61,18 +61,22 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
             }
         });
         
-        // TODO Add Identifier textbox
-//        textBoxes.add(new TextBoxNumberNegative(gui, 3, "hqm.locationMenu.dim") {
-//            @Override
-//            protected void setValue(int number) {
-//                location.setDimension(number);
-//            }
-//            
-//            @Override
-//            protected int getValue() {
-//                return location.getDimension();
-//            }
-//        });
+        TextBoxGroup.TextBox locationBox;
+        textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, location.getDimension(), BOX_X, BOX_Y + BOX_OFFSET * 3, true) {
+            @Override
+            public void textChanged(GuiBase gui) {
+                super.textChanged(gui);
+                location.setDimension(getText());
+            }
+            
+            @Override
+            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
+                super.draw(matrices, gui, selected);
+                
+                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), BOX_X, BOX_Y + BOX_OFFSET * 3 + TEXT_OFFSET, 0x404040);
+            }
+        });
+        locationBox.recalculateCursor(gui);
         
         textBoxes.add(new TextBoxNumberNegative(gui, 4, "hqm.locationMenu.radius") {
             @Override
@@ -110,9 +114,12 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
                 location.setX((int) player.getX());
                 location.setY((int) player.getY());
                 location.setZ((int) player.getZ());
-                location.setDimension(player.level.dimension());
+                location.setDimension(player.level.dimension().location().toString());
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
-                    textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
+                    if (textBox instanceof TextBoxNumber)
+                        textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
+                    else
+                        textBox.recalculateCursor(gui);
                 }
             }
         });

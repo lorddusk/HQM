@@ -108,7 +108,7 @@ public class TextBoxGroup {
         
         @Environment(EnvType.CLIENT)
         @Override
-        protected void recalculateCursor(GuiBase gui) {
+        public void recalculateCursor(GuiBase gui) {
             if (scrollable) {
                 if (updatedCursor) {
                     updateVisible(gui);
