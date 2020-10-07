@@ -43,7 +43,7 @@ public class BagAdapter {
             JsonObject object = json.getAsJsonObject();
             
             Group group = new Group(UUID.fromString(GsonHelper.getAsString(object, ID)));
-            group.setName(GsonHelper.getAsString(object, NAME));
+            group.setName(GsonHelper.getAsString(object, NAME, null));
             group.setLimit(GsonHelper.getAsInt(object, LIMIT));
             for (JsonElement element : GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray())) {
                 ItemStack stack = MinecraftAdapter.ITEM_STACK.deserialize(element);
