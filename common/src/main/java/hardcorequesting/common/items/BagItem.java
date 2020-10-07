@@ -36,7 +36,6 @@ public class BagItem extends Item {
     
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
         if (!world.isClientSide) {
             int totalWeight = 0;
             for (Group group : Group.getGroups().values()) {
@@ -62,14 +61,12 @@ public class BagItem extends Item {
                 }
             }
             
-            //doing this makes sure the inventory is updated on the client, and the creative mode thingy is already handled by the calling code
-            //if(!player.capabilities.isCreativeMode) {
+            ItemStack stack = player.getItemInHand(hand).copy();
             stack.shrink(1);
-            //}
-            return InteractionResultHolder.success(stack);
+            player.setItemInHand(hand, stack);
         }
         
-        return InteractionResultHolder.consume(stack);
+        return InteractionResultHolder.consume(player.getItemInHand(hand));
     }
     
     @Environment(EnvType.CLIENT)
