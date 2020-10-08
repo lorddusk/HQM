@@ -67,7 +67,7 @@ shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadow]
-    classifier null
+    archiveClassifier.set("forge")
 }
 
 reobf {

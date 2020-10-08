@@ -11,7 +11,7 @@ allprojects {
     apply plugin: "architect-plugin"
 
     archivesBaseName = project.archives_base_name
-    version = project.mod_version
+    version = minecraft_version + "+" + project.mod_version
     group = project.maven_group
 
     tasks.withType(JavaCompile) {
