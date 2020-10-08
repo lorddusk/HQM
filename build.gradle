@@ -1,84 +1,20 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
-}
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'idea'
-
-runClient {
-    args '--username', 'hqmtest'
+plugins {
+    id "architect-plugin" version "1.0.6"
 }
 
-repositories {
-    maven {
-        name = "Forge"
-        url = "http://files.minecraftforge.net/maven"
-    }
-    maven {
-        name = "JEI"
-        url =  "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "HWYLA"
-        url = "http://tehnut.info/maven"
-    }
-    maven { // Actually Additions, TUMAT
-        url = "http://maven.chaosfield.at"
-    }
-    maven { // The One Probe
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
-    }
+architect {
+    minecraft = minecraft_version
 }
 
-dependencies {
-    deobfCompile "mcp.mobius.waila:Hwyla:${project.hwyla_version}"
-    deobfProvided "mezz.jei:jei_${project.jei_version}:api"
-    runtime "mezz.jei:jei_${project.jei_version}"
-    deobfCompile "de.ellpeck.actuallyadditions:ActuallyAdditions:${project.actadd_version}"
-    deobfCompile "de.canitzp.tumat:TUMAT:${project.tumat_version}"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
-}
+allprojects {
+    apply plugin: "java"
+    apply plugin: "architect-plugin"
 
-version = "${version}"
-group = "${group}"
-archivesBaseName = "${archives_base_name}"
+    archivesBaseName = project.archives_base_name
+    version = minecraft_version + "+" + project.mod_version
+    group = project.maven_group
 
-sourceCompatibility = targetCompatibility = 1.8
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
-minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    mappings = "${forge_mappings}"
-    runDir = "run"
-
-    useDepAts = true
-
-    replace "@VERSION@", "${version}"
-    replaceIn "src/main/java/hardcorequesting/ModInformation.java"
-}
-
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
     }
-
-    from(sourceSets.main.resources.srcDirs) { exclude '**/*.info' }
-
-    // Move access transformers to META-INF
-    rename '(.+_at.cfg)', 'META-INF/$1'
 }

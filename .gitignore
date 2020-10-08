@@ -1,12 +1,12 @@
 # Created by .ignore support plugin (hsz.mobi)
-/build/
-/HQM.ipr
-/run/
-/HQM.iws
-/out/
-/HQM.iml
-/.gradle/
-/output/
+build/
+*.ipr
+run/
+*.iws
+out/
+*.iml
+.gradle/
+output/
 bin/
 libs/
 

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hardcorequesting:block/quest_tracker"
+    }
+  }
+}

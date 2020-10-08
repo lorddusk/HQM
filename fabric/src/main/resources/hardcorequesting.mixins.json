@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "hardcorequesting.fabric.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinAnvilMenu", "MixinFurnaceResultSlot", "MixinLanguage", "MixinLivingEntity", "MixinPlayerAdvancements", "MixinPlayerInventory", "MixinResultSlot",
+    "MixinRunAroundLikeCrazyGoal", "MixinServerPlayerEntity"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,17 @@
+pluginManagement {
+    repositories {
+        jcenter()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven { url "https://dl.bintray.com/shedaniel/cloth" }
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name="HQM"
+
+include("common")
+include("fabric")
+include("forge")

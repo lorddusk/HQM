@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "hardcorequesting:halfheart"
+    },
+    {
+      "item": "hardcorequesting:halfheart"
+    }
+  ],
+  "result": {
+    "item": "hardcorequesting:heart"
+  }
+}
