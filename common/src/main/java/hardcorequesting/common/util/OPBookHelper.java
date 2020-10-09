@@ -141,8 +141,6 @@ public final class OPBookHelper {
         }
         
         public void process(Player player, String data) {
-            // TODO is op
-//            if (CommandHandler.isOwnerOrOp(player))
             if (HardcoreQuestingCore.getServer().getProfilePermissions(player.getGameProfile()) >= 4)
                 process(data);
         }

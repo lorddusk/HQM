@@ -17,7 +17,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
         super(parent, description, longDescription);
     }
     
-    public boolean increaseFluid(FluidStack fluidVolume, QuestDataTaskItems data, UUID playerId) {
+    public boolean increaseFluid(FluidStack fluidVolume, QuestDataTaskItems data, UUID playerId, boolean action) {
         boolean updated = false;
         
         for (int i = 0; i < items.length; i++) {
@@ -28,7 +28,8 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
             
             if (fluidVolume != null && fluidVolume.getFluid() != null && fluidVolume.getFluid() == item.fluid.getFluid()) {
                 Fraction amount = fluidVolume.getAmount().isLessThan(Fraction.ofWhole(item.required - data.progress[i])) ? fluidVolume.getAmount() : Fraction.ofWhole(item.required - data.progress[i]);
-                data.progress[i] += amount.intValue();
+                if (action)
+                    data.progress[i] += amount.intValue();
                 fluidVolume.split(amount);
                 updated = true;
                 break;
@@ -36,7 +37,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
         }
         
         
-        if (updated) {
+        if (action && updated) {
             doCompletionCheck(data, playerId);
         }
         
