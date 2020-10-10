@@ -30,28 +30,17 @@ import java.util.function.Consumer;
 public class NetworkingManager implements NetworkManager {
     private static final ResourceLocation CHANNEL_ID = new ResourceLocation(HardcoreQuestingCore.ID, "network");
     private static final ResourceLocation SYNC_IDS = new ResourceLocation(HardcoreQuestingCore.ID, "sync_ids");
-    private static final EventNetworkChannel CHANNEL = NetworkRegistry.newEventChannel(CHANNEL_ID, () -> "1", version -> true, version -> true);
-    private static final Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> S2C = Maps.newHashMap();
-    private static final Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> C2S = Maps.newHashMap();
+    static final EventNetworkChannel CHANNEL = NetworkRegistry.newEventChannel(CHANNEL_ID, () -> "1", version -> true, version -> true);
+    static final Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> S2C = Maps.newHashMap();
+    static final Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> C2S = Maps.newHashMap();
     
     public static void init() {
         CHANNEL.addListener(createPacketHandler(NetworkEvent.ClientCustomPayloadEvent.class, C2S));
         
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::initClient);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientNetworkingManager::initClient);
     }
     
-    @OnlyIn(Dist.CLIENT)
-    private static class Client {
-        public static void initClient() {
-            CHANNEL.addListener(createPacketHandler(NetworkEvent.ServerCustomPayloadEvent.class, S2C));
-        }
-        
-        public static PlayerEntity getClientPlayer() {
-            return Minecraft.getInstance().player;
-        }
-    }
-    
-    private static <T extends NetworkEvent> Consumer<T> createPacketHandler(Class<T> clazz, Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> map) {
+    static <T extends NetworkEvent> Consumer<T> createPacketHandler(Class<T> clazz, Map<ResourceLocation, BiConsumer<PacketContext, PacketBuffer>> map) {
         return event -> {
             if (event.getClass() != clazz) return;
             NetworkEvent.Context context = event.getSource().get();
@@ -78,7 +67,7 @@ public class NetworkingManager implements NetworkManager {
                     }
                     
                     private PlayerEntity getClientPlayer() {
-                        return DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> Client::getClientPlayer);
+                        return DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> ClientNetworkingManager::getClientPlayer);
                     }
                 }, buffer);
             }
