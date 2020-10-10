@@ -282,7 +282,9 @@ public class QuestTaskAdvancement extends QuestTask {
     public void read(JsonObject object) {
         List<AdvancementTask> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray())) {
-            list.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element));
+            AdvancementTask advancementTask = QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element);
+            if (advancementTask != null)
+                list.add(advancementTask);
         }
         advancements = list.toArray(new AdvancementTask[0]);
     }

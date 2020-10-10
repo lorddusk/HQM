@@ -169,7 +169,9 @@ public abstract class QuestTaskReputation extends QuestTask {
     public void read(JsonObject object) {
         List<QuestTaskAdapter.ReputationSettingConstructor> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, REPUTATION, new JsonArray())) {
-            list.add(QuestTaskAdapter.ReputationSettingConstructor.read(element));
+            QuestTaskAdapter.ReputationSettingConstructor constructor = QuestTaskAdapter.ReputationSettingConstructor.read(element);
+            if (constructor != null)
+                list.add(constructor);
         }
         QuestTaskAdapter.taskReputationListMap.put(this, list);
     }

@@ -263,7 +263,9 @@ public class QuestTaskCompleted extends QuestTask {
     public void read(JsonObject object) {
         List<CompletedQuestTask> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray())) {
-            list.add(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element));
+            CompletedQuestTask task = QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element);
+            if (task != null)
+                list.add(task);
         }
         quests = list.toArray(new CompletedQuestTask[0]);
     }

@@ -282,7 +282,9 @@ public class QuestTaskMob extends QuestTask {
     public void read(JsonObject object) {
         List<Mob> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, MOBS, new JsonArray())) {
-            list.add(QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element));
+            Mob mob = QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element);
+            if (mob != null)
+                list.add(mob);
         }
         mobs = list.toArray(new Mob[0]);
     }

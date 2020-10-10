@@ -278,7 +278,9 @@ public class QuestTaskTame extends QuestTask {
     public void read(JsonObject object) {
         List<Tame> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, TAME, new JsonArray())) {
-            list.add(QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element));
+            Tame tame = QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element);
+            if (tame != null)
+                list.add(tame);
         }
         tames = list.toArray(new Tame[0]);
     }

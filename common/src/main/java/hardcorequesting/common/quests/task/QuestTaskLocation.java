@@ -300,7 +300,9 @@ public class QuestTaskLocation extends QuestTask {
     public void read(JsonObject object) {
         List<Location> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray())) {
-            list.add(QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element));
+            Location location = QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element);
+            if (location != null)
+                list.add(location);
         }
         locations = list.toArray(new Location[0]);
     }

@@ -58,7 +58,9 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     public void read(JsonObject object) {
         List<ItemRequirement> list = new ArrayList<>();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray())) {
-            list.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element));
+            ItemRequirement requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
+            if (requirement != null)
+                list.add(requirement);
         }
         setItems(list.toArray(new ItemRequirement[0]));
     }
