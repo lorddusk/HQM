@@ -16,7 +16,7 @@ import hardcorequesting.common.network.message.PlayerDataSyncMessage;
 import hardcorequesting.common.network.message.QuestLineSyncMessage;
 import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
-import hardcorequesting.common.team.Team;
+import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class QuestLine {
     
@@ -46,7 +47,7 @@ public class QuestLine {
     public final QuestingDataManager questingDataManager;
     public final DeathStatsManager deathStatsManager;
     public final QuestSetsManager questSetsManager;
-    public final Team.Manager teamManager;
+    public final TeamManager teamManager;
     public String mainDescription = "No description";
     private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
@@ -69,7 +70,7 @@ public class QuestLine {
         this.questingDataManager = new QuestingDataManager(this);
         this.deathStatsManager = new DeathStatsManager(this);
         this.questSetsManager = new QuestSetsManager(this);
-        this.teamManager = new Team.Manager(this);
+        this.teamManager = new TeamManager(this);
         GroupTier.initBaseTiers(this);
         
         try {
@@ -155,7 +156,7 @@ public class QuestLine {
                     NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), serverPlayer);
             }
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), serverPlayer);
-            NetworkManager.sendToPlayer(new TeamStatsMessage(questLine.questingDataManager.getTeams().values().stream()), serverPlayer);
+            NetworkManager.sendToPlayer(new TeamStatsMessage(StreamSupport.stream(questLine.teamManager.getTeams().spliterator(), false)), serverPlayer);
         }
     }
     
@@ -184,7 +185,7 @@ public class QuestLine {
             serializable.load();
         }
         SaveHelper.onLoad();
-    
+        
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }

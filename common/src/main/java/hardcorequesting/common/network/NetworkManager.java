@@ -96,6 +96,7 @@ public class NetworkManager {
     }
     
     public static void sendToPlayer(IMessage message, ServerPlayer player) {
+        if (player == null) return;
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         Tuple<Class<? extends IMessageHandler>, Integer> pair = PACKET_HANDLERS.get(message.getClass());
         buf.writeInt(pair.getB());

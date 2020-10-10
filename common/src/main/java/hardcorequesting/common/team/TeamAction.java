@@ -17,18 +17,19 @@ public enum TeamAction {
         @Override
         public void process(Team team, Player player, String teamName) {
             if (team.isSingle()) {
-                QuestingDataManager manager = QuestingDataManager.getInstance();
+                TeamManager manager = TeamManager.getInstance();
                 if (teamName.length() == 0) {
                     return;
                 }
                 
-                for (Team t : manager.getTeams().values()) {
+                for (Team t : manager.getTeams()) {
                     if (t.getName().equals(teamName)) {
                         TeamError.USED_NAME.sendToClient(player);
                         return;
                     }
                 }
                 
+                team.setId(UUID.randomUUID());
                 manager.addTeam(team);
                 team.setName(teamName);
                 team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
@@ -45,27 +46,27 @@ public enum TeamAction {
     INVITE {
         @Override
         public void process(Team team, Player player, String playerName) {
-            Player invitee = HardcoreQuestingCore.getServer().getPlayerList().getPlayerByName(playerName);
-            if (!team.isSingle() && team.isOwner(player) && invitee != null) {
+            ServerPlayer invitedPlayer = HardcoreQuestingCore.getServer().getPlayerList().getPlayerByName(playerName);
+            if (!team.isSingle() && team.isOwner(player) && invitedPlayer != null) {
                 QuestingDataManager manager = QuestingDataManager.getInstance();
-                PlayerEntry entry = new PlayerEntry(invitee.getUUID(), false, false);
+                PlayerEntry invitedPlayerEntry = new PlayerEntry(invitedPlayer.getUUID(), false, false);
                 
-                if (!manager.hasData(entry.getUUID())) {
+                if (!manager.hasData(invitedPlayer.getUUID())) {
                     TeamError.INVALID_PLAYER.sendToClient(player);
                     return;
                 }
                 
-                if (!manager.getQuestingData(entry.getUUID()).getTeam().isSingle()) {
+                if (!manager.getQuestingData(invitedPlayer.getUUID()).getTeam().isSingle()) {
                     TeamError.IN_PARTY.sendToClient(player);
                     return;
                 }
                 
-                if (!team.getPlayers().contains(entry)) {
-                    team.getPlayers().add(entry);
+                if (!team.getPlayers().contains(invitedPlayerEntry)) {
+                    team.getPlayers().add(invitedPlayerEntry);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
-                    manager.getQuestingData(entry.getUUID()).getTeam().refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
-                    manager.getQuestingData(entry.getUUID()).getTeam().getInvites().add(team);
-                    NetworkManager.sendToPlayer(TeamUpdateType.INVITE.build(team), entry.getPlayerMP());
+                    manager.getQuestingData(invitedPlayer.getUUID()).getTeam().refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);
+                    manager.getQuestingData(invitedPlayer.getUUID()).getTeam().getInvites().add(team);
+                    NetworkManager.sendToPlayer(TeamUpdateType.INVITE.build(team), invitedPlayer);
                 }
             }
         }
@@ -74,10 +75,9 @@ public enum TeamAction {
         @Override
         public void process(Team team, Player player, String data) {
             if (team.isSingle()) {
-                QuestingDataManager manager = QuestingDataManager.getInstance();
-                int acceptId = Integer.parseInt(data);
-                if (acceptId >= 0 && acceptId < manager.getTeams().size()) {
-                    Team inviteTeam = manager.getTeams().get(acceptId);
+                UUID acceptId = UUID.fromString(data);
+                Team inviteTeam = TeamManager.getInstance().getByTeamId(acceptId);
+                if (inviteTeam != null) {
                     int id = 0;
                     for (PlayerEntry entry : inviteTeam.getPlayers()) {
                         if (entry.isInTeam()) {
@@ -85,8 +85,7 @@ public enum TeamAction {
                         } else if (entry.getUUID().equals(player.getUUID())) {
                             entry.setBookOpen(true);
                             entry.setInTeam(true);
-                            manager.getQuestingData(entry.getUUID()).setTeam(inviteTeam);
-                            team.setId(inviteTeam.getId());
+                            QuestingDataManager.getInstance().getQuestingData(player).setTeam(inviteTeam);
                             
                             for (UUID questId : inviteTeam.getQuestData().keySet()) {
                                 QuestData joinData = team.getQuestData().get(questId);
@@ -129,10 +128,9 @@ public enum TeamAction {
                             }
                             
                             inviteTeam.refreshData();
-                            inviteTeam.refreshTeamData(TeamUpdateSize.ALL);
                             Team.declineAll(player.getUUID());
                             TeamLiteStat.refreshTeam(inviteTeam);
-                            NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, entry.getUUID()), entry.getPlayerMP());
+                            NetworkManager.sendToPlayer(TeamUpdateType.JOIN_TEAM.build(inviteTeam, player.getUUID()), entry.getPlayerMP());
                             break;
                         }
                     }
@@ -144,10 +142,10 @@ public enum TeamAction {
         @Override
         public void process(Team team, Player player, String data) {
             if (team.isSingle()) {
-                int declineId = Integer.parseInt(data);
-                QuestingDataManager manager = QuestingDataManager.getInstance();
-                if (declineId >= 0 && declineId < manager.getTeams().size()) {
-                    Team inviteTeam = manager.getTeams().get(declineId);
+                UUID declineId = UUID.fromString(data);
+                TeamManager manager = TeamManager.getInstance();
+                Team inviteTeam = manager.getByTeamId(declineId);
+                if (inviteTeam != null) {
                     inviteTeam.getPlayers().remove(new PlayerEntry(player.getUUID(), false, false));
                     inviteTeam.refreshTeamData(TeamUpdateSize.ONLY_OWNER);
                     team.refreshTeamData(TeamUpdateSize.ONLY_MEMBERS);

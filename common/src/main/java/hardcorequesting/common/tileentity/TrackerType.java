@@ -6,6 +6,7 @@ import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
+import hardcorequesting.common.team.TeamManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +16,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+            for (Team team : TeamManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     boolean valid = radius == 0;
                     valid = isValid(valid, team, tracker, radius);
@@ -33,7 +34,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+            for (Team team : TeamManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
                     
                     for (PlayerEntry entry : team.getPlayers()) {
@@ -64,7 +65,7 @@ public enum TrackerType {
         @Override
         public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
-            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+            for (Team team : TeamManager.getInstance().getTeams()) {
                 int newMeta = (int) (quest.getProgress(team) * 15);
                 if (newMeta > meta) {
                     boolean valid = radius == 0;

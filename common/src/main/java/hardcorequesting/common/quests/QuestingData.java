@@ -1,5 +1,6 @@
 package hardcorequesting.common.quests;
 
+import com.google.common.collect.Iterables;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupData;
@@ -8,10 +9,7 @@ import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.LivesUpdate;
-import hardcorequesting.common.team.PlayerEntry;
-import hardcorequesting.common.team.Team;
-import hardcorequesting.common.team.TeamLiteStat;
-import hardcorequesting.common.team.TeamUpdateSize;
+import hardcorequesting.common.team.*;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.Util;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -24,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class QuestingData {
@@ -41,15 +40,14 @@ public class QuestingData {
     public QuestingData(QuestingDataManager manager, UUID playerId) {
         this.lives = manager.getDefaultLives();
         this.playerId = playerId;
-        this.team = new Team(playerId);
+        this.team = Team.single(playerId);
         createGroupData();
     }
     
-    public QuestingData(QuestingDataManager manager, UUID playerId, int lives, UUID teamId, Map<UUID, GroupData> groupData) {
+    public QuestingData(QuestingDataManager manager, UUID playerId, int lives, Map<UUID, GroupData> groupData) {
         this.playerId = playerId;
         this.lives = lives;
-        this.team = manager.getTeams().get(teamId);
-        if (team == null) team = new Team(playerId);
+        this.team = TeamManager.getInstance().getByPlayer(playerId);
         createGroupData();
         this.groupData.putAll(groupData);
         manager.questingData.put(playerId, this);
@@ -86,6 +84,10 @@ public class QuestingData {
             }
         }
         return this.name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
     }
     
     private void createGroupData() {
@@ -228,8 +230,8 @@ public class QuestingData {
         QuestingDataManager manager = QuestingDataManager.getInstance();
         QuestingData data = manager.getQuestingData(player);
         Team team = data.getTeam();
-        if (!team.isSingle() && !manager.getTeams().isEmpty()) {
-            team.removePlayer(player.getUUID());
+        if (!team.isSingle() && !Iterables.isEmpty(TeamManager.getInstance().getTeams())) {
+            team.removePlayer(player);
             if (team.getPlayerCount() == 0) {
                 team.deleteTeam();
             } else {
@@ -247,8 +249,8 @@ public class QuestingData {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";
             
-            UserBanListEntry userlistbansentry = new UserBanListEntry(player.getGameProfile(), null, setBannedBy, null, setBanReason);
-            mcServer.getPlayerList().getBans().add(userlistbansentry);
+            UserBanListEntry entry = new UserBanListEntry(player.getGameProfile(), null, setBannedBy, null, setBanReason);
+            mcServer.getPlayerList().getBans().add(entry);
             
             //mcServer.getConfigurationManager().getBannedPlayers().put(banentry);
             ((ServerPlayer) player).connection.disconnect(Translator.translatable("hqm.message.gameOver"));
@@ -261,19 +263,27 @@ public class QuestingData {
     @NotNull
     public Team getTeam() {
         if (!this.team.isSingle()) {
-            Map<UUID, Team> teams = QuestingDataManager.getInstance().getTeams();
-            if (teams.containsKey(this.team.getId())) {
-                this.team = teams.get(this.team.getId());
+            Team t = TeamManager.getInstance().getByTeamId(this.team.getId());
+            if (t != null) {
+                this.team = t;
             }
         }
-        return this.team;
+        return Objects.requireNonNull(this.team);
     }
     
     public void setTeam(@Nullable Team team) {
         if (team == null) {
-            team = new Team(this.playerId);
+            this.team = Team.single(this.playerId);
+        } else if (team.isSingle()) {
+            this.team = team;
+        } else {
+            Team t = TeamManager.getInstance().getByTeamId(team.getId());
+            if (t != null) {
+                this.team = t;
+            } else {
+                setTeam(null);
+            }
         }
-        this.team = team;
     }
     
     public Map<UUID, GroupData> getGroupData() {

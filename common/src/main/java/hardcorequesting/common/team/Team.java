@@ -1,13 +1,12 @@
 package hardcorequesting.common.team;
 
-import com.google.common.collect.Lists;
-import com.google.gson.reflect.TypeToken;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.io.SaveHandler;
-import hardcorequesting.common.io.adapter.TeamAdapter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.TeamMessage;
-import hardcorequesting.common.quests.*;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestData;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -17,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Team {
     public static boolean reloadedInvites;
-    private UUID id = Util.NIL_UUID;
+    @Nullable
+    private UUID id = null;
     private List<PlayerEntry> players = new ArrayList<>();
     private List<Team> invites;
     private String name;
@@ -31,7 +30,7 @@ public class Team {
     private RewardSetting rewardSetting = RewardSetting.getDefault();
     private LifeSetting lifeSetting = LifeSetting.SHARE;
     
-    public Team(UUID uuid) {
+    private Team(UUID uuid) {
         if (uuid != null)
             players.add(new PlayerEntry(uuid, true, true));
         createQuestData();
@@ -39,49 +38,29 @@ public class Team {
         this.invites = new ArrayList<>();
     }
     
-    public static class Manager extends SimpleSerializable {
-        public Manager(QuestLine parent) {
-            super(parent);
-        }
-        
-        @Override
-        public String filePath() {
-            return "teams.json";
-        }
-        
-        @Override
-        public boolean isData() {
-            return true;
-        }
-        
-        @Override
-        public void loadFromString(Optional<String> string) {
-            QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
-            questingDataManager.getTeams().clear();
-            TeamAdapter.clearInvitesMap();
-            List<Team> teams = string
-                    .flatMap(s -> SaveHandler.<List<Team>>load(s, new TypeToken<List<Team>>() {}.getType()))
-                    .orElseGet(Lists::newArrayList);
-            teams.stream().filter(team -> !team.isSingle()).forEach(team -> questingDataManager.getTeams().put(team.getId(), team));
-            TeamAdapter.commitInvitesMap();
-            if (HardcoreQuestingCore.platform.isClient())
-                TeamLiteStat.updateTeams(questingDataManager.getTeams().values().stream().map(Team::toLiteStat).collect(Collectors.toList()));
-        }
-        
-        @Override
-        public String saveToString() {
-            return SaveHandler.save(QuestingDataManager.getInstance().getTeams().values(), new TypeToken<Collection<Team>>() {}.getType());
-        }
-        
-        public String saveToString(Player player) {
-            Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
-            if (team.isSingle()) return "[]";
-            return "[" + SaveHandler.save(team, Team.class) + "]";
-        }
+    public static Team single(UUID player) {
+        return new Team(player);
+    }
+    
+    public static Team empty() {
+        return new Team(null);
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Team team = (Team) o;
+        return isSingle() || team.isSingle() ? Objects.equals(players.get(0), team.players.get(0)) : Objects.equals(id, team.id);
+    }
+    
+    @Override
+    public int hashCode() {
+        return isSingle() ? Objects.hash(players.get(0)) : Objects.hash(id);
     }
     
     public static void declineAll(UUID playerID) {
-        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+        for (Team team : TeamManager.getInstance().getTeams()) {
             for (Iterator<PlayerEntry> iterator = team.getPlayers().iterator(); iterator.hasNext(); ) {
                 PlayerEntry playerEntry = iterator.next();
                 if (!playerEntry.isInTeam() && playerEntry.getUUID().equals(playerID)) {
@@ -152,11 +131,11 @@ public class Team {
     }
     
     public UUID getId() {
-        return id;
+        return id == null ? Util.NIL_UUID : id;
     }
     
-    public void setId(UUID id) {
-        this.id = id;
+    public void setId(@Nullable UUID id) {
+        this.id = Objects.equals(id, Util.NIL_UUID) ? null : id;
     }
     
     public boolean isSharingLives() {
@@ -185,63 +164,58 @@ public class Team {
         players.add(entry);
     }
     
-    public void removePlayer(Player player) {
-        removePlayer(player.getUUID());
-    }
-    
-    public void removePlayer(UUID uuid) {
+    public void removePlayer(Player toBeRemoved) {
         int id = 0;
-        for (PlayerEntry player : players) {
-            if (player.isInTeam()) {
-                if (player.getUUID().equals(uuid)) {
-                    Team leaveTeam = new Team(uuid);
-                    for (UUID i : questData.keySet()) {
-                        QuestData leaveData = leaveTeam.questData.get(i);
-                        QuestData data = questData.get(i);
-                        if (data != null) {
-                            boolean[] old = data.reward;
-                            data.reward = new boolean[old.length - 1];
-                            for (int j = 0; j < data.reward.length; j++) {
-                                if (j < id) {
-                                    data.reward[j] = old[j];
-                                } else {
-                                    data.reward[j] = old[j + 1];
-                                }
+        Iterator<PlayerEntry> iterator = players.iterator();
+        while (iterator.hasNext()) {
+            PlayerEntry player = iterator.next();
+            
+            if (player.getUUID().equals(toBeRemoved.getUUID())) {
+                Team newSingleTeam = Team.single(toBeRemoved.getUUID());
+                for (UUID i : questData.keySet()) {
+                    QuestData leaveData = newSingleTeam.questData.get(i);
+                    QuestData data = questData.get(i);
+                    if (data != null) {
+                        boolean[] old = data.reward;
+                        data.reward = new boolean[old.length - 1];
+                        for (int j = 0; j < data.reward.length; j++) {
+                            if (j < id) {
+                                data.reward[j] = old[j];
+                            } else {
+                                data.reward[j] = old[j + 1];
                             }
-                            
-                            leaveData.reward[0] = old[id];
                         }
+                        
+                        leaveData.reward[0] = old[id];
                     }
-                    
-                    players.remove(id);
-                    
-                    for (UUID i : questData.keySet()) {
-                        QuestData leaveData = leaveTeam.questData.get(i);
-                        QuestData data = questData.get(i);
-                        if (data != null && Quest.getQuest(i) != null) {
-                            Quest.getQuest(i).copyProgress(leaveData, data);
-                        }
-                    }
-                    
-                    ReputationManager reputationManager = ReputationManager.getInstance();
-                    for (String i : reputationManager.getReputations().keySet()) {
-                        Reputation reputation = reputationManager.getReputation(i);
-                        if (reputation != null) {
-                            leaveTeam.setReputation(reputation, this.getReputation(reputation));
-                        }
-                    }
-                    
-                    QuestingDataManager.getInstance().getQuestingData(uuid).setTeam(leaveTeam);
-                    refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
-                    leaveTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
-                    NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID(), leaveTeam), player.getPlayerMP());
-                    break;
                 }
-                id++;
+                
+                iterator.remove();
+                
+                for (UUID i : questData.keySet()) {
+                    QuestData leaveData = newSingleTeam.questData.get(i);
+                    QuestData data = questData.get(i);
+                    if (data != null && Quest.getQuest(i) != null) {
+                        Quest.getQuest(i).copyProgress(leaveData, data);
+                    }
+                }
+                
+                ReputationManager reputationManager = ReputationManager.getInstance();
+                for (String i : reputationManager.getReputations().keySet()) {
+                    Reputation reputation = reputationManager.getReputation(i);
+                    if (reputation != null) {
+                        newSingleTeam.setReputation(reputation, this.getReputation(reputation));
+                    }
+                }
+                
+                QuestingDataManager.getInstance().getQuestingData(toBeRemoved).setTeam(newSingleTeam);
+                refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                newSingleTeam.refreshTeamData(player, TeamUpdateSize.ONLY_MEMBERS);
+                NetworkManager.sendToPlayer(TeamUpdateType.LEAVE_TEAM.build(this, player.getUUID(), newSingleTeam), player.getPlayerMP());
+                break;
             }
+            id++;
         }
-        
-        
     }
     
     public void refreshTeamData(TeamUpdateSize type) {
@@ -294,18 +268,20 @@ public class Team {
     }
     
     public void deleteTeam() {
+        if (isSingle())
+            throw new IllegalStateException("Tried to delete a single team.");
+        
         for (int i = players.size() - 1; i >= 0; i--) {
             PlayerEntry player = players.get(i);
             if (player.isInTeam()) {
-                removePlayer(player.getUUID());
+                removePlayer(player.getPlayerMP());
             } else {
                 players.remove(i);
             }
         }
         
         QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
-        Map<UUID, Team> teams = questingDataManager.getTeams();
-        teams.remove(id);
+        TeamManager.getInstance().removeTeam(this);
         
         NetworkManager.sendToAllPlayers(TeamUpdateType.REMOVE_TEAM.build(this));
         
@@ -336,11 +312,11 @@ public class Team {
     }
     
     public void accept() {
-        NetworkManager.sendToServer(new TeamMessage(TeamAction.ACCEPT, "" + id));
+        NetworkManager.sendToServer(new TeamMessage(TeamAction.ACCEPT, "" + getId()));
     }
     
     public void decline() {
-        NetworkManager.sendToServer(new TeamMessage(TeamAction.DECLINE, "" + id));
+        NetworkManager.sendToServer(new TeamMessage(TeamAction.DECLINE, "" + getId()));
     }
     
     public void kick(UUID playerID) {
@@ -430,7 +406,7 @@ public class Team {
     }
     
     public boolean isSingle() {
-        return id.getLeastSignificantBits() == 0 && id.getMostSignificantBits() == 0;
+        return id == null;
     }
     
     public String getName() {

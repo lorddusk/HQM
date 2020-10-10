@@ -244,8 +244,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     
     @Override
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        
-        
         Team team = getTeam();
         PlayerEntry entry = getEntry(team);
         
@@ -501,8 +499,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         return team.getEntry(this.player.getUUID());
     }
     
-    private class TextBoxName extends TextBoxGroup.TextBox {
-        
+    private static class TextBoxName extends TextBoxGroup.TextBox {
         public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
             super(gui, str, x, y, true);
             setMult(0.7F);

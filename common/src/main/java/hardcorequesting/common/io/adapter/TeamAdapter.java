@@ -4,17 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import hardcorequesting.common.quests.QuestData;
-import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
-import hardcorequesting.common.team.LifeSetting;
-import hardcorequesting.common.team.PlayerEntry;
-import hardcorequesting.common.team.RewardSetting;
-import hardcorequesting.common.team.Team;
+import hardcorequesting.common.team.*;
 import net.minecraft.Util;
 import net.minecraft.util.GsonHelper;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 public class TeamAdapter {
     
@@ -79,7 +76,7 @@ public class TeamAdapter {
         public Team deserialize(JsonElement json) throws JsonParseException {
             List<UUID> invites = new ArrayList<>();
             JsonObject object = json.getAsJsonObject();
-            Team team = new Team(null);
+            Team team = Team.empty();
             if (object.has(ID) && object.get(ID).getAsJsonPrimitive().isString())
                 team.setId(UUID.fromString(GsonHelper.getAsString(object, ID)));
             if (!team.getId().equals(Util.NIL_UUID))
@@ -120,8 +117,8 @@ public class TeamAdapter {
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
             Map<UUID, Team> tempMap = new HashMap<>();
-            QuestingDataManager.getInstance().getTeams().values().stream().filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
-            for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+            StreamSupport.stream(TeamManager.getInstance().getTeams().spliterator(), false).filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
+            for (Team team : TeamManager.getInstance().getTeams()) {
                 List<UUID> invites = invitesMap.get(team);
                 if (invites != null)
                     invites.forEach(id -> {

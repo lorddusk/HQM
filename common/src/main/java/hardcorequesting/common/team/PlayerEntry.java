@@ -7,9 +7,11 @@ import hardcorequesting.common.io.adapter.Adapter;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -20,14 +22,15 @@ public class PlayerEntry {
     private static final String ENTRY_OWNER = "owner";
     private static final String ENTRY_BOOK = "bookOpen";
     private static final String ENTRY_IN_TEAM = "inTeam";
+    private static final String ENTRY_NAME = "name";
     private UUID uuid;
     private boolean inTeam;
     private boolean owner;
     private boolean bookOpen;
-    private String playername;
+    private String playerName;
     
     private PlayerEntry() {
-        this.playername = null;
+        this.playerName = null;
     }
     
     public PlayerEntry(UUID uuid, boolean inTeam, boolean owner) {
@@ -45,6 +48,7 @@ public class PlayerEntry {
         playerEntry.owner = GsonHelper.getAsBoolean(object, ENTRY_OWNER);
         playerEntry.bookOpen = GsonHelper.getAsBoolean(object, ENTRY_BOOK);
         playerEntry.inTeam = GsonHelper.getAsBoolean(object, ENTRY_IN_TEAM);
+        playerEntry.playerName = StringUtils.defaultIfEmpty(GsonHelper.getAsString(object, ENTRY_NAME, null), null);
         return playerEntry;
     }
     
@@ -52,16 +56,29 @@ public class PlayerEntry {
         return uuid;
     }
     
-    @Nullable
-    @Environment(EnvType.CLIENT)
     public String getDisplayName() {
-        if (this.playername == null) {
-            Player entry = Minecraft.getInstance().level.getPlayerByUUID(this.getUUID());
-            if (entry != null) {
-                this.playername = entry.getScoreboardName();
+        if (this.playerName == null) {
+            MinecraftServer server = HardcoreQuestingCore.getServer();
+            if (server != null) {
+                ServerPlayer entry = server.getPlayerList().getPlayer(getUUID());
+                if (entry != null) {
+                    return StringUtils.defaultIfEmpty(this.playerName = entry.getScoreboardName(), "");
+                }
+            }
+            if (HardcoreQuestingCore.platform.isClient()) {
+                return StringUtils.defaultIfEmpty(this.playerName = getDisplayNameClient(), "");
             }
         }
-        return playername;
+        return Objects.toString(playerName);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private String getDisplayNameClient() {
+        Player entry = Minecraft.getInstance().level.getPlayerByUUID(this.getUUID());
+        if (entry != null) {
+            return entry.getScoreboardName();
+        }
+        return null;
     }
     
     public boolean isInTeam() {
@@ -105,17 +122,11 @@ public class PlayerEntry {
                 .add(ENTRY_OWNER, owner)
                 .add(ENTRY_BOOK, bookOpen)
                 .add(ENTRY_IN_TEAM, inTeam)
+                .add(ENTRY_NAME, getDisplayName())
                 .build();
     }
     
     public ServerPlayer getPlayerMP() {
-        if (!HardcoreQuestingCore.platform.isClient()) {
-            return HardcoreQuestingCore.getServer().getPlayerList().getPlayer(this.getUUID());
-        } else {
-            if (Minecraft.getInstance().hasSingleplayerServer()) {
-                return Minecraft.getInstance().getSingleplayerServer().getPlayerList().getPlayer(this.getUUID());
-            }
-        }
-        return null;
+        return HardcoreQuestingCore.getServer().getPlayerList().getPlayer(this.getUUID());
     }
 }

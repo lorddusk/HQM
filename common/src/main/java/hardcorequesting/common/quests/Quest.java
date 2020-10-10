@@ -23,6 +23,7 @@ import hardcorequesting.common.quests.task.*;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
+import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
@@ -1284,8 +1285,8 @@ public class Quest {
         for (int i = 0; i < tasks.size(); i++) {
             try {
                 Constructor<? extends QuestDataTask> constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
-                Object obj = constructor.newInstance(tasks.get(i));
-                data.tasks[i] = (QuestDataTask) obj;
+                QuestDataTask obj = constructor.newInstance(tasks.get(i));
+                data.tasks[i] = obj;
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return false;
@@ -1396,9 +1397,7 @@ public class Quest {
                     QuestData data = getQuestData(player);
                     Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                        for (int i = 0; i < data.reward.length; i++) {
-                            data.reward[i] = false;
-                        }
+                        Arrays.fill(data.reward, false);
                         sendUpdatedDataToTeam(player);
                     } else {
                         data.claimReward(player);
@@ -1567,7 +1566,7 @@ public class Quest {
     }
     
     public void resetAll() {
-        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+        for (Team team : TeamManager.getInstance().getTeams()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available) {
                 reset(data);
@@ -1577,7 +1576,7 @@ public class Quest {
     }
     
     public void resetOnTime(int time) {
-        for (Team team : QuestingDataManager.getInstance().getTeams().values()) {
+        for (Team team : TeamManager.getInstance().getTeams()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available && data.time <= time) {
                 reset(data);
