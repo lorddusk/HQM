@@ -4,8 +4,18 @@ plugins {
 }
 
 repositories {
-    maven { url "https://dl.bintray.com/ladysnake/libs" }
-    maven { url "https://mod-buildcraft.com/maven" }
+    maven {
+        url "https://dl.bintray.com/ladysnake/libs"
+        content {
+            includeGroup "io.github.onyxstudios.Cardinal-Components-API"
+        }
+    }
+    maven {
+        url "https://mod-buildcraft.com/maven"
+        content {
+            includeGroup "alexiil.mc.lib"
+        }
+    }
 }
 
 configurations {
@@ -44,7 +54,7 @@ dependencies {
 shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
     exclude "META-INF/mods.toml"
-    
+
     configurations = [project.configurations.shadow]
     classifier "shadow"
 }

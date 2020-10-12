@@ -1,5 +1,5 @@
 plugins {
-    id "architect-plugin" version "1.0.9"
+    id "architect-plugin" version "1.0.10"
 }
 
 architect {
