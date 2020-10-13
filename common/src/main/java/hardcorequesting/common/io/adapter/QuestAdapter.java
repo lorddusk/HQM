@@ -215,7 +215,7 @@ public class QuestAdapter {
             if (hasUuid)
                 QUEST.setId(java.util.UUID.fromString(GsonHelper.getAsString(object, UUID)));
             QUEST.setTriggerTasks(GsonHelper.getAsInt(object, TRIGGER_TASKS, QUEST.getTriggerTasks()));
-            QUEST.setParentRequirementCount(GsonHelper.getAsInt(object, PARENT_REQUIREMENT, QUEST.getParentRequirementCount()));
+            QUEST.setParentRequirementCount(GsonHelper.getAsInt(object, PARENT_REQUIREMENT, QUEST._getParentRequirementCount()));
             if (object.has(ICON)) {
                 ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON));
                 if (!icon.isEmpty()) {

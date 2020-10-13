@@ -1604,11 +1604,15 @@ public class Quest {
     }
     
     public boolean getUseModifiedParentRequirement() {
-        return (parentRequirementCount != -1) && this.parentRequirementCount < this.getRequirements().size();
+        return parentRequirementCount != -1;
     }
     
     public int getParentRequirementCount() {
-        return (parentRequirementCount == -1) ? this.getRequirements().size() : this.parentRequirementCount;
+        return parentRequirementCount == -1 ? this.getRequirements().size() : this.parentRequirementCount;
+    }
+    
+    public int _getParentRequirementCount() {
+        return parentRequirementCount;
     }
     
     public void setParentRequirementCount(int parentRequirementCount) {
