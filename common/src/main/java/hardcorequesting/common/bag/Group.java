@@ -16,6 +16,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class Group {
     private GroupTier tier;
-    private List<ItemStack> items;
+    private NonNullList<ItemStack> items;
     private String name;
     private int limit;
     private UUID groupId;
@@ -41,7 +42,7 @@ public class Group {
                 GroupTier.initBaseTiers(QuestLine.getActiveQuestLine());
             this.tier = GroupTierManager.getInstance().getTiers().get(0);
         }
-        items = new ArrayList<>();
+        items = NonNullList.create();
     }
     
     public static int size() {
@@ -184,7 +185,7 @@ public class Group {
         return name != null && !name.isEmpty();
     }
     
-    public List<ItemStack> getItems() {
+    public NonNullList<ItemStack> getItems() {
         return items;
     }
     

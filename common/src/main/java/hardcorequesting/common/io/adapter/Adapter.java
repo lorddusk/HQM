@@ -4,6 +4,8 @@ import com.google.gson.*;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.common.HardcoreQuestingCore;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -11,6 +13,7 @@ import java.util.function.Consumer;
 public abstract class Adapter<T> extends TypeAdapter<T> {
     public abstract JsonElement serialize(T src);
     
+    @Nullable
     public abstract T deserialize(JsonElement json);
     
     @Override
@@ -19,8 +22,14 @@ public abstract class Adapter<T> extends TypeAdapter<T> {
     }
     
     @Override
-    public T read(JsonReader in) throws IOException {
-        return deserialize(Streams.parse(in));
+    public T read(JsonReader in){
+        try{
+            JsonElement jsonElement = Streams.parse(in);
+            return deserialize(jsonElement);
+        } catch(JsonParseException e){
+            HardcoreQuestingCore.LOGGER.error("Can't parse JsonReader to JsonElement!", e);
+            return null;
+        }
     }
     
     public static JsonObjectBuilder object() {

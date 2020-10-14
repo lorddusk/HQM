@@ -31,7 +31,7 @@ public class SaveHandler {
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Reputation.class, ReputationAdapter.REPUTATION_ADAPTER)
             .registerTypeAdapter(QuestSet.class, QuestAdapter.QUEST_SET_ADAPTER)
-            .registerTypeAdapter(GroupTier.class, BagAdapter.GROUP_TIER_ADAPTER)
+            .registerTypeAdapter(GroupTier.class, GroupAdapter.GROUP_TIER_ADAPTER)
             .registerTypeAdapter(DeathStat.class, DeathAdapter.DEATH_STATS_ADAPTER)
             .registerTypeAdapter(Team.class, TeamAdapter.TEAM_ADAPTER)
             .registerTypeAdapter(QuestingData.class, QuestingAdapter.QUESTING_DATA_ADAPTER)
