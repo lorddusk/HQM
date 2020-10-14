@@ -1,5 +1,6 @@
 package hardcorequesting.common.io.adapter;
 
+import com.google.common.base.Enums;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -48,7 +49,7 @@ public class GroupAdapter {
                 HardcoreQuestingCore.LOGGER.error(new JsonParseException("JsonElement '" + ID + "' for 'Group' is not present or a valid string value!"));
                 return null;
             }
-            if(!json.has(LIMIT) || !json.get(LIMIT).isJsonPrimitive() || !json.get(LIMIT).getAsJsonPrimitive().isNumber()){
+            if(!json.has(LIMIT) || !GsonHelper.isNumberValue(json.get(LIMIT))){
                 HardcoreQuestingCore.LOGGER.error(new JsonParseException("JsonElement '" + LIMIT + "' for 'Group' is not present or a valid int value!"));
                 return null;
             }
@@ -111,10 +112,10 @@ public class GroupAdapter {
                 name = json.get(NAME).getAsString();
             }
             if(json.has(COLOUR) && json.get(COLOUR).isJsonPrimitive()){
-                try{
+                if(Enums.getIfPresent(GuiColor.class, json.get(COLOUR).getAsString()).isPresent()){
                     color = GuiColor.valueOf(json.get(COLOUR).getAsString());
-                } catch(IllegalArgumentException e){
-                    HardcoreQuestingCore.LOGGER.error("JsonElement '" + COLOUR + "' of 'Group Tier' cannot be mapped to a color!", e);
+                } else {
+                    HardcoreQuestingCore.LOGGER.error("JsonElement '" + COLOUR + "' of 'Group Tier' cannot be mapped to a color!");
                 }
             }
             if(json.has(WEIGHTS) && json.get(WEIGHTS).isJsonArray()){
