@@ -14,6 +14,7 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -34,6 +35,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.RegistryKey;
@@ -65,9 +67,13 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
@@ -80,11 +86,17 @@ import java.util.function.Supplier;
 @Mod("hardcorequesting")
 public class HardcoreQuestingForge implements AbstractPlatform {
     private final NetworkManager networkManager = new NetworkingManager();
+    private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
+    private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
+    private final DeferredRegister<TileEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
         NetworkingManager.init();
         HardcoreQuestingCore.initialize(this);
         
+        block.register(FMLJavaModLoadingContext.get().getModEventBus());
+        item.register(FMLJavaModLoadingContext.get().getModEventBus());
+        tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
             if (event.getEntityLiving() instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) event.getEntityLiving();
@@ -99,7 +111,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 while (iter.hasNext()) {
                     ItemEntity entityItem = iter.next();
                     ItemStack stack = entityItem.getItem();
-                    if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
+                    if (!stack.isEmpty() && stack.getItem().equals(ModItems.book.get())) {
                         player.inventory.add(stack);
                         iter.remove();
                     }
@@ -114,8 +126,8 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 return;
             }
             
-            if (event.getOriginal().inventory.contains(new ItemStack(ModItems.book))) {
-                ItemStack bookStack = new ItemStack(ModItems.book);
+            if (event.getOriginal().inventory.contains(new ItemStack(ModItems.book.get()))) {
+                ItemStack bookStack = new ItemStack(ModItems.book.get());
                 for (ItemStack stack : event.getOriginal().inventory.armor) {
                     if (bookStack.sameItem(stack)) {
                         bookStack = stack.copy();
@@ -363,5 +375,35 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public Fraction getBucketAmount() {
         return Fraction.ofWhole(1000);
+    }
+    
+    @Override
+    public Block getBlock(ResourceLocation resourceLocation) {
+        return ForgeRegistries.BLOCKS.getValue(resourceLocation);
+    }
+    
+    @Override
+    public Item getItem(ResourceLocation resourceLocation) {
+        return ForgeRegistries.ITEMS.getValue(resourceLocation);
+    }
+    
+    @Override
+    public TileEntityType<?> getBlockEntity(ResourceLocation resourceLocation) {
+        return ForgeRegistries.TILE_ENTITIES.getValue(resourceLocation);
+    }
+    
+    @Override
+    public void registerBlock(ResourceLocation resourceLocation, Supplier<Block> supplier) {
+        block.register(resourceLocation.getPath(), supplier);
+    }
+    
+    @Override
+    public void registerItem(ResourceLocation resourceLocation, Supplier<Item> supplier) {
+        item.register(resourceLocation.getPath(), supplier);
+    }
+    
+    @Override
+    public void registerBlockEntity(ResourceLocation resourceLocation, Supplier<TileEntityType<?>> supplier) {
+        tileEntityType.register(resourceLocation.getPath(), supplier);
     }
 }

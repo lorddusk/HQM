@@ -27,6 +27,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -122,4 +124,16 @@ public interface AbstractPlatform {
     void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2);
     
     Fraction getBucketAmount();
+    
+    Block getBlock(ResourceLocation location);
+    
+    Item getItem(ResourceLocation location);
+    
+    BlockEntityType<?> getBlockEntity(ResourceLocation location);
+    
+    void registerBlock(ResourceLocation location, Supplier<Block> block);
+    
+    void registerItem(ResourceLocation location, Supplier<Item> item);
+    
+    void registerBlockEntity(ResourceLocation location, Supplier<BlockEntityType<?>> type);
 }

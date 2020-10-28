@@ -8,6 +8,7 @@ import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.SimpleSerializable;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -72,6 +73,42 @@ public class DeathStatsManager extends SimpleSerializable {
     @Override
     public String saveToString() {
         return SaveHandler.save(getDeathStatsList(), new TypeToken<List<DeathStat>>() {}.getType());
+    }
+    
+    public void writeSimplified(FriendlyByteBuf buf) {
+        buf.writeInt(deathMap.size());
+        for (Map.Entry<UUID, DeathStat> entry : deathMap.entrySet()) {
+            buf.writeUUID(entry.getKey());
+            int[] deaths = entry.getValue().deaths;
+            int count = 0;
+            for (int death : deaths) {
+                if (death != 0) {
+                    count++;
+                }
+            }
+            buf.writeByte(count);
+            for (int i = 0; i < deaths.length; i++) {
+                if (deaths[i] != 0) {
+                    buf.writeByte(i);
+                    buf.writeShort((short) deaths[i]);
+                }
+            }
+        }
+    }
+    
+    public Map<UUID, DeathStat> readSimplified(FriendlyByteBuf buf) {
+        Map<UUID, DeathStat> deathMap = new HashMap<>();
+        int length = buf.readInt();
+        for (int i = 0; i < length; i++) {
+            UUID uuid = buf.readUUID();
+            DeathStat stat = new DeathStat(uuid);
+            int count = buf.readByte();
+            for (int j = 0; j < count; j++) {
+                stat.increaseDeath(buf.readByte(), buf.readShort(), false);
+            }
+            deathMap.put(uuid, stat);
+        }
+        return deathMap;
     }
     
     @Override

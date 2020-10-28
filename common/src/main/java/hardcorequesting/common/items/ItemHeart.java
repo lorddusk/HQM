@@ -91,7 +91,7 @@ public class ItemHeart extends Item {
                     int newRot = tagCompound.getInt("RotTime");
                     if (newRot <= 0) {
                         // TODO who wrote this code lmao -bikeshedaniel
-                        stack = new ItemStack(ModItems.rottenHeart);
+                        stack = new ItemStack(ModItems.rottenHeart.get());
                         entityPlayer.sendMessage(Translator.translatable("hqm.message.hearthDecay"), Util.NIL_UUID);
                     } else {
                         tagCompound.putInt("RotTime", newRot - 1);

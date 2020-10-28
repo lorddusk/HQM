@@ -3,7 +3,6 @@ package hardcorequesting.common.util;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.items.ModItems;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -15,13 +14,30 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RegisterHelper {
-    public static void registerBlock(Block block, String id, Function<Block, BlockItem> itemFunction) {
-        Registry.register(Registry.BLOCK, new ResourceLocation(HardcoreQuestingCore.ID, id), block);
-        registerItem(itemFunction.apply(block), id);
+    public static Supplier<Block> delegateBlock(String id) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        return () -> HardcoreQuestingCore.platform.getBlock(location);
     }
     
-    public static void registerItem(Item item, String id) {
-        Registry.register(Registry.ITEM, new ResourceLocation(HardcoreQuestingCore.ID, id), item);
+    public static Supplier<Item> delegateItem(String id) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        return () -> HardcoreQuestingCore.platform.getItem(location);
+    }
+    
+    public static Supplier<BlockEntityType<?>> delegateBlockEntity(String id) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        return () -> HardcoreQuestingCore.platform.getBlockEntity(location);
+    }
+    
+    public static <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block, Function<T, BlockItem> itemFunction) {
+        HardcoreQuestingCore.platform.registerBlock(new ResourceLocation(HardcoreQuestingCore.ID, id), (Supplier<Block>) block);
+        registerItem(id, () -> itemFunction.apply((T) delegateBlock(id).get()));
+        return (Supplier<T>) delegateBlock(id);
+    }
+    
+    public static <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
+        HardcoreQuestingCore.platform.registerItem(new ResourceLocation(HardcoreQuestingCore.ID, id), (Supplier<Item>) item);
+        return (Supplier<T>) delegateItem(id);
     }
     
     public static void register() {
@@ -30,7 +46,8 @@ public class RegisterHelper {
         ModItems.init();
     }
     
-    public static <T extends BlockEntity> BlockEntityType<T> registerTileEntity(Supplier<T> blockEntitySupplier, ResourceLocation identifier) {
-        return Registry.register(Registry.BLOCK_ENTITY_TYPE, identifier, BlockEntityType.Builder.of(blockEntitySupplier).build(null));
+    public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, Supplier<T> blockEntitySupplier) {
+        HardcoreQuestingCore.platform.registerBlockEntity(new ResourceLocation(HardcoreQuestingCore.ID, id), () -> BlockEntityType.Builder.of(blockEntitySupplier).build(null));
+        return (Supplier) delegateBlockEntity(id);
     }
 }

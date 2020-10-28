@@ -34,7 +34,7 @@ public class TrackerBlockEntity extends BlockEntity implements TickableBlockEnti
     private int delay = 0;
     
     public TrackerBlockEntity() {
-        super(ModBlocks.typeTracker);
+        super(ModBlocks.typeTracker.get());
     }
     
     private static TrackerBlockEntity getTracker(Level world, BlockPos pos) {

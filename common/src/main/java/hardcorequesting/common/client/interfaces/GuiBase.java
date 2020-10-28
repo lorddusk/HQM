@@ -250,10 +250,10 @@ public class GuiBase extends Screen {
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.enableDepthTest();
             RenderSystem.enableRescaleNormal();
-            RenderSystem.translatef(getLeft() + x, getTop() + y, 0);
             
-            Minecraft.getInstance().getItemRenderer().renderAndDecorateFakeItem(stack, 0, 0);
-            Minecraft.getInstance().getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, "");
+            ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+            renderer.renderAndDecorateFakeItem(stack, getLeft() + x, getTop() + y);
+            renderer.renderGuiItemDecorations(font, stack, getLeft() + x, getTop() + y);
             
             RenderSystem.popMatrix();
         } catch (Exception ignored) {

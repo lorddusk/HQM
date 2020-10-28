@@ -1449,7 +1449,7 @@ public class Quest {
     public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, Player player) {
         if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
             if (element instanceof GuiEditMenuItem.ElementItem) {
-                ItemStack stack = ((GuiEditMenuItem.ElementItem) element).getStack();
+                ItemStack stack = ((GuiEditMenuItem.ElementItem) element).getStack().copy();
                 if (!stack.isEmpty()) {
                     stack.setCount(Math.min(127, element.getAmount()));
                     setReward(stack, id, type == GuiEditMenuItem.Type.REWARD);

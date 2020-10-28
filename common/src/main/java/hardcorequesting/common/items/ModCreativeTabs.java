@@ -6,5 +6,5 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 public class ModCreativeTabs {
-    public static CreativeModeTab HQMTab = HardcoreQuestingCore.platform.createTab(new ResourceLocation("hardcorequesting", "hardcorequesting"), () -> new ItemStack(ModItems.book));
+    public static CreativeModeTab HQMTab = HardcoreQuestingCore.platform.createTab(new ResourceLocation("hardcorequesting", "hardcorequesting"), () -> new ItemStack(ModItems.book.get()));
 }

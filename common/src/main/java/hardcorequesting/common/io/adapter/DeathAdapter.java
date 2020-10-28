@@ -20,15 +20,13 @@ public class DeathAdapter {
         @Override
         public JsonElement serialize(DeathStat src) {
             return object()
-                    .add(src.getUuid().toString(), object()
-                            .add(DEATHS, array()
-                                    .use(builder -> {
-                                        for (DeathType type : DeathType.values())
-                                            builder.add(src.getDeaths(type.ordinal()));
-                                    })
-                                    .build())
-                            .add(NAME, src.getCachedName())
+                    .add(src.getUuid().toString(), array()
+                            .use(builder -> {
+                                for (DeathType type : DeathType.values())
+                                    builder.add(src.getDeaths(type.ordinal()));
+                            })
                             .build())
+                    .add(NAME, src.getCachedName())
                     .build();
         }
         
@@ -38,10 +36,11 @@ public class DeathAdapter {
             for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
                 DeathStat stat = new DeathStat(UUID.fromString(entry.getKey()));
                 JsonArray array = new JsonArray();
+                stat.setCachedName(GsonHelper.getAsString(object, NAME, null));
                 if (entry.getValue().isJsonArray()) array = entry.getValue().getAsJsonArray();
                 if (entry.getValue().isJsonObject()) {
                     JsonObject jsonObject = entry.getValue().getAsJsonObject();
-                    stat.setCachedName(GsonHelper.getAsString(jsonObject, NAME, null));
+                    stat.setCachedName(GsonHelper.getAsString(jsonObject, NAME, stat.getCachedName()));
                     array = GsonHelper.getAsJsonArray(jsonObject, DEATHS, array);
                 }
                 int i = 0;

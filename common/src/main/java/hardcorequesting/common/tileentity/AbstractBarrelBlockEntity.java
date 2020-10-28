@@ -28,7 +28,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     private UUID playerId;
     
     public AbstractBarrelBlockEntity() {
-        super(ModBlocks.typeBarrel);
+        super(ModBlocks.typeBarrel.get());
     }
     
     @Override
@@ -133,7 +133,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
             if (task != null && !task.isCompleted(this.getPlayerUUID())) {
                 bound = true;
             }
-            level.setBlock(worldPosition, ModBlocks.blockBarrel.defaultBlockState().setValue(DeliveryBlock.BOUND, bound), 3);
+            level.setBlock(worldPosition, ModBlocks.blockBarrel.get().defaultBlockState().setValue(DeliveryBlock.BOUND, bound), 3);
         }
     }
     

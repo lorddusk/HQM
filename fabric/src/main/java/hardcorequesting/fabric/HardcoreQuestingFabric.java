@@ -31,6 +31,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -48,6 +49,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
@@ -250,5 +253,35 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public Fraction getBucketAmount() {
         return Fraction.ofWhole(1);
+    }
+    
+    @Override
+    public Block getBlock(ResourceLocation location) {
+        return Registry.BLOCK.get(location);
+    }
+    
+    @Override
+    public Item getItem(ResourceLocation location) {
+        return Registry.ITEM.get(location);
+    }
+    
+    @Override
+    public BlockEntityType<?> getBlockEntity(ResourceLocation location) {
+        return Registry.BLOCK_ENTITY_TYPE.get(location);
+    }
+    
+    @Override
+    public void registerBlock(ResourceLocation location, Supplier<Block> block) {
+        Registry.register(Registry.BLOCK, location, block.get());
+    }
+    
+    @Override
+    public void registerItem(ResourceLocation location, Supplier<Item> item) {
+        Registry.register(Registry.ITEM, location, item.get());
+    }
+    
+    @Override
+    public void registerBlockEntity(ResourceLocation location, Supplier<BlockEntityType<?>> type) {
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, type.get());
     }
 }

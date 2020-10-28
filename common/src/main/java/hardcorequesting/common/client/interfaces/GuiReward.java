@@ -168,8 +168,7 @@ public class GuiReward extends GuiBase {
         return false;
     }
     
-    private class Reward {
-        
+    private static class Reward {
         private ItemStack stack;
         private int x;
         private int y;

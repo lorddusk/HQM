@@ -227,7 +227,7 @@ public abstract class QuestTaskItems extends QuestTask {
             matrices.pushPose();
             matrices.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
-            gui.drawStringWithShadow(matrices, str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
+            gui.drawStringWithShadow(matrices, str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - (item.hasItem && !item.stack.isEmpty() && item.stack.getCount() != 1 ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
             matrices.popPose();
         }
         

@@ -33,7 +33,7 @@ public class TrackerBlock extends BaseEntityBlock {
     @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (player != null) {
-            if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() == ModItems.book) {
+            if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() == ModItems.book.get()) {
                 if (!world.isClientSide) {
                     BlockEntity tile = world.getBlockEntity(pos);
                     if (tile instanceof TrackerBlockEntity) {

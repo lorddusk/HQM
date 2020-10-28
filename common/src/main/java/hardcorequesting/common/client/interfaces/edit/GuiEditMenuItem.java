@@ -96,7 +96,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                     }
                 }
                 
-                if (!exists && stack.getItem() != ModItems.book) {
+                if (!exists && stack.getItem() != ModItems.book.get()) {
                     playerItems.add(new ElementItem(stack));
                 }
             }
@@ -207,7 +207,6 @@ public class GuiEditMenuItem extends GuiEditMenu {
             drawArrow(gui, mX, mY, false);
             gui.drawCenteredString(matrices, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         }
-        
     }
     
     @Override

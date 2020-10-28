@@ -41,7 +41,7 @@ public class QuestBookItem extends Item {
     }
     
     public static ItemStack getOPBook(Player player) {
-        ItemStack stack = new ItemStack(ModItems.enabledBook);
+        ItemStack stack = new ItemStack(ModItems.enabledBook.get());
         CompoundTag nbt = stack.getOrCreateTagElement("hqm");
         nbt.putString(NBT_PLAYER, player.getUUID().toString());
         stack.addTagElement("hqm", nbt);
@@ -67,7 +67,7 @@ public class QuestBookItem extends Item {
             if (!questingData.isQuestActive()) {
                 player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
             } else {
-                if (stack.getItem() == ModItems.enabledBook) {
+                if (stack.getItem() == ModItems.enabledBook.get()) {
                     CompoundTag compound = stack.getTagElement("hqm");
                     if (compound != null && compound.contains(NBT_PLAYER)) {
                         String uuidS = compound.getString(NBT_PLAYER);
@@ -116,7 +116,7 @@ public class QuestBookItem extends Item {
     
     @Override
     public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
-        if (stack.getItem() == ModItems.enabledBook) {
+        if (stack.getItem() == ModItems.enabledBook.get()) {
             CompoundTag compound = stack.getTagElement("hqm");
             if (compound != null && compound.contains(NBT_PLAYER)) {
                 Player useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
@@ -128,6 +128,6 @@ public class QuestBookItem extends Item {
     
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.getItem() == ModItems.enabledBook;
+        return stack.getItem() == ModItems.enabledBook.get();
     }
 }
