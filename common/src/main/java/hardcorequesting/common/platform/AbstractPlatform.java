@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -132,6 +133,8 @@ public interface AbstractPlatform {
     BlockEntityType<?> getBlockEntity(ResourceLocation location);
     
     void registerBlock(ResourceLocation location, Supplier<Block> block);
+    
+    void registerSound(ResourceLocation location, Supplier<SoundEvent> sound);
     
     void registerItem(ResourceLocation location, Supplier<Item> item);
     

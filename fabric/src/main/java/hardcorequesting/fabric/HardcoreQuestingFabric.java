@@ -38,6 +38,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -273,6 +274,11 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void registerBlock(ResourceLocation location, Supplier<Block> block) {
         Registry.register(Registry.BLOCK, location, block.get());
+    }
+    
+    @Override
+    public void registerSound(ResourceLocation location, Supplier<SoundEvent> sound) {
+        Registry.register(Registry.SOUND_EVENT, location, sound.get());
     }
     
     @Override

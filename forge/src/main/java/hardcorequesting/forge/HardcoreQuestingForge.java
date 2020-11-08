@@ -36,10 +36,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.world.GameRules;
@@ -86,6 +83,7 @@ import java.util.function.Supplier;
 @Mod("hardcorequesting")
 public class HardcoreQuestingForge implements AbstractPlatform {
     private final NetworkManager networkManager = new NetworkingManager();
+    private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
     private final DeferredRegister<TileEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, HardcoreQuestingCore.ID);
@@ -93,7 +91,8 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     public HardcoreQuestingForge() {
         NetworkingManager.init();
         HardcoreQuestingCore.initialize(this);
-        
+    
+        sounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         block.register(FMLJavaModLoadingContext.get().getModEventBus());
         item.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -395,6 +394,11 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public void registerBlock(ResourceLocation resourceLocation, Supplier<Block> supplier) {
         block.register(resourceLocation.getPath(), supplier);
+    }
+    
+    @Override
+    public void registerSound(ResourceLocation resourceLocation, Supplier<SoundEvent> supplier) {
+        sounds.register(resourceLocation.getPath(), supplier);
     }
     
     @Override
