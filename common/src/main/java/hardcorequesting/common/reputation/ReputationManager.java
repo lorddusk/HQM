@@ -1,7 +1,6 @@
 package hardcorequesting.common.reputation;
 
 import com.google.gson.reflect.TypeToken;
-import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.SimpleSerializable;
@@ -61,7 +60,7 @@ public class ReputationManager extends SimpleSerializable {
     @Override
     public void loadFromString(Optional<String> string) {
         reputationMap.clear();
-        string.flatMap(s -> SaveHandler.<List<Reputation>>load(s, new TypeToken<List<GroupTier>>() {}.getType()))
+        string.flatMap(s -> SaveHandler.<List<Reputation>>load(s, new TypeToken<List<Reputation>>() {}.getType()))
                 .ifPresent(reputations -> reputations.forEach(this::addReputation));
     }
 }
