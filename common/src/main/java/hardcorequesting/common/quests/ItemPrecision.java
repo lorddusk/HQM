@@ -98,7 +98,7 @@ public abstract class ItemPrecision {
     }
     
     public static ItemPrecision getPrecisionType(String uniqueID) {
-        return precisionTypes.containsKey(uniqueID) ? precisionTypes.get(uniqueID) : PRECISE;
+        return precisionTypes.getOrDefault(uniqueID, PRECISE);
     }
 
     /* This code is never called

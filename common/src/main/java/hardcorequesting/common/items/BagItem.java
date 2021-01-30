@@ -64,6 +64,8 @@ public class BagItem extends Item {
             ItemStack stack = player.getItemInHand(hand).copy();
             stack.shrink(1);
             player.setItemInHand(hand, stack);
+    
+            return InteractionResultHolder.success(stack);
         }
         
         return InteractionResultHolder.consume(player.getItemInHand(hand));
