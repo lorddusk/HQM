@@ -49,7 +49,7 @@ public class ReputationAdapter {
                     .add(MARKERS, array()
                             .use(builder -> {
                                 for (int i = 0; i < src.getMarkerCount(); i++) {
-                                    REPUTATION_MARKER_ADAPTER.serialize(src.getMarker(i));
+                                    builder.add(REPUTATION_MARKER_ADAPTER.serialize(src.getMarker(i)));
                                 }
                             })
                             .build())
