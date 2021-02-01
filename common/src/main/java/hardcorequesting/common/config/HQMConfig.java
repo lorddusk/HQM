@@ -45,6 +45,9 @@ public class HQMConfig {
     @Comment("Allow every single player in a party to claim the reward for a quest. Setting this to false will give the party one set of rewards to share.")
     public boolean MULTI_REWARD = true;
     
+    @Comment("Allow teams, currently extremely buggy!")
+    public boolean ENABLE_TEAMS = true;
+    
     //@Name("NBT Subset Tags to Filter")
     @Comment("Use this to specify NBT tags that should be ignored when comparing items with NBT subset")
     public String[] NBT_SUBSET_FILTER = new String[]{"RepairCost"};

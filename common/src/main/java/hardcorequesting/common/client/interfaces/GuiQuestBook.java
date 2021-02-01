@@ -12,6 +12,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.edit.*;
 import hardcorequesting.common.client.sounds.SoundHandler;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.network.NetworkManager;
@@ -762,7 +763,8 @@ public class GuiQuestBook extends GuiBase {
     private void drawMenuPage(PoseStack matrices, int x, int y) {
         QuestingDataManager manager = QuestingDataManager.getInstance();
         drawString(matrices, Translator.translatable("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
-        drawString(matrices, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
+        if (HQMConfig.getInstance().ENABLE_TEAMS)
+            drawString(matrices, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
         
@@ -800,7 +802,8 @@ public class GuiQuestBook extends GuiBase {
         int deaths = DeathStatsManager.getInstance().getDeathStat(this.getPlayer().getUUID()).getTotalDeaths();
         drawString(matrices, Translator.pluralTranslated(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
-        
+    
+        if (!HQMConfig.getInstance().ENABLE_TEAMS) return;
         
         FormattedText str;
         Team team = manager.getQuestingData(player).getTeam();
@@ -916,7 +919,7 @@ public class GuiQuestBook extends GuiBase {
         if (button == 1) {
             isMainPageOpen = true;
         } else {
-            if (inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
+            if (HQMConfig.getInstance().ENABLE_TEAMS && inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuTeam(this, player);
             } else if (inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuDeath(this, player);
