@@ -47,8 +47,8 @@ public class QuestAdapter {
             
             return new RepeatInfo(
                     RepeatType.valueOf(GsonHelper.getAsString(object, TYPE)),
-                    GsonHelper.getAsInt(object, HOURS, 0),
-                    GsonHelper.getAsInt(object, DAYS, 0)
+                    GsonHelper.getAsInt(object, DAYS, 0),
+                    GsonHelper.getAsInt(object, HOURS, 0)
             );
         }
     };
