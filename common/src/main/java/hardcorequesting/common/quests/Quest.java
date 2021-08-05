@@ -1575,7 +1575,7 @@ public class Quest {
         }
     }
     
-    public void resetOnTime(int time) {
+    public void resetOnTime(long time) {
         for (Team team : TeamManager.getInstance().getTeams()) {
             QuestData data = team.getQuestData(getQuestId());
             if (data != null && !data.available && data.time <= time) {

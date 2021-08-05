@@ -65,13 +65,12 @@ public enum RepeatType {
     @Environment(EnvType.CLIENT)
     private static String formatRemainingTime(Quest quest, Player player, int days, int hours) {
         if (!quest.getQuestData(player).available) {
-            int total = days * 24 + hours;
-            int time = quest.getQuestData(player).time;
-            int current = Quest.clientTicker.getHours();
+            int timerDuration = days * 24 + hours;
+            long timerStart = quest.getQuestData(player).time;
+            long current = Quest.clientTicker.getHours();
+            int remaining = (int) (timerStart + timerDuration - current);
             
-            total = time + total - current;
-            
-            return "\n" + formatResetTime(quest, player, total / 24, total % 24);
+            return "\n" + formatResetTime(quest, player, remaining / 24, remaining % 24);
         } else {
             return "";
         }
@@ -84,7 +83,7 @@ public enum RepeatType {
         }
         
         int total = days * 24 + hours;
-        int resetHoursTotal = total - Quest.clientTicker.getHours() % total;
+        int resetHoursTotal = total - (int) (Quest.clientTicker.getHours() % total);
         
         int resetDays = resetHoursTotal / 24;
         int resetHours = resetHoursTotal % 24;

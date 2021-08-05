@@ -13,7 +13,7 @@ public class QuestData {
     public boolean claimed;
     public QuestDataTask[] tasks;
     public boolean available = true;
-    public int time;
+    public long time;
     
     public QuestData(int players) {
         reward = new boolean[players];
