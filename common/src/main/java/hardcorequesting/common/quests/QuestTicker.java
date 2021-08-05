@@ -27,6 +27,8 @@ public class QuestTicker {
                         }
                     } else if (quest.getRepeatInfo().getType() == RepeatType.TIME) {
                         quest.resetOnTime(hours - total);
+                    } else if (quest.getRepeatInfo().getType() == RepeatType.INSTANT) {
+                        quest.resetAll();
                     }
                 }
             }
