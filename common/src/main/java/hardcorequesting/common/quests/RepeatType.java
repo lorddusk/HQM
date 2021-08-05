@@ -31,7 +31,7 @@ public enum RepeatType {
         @Environment(EnvType.CLIENT)
         @Override
         public String getMessage(Quest quest, Player player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.interval.message") + "\n" + formatTime(days, hours) + "\n" + formatResetTime(quest, player, days, hours);
+            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.interval.message") + "\n" + formatTime(days, hours) + "\n" + formatIntervalTime(quest, player, days, hours);
         }
     
         @Environment(EnvType.CLIENT)
@@ -44,7 +44,7 @@ public enum RepeatType {
         @Environment(EnvType.CLIENT)
         @Override
         public String getMessage(Quest quest, Player player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.time.message") + "\n" + formatTime(days, hours) + formatRemainingTime(quest, player, days, hours);
+            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.time.message") + "\n" + formatTime(days, hours) + formatCooldownTime(quest, player, days, hours);
         }
     
         @Environment(EnvType.CLIENT)
@@ -62,36 +62,48 @@ public enum RepeatType {
         this.useTime = useTime;
     }
     
+    /**
+     * Formats and produces text describing the reset time, given the cooldown time from a quest being finished to reset
+     */
     @Environment(EnvType.CLIENT)
-    private static String formatRemainingTime(Quest quest, Player player, int days, int hours) {
+    private static String formatCooldownTime(Quest quest, Player player, int days, int hours) {
         if (!quest.getQuestData(player).available) {
             int timerDuration = days * 24 + hours;
             long timerStart = quest.getQuestData(player).time;
             long current = Quest.clientTicker.getHours();
             int remaining = (int) (timerStart + timerDuration - current);
             
-            return "\n" + formatResetTime(quest, player, remaining / 24, remaining % 24);
+            return "\n" + formatRemainingTime(quest, player, remaining / 24, remaining % 24);
         } else {
             return "";
         }
     }
     
+    /**
+     * Formats and produces text describing the reset time, given the interval time between scheduled resets
+     */
     @Environment(EnvType.CLIENT)
-    private static String formatResetTime(Quest quest, Player player, int days, int hours) {
+    private static String formatIntervalTime(Quest quest, Player player, int days, int hours) {
         if (days == 0 && hours == 0) {
             return GuiColor.RED + I18n.get("hqm.repeat.invalid");
         }
         
-        int total = days * 24 + hours;
-        int resetHoursTotal = total - (int) (Quest.clientTicker.getHours() % total);
+        int interval = days * 24 + hours;
+        int remaining = interval - (int) (Quest.clientTicker.getHours() % interval);
         
-        int resetDays = resetHoursTotal / 24;
-        int resetHours = resetHoursTotal % 24;
+        return formatRemainingTime(quest, player, remaining / 24, remaining % 24);
+    }
+    
+    /**
+     * Formats and produces text describing the reset time, given the remaining time until the next reset
+     */
+    @Environment(EnvType.CLIENT)
+    private static String formatRemainingTime(Quest quest, Player player, int days, int hours) {
         
         if (!quest.isAvailable(player)) {
-            return GuiColor.YELLOW + I18n.get("hqm.repeat.resetIn", formatTime(resetDays, resetHours));
+            return GuiColor.YELLOW + I18n.get("hqm.repeat.resetIn", formatTime(days, hours));
         } else {
-            return GuiColor.GRAY + I18n.get("hqm.repeat.nextReset", formatTime(resetDays, resetHours));
+            return GuiColor.GRAY + I18n.get("hqm.repeat.nextReset", formatTime(days, hours));
         }
     }
     
