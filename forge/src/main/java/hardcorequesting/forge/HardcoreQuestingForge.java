@@ -195,17 +195,26 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnServerTick(Consumer<MinecraftServer> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.ServerTickEvent>addListener(event -> consumer.accept(getServer()));
+        MinecraftForge.EVENT_BUS.<TickEvent.ServerTickEvent>addListener(event -> {
+            if(event.phase == TickEvent.Phase.END)
+                consumer.accept(getServer());
+        });
     }
     
     @Override
     public void registerOnClientTick(Consumer<Minecraft> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.ClientTickEvent>addListener(event -> consumer.accept(Minecraft.getInstance()));
+        MinecraftForge.EVENT_BUS.<TickEvent.ClientTickEvent>addListener(event -> {
+            if(event.phase == TickEvent.Phase.END)
+                consumer.accept(Minecraft.getInstance());
+        });
     }
     
     @Override
     public void registerOnWorldTick(Consumer<Level> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.WorldTickEvent>addListener(event -> consumer.accept(event.world));
+        MinecraftForge.EVENT_BUS.<TickEvent.WorldTickEvent>addListener(event -> {
+            if(event.phase == TickEvent.Phase.END)
+                consumer.accept(event.world);
+        });
     }
     
     @Override
