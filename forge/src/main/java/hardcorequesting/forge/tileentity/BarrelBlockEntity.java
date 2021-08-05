@@ -6,10 +6,10 @@ import hardcorequesting.common.quests.task.QuestTaskItems;
 import hardcorequesting.common.quests.task.QuestTaskItemsConsume;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.forge.ForgeFluidStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.util.Direction;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -94,20 +94,20 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
     @Override
     public void syncToClientsNearby() {
         if (!getLevel().isClientSide()) {
-            ServerWorld world = (ServerWorld) getLevel();
+            ServerLevel world = (ServerLevel) getLevel();
             world.getChunkSource().blockChanged(getBlockPos());
         }
     }
     
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(worldPosition, 10, getUpdateTag());
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return new ClientboundBlockEntityDataPacket(worldPosition, 10, getUpdateTag());
     }
     
     @Nonnull
     @Override
-    public CompoundNBT getUpdateTag() {
-        return save(new CompoundNBT());
+    public CompoundTag getUpdateTag() {
+        return save(new CompoundTag());
     }
     
     @NotNull

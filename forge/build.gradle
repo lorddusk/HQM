@@ -1,63 +1,34 @@
-buildscript {
-    repositories {
-        maven { url "https://files.minecraftforge.net/maven" }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath(group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "3.+", changing: true)
-    }
-}
-
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
-    id "eclipse"
-}
-
-apply plugin: "net.minecraftforge.gradle"
-
-minecraft {
-    mappings(channel: "official", version: rootProject.architect.minecraft)
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    runs {
-        client {
-            workingDirectory project.file("run")
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
-        server {
-            workingDirectory project.file("run")
-            mods {
-                examplemod {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-repositories {
-    jcenter()
-    maven { url "https://files.minecraftforge.net/maven" }
 }
 
 configurations {
-    shadow
+    shadowCommon
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+loom {
+    useFabricMixin = true
 }
 
 dependencies {
-    minecraft("net.minecraftforge:forge:${rootProject.architect.minecraft}-${project.forge_version}")
+    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${project.forge_version}"
 
     compileOnly("org.jetbrains:annotations:19.0.0")
-    compile("blue.endless:jankson:1.2.0")
-    shadow("blue.endless:jankson:1.2.0")
-    compile(project(path: ":common", configuration: "mcpGenerateMod")) {
+    implementation("blue.endless:jankson:1.2.0")
+    shadowCommon("blue.endless:jankson:1.2.0")
+
+    implementation(project(path: ":common")) {
         transitive = false
     }
-    shadow(project(path: ":common", configuration: "mcp")) {
+    developmentForge(project(path: ":common")) {
+        transitive = false
+    }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
     }
 }
@@ -67,10 +38,12 @@ shadowJar {
     relocate "blue.endless.jankson", "hardcorequesting.common.forge.blue.endless.jankson"
     exclude "fabric.mod.json"
 
-    configurations = [project.configurations.shadow]
-    archiveClassifier.set("forge")
+    configurations = [project.configurations.shadowCommon]
+    classifier "forge"
 }
 
-reobf {
-    shadowJar {}
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "forge"
 }

@@ -1,14 +1,28 @@
 plugins {
-    id "architect-plugin" version "1.0.10"
+    id "architectury-plugin" version "3.2-SNAPSHOT"
+    id "dev.architectury.loom" version "0.7.2-SNAPSHOT" apply false
 }
 
-architect {
-    minecraft = minecraft_version
+architectury {
+    minecraft = rootProject.minecraft_version
+}
+
+subprojects {
+    apply plugin: "dev.architectury.loom"
+
+    loom {
+        silentMojangMappingsLicense()
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings loom.officialMojangMappings()
+    }
 }
 
 allprojects {
     apply plugin: "java"
-    apply plugin: "architect-plugin"
+    apply plugin: "architectury-plugin"
 
     archivesBaseName = project.archives_base_name
     version = minecraft_version + "+" + project.mod_version
@@ -16,5 +30,14 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+
+        def targetVersion = 8
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.release = targetVersion
+        }
+    }
+
+    java {
+        withSourcesJar()
     }
 }

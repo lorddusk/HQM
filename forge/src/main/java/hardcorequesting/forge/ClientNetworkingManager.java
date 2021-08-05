@@ -1,7 +1,7 @@
 package hardcorequesting.forge;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -12,7 +12,7 @@ public class ClientNetworkingManager {
         NetworkingManager.CHANNEL.addListener(NetworkingManager.createPacketHandler(NetworkEvent.ServerCustomPayloadEvent.class, NetworkingManager.S2C));
     }
     
-    public static PlayerEntity getClientPlayer() {
+    public static Player getClientPlayer() {
         return Minecraft.getInstance().player;
     }
 }
