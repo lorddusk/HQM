@@ -1052,7 +1052,7 @@ public class Quest {
         if (rewards != null) {
             for (int i = 0; i < rewards.size(); i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    if (rewards.get(i) != null) {
+                    if (!rewards.get(i).isEmpty()) {
                         GuiQuestBook.setSelectedStack(rewards.get(i));
                         List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                         List<FormattedText> list2 = Lists.newArrayList(str);
@@ -1103,7 +1103,7 @@ public class Quest {
                 if (canSelect && (!canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
                     if (selectedReward == i) {
                         selectedReward = -1;
-                    } else if (rewards.get(i) != null) {
+                    } else if (!rewards.get(i).isEmpty()) {
                         selectedReward = i;
                     }
                 } else if (canQuestsBeEdited()) {
@@ -1126,7 +1126,7 @@ public class Quest {
                             SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards.get(i) == null ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE));
+                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE));
                     }
                 }
                 
