@@ -117,7 +117,7 @@ public class TeamAdapter {
     public static void commitInvitesMap() {
         if (invitesMap.size() > 0) {
             Map<UUID, Team> tempMap = new HashMap<>();
-            StreamSupport.stream(TeamManager.getInstance().getTeams().spliterator(), false).filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
+            StreamSupport.stream(TeamManager.getInstance().getNamedTeams().spliterator(), false).filter(Objects::nonNull).forEach(team -> tempMap.put(team.getId(), team));
             for (Team team : TeamManager.getInstance().getTeams()) {
                 List<UUID> invites = invitesMap.get(team);
                 if (invites != null)

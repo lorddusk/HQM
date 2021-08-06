@@ -68,7 +68,7 @@ public class QuestDataAdapter {
                         data.available = in.nextBoolean();
                         break;
                     case TIME:
-                        data.time = in.nextInt();
+                        data.time = in.nextLong();
                         break;
                     case TASKS_SIZE:
                         data.tasks = new QuestDataTask[in.nextInt()];

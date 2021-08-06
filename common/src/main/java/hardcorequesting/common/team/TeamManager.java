@@ -1,5 +1,6 @@
 package hardcorequesting.common.team;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.reflect.TypeToken;
@@ -7,6 +8,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.TeamAdapter;
 import hardcorequesting.common.quests.QuestLine;
+import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.SimpleSerializable;
 import net.minecraft.world.entity.player.Player;
@@ -83,8 +85,15 @@ public class TeamManager extends SimpleSerializable {
         return Team.single(playerId);
     }
     
-    public Iterable<Team> getTeams() {
+    public Iterable<Team> getNamedTeams() {
         return teams;
+    }
+    
+    public Iterable<Team> getTeams() {
+        //Collect any teams that are not managed by the TeamManager
+        Iterable<Team> singleTeams = QuestingDataManager.getInstance().getQuestingData().values().stream().map(QuestingData::getTeam)
+                .filter(Team::isSingle).collect(Collectors.toSet());
+        return Iterables.concat(teams, singleTeams);
     }
     
     public void deactivate() {

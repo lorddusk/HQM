@@ -230,7 +230,7 @@ public class QuestingData {
         QuestingDataManager manager = QuestingDataManager.getInstance();
         QuestingData data = manager.getQuestingData(player);
         Team team = data.getTeam();
-        if (!team.isSingle() && !Iterables.isEmpty(TeamManager.getInstance().getTeams())) {
+        if (!team.isSingle() && !Iterables.isEmpty(TeamManager.getInstance().getNamedTeams())) {
             team.removePlayer(player);
             if (team.getPlayerCount() == 0) {
                 team.deleteTeam();
