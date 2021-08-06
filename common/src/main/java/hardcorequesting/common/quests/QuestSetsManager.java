@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
@@ -74,6 +75,8 @@ public class QuestSetsManager implements Serializable {
     public void load() {
         quests.clear();
         questSets.clear();
+        EventTrigger.instance().clear();
+        
         parent.resolve("sets.json")
                 .flatMap(QuestLine.FileProvider::get)
                 .map(SaveHandler.JSON_PARSER::parse)
