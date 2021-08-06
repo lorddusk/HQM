@@ -2,9 +2,9 @@ package hardcorequesting.forge;
 
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.util.Fraction;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 public class ForgeFluidStack implements FluidStack {
     public net.minecraftforge.fluids.FluidStack _stack;
@@ -18,7 +18,7 @@ public class ForgeFluidStack implements FluidStack {
     }
     
     @Override
-    public ITextComponent getName() {
+    public Component getName() {
         return _stack.getDisplayName();
     }
     
