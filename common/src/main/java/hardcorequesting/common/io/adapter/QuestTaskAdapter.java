@@ -435,7 +435,7 @@ public class QuestTaskAdapter {
                 if (this.lower >= 0 && this.lower < reputation.getMarkerCount())
                     lower = reputation.getMarker(this.lower);
                 if (this.upper >= 0 && this.upper < reputation.getMarkerCount())
-                    upper = reputation.getMarker(this.lower);
+                    upper = reputation.getMarker(this.upper);
                 return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
             }
             return null;

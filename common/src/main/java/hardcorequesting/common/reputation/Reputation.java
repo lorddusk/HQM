@@ -158,6 +158,10 @@ public class Reputation {
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
                         gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputation));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
+                        if (selectedReputation == reputation) {
+                            selectedReputation = null;
+                        }
+
                         for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof QuestTaskReputation) {
