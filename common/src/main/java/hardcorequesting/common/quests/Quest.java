@@ -33,6 +33,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -469,19 +470,19 @@ public class Quest {
         this.y = y;
     }
     
-    public ItemStack[] getReward() {
-        return rewards.toArray();
+    public NonNullList<ItemStack> getReward() {
+        return rewards.toList();
     }
     
-    public void setReward(ItemStack[] reward) {
+    public void setReward(NonNullList<ItemStack> reward) {
         this.rewards.set(reward);
     }
     
-    public ItemStack[] getRewardChoice() {
-        return rewardChoices.toArray();
+    public NonNullList<ItemStack> getRewardChoice() {
+        return rewardChoices.toList();
     }
     
-    public void setRewardChoice(ItemStack[] rewardChoice) {
+    public void setRewardChoice(NonNullList<ItemStack> rewardChoice) {
         this.rewardChoices.set(rewardChoice);
     }
     
@@ -903,14 +904,14 @@ public class Quest {
         }
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewards.toArray(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
+            drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
                 gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
-                drawRewards(gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+                drawRewards(gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
         } else if (!rewardChoices.isEmpty()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+            drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
         
         for (LargeButton button : buttons) {
@@ -982,12 +983,12 @@ public class Quest {
         }
         
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            drawRewardMouseOver(matrices, gui, rewards.toArray(), REWARD_Y, -1, mX, mY);
+            drawRewardMouseOver(matrices, gui, rewards.toList(), REWARD_Y, -1, mX, mY);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                drawRewardMouseOver(matrices, gui, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
+                drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
             }
         } else if (!rewardChoices.isEmpty()) {
-            drawRewardMouseOver(matrices, gui, rewardChoices.toArray(), REWARD_Y, selectedReward, mX, mY);
+            drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY);
         }
         for (LargeButton button : buttons) {
             button.renderTooltip(matrices, gui, player, mX, mY);
@@ -1037,23 +1038,23 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawRewards(GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY, int max) {
+    private void drawRewards(GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY, int max) {
         rewards = getEditFriendlyRewards(rewards, max);
         
         
-        for (int i = 0; i < rewards.length; i++) {
-            gui.drawItemStack(rewards[i], START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
+        for (int i = 0; i < rewards.size(); i++) {
+            gui.drawItemStack(rewards.get(i), START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawRewardMouseOver(PoseStack matrices, GuiQuestBook gui, ItemStack[] rewards, int y, int selected, int mX, int mY) {
+    private void drawRewardMouseOver(PoseStack matrices, GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY) {
         if (rewards != null) {
-            for (int i = 0; i < rewards.length; i++) {
+            for (int i = 0; i < rewards.size(); i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    if (rewards[i] != null) {
-                        GuiQuestBook.setSelectedStack(rewards[i]);
-                        List<Component> str = rewards[i].getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+                    if (rewards.get(i) != null) {
+                        GuiQuestBook.setSelectedStack(rewards.get(i));
+                        List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                         List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
                             list2.add(FormattedText.EMPTY);
@@ -1068,25 +1069,26 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    private ItemStack[] getEditFriendlyRewards(ItemStack[] rewards, int max) {
-        if (rewards == null) {
-            return new ItemStack[]{ItemStack.EMPTY};
-        } else if (canQuestsBeEdited() && rewards.length < max) {
-            ItemStack[] ret = Arrays.copyOf(rewards, rewards.length + 1);
-            ret[ret.length - 1] = ItemStack.EMPTY;
-            return ret;
+    private NonNullList<ItemStack> getEditFriendlyRewards(NonNullList<ItemStack> rewards, int max) {
+        if (rewards.isEmpty()) {
+            return NonNullList.withSize(1, ItemStack.EMPTY);
+        } else if (canQuestsBeEdited() && rewards.size() < max) {
+            NonNullList<ItemStack> rewardsWithEmpty = NonNullList.create();
+            rewardsWithEmpty.addAll(rewards);
+            rewardsWithEmpty.add(ItemStack.EMPTY);
+            return rewardsWithEmpty;
         } else {
             return rewards;
         }
     }
     
     @Environment(EnvType.CLIENT)
-    private void handleRewardClick(GuiQuestBook gui, Player player, ItemStack[] rawRewards, int y, boolean canSelect, int mX, int mY) {
-        ItemStack[] rewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
+    private void handleRewardClick(GuiQuestBook gui, Player player, NonNullList<ItemStack> rawRewards, int y, boolean canSelect, int mX, int mY) {
+        NonNullList<ItemStack> rewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
         
         boolean doubleClick = false;
         
-        for (int i = 0; i < rewards.length; i++) {
+        for (int i = 0; i < rewards.size(); i++) {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.NORMAL) {
                     int lastDiff = player.tickCount - lastClicked;
@@ -1101,44 +1103,30 @@ public class Quest {
                 if (canSelect && (!canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
                     if (selectedReward == i) {
                         selectedReward = -1;
-                    } else if (rewards[i] != null) {
+                    } else if (rewards.get(i) != null) {
                         selectedReward = i;
                     }
                 } else if (canQuestsBeEdited()) {
                     if (gui.getCurrentMode() == EditMode.DELETE) {
-                        if (rewards[i] != null) {
-                            ItemStack[] newRewards;
-                            if (rawRewards.length == 1) {
-                                newRewards = null;
-                                if (canSelect) {
+                        if (i < rawRewards.size()) {
+                            rawRewards.remove(i);
+                            if (canSelect && selectedReward != -1) {
+                                if (selectedReward == i) {
                                     selectedReward = -1;
-                                }
-                            } else {
-                                newRewards = new ItemStack[rawRewards.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < rawRewards.length; j++) {
-                                    if (j != i) {
-                                        newRewards[id] = rawRewards[j];
-                                        id++;
-                                    }
-                                }
-                                if (canSelect && selectedReward != -1) {
-                                    if (selectedReward == i) {
-                                        selectedReward = -1;
-                                    } else if (selectedReward > i) {
-                                        selectedReward--;
-                                    }
+                                } else if (selectedReward > i) {
+                                    selectedReward--;
                                 }
                             }
+                            
                             if (canSelect) {
-                                this.rewardChoices.set(newRewards);
+                                this.rewardChoices.set(rawRewards);
                             } else {
-                                this.rewards.set(newRewards);
+                                this.rewards.set(rawRewards);
                             }
                             SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards[i], i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards[i] == null ? 1 : rewards[i].getCount(), ItemPrecision.PRECISE));
+                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards.get(i) == null ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE));
                     }
                 }
                 
@@ -1215,12 +1203,12 @@ public class Quest {
             }
             
             if (!rewards.isEmpty() || canQuestsBeEdited()) {
-                handleRewardClick(gui, player, rewards.toArray(), REWARD_Y, false, mX, mY);
+                handleRewardClick(gui, player, rewards.toList(), REWARD_Y, false, mX, mY);
                 if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                    handleRewardClick(gui, player, rewardChoices.toArray(), REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
+                    handleRewardClick(gui, player, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
                 }
             } else if (!rewardChoices.isEmpty()) {
-                handleRewardClick(gui, player, rewardChoices.toArray(), REWARD_Y, true, mX, mY);
+                handleRewardClick(gui, player, rewardChoices.toList(), REWARD_Y, true, mX, mY);
             }
             
             if (selectedTask != null) {
@@ -1334,7 +1322,7 @@ public class Quest {
             if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
                 List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
-                    for (ItemStack stack : rewards.toArray()) {
+                    for (ItemStack stack : rewards.toList()) {
                         items.add(stack.copy());
                     }
                 }

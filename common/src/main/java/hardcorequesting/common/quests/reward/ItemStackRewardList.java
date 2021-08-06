@@ -1,21 +1,18 @@
 package hardcorequesting.common.quests.reward;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ItemStackRewardList extends QuestRewardList<ItemStack> {
     
-    public void addAll(ItemStack[] array) {
-        for (ItemStack stack : array)
+    public void addAll(NonNullList<ItemStack> list) {
+        for (ItemStack stack : list)
             add(new ItemStackReward(stack));
     }
     
-    public void set(ItemStack[] array) {
+    public void set(NonNullList<ItemStack> list) {
         clear();
-        if (array != null)
-            addAll(array);
+        addAll(list);
     }
     
     public void set(int id, ItemStack stack) {
@@ -26,15 +23,13 @@ public class ItemStackRewardList extends QuestRewardList<ItemStack> {
         add(new ItemStackReward(stack));
     }
     
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public ItemStack[] toArray() { // TODO change every ItemStack[] to NonNullList<ItemStack>
-        List<ItemStack> result = new ArrayList<>();
+    public NonNullList<ItemStack> toList() {
+        NonNullList<ItemStack> result = NonNullList.create();
         for (QuestReward<ItemStack> reward : list) {
-            if (reward.getReward() != null) {
+            if (!reward.getReward().isEmpty()) {
                 result.add(reward.getReward());
             }
         }
-        return result.isEmpty() ? null : result.toArray(new ItemStack[0]);
+        return result;
     }
 }

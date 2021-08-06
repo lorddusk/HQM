@@ -14,6 +14,7 @@ import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.SaveHelper;
+import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
@@ -141,7 +142,7 @@ public class QuestAdapter {
             return array.build();
         }
         
-        private JsonElement writeItemStackArray(ItemStack[] stacks) {
+        private JsonElement writeItemStackList(NonNullList<ItemStack> stacks) {
             JsonArrayBuilder array = array();
             if (stacks != null) {
                 for (ItemStack stack : stacks) {
@@ -191,8 +192,8 @@ public class QuestAdapter {
                     })
                     .add(PREREQUISITES, writeQuestList(src.getRequirements()))
                     .add(OPTIONLINKS, writeQuestList(src.getOptionLinks()))
-                    .add(REWARDS, writeItemStackArray(src.getReward()))
-                    .add(REWARDS_CHOICE, writeItemStackArray(src.getRewardChoice()))
+                    .add(REWARDS, writeItemStackList(src.getReward()))
+                    .add(REWARDS_CHOICE, writeItemStackList(src.getRewardChoice()))
                     .add(REWARDS_COMMAND, SaveHandler.GSON.toJsonTree(src.getCommandRewardsAsStrings()))
                     .build();
         }
@@ -231,8 +232,8 @@ public class QuestAdapter {
             for (JsonElement element : GsonHelper.getAsJsonArray(object, TASKS, EMPTY_ARRAY)) {
                 QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
             }
-            QUEST.setReward(readItemStackArray(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
-            QUEST.setRewardChoice(readItemStackArray(GsonHelper.getAsJsonArray(object, REWARDS_CHOICE, EMPTY_ARRAY)));
+            QUEST.setReward(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
+            QUEST.setRewardChoice(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS_CHOICE, EMPTY_ARRAY)));
             if (object.has(REWARDS_REPUTATION)) {
                 List<ReputationReward> reputationRewards = new ArrayList<>();
                 for (JsonElement element : GsonHelper.getAsJsonArray(object, REWARDS_REPUTATION, EMPTY_ARRAY)) {
@@ -261,14 +262,14 @@ public class QuestAdapter {
             }
         }
         
-        private ItemStack[] readItemStackArray(JsonArray array) {
-            List<ItemStack> stacks = new ArrayList<>();
+        private NonNullList<ItemStack> readItemStackList(JsonArray array) {
+            NonNullList<ItemStack> stacks = NonNullList.create();
             for (JsonElement element : array) {
                 ItemStack stack = MinecraftAdapter.ITEM_STACK.deserialize(element);
                 if (!stack.isEmpty())
                     stacks.add(stack);
             }
-            return stacks.toArray(new ItemStack[0]);
+            return stacks;
         }
     };
     public static final Adapter<QuestSet> QUEST_SET_ADAPTER = new Adapter<QuestSet>() {
