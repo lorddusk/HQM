@@ -124,6 +124,8 @@ public class QuestTaskLocation extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
+        if (stack.isEmpty()) return;
+        
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
         locations[id].iconStack = stack;
@@ -198,11 +200,7 @@ public class QuestTaskLocation extends QuestTask {
                         case ITEM:
                             final int locationId = i;
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, location.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> {
-                                        if (!result.isEmpty()) {
-                                            this.setIcon(locationId, (ItemStack) result.getStack(), player);
-                                        }
-                                    }));
+                                    result -> this.setIcon(locationId, result.getStack(), player)));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, location));

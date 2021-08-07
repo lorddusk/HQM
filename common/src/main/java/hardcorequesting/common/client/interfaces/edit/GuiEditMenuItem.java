@@ -51,7 +51,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private static final int PLAYER_LINES = 6;
     public static final ThreadingHandler HANDLER = new ThreadingHandler();
     
-    private final BiConsumer<Element<?>, ItemPrecision> resultConsumer;
+    private final Consumer<Result<?>> resultConsumer;
     protected Element<?> selected;
     private Type type;
     private List<Element<?>> playerItems;
@@ -62,15 +62,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private int lastClicked;
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Element<?>> resultConsumer) {
-        this(gui, player, Element.create(obj), type, amount, precision, (result, _precision) -> resultConsumer.accept(result));
-    }
-    
-    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, BiConsumer<Element<?>, ItemPrecision> resultConsumer) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
         this(gui, player, Element.create(obj), type, amount, precision, resultConsumer);
     }
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, ItemPrecision precision, BiConsumer<Element<?>, ItemPrecision> resultConsumer) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
         super(gui, player, true);
         this.resultConsumer = resultConsumer;
         this.selected = element;
@@ -252,7 +248,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     
     @Override
     public void save(GuiBase gui) {
-        resultConsumer.accept(selected, precision);
+        resultConsumer.accept(new Result<>(selected.getStack(), selected.getAmount(), precision));
     }
     
     private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
@@ -442,6 +438,46 @@ public class GuiEditMenuItem extends GuiEditMenu {
         // I don't think this is technically ever really empty
         public boolean isEmpty() {
             return false;
+        }
+    }
+    
+    public static class Result<T> {
+        private final T value;
+        private final int amount;
+        private final ItemPrecision precision;
+    
+        private Result(T value, int amount, ItemPrecision precision) {
+            this.value = value;
+            this.amount = amount;
+            this.precision = precision;
+        }
+    
+        public T get() {
+            return value;
+        }
+        
+        public ItemStack getStack() {
+            return (ItemStack) value;
+        }
+    
+        public int getAmount() {
+            return amount;
+        }
+    
+        public ItemPrecision getPrecision() {
+            return precision;
+        }
+        
+        public boolean isEmpty() {
+            return value instanceof ItemStack && ((ItemStack) value).isEmpty();
+        }
+        
+        public void handle(Consumer<ItemStack> itemConsumer, Consumer<FluidStack> fluidConsumer) {
+            if(value instanceof ItemStack) {
+                itemConsumer.accept((ItemStack) value);
+            } else if(value instanceof  FluidStack) {
+                fluidConsumer.accept((FluidStack) value);
+            }
         }
     }
     

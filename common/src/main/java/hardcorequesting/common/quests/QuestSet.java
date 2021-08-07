@@ -799,9 +799,9 @@ public class QuestSet {
                             case ITEM:
                                 gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIconStack(), GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
                                         result -> {
-                                            if (result instanceof GuiEditMenuItem.ElementItem && !result.isEmpty()) {
+                                            if (!result.isEmpty()) {
                                                 try {
-                                                    quest.setIconStack((ItemStack) result.getStack());
+                                                    quest.setIconStack(result.getStack());
                                                 } catch (Exception e) {
                                                     System.out.println("Tell LordDusk that he found the issue.");
                                                 }

@@ -83,6 +83,8 @@ public class QuestTaskAdvancement extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
+        if (stack.isEmpty()) return;
+        
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
         advancements[id].iconStack = stack;
@@ -136,11 +138,7 @@ public class QuestTaskAdvancement extends QuestTask {
                         case ITEM:
                             final int advancementId = i;
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, advancement.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> {
-                                        if (!result.isEmpty()) {
-                                            this.setIcon(advancementId, (ItemStack) result.getStack(), player);
-                                        }
-                                    }));
+                                    result -> this.setIcon(advancementId, result.getStack(), player)));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, advancement));

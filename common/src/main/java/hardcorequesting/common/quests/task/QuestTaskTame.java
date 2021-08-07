@@ -64,7 +64,8 @@ public class QuestTaskTame extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
-        System.out.println(stack);
+        if (stack.isEmpty()) return;
+        
         setTame(id, id >= tames.length ? new Tame() : tames[id], player);
         
         tames[id].iconStack = stack;
@@ -137,11 +138,7 @@ public class QuestTaskTame extends QuestTask {
                         case ITEM:
                             final int tameId = i;
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, tame.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> {
-                                        if (!result.isEmpty()) {
-                                            this.setIcon(tameId, (ItemStack) result.getStack(), player);
-                                        }
-                                    }));
+                                    result -> this.setIcon(tameId, result.getStack(), player)));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, tame));

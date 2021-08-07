@@ -190,6 +190,8 @@ public class Group {
     }
     
     public void setItem(int id, ItemStack stack) {
+        if (stack.isEmpty()) return;
+        
         if (id >= items.size()) {
             items.add(stack);
             SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CREATE);
@@ -327,11 +329,8 @@ public class Group {
                     
                     final int id = i;
                     gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), stack, GuiEditMenuItem.Type.REWARD, amount, ItemPrecision.PRECISE,
-                            result -> {
-                                if (result instanceof GuiEditMenuItem.ElementItem && result.getStack() != null && !result.isEmpty()) {
-                                    this.setItem(id, (ItemStack) result.getStack());
-                                }
-                            }));
+                            result -> this.setItem(id, result.getStack())));
+                    
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
                     SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);

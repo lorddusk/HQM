@@ -75,7 +75,8 @@ public class QuestTaskMob extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
-        System.out.println(stack);
+        if (stack.isEmpty()) return;
+        
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
         
         mobs[id].iconStack = stack;
@@ -148,11 +149,7 @@ public class QuestTaskMob extends QuestTask {
                         case ITEM:
                             final int mobId = i;
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, mob.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> {
-                                        if (!result.isEmpty()) {
-                                            this.setIcon(mobId, (ItemStack) result.getStack(), player);
-                                        }
-                                    }));
+                                    result -> this.setIcon(mobId, result.getStack(), player)));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));

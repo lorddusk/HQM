@@ -1129,12 +1129,10 @@ public class Quest {
                         final int id = i;
                         gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), GuiEditMenuItem.Type.REWARD, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE,
                                 result -> {
-                                    if (result instanceof GuiEditMenuItem.ElementItem) {
-                                        ItemStack stack = ((GuiEditMenuItem.ElementItem) result).getStack().copy();
-                                        if (!stack.isEmpty()) {
-                                            stack.setCount(Math.min(127, result.getAmount()));
-                                            this.setReward(stack, id, !canSelect);
-                                        }
+                                    ItemStack stack = result.getStack().copy();
+                                    if (!stack.isEmpty()) {
+                                        stack.setCount(Math.min(127, result.getAmount()));
+                                        this.setReward(stack, id, !canSelect);
                                     }
                                 }));
                     }

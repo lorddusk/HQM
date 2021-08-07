@@ -82,8 +82,8 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(GuiEditMenuItem.Element element, int id, ItemPrecision precision) {
-        if (element.getStack() == null) return;
+    public void setItem(GuiEditMenuItem.Result<?> result, int id) {
+        if (result.isEmpty()) return;
         
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);
@@ -93,19 +93,17 @@ public abstract class QuestTaskItems extends QuestTask {
         }
         
         if (id < items.length) {
-            if (element instanceof GuiEditMenuItem.ElementItem) {
-                GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem) element;
+            if (result.get() instanceof ItemStack) {
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                items[id].stack = item.getStack().copy();
+                items[id].stack = ((ItemStack) result.get()).copy();
             } else {
-                GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
                 items[id].hasItem = false;
-                items[id].fluid = fluid.getStack();
+                items[id].fluid = ((FluidStack) result.get());
                 items[id].stack = null;
             }
-            items[id].required = element.getAmount();
-            items[id].precision = precision;
+            items[id].required = result.getAmount();
+            items[id].precision = result.getPrecision();
             items[id].permutations = null;
         }
     }
@@ -293,11 +291,8 @@ public abstract class QuestTaskItems extends QuestTask {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             final int id = i;
                             gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
-                                    (result, precision) -> {
-                                        if (!result.isEmpty()) {
-                                            this.setItem(result, id, precision);
-                                        }
-                                    }));
+                                    result -> this.setItem(result, id)));
+                            
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                             int id = 0;
