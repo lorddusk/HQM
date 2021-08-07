@@ -146,7 +146,13 @@ public class QuestTaskMob extends QuestTask {
                             gui.setEditMenu(new GuiEditMenuMob(gui, this, mob.copy(), i, player));
                             break;
                         case ITEM:
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, mob.iconStack, i, GuiEditMenuItem.Type.MOB, 1, ItemPrecision.PRECISE));
+                            final int mobId = i;
+                            gui.setEditMenu(new GuiEditMenuItem(gui, player, mob.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
+                                    result -> {
+                                        if (!result.isEmpty()) {
+                                            this.setIcon(mobId, (ItemStack) result.getStack(), player);
+                                        }
+                                    }));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));

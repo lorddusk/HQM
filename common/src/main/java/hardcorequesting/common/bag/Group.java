@@ -325,7 +325,13 @@ public class Group {
                         amount = 1;
                     }
                     
-                    gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), stack, i, GuiEditMenuItem.Type.BAG_ITEM, amount, ItemPrecision.PRECISE));
+                    final int id = i;
+                    gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), stack, GuiEditMenuItem.Type.REWARD, amount, ItemPrecision.PRECISE,
+                            result -> {
+                                if (result instanceof GuiEditMenuItem.ElementItem && result.getStack() != null && !result.isEmpty()) {
+                                    this.setItem(id, (ItemStack) result.getStack());
+                                }
+                            }));
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
                     SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);

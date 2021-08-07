@@ -1126,7 +1126,17 @@ public class Quest {
                             SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), i, canSelect ? GuiEditMenuItem.Type.PICK_REWARD : GuiEditMenuItem.Type.REWARD, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE));
+                        final int id = i;
+                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), GuiEditMenuItem.Type.REWARD, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE,
+                                result -> {
+                                    if (result instanceof GuiEditMenuItem.ElementItem) {
+                                        ItemStack stack = ((GuiEditMenuItem.ElementItem) result).getStack().copy();
+                                        if (!stack.isEmpty()) {
+                                            stack.setCount(Math.min(127, result.getAmount()));
+                                            this.setReward(stack, id, !canSelect);
+                                        }
+                                    }
+                                }));
                     }
                 }
                 
@@ -1430,30 +1440,6 @@ public class Quest {
     public void setDescription(String description) {
         this.description = description;
         cachedDescription = null;
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @SuppressWarnings("rawtypes")
-    public void setItem(GuiEditMenuItem.Element element, int id, GuiEditMenuItem.Type type, ItemPrecision precision, Player player) {
-        if (type == GuiEditMenuItem.Type.REWARD || type == GuiEditMenuItem.Type.PICK_REWARD) {
-            if (element instanceof GuiEditMenuItem.ElementItem) {
-                ItemStack stack = ((GuiEditMenuItem.ElementItem) element).getStack().copy();
-                if (!stack.isEmpty()) {
-                    stack.setCount(Math.min(127, element.getAmount()));
-                    setReward(stack, id, type == GuiEditMenuItem.Type.REWARD);
-                }
-            }
-        } else if (selectedTask instanceof QuestTaskItems) {
-            ((QuestTaskItems) selectedTask).setItem(element, id, precision);
-        } else if (selectedTask instanceof QuestTaskLocation && type == GuiEditMenuItem.Type.LOCATION) {
-            ((QuestTaskLocation) selectedTask).setIcon(id, (ItemStack) element.getStack(), player);
-        } else if (selectedTask instanceof QuestTaskTame && type == GuiEditMenuItem.Type.TAME) {
-            ((QuestTaskTame) selectedTask).setIcon(id, (ItemStack) element.getStack(), player);
-        } else if (selectedTask instanceof QuestTaskAdvancement && type == GuiEditMenuItem.Type.ADVANCEMENT) {
-            ((QuestTaskAdvancement) selectedTask).setIcon(id, (ItemStack) element.getStack(), player);
-        } else if (selectedTask instanceof QuestTaskMob && type == GuiEditMenuItem.Type.MOB) {
-            ((QuestTaskMob) selectedTask).setIcon(id, (ItemStack) element.getStack(), player);
-        }
     }
     
     private void setReward(ItemStack stack, int id, boolean isStandardReward) {

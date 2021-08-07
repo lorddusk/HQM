@@ -15,7 +15,7 @@ public class QuestTaskBlockBreak extends QuestTaskBlock {
     }
     
     public GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.BLOCK_BREAK_TASK;
+        return GuiEditMenuItem.Type.ITEM_TASK;
     }
     
     @Override

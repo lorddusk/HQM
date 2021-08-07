@@ -135,7 +135,13 @@ public class QuestTaskTame extends QuestTask {
                             gui.setEditMenu(new GuiEditMenuTame(gui, this, tame.copy(), i, player));
                             break;
                         case ITEM:
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, tame.iconStack, i, GuiEditMenuItem.Type.TAME, 1, ItemPrecision.PRECISE));
+                            final int tameId = i;
+                            gui.setEditMenu(new GuiEditMenuItem(gui, player, tame.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
+                                    result -> {
+                                        if (!result.isEmpty()) {
+                                            this.setIcon(tameId, (ItemStack) result.getStack(), player);
+                                        }
+                                    }));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, tame));

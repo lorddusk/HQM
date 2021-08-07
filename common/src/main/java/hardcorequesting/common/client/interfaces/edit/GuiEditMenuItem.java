@@ -11,9 +11,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem.Search.Thr
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
-import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.Fraction;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
@@ -28,6 +26,8 @@ import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class GuiEditMenuItem extends GuiEditMenu {
@@ -50,9 +50,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
     private static final int PLAYER_LINES = 6;
     public static final ThreadingHandler HANDLER = new ThreadingHandler();
+    
+    private final BiConsumer<Element<?>, ItemPrecision> resultConsumer;
     protected Element<?> selected;
-    private int id;
-    private UUID questId;
     private Type type;
     private List<Element<?>> playerItems;
     public List<Element<?>> searchItems;
@@ -62,20 +62,18 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private int lastClicked;
     
-    
-    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, int id, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, Element.create(obj), null, id, type, amount, precision);
+    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Element<?>> resultConsumer) {
+        this(gui, player, Element.create(obj), type, amount, precision, (result, _precision) -> resultConsumer.accept(result));
     }
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, UUID questId, Type type, int amount, ItemPrecision precision) {
-        this(gui, player, Element.create(obj), questId, -1, type, amount, precision);
+    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, BiConsumer<Element<?>, ItemPrecision> resultConsumer) {
+        this(gui, player, Element.create(obj), type, amount, precision, resultConsumer);
     }
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, UUID questId, int id, final Type type, final int amount, ItemPrecision precision) {
+    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, ItemPrecision precision, BiConsumer<Element<?>, ItemPrecision> resultConsumer) {
         super(gui, player, true);
+        this.resultConsumer = resultConsumer;
         this.selected = element;
-        this.id = id;
-        this.questId = questId;
         this.type = type;
         this.precision = precision;
         
@@ -254,24 +252,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     
     @Override
     public void save(GuiBase gui) {
-        if (type == Type.BAG_ITEM) {
-            if (GuiQuestBook.getSelectedGroup() != null && selected instanceof ElementItem && selected.getStack() != null && !selected.isEmpty()) {
-                GuiQuestBook.getSelectedGroup().setItem(id, (ItemStack) selected.getStack());
-            }
-        } else if (type == Type.QUEST_ICON) {
-            if (Quest.getQuest(questId) != null && selected instanceof ElementItem && !selected.isEmpty()) {
-                try {
-                    Quest.getQuest(questId).setIconStack((ItemStack) selected.getStack());
-                } catch (Exception e) {
-                    System.out.println("Tell LordDusk that he found the issue.");
-                }
-                SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
-            }
-        } else {
-            if (!selected.isEmpty()) {
-                GuiQuestBook.selectedQuest.setItem(selected, id, type, precision, player);
-            }
-        }
+        resultConsumer.accept(selected, precision);
     }
     
     private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
@@ -333,18 +314,9 @@ public class GuiEditMenuItem extends GuiEditMenu {
     
     public enum Type {
         REWARD(false, true, false),
-        PICK_REWARD(false, true, false),
-        CONSUME_TASK(true, true, true),
-        CRAFTING_TASK(false, true, true),
-        QUEST_ICON(false, false, false),
-        BAG_ITEM(false, true, false),
-        LOCATION(false, false, false),
-        TAME(false, false, false),
-        MOB(false, false, false),
-        ADVANCEMENT(false, false, false),
-        PORTAL(false, false, false),
-        BLOCK_PLACE_TASK(false, true, true),
-        BLOCK_BREAK_TASK(false, true, true);
+        ITEM_FLUID_TASK(true, true, true),
+        ITEM_TASK(false, true, true),
+        ICON(false, false, false);
         
         private boolean allowFluids;
         private boolean allowAmount;

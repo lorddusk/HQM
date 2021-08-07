@@ -25,7 +25,7 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     @Environment(EnvType.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.CRAFTING_TASK;
+        return GuiEditMenuItem.Type.ITEM_TASK;
     }
     
     @Override

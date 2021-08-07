@@ -291,7 +291,13 @@ public abstract class QuestTaskItems extends QuestTask {
                         OPBookHelper.reverseRequirementCompletion(this, i, player);
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
+                            final int id = i;
+                            gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
+                                    (result, precision) -> {
+                                        if (!result.isEmpty()) {
+                                            this.setItem(result, id, precision);
+                                        }
+                                    }));
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                             int id = 0;

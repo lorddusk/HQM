@@ -19,6 +19,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -796,7 +797,17 @@ public class QuestSet {
                                 SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIconStack(), quest.getQuestId(), GuiEditMenuItem.Type.QUEST_ICON, 1, ItemPrecision.PRECISE));
+                                gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIconStack(), GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
+                                        result -> {
+                                            if (result instanceof GuiEditMenuItem.ElementItem && !result.isEmpty()) {
+                                                try {
+                                                    quest.setIconStack((ItemStack) result.getStack());
+                                                } catch (Exception e) {
+                                                    System.out.println("Tell LordDusk that he found the issue.");
+                                                }
+                                                SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+                                            }
+                                        }));
                                 break;
                             case DELETE:
                                 Quest.removeQuest(quest);
