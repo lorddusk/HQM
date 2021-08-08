@@ -115,9 +115,7 @@ public class PickItemMenu extends GuiEditMenu {
                         }
                         
                         PickItemMenu.this.amount = number;
-                        if (getSelected() != null) {
-                            getSelected().setAmount(number);
-                        }
+                        
                     } catch (Exception ignored) {
                     }
                     
@@ -223,7 +221,7 @@ public class PickItemMenu extends GuiEditMenu {
     @Override
     public void save(GuiBase gui) {
         if (!selected.isEmpty()) {
-            resultConsumer.accept(new Result<>(selected.getStack(), amount, precision));
+            resultConsumer.accept(new Result<>(selected.createResultStack(amount), amount, precision));
         }
     }
     
@@ -261,12 +259,8 @@ public class PickItemMenu extends GuiEditMenu {
             
             if (gui.inBounds(x + xI * OFFSET, y + yI * OFFSET, SIZE, SIZE, mX, mY)) {
                 if (element != null) {
-                    selected = element.copy();
-                    if (amountTextBox != null) {
-                        amountTextBox.textChanged(gui);
-                    } else {
-                        selected.setAmount(1);
-                    }
+                    selected = element;
+                    
                     int lastDiff = player.tickCount - lastClicked;
                     if (lastDiff < 0) {
                         lastClicked = player.tickCount;
@@ -388,13 +382,7 @@ public class PickItemMenu extends GuiEditMenu {
         
         public abstract List<FormattedText> getName(GuiBase gui);
     
-        public abstract void setAmount(int val);
-        
-        public T getStack() {
-            return stack;
-        }
-        
-        public abstract Element<?> copy();
+        public abstract T createResultStack(int amount);
         
         public abstract boolean isEmpty();
         
@@ -425,19 +413,14 @@ public class PickItemMenu extends GuiEditMenu {
                 return Collections.singletonList(Translator.plain("Unknown"));
             }
         }
+        
+        @Override
+        public ItemStack createResultStack(int amount) {
+            ItemStack stack = this.stack.copy();
+            stack.setCount(amount);
+            return stack;
+        }
     
-        @Override
-        public void setAmount(int val) {
-            if (stack != null && !stack.isEmpty()) {
-                stack.setCount(val);
-            }
-        }
-        
-        @Override
-        public Element<?> copy() {
-            return new ElementItem((stack == null || stack.isEmpty()) ? null : stack.copy());
-        }
-        
         @Override
         public boolean isEmpty() {
             return stack == null || stack.isEmpty();
@@ -465,13 +448,8 @@ public class PickItemMenu extends GuiEditMenu {
         }
     
         @Override
-        public void setAmount(int val) {
-            stack = HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(val));
-        }
-        
-        @Override
-        public Element<?> copy() {
-            return new ElementFluid(stack.copy());
+        public FluidStack createResultStack(int amount) {
+            return HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(amount));
         }
         
         @Override
