@@ -1,7 +1,6 @@
 package hardcorequesting.common.client;
 
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.platform.FluidStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -29,8 +29,12 @@ public class TextSearch<T> {
     
     private static Future<?> currentSearch;
     
-    public static List<SearchEntry<PickItemMenu.Element<?>>> searchItems = new ArrayList<>();
-    public static List<SearchEntry<PickItemMenu.Element<?>>> searchFluids = new ArrayList<>();
+    public static List<SearchEntry<ItemStack>> ITEMS = new ArrayList<>();
+    public static List<SearchEntry<FluidStack>> FLUIDS = new ArrayList<>();
+    
+    public static <A, B> Stream<SearchEntry<B>> innerMap(Stream<SearchEntry<A>> stream, Function<A, B> mapper) {
+        return stream.map(entry -> entry.map(mapper));
+    }
     
     public static <T> Future<List<T>> startSearch(String text, Supplier<Stream<SearchEntry<T>>> searchEntrySupplier, int limit) {
         if (currentSearch != null)
@@ -64,7 +68,7 @@ public class TextSearch<T> {
     
     @SuppressWarnings("rawtypes")
     public static void initItems() {
-        if (searchItems.isEmpty() || searchFluids.isEmpty()) {
+        if (ITEMS.isEmpty() || FLUIDS.isEmpty()) {
             clear();
             NonNullList<ItemStack> stacks = NonNullList.create();
             for (Item item : Registry.ITEM) {
@@ -87,21 +91,21 @@ public class TextSearch<T> {
                     if (string != null)
                         advSearchString.append(string).append("\n");
                 }
-                searchItems.add(new SearchEntry<>(searchString.toString(), advSearchString.toString(), new PickItemMenu.ElementItem(stack)));
+                ITEMS.add(new SearchEntry<>(searchString.toString(), advSearchString.toString(), stack));
             }
             for (Fluid fluid : Registry.FLUID) {
                 if (fluid instanceof EmptyFluid) continue;
                 if (!fluid.defaultFluidState().isSource()) continue;
                 FluidStack fluidVolume = HardcoreQuestingCore.platform.createFluidStack(fluid, HardcoreQuestingCore.platform.getBucketAmount());
                 String search = fluidVolume.getName().getString();
-                searchFluids.add(new SearchEntry<>(search, search, new PickItemMenu.ElementFluid(fluidVolume)));
+                FLUIDS.add(new SearchEntry<>(search, search, fluidVolume));
             }
         }
     }
     
     public static void clear() {
-        searchFluids.clear();
-        searchItems.clear();
+        FLUIDS.clear();
+        ITEMS.clear();
     }
     
     public static class SearchEntry<T> {
@@ -121,6 +125,10 @@ public class TextSearch<T> {
             } else {
                 return Stream.empty();
             }
+        }
+        
+        public <R> SearchEntry<R> map(Function<T, R> mapper) {
+            return new SearchEntry<>(toolTip, advToolTip, mapper.apply(element));
         }
     }
 }

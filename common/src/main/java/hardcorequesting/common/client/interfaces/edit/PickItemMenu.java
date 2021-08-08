@@ -293,7 +293,7 @@ public class PickItemMenu extends GuiEditMenu {
     
             @Override
             protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
-                return TextSearch.searchItems.stream();
+                return TextSearch.innerMap(TextSearch.ITEMS.stream(), ElementItem::new);
             }
         };
         
@@ -306,7 +306,8 @@ public class PickItemMenu extends GuiEditMenu {
     
             @Override
             protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
-                return Stream.concat(TextSearch.searchItems.stream(), TextSearch.searchFluids.stream());
+                return Stream.concat(TextSearch.innerMap(TextSearch.ITEMS.stream(), ElementItem::new),
+                        TextSearch.innerMap(TextSearch.FLUIDS.stream(), ElementFluid::new));
             }
         };
         
