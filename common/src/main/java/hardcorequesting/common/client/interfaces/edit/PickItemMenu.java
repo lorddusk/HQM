@@ -3,31 +3,24 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.TextBoxGroup;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu.Search.ThreadingHandler;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,16 +41,15 @@ public class PickItemMenu extends GuiEditMenu {
     private static final int OFFSET = 20;
     private static final int ITEMS_PER_LINE = 7;
     private static final int SEARCH_LINES = 9;
-    private static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
+    public static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
     private static final int PLAYER_LINES = 6;
-    public static final ThreadingHandler HANDLER = new ThreadingHandler();
     
     private final Consumer<Result<?>> resultConsumer;
     private final boolean precisionInput;
-    private final Type type;
+    public final Type type;
     
     private final List<Element<?>> playerItems;
-    private List<Element<?>> searchItems;
+    public List<Element<?>> searchItems;
     
     private Element<?> selected;
     private int amount;
@@ -129,7 +121,7 @@ public class PickItemMenu extends GuiEditMenu {
             @Override
             public void textChanged(GuiBase gui) {
                 searchItems.clear();
-                Thread thread = new Thread(new Search(getText(), PickItemMenu.this));
+                Thread thread = new Thread(new TextSearch(getText(), PickItemMenu.this));
                 thread.start();
             }
         });
@@ -293,8 +285,8 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            protected Stream<Search.SearchEntry> getSearchEntriesStream() {
-                return Search.searchItems.stream();
+            public Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+                return TextSearch.searchItems.stream();
             }
         };
         
@@ -306,14 +298,14 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            protected Stream<Search.SearchEntry> getSearchEntriesStream() {
-                return Stream.concat(Search.searchItems.stream(), Search.searchFluids.stream());
+            public Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+                return Stream.concat(TextSearch.searchItems.stream(), TextSearch.searchFluids.stream());
             }
         };
         
         protected abstract List<Element<?>> createPlayerEntries(Player player);
         
-        protected abstract Stream<Search.SearchEntry> getSearchEntriesStream();
+        public abstract Stream<TextSearch.SearchEntry> getSearchEntriesStream();
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {
@@ -494,127 +486,6 @@ public class PickItemMenu extends GuiEditMenu {
                 itemConsumer.accept((ItemStack) value);
             } else if(value instanceof  FluidStack) {
                 fluidConsumer.accept((FluidStack) value);
-            }
-        }
-    }
-    
-    public static class Search implements Runnable {
-        
-        public static List<SearchEntry> searchItems = new ArrayList<>();
-        public static List<SearchEntry> searchFluids = new ArrayList<>();
-        
-        private String search;
-        private PickItemMenu menu;
-        public List<Element<?>> elements;
-        private long startTime;
-        
-        public Search(String search, PickItemMenu menu) {
-            this.search = search;
-            this.menu = menu;
-            startTime = System.currentTimeMillis();
-        }
-        
-        public static void setResult(PickItemMenu menu, Search search) {
-            ThreadingHandler.handle(menu, search);
-        }
-        
-        @SuppressWarnings("rawtypes")
-        public static void initItems() {
-            if (searchItems.isEmpty() || searchFluids.isEmpty()) {
-                clear();
-                NonNullList<ItemStack> stacks = NonNullList.create();
-                for (Item item : Registry.ITEM) {
-                    try {
-                        item.fillItemCategory(item.getItemCategory(), stacks);
-                    } catch (Exception ignore) {
-                    }
-                }
-                Player player = Minecraft.getInstance().player;
-                for (ItemStack stack : stacks) {
-                    List tooltipList = stack.getTooltipLines(player, TooltipFlag.Default.NORMAL);
-                    List advTooltipList = stack.getTooltipLines(player, TooltipFlag.Default.ADVANCED);
-                    StringBuilder searchString = new StringBuilder();
-                    for (Object string : tooltipList) {
-                        if (string != null)
-                            searchString.append(string).append("\n");
-                    }
-                    StringBuilder advSearchString = new StringBuilder();
-                    for (Object string : advTooltipList) {
-                        if (string != null)
-                            advSearchString.append(string).append("\n");
-                    }
-                    searchItems.add(new SearchEntry(searchString.toString(), advSearchString.toString(), new ElementItem(stack)));
-                }
-                for (Fluid fluid : Registry.FLUID) {
-                    if (fluid instanceof EmptyFluid) continue;
-                    if (!fluid.defaultFluidState().isSource()) continue;
-                    FluidStack fluidVolume = HardcoreQuestingCore.platform.createFluidStack(fluid, HardcoreQuestingCore.platform.getBucketAmount());
-                    String search = fluidVolume.getName().getString();
-                    searchFluids.add(new SearchEntry(search, search, new ElementFluid(fluidVolume)));
-                }
-            }
-        }
-        
-        public static void clear() {
-            searchFluids.clear();
-            searchItems.clear();
-        }
-        
-        @Override
-        public void run() {
-            initItems();
-            Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
-            boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
-            
-            elements = menu.type.getSearchEntriesStream().flatMap(entry -> entry.tryMatch(pattern, advanced))
-                    .limit(ITEMS_TO_DISPLAY).collect(Collectors.toList());
-            
-            setResult(this.menu, this);
-        }
-        
-        public boolean isNewerThan(Search search) {
-            return startTime > search.startTime;
-        }
-        
-        public static class SearchEntry {
-            private String toolTip;
-            private String advToolTip;
-            private Element<?> element;
-            
-            public SearchEntry(String searchString, String advSearchString, Element<?> element) {
-                this.toolTip = searchString;
-                this.advToolTip = advSearchString;
-                this.element = element;
-            }
-            
-            public Stream<Element<?>> tryMatch(Pattern pattern, boolean advanced) {
-                if (pattern.matcher(advanced ? advToolTip : toolTip).find()) {
-                    return Stream.of(element);
-                } else {
-                    return Stream.empty();
-                }
-            }
-        }
-        
-        public static class ThreadingHandler {
-            private Map<PickItemMenu, Search> handle = new LinkedHashMap<>();
-            
-            private ThreadingHandler() {
-                HardcoreQuestingCore.platform.registerOnHudRender(this::renderEvent);
-            }
-            
-            private static void handle(PickItemMenu menu, Search search) {
-                if (!HANDLER.handle.containsKey(menu) || search.isNewerThan(HANDLER.handle.get(menu)))
-                    HANDLER.handle.put(menu, search);
-            }
-            
-            public void renderEvent(PoseStack matrices, float delta) {
-                if (!handle.isEmpty()) {
-                    for (Map.Entry<PickItemMenu, Search> entry : handle.entrySet()) {
-                        entry.getKey().searchItems = entry.getValue().elements;
-                    }
-                    handle.clear();
-                }
             }
         }
     }
