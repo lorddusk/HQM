@@ -328,7 +328,7 @@ public class Group {
                     
                     final int id = i;
                     PickItemMenu.display(gui, gui.getPlayer(), stack, PickItemMenu.Type.ITEM, amount,
-                            result -> this.setItem(id, result.get()));
+                            result -> this.setItem(id, result.getWithAmount()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);

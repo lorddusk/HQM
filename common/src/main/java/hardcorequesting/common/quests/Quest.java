@@ -1129,11 +1129,7 @@ public class Quest {
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
                         PickItemMenu.display(gui, player, rewards.get(i), PickItemMenu.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
-                                result -> {
-                                    ItemStack stack = result.get();
-                                    stack.setCount(Math.min(127, result.getAmount()));
-                                    this.setReward(stack, id, !canSelect);
-                                });
+                                result -> this.setReward(result.getWithAmount(), id, !canSelect));
                     }
                 }
                 

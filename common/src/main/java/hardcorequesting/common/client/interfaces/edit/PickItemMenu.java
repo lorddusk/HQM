@@ -16,6 +16,7 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -86,7 +87,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         this.type = type;
         this.precisionInput = precisionInput;
         
-        this.selected = element;
+        this.selected = type.copyWith(element, 1);
         this.amount = amount;
         this.precision = precision;
         
@@ -219,7 +220,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
     @Override
     public void save(GuiBase gui) {
         if (!type.isEmpty(selected)) {
-            resultConsumer.accept(new Result<>(type.copyWith(selected, amount), amount, precision));
+            resultConsumer.accept(new Result<>(selected, amount, precision, type));
         }
     }
     
@@ -309,7 +310,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
             @Override
             protected ItemStack copyWith(ItemStack item, int amount) {
                 ItemStack newStack = item.copy();
-                newStack.setCount(amount);
+                newStack.setCount(Mth.clamp(amount, 1, 127));
                 return newStack;
             }
         };
@@ -440,15 +441,21 @@ public class PickItemMenu<T> extends GuiEditMenu {
         private final T value;
         private final int amount;
         private final ItemPrecision precision;
+        private final Type<T> type;
     
-        private Result(T value, int amount, ItemPrecision precision) {
+        private Result(T value, int amount, ItemPrecision precision, Type<T> type) {
             this.value = value;
             this.amount = amount;
             this.precision = precision;
+            this.type = type;
         }
         
         public T get() {
-            return value;
+            return type.copyWith(value, 1);
+        }
+        
+        public T getWithAmount() {
+            return type.copyWith(value, amount);
         }
         
         public int getAmount() {
