@@ -8,12 +8,11 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuAdvancement;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
@@ -137,7 +136,7 @@ public class QuestTaskAdvancement extends QuestTask {
                             break;
                         case ITEM:
                             final int advancementId = i;
-                            GuiEditMenuItem.display(gui, player, advancement.iconStack, GuiEditMenuItem.Type.ITEM,
+                            PickItemMenu.display(gui, player, advancement.iconStack, PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(advancementId, result.getStack(), player));
                             break;
                         case RENAME:

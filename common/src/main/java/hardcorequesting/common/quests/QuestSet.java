@@ -19,7 +19,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -797,7 +796,7 @@ public class QuestSet {
                                 SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                GuiEditMenuItem.display(gui, player, quest.getIconStack(), GuiEditMenuItem.Type.ITEM,
+                                PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
                                         result -> {
                                             if (!result.isEmpty()) {
                                                 try {

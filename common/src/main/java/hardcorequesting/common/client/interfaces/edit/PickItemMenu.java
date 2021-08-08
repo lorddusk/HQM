@@ -7,7 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.TextBoxGroup;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem.Search.ThreadingHandler;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu.Search.ThreadingHandler;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-public class GuiEditMenuItem extends GuiEditMenu {
+public class PickItemMenu extends GuiEditMenu {
     
     private static final int ARROW_X_LEFT = 20;
     private static final int ARROW_X_RIGHT = 150;
@@ -66,18 +66,18 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private int lastClicked;
     
     public static void display(GuiBase gui, Player player, Object obj, Type type, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
+        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, amount, true, precision, true, resultConsumer));
+        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, amount, true, precision, true, resultConsumer));
     }
     
-    private GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<?>> resultConsumer) {
+    private PickItemMenu(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<?>> resultConsumer) {
         super(gui, player, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
@@ -118,7 +118,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                             number = 1;
                         }
                         
-                        GuiEditMenuItem.this.amount = number;
+                        PickItemMenu.this.amount = number;
                         if (getSelected() != null) {
                             getSelected().setAmount(number);
                         }
@@ -132,7 +132,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             @Override
             public void textChanged(GuiBase gui) {
                 searchItems.clear();
-                Thread thread = new Thread(new Search(getText(), GuiEditMenuItem.this));
+                Thread thread = new Thread(new Search(getText(), PickItemMenu.this));
                 thread.start();
             }
         });
@@ -488,17 +488,17 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public static List<SearchEntry> searchFluids = new ArrayList<>();
         
         private String search;
-        private GuiEditMenuItem menu;
+        private PickItemMenu menu;
         public List<Element<?>> elements;
         private long startTime;
         
-        public Search(String search, GuiEditMenuItem menu) {
+        public Search(String search, PickItemMenu menu) {
             this.search = search;
             this.menu = menu;
             startTime = System.currentTimeMillis();
         }
         
-        public static void setResult(GuiEditMenuItem menu, Search search) {
+        public static void setResult(PickItemMenu menu, Search search) {
             ThreadingHandler.handle(menu, search);
         }
         
@@ -586,20 +586,20 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         public static class ThreadingHandler {
-            private Map<GuiEditMenuItem, Search> handle = new LinkedHashMap<>();
+            private Map<PickItemMenu, Search> handle = new LinkedHashMap<>();
             
             private ThreadingHandler() {
                 HardcoreQuestingCore.platform.registerOnHudRender(this::renderEvent);
             }
             
-            private static void handle(GuiEditMenuItem menu, Search search) {
+            private static void handle(PickItemMenu menu, Search search) {
                 if (!HANDLER.handle.containsKey(menu) || search.isNewerThan(HANDLER.handle.get(menu)))
                     HANDLER.handle.put(menu, search);
             }
             
             public void renderEvent(PoseStack matrices, float delta) {
                 if (!handle.isEmpty()) {
-                    for (Map.Entry<GuiEditMenuItem, Search> entry : handle.entrySet()) {
+                    for (Map.Entry<PickItemMenu, Search> entry : handle.entrySet()) {
                         entry.getKey().searchItems = entry.getValue().elements;
                     }
                     handle.clear();

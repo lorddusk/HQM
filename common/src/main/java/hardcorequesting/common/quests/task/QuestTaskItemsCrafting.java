@@ -1,6 +1,6 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
@@ -29,8 +29,8 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM;
+    protected PickItemMenu.Type getMenuTypeId() {
+        return PickItemMenu.Type.ITEM;
     }
     
     private void create(Player player, ItemStack stack) {

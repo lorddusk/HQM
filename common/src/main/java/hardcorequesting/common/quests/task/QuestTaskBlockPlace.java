@@ -1,6 +1,6 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
@@ -17,8 +17,8 @@ public class QuestTaskBlockPlace extends QuestTaskItems {
         register(EventTrigger.Type.ITEM_USED);
     }
     
-    public GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM;
+    public PickItemMenu.Type getMenuTypeId() {
+        return PickItemMenu.Type.ITEM;
     }
     
     @Override

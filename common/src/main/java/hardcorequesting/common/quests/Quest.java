@@ -1127,7 +1127,7 @@ public class Quest {
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
-                        GuiEditMenuItem.display(gui, player, rewards.get(i), GuiEditMenuItem.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
+                        PickItemMenu.display(gui, player, rewards.get(i), PickItemMenu.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
                                 result -> {
                                     ItemStack stack = result.getStack().copy();
                                     if (!stack.isEmpty()) {

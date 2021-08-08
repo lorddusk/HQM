@@ -1,6 +1,6 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import net.minecraft.core.BlockPos;
@@ -14,8 +14,8 @@ public class QuestTaskBlockBreak extends QuestTaskBlock {
         register(EventTrigger.Type.BLOCK_BROKEN);
     }
     
-    public GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM;
+    public PickItemMenu.Type getMenuTypeId() {
+        return PickItemMenu.Type.ITEM;
     }
     
     @Override

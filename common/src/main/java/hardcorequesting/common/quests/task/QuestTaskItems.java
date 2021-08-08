@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -82,7 +82,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(GuiEditMenuItem.Result<?> result, int id) {
+    public void setItem(PickItemMenu.Result<?> result, int id) {
         if (result.isEmpty()) return;
         
         if (id >= items.length) {
@@ -151,7 +151,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    protected abstract GuiEditMenuItem.Type getMenuTypeId();
+    protected abstract PickItemMenu.Type getMenuTypeId();
     
     public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
         if (!parent.isAvailable(playerId)) return false;
@@ -290,7 +290,7 @@ public abstract class QuestTaskItems extends QuestTask {
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             final int id = i;
-                            GuiEditMenuItem.display(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
+                            PickItemMenu.display(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
                                     result -> this.setItem(result, id));
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
