@@ -26,7 +26,6 @@ import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -52,10 +51,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public static final ThreadingHandler HANDLER = new ThreadingHandler();
     
     private final Consumer<Result<?>> resultConsumer;
-    protected Element<?> selected;
     private Type type;
     private List<Element<?>> playerItems;
-    public List<Element<?>> searchItems;
+    private List<Element<?>> searchItems;
+    private Element<?> selected;
+    private int amount;
     private ItemPrecision precision;
     private boolean clicked;
     private TextBoxGroup.TextBox amountTextBox;
@@ -69,8 +69,10 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
         super(gui, player, true);
         this.resultConsumer = resultConsumer;
-        this.selected = element;
         this.type = type;
+        
+        this.selected = element;
+        this.amount = amount;
         this.precision = precision;
         
         playerItems = new ArrayList<>();
@@ -137,6 +139,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                             number = 1;
                         }
                         
+                        GuiEditMenuItem.this.amount = number;
                         if (getSelected() != null) {
                             getSelected().setAmount(number);
                         }
@@ -248,7 +251,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
     
     @Override
     public void save(GuiBase gui) {
-        resultConsumer.accept(new Result<>(selected.getStack(), selected.getAmount(), precision));
+        resultConsumer.accept(new Result<>(selected.getStack(), amount, precision));
     }
     
     private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
@@ -335,9 +338,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         public abstract void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY);
         
         public abstract List<FormattedText> getName(GuiBase gui);
-        
-        public abstract int getAmount();
-        
+    
         public abstract void setAmount(int val);
         
         public T getStack() {
@@ -375,12 +376,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 return Collections.singletonList(Translator.plain("Unknown"));
             }
         }
-        
-        @Override
-        public int getAmount() {
-            return (stack == null || stack.isEmpty()) ? 0 : stack.getCount();
-        }
-        
+    
         @Override
         public void setAmount(int val) {
             if (stack != null && !stack.isEmpty()) {
@@ -418,12 +414,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
             }
             return Collections.emptyList();
         }
-        
-        @Override
-        public int getAmount() {
-            return stack.getAmount().intValue();
-        }
-        
+    
         @Override
         public void setAmount(int val) {
             stack = HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(val));
