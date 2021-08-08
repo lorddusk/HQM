@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -32,8 +31,6 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskItems.class;
     }
-    
-    public abstract GuiEditMenuItem.Type getMenuTypeId();
     
     @Override
     public void onUpdate(Player player) {

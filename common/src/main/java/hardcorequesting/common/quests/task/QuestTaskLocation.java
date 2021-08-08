@@ -7,13 +7,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuLocation;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskLocation;
@@ -124,6 +123,8 @@ public class QuestTaskLocation extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
+        if (stack.isEmpty()) return;
+        
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
         locations[id].iconStack = stack;
@@ -196,7 +197,9 @@ public class QuestTaskLocation extends QuestTask {
                             gui.setEditMenu(new GuiEditMenuLocation(gui, this, location.copy(), i, player));
                             break;
                         case ITEM:
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, location.iconStack, i, GuiEditMenuItem.Type.LOCATION, 1, ItemPrecision.PRECISE));
+                            final int locationId = i;
+                            PickItemMenu.display(gui, player, location.iconStack, PickItemMenu.Type.ITEM,
+                                    result -> this.setIcon(locationId, result.get(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, location));

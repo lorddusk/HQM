@@ -1,6 +1,5 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
@@ -53,8 +52,8 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.CONSUME_TASK;
+    protected boolean mayUseFluids() {
+        return true;
     }
     
     @Override

@@ -121,6 +121,13 @@ public interface AbstractPlatform {
     
     FluidStack createFluidStack(Fluid fluid, Fraction amount);
     
+    /**
+     * Obtains the fluid contained in the item stack.
+     * If there is no fluid in the item stack, an empty fluid stack will be returned.
+     * Only the fluid type is guaranteed to match. The amount returned might not match the amount in the item stack.
+     */
+    FluidStack findFluidIn(ItemStack stack);
+    
     @Environment(EnvType.CLIENT)
     void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2);
     

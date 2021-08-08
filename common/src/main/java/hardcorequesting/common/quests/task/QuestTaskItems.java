@@ -4,10 +4,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -82,8 +83,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(GuiEditMenuItem.Element element, int id, ItemPrecision precision) {
-        if (element.getStack() == null) return;
+    public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
         
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);
@@ -93,18 +93,16 @@ public abstract class QuestTaskItems extends QuestTask {
         }
         
         if (id < items.length) {
-            if (element instanceof GuiEditMenuItem.ElementItem) {
-                GuiEditMenuItem.ElementItem item = (GuiEditMenuItem.ElementItem) element;
+            item.ifLeft(itemStack -> {
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                items[id].stack = item.getStack().copy();
-            } else {
-                GuiEditMenuItem.ElementFluid fluid = (GuiEditMenuItem.ElementFluid) element;
+                items[id].stack = itemStack;
+            }).ifRight(fluidStack -> {
                 items[id].hasItem = false;
-                items[id].fluid = fluid.getStack();
+                items[id].fluid = fluidStack;
                 items[id].stack = null;
-            }
-            items[id].required = element.getAmount();
+            });
+            items[id].required = amount;
             items[id].precision = precision;
             items[id].permutations = null;
         }
@@ -153,7 +151,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    protected abstract GuiEditMenuItem.Type getMenuTypeId();
+    protected abstract boolean mayUseFluids();
     
     public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
         if (!parent.isAvailable(playerId)) return false;
@@ -291,7 +289,15 @@ public abstract class QuestTaskItems extends QuestTask {
                         OPBookHelper.reverseRequirementCompletion(this, i, player);
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, i, getMenuTypeId(), item.required, item.precision));
+                            final int id = i;
+                            if(mayUseFluids()) {
+                                PickItemMenu.display(gui, player, item.hasItem ? Either.left(item.stack) : Either.right(item.fluid), PickItemMenu.Type.ITEM_FLUID, item.required, item.precision,
+                                        result -> this.setItem(result.get(), result.getAmount(), result.getPrecision(), id));
+                            } else {
+                                PickItemMenu.display(gui, player, item.stack, PickItemMenu.Type.ITEM, item.required, item.precision,
+                                        result -> this.setItem(Either.left(result.get()), result.getAmount(), result.getPrecision(), id));
+                            }
+                            
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
                             int id = 0;

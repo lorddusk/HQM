@@ -796,7 +796,15 @@ public class QuestSet {
                                 SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIconStack(), quest.getQuestId(), GuiEditMenuItem.Type.QUEST_ICON, 1, ItemPrecision.PRECISE));
+                                PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
+                                        result -> {
+                                            try {
+                                                quest.setIconStack(result.get());
+                                            } catch (Exception e) {
+                                                System.out.println("Tell LordDusk that he found the issue.");
+                                            }
+                                            SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+                                        });
                                 break;
                             case DELETE:
                                 Quest.removeQuest(quest);

@@ -1,7 +1,9 @@
 package hardcorequesting.fabric;
 
+import alexiil.mc.lib.attributes.fluid.FluidItemUtil;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
+import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -244,6 +246,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public FluidStack createFluidStack(Fluid fluid, Fraction amount) {
         return new FabricFluidStack(FluidKeys.get(fluid).withAmount(FluidAmount.of(amount.getNumerator(), amount.getDenominator())));
+    }
+    
+    @Override
+    public FluidStack findFluidIn(ItemStack stack) {
+        FluidKey fluid = FluidItemUtil.getContainedFluid(stack);
+        return new FabricFluidStack(fluid.withAmount(FluidAmount.ONE));
     }
     
     @Override

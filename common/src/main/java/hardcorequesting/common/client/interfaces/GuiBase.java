@@ -138,8 +138,9 @@ public class GuiBase extends Screen {
         renderTooltipL(matrices, font.getSplitter().splitLines(stringRenderable, Integer.MAX_VALUE, Style.EMPTY), x, y);
     }
     
-    public void renderTooltipL(PoseStack matrices, List<FormattedText> stringRenderables, int x, int y) {
-        renderTooltip(matrices, Language.getInstance().getVisualOrder(stringRenderables), x, y);
+    @SuppressWarnings("unchecked")
+    public void renderTooltipL(PoseStack matrices, List<? extends FormattedText> stringRenderables, int x, int y) {
+        renderTooltip(matrices, Language.getInstance().getVisualOrder((List<FormattedText>) stringRenderables), x, y);
     }
     
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {

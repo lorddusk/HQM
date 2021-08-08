@@ -8,12 +8,11 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuAdvancement;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuItem;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
@@ -83,6 +82,8 @@ public class QuestTaskAdvancement extends QuestTask {
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
+        if (stack.isEmpty()) return;
+        
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
         advancements[id].iconStack = stack;
@@ -134,7 +135,9 @@ public class QuestTaskAdvancement extends QuestTask {
                             gui.setEditMenu(new GuiEditMenuAdvancement(gui, this, advancement.copy(), i, player));
                             break;
                         case ITEM:
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, advancement.iconStack, i, GuiEditMenuItem.Type.ADVANCEMENT, 1, ItemPrecision.PRECISE));
+                            final int advancementId = i;
+                            PickItemMenu.display(gui, player, advancement.iconStack, PickItemMenu.Type.ITEM,
+                                    result -> this.setIcon(advancementId, result.get(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, advancement));
