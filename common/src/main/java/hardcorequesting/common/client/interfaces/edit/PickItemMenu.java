@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PickItemMenu extends GuiEditMenu {
     
@@ -90,13 +91,7 @@ public class PickItemMenu extends GuiEditMenu {
         
         searchItems = Collections.emptyList();
         
-        playerItems = getPlayerItems(player).stream().map(ElementItem::new)
-                .collect(Collectors.toCollection(ArrayList::new));
-        
-        if (type == Type.ITEM_FLUID) {
-            playerItems.addAll(getPlayerFluids(player).stream().map(ElementFluid::new)
-                    .collect(Collectors.toList()));
-        }
+        playerItems = type.createPlayerEntries(player);
         
         textBoxes = new TextBoxGroup();
         if (amountInput) {
@@ -153,10 +148,6 @@ public class PickItemMenu extends GuiEditMenu {
     
     private boolean usePrecision() {
         return precisionInput && selected instanceof ElementItem;
-    }
-    
-    public boolean showFluids() {
-        return type == Type.ITEM_FLUID;
     }
     
     private Element<?> getSelected() {
@@ -292,9 +283,35 @@ public class PickItemMenu extends GuiEditMenu {
         return false;
     }
     
-    public enum Type {
-        ITEM,
-        ITEM_FLUID
+    public static abstract class Type {
+        public static final Type ITEM = new Type() {
+            @Override
+            protected List<Element<?>> createPlayerEntries(Player player) {
+                return getPlayerItems(player).stream().map(ElementItem::new).collect(Collectors.toList());
+            }
+    
+            @Override
+            protected Stream<Search.SearchEntry> getSearchEntriesStream() {
+                return Search.searchItems.stream();
+            }
+        };
+        
+        public static final Type ITEM_FLUID = new Type() {
+            @Override
+            protected List<Element<?>> createPlayerEntries(Player player) {
+                return Stream.concat(getPlayerItems(player).stream().map(ElementItem::new),
+                        getPlayerFluids(player).stream().map(ElementFluid::new)).collect(Collectors.toList());
+            }
+    
+            @Override
+            protected Stream<Search.SearchEntry> getSearchEntriesStream() {
+                return Stream.concat(Search.searchItems.stream(), Search.searchFluids.stream());
+            }
+        };
+        
+        protected abstract List<Element<?>> createPlayerEntries(Player player);
+        
+        protected abstract Stream<Search.SearchEntry> getSearchEntriesStream();
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {
@@ -545,19 +562,12 @@ public class PickItemMenu extends GuiEditMenu {
         @Override
         public void run() {
             initItems();
-            elements = new ArrayList<>();
             Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
             boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
-            for (int i = 0; i < searchItems.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
-                SearchEntry entry = searchItems.get(i);
-                entry.search(pattern, elements, advanced);
-            }
-            if (menu.showFluids()) {
-                for (int i = 0; i < searchFluids.size() && elements.size() < ITEMS_TO_DISPLAY; i++) {
-                    SearchEntry entry = searchFluids.get(i);
-                    entry.search(pattern, elements, advanced);
-                }
-            }
+            
+            elements = menu.type.getSearchEntriesStream().flatMap(entry -> entry.tryMatch(pattern, advanced))
+                    .limit(ITEMS_TO_DISPLAY).collect(Collectors.toList());
+            
             setResult(this.menu, this);
         }
         
@@ -576,9 +586,11 @@ public class PickItemMenu extends GuiEditMenu {
                 this.element = element;
             }
             
-            public void search(Pattern pattern, List<Element<?>> elements, boolean advanced) {
+            public Stream<Element<?>> tryMatch(Pattern pattern, boolean advanced) {
                 if (pattern.matcher(advanced ? advToolTip : toolTip).find()) {
-                    elements.add(element);
+                    return Stream.of(element);
+                } else {
+                    return Stream.empty();
                 }
             }
         }
