@@ -89,44 +89,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
         
         playerItems = new ArrayList<>();
         searchItems = new ArrayList<>();
-        Inventory inventory = Minecraft.getInstance().player.inventory;
-        int itemLength = inventory.getContainerSize();
-        for (int i = 0; i < itemLength; i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (!stack.isEmpty()) {
-                stack = stack.copy();
-                stack.setCount(1);
-                boolean exists = false;
-                for (Element<?> other : playerItems) {
-                    if (ItemStack.matches(stack, (ItemStack) other.getStack())) {
-                        exists = true;
-                        break;
-                    }
-                }
-                
-                if (!exists && stack.getItem() != ModItems.book.get()) {
-                    playerItems.add(new ElementItem(stack));
-                }
-            }
-        }
+        
+        addPlayerItemStacks(playerItems, player);
+        
         if (type == Type.ITEM_FLUID) {
-            List<String> fluids = new ArrayList<>();
-            int end = playerItems.size();
-            for (int i = 0; i < end; i++) {
-                Element<?> item = playerItems.get(i);
-                ItemStack stack = (ItemStack) item.getStack();
-                // TODO Fluid support!
-//                if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)) {
-//                    FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
-//                    if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
-//                        fluids.add(fluidStack.getFluid().getName());
-//                        playerItems.add(new ElementFluid(fluidStack.getFluid()));
-//                        if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
-//                            break;
-//                        }
-//                    }
-//                }
-            }
+            addPlayerFluids(playerItems, player);
         }
         
         textBoxes = new TextBoxGroup();
@@ -326,6 +293,49 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public enum Type {
         ITEM,
         ITEM_FLUID
+    }
+    
+    private static void addPlayerItemStacks(List<Element<?>> playerItems, Player player) {
+        Inventory inventory = player.inventory;
+        int itemLength = inventory.getContainerSize();
+        for (int i = 0; i < itemLength; i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (!stack.isEmpty()) {
+                stack = stack.copy();
+                stack.setCount(1);
+                boolean exists = false;
+                for (Element<?> other : playerItems) {
+                    if (ItemStack.matches(stack, (ItemStack) other.getStack())) {
+                        exists = true;
+                        break;
+                    }
+                }
+            
+                if (!exists && stack.getItem() != ModItems.book.get()) {
+                    playerItems.add(new ElementItem(stack));
+                }
+            }
+        }
+    }
+    
+    private static void addPlayerFluids(List<Element<?>> playerItems, Player player) {
+        List<String> fluids = new ArrayList<>();
+        int end = playerItems.size();
+        for (int i = 0; i < end; i++) {
+            Element<?> item = playerItems.get(i);
+            ItemStack stack = (ItemStack) item.getStack();
+            /* TODO Fluid support!
+            if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)) {
+                FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
+                if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
+                    fluids.add(fluidStack.getFluid().getName());
+                    playerItems.add(new ElementFluid(fluidStack.getFluid()));
+                    if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
+                        break;
+                    }
+                }
+            }*/
+        }
     }
     
     public static abstract class Element<T> {
