@@ -319,7 +319,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
             protected List<Either<ItemStack, FluidStack>> createPlayerEntries(Player player) {
                 return Stream.concat(getPlayerItems(player).stream().map(Either::<ItemStack, FluidStack>left),
                         getPlayerFluids(player).stream().map(Either::<ItemStack, FluidStack>right)
-                ).collect(Collectors.toList());
+                ).limit(PLAYER_LINES * ITEMS_PER_LINE).collect(Collectors.toList());
             }
     
             @Override
