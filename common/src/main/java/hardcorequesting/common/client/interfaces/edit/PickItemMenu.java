@@ -28,6 +28,7 @@ import net.minecraft.world.level.material.Fluid;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PickItemMenu extends GuiEditMenu {
     
@@ -54,7 +55,7 @@ public class PickItemMenu extends GuiEditMenu {
     private final boolean precisionInput;
     private final Type type;
     
-    private List<Element<?>> playerItems;
+    private final List<Element<?>> playerItems;
     private List<Element<?>> searchItems;
     
     private Element<?> selected;
@@ -87,13 +88,14 @@ public class PickItemMenu extends GuiEditMenu {
         this.amount = amount;
         this.precision = precision;
         
-        playerItems = new ArrayList<>();
-        searchItems = new ArrayList<>();
+        searchItems = Collections.emptyList();
         
-        addPlayerItemStacks(playerItems, player);
+        playerItems = getPlayerItems(player).stream().map(ElementItem::new)
+                .collect(Collectors.toCollection(ArrayList::new));
         
         if (type == Type.ITEM_FLUID) {
-            addPlayerFluids(playerItems, player);
+            playerItems.addAll(getPlayerFluids(player).stream().map(ElementFluid::new)
+                    .collect(Collectors.toList()));
         }
         
         textBoxes = new TextBoxGroup();
@@ -295,30 +297,28 @@ public class PickItemMenu extends GuiEditMenu {
         ITEM_FLUID
     }
     
-    private static void addPlayerItemStacks(List<Element<?>> playerItems, Player player) {
+    private static List<ItemStack> getPlayerItems(Player player) {
+        List<ItemStack> playerItems = new ArrayList<>();
+        
         Inventory inventory = player.inventory;
         int itemLength = inventory.getContainerSize();
         for (int i = 0; i < itemLength; i++) {
-            ItemStack stack = inventory.getItem(i);
-            if (!stack.isEmpty()) {
-                stack = stack.copy();
+            ItemStack invStack = inventory.getItem(i);
+            if (!invStack.isEmpty() && invStack.getItem() != ModItems.book.get()) {
+                ItemStack stack = invStack.copy();
                 stack.setCount(1);
-                boolean exists = false;
-                for (Element<?> other : playerItems) {
-                    if (ItemStack.matches(stack, (ItemStack) other.getStack())) {
-                        exists = true;
-                        break;
-                    }
-                }
-            
-                if (!exists && stack.getItem() != ModItems.book.get()) {
-                    playerItems.add(new ElementItem(stack));
+                
+                if (playerItems.stream().noneMatch(other -> ItemStack.matches(stack, other))) {
+                    playerItems.add(stack);
                 }
             }
         }
+        
+        return playerItems;
     }
     
-    private static void addPlayerFluids(List<Element<?>> playerItems, Player player) {
+    private static List<FluidStack> getPlayerFluids(Player player) {
+        List<FluidStack> playerFluids = new ArrayList<>();
         Set<Fluid> fluids = new HashSet<>();
         
         Inventory inventory = player.inventory;
@@ -328,14 +328,11 @@ public class PickItemMenu extends GuiEditMenu {
             
             FluidStack fluid = HardcoreQuestingCore.platform.findFluidIn(stack);
             if (!fluid.isEmpty() && fluids.add(fluid.getFluid())) {
-                playerItems.add(new ElementFluid(fluid));
-                
-                if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
-                    break;
-                }
+                playerFluids.add(fluid);
             }
-            
         }
+        
+        return playerFluids;
     }
     
     public static abstract class Element<T> {
