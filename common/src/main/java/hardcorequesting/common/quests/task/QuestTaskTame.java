@@ -7,9 +7,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTame;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -137,7 +137,7 @@ public class QuestTaskTame extends QuestTask {
                         case ITEM:
                             final int tameId = i;
                             PickItemMenu.display(gui, player, tame.iconStack, PickItemMenu.Type.ITEM,
-                                    result -> this.setIcon(tameId, result.getStack(), player));
+                                    result -> this.setIcon(tameId, result.get(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, tame));

@@ -799,7 +799,7 @@ public class QuestSet {
                                 PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
                                         result -> {
                                             try {
-                                                quest.setIconStack(result.getStack());
+                                                quest.setIconStack(result.get());
                                             } catch (Exception e) {
                                                 System.out.println("Tell LordDusk that he found the issue.");
                                             }

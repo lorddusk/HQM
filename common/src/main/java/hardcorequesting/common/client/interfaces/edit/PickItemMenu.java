@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
@@ -13,6 +14,7 @@ import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +30,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PickItemMenu extends GuiEditMenu {
+public class PickItemMenu<T> extends GuiEditMenu {
     
     private static final Logger LOGGER = LogManager.getLogger();
     
@@ -50,15 +52,15 @@ public class PickItemMenu extends GuiEditMenu {
     public static final int ITEMS_TO_DISPLAY = SEARCH_LINES * ITEMS_PER_LINE;
     private static final int PLAYER_LINES = 6;
     
-    private final Consumer<Result<?>> resultConsumer;
+    private final Consumer<Result<T>> resultConsumer;
     private final boolean precisionInput;
-    private final Type type;
+    private final Type<T> type;
     
-    private final List<Element<?>> playerItems;
-    private List<Element<?>> searchItems;
-    private Future<List<Element<?>>> search;
+    private final List<T> playerItems;
+    private List<T> searchItems;
+    private Future<List<T>> search;
     
-    private Element<?> selected;
+    private T selected;
     private int amount;
     private ItemPrecision precision;
     private boolean clicked;
@@ -66,19 +68,19 @@ public class PickItemMenu extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private int lastClicked;
     
-    public static void display(GuiBase gui, Player player, Object obj, Type type, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiBase gui, Player player, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, player, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
-    public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
-    public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu(gui, player, Element.create(obj), type, amount, true, precision, true, resultConsumer));
+    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<?>> resultConsumer) {
+    private PickItemMenu(GuiBase gui, Player player, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
         super(gui, player, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
@@ -142,11 +144,7 @@ public class PickItemMenu extends GuiEditMenu {
     }
     
     private boolean usePrecision() {
-        return precisionInput && selected instanceof ElementItem;
-    }
-    
-    private Element<?> getSelected() {
-        return selected;
+        return precisionInput && type.mayHavePrecision(selected);
     }
     
     @Override
@@ -220,14 +218,14 @@ public class PickItemMenu extends GuiEditMenu {
     
     @Override
     public void save(GuiBase gui) {
-        if (!selected.isEmpty()) {
-            resultConsumer.accept(new Result<>(selected.createResultStack(amount), amount, precision));
+        if (!type.isEmpty(selected)) {
+            resultConsumer.accept(new Result<>(type.copyWith(selected, amount), amount, precision));
         }
     }
     
-    private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
-            Element<?> element = items.get(i);
+            T element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
     
@@ -235,9 +233,9 @@ public class PickItemMenu extends GuiEditMenu {
         }
     }
     
-    private void drawListMouseOver(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private void drawListMouseOver(PoseStack matrices, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
-            Element<?> element = items.get(i);
+            T element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
             
@@ -251,9 +249,9 @@ public class PickItemMenu extends GuiEditMenu {
         }
     }
     
-    private boolean clickList(GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
+    private boolean clickList(GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
-            Element<?> element = items.get(i);
+            T element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
             
@@ -262,9 +260,7 @@ public class PickItemMenu extends GuiEditMenu {
                     selected = element;
                     
                     int lastDiff = player.tickCount - lastClicked;
-                    if (lastDiff < 0) {
-                        lastClicked = player.tickCount;
-                    } else if (lastDiff < 6 && !selected.isEmpty()) {
+                    if (0 <= lastDiff && lastDiff < 6 && !type.isEmpty(selected)) {
                         save(gui);
                         close(gui);
                         return true;
@@ -278,44 +274,105 @@ public class PickItemMenu extends GuiEditMenu {
         return false;
     }
     
-    public static abstract class Type {
-        public static final Type ITEM = new Type() {
+    public static abstract class Type<T> {
+        public static final Type<ItemStack> ITEM = new Type<ItemStack>() {
             @Override
-            protected List<Element<?>> createPlayerEntries(Player player) {
-                return getPlayerItems(player).stream().map(ElementItem::new).collect(Collectors.toList());
+            protected List<ItemStack> createPlayerEntries(Player player) {
+                return getPlayerItems(player);
             }
     
             @Override
-            protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
-                return TextSearch.innerMap(TextSearch.ITEMS.stream(), ElementItem::new);
+            protected Stream<TextSearch.SearchEntry<ItemStack>> getSearchEntriesStream() {
+                return TextSearch.ITEMS.stream();
+            }
+    
+            @Override
+            protected void draw(ItemStack item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
+                gui.drawItemStack(item, x, y, mX, mY, false);
+            }
+    
+            @Override
+            protected List<Component> getName(ItemStack item, GuiBase gui) {
+                return gui.getTooltipFromItem(item);
+            }
+    
+            @Override
+            protected boolean isEmpty(ItemStack item) {
+                return item.isEmpty();
+            }
+    
+            @Override
+            protected boolean mayHavePrecision(ItemStack item) {
+                return true;
+            }
+    
+            @Override
+            protected ItemStack copyWith(ItemStack item, int amount) {
+                ItemStack newStack = item.copy();
+                newStack.setCount(amount);
+                return newStack;
             }
         };
         
-        public static final Type ITEM_FLUID = new Type() {
+        public static final Type<Either<ItemStack, FluidStack>> ITEM_FLUID = new Type<Either<ItemStack, FluidStack>>() {
             @Override
-            protected List<Element<?>> createPlayerEntries(Player player) {
-                return Stream.concat(getPlayerItems(player).stream().map(ElementItem::new),
-                        getPlayerFluids(player).stream().map(ElementFluid::new)).collect(Collectors.toList());
+            protected List<Either<ItemStack, FluidStack>> createPlayerEntries(Player player) {
+                return Stream.concat(getPlayerItems(player).stream().map(Either::<ItemStack, FluidStack>left),
+                        getPlayerFluids(player).stream().map(Either::<ItemStack, FluidStack>right)
+                ).collect(Collectors.toList());
             }
     
             @Override
-            protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
-                return Stream.concat(TextSearch.innerMap(TextSearch.ITEMS.stream(), ElementItem::new),
-                        TextSearch.innerMap(TextSearch.FLUIDS.stream(), ElementFluid::new));
+            protected Stream<TextSearch.SearchEntry<Either<ItemStack, FluidStack>>> getSearchEntriesStream() {
+                return Stream.concat(TextSearch.innerMap(TextSearch.ITEMS.stream(), Either::<ItemStack, FluidStack>left),
+                        TextSearch.innerMap(TextSearch.FLUIDS.stream(), Either::<ItemStack, FluidStack>right));
+            }
+    
+            @Override
+            protected void draw(Either<ItemStack, FluidStack> item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
+                item.ifLeft(stack -> gui.drawItemStack(stack, x, y, mX, mY, false))
+                        .ifRight(stack -> gui.drawFluid(stack, matrices, x, y, mX, mY));
+            }
+    
+            @Override
+            protected List<Component> getName(Either<ItemStack, FluidStack> item, GuiBase gui) {
+                return item.map(gui::getTooltipFromItem,
+                        stack -> Collections.singletonList(stack.getName()));
+            }
+    
+            @Override
+            protected boolean isEmpty(Either<ItemStack, FluidStack> item) {
+                return item.map(ItemStack::isEmpty, FluidStack::isEmpty);
+            }
+    
+            @Override
+            protected boolean mayHavePrecision(Either<ItemStack, FluidStack> item) {
+                return item.left().isPresent();
+            }
+    
+            @Override
+            protected Either<ItemStack, FluidStack> copyWith(Either<ItemStack, FluidStack> item, int amount) {
+                return item.mapBoth(stack -> {
+                    ItemStack newStack = stack.copy();
+                    newStack.setCount(amount);
+                    return newStack;
+                }, stack -> HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(amount)));
             }
         };
         
-        protected abstract List<Element<?>> createPlayerEntries(Player player);
+        protected abstract List<T> createPlayerEntries(Player player);
     
-        protected abstract Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream();
+        protected abstract Stream<TextSearch.SearchEntry<T>> getSearchEntriesStream();
     
-        protected void draw(Element<?> item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-            item.draw(matrices, gui, x, y, mX, mY);
-        }
+        protected abstract void draw(T item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY);
     
-        protected List<FormattedText> getName(Element<?> item, GuiBase gui) {
-            return item.getName(gui);
-        }
+        protected abstract List<? extends FormattedText> getName(T item, GuiBase gui);
+        
+        protected abstract boolean isEmpty(T item);
+        
+        protected abstract boolean mayHavePrecision(T item);
+        
+        protected abstract T copyWith(T item, int amount);
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {
@@ -379,93 +436,6 @@ public class PickItemMenu extends GuiEditMenu {
         }
     }
     
-    public static abstract class Element<T> {
-        
-        protected T stack;
-        
-        protected Element() {
-        }
-        
-        public abstract void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY);
-        
-        public abstract List<FormattedText> getName(GuiBase gui);
-    
-        public abstract T createResultStack(int amount);
-        
-        public abstract boolean isEmpty();
-        
-        public static Element<?> create(Object stack) {
-            if (stack instanceof ItemStack) return new ElementItem((ItemStack) stack);
-            else if (stack instanceof FluidStack) return new ElementFluid((FluidStack) stack);
-            else return null;
-        }
-    }
-    
-    public static class ElementItem extends Element<ItemStack> {
-        public ElementItem(ItemStack stack) {
-            this.stack = stack;
-        }
-        
-        @Override
-        public void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-            if (stack != null && !stack.isEmpty()) {
-                gui.drawItemStack(stack, x, y, mX, mY, false);
-            }
-        }
-        
-        @Override
-        public List<FormattedText> getName(GuiBase gui) {
-            if (stack != null && !stack.isEmpty()) {
-                return (List) gui.getTooltipFromItem(stack);
-            } else {
-                return Collections.singletonList(Translator.plain("Unknown"));
-            }
-        }
-        
-        @Override
-        public ItemStack createResultStack(int amount) {
-            ItemStack stack = this.stack.copy();
-            stack.setCount(amount);
-            return stack;
-        }
-    
-        @Override
-        public boolean isEmpty() {
-            return stack == null || stack.isEmpty();
-        }
-        
-    }
-    
-    public static class ElementFluid extends Element<FluidStack> {
-        
-        public ElementFluid(FluidStack fluid) {
-            this.stack = fluid;
-        }
-        
-        @Override
-        public void draw(PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-            gui.drawFluid(stack, matrices, x, y, mX, mY);
-        }
-        
-        @Override
-        public List<FormattedText> getName(GuiBase gui) {
-            if (stack != null) {
-                return Collections.singletonList(stack.getName());
-            }
-            return Collections.emptyList();
-        }
-    
-        @Override
-        public FluidStack createResultStack(int amount) {
-            return HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(amount));
-        }
-        
-        @Override
-        public boolean isEmpty() {
-            return stack.isEmpty();
-        }
-    }
-    
     public static class Result<T> {
         private final T value;
         private final int amount;
@@ -475,35 +445,18 @@ public class PickItemMenu extends GuiEditMenu {
             this.value = value;
             this.amount = amount;
             this.precision = precision;
-            if (value instanceof ItemStack && ((ItemStack) value).isEmpty()
-                    || value instanceof FluidStack && ((FluidStack) value).isEmpty())
-                throw new IllegalArgumentException("Result should be non-empty");
-            if(!(value instanceof ItemStack || value instanceof FluidStack))
-                throw new IllegalArgumentException("Result must be an item stack or a fluid stack");
         }
-    
+        
         public T get() {
             return value;
         }
         
-        public ItemStack getStack() {
-            return (ItemStack) value;
-        }
-    
         public int getAmount() {
             return amount;
         }
-    
+        
         public ItemPrecision getPrecision() {
             return precision;
-        }
-        
-        public void handle(Consumer<ItemStack> itemConsumer, Consumer<FluidStack> fluidConsumer) {
-            if(value instanceof ItemStack) {
-                itemConsumer.accept((ItemStack) value);
-            } else if(value instanceof  FluidStack) {
-                fluidConsumer.accept((FluidStack) value);
-            }
         }
     }
 }

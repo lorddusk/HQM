@@ -1,6 +1,5 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
@@ -17,8 +16,8 @@ public class QuestTaskBlockPlace extends QuestTaskItems {
         register(EventTrigger.Type.ITEM_USED);
     }
     
-    public PickItemMenu.Type getMenuTypeId() {
-        return PickItemMenu.Type.ITEM;
+    public boolean mayUseFluids() {
+        return false;   //TODO perhaps this could be done with fluids as well? check if an appropriate hook could be made
     }
     
     @Override

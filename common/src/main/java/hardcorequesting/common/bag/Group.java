@@ -5,8 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ScrollBar;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -328,7 +328,7 @@ public class Group {
                     
                     final int id = i;
                     PickItemMenu.display(gui, gui.getPlayer(), stack, PickItemMenu.Type.ITEM, amount,
-                            result -> this.setItem(id, result.getStack()));
+                            result -> this.setItem(id, result.get()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -82,7 +83,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(PickItemMenu.Result<?> result, int id) {
+    public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
         
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);
@@ -92,17 +93,17 @@ public abstract class QuestTaskItems extends QuestTask {
         }
         
         if (id < items.length) {
-            result.handle(itemStack -> {
+            item.ifLeft(itemStack -> {
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                items[id].stack = itemStack.copy();
-            }, fluidStack -> {
+                items[id].stack = itemStack;
+            }).ifRight(fluidStack -> {
                 items[id].hasItem = false;
                 items[id].fluid = fluidStack;
                 items[id].stack = null;
             });
-            items[id].required = result.getAmount();
-            items[id].precision = result.getPrecision();
+            items[id].required = amount;
+            items[id].precision = precision;
             items[id].permutations = null;
         }
     }
@@ -150,7 +151,7 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    protected abstract PickItemMenu.Type getMenuTypeId();
+    protected abstract boolean mayUseFluids();
     
     public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
         if (!parent.isAvailable(playerId)) return false;
@@ -289,8 +290,13 @@ public abstract class QuestTaskItems extends QuestTask {
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             final int id = i;
-                            PickItemMenu.display(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
-                                    result -> this.setItem(result, id));
+                            if(mayUseFluids()) {
+                                PickItemMenu.display(gui, player, item.hasItem ? Either.left(item.stack) : Either.right(item.fluid), PickItemMenu.Type.ITEM_FLUID, item.required, item.precision,
+                                        result -> this.setItem(result.get(), result.getAmount(), result.getPrecision(), id));
+                            } else {
+                                PickItemMenu.display(gui, player, item.stack, PickItemMenu.Type.ITEM, item.required, item.precision,
+                                        result -> this.setItem(Either.left(result.get()), result.getAmount(), result.getPrecision(), id));
+                            }
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];

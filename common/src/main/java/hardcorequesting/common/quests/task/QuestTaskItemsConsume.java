@@ -1,6 +1,5 @@
 package hardcorequesting.common.quests.task;
 
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
@@ -53,8 +52,8 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected PickItemMenu.Type getMenuTypeId() {
-        return PickItemMenu.Type.ITEM_FLUID;
+    protected boolean mayUseFluids() {
+        return true;
     }
     
     @Override

@@ -1130,7 +1130,7 @@ public class Quest {
                         final int id = i;
                         PickItemMenu.display(gui, player, rewards.get(i), PickItemMenu.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
                                 result -> {
-                                    ItemStack stack = result.getStack().copy();
+                                    ItemStack stack = result.get();
                                     stack.setCount(Math.min(127, result.getAmount()));
                                     this.setReward(stack, id, !canSelect);
                                 });
