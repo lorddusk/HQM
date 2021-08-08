@@ -56,20 +56,6 @@ dependencies {
     }
 }
 
-shadowJar {
-    relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
-    exclude "META-INF/mods.toml"
-
-    configurations = [project.configurations.shadowCommon]
-    classifier "shadow"
-}
-
-remapJar {
-    dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
-    classifier "fabric"
-}
-
 def depend(String string) {
     dependencies.modApi(string) {
         exclude(group: "net.fabricmc.fabric-api")
@@ -94,10 +80,34 @@ processResources {
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+shadowJar {
+    relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
+
+    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "fabric"
 }
 
 jar {
     from "LICENSE"
+    classifier "dev"
+}
+
+java {
+    withSourcesJar()
+}
+
+sourcesJar {
+    def commonSources = project(":common").sourcesJar
+    dependsOn commonSources
+    from commonSources.archiveFile.map { zipTree(it) }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }

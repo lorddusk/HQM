@@ -7,3 +7,7 @@ dependencies {
 architectury {
     common()
 }
+
+java {
+    withSourcesJar()
+}
