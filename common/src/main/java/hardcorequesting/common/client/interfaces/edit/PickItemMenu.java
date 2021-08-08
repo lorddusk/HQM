@@ -292,7 +292,7 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            protected Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+            protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
                 return TextSearch.searchItems.stream();
             }
         };
@@ -305,14 +305,14 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            protected Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+            protected Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream() {
                 return Stream.concat(TextSearch.searchItems.stream(), TextSearch.searchFluids.stream());
             }
         };
         
         protected abstract List<Element<?>> createPlayerEntries(Player player);
     
-        protected abstract Stream<TextSearch.SearchEntry> getSearchEntriesStream();
+        protected abstract Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream();
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {

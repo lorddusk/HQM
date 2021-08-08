@@ -29,10 +29,10 @@ public class TextSearch {
     
     private static Future<?> currentSearch;
     
-    public static List<SearchEntry> searchItems = new ArrayList<>();
-    public static List<SearchEntry> searchFluids = new ArrayList<>();
+    public static List<SearchEntry<PickItemMenu.Element<?>>> searchItems = new ArrayList<>();
+    public static List<SearchEntry<PickItemMenu.Element<?>>> searchFluids = new ArrayList<>();
     
-    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, Supplier<Stream<SearchEntry>> searchEntrySupplier, int limit) {
+    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier, int limit) {
         if (currentSearch != null)
             currentSearch.cancel(true);
         
@@ -43,11 +43,11 @@ public class TextSearch {
     }
     
     private final String text;
-    private final Supplier<Stream<SearchEntry>> searchEntrySupplier;
+    private final Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier;
     private final int limit;
     private final boolean advancedTooltips;
     
-    private TextSearch(String text, Supplier<Stream<SearchEntry>> searchEntrySupplier, int limit) {
+    private TextSearch(String text, Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier, int limit) {
         this.text = text;
         this.searchEntrySupplier = searchEntrySupplier;
         this.limit = limit;
@@ -87,14 +87,14 @@ public class TextSearch {
                     if (string != null)
                         advSearchString.append(string).append("\n");
                 }
-                searchItems.add(new SearchEntry(searchString.toString(), advSearchString.toString(), new PickItemMenu.ElementItem(stack)));
+                searchItems.add(new SearchEntry<>(searchString.toString(), advSearchString.toString(), new PickItemMenu.ElementItem(stack)));
             }
             for (Fluid fluid : Registry.FLUID) {
                 if (fluid instanceof EmptyFluid) continue;
                 if (!fluid.defaultFluidState().isSource()) continue;
                 FluidStack fluidVolume = HardcoreQuestingCore.platform.createFluidStack(fluid, HardcoreQuestingCore.platform.getBucketAmount());
                 String search = fluidVolume.getName().getString();
-                searchFluids.add(new SearchEntry(search, search, new PickItemMenu.ElementFluid(fluidVolume)));
+                searchFluids.add(new SearchEntry<>(search, search, new PickItemMenu.ElementFluid(fluidVolume)));
             }
         }
     }
@@ -104,18 +104,18 @@ public class TextSearch {
         searchItems.clear();
     }
     
-    public static class SearchEntry {
-        private String toolTip;
-        private String advToolTip;
-        private PickItemMenu.Element<?> element;
+    public static class SearchEntry<T> {
+        private final String toolTip;
+        private final String advToolTip;
+        private final T element;
         
-        public SearchEntry(String searchString, String advSearchString, PickItemMenu.Element<?> element) {
+        public SearchEntry(String searchString, String advSearchString, T element) {
             this.toolTip = searchString;
             this.advToolTip = advSearchString;
             this.element = element;
         }
         
-        public Stream<PickItemMenu.Element<?>> tryMatch(Pattern pattern, boolean advanced) {
+        public Stream<T> tryMatch(Pattern pattern, boolean advanced) {
             if (pattern.matcher(advanced ? advToolTip : toolTip).find()) {
                 return Stream.of(element);
             } else {
