@@ -52,7 +52,7 @@ public class PickItemMenu extends GuiEditMenu {
     
     private final Consumer<Result<?>> resultConsumer;
     private final boolean precisionInput;
-    public final Type type;
+    private final Type type;
     
     private final List<Element<?>> playerItems;
     private List<Element<?>> searchItems;
@@ -292,7 +292,7 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            public Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+            protected Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
                 return TextSearch.searchItems.stream();
             }
         };
@@ -305,14 +305,14 @@ public class PickItemMenu extends GuiEditMenu {
             }
     
             @Override
-            public Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
+            protected Stream<TextSearch.SearchEntry> getSearchEntriesStream() {
                 return Stream.concat(TextSearch.searchItems.stream(), TextSearch.searchFluids.stream());
             }
         };
         
         protected abstract List<Element<?>> createPlayerEntries(Player player);
-        
-        public abstract Stream<TextSearch.SearchEntry> getSearchEntriesStream();
+    
+        protected abstract Stream<TextSearch.SearchEntry> getSearchEntriesStream();
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {
@@ -355,7 +355,7 @@ public class PickItemMenu extends GuiEditMenu {
     
     private void startSearch(String text) {
         searchItems.clear();
-        search = TextSearch.startSearch(text, PickItemMenu.this);
+        search = TextSearch.startSearch(text, type::getSearchEntriesStream, ITEMS_TO_DISPLAY);
     }
     
     private void checkSearchResult() {

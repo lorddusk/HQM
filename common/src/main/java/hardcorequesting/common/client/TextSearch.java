@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,31 +32,34 @@ public class TextSearch {
     public static List<SearchEntry> searchItems = new ArrayList<>();
     public static List<SearchEntry> searchFluids = new ArrayList<>();
     
-    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, PickItemMenu menu) {
+    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, Supplier<Stream<SearchEntry>> searchEntrySupplier, int limit) {
         if (currentSearch != null)
             currentSearch.cancel(true);
         
-        TextSearch search = new TextSearch(text, menu);
+        TextSearch search = new TextSearch(text, searchEntrySupplier, limit);
         Future<List<PickItemMenu.Element<?>>> future = EXECUTOR.submit(search::doSearch);
         currentSearch = future;
         return future;
     }
     
-    private String search;
-    private PickItemMenu menu;
+    private final String text;
+    private final Supplier<Stream<SearchEntry>> searchEntrySupplier;
+    private final int limit;
+    private final boolean advancedTooltips;
     
-    private TextSearch(String search, PickItemMenu menu) {
-        this.search = search;
-        this.menu = menu;
+    private TextSearch(String text, Supplier<Stream<SearchEntry>> searchEntrySupplier, int limit) {
+        this.text = text;
+        this.searchEntrySupplier = searchEntrySupplier;
+        this.limit = limit;
+        this.advancedTooltips = Minecraft.getInstance().options.advancedItemTooltips;
     }
     
     private List<PickItemMenu.Element<?>> doSearch() {
         initItems();
-        Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
-        boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
+        Pattern pattern = Pattern.compile(Pattern.quote(text), Pattern.CASE_INSENSITIVE);
         
-        return menu.type.getSearchEntriesStream().flatMap(entry -> entry.tryMatch(pattern, advanced))
-                .limit(PickItemMenu.ITEMS_TO_DISPLAY).collect(Collectors.toList());
+        return searchEntrySupplier.get().flatMap(entry -> entry.tryMatch(pattern, advancedTooltips))
+                .limit(limit).collect(Collectors.toList());
     }
     
     @SuppressWarnings("rawtypes")
