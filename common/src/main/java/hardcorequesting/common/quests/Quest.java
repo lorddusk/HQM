@@ -43,8 +43,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
-import java.awt.Polygon;
+import java.awt.*;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1130,10 +1131,8 @@ public class Quest {
                         PickItemMenu.display(gui, player, rewards.get(i), PickItemMenu.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
                                 result -> {
                                     ItemStack stack = result.getStack().copy();
-                                    if (!stack.isEmpty()) {
-                                        stack.setCount(Math.min(127, result.getAmount()));
-                                        this.setReward(stack, id, !canSelect);
-                                    }
+                                    stack.setCount(Math.min(127, result.getAmount()));
+                                    this.setReward(stack, id, !canSelect);
                                 });
                     }
                 }

@@ -92,15 +92,15 @@ public abstract class QuestTaskItems extends QuestTask {
         }
         
         if (id < items.length) {
-            if (result.get() instanceof ItemStack) {
+            result.handle(itemStack -> {
                 items[id].hasItem = true;
                 items[id].fluid = null;
-                items[id].stack = ((ItemStack) result.get()).copy();
-            } else {
+                items[id].stack = itemStack.copy();
+            }, fluidStack -> {
                 items[id].hasItem = false;
-                items[id].fluid = ((FluidStack) result.get());
+                items[id].fluid = fluidStack;
                 items[id].stack = null;
-            }
+            });
             items[id].required = result.getAmount();
             items[id].precision = result.getPrecision();
             items[id].permutations = null;
