@@ -83,7 +83,6 @@ public abstract class QuestTaskItems extends QuestTask {
     
     @Environment(EnvType.CLIENT)
     public void setItem(PickItemMenu.Result<?> result, int id) {
-        if (result.isEmpty()) return;
         
         if (id >= items.length) {
             this.items = getEditFriendlyItems(items);

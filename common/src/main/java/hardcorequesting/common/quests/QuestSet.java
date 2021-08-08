@@ -798,14 +798,12 @@ public class QuestSet {
                             case ITEM:
                                 PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
                                         result -> {
-                                            if (!result.isEmpty()) {
-                                                try {
-                                                    quest.setIconStack(result.getStack());
-                                                } catch (Exception e) {
-                                                    System.out.println("Tell LordDusk that he found the issue.");
-                                                }
-                                                SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+                                            try {
+                                                quest.setIconStack(result.getStack());
+                                            } catch (Exception e) {
+                                                System.out.println("Tell LordDusk that he found the issue.");
                                             }
+                                            SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
                                         });
                                 break;
                             case DELETE:

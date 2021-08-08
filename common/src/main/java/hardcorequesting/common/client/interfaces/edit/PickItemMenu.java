@@ -223,7 +223,9 @@ public class PickItemMenu extends GuiEditMenu {
     
     @Override
     public void save(GuiBase gui) {
-        resultConsumer.accept(new Result<>(selected.getStack(), amount, precision));
+        if (!selected.isEmpty()) {
+            resultConsumer.accept(new Result<>(selected.getStack(), amount, precision));
+        }
     }
     
     private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<Element<?>> items, int mX, int mY) {
@@ -450,9 +452,8 @@ public class PickItemMenu extends GuiEditMenu {
         }
         
         @Override
-        // I don't think this is technically ever really empty
         public boolean isEmpty() {
-            return false;
+            return stack.isEmpty();
         }
     }
     
@@ -465,6 +466,11 @@ public class PickItemMenu extends GuiEditMenu {
             this.value = value;
             this.amount = amount;
             this.precision = precision;
+            if (value instanceof ItemStack && ((ItemStack) value).isEmpty()
+                    || value instanceof FluidStack && ((FluidStack) value).isEmpty())
+                throw new IllegalArgumentException("Result should be non-empty");
+            if(!(value instanceof ItemStack || value instanceof FluidStack))
+                throw new IllegalArgumentException("Result must be an item stack or a fluid stack");
         }
     
         public T get() {
@@ -481,11 +487,6 @@ public class PickItemMenu extends GuiEditMenu {
     
         public ItemPrecision getPrecision() {
             return precision;
-        }
-        
-        public boolean isEmpty() {
-            return value instanceof ItemStack && ((ItemStack) value).isEmpty()
-                    || value instanceof FluidStack && ((FluidStack) value).isEmpty();
         }
         
         public void handle(Consumer<ItemStack> itemConsumer, Consumer<FluidStack> fluidConsumer) {
