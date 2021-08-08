@@ -155,7 +155,7 @@ public class PickItemMenu extends GuiEditMenu {
         
         super.draw(matrices, gui, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
-        selected.draw(matrices, gui, 70, 15, mX, mY);
+        type.draw(selected, matrices, gui, 70, 15, mX, mY);
         gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
         drawList(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         
@@ -230,8 +230,8 @@ public class PickItemMenu extends GuiEditMenu {
             Element<?> element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
-            
-            element.draw(matrices, gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
+    
+            type.draw(element, matrices, gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
         }
     }
     
@@ -243,7 +243,7 @@ public class PickItemMenu extends GuiEditMenu {
             
             if (gui.inBounds(x + xI * OFFSET, y + yI * OFFSET, SIZE, SIZE, mX, mY)) {
                 if (element != null) {
-                    gui.renderTooltipL(matrices, element.getName(gui), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(matrices, type.getName(element, gui), mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
@@ -308,6 +308,14 @@ public class PickItemMenu extends GuiEditMenu {
         protected abstract List<Element<?>> createPlayerEntries(Player player);
     
         protected abstract Stream<TextSearch.SearchEntry<Element<?>>> getSearchEntriesStream();
+    
+        protected void draw(Element<?> item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
+            item.draw(matrices, gui, x, y, mX, mY);
+        }
+    
+        protected List<FormattedText> getName(Element<?> item, GuiBase gui) {
+            return item.getName(gui);
+        }
     }
     
     private static List<ItemStack> getPlayerItems(Player player) {
