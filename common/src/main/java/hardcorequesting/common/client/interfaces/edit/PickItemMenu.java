@@ -18,13 +18,19 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PickItemMenu extends GuiEditMenu {
+    
+    private static final Logger LOGGER = LogManager.getLogger();
     
     private static final int ARROW_X_LEFT = 20;
     private static final int ARROW_X_RIGHT = 150;
@@ -49,7 +55,8 @@ public class PickItemMenu extends GuiEditMenu {
     public final Type type;
     
     private final List<Element<?>> playerItems;
-    public List<Element<?>> searchItems;
+    private List<Element<?>> searchItems;
+    private Future<List<Element<?>>> search;
     
     private Element<?> selected;
     private int amount;
@@ -120,8 +127,7 @@ public class PickItemMenu extends GuiEditMenu {
         textBoxes.add(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override
             public void textChanged(GuiBase gui) {
-                searchItems.clear();
-                TextSearch.startSearch(getText(), PickItemMenu.this);
+                startSearch(getText());
             }
         });
     }
@@ -147,6 +153,8 @@ public class PickItemMenu extends GuiEditMenu {
     
     @Override
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+        checkSearchResult();
+        
         super.draw(matrices, gui, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
         selected.draw(matrices, gui, 70, 15, mX, mY);
@@ -343,6 +351,29 @@ public class PickItemMenu extends GuiEditMenu {
         }
         
         return playerFluids;
+    }
+    
+    private void startSearch(String text) {
+        searchItems.clear();
+        search = TextSearch.startSearch(text, PickItemMenu.this);
+    }
+    
+    private void checkSearchResult() {
+        if(search != null && search.isDone()) {
+            if(search.isCancelled()) {
+                LOGGER.error("Item search had been cancelled, but the reference was kept!");
+                search = null;
+            } else {
+                try {
+                    searchItems = search.get();
+                    search = null;
+                } catch (ExecutionException e) {
+                    LOGGER.error("Item search failed with error: ", e.getCause());
+                    search = null;
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
     }
     
     public static abstract class Element<T> {

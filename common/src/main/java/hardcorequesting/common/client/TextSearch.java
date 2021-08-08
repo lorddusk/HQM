@@ -1,6 +1,5 @@
 package hardcorequesting.common.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.platform.FluidStack;
@@ -15,38 +14,48 @@ import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TextSearch implements Runnable {
+public class TextSearch {
     
-    public static final ThreadingHandler HANDLER = new ThreadingHandler();
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    
+    private static Future<?> currentSearch;
     
     public static List<SearchEntry> searchItems = new ArrayList<>();
     public static List<SearchEntry> searchFluids = new ArrayList<>();
     
+    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, PickItemMenu menu) {
+        if (currentSearch != null)
+            currentSearch.cancel(true);
+        
+        TextSearch search = new TextSearch(text, menu);
+        Future<List<PickItemMenu.Element<?>>> future = EXECUTOR.submit(search::doSearch);
+        currentSearch = future;
+        return future;
+    }
+    
     private String search;
     private PickItemMenu menu;
-    public List<PickItemMenu.Element<?>> elements;
-    private long startTime;
-    
-    public static void startSearch(String search, PickItemMenu menu) {
-        Thread thread = new Thread(new TextSearch(search, menu));
-        thread.start();
-    }
     
     private TextSearch(String search, PickItemMenu menu) {
         this.search = search;
         this.menu = menu;
-        startTime = System.currentTimeMillis();
     }
     
-    public static void setResult(PickItemMenu menu, TextSearch search) {
-        ThreadingHandler.handle(menu, search);
+    private List<PickItemMenu.Element<?>> doSearch() {
+        initItems();
+        Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
+        boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
+        
+        return menu.type.getSearchEntriesStream().flatMap(entry -> entry.tryMatch(pattern, advanced))
+                .limit(PickItemMenu.ITEMS_TO_DISPLAY).collect(Collectors.toList());
     }
     
     @SuppressWarnings("rawtypes")
@@ -91,22 +100,6 @@ public class TextSearch implements Runnable {
         searchItems.clear();
     }
     
-    @Override
-    public void run() {
-        initItems();
-        Pattern pattern = Pattern.compile(Pattern.quote(search), Pattern.CASE_INSENSITIVE);
-        boolean advanced = Minecraft.getInstance().options.advancedItemTooltips;
-        
-        elements = menu.type.getSearchEntriesStream().flatMap(entry -> entry.tryMatch(pattern, advanced))
-                .limit(PickItemMenu.ITEMS_TO_DISPLAY).collect(Collectors.toList());
-        
-        setResult(this.menu, this);
-    }
-    
-    public boolean isNewerThan(TextSearch search) {
-        return startTime > search.startTime;
-    }
-    
     public static class SearchEntry {
         private String toolTip;
         private String advToolTip;
@@ -123,28 +116,6 @@ public class TextSearch implements Runnable {
                 return Stream.of(element);
             } else {
                 return Stream.empty();
-            }
-        }
-    }
-    
-    public static class ThreadingHandler {
-        private Map<PickItemMenu, TextSearch> handle = new LinkedHashMap<>();
-        
-        private ThreadingHandler() {
-            HardcoreQuestingCore.platform.registerOnHudRender(this::renderEvent);
-        }
-        
-        private static void handle(PickItemMenu menu, TextSearch search) {
-            if (!HANDLER.handle.containsKey(menu) || search.isNewerThan(HANDLER.handle.get(menu)))
-                HANDLER.handle.put(menu, search);
-        }
-        
-        public void renderEvent(PoseStack matrices, float delta) {
-            if (!handle.isEmpty()) {
-                for (Map.Entry<PickItemMenu, TextSearch> entry : handle.entrySet()) {
-                    entry.getKey().searchItems = entry.getValue().elements;
-                }
-                handle.clear();
             }
         }
     }
