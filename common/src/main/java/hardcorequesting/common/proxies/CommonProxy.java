@@ -9,7 +9,7 @@ public class CommonProxy {
     public void initSounds() {}
     
     public void init() {
-        Quest.serverTicker = new QuestTicker(false);
+        Quest.serverTicker = QuestTicker.initServerTicker();
     }
     
     public boolean isClient() {
