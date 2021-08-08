@@ -34,7 +34,12 @@ public class TextSearch implements Runnable {
     public List<PickItemMenu.Element<?>> elements;
     private long startTime;
     
-    public TextSearch(String search, PickItemMenu menu) {
+    public static void startSearch(String search, PickItemMenu menu) {
+        Thread thread = new Thread(new TextSearch(search, menu));
+        thread.start();
+    }
+    
+    private TextSearch(String search, PickItemMenu menu) {
         this.search = search;
         this.menu = menu;
         startTime = System.currentTimeMillis();

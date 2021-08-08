@@ -121,8 +121,7 @@ public class PickItemMenu extends GuiEditMenu {
             @Override
             public void textChanged(GuiBase gui) {
                 searchItems.clear();
-                Thread thread = new Thread(new TextSearch(getText(), PickItemMenu.this));
-                thread.start();
+                TextSearch.startSearch(getText(), PickItemMenu.this);
             }
         });
     }
