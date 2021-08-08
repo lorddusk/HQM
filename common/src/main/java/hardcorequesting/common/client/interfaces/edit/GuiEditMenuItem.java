@@ -51,9 +51,12 @@ public class GuiEditMenuItem extends GuiEditMenu {
     public static final ThreadingHandler HANDLER = new ThreadingHandler();
     
     private final Consumer<Result<?>> resultConsumer;
-    private Type type;
+    private final boolean precisionInput;
+    private final Type type;
+    
     private List<Element<?>> playerItems;
     private List<Element<?>> searchItems;
+    
     private Element<?> selected;
     private int amount;
     private ItemPrecision precision;
@@ -62,14 +65,23 @@ public class GuiEditMenuItem extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private int lastClicked;
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
-        this(gui, player, Element.create(obj), type, amount, precision, resultConsumer);
+    public static void display(GuiBase gui, Player player, Object obj, Type type, Consumer<Result<?>> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
-    public GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
+    public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, Consumer<Result<?>> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+    }
+    
+    public static void display(GuiBase gui, Player player, Object obj, Type type, int amount, ItemPrecision precision, Consumer<Result<?>> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuItem(gui, player, Element.create(obj), type, amount, true, precision, true, resultConsumer));
+    }
+    
+    private GuiEditMenuItem(GuiBase gui, Player player, Element<?> element, final Type type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<?>> resultConsumer) {
         super(gui, player, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
+        this.precisionInput = precisionInput;
         
         this.selected = element;
         this.amount = amount;
@@ -97,7 +109,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
                 }
             }
         }
-        if (type.allowFluids) {
+        if (type == Type.ITEM_FLUID) {
             List<String> fluids = new ArrayList<>();
             int end = playerItems.size();
             for (int i = 0; i < end; i++) {
@@ -118,7 +130,7 @@ public class GuiEditMenuItem extends GuiEditMenu {
         }
         
         textBoxes = new TextBoxGroup();
-        if (type.allowAmount) {
+        if (amountInput) {
             textBoxes.add(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
                 protected boolean isCharacterValid(char c) {
@@ -171,11 +183,11 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
     
     private boolean usePrecision() {
-        return type.allowPrecision && selected instanceof ElementItem;
+        return precisionInput && selected instanceof ElementItem;
     }
     
     public boolean showFluids() {
-        return type.allowFluids;
+        return type == Type.ITEM_FLUID;
     }
     
     private Element<?> getSelected() {
@@ -312,20 +324,8 @@ public class GuiEditMenuItem extends GuiEditMenu {
     }
     
     public enum Type {
-        REWARD(false, true, false),
-        ITEM_FLUID_TASK(true, true, true),
-        ITEM_TASK(false, true, true),
-        ICON(false, false, false);
-        
-        private boolean allowFluids;
-        private boolean allowAmount;
-        private boolean allowPrecision;
-        
-        Type(boolean allowFluids, boolean allowAmount, boolean allowPrecision) {
-            this.allowFluids = allowFluids;
-            this.allowAmount = allowAmount;
-            this.allowPrecision = allowPrecision;
-        }
+        ITEM,
+        ITEM_FLUID
     }
     
     public static abstract class Element<T> {

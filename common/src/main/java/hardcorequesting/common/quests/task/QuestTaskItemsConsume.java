@@ -54,7 +54,7 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
     @Environment(EnvType.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM_FLUID_TASK;
+        return GuiEditMenuItem.Type.ITEM_FLUID;
     }
     
     @Override

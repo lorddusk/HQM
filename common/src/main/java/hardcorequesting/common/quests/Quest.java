@@ -1127,14 +1127,14 @@ public class Quest {
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
-                        gui.setEditMenu(new GuiEditMenuItem(gui, player, rewards.get(i), GuiEditMenuItem.Type.REWARD, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(), ItemPrecision.PRECISE,
+                        GuiEditMenuItem.display(gui, player, rewards.get(i), GuiEditMenuItem.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
                                 result -> {
                                     ItemStack stack = result.getStack().copy();
                                     if (!stack.isEmpty()) {
                                         stack.setCount(Math.min(127, result.getAmount()));
                                         this.setReward(stack, id, !canSelect);
                                     }
-                                }));
+                                });
                     }
                 }
                 

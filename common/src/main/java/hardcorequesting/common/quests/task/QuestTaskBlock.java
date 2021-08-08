@@ -33,8 +33,6 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
         return QuestDataTaskItems.class;
     }
     
-    public abstract GuiEditMenuItem.Type getMenuTypeId();
-    
     @Override
     public void onUpdate(Player player) {
     }

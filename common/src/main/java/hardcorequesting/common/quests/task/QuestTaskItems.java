@@ -290,8 +290,8 @@ public abstract class QuestTaskItems extends QuestTask {
                     } else if (Quest.canQuestsBeEdited()) {
                         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                             final int id = i;
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
-                                    result -> this.setItem(result, id)));
+                            GuiEditMenuItem.display(gui, player, item.hasItem ? item.stack != null ? item.stack.copy() : null : item.fluid, getMenuTypeId(), item.required, item.precision,
+                                    result -> this.setItem(result, id));
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];

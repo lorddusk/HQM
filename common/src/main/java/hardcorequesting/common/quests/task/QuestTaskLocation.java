@@ -199,8 +199,8 @@ public class QuestTaskLocation extends QuestTask {
                             break;
                         case ITEM:
                             final int locationId = i;
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, location.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> this.setIcon(locationId, result.getStack(), player)));
+                            GuiEditMenuItem.display(gui, player, location.iconStack, GuiEditMenuItem.Type.ITEM,
+                                    result -> this.setIcon(locationId, result.getStack(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, location));

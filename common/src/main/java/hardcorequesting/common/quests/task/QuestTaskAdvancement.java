@@ -137,8 +137,8 @@ public class QuestTaskAdvancement extends QuestTask {
                             break;
                         case ITEM:
                             final int advancementId = i;
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, advancement.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> this.setIcon(advancementId, result.getStack(), player)));
+                            GuiEditMenuItem.display(gui, player, advancement.iconStack, GuiEditMenuItem.Type.ITEM,
+                                    result -> this.setIcon(advancementId, result.getStack(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, advancement));

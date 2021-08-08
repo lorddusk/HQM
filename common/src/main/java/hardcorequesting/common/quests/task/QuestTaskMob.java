@@ -148,8 +148,8 @@ public class QuestTaskMob extends QuestTask {
                             break;
                         case ITEM:
                             final int mobId = i;
-                            gui.setEditMenu(new GuiEditMenuItem(gui, player, mob.iconStack, GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
-                                    result -> this.setIcon(mobId, result.getStack(), player)));
+                            GuiEditMenuItem.display(gui, player, mob.iconStack, GuiEditMenuItem.Type.ITEM,
+                                    result -> this.setIcon(mobId, result.getStack(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));

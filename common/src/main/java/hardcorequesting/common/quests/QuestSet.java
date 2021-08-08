@@ -797,7 +797,7 @@ public class QuestSet {
                                 SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                gui.setEditMenu(new GuiEditMenuItem(gui, player, quest.getIconStack(), GuiEditMenuItem.Type.ICON, 1, ItemPrecision.PRECISE,
+                                GuiEditMenuItem.display(gui, player, quest.getIconStack(), GuiEditMenuItem.Type.ITEM,
                                         result -> {
                                             if (!result.isEmpty()) {
                                                 try {
@@ -807,7 +807,7 @@ public class QuestSet {
                                                 }
                                                 SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
                                             }
-                                        }));
+                                        });
                                 break;
                             case DELETE:
                                 Quest.removeQuest(quest);

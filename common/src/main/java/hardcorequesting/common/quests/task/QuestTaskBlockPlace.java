@@ -18,7 +18,7 @@ public class QuestTaskBlockPlace extends QuestTaskItems {
     }
     
     public GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM_TASK;
+        return GuiEditMenuItem.Type.ITEM;
     }
     
     @Override

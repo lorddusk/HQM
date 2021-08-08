@@ -30,7 +30,7 @@ public class QuestTaskItemsCrafting extends QuestTaskItems {
     @Environment(EnvType.CLIENT)
     @Override
     protected GuiEditMenuItem.Type getMenuTypeId() {
-        return GuiEditMenuItem.Type.ITEM_TASK;
+        return GuiEditMenuItem.Type.ITEM;
     }
     
     private void create(Player player, ItemStack stack) {

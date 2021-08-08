@@ -328,8 +328,8 @@ public class Group {
                     }
                     
                     final int id = i;
-                    gui.setEditMenu(new GuiEditMenuItem(gui, gui.getPlayer(), stack, GuiEditMenuItem.Type.REWARD, amount, ItemPrecision.PRECISE,
-                            result -> this.setItem(id, result.getStack())));
+                    GuiEditMenuItem.display(gui, gui.getPlayer(), stack, GuiEditMenuItem.Type.ITEM, amount,
+                            result -> this.setItem(id, result.getStack()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
