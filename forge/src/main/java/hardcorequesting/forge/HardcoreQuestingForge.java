@@ -66,6 +66,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -346,6 +347,13 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public FluidStack createFluidStack(Fluid fluid, Fraction fraction) {
         return new ForgeFluidStack(new net.minecraftforge.fluids.FluidStack(fluid, fraction.intValue()));
+    }
+    
+    @Override
+    public FluidStack findFluidIn(ItemStack stack) {
+        return new ForgeFluidStack(stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+                .map(handler -> handler.getFluidInTank(0))
+                .orElse(net.minecraftforge.fluids.FluidStack.EMPTY));
     }
     
     @OnlyIn(Dist.CLIENT)

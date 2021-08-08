@@ -319,22 +319,22 @@ public class PickItemMenu extends GuiEditMenu {
     }
     
     private static void addPlayerFluids(List<Element<?>> playerItems, Player player) {
-        List<String> fluids = new ArrayList<>();
-        int end = playerItems.size();
-        for (int i = 0; i < end; i++) {
-            Element<?> item = playerItems.get(i);
-            ItemStack stack = (ItemStack) item.getStack();
-            /* TODO Fluid support!
-            if (stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH)) {
-                FluidStack fluidStack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.NORTH).drain(0, false);
-                if (fluidStack != null && !fluids.contains(fluidStack.getFluid().getName())) {
-                    fluids.add(fluidStack.getFluid().getName());
-                    playerItems.add(new ElementFluid(fluidStack.getFluid()));
-                    if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
-                        break;
-                    }
+        Set<Fluid> fluids = new HashSet<>();
+        
+        Inventory inventory = player.inventory;
+        int itemLength = inventory.getContainerSize();
+        for (int i = 0; i < itemLength; i++) {
+            ItemStack stack = inventory.getItem(i);
+            
+            FluidStack fluid = HardcoreQuestingCore.platform.findFluidIn(stack);
+            if (!fluid.isEmpty() && fluids.add(fluid.getFluid())) {
+                playerItems.add(new ElementFluid(fluid));
+                
+                if (playerItems.size() == PLAYER_LINES * ITEMS_PER_LINE) {
+                    break;
                 }
-            }*/
+            }
+            
         }
     }
     
@@ -470,7 +470,8 @@ public class PickItemMenu extends GuiEditMenu {
         }
         
         public boolean isEmpty() {
-            return value instanceof ItemStack && ((ItemStack) value).isEmpty();
+            return value instanceof ItemStack && ((ItemStack) value).isEmpty()
+                    || value instanceof FluidStack && ((FluidStack) value).isEmpty();
         }
         
         public void handle(Consumer<ItemStack> itemConsumer, Consumer<FluidStack> fluidConsumer) {
