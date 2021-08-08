@@ -31,6 +31,11 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A menu where you pick an item (or optionally fluid) for some purpose.
+ * Can be created to also allow setting the amount, or specify precision.
+ * It provides suggestions from the player inventory, and provides a search menu for the player to pick from.
+ */
 public class PickItemMenu<T> extends GuiEditMenu {
     
     private static final Logger LOGGER = LogManager.getLogger();
@@ -69,14 +74,23 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private int lastClicked;
     
+    /**
+     * Create and display the menu.
+     */
     public static <T> void display(GuiBase gui, Player player, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, player, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
+    /**
+     * Create and display the menu, and include text bar for amounts.
+     */
     public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
+    /**
+     * Create and display the menu, include text bar for amounts, and allow choice of precision.
+     */
     public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, precision, true, resultConsumer));
     }

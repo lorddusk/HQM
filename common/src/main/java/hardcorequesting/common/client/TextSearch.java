@@ -23,6 +23,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A helper class for performing a text search among items (or other things) on a separate thread.
+ * It is designed to be used for a gui, and as such is designed to have only one search running at the same time.
+ */
 public class TextSearch<T> {
     
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
