@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TextSearch {
+public class TextSearch<T> {
     
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
     
@@ -32,29 +32,29 @@ public class TextSearch {
     public static List<SearchEntry<PickItemMenu.Element<?>>> searchItems = new ArrayList<>();
     public static List<SearchEntry<PickItemMenu.Element<?>>> searchFluids = new ArrayList<>();
     
-    public static Future<List<PickItemMenu.Element<?>>> startSearch(String text, Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier, int limit) {
+    public static <T> Future<List<T>> startSearch(String text, Supplier<Stream<SearchEntry<T>>> searchEntrySupplier, int limit) {
         if (currentSearch != null)
             currentSearch.cancel(true);
         
-        TextSearch search = new TextSearch(text, searchEntrySupplier, limit);
-        Future<List<PickItemMenu.Element<?>>> future = EXECUTOR.submit(search::doSearch);
+        TextSearch<T> search = new TextSearch<>(text, searchEntrySupplier, limit);
+        Future<List<T>> future = EXECUTOR.submit(search::doSearch);
         currentSearch = future;
         return future;
     }
     
     private final String text;
-    private final Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier;
+    private final Supplier<Stream<SearchEntry<T>>> searchEntrySupplier;
     private final int limit;
     private final boolean advancedTooltips;
     
-    private TextSearch(String text, Supplier<Stream<SearchEntry<PickItemMenu.Element<?>>>> searchEntrySupplier, int limit) {
+    private TextSearch(String text, Supplier<Stream<SearchEntry<T>>> searchEntrySupplier, int limit) {
         this.text = text;
         this.searchEntrySupplier = searchEntrySupplier;
         this.limit = limit;
         this.advancedTooltips = Minecraft.getInstance().options.advancedItemTooltips;
     }
     
-    private List<PickItemMenu.Element<?>> doSearch() {
+    private List<T> doSearch() {
         initItems();
         Pattern pattern = Pattern.compile(Pattern.quote(text), Pattern.CASE_INSENSITIVE);
         
