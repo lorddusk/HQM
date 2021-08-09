@@ -8,8 +8,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuAdvancement;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -32,13 +30,10 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
     private static final String ADVANCEMENTS = "advancements";
-    private static final int Y_OFFSET = 30;
-    private static final int ITEM_SIZE = 18;
     
     public QuestTaskAdvancement(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -59,8 +54,13 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     }
     
     @Override
-    protected void onModifyElement(Player player) {
+    protected void onModifyElement() {
         SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
+    }
+    
+    @Override
+    protected void onRemoveElement() {
+        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_REMOVE);
     }
     
     private boolean advanced(int id, Player player) {
@@ -86,42 +86,10 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<AdvancementTask> advancements = getShownElements();
-            for (int i = 0; i < advancements.size(); i++) {
-                AdvancementTask advancement = advancements.get(i);
-                
-                int x = START_X;
-                int y = START_Y + i * Y_OFFSET;
-                
-                if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    final int advancementId = i;
-                    switch (gui.getCurrentMode()) {
-                        case LOCATION:
-                            GuiEditMenuAdvancement.display(gui, player, advancement.getAdvancement(),
-                                    result -> setAdvancement(advancementId, result, player));
-                            break;
-                        case ITEM:
-                            PickItemMenu.display(gui, player, advancement.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> setIcon(advancementId, result.get(), player));
-                            break;
-                        case RENAME:
-                            GuiEditMenuTextEditor.display(gui, player, advancement.getName(), 110,
-                                    result -> setName(advancementId, result, player));
-                            break;
-                        case DELETE:
-                            if (i < this.elements.size()) {
-                                elements.remove(i);
-                                SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_REMOVE);
-                            }
-                            break;
-                        default:
-                    }
-                    
-                    break;
-                }
-            }
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, AdvancementTask task) {
+        if (mode == EditMode.LOCATION) {
+            GuiEditMenuAdvancement.display(gui, player, task.getAdvancement(),
+                    result -> setAdvancement(id, result, player));
         }
     }
     

@@ -8,8 +8,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTame;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -32,13 +30,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     private static final String TAME = "tame";
-    private static final int Y_OFFSET = 30;
-    private static final int ITEM_SIZE = 18;
     
     public QuestTaskTame(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -58,8 +53,13 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     }
     
     @Override
-    protected void onModifyElement(Player player) {
+    protected void onModifyElement() {
         SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
+    }
+    
+    @Override
+    protected void onRemoveElement() {
+        SaveHelper.add(SaveHelper.EditType.MONSTER_REMOVE);
     }
     
     @Environment(EnvType.CLIENT)
@@ -104,42 +104,10 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Tame> tames = getShownElements();
-            for (int i = 0; i < tames.size(); i++) {
-                Tame tame = tames.get(i);
-                
-                int x = START_X;
-                int y = START_Y + i * Y_OFFSET;
-                
-                if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    final int tameId = i;
-                    switch (gui.getCurrentMode()) {
-                        case MOB:
-                            GuiEditMenuTame.display(gui, player, tame.getTame(), tame.getCount(),
-                                    result -> setInfo(tameId, result.getEntityId(), result.getAmount(), player));
-                            break;
-                        case ITEM:
-                            PickItemMenu.display(gui, player, tame.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> setIcon(tameId, result.get(), player));
-                            break;
-                        case RENAME:
-                            GuiEditMenuTextEditor.display(gui, player, tame.getName(), 110,
-                                    result -> setName(tameId, result, player));
-                            break;
-                        case DELETE:
-                            if (i < this.elements.size()) {
-                                elements.remove(i);
-                                SaveHelper.add(SaveHelper.EditType.MONSTER_REMOVE);
-                            }
-                            break;
-                        default:
-                    }
-                    
-                    break;
-                }
-            }
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Tame tame) {
+        if (mode == EditMode.MOB) {
+            GuiEditMenuTame.display(gui, player, tame.getTame(), tame.getCount(),
+                    result -> setInfo(id, result.getEntityId(), result.getAmount(), player));
         }
     }
     

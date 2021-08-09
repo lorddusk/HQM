@@ -1,7 +1,10 @@
 package hardcorequesting.common.quests.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -22,6 +25,7 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
+    private static final int ITEM_SIZE = 18;
     
     public final List<T> elements;
     private final List<T> elementsWithEmpty;
@@ -39,10 +43,15 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
     
     protected abstract void onAddElement(Player player);
     
-    protected abstract void onModifyElement(Player player);
+    protected abstract void onModifyElement();
+    
+    protected abstract void onRemoveElement();
     
     @Environment(EnvType.CLIENT)
     protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, T element, int index, int x, int y);
+    
+    @Environment(EnvType.CLIENT)
+    protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T element);
     
     protected final List<T> getShownElements() {
         if (Quest.canQuestsBeEdited()) {
@@ -59,7 +68,7 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
             onAddElement(player);
             return element;
         } else {
-            onModifyElement(player);
+            onModifyElement();
             return elements.get(id);
         }
     }
@@ -85,6 +94,44 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
             gui.drawString(matrices, Translator.plain(element.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             drawElementText(matrices, gui, player, element, i, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9);
+        }
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    public final void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
+            List<T> elements = getShownElements();
+            for (int i = 0; i < elements.size(); i++) {
+                T element = elements.get(i);
+                
+                int x = START_X;
+                int y = START_Y + i * Y_OFFSET;
+                
+                if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                    final int id = i;
+                    switch (gui.getCurrentMode()) {
+                        case ITEM:
+                            PickItemMenu.display(gui, player, element.getIconStack(), PickItemMenu.Type.ITEM,
+                                    result -> setIcon(id, result.get(), player));
+                            break;
+                        case RENAME:
+                            GuiEditMenuTextEditor.display(gui, player, element.getName(), 110,
+                                    result -> setName(id, result, player));
+                            break;
+                        case DELETE:
+                            if (i < this.elements.size()) {
+                                this.elements.remove(i);
+                                onRemoveElement();
+                            }
+                            break;
+                        default:
+                            handleElementEditClick(gui, player, gui.getCurrentMode(), id, element);
+                    }
+                    
+                    break;
+                }
+            }
         }
     }
     
