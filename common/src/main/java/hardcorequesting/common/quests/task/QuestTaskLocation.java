@@ -20,6 +20,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -77,7 +78,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                         ((QuestDataTaskLocation) this.getData(player)).visited = visited;
                     }
                     if (!visited[i] && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
-                        int current = (int) player.distanceToSqr((double) location.x + 0.5D, (double) location.y + 0.5D, (double) location.z + 0.5D);
+                        int current = (int) player.distanceToSqr((double) location.pos.getX() + 0.5D, (double) location.pos.getY() + 0.5D, (double) location.pos.getZ() + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
                             all = false;
@@ -130,6 +131,16 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         elements.get(id).setName(str);
     }
     
+    private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, Player player) {
+        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
+        
+        Location location = elements.get(id);
+        location.setVisibility(visibility);
+        location.setPosition(pos);
+        location.setRadius(radius);
+        location.setDimension(dimension);
+    }
+    
     @Override
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskLocation.class;
@@ -151,13 +162,13 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                 gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             } else if (location.visibility.doShowCoordinate()) {
                 if (location.radius >= 0) {
-                    gui.drawString(matrices, Translator.plain("(" + location.x + ", " + location.y + ", " + location.z + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                    gui.drawString(matrices, Translator.plain("(" + location.pos.toShortString() + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
                 }
                 
                 if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
                     if (location.radius >= 0) {
                         FormattedText str;
-                        int distance = (int) player.distanceToSqr(location.x + 0.5, location.y + 0.5, location.z + 0.5);
+                        int distance = (int) player.distanceToSqr(location.pos.getX() + 0.5, location.pos.getY() + 0.5, location.pos.getZ() + 0.5);
                         str = Translator.translatable("hqm.locationMenu.mAway", distance);
                         if (location.visibility.doShowRadius()) {
                             str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
@@ -186,12 +197,13 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                 int y = START_Y + i * Y_OFFSET;
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                    final int locationId = i;
                     switch (gui.getCurrentMode()) {
                         case LOCATION:
-                            gui.setEditMenu(new GuiEditMenuLocation(gui, this, location.copy(), i, player));
+                            GuiEditMenuLocation.display(gui, player, location.getVisibility(), location.getPosition(), location.radius, location.dimension,
+                                    result -> setInfo(locationId, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension(), player));
                             break;
                         case ITEM:
-                            final int locationId = i;
                             PickItemMenu.display(gui, player, location.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(locationId, result.get(), player));
                             break;
@@ -329,49 +341,17 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     
     public static class Location extends IconTask {
         
-        private int x;
-        private int y;
-        private int z;
+        private BlockPos pos;
         private int radius = 3;
         private Visibility visibility = Visibility.LOCATION;
         private String dimension;
         
-        private Location copy() {
-            Location location = new Location();
-            location.setIconStack(getIconStack().copy());
-            location.copyFrom(this);
-            location.x = x;
-            location.y = y;
-            location.z = z;
-            location.radius = radius;
-            location.visibility = visibility;
-            location.dimension = dimension;
-            
-            return location;
+        public BlockPos getPosition() {
+            return pos;
         }
         
-        public int getX() {
-            return x;
-        }
-        
-        public void setX(int x) {
-            this.x = x;
-        }
-        
-        public int getY() {
-            return y;
-        }
-        
-        public void setY(int y) {
-            this.y = y;
-        }
-        
-        public int getZ() {
-            return z;
-        }
-        
-        public void setZ(int z) {
-            this.z = z;
+        public void setPosition(BlockPos pos) {
+            this.pos = pos;
         }
         
         public int getRadius() {

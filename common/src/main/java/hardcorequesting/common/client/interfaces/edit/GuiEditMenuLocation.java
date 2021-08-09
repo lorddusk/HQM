@@ -7,66 +7,74 @@ import hardcorequesting.common.client.interfaces.LargeButton;
 import hardcorequesting.common.client.interfaces.TextBoxGroup;
 import hardcorequesting.common.quests.task.QuestTaskLocation;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.function.Consumer;
 
 public class GuiEditMenuLocation extends GuiEditMenuExtended {
     
-    private int id;
-    private QuestTaskLocation task;
-    private QuestTaskLocation.Location location;
-    private Player player;
+    private final Consumer<Result> resultConsumer;
+    private QuestTaskLocation.Visibility visibility;
+    private BlockPos.MutableBlockPos pos;
+    private int radius;
+    private String dimension;
     
+    public static void display(GuiQuestBook gui, Player player, QuestTaskLocation.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuLocation(gui, player, visibility, initPos, initRadius, initDimension, resultConsumer));
+    }
     
-    public GuiEditMenuLocation(GuiQuestBook gui, QuestTaskLocation task, final QuestTaskLocation.Location location, int id, Player player) {
+    private GuiEditMenuLocation(GuiQuestBook gui, Player player, QuestTaskLocation.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         super(gui, player, true, 180, 30, 20, 30);
-        this.id = id;
-        this.task = task;
-        this.location = location;
-        this.player = player;
-        
+    
+        this.resultConsumer = resultConsumer;
+        this.visibility = visibility;
+        this.pos = new BlockPos.MutableBlockPos(initPos.getX(), initPos.getY(), initPos.getZ());
+        this.radius = initRadius;
+        this.dimension = initDimension;
         
         textBoxes.add(new TextBoxNumberNegative(gui, 0, "hqm.locationMenu.xTarget") {
             @Override
             protected void setValue(int number) {
-                location.setX(number);
+                pos.setX(number);
             }
             
             @Override
             protected int getValue() {
-                return location.getX();
+                return pos.getX();
             }
         });
         
         textBoxes.add(new TextBoxNumberNegative(gui, 1, "hqm.locationMenu.yTarget") {
             @Override
             protected void setValue(int number) {
-                location.setY(number);
+                pos.setY(number);
             }
             
             @Override
             protected int getValue() {
-                return location.getY();
+                return pos.getY();
             }
         });
         
         textBoxes.add(new TextBoxNumberNegative(gui, 2, "hqm.locationMenu.zTarget") {
             @Override
             protected void setValue(int number) {
-                location.setZ(number);
+                pos.setZ(number);
             }
             
             @Override
             protected int getValue() {
-                return location.getZ();
+                return pos.getZ();
             }
         });
         
         TextBoxGroup.TextBox locationBox;
-        textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, location.getDimension(), BOX_X, BOX_Y + BOX_OFFSET * 3, true) {
+        textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, initDimension, BOX_X, BOX_Y + BOX_OFFSET * 3, true) {
             @Override
             public void textChanged(GuiBase gui) {
                 super.textChanged(gui);
-                location.setDimension(getText());
+                dimension = getText();
             }
             
             @Override
@@ -81,12 +89,12 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         textBoxes.add(new TextBoxNumberNegative(gui, 4, "hqm.locationMenu.radius") {
             @Override
             protected int getValue() {
-                return location.getRadius();
+                return radius;
             }
             
             @Override
             protected void setValue(int number) {
-                location.setRadius(number);
+                radius = number;
             }
             
             @Override
@@ -111,10 +119,8 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
             
             @Override
             public void onClick(GuiBase gui, Player player) {
-                location.setX((int) player.getX());
-                location.setY((int) player.getY());
-                location.setZ((int) player.getZ());
-                location.setDimension(player.level.dimension().location().toString());
+                pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
+                dimension = player.level.dimension().location().toString();
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
                     if (textBox instanceof TextBoxNumber)
                         textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
@@ -128,25 +134,25 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (left) {
-            location.setVisibility(QuestTaskLocation.Visibility.values()[(location.getVisibility().ordinal() + QuestTaskLocation.Visibility.values().length - 1) % QuestTaskLocation.Visibility.values().length]);
+            visibility = QuestTaskLocation.Visibility.values()[(visibility.ordinal() + QuestTaskLocation.Visibility.values().length - 1) % QuestTaskLocation.Visibility.values().length];
         } else {
-            location.setVisibility(QuestTaskLocation.Visibility.values()[(location.getVisibility().ordinal() + 1) % QuestTaskLocation.Visibility.values().length]);
+            visibility = QuestTaskLocation.Visibility.values()[(visibility.ordinal() + 1) % QuestTaskLocation.Visibility.values().length];
         }
     }
     
     @Override
     protected String getArrowText() {
-        return location.getVisibility().getName();
+        return visibility.getName();
     }
     
     @Override
     protected String getArrowDescription() {
-        return location.getVisibility().getDescription();
+        return visibility.getDescription();
     }
     
     @Override
     public void save(GuiBase gui) {
-        task.setLocation(id, location, player);
+        resultConsumer.accept(new Result(visibility, pos.immutable(), radius, dimension));
     }
     
     private abstract class TextBoxNumberNegative extends TextBoxNumber {
@@ -157,6 +163,36 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
         @Override
         protected boolean isNegativeAllowed() {
             return true;
+        }
+    }
+    
+    public static class Result {
+        private final QuestTaskLocation.Visibility visibility;
+        private final BlockPos pos;
+        private final int radius;
+        private final String dimension;
+    
+        private Result(QuestTaskLocation.Visibility visibility, BlockPos pos, int radius, String dimension) {
+            this.visibility = visibility;
+            this.pos = pos;
+            this.radius = radius;
+            this.dimension = dimension;
+        }
+    
+        public QuestTaskLocation.Visibility getVisibility() {
+            return visibility;
+        }
+    
+        public BlockPos getPos() {
+            return pos;
+        }
+    
+        public int getRadius() {
+            return radius;
+        }
+    
+        public String getDimension() {
+            return dimension;
         }
     }
 }

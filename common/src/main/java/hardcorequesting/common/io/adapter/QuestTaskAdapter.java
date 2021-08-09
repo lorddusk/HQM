@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.task.QuestTaskMob.Mob;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -124,9 +125,9 @@ public class QuestTaskAdapter {
         public JsonElement serialize(QuestTaskLocation.Location src) {
             return object()
                     .add(NAME, src.getName())
-                    .add(X, src.getX())
-                    .add(Y, src.getY())
-                    .add(Z, src.getZ())
+                    .add(X, src.getPosition().getX())
+                    .add(Y, src.getPosition().getY())
+                    .add(Z, src.getPosition().getZ())
                     .add(DIM, src.getDimension())
                     .add(RADIUS, src.getRadius())
                     .add(VISIBLE, src.getVisibility().name())
@@ -146,9 +147,7 @@ public class QuestTaskAdapter {
             JsonObject object = json.getAsJsonObject();
             QuestTaskLocation.Location result = new QuestTaskLocation.Location();
             result.setName(GsonHelper.getAsString(object, NAME));
-            result.setX(GsonHelper.getAsInt(object, X));
-            result.setY(GsonHelper.getAsInt(object, Y));
-            result.setZ(GsonHelper.getAsInt(object, Z));
+            result.setPosition(new BlockPos(GsonHelper.getAsInt(object, X), GsonHelper.getAsInt(object, Y), GsonHelper.getAsInt(object, Z)));
             result.setDimension(GsonHelper.getAsString(object, DIM));
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
             result.setVisibility(QuestTaskLocation.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
