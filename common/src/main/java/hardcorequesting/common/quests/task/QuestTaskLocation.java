@@ -40,9 +40,6 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     
     private static final int CHECK_DELAY = 20;
     private static final int Y_OFFSET = 30;
-    private static final int X_TEXT_OFFSET = 23;
-    private static final int X_TEXT_INDENT = 0;
-    private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     private int delay = 1;
     
@@ -140,40 +137,30 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Location> locations = getShownElements();
-        for (int i = 0; i < locations.size(); i++) {
-            Location location = locations.get(i);
-            
-            int x = START_X;
-            int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(location.getIconStack(), x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(location.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            
-            if (visited(i, player)) {
-                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            } else if (location.visibility.doShowCoordinate()) {
-                if (location.radius >= 0) {
-                    gui.drawString(matrices, Translator.plain("(" + location.pos.toShortString() + ")"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-                }
-                
-                if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
-                    if (location.radius >= 0) {
-                        FormattedText str;
-                        int distance = (int) player.distanceToSqr(location.pos.getX() + 0.5, location.pos.getY() + 0.5, location.pos.getZ() + 0.5);
-                        str = Translator.translatable("hqm.locationMenu.mAway", distance);
-                        if (location.visibility.doShowRadius()) {
-                            str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
-                        }
-                        gui.drawString(matrices, str, x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
-                    }
-                    
-                } else {
-                    gui.drawString(matrices, Translator.translatable("hqm.locationMenu.wrongDim"), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + (location.radius >= 0 ? 15 : 9), 0.7F, 0x404040);
-                }
-                
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Location location, int index, int x, int y) {
+        if (visited(index, player)) {
+            gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
+        } else if (location.visibility.doShowCoordinate()) {
+            int row = 0;
+            if (location.radius >= 0) {
+                gui.drawString(matrices, Translator.plain("(" + location.pos.toShortString() + ")"), x, y, 0.7F, 0x404040);
+                row++;
             }
+        
+            if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
+                if (location.radius >= 0) {
+                    FormattedText str;
+                    int distance = (int) player.distanceToSqr(location.pos.getX() + 0.5, location.pos.getY() + 0.5, location.pos.getZ() + 0.5);
+                    str = Translator.translatable("hqm.locationMenu.mAway", distance);
+                    if (location.visibility.doShowRadius()) {
+                        str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
+                    }
+                    gui.drawString(matrices, str, x, y + 6*row, 0.7F, 0x404040);
+                }
             
+            } else {
+                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, 0x404040);
+            }
         }
     }
     

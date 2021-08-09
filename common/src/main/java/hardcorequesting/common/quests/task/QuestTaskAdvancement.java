@@ -39,9 +39,6 @@ import java.util.UUID;
 public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
     private static final String ADVANCEMENTS = "advancements";
     private static final int Y_OFFSET = 30;
-    private static final int X_TEXT_OFFSET = 23;
-    private static final int X_TEXT_INDENT = 0;
-    private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
     public QuestTaskAdvancement(Quest parent, String description, String longDescription) {
@@ -90,19 +87,9 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<AdvancementTask> advancements = getShownElements();
-        for (int i = 0; i < advancements.size(); i++) {
-            AdvancementTask advancement = advancements.get(i);
-            
-            int x = START_X;
-            int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(advancement.getIconStack(), x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(advancement.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            
-            if (advanced(i, player)) {
-                gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            }
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, AdvancementTask task, int index, int x, int y) {
+        if (advanced(index, player)) {
+            gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         }
     }
     

@@ -37,9 +37,6 @@ import java.util.UUID;
 public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     private static final String MOBS = "mobs";
     private static final int Y_OFFSET = 30;
-    private static final int X_TEXT_OFFSET = 23;
-    private static final int X_TEXT_INDENT = 0;
-    private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
     public QuestTaskMob(Quest parent, String description, String longDescription) {
@@ -99,24 +96,14 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Mob> mobs = getShownElements();
-        for (int i = 0; i < mobs.size(); i++) {
-            Mob mob = mobs.get(i);
-            
-            int x = START_X;
-            int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(mob.getIconStack(), x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(mob.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            
-            int killed = killed(i, player);
-            if (killed == mob.count) {
-                gui.drawString(matrices, Translator.translatable("hqm.mobTask.allKilled", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            } else {
-                gui.drawString(matrices, Translator.translatable("hqm.mobTask.partKills", killed, (100 * killed / mob.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            }
-            gui.drawString(matrices, Translator.translatable("hqm.mobTask.totalKills", mob.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Mob mob, int index, int x, int y) {
+        int killed = killed(index, player);
+        if (killed == mob.count) {
+            gui.drawString(matrices, Translator.translatable("hqm.mobTask.allKilled", GuiColor.GREEN), x, y, 0.7F, 0x404040);
+        } else {
+            gui.drawString(matrices, Translator.translatable("hqm.mobTask.partKills", killed, (100 * killed / mob.count)), x, y, 0.7F, 0x404040);
         }
+        gui.drawString(matrices, Translator.translatable("hqm.mobTask.totalKills", mob.count), x, y + 6, 0.7F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)

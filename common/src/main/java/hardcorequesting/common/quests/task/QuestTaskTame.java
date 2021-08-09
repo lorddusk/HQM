@@ -38,9 +38,6 @@ import java.util.UUID;
 public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     private static final String TAME = "tame";
     private static final int Y_OFFSET = 30;
-    private static final int X_TEXT_OFFSET = 23;
-    private static final int X_TEXT_INDENT = 0;
-    private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
     public QuestTaskTame(Quest parent, String description, String longDescription) {
@@ -103,24 +100,14 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Tame> tames = getShownElements();
-        for (int i = 0; i < tames.size(); i++) {
-            Tame tame = tames.get(i);
-            
-            int x = START_X;
-            int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(tame.getIconStack(), x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(tame.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            
-            int tamed = tamed(i, player);
-            if (tamed == tame.count) {
-                gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            } else {
-                gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / tame.count)), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
-            }
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", tame.count), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 15, 0.7F, 0x404040);
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Tame tame, int index, int x, int y) {
+        int tamed = tamed(index, player);
+        if (tamed == tame.count) {
+            gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
+        } else {
+            gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / tame.count)), x, y, 0.7F, 0x404040);
         }
+        gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", tame.count), x, y + 6, 0.7F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
