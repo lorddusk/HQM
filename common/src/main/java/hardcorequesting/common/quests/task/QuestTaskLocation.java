@@ -26,7 +26,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -112,14 +111,6 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     
     private boolean visited(int id, Player player) {
         return id < elements.size() && ((QuestDataTaskLocation) getData(player)).visited[id];
-    }
-    
-    private void setIcon(int id, ItemStack stack, Player player) {
-        getOrCreateForModify(id, player).setIconStack(stack);
-    }
-    
-    public void setName(int id, String str, Player player) {
-        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, Player player) {

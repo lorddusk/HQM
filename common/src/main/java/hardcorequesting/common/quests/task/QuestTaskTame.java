@@ -62,14 +62,6 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
     }
     
-    private void setIcon(int id, ItemStack stack, Player player) {
-        getOrCreateForModify(id, player).setIconStack(stack);
-    }
-    
-    public void setName(int id, String str, Player player) {
-        getOrCreateForModify(id, player).setName(str);
-    }
-    
     @Environment(EnvType.CLIENT)
     private void setInfo(int id, String entityId, int amount, Player player) {
         

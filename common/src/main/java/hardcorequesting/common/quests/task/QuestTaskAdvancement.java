@@ -28,7 +28,6 @@ import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -66,14 +65,6 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     
     private boolean advanced(int id, Player player) {
         return id < elements.size() && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
-    }
-    
-    private void setIcon(int id, ItemStack stack, Player player) {
-        getOrCreateForModify(id, player).setIconStack(stack);
-    }
-    
-    public void setName(int id, String str, Player player) {
-        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setAdvancement(int id, String advancement, Player player) {

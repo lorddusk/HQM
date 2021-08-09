@@ -64,6 +64,14 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
         }
     }
     
+    protected void setIcon(int id, ItemStack stack, Player player) {
+        getOrCreateForModify(id, player).setIconStack(stack);
+    }
+    
+    public void setName(int id, String str, Player player) {
+        getOrCreateForModify(id, player).setName(str);
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     public final void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {

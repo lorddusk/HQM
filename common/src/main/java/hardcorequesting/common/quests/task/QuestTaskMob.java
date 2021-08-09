@@ -28,7 +28,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,14 +68,6 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         }
         
         return null;
-    }
-    
-    private void setIcon(int id, ItemStack stack, Player player) {
-        getOrCreateForModify(id, player).setIconStack(stack);
-    }
-    
-    public void setName(int id, String str, Player player) {
-        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setInfo(int id, ResourceLocation mobId, int amount, Player player) {
