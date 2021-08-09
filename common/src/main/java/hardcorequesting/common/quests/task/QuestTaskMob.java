@@ -30,9 +30,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
@@ -42,7 +40,6 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
-    public Mob[] mobs = new Mob[0];
     
     public QuestTaskMob(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -60,45 +57,44 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     }
     
     public void setMob(int id, Mob mob, Player player) {
-        if (id >= mobs.length) {
-            mobs = Arrays.copyOf(mobs, mobs.length + 1);
+        if (id >= elements.size()) {
+            elements.add(mob);
             QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
             data.killed = Arrays.copyOf(data.killed, data.killed.length + 1);
             SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
         } else {
+            elements.set(id, mob);
             SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
         }
-        
-        mobs[id] = mob;
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
-        
-        mobs[id].setIconStack(stack);
+        setMob(id, id >= elements.size() ? new Mob() : elements.get(id), player);
+    
+        elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
-        
-        mobs[id].setName(str);
+        setMob(id, id >= elements.size() ? new Mob() : elements.get(id), player);
+    
+        elements.get(id).setName(str);
     }
     
     @Environment(EnvType.CLIENT)
-    private Mob[] getEditFriendlyMobs(Mob[] mobs) {
+    private Mob[] getEditFriendlyMobs() {
         if (Quest.canQuestsBeEdited()) {
-            mobs = Arrays.copyOf(mobs, mobs.length + 1);
+            Mob[] mobs = elements.toArray(new Mob[elements.size() + 1]);
             mobs[mobs.length - 1] = new Mob();
             return mobs;
         } else {
-            return mobs;
+            return elements.toArray(new Mob[0]);
         }
     }
     
     private int killed(int id, Player player) {
-        return id < mobs.length ? ((QuestDataTaskMob) getData(player)).killed[id] : 0;
+        return id < elements.size() ? ((QuestDataTaskMob) getData(player)).killed[id] : 0;
     }
     
     @Override
@@ -109,7 +105,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Mob[] mobs = getEditFriendlyMobs(this.mobs);
+        Mob[] mobs = getEditFriendlyMobs();
         for (int i = 0; i < mobs.length; i++) {
             Mob mob = mobs[i];
             
@@ -132,7 +128,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Mob[] mobs = getEditFriendlyMobs(this.mobs);
+            Mob[] mobs = getEditFriendlyMobs();
             for (int i = 0; i < mobs.length; i++) {
                 Mob mob = mobs[i];
                 
@@ -153,16 +149,8 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));
                             break;
                         case DELETE:
-                            if (i < this.mobs.length) {
-                                Mob[] newMobs = new Mob[this.mobs.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < this.mobs.length; j++) {
-                                    if (j != i) {
-                                        newMobs[id] = this.mobs[j];
-                                        id++;
-                                    }
-                                }
-                                this.mobs = newMobs;
+                            if (i < this.elements.size()) {
+                                elements.remove(i);
                                 SaveHelper.add(SaveHelper.EditType.MONSTER_REMOVE);
                             }
                             break;
@@ -185,9 +173,9 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         int killed = 0;
         int total = 0;
         
-        for (int i = 0; i < mobs.length; i++) {
+        for (int i = 0; i < elements.size(); i++) {
             killed += ((QuestDataTaskMob) getData(playerID)).killed[i];
-            total += mobs[i].count;
+            total += elements.get(i).count;
         }
         
         return (float) killed / total;
@@ -201,7 +189,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         boolean all = true;
         for (int i = 0; i < killed.length; i++) {
             killed[i] = Math.max(killed[i], otherKilled[i]);
-            if (killed[i] < mobs[i].count) {
+            if (killed[i] < elements.get(i).count) {
                 all = false;
             }
         }
@@ -216,7 +204,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         int[] killed = ((QuestDataTaskMob) getData(playerID)).killed;
         for (int i = 0; i < killed.length; i++) {
             if (status) {
-                killed[i] = mobs[i].count;
+                killed[i] = elements.get(i).count;
             } else {
                 killed[i] = 0;
             }
@@ -236,8 +224,8 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
             boolean updated = false;
-            for (int i = 0; i < mobs.length; i++) {
-                Mob mob = mobs[i];
+            for (int i = 0; i < elements.size(); i++) {
+                Mob mob = elements.get(i);
                 if (mob.count > ((QuestDataTaskMob) getData(killer)).killed[i]) {
                     EntityType<?> type = Registry.ENTITY_TYPE.get(mob.mob);
                     if (type != null) {
@@ -251,8 +239,8 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
             
             if (updated) {
                 boolean done = true;
-                for (int i = 0; i < mobs.length; i++) {
-                    Mob mob = mobs[i];
+                for (int i = 0; i < elements.size(); i++) {
+                    Mob mob = elements.get(i);
                     
                     if (killed(i, killer) < mob.count) {
                         done = false;
@@ -273,7 +261,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Mob mob : mobs) {
+        for (Mob mob : elements) {
             array.add(QuestTaskAdapter.MOB_ADAPTER.toJsonTree(mob));
         }
         builder.add(MOBS, array.build());
@@ -281,13 +269,12 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     
     @Override
     public void read(JsonObject object) {
-        List<Mob> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, MOBS, new JsonArray())) {
             Mob mob = QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element);
             if (mob != null)
-                list.add(mob);
+                elements.add(mob);
         }
-        mobs = list.toArray(new Mob[0]);
     }
     
     public static class Mob extends IconTask {

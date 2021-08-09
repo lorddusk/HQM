@@ -17,7 +17,7 @@ public class QuestDataTaskMob extends QuestDataTask {
     
     public QuestDataTaskMob(QuestTask task) {
         super(task);
-        this.killed = new int[((QuestTaskMob) task).mobs.length];
+        this.killed = new int[((QuestTaskMob) task).elements.size()];
     }
     
     protected QuestDataTaskMob() {

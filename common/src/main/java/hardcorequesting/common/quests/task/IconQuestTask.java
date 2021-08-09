@@ -4,10 +4,16 @@ import hardcorequesting.common.quests.Quest;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A base class for tasks with sub-elements that uses item icons for display.
  */
 public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends QuestTask {
+    
+    public final List<T> elements = new ArrayList<>();
+    
     public IconQuestTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }

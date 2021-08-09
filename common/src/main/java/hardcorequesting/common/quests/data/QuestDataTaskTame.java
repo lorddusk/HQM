@@ -17,7 +17,7 @@ public class QuestDataTaskTame extends QuestDataTask {
     
     public QuestDataTaskTame(QuestTask task) {
         super(task);
-        this.tamed = new int[((QuestTaskTame) task).tames.length];
+        this.tamed = new int[((QuestTaskTame) task).elements.size()];
     }
     
     protected QuestDataTaskTame() {

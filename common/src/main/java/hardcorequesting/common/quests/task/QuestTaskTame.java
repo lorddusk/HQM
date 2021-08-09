@@ -29,9 +29,7 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
@@ -41,7 +39,6 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
-    public Tame[] tames = new Tame[0];
     
     public QuestTaskTame(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -49,45 +46,44 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     }
     
     public void setTame(int id, Tame tame, Player player) {
-        if (id >= tames.length) {
-            tames = Arrays.copyOf(tames, tames.length + 1);
+        if (id >= elements.size()) {
+            elements.add(tame);
             QuestDataTaskTame data = (QuestDataTaskTame) getData(player);
             data.tamed = Arrays.copyOf(data.tamed, data.tamed.length + 1);
             SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
         } else {
+            elements.set(id, tame);
             SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
         }
-        
-        tames[id] = tame;
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setTame(id, id >= tames.length ? new Tame() : tames[id], player);
-        
-        tames[id].setIconStack(stack);
+        setTame(id, id >= elements.size() ? new Tame() : elements.get(id), player);
+    
+        elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setTame(id, id >= tames.length ? new Tame() : tames[id], player);
-        
-        tames[id].setName(str);
+        setTame(id, id >= elements.size() ? new Tame() : elements.get(id), player);
+    
+        elements.get(id).setName(str);
     }
     
     @Environment(EnvType.CLIENT)
-    private Tame[] getEditFriendlyTames(Tame[] tames) {
+    private Tame[] getEditFriendlyTames() {
         if (Quest.canQuestsBeEdited()) {
-            tames = Arrays.copyOf(tames, tames.length + 1);
+            Tame[] tames = elements.toArray(new Tame[elements.size() + 1]);
             tames[tames.length - 1] = new Tame();
             return tames;
         } else {
-            return tames;
+            return elements.toArray(new Tame[0]);
         }
     }
     
     private int tamed(int id, Player player) {
-        return id < tames.length ? ((QuestDataTaskTame) getData(player)).tamed[id] : 0;
+        return id < elements.size() ? ((QuestDataTaskTame) getData(player)).tamed[id] : 0;
     }
     
     @Override
@@ -98,7 +94,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Tame[] tames = getEditFriendlyTames(this.tames);
+        Tame[] tames = getEditFriendlyTames();
         for (int i = 0; i < tames.length; i++) {
             Tame tame = tames[i];
             
@@ -121,7 +117,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Tame[] tames = getEditFriendlyTames(this.tames);
+            Tame[] tames = getEditFriendlyTames();
             for (int i = 0; i < tames.length; i++) {
                 Tame tame = tames[i];
                 
@@ -142,16 +138,8 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, tame));
                             break;
                         case DELETE:
-                            if (i < this.tames.length) {
-                                Tame[] newTames = new Tame[this.tames.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < this.tames.length; j++) {
-                                    if (j != i) {
-                                        newTames[id] = this.tames[j];
-                                        id++;
-                                    }
-                                }
-                                this.tames = newTames;
+                            if (i < this.elements.size()) {
+                                elements.remove(i);
                                 SaveHelper.add(SaveHelper.EditType.MONSTER_REMOVE);
                             }
                             break;
@@ -174,9 +162,9 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         int tamed = 0;
         int total = 0;
         
-        for (int i = 0; i < tames.length; i++) {
+        for (int i = 0; i < elements.size(); i++) {
             tamed += ((QuestDataTaskTame) getData(uuid)).tamed[i];
-            total += tames[i].count;
+            total += elements.get(i).count;
         }
         
         return (float) tamed / total;
@@ -190,7 +178,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         boolean all = true;
         for (int i = 0; i < tamed.length; i++) {
             tamed[i] = Math.max(tamed[i], otherTamed[i]);
-            if (tamed[i] < tames[i].count) {
+            if (tamed[i] < elements.get(i).count) {
                 all = false;
             }
         }
@@ -208,7 +196,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
             // This can sometimes cause an array-out-of-bounds error
             if (q != tamed.length) q = tamed.length;
             if (status) {
-                tamed[i] = tames[i].count;
+                tamed[i] = elements.get(i).count;
             } else {
                 tamed[i] = 0;
             }
@@ -226,8 +214,8 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     public void onAnimalTame(Player tamer, Entity entity) {
         if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
             boolean updated = false;
-            for (int i = 0; i < tames.length; i++) {
-                Tame tame = tames[i];
+            for (int i = 0; i < elements.size(); i++) {
+                Tame tame = elements.get(i);
                 if (tame.count > ((QuestDataTaskTame) getData(tamer)).tamed[i] && tame.tame != null) {
                     if (tame.tame.equals("minecraft:abstracthorse")) {
                         if (entity instanceof AbstractHorse) {
@@ -248,8 +236,8 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
             
             if (updated) {
                 boolean done = true;
-                for (int i = 0; i < tames.length; i++) {
-                    Tame tame = tames[i];
+                for (int i = 0; i < elements.size(); i++) {
+                    Tame tame = elements.get(i);
                     
                     if (tamed(i, tamer) < tame.count) {
                         done = false;
@@ -269,7 +257,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Tame tame : tames) {
+        for (Tame tame : elements) {
             array.add(QuestTaskAdapter.TAME_ADAPTER.toJsonTree(tame));
         }
         builder.add(TAME, array.build());
@@ -277,13 +265,12 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     
     @Override
     public void read(JsonObject object) {
-        List<Tame> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, TAME, new JsonArray())) {
             Tame tame = QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element);
             if (tame != null)
-                list.add(tame);
+                elements.add(tame);
         }
-        tames = list.toArray(new Tame[0]);
     }
     
     public static class Tame extends IconTask {

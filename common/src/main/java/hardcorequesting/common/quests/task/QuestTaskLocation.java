@@ -29,7 +29,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
 
 public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location> {
     private static final String LOCATIONS = "locations";
@@ -40,7 +42,6 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
-    public Location[] locations = new Location[0];
     private int delay = 1;
     
     public QuestTaskLocation(Quest parent, String description, String longDescription) {
@@ -61,8 +62,8 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                 boolean all = true;
                 boolean updated = false;
                 
-                for (int i = 0; i < locations.length; ++i) {
-                    Location location = this.locations[i];
+                for (int i = 0; i < elements.size(); ++i) {
+                    Location location = this.elements.get(i);
                     if (visited.length < i) { // Fix to make sure than the visited array is as long as the location array (#400)
                         boolean[] oldVisited = ArrayUtils.addAll(visited, (boolean[]) null);
                         visited = new boolean[i];
@@ -94,45 +95,44 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     }
     
     @Environment(EnvType.CLIENT)
-    private Location[] getEditFriendlyLocations(Location[] locations) {
+    private Location[] getEditFriendlyLocations() {
         if (Quest.canQuestsBeEdited()) {
-            locations = Arrays.copyOf(locations, locations.length + 1);
+            Location[] locations = elements.toArray(new Location[elements.size() + 1]);
             locations[locations.length - 1] = new Location();
             return locations;
         } else {
-            return locations;
+            return elements.toArray(new Location[0]);
         }
     }
     
     private boolean visited(int id, Player player) {
-        return id < locations.length && ((QuestDataTaskLocation) getData(player)).visited[id];
+        return id < elements.size() && ((QuestDataTaskLocation) getData(player)).visited[id];
     }
     
     public void setLocation(int id, Location location, Player player) {
-        if (id >= locations.length) {
-            locations = Arrays.copyOf(locations, locations.length + 1);
+        if (id >= elements.size()) {
+            elements.add(location);
             QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
             data.visited = Arrays.copyOf(data.visited, data.visited.length + 1);
             SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
         } else {
+            elements.set(id, location);
             SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
         }
-        
-        locations[id] = location;
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setLocation(id, id >= locations.length ? new Location() : locations[id], player);
+        setLocation(id, id >= elements.size() ? new Location() : elements.get(id), player);
         
-        locations[id].setIconStack(stack);
+        elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setLocation(id, id >= locations.length ? new Location() : locations[id], player);
-        
-        locations[id].setName(str);
+        setLocation(id, id >= elements.size() ? new Location() : elements.get(id), player);
+    
+        elements.get(id).setName(str);
     }
     
     @Override
@@ -143,7 +143,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Location[] locations = getEditFriendlyLocations(this.locations);
+        Location[] locations = getEditFriendlyLocations();
         for (int i = 0; i < locations.length; i++) {
             Location location = locations[i];
             
@@ -183,7 +183,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Location[] locations = getEditFriendlyLocations(this.locations);
+            Location[] locations = getEditFriendlyLocations();
             for (int i = 0; i < locations.length; i++) {
                 Location location = locations[i];
                 
@@ -204,16 +204,8 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, location));
                             break;
                         case DELETE:
-                            if (i < this.locations.length) {
-                                Location[] newLocations = new Location[this.locations.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < this.locations.length; j++) {
-                                    if (j != i) {
-                                        newLocations[id] = this.locations[j];
-                                        id++;
-                                    }
-                                }
-                                this.locations = newLocations;
+                            if (i < this.elements.size()) {
+                                elements.remove(i);
                                 SaveHelper.add(SaveHelper.EditType.LOCATION_REMOVE);
                             }
                             break;
@@ -240,7 +232,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
             }
         }
         
-        return (float) visited / locations.length;
+        return (float) visited / elements.size();
     }
     
     @Override
@@ -292,7 +284,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Location location : locations) {
+        for (Location location : elements) {
             array.add(QuestTaskAdapter.LOCATION_ADAPTER.toJsonTree(location));
         }
         builder.add(LOCATIONS, array.build());
@@ -300,13 +292,12 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     
     @Override
     public void read(JsonObject object) {
-        List<Location> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray())) {
             Location location = QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element);
             if (location != null)
-                list.add(location);
+                elements.add(location);
         }
-        locations = list.toArray(new Location[0]);
     }
     
     public enum Visibility {

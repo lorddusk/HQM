@@ -16,7 +16,7 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     
     public QuestDataTaskAdvancement(QuestTask task) {
         super(task);
-        this.advanced = new boolean[((QuestTaskAdvancement) task).advancements.length];
+        this.advanced = new boolean[((QuestTaskAdvancement) task).elements.size()];
     }
     
     protected QuestDataTaskAdvancement() {

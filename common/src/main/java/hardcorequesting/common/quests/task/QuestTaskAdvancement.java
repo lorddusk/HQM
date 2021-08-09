@@ -32,9 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
@@ -44,7 +42,6 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
-    public AdvancementTask[] advancements = new AdvancementTask[0];
     
     public QuestTaskAdvancement(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -53,45 +50,44 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     }
     
     @Environment(EnvType.CLIENT)
-    private AdvancementTask[] getEditFriendlyAdvancements(AdvancementTask[] advancements) {
+    private AdvancementTask[] getEditFriendlyAdvancements() {
         if (Quest.canQuestsBeEdited()) {
-            advancements = Arrays.copyOf(advancements, advancements.length + 1);
+            AdvancementTask[] advancements = elements.toArray(new AdvancementTask[elements.size() + 1]);
             advancements[advancements.length - 1] = new AdvancementTask();
             return advancements;
         } else {
-            return advancements;
+            return elements.toArray(new AdvancementTask[0]);
         }
     }
     
     private boolean advanced(int id, Player player) {
-        return id < advancements.length && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
+        return id < elements.size() && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
     }
     
     public void setAdvancement(int id, AdvancementTask advancement, Player player) {
-        if (id >= advancements.length) {
-            advancements = Arrays.copyOf(advancements, advancements.length + 1);
+        if (id >= elements.size()) {
+            elements.add(advancement);
             QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
             data.advanced = Arrays.copyOf(data.advanced, data.advanced.length + 1);
             SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
         } else {
+            elements.set(id, advancement);
             SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
         }
-        
-        advancements[id] = advancement;
     }
     
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
-        
-        advancements[id].setIconStack(stack);
+        setAdvancement(id, id >= elements.size() ? new AdvancementTask() : elements.get(id), player);
+    
+        elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
-        
-        advancements[id].setName(str);
+        setAdvancement(id, id >= elements.size() ? new AdvancementTask() : elements.get(id), player);
+    
+        elements.get(id).setName(str);
     }
     
     @Override
@@ -102,7 +98,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
+        AdvancementTask[] advancements = getEditFriendlyAdvancements();
         for (int i = 0; i < advancements.length; i++) {
             AdvancementTask advancement = advancements[i];
             
@@ -121,7 +117,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            AdvancementTask[] advancements = getEditFriendlyAdvancements(this.advancements);
+            AdvancementTask[] advancements = getEditFriendlyAdvancements();
             for (int i = 0; i < advancements.length; i++) {
                 AdvancementTask advancement = advancements[i];
                 
@@ -142,16 +138,8 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, advancement));
                             break;
                         case DELETE:
-                            if (i < this.advancements.length) {
-                                AdvancementTask[] newAdvancements = new AdvancementTask[this.advancements.length - 1];
-                                int id = 0;
-                                for (int j = 0; j < this.advancements.length; j++) {
-                                    if (j != i) {
-                                        newAdvancements[id] = this.advancements[j];
-                                        id++;
-                                    }
-                                }
-                                this.advancements = newAdvancements;
+                            if (i < this.elements.size()) {
+                                elements.remove(i);
                                 SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_REMOVE);
                             }
                             break;
@@ -179,9 +167,9 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
             boolean[] advanced = ((QuestDataTaskAdvancement) this.getData(player)).advanced;
             
-            if (advanced.length < advancements.length) {
+            if (advanced.length < elements.size()) {
                 boolean[] oldVisited = ArrayUtils.addAll(advanced, (boolean[]) null);
-                advanced = new boolean[advancements.length];
+                advanced = new boolean[elements.size()];
                 System.arraycopy(oldVisited, 0, advanced, 0, oldVisited.length);
                 ((QuestDataTaskAdvancement) this.getData(player)).advanced = advanced;
             }
@@ -190,10 +178,10 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
             ServerAdvancementManager manager = player.getServer().getAdvancements();
             PlayerAdvancements playerAdvancements = player.getServer().getPlayerList().getPlayerAdvancements((ServerPlayer) player);
             
-            for (int i = 0; i < advancements.length; i++) {
+            for (int i = 0; i < elements.size(); i++) {
                 if (advanced[i]) continue;
                 
-                AdvancementTask advancement = this.advancements[i];
+                AdvancementTask advancement = this.elements.get(i);
                 if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
                 
                 ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
@@ -213,7 +201,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
                 }
             }
             
-            if (completed && advancements.length > 0) {
+            if (completed && elements.size() > 0) {
                 completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
@@ -229,7 +217,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
             }
         }
         
-        return (float) advanced / advancements.length;
+        return (float) advanced / elements.size();
     }
     
     @Override
@@ -274,7 +262,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (AdvancementTask advancement : advancements) {
+        for (AdvancementTask advancement : elements) {
             array.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.toJsonTree(advancement));
         }
         builder.add(ADVANCEMENTS, array.build());
@@ -282,13 +270,12 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     
     @Override
     public void read(JsonObject object) {
-        List<AdvancementTask> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray())) {
             AdvancementTask advancementTask = QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element);
             if (advancementTask != null)
-                list.add(advancementTask);
+                elements.add(advancementTask);
         }
-        advancements = list.toArray(new AdvancementTask[0]);
     }
     
     public enum Visibility {
