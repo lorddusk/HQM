@@ -53,37 +53,30 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         return new Tame();
     }
     
-    public void setTame(int id, Tame tame, Player player) {
-        if (id >= elements.size()) {
-            elements.add(tame);
-            QuestDataTaskTame data = (QuestDataTaskTame) getData(player);
-            data.tamed = Arrays.copyOf(data.tamed, data.tamed.length + 1);
-            SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
-        } else {
-            elements.set(id, tame);
-            SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
-        }
+    @Override
+    protected void onAddElement(Player player) {
+        QuestDataTaskTame data = (QuestDataTaskTame) getData(player);
+        data.tamed = Arrays.copyOf(data.tamed, data.tamed.length + 1);
+        SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
     }
     
-    public void setIcon(int id, ItemStack stack, Player player) {
-        if (stack.isEmpty()) return;
-        
-        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
+    @Override
+    protected void onModifyElement(Player player) {
+        SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
+    }
     
-        elements.get(id).setIconStack(stack);
+    private void setIcon(int id, ItemStack stack, Player player) {
+        getOrCreateForModify(id, player).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setName(str);
+        getOrCreateForModify(id, player).setName(str);
     }
     
     @Environment(EnvType.CLIENT)
     private void setInfo(int id, String entityId, int amount, Player player) {
-        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
         
-        Tame tame = elements.get(id);
+        Tame tame = getOrCreateForModify(id, player);
         tame.setTame(entityId);
         tame.setCount(amount);
         

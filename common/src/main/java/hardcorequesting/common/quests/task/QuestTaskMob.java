@@ -52,6 +52,18 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         return new Mob();
     }
     
+    @Override
+    protected void onAddElement(Player player) {
+        QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
+        data.killed = Arrays.copyOf(data.killed, data.killed.length + 1);
+        SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement(Player player) {
+        SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
+    }
+    
     public static Player getKiller(DamageSource source) {
         Entity entity = source.getEntity();
         
@@ -62,36 +74,16 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         return null;
     }
     
-    public void setMob(int id, Mob mob, Player player) {
-        if (id >= elements.size()) {
-            elements.add(mob);
-            QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
-            data.killed = Arrays.copyOf(data.killed, data.killed.length + 1);
-            SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
-        } else {
-            elements.set(id, mob);
-            SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
-        }
-    }
-    
-    public void setIcon(int id, ItemStack stack, Player player) {
-        if (stack.isEmpty()) return;
-        
-        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setIconStack(stack);
+    private void setIcon(int id, ItemStack stack, Player player) {
+        getOrCreateForModify(id, player).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setName(str);
+        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setInfo(int id, ResourceLocation mobId, int amount, Player player) {
-        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-        
-        Mob mob = elements.get(id);
+        Mob mob = getOrCreateForModify(id, player);
         mob.setMob(mobId);
         mob.setCount(amount);
     }

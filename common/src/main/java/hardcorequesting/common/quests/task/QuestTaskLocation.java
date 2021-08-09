@@ -57,6 +57,18 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         return new Location();
     }
     
+    @Override
+    protected void onAddElement(Player player) {
+        QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
+        data.visited = Arrays.copyOf(data.visited, data.visited.length + 1);
+        SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement(Player player) {
+        SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
+    }
+    
     private void tick(Player player, boolean isPlayerEvent) {
         if (!isPlayerEvent) {
             delay++;
@@ -105,36 +117,16 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         return id < elements.size() && ((QuestDataTaskLocation) getData(player)).visited[id];
     }
     
-    public void setLocation(int id, Location location, Player player) {
-        if (id >= elements.size()) {
-            elements.add(location);
-            QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
-            data.visited = Arrays.copyOf(data.visited, data.visited.length + 1);
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
-        } else {
-            elements.set(id, location);
-            SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
-        }
-    }
-    
-    public void setIcon(int id, ItemStack stack, Player player) {
-        if (stack.isEmpty()) return;
-        
-        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-        
-        elements.get(id).setIconStack(stack);
+    private void setIcon(int id, ItemStack stack, Player player) {
+        getOrCreateForModify(id, player).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setName(str);
+        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, Player player) {
-        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-        
-        Location location = elements.get(id);
+        Location location = getOrCreateForModify(id, player);
         location.setVisibility(visibility);
         location.setPosition(pos);
         location.setRadius(radius);

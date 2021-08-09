@@ -55,40 +55,32 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         return new AdvancementTask();
     }
     
+    @Override
+    protected void onAddElement(Player player) {
+        QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
+        data.advanced = Arrays.copyOf(data.advanced, data.advanced.length + 1);
+        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement(Player player) {
+        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
+    }
+    
     private boolean advanced(int id, Player player) {
         return id < elements.size() && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
     }
     
-    public void setAdvancement(int id, AdvancementTask advancement, Player player) {
-        if (id >= elements.size()) {
-            elements.add(advancement);
-            QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
-            data.advanced = Arrays.copyOf(data.advanced, data.advanced.length + 1);
-            SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
-        } else {
-            elements.set(id, advancement);
-            SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
-        }
-    }
-    
-    public void setIcon(int id, ItemStack stack, Player player) {
-        if (stack.isEmpty()) return;
-        
-        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setIconStack(stack);
+    private void setIcon(int id, ItemStack stack, Player player) {
+        getOrCreateForModify(id, player).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setName(str);
+        getOrCreateForModify(id, player).setName(str);
     }
     
     private void setAdvancement(int id, String advancement, Player player) {
-        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
-    
-        elements.get(id).setAdvancement(advancement);
+        getOrCreateForModify(id, player).setAdvancement(advancement);
     }
     
     @Override

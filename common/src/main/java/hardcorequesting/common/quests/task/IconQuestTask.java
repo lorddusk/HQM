@@ -1,6 +1,7 @@
 package hardcorequesting.common.quests.task;
 
 import hardcorequesting.common.quests.Quest;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,11 +28,27 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
     
     protected abstract T createEmpty();
     
+    protected abstract void onAddElement(Player player);
+    
+    protected abstract void onModifyElement(Player player);
+    
     protected final List<T> getShownElements() {
         if (Quest.canQuestsBeEdited()) {
             return elementsWithEmpty;
         } else {
             return elements;
+        }
+    }
+    
+    protected final T getOrCreateForModify(int id, Player player) {
+        if (id >= elements.size()) {
+            T element = createEmpty();
+            elements.add(element);
+            onAddElement(player);
+            return element;
+        } else {
+            onModifyElement(player);
+            return elements.get(id);
         }
     }
     
