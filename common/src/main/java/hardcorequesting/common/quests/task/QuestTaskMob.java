@@ -88,6 +88,14 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         elements.get(id).setName(str);
     }
     
+    private void setInfo(int id, ResourceLocation mobId, int amount, Player player) {
+        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
+        
+        Mob mob = elements.get(id);
+        mob.setMob(mobId);
+        mob.setCount(amount);
+    }
+    
     private int killed(int id, Player player) {
         return id < elements.size() ? ((QuestDataTaskMob) getData(player)).killed[id] : 0;
     }
@@ -131,14 +139,15 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
                 int y = START_Y + i * Y_OFFSET;
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                    final int taskId = i;
                     switch (gui.getCurrentMode()) {
                         case MOB:
-                            gui.setEditMenu(new GuiEditMenuMob(gui, this, mob.copy(), i, player));
+                            GuiEditMenuMob.display(gui, player, mob.getMob(), mob.getCount(),
+                                    result -> setInfo(taskId, result.getMobId(), result.getAmount(), player));
                             break;
                         case ITEM:
-                            final int mobId = i;
                             PickItemMenu.display(gui, player, mob.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> this.setIcon(mobId, result.get(), player));
+                                    result -> this.setIcon(taskId, result.get(), player));
                             break;
                         case RENAME:
                             gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));
@@ -276,15 +285,6 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         
         private ResourceLocation mob = Registry.ENTITY_TYPE.getDefaultKey();
         private int count = 1;
-        
-        public Mob copy() {
-            Mob other = new Mob();
-            other.copyFrom(this);
-            other.mob = mob;
-            other.count = count;
-            
-            return other;
-        }
         
         public ResourceLocation getMob() {
             return mob;

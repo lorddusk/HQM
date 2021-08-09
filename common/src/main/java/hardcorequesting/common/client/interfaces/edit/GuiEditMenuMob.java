@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.quests.task.QuestTaskMob;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
@@ -14,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
     
@@ -21,18 +21,25 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private static final int START_Y = 20;
     private static final int OFFSET_Y = 8;
     private static final int VISIBLE_MOBS = 24;
-    private QuestTaskMob task;
-    private QuestTaskMob.Mob mob;
-    private int id;
+    
+    private final Consumer<Result> resultConsumer;
+    private ResourceLocation mobId;
+    private int amount;
+    
     private ScrollBar scrollBar;
     private List<ResourceLocation> rawMobs;
     private List<ResourceLocation> mobs;
     
-    public GuiEditMenuMob(GuiQuestBook gui, QuestTaskMob task, final QuestTaskMob.Mob mob, int id, Player player) {
+    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, resultConsumer));
+    }
+    
+    private GuiEditMenuMob(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, Consumer<Result> resultConsumer) {
         super(gui, player, false, 180, 70, 180, 150);
-        this.task = task;
-        this.mob = mob;
-        this.id = id;
+        
+        this.resultConsumer = resultConsumer;
+        this.mobId = initMobId;
+        this.amount = initAmount;
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
             @Override
@@ -44,12 +51,12 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
             protected int getValue() {
-                return mob.getCount();
+                return amount;
             }
             
             @Override
             protected void setValue(int number) {
-                mob.setCount(number);
+                amount = number;
             }
         });
         
@@ -97,16 +104,16 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
-            boolean selected = mobs.get(i).equals(mob.getMob());
+            boolean selected = mobs.get(i).equals(mobId);
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
             gui.drawString(matrices, Registry.ENTITY_TYPE.get(mobs.get(i)).getDescription(), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
         gui.drawString(matrices, Translator.translatable("hqm.mobTask.search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translatable("hqm.mobTask." + (mob.getMob() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
-        if (mob.getMob() != null) {
-            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mob.getMob()).getDescription(), 180, 50, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.mobTask." + (mobId == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        if (mobId != null) {
+            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mobId).getDescription(), 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -120,10 +127,10 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
             if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
-                if (mobs.get(i).equals(mob.getMob())) {
-                    mob.setMob(null);
+                if (mobs.get(i).equals(mobId)) {
+                    mobId = null;
                 } else {
-                    mob.setMob(mobs.get(i));
+                    mobId = mobs.get(i);
                 }
                 break;
             }
@@ -166,7 +173,24 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        mob.setCount(Math.max(1, mob.getCount()));
-        task.setMob(id, mob, player);
+        resultConsumer.accept(new Result(mobId, Math.max(1, amount)));
+    }
+    
+    public static class Result {
+        private final ResourceLocation mobId;
+        private final int amount;
+    
+        private Result(ResourceLocation mobId, int amount) {
+            this.mobId = mobId;
+            this.amount = amount;
+        }
+    
+        public ResourceLocation getMobId() {
+            return mobId;
+        }
+    
+        public int getAmount() {
+            return amount;
+        }
     }
 }
