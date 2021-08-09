@@ -31,6 +31,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
@@ -44,6 +45,11 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     public QuestTaskMob(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.DEATH);
+    }
+    
+    @Override
+    protected Mob createEmpty() {
+        return new Mob();
     }
     
     public static Player getKiller(DamageSource source) {
@@ -71,26 +77,15 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setMob(id, id >= elements.size() ? new Mob() : elements.get(id), player);
+        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setMob(id, id >= elements.size() ? new Mob() : elements.get(id), player);
+        setMob(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setName(str);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private Mob[] getEditFriendlyMobs() {
-        if (Quest.canQuestsBeEdited()) {
-            Mob[] mobs = elements.toArray(new Mob[elements.size() + 1]);
-            mobs[mobs.length - 1] = new Mob();
-            return mobs;
-        } else {
-            return elements.toArray(new Mob[0]);
-        }
     }
     
     private int killed(int id, Player player) {
@@ -105,9 +100,9 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Mob[] mobs = getEditFriendlyMobs();
-        for (int i = 0; i < mobs.length; i++) {
-            Mob mob = mobs[i];
+        List<Mob> mobs = getShownElements();
+        for (int i = 0; i < mobs.size(); i++) {
+            Mob mob = mobs.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -128,9 +123,9 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Mob[] mobs = getEditFriendlyMobs();
-            for (int i = 0; i < mobs.length; i++) {
-                Mob mob = mobs[i];
+            List<Mob> mobs = getShownElements();
+            for (int i = 0; i < mobs.size(); i++) {
+                Mob mob = mobs.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;

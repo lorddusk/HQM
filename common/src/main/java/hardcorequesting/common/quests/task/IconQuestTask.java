@@ -5,6 +5,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,10 +13,26 @@ import java.util.List;
  */
 public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends QuestTask {
     
-    public final List<T> elements = new ArrayList<>();
+    public final List<T> elements;
+    public final List<T> elementsWithEmpty;
     
     public IconQuestTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
+        
+        List<T> list = new ArrayList<>();
+        list.add(createEmpty());
+        elements = list.subList(0, 0);
+        elementsWithEmpty = Collections.unmodifiableList(list);
+    }
+    
+    protected abstract T createEmpty();
+    
+    protected final List<T> getShownElements() {
+        if (Quest.canQuestsBeEdited()) {
+            return elementsWithEmpty;
+        } else {
+            return elements;
+        }
     }
     
     protected abstract static class IconTask {

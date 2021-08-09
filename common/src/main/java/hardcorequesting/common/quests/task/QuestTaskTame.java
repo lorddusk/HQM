@@ -30,6 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
@@ -43,6 +44,11 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     public QuestTaskTame(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.ANIMAL_TAME);
+    }
+    
+    @Override
+    protected Tame createEmpty() {
+        return new Tame();
     }
     
     public void setTame(int id, Tame tame, Player player) {
@@ -60,26 +66,15 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setTame(id, id >= elements.size() ? new Tame() : elements.get(id), player);
+        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setTame(id, id >= elements.size() ? new Tame() : elements.get(id), player);
+        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setName(str);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private Tame[] getEditFriendlyTames() {
-        if (Quest.canQuestsBeEdited()) {
-            Tame[] tames = elements.toArray(new Tame[elements.size() + 1]);
-            tames[tames.length - 1] = new Tame();
-            return tames;
-        } else {
-            return elements.toArray(new Tame[0]);
-        }
     }
     
     private int tamed(int id, Player player) {
@@ -94,9 +89,9 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Tame[] tames = getEditFriendlyTames();
-        for (int i = 0; i < tames.length; i++) {
-            Tame tame = tames[i];
+        List<Tame> tames = getShownElements();
+        for (int i = 0; i < tames.size(); i++) {
+            Tame tame = tames.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -117,9 +112,9 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Tame[] tames = getEditFriendlyTames();
-            for (int i = 0; i < tames.length; i++) {
-                Tame tame = tames[i];
+            List<Tame> tames = getShownElements();
+            for (int i = 0; i < tames.size(); i++) {
+                Tame tame = tames.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;

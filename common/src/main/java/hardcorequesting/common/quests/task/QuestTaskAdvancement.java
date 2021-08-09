@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
@@ -49,15 +50,9 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }
     
-    @Environment(EnvType.CLIENT)
-    private AdvancementTask[] getEditFriendlyAdvancements() {
-        if (Quest.canQuestsBeEdited()) {
-            AdvancementTask[] advancements = elements.toArray(new AdvancementTask[elements.size() + 1]);
-            advancements[advancements.length - 1] = new AdvancementTask();
-            return advancements;
-        } else {
-            return elements.toArray(new AdvancementTask[0]);
-        }
+    @Override
+    protected AdvancementTask createEmpty() {
+        return new AdvancementTask();
     }
     
     private boolean advanced(int id, Player player) {
@@ -79,13 +74,13 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setAdvancement(id, id >= elements.size() ? new AdvancementTask() : elements.get(id), player);
+        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setAdvancement(id, id >= elements.size() ? new AdvancementTask() : elements.get(id), player);
+        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setName(str);
     }
@@ -98,9 +93,9 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        AdvancementTask[] advancements = getEditFriendlyAdvancements();
-        for (int i = 0; i < advancements.length; i++) {
-            AdvancementTask advancement = advancements[i];
+        List<AdvancementTask> advancements = getShownElements();
+        for (int i = 0; i < advancements.size(); i++) {
+            AdvancementTask advancement = advancements.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -117,9 +112,9 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            AdvancementTask[] advancements = getEditFriendlyAdvancements();
-            for (int i = 0; i < advancements.length; i++) {
-                AdvancementTask advancement = advancements[i];
+            List<AdvancementTask> advancements = getShownElements();
+            for (int i = 0; i < advancements.size(); i++) {
+                AdvancementTask advancement = advancements.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;

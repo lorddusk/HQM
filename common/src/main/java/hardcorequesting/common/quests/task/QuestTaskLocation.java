@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -48,6 +49,11 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
+    }
+    
+    @Override
+    protected Location createEmpty() {
+        return new Location();
     }
     
     private void tick(Player player, boolean isPlayerEvent) {
@@ -94,17 +100,6 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         }
     }
     
-    @Environment(EnvType.CLIENT)
-    private Location[] getEditFriendlyLocations() {
-        if (Quest.canQuestsBeEdited()) {
-            Location[] locations = elements.toArray(new Location[elements.size() + 1]);
-            locations[locations.length - 1] = new Location();
-            return locations;
-        } else {
-            return elements.toArray(new Location[0]);
-        }
-    }
-    
     private boolean visited(int id, Player player) {
         return id < elements.size() && ((QuestDataTaskLocation) getData(player)).visited[id];
     }
@@ -124,13 +119,13 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     public void setIcon(int id, ItemStack stack, Player player) {
         if (stack.isEmpty()) return;
         
-        setLocation(id, id >= elements.size() ? new Location() : elements.get(id), player);
+        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
         
         elements.get(id).setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
-        setLocation(id, id >= elements.size() ? new Location() : elements.get(id), player);
+        setLocation(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
     
         elements.get(id).setName(str);
     }
@@ -143,9 +138,9 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        Location[] locations = getEditFriendlyLocations();
-        for (int i = 0; i < locations.length; i++) {
-            Location location = locations[i];
+        List<Location> locations = getShownElements();
+        for (int i = 0; i < locations.size(); i++) {
+            Location location = locations.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -183,9 +178,9 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            Location[] locations = getEditFriendlyLocations();
-            for (int i = 0; i < locations.length; i++) {
-                Location location = locations[i];
+            List<Location> locations = getShownElements();
+            for (int i = 0; i < locations.size(); i++) {
+                Location location = locations.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;
