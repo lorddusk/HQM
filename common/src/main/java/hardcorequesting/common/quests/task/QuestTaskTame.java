@@ -77,6 +77,14 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         elements.get(id).setName(str);
     }
     
+    private void setInfo(int id, String entityId, int amount, Player player) {
+        setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
+        
+        Tame tame = elements.get(id);
+        tame.setTame(entityId);
+        tame.setCount(amount);
+    }
+    
     private int tamed(int id, Player player) {
         return id < elements.size() ? ((QuestDataTaskTame) getData(player)).tamed[id] : 0;
     }
@@ -120,12 +128,13 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
                 int y = START_Y + i * Y_OFFSET;
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                    final int tameId = i;
                     switch (gui.getCurrentMode()) {
                         case MOB:
-                            gui.setEditMenu(new GuiEditMenuTame(gui, this, tame.copy(), i, player));
+                            GuiEditMenuTame.display(gui, player, tame.getTame(), tame.getCount(),
+                                    result -> setInfo(tameId, result.getEntityId(), result.getAmount(), player));
                             break;
                         case ITEM:
-                            final int tameId = i;
                             PickItemMenu.display(gui, player, tame.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(tameId, result.get(), player));
                             break;

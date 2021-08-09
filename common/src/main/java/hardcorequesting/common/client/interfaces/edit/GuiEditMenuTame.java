@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.quests.task.QuestTaskTame;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
@@ -13,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiEditMenuTame extends GuiEditMenuExtended {
     
@@ -20,18 +20,24 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     private static final int START_Y = 20;
     private static final int OFFSET_Y = 8;
     private static final int VISIBLE_MOBS = 24;
-    private QuestTaskTame task;
-    private QuestTaskTame.Tame tame;
-    private int id;
+    
+    private final Consumer<Result> resultConsumer;
+    private String entityId;
+    private int amount;
     private ScrollBar scrollBar;
     private List<String> rawTames;
     private List<String> tames;
     
-    public GuiEditMenuTame(GuiQuestBook gui, QuestTaskTame task, final QuestTaskTame.Tame tame, int id, Player player) {
+    public static void display(GuiQuestBook gui, Player player, String entityId, int amount, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuTame(gui, player, entityId, amount, resultConsumer));
+    }
+    
+    private GuiEditMenuTame(GuiQuestBook gui, Player player, String entityId, int amount, Consumer<Result> resultConsumer) {
         super(gui, player, false, 180, 70, 180, 150);
-        this.task = task;
-        this.tame = tame;
-        this.id = id;
+        
+        this.resultConsumer = resultConsumer;
+        this.entityId = entityId;
+        this.amount = amount;
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
             @Override
@@ -43,12 +49,12 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.tameTask.reqKills") {
             @Override
             protected int getValue() {
-                return tame.getCount();
+                return GuiEditMenuTame.this.amount;
             }
             
             @Override
             protected void setValue(int number) {
-                tame.setCount(number);
+                GuiEditMenuTame.this.amount = number;
             }
         });
         
@@ -96,16 +102,16 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         int start = scrollBar.isVisible(gui) ? Math.round((tames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(tames.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
-            boolean selected = tames.get(i).equals(tame.getTame());
+            boolean selected = tames.get(i).equals(entityId);
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
             gui.drawString(matrices, Translator.plain(tames.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
         gui.drawString(matrices, Translator.translatable("hqm.tameTask.search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translatable("hqm.tameTask." + (tame.getTame() == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
-        if (tame.getTame() != null) {
-            gui.drawString(matrices, Translator.plain(tame.getTame()), 180, 50, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.tameTask." + (entityId == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        if (entityId != null) {
+            gui.drawString(matrices, Translator.plain(entityId), 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -120,10 +126,10 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
         for (int i = start; i < end; i++) {
             if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
                 
-                if (tames.get(i).equals(tame.getTame())) {
-                    tame.setTame(null);
+                if (tames.get(i).equals(entityId)) {
+                    entityId = null;
                 } else {
-                    tame.setTame(tames.get(i));
+                    entityId = tames.get(i);
                 }
                 break;
             }
@@ -166,7 +172,6 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        tame.setCount(Math.max(1, tame.getCount()));
 
 //        if ((tame.getIconStack() == null || tame.getIconStack().getItem() == Items.SPAWN_EGG) && tame.getTame() != null) {
 //            if (EntityList.ENTITY_EGGS.containsKey(new Identifier(tame.getTame()))) {
@@ -175,6 +180,24 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
 //            }
 //        }
         
-        task.setTame(id, tame, player);
+        resultConsumer.accept(new Result(entityId, Math.max(1, amount)));
+    }
+    
+    public static class Result {
+        private final String entityId;
+        private final int amount;
+    
+        private Result(String entityId, int amount) {
+            this.entityId = entityId;
+            this.amount = amount;
+        }
+    
+        public String getEntityId() {
+            return entityId;
+        }
+    
+        public int getAmount() {
+            return amount;
+        }
     }
 }
