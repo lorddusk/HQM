@@ -104,10 +104,11 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
                             break;
                         case ITEM:
                             PickItemMenu.display(gui, player, advancement.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> this.setIcon(advancementId, result.get(), player));
+                                    result -> setIcon(advancementId, result.get(), player));
                             break;
                         case RENAME:
-                            gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, advancement));
+                            GuiEditMenuTextEditor.display(gui, player, advancement.getName(), 110,
+                                    result -> setName(advancementId, result, player));
                             break;
                         case DELETE:
                             if (i < this.elements.size()) {

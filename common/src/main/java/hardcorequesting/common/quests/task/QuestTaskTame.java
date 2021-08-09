@@ -122,10 +122,11 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
                             break;
                         case ITEM:
                             PickItemMenu.display(gui, player, tame.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> this.setIcon(tameId, result.get(), player));
+                                    result -> setIcon(tameId, result.get(), player));
                             break;
                         case RENAME:
-                            gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, tame));
+                            GuiEditMenuTextEditor.display(gui, player, tame.getName(), 110,
+                                    result -> setName(tameId, result, player));
                             break;
                         case DELETE:
                             if (i < this.elements.size()) {

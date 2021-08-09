@@ -14,10 +14,14 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -227,7 +231,12 @@ public class QuestSet {
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), questSet, true));
+                        GuiEditMenuTextEditor.display(gui, gui.getPlayer(), questSet.getName(), true,
+                                result -> {
+                                    if (!questSet.setName(result)) {
+                                        gui.getPlayer().sendMessage(new TranslatableComponent("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)), Util.NIL_UUID);
+                                    }
+                                });
                         break;
                     default:
                         int thisClicked = gui.getPlayer().tickCount - lastClicked;
@@ -254,7 +263,7 @@ public class QuestSet {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
-                gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
+                GuiEditMenuTextEditor.display(gui, gui.getPlayer(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
             }
         }
     }

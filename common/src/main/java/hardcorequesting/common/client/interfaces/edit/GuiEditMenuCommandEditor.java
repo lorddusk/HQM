@@ -25,7 +25,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     private String added;
     
     public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
-        super(gui, player, "", false);
+        super(gui, player, "", false, -1, null);
         this.quest = GuiQuestBook.selectedQuest;
         this.commands = this.quest.getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];

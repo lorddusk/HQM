@@ -46,7 +46,7 @@ public class GroupTier {
                         gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer(), groupTier));
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), groupTier));
+                        GuiEditMenuTextEditor.display(gui, gui.getPlayer(), groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {
@@ -82,7 +82,7 @@ public class GroupTier {
         return name == null || name.equals("") ? I18n.get("hqm.bag.unknown") : name;
     }
     
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
     

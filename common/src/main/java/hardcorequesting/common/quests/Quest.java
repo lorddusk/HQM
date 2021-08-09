@@ -1164,7 +1164,8 @@ public class Quest {
                         }
                         if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
-                                gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, task, true));
+                                GuiEditMenuTextEditor.display(gui, player, task.getDescription(), true,
+                                        task::setDescription);
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
                                 if (i + 1 < tasks.size()) {
                                     tasks.get(i + 1).clearRequirements();
@@ -1228,11 +1229,12 @@ public class Quest {
             
             if (gui.getCurrentMode() == EditMode.RENAME) {
                 if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, true));
+                    GuiEditMenuTextEditor.display(gui, player, getName(), true, this::setName);
                 } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, false));
+                    GuiEditMenuTextEditor.display(gui, player, getDescription(), false, this::setDescription);
                 } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedTask, false));
+                    GuiEditMenuTextEditor.display(gui, player, selectedTask.getDescription(), false,
+                            selectedTask::setDescription);
                 }
             }
             

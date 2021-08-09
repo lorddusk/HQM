@@ -145,7 +145,7 @@ public class Group {
                         gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), group));
+                        GuiEditMenuTextEditor.display(gui, gui.getPlayer(), group.getDisplayName(), true, group::setName);
                         break;
                     case DELETE:
                         remove(group.getId());
@@ -178,6 +178,7 @@ public class Group {
     
     public void setName(String name) {
         this.name = name;
+        SaveHelper.add(SaveHelper.EditType.NAME_CHANGE);
     }
     
     public boolean hasName() {

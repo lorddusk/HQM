@@ -120,7 +120,8 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
                                     result -> this.setIcon(taskId, result.get(), player));
                             break;
                         case RENAME:
-                            gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, mob));
+                            GuiEditMenuTextEditor.display(gui, player, mob.getName(), 110,
+                                    result -> setName(taskId, result, player));
                             break;
                         case DELETE:
                             if (i < this.elements.size()) {

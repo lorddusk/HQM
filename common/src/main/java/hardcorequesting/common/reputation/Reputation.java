@@ -156,7 +156,7 @@ public class Reputation {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputation));
+                        GuiEditMenuTextEditor.display(gui, player, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
@@ -196,7 +196,7 @@ public class Reputation {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
+                    GuiEditMenuTextEditor.display(gui, player, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
                 }
                 return;
             }
@@ -210,7 +210,8 @@ public class Reputation {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.markers.get(i)));
+                        ReputationMarker marker = selectedReputation.markers.get(i);
+                        GuiEditMenuTextEditor.display(gui, player, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {

@@ -175,10 +175,11 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                             break;
                         case ITEM:
                             PickItemMenu.display(gui, player, location.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> this.setIcon(locationId, result.get(), player));
+                                    result -> setIcon(locationId, result.get(), player));
                             break;
                         case RENAME:
-                            gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, i, location));
+                            GuiEditMenuTextEditor.display(gui, player, location.getName(), 110,
+                                    result -> setName(locationId, result, player));
                             break;
                         case DELETE:
                             if (i < this.elements.size()) {
