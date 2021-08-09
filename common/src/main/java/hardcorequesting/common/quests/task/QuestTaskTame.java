@@ -27,7 +27,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,12 +79,24 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         elements.get(id).setName(str);
     }
     
+    @Environment(EnvType.CLIENT)
     private void setInfo(int id, String entityId, int amount, Player player) {
         setTame(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
         
         Tame tame = elements.get(id);
         tame.setTame(entityId);
         tame.setCount(amount);
+        
+        if(entityId != null && (tame.getIconStack().isEmpty() || tame.getIconStack().getItem() instanceof SpawnEggItem)) {
+            EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityId));
+            if(entityType != null) {
+                Item egg = SpawnEggItem.byId(entityType);
+                if(egg != null) {
+                    tame.setIconStack(new ItemStack(egg));
+                }
+            }
+        }
+    
     }
     
     private int tamed(int id, Player player) {
@@ -280,15 +294,6 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     public static class Tame extends IconTask {
         private String tame;
         private int count = 1;
-        
-        public Tame copy() {
-            Tame other = new Tame();
-            other.copyFrom(this);
-            other.tame = tame;
-            other.count = count;
-            
-            return other;
-        }
         
         public String getTame() {
             return tame;

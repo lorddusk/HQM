@@ -172,14 +172,6 @@ public class GuiEditMenuTame extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-
-//        if ((tame.getIconStack() == null || tame.getIconStack().getItem() == Items.SPAWN_EGG) && tame.getTame() != null) {
-//            if (EntityList.ENTITY_EGGS.containsKey(new Identifier(tame.getTame()))) {
-//                ItemStack stack = new ItemStack(Items.SPAWN_EGG);
-//                ItemMonsterPlacer.applyEntityIdToItemStack(stack, new Identifier(tame.getTame()));
-//            }
-//        }
-        
         resultConsumer.accept(new Result(entityId, Math.max(1, amount)));
     }
     
