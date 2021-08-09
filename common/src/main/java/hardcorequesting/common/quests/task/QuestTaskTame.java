@@ -28,7 +28,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,13 +66,13 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         
         setTame(id, id >= tames.length ? new Tame() : tames[id], player);
         
-        tames[id].iconStack = stack;
+        tames[id].setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
         setTame(id, id >= tames.length ? new Tame() : tames[id], player);
         
-        tames[id].name = str;
+        tames[id].setName(str);
     }
     
     @Environment(EnvType.CLIENT)
@@ -105,8 +104,8 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(tame.iconStack, x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(tame.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawItemStack(tame.getIconStack(), x, y, mX, mY, false);
+            gui.drawString(matrices, Translator.plain(tame.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             int tamed = tamed(i, player);
             if (tamed == tame.count) {
@@ -136,7 +135,7 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
                             break;
                         case ITEM:
                             final int tameId = i;
-                            PickItemMenu.display(gui, player, tame.iconStack, PickItemMenu.Type.ITEM,
+                            PickItemMenu.display(gui, player, tame.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(tameId, result.get(), player));
                             break;
                         case RENAME:
@@ -287,36 +286,17 @@ public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
         tames = list.toArray(new Tame[0]);
     }
     
-    public static class Tame {
-        private ItemStack iconStack = ItemStack.EMPTY;
-        private String name = "New";
+    public static class Tame extends IconTask {
         private String tame;
         private int count = 1;
         
         public Tame copy() {
             Tame other = new Tame();
-            other.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
-            other.name = name;
+            other.copyFrom(this);
             other.tame = tame;
             other.count = count;
             
             return other;
-        }
-        
-        public ItemStack getIconStack() {
-            return iconStack;
-        }
-        
-        public void setIconStack(@NotNull ItemStack iconStack) {
-            this.iconStack = iconStack;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
         }
         
         public String getTame() {

@@ -31,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,13 +85,13 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
-        advancements[id].iconStack = stack;
+        advancements[id].setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
         setAdvancement(id, id >= advancements.length ? new AdvancementTask() : advancements[id], player);
         
-        advancements[id].name = str;
+        advancements[id].setName(str);
     }
     
     @Override
@@ -109,8 +108,8 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(advancement.iconStack, x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(advancement.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawItemStack(advancement.getIconStack(), x, y, mX, mY, false);
+            gui.drawString(matrices, Translator.plain(advancement.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             if (advanced(i, player)) {
                 gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
@@ -136,7 +135,7 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
                             break;
                         case ITEM:
                             final int advancementId = i;
-                            PickItemMenu.display(gui, player, advancement.iconStack, PickItemMenu.Type.ITEM,
+                            PickItemMenu.display(gui, player, advancement.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(advancementId, result.get(), player));
                             break;
                         case RENAME:
@@ -312,37 +311,18 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         }
     }
     
-    public static class AdvancementTask {
+    public static class AdvancementTask extends IconTask {
         
-        private ItemStack iconStack = ItemStack.EMPTY;
-        private String name = "New";
         private Visibility visible = Visibility.FULL;
         private String adv_name;
         
         private AdvancementTask copy() {
             AdvancementTask advancement = new AdvancementTask();
-            advancement.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
-            advancement.name = name;
+            advancement.copyFrom(this);
             advancement.visible = visible;
             advancement.adv_name = adv_name;
             
             return advancement;
-        }
-        
-        public ItemStack getIconStack() {
-            return iconStack;
-        }
-        
-        public void setIconStack(@NotNull ItemStack iconStack) {
-            this.iconStack = iconStack;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
         }
         
         public Visibility getVisible() {

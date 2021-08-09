@@ -29,7 +29,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,13 +77,13 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
         
-        mobs[id].iconStack = stack;
+        mobs[id].setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
         setMob(id, id >= mobs.length ? new Mob() : mobs[id], player);
         
-        mobs[id].name = str;
+        mobs[id].setName(str);
     }
     
     @Environment(EnvType.CLIENT)
@@ -116,8 +115,8 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(mob.iconStack, x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(mob.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawItemStack(mob.getIconStack(), x, y, mX, mY, false);
+            gui.drawString(matrices, Translator.plain(mob.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             int killed = killed(i, player);
             if (killed == mob.count) {
@@ -147,7 +146,7 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
                             break;
                         case ITEM:
                             final int mobId = i;
-                            PickItemMenu.display(gui, player, mob.iconStack, PickItemMenu.Type.ITEM,
+                            PickItemMenu.display(gui, player, mob.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(mobId, result.get(), player));
                             break;
                         case RENAME:
@@ -291,37 +290,18 @@ public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
         mobs = list.toArray(new Mob[0]);
     }
     
-    public static class Mob {
+    public static class Mob extends IconTask {
         
-        private ItemStack iconStack = ItemStack.EMPTY;
-        private String name = "New";
         private ResourceLocation mob = Registry.ENTITY_TYPE.getDefaultKey();
         private int count = 1;
         
         public Mob copy() {
             Mob other = new Mob();
-            other.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
-            other.name = name;
+            other.copyFrom(this);
             other.mob = mob;
             other.count = count;
             
             return other;
-        }
-        
-        public ItemStack getIconStack() {
-            return iconStack;
-        }
-        
-        public void setIconStack(@NotNull ItemStack iconStack) {
-            this.iconStack = iconStack;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
         }
         
         public ResourceLocation getMob() {

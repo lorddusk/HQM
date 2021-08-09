@@ -28,7 +28,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -127,13 +126,13 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
-        locations[id].iconStack = stack;
+        locations[id].setIconStack(stack);
     }
     
     public void setName(int id, String str, Player player) {
         setLocation(id, id >= locations.length ? new Location() : locations[id], player);
         
-        locations[id].name = str;
+        locations[id].setName(str);
     }
     
     @Override
@@ -150,8 +149,8 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
-            gui.drawItemStack(location.iconStack, x, y, mX, mY, false);
-            gui.drawString(matrices, Translator.plain(location.name), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawItemStack(location.getIconStack(), x, y, mX, mY, false);
+            gui.drawString(matrices, Translator.plain(location.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             
             if (visited(i, player)) {
                 gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
@@ -198,7 +197,7 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
                             break;
                         case ITEM:
                             final int locationId = i;
-                            PickItemMenu.display(gui, player, location.iconStack, PickItemMenu.Type.ITEM,
+                            PickItemMenu.display(gui, player, location.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(locationId, result.get(), player));
                             break;
                         case RENAME:
@@ -342,10 +341,8 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         }
     }
     
-    public static class Location {
+    public static class Location extends IconTask {
         
-        private ItemStack iconStack = ItemStack.EMPTY;
-        private String name = "New";
         private int x;
         private int y;
         private int z;
@@ -355,8 +352,8 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
         
         private Location copy() {
             Location location = new Location();
-            location.iconStack = iconStack.isEmpty() ? ItemStack.EMPTY : iconStack.copy();
-            location.name = name;
+            location.setIconStack(getIconStack().copy());
+            location.copyFrom(this);
             location.x = x;
             location.y = y;
             location.z = z;
@@ -365,22 +362,6 @@ public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location>
             location.dimension = dimension;
             
             return location;
-        }
-        
-        public ItemStack getIconStack() {
-            return iconStack;
-        }
-        
-        public void setIconStack(@NotNull ItemStack iconStack) {
-            this.iconStack = iconStack;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public void setName(String name) {
-            this.name = name;
         }
         
         public int getX() {
