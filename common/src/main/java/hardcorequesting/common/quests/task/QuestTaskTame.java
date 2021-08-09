@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestTaskTame extends QuestTask {
+public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
     private static final String TAME = "tame";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;

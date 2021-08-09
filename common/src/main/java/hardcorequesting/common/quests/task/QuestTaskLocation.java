@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class QuestTaskLocation extends QuestTask {
+public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location> {
     private static final String LOCATIONS = "locations";
     
     private static final int CHECK_DELAY = 20;

@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestTaskMob extends QuestTask {
+public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
     private static final String MOBS = "mobs";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;

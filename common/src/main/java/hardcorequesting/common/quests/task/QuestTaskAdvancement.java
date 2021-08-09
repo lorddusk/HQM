@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestTaskAdvancement extends QuestTask {
+public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
     private static final String ADVANCEMENTS = "advancements";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
