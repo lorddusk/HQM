@@ -85,6 +85,12 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         elements.get(id).setName(str);
     }
     
+    private void setAdvancement(int id, String advancement, Player player) {
+        setAdvancement(id, id >= elements.size() ? createEmpty() : elements.get(id), player);
+    
+        elements.get(id).setAdvancement(advancement);
+    }
+    
     @Override
     public Class<? extends QuestDataTask> getDataType() {
         return QuestDataTaskAdvancement.class;
@@ -120,12 +126,13 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
                 int y = START_Y + i * Y_OFFSET;
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
+                    final int advancementId = i;
                     switch (gui.getCurrentMode()) {
                         case LOCATION:
-                            gui.setEditMenu(new GuiEditMenuAdvancement(gui, this, advancement.copy(), i, player));
+                            GuiEditMenuAdvancement.display(gui, player, advancement.getAdvancement(),
+                                    result -> setAdvancement(advancementId, result, player));
                             break;
                         case ITEM:
-                            final int advancementId = i;
                             PickItemMenu.display(gui, player, advancement.getIconStack(), PickItemMenu.Type.ITEM,
                                     result -> this.setIcon(advancementId, result.get(), player));
                             break;
@@ -298,15 +305,6 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         private Visibility visible = Visibility.FULL;
         private String adv_name;
         
-        private AdvancementTask copy() {
-            AdvancementTask advancement = new AdvancementTask();
-            advancement.copyFrom(this);
-            advancement.visible = visible;
-            advancement.adv_name = adv_name;
-            
-            return advancement;
-        }
-        
         public Visibility getVisible() {
             return visible;
         }
@@ -325,10 +323,6 @@ public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.Adv
         
         public void setAdvancement(ResourceLocation name) {
             setAdvancement(name.toString());
-        }
-        
-        public void unsetAdvancement() {
-            this.adv_name = null;
         }
     }
 }
