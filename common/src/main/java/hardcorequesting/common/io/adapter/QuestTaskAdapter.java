@@ -10,7 +10,7 @@ import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.*;
 import hardcorequesting.common.quests.task.*;
-import hardcorequesting.common.quests.task.QuestTaskMob.Mob;
+import hardcorequesting.common.quests.task.KillMobsTask.Mob;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
@@ -111,7 +111,7 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static final Adapter<QuestTaskLocation.Location> LOCATION_ADAPTER = new Adapter<QuestTaskLocation.Location>() {
+    public static final Adapter<VisitLocationTask.Location> LOCATION_ADAPTER = new Adapter<VisitLocationTask.Location>() {
         private static final String X = "x";
         private static final String Y = "y";
         private static final String Z = "z";
@@ -122,7 +122,7 @@ public class QuestTaskAdapter {
         private static final String NAME = "name";
         
         @Override
-        public JsonElement serialize(QuestTaskLocation.Location src) {
+        public JsonElement serialize(VisitLocationTask.Location src) {
             return object()
                     .add(NAME, src.getName())
                     .add(X, src.getPosition().getX())
@@ -143,14 +143,14 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskLocation.Location deserialize(JsonElement json) {
+        public VisitLocationTask.Location deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
-            QuestTaskLocation.Location result = new QuestTaskLocation.Location();
+            VisitLocationTask.Location result = new VisitLocationTask.Location();
             result.setName(GsonHelper.getAsString(object, NAME));
             result.setPosition(new BlockPos(GsonHelper.getAsInt(object, X), GsonHelper.getAsInt(object, Y), GsonHelper.getAsInt(object, Z)));
             result.setDimension(GsonHelper.getAsString(object, DIM));
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
-            result.setVisibility(QuestTaskLocation.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
+            result.setVisibility(VisitLocationTask.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
             if (object.has(ICON)) {
                 result.setIconStack(MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON)));
             }
@@ -193,7 +193,7 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<QuestTaskTame.Tame> TAME_ADAPTER = new TypeAdapter<QuestTaskTame.Tame>() {
+    public static final TypeAdapter<TameMobsTask.Tame> TAME_ADAPTER = new TypeAdapter<TameMobsTask.Tame>() {
         private static final String TAMES = "tames";
         private static final String EXACT = "exact";
         private static final String TAME = "tame";
@@ -201,7 +201,7 @@ public class QuestTaskAdapter {
         private static final String NAME = "name";
         
         @Override
-        public void write(JsonWriter out, QuestTaskTame.Tame value) throws IOException {
+        public void write(JsonWriter out, TameMobsTask.Tame value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
             ItemStack stack = value.getIconStack();
@@ -214,9 +214,9 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskTame.Tame read(JsonReader in) throws IOException {
+        public TameMobsTask.Tame read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskTame.Tame result = new QuestTaskTame.Tame();
+            TameMobsTask.Tame result = new TameMobsTask.Tame();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
@@ -237,14 +237,14 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<QuestTaskAdvancement.AdvancementTask> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<QuestTaskAdvancement.AdvancementTask>() {
+    public static final TypeAdapter<GetAdvancementTask.AdvancementTask> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<GetAdvancementTask.AdvancementTask>() {
         private final String ICON = "icon";
         private final String VISIBLE = "visible";
         private final String NAME = "name";
         private final String ADV_NAME = "adv_name";
         
         @Override
-        public void write(JsonWriter out, QuestTaskAdvancement.AdvancementTask value) throws IOException {
+        public void write(JsonWriter out, GetAdvancementTask.AdvancementTask value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
             ItemStack stack = value.getIconStack();
@@ -254,15 +254,15 @@ public class QuestTaskAdapter {
             if (value.getAdvancement() != null) {
                 out.name(ADV_NAME).value(value.getAdvancement());
             }
-            if (value.getVisible() != QuestTaskAdvancement.Visibility.FULL)
+            if (value.getVisible() != GetAdvancementTask.Visibility.FULL)
                 out.name(VISIBLE).value(value.getVisible().name());
             out.endObject();
         }
         
         @Override
-        public QuestTaskAdvancement.AdvancementTask read(JsonReader in) throws IOException {
+        public GetAdvancementTask.AdvancementTask read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskAdvancement.AdvancementTask result = new QuestTaskAdvancement.AdvancementTask();
+            GetAdvancementTask.AdvancementTask result = new GetAdvancementTask.AdvancementTask();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
@@ -272,7 +272,7 @@ public class QuestTaskAdapter {
                 } else if (name.equalsIgnoreCase(ADV_NAME)) {
                     result.setAdvancement(in.nextString());
                 } else if (name.equalsIgnoreCase(VISIBLE)) {
-                    result.setVisible(QuestTaskAdvancement.Visibility.valueOf(in.nextString()));
+                    result.setVisible(GetAdvancementTask.Visibility.valueOf(in.nextString()));
                 }
             }
             in.endObject();

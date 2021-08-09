@@ -5,8 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
+import hardcorequesting.common.quests.task.KillMobsTask;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskMob;
 import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskMob extends QuestDataTask {
@@ -17,7 +17,7 @@ public class QuestDataTaskMob extends QuestDataTask {
     
     public QuestDataTaskMob(QuestTask task) {
         super(task);
-        this.killed = new int[((QuestTaskMob) task).elements.size()];
+        this.killed = new int[((KillMobsTask) task).elements.size()];
     }
     
     protected QuestDataTaskMob() {

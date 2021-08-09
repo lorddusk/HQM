@@ -5,7 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.LargeButton;
 import hardcorequesting.common.client.interfaces.TextBoxGroup;
-import hardcorequesting.common.quests.task.QuestTaskLocation;
+import hardcorequesting.common.quests.task.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -15,16 +15,16 @@ import java.util.function.Consumer;
 public class GuiEditMenuLocation extends GuiEditMenuExtended {
     
     private final Consumer<Result> resultConsumer;
-    private QuestTaskLocation.Visibility visibility;
+    private VisitLocationTask.Visibility visibility;
     private BlockPos.MutableBlockPos pos;
     private int radius;
     private String dimension;
     
-    public static void display(GuiQuestBook gui, Player player, QuestTaskLocation.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+    public static void display(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         gui.setEditMenu(new GuiEditMenuLocation(gui, player, visibility, initPos, initRadius, initDimension, resultConsumer));
     }
     
-    private GuiEditMenuLocation(GuiQuestBook gui, Player player, QuestTaskLocation.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+    private GuiEditMenuLocation(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         super(gui, player, true, 180, 30, 20, 30);
     
         this.resultConsumer = resultConsumer;
@@ -134,9 +134,9 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
     @Override
     protected void onArrowClick(boolean left) {
         if (left) {
-            visibility = QuestTaskLocation.Visibility.values()[(visibility.ordinal() + QuestTaskLocation.Visibility.values().length - 1) % QuestTaskLocation.Visibility.values().length];
+            visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + VisitLocationTask.Visibility.values().length - 1) % VisitLocationTask.Visibility.values().length];
         } else {
-            visibility = QuestTaskLocation.Visibility.values()[(visibility.ordinal() + 1) % QuestTaskLocation.Visibility.values().length];
+            visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + 1) % VisitLocationTask.Visibility.values().length];
         }
     }
     
@@ -167,19 +167,19 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
     }
     
     public static class Result {
-        private final QuestTaskLocation.Visibility visibility;
+        private final VisitLocationTask.Visibility visibility;
         private final BlockPos pos;
         private final int radius;
         private final String dimension;
     
-        private Result(QuestTaskLocation.Visibility visibility, BlockPos pos, int radius, String dimension) {
+        private Result(VisitLocationTask.Visibility visibility, BlockPos pos, int radius, String dimension) {
             this.visibility = visibility;
             this.pos = pos;
             this.radius = radius;
             this.dimension = dimension;
         }
     
-        public QuestTaskLocation.Visibility getVisibility() {
+        public VisitLocationTask.Visibility getVisibility() {
             return visibility;
         }
     

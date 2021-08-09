@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskLocation;
+import hardcorequesting.common.quests.task.VisitLocationTask;
 import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskLocation extends QuestDataTask {
@@ -17,7 +17,7 @@ public class QuestDataTaskLocation extends QuestDataTask {
     
     public QuestDataTaskLocation(QuestTask task) {
         super(task);
-        this.visited = new boolean[((QuestTaskLocation) task).elements.size()];
+        this.visited = new boolean[((VisitLocationTask) task).elements.size()];
     }
     
     protected QuestDataTaskLocation() {

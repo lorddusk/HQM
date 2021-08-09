@@ -30,10 +30,13 @@ import net.minecraft.world.entity.player.Player;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class QuestTaskMob extends IconQuestTask<QuestTaskMob.Mob> {
+/**
+ * A task where the player has to kill certain mobs.
+ */
+public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     private static final String MOBS = "mobs";
     
-    public QuestTaskMob(Quest parent, String description, String longDescription) {
+    public KillMobsTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.DEATH);
     }

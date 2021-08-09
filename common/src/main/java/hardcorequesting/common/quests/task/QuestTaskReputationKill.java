@@ -88,7 +88,7 @@ public class QuestTaskReputationKill extends QuestTaskReputation {
     
     @Override
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
-        Player killer = QuestTaskMob.getKiller(source);
+        Player killer = KillMobsTask.getKiller(source);
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
             if (entity instanceof Player && isPlayerInRange((Player) entity)) {
                 QuestDataTaskReputationKill killData = (QuestDataTaskReputationKill) getData(killer);

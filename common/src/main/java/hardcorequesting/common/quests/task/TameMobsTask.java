@@ -32,10 +32,13 @@ import net.minecraft.world.item.SpawnEggItem;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class QuestTaskTame extends IconQuestTask<QuestTaskTame.Tame> {
+/**
+ * A task where the player needs to tame certain mobs.
+ */
+public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     private static final String TAME = "tame";
     
-    public QuestTaskTame(Quest parent, String description, String longDescription) {
+    public TameMobsTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.ANIMAL_TAME);
     }

@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskTame;
+import hardcorequesting.common.quests.task.TameMobsTask;
 import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskTame extends QuestDataTask {
@@ -17,7 +17,7 @@ public class QuestDataTaskTame extends QuestDataTask {
     
     public QuestDataTaskTame(QuestTask task) {
         super(task);
-        this.tamed = new int[((QuestTaskTame) task).elements.size()];
+        this.tamed = new int[((TameMobsTask) task).elements.size()];
     }
     
     protected QuestDataTaskTame() {

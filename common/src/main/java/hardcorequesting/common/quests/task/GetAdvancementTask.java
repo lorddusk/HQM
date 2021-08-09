@@ -32,10 +32,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class QuestTaskAdvancement extends IconQuestTask<QuestTaskAdvancement.AdvancementTask> {
+/**
+ * A task where the player has to complete advancements.
+ */
+public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.AdvancementTask> {
     private static final String ADVANCEMENTS = "advancements";
     
-    public QuestTaskAdvancement(Quest parent, String description, String longDescription) {
+    public GetAdvancementTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);

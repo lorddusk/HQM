@@ -31,13 +31,16 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
-public class QuestTaskLocation extends IconQuestTask<QuestTaskLocation.Location> {
+/**
+ * A task where the player has to visit certain locations.
+ */
+public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location> {
     private static final String LOCATIONS = "locations";
     
     private static final int CHECK_DELAY = 20;
     private int delay = 1;
     
-    public QuestTaskLocation(Quest parent, String description, String longDescription) {
+    public VisitLocationTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
