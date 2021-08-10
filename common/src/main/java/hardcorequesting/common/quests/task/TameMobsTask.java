@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTame;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuMob;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -37,6 +37,8 @@ import java.util.UUID;
  */
 public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     private static final String TAME = "tame";
+    
+    public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
     public TameMobsTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -109,8 +111,8 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Tame tame) {
         if (mode == EditMode.MOB) {
-            GuiEditMenuTame.display(gui, player, tame.getTame(), tame.getCount(),
-                    result -> setInfo(id, result.getEntityId(), result.getAmount(), player));
+            GuiEditMenuMob.display(gui, player, tame.getTame() == null ? null : ResourceLocation.tryParse(tame.getTame()), tame.getCount(), "tameTask",
+                    GuiEditMenuMob.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount(), player));
         }
     }
     
@@ -179,7 +181,7 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
             for (int i = 0; i < elements.size(); i++) {
                 Tame tame = elements.get(i);
                 if (tame.count > ((QuestDataTaskTame) getData(tamer)).tamed[i] && tame.tame != null) {
-                    if (tame.tame.equals("minecraft:abstracthorse")) {
+                    if (tame.tame.equals(ABSTRACT_HORSE.toString())) {
                         if (entity instanceof AbstractHorse) {
                             ((QuestDataTaskTame) getData(tamer)).tamed[i]++;
                             updated = true;

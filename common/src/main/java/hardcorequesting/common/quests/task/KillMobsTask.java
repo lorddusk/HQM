@@ -104,7 +104,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Mob mob) {
         if (mode == EditMode.MOB) {
-            GuiEditMenuMob.display(gui, player, mob.getMob(), mob.getCount(),
+            GuiEditMenuMob.display(gui, player, mob.getMob(), mob.getCount(), "mobTask",
                     result -> setInfo(id, result.getMobId(), result.getAmount(), player));
         }
     }

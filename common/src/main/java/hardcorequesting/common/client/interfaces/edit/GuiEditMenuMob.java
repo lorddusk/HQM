@@ -1,21 +1,27 @@
 package hardcorequesting.common.client.interfaces.edit;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.*;
+import hardcorequesting.common.quests.task.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class GuiEditMenuMob extends GuiEditMenuExtended {
+    //TODO add support for entity tags to replace functionality of this special case
+    public static final List<Entry> EXTRA_TAME_ENTRIES = ImmutableList.of(new Entry(TameMobsTask.ABSTRACT_HORSE, Translator.plain("Any Horse-like Entity")));
     
     private static final int START_X = 20;
     private static final int START_Y = 20;
@@ -23,22 +29,27 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private static final int VISIBLE_MOBS = 24;
     
     private final Consumer<Result> resultConsumer;
-    private ResourceLocation mobId;
+    private final String textKey;
+    private Entry mob;
     private int amount;
     
-    private ScrollBar scrollBar;
-    private List<ResourceLocation> rawMobs;
-    private List<ResourceLocation> mobs;
+    private final ScrollBar scrollBar;
+    private final List<Entry> rawMobs;
+    private final List<Entry> mobs;
     
-    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, resultConsumer));
+    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
     }
     
-    private GuiEditMenuMob(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, Consumer<Result> resultConsumer) {
+    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, textKey, extraEntries, resultConsumer));
+    }
+    
+    private GuiEditMenuMob(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
         super(gui, player, false, 180, 70, 180, 150);
         
         this.resultConsumer = resultConsumer;
-        this.mobId = initMobId;
+        this.textKey = textKey;
         this.amount = initAmount;
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
@@ -48,7 +59,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
             }
         };
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm." + textKey + ".reqKills") {
             @Override
             protected int getValue() {
                 return amount;
@@ -73,20 +84,28 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         
         for (EntityType<?> type : Registry.ENTITY_TYPE) {
             if (type.canSummon()) {
-                rawMobs.add(Registry.ENTITY_TYPE.getKey(type));
+                rawMobs.add(new Entry(type));
             }
         }
         
+        rawMobs.addAll(extraEntries);
         
-        Collections.sort(rawMobs);
+        for (Entry entry : rawMobs) {
+            if (entry.id.equals(initMobId))
+                this.mob = entry;
+        }
+        
+        rawMobs.sort(Comparator.comparing(entry -> entry.id));
         updateMobs("");
     }
     
     private void updateMobs(String search) {
+        search = search.toLowerCase();
         if (mobs != null) {
             mobs.clear();
-            for (ResourceLocation rawMob : rawMobs) {
-                if (Registry.ENTITY_TYPE.get(rawMob).getDescription().toString().toLowerCase().contains(search.toLowerCase())) {
+            for (Entry rawMob : rawMobs) {
+                if (rawMob.description.toString().toLowerCase().contains(search)
+                        || rawMob.id.toString().toLowerCase().contains(search)) {
                     mobs.add(rawMob);
                 }
             }
@@ -104,16 +123,16 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
-            boolean selected = mobs.get(i).equals(mobId);
+            boolean selected = mobs.get(i).equals(mob);
             boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
             
-            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mobs.get(i)).getDescription(), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, mobs.get(i).description, START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
         }
         
-        gui.drawString(matrices, Translator.translatable("hqm.mobTask.search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translatable("hqm.mobTask." + (mobId == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
-        if (mobId != null) {
-            gui.drawString(matrices, Registry.ENTITY_TYPE.get(mobId).getDescription(), 180, 50, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm." + textKey + ".search"), 180, 20, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm." + textKey + "." + (mob == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        if (mob != null) {
+            gui.drawString(matrices, mob.description, 180, 50, 0.7F, 0x404040);
         }
     }
     
@@ -127,10 +146,10 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
             if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
-                if (mobs.get(i).equals(mobId)) {
-                    mobId = null;
+                if (mobs.get(i).equals(mob)) {
+                    mob = null;
                 } else {
-                    mobId = mobs.get(i);
+                    mob = mobs.get(i);
                 }
                 break;
             }
@@ -151,12 +170,12 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
     @Override
     protected String getArrowText() {
-        return I18n.get("hqm.mobTask." + "type" + "Match.title");
+        return I18n.get("hqm." + textKey + "." + "type" + "Match.title");
     }
     
     @Override
     protected String getArrowDescription() {
-        return I18n.get("hqm.mobTask." + "type" + "Match.desc");
+        return I18n.get("hqm." + textKey + "." + "type" + "Match.desc");
     }
     
     @Override
@@ -173,7 +192,7 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        resultConsumer.accept(new Result(mobId, Math.max(1, amount)));
+        resultConsumer.accept(new Result(mob.id, Math.max(1, amount)));
     }
     
     public static class Result {
@@ -191,6 +210,21 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     
         public int getAmount() {
             return amount;
+        }
+    }
+    
+    public static class Entry {
+        private final ResourceLocation id;
+        private final FormattedText description;
+    
+        private Entry(EntityType<?> type) {
+            this.id = Registry.ENTITY_TYPE.getKey(type);
+            this.description = type.getDescription();
+        }
+        
+        public Entry(ResourceLocation id, FormattedText description) {
+            this.id = id;
+            this.description = description;
         }
     }
 }
