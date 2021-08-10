@@ -17,6 +17,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.util.OPBookHelper;
+import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -79,7 +80,6 @@ public abstract class QuestTaskItems extends QuestTask {
     
     public void setItems(ItemRequirement[] items) {
         this.items = items;
-        setPositions(this.items);
     }
     
     @Environment(EnvType.CLIENT)
@@ -121,33 +121,34 @@ public abstract class QuestTaskItems extends QuestTask {
         return data.progress[id];
     }
     
-    private void setPositions(ItemRequirement[] items) {
+    private List<Positioned<ItemRequirement>> getPositionedItems(ItemRequirement[] items) {
+        List<Positioned<ItemRequirement>> list = new ArrayList<>(items.length);
         int x = START_X;
         int y = START_Y;
-        
+    
         for (ItemRequirement item : items) {
-            item.x = x;
-            item.y = y;
-            
+            list.add(new Positioned<>(x, y, item));
+        
             x += OFFSET;
             if (x > MAX_X) {
                 x = START_X;
                 y += OFFSET;
             }
         }
+        
+        return list;
     }
     
     @Environment(EnvType.CLIENT)
     private ItemRequirement[] getEditFriendlyItems(ItemRequirement[] items) {
         if (Quest.canQuestsBeEdited()) {
             items = Arrays.copyOf(items, items.length + 1);
+            items[items.length - 1] = new ItemRequirement(ItemStack.EMPTY, 1);
+            return items;
         } else {
             return items;
         }
         
-        items[items.length - 1] = new ItemRequirement(ItemStack.EMPTY, 1);
-        setPositions(items);
-        return items;
     }
     
     @Environment(EnvType.CLIENT)
@@ -211,27 +212,31 @@ public abstract class QuestTaskItems extends QuestTask {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        ItemRequirement[] items = getEditFriendlyItems(this.items);
+        List<Positioned<ItemRequirement>> items = getPositionedItems(getEditFriendlyItems(this.items));
         
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        for (int i = 0; i < items.size(); i++) {
+            Positioned<ItemRequirement> pos = items.get(i);
+            ItemRequirement item = pos.getElement();
+            
             if (item.hasItem) {
-                gui.drawItemStack(item.getPermutatedItem(), item.x, item.y, mX, mY, false);
+                gui.drawItemStack(item.getPermutatedItem(), pos.getX(), pos.getY(), mX, mY, false);
             } else if (item.fluid != null) {
-                gui.drawFluid(item.fluid, matrices, item.x, item.y, mX, mY);
+                gui.drawFluid(item.fluid, matrices, pos.getX(), pos.getY(), mX, mY);
             }
             
             FormattedText str = Translator.plain((getProgress(player, i) * 100 / item.required) + "%");
             matrices.pushPose();
             matrices.translate(0, 0, 200);// magic z value to write over stack render
             float textSize = 0.8F;
-            gui.drawStringWithShadow(matrices, str, (int) (item.x + SIZE - gui.getStringWidth(str) * textSize), (int) (item.y + SIZE - (item.hasItem && !item.stack.isEmpty() && item.stack.getCount() != 1 ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
+            gui.drawStringWithShadow(matrices, str, (int) (pos.getX() + SIZE - gui.getStringWidth(str) * textSize), (int) (pos.getY() + SIZE - (item.hasItem && !item.stack.isEmpty() && item.stack.getCount() != 1 ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, getProgress(player, i) == item.required ? 0x308030 : 0xFFFFFF);
             matrices.popPose();
         }
         
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
-            if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
+        for (int i = 0; i < items.size(); i++) {
+            Positioned<ItemRequirement> pos = items.get(i);
+            ItemRequirement item = pos.getElement();
+            
+            if (gui.inBounds(pos.getX(), pos.getY(), SIZE, SIZE, mX, mY)) {
                 GuiQuestBook.setSelectedStack(item.getStack());
                 ItemStack stack = item.getStack();
                 List<FormattedText> str = new ArrayList<>();
@@ -271,11 +276,13 @@ public abstract class QuestTaskItems extends QuestTask {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();
         boolean doubleClick = false;
         if (Quest.canQuestsBeEdited() || isOpBookWithShiftKeyDown) {
-            ItemRequirement[] items = getEditFriendlyItems(this.items);
+            List<Positioned<ItemRequirement>> items = getPositionedItems(getEditFriendlyItems(this.items));
             
-            for (int i = 0; i < items.length; i++) {
-                ItemRequirement item = items[i];
-                if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
+            for (int i = 0; i < items.size(); i++) {
+                Positioned<ItemRequirement> pos = items.get(i);
+                ItemRequirement item = pos.getElement();
+                
+                if (gui.inBounds(pos.getX(), pos.getY(), SIZE, SIZE, mX, mY)) {
                     int lastDiff = player.tickCount - lastClicked;
                     if (lastDiff < 0) {
                         lastClicked = player.tickCount;
@@ -394,8 +401,6 @@ public abstract class QuestTaskItems extends QuestTask {
         private int cycleAt = -1;
         private int current = 0;
         private int last;
-        private int x;
-        private int y;
         
         public ItemRequirement(ItemStack stack, int required) {
             this.stack = stack;
