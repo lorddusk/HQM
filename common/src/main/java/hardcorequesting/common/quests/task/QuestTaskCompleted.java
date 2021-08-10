@@ -23,19 +23,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestTaskCompleted extends QuestTask {
+public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQuestTask> {
     private static final String COMPLETED_QUESTS = "completed_quests";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
-    public CompletedQuestTask[] quests = new CompletedQuestTask[0];
     
     public QuestTaskCompleted(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
@@ -43,39 +41,30 @@ public class QuestTaskCompleted extends QuestTask {
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }
     
-    @Environment(EnvType.CLIENT)
-    private CompletedQuestTask[] getEditFriendlyCompleted(CompletedQuestTask[] completed) {
-        if (Quest.canQuestsBeEdited()) {
-            completed = Arrays.copyOf(completed, completed.length + 1);
-            completed[completed.length - 1] = new CompletedQuestTask();
-            return completed;
-        } else {
-            return completed;
-        }
+    @Override
+    protected CompletedQuestTask createEmpty() {
+        return new CompletedQuestTask();
+    }
+    
+    @Override
+    protected void onAddElement(Player player) {
+        QuestDataTaskCompleted data = (QuestDataTaskCompleted) getData(player);
+        data.quests = Arrays.copyOf(data.quests, data.quests.length + 1);
+        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement() {
+        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
     }
     
     private boolean completed(int id, Player player) {
-        return id < quests.length && ((QuestDataTaskCompleted) getData(player)).quests[id];
-    }
-    
-    public void setTask(int id, CompletedQuestTask task, Player player) {
-        if (id >= quests.length) {
-            quests = Arrays.copyOf(quests, quests.length + 1);
-            QuestDataTaskCompleted data = (QuestDataTaskCompleted) getData(player);
-            data.quests = Arrays.copyOf(data.quests, data.quests.length + 1);
-            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
-        } else {
-            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
-        }
-        
-        quests[id] = task;
+        return id < elements.size() && ((QuestDataTaskCompleted) getData(player)).quests[id];
     }
     
     @SuppressWarnings("unused")
     public void setQuest(int id, UUID quest, Player player) {
-        setTask(id, id >= quests.length ? new CompletedQuestTask() : quests[id], player);
-        
-        quests[id].setQuest(quest);
+        getOrCreateForModify(id, player).setQuest(quest);
     }
     
     @Override
@@ -86,9 +75,9 @@ public class QuestTaskCompleted extends QuestTask {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
-        for (int i = 0; i < completed_quests.length; i++) {
-            CompletedQuestTask completed = completed_quests[i];
+        List<CompletedQuestTask> quests = getShownElements();
+        for (int i = 0; i < quests.size(); i++) {
+            CompletedQuestTask completed = quests.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -111,31 +100,21 @@ public class QuestTaskCompleted extends QuestTask {
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited()) {
-            CompletedQuestTask[] completed_quests = getEditFriendlyCompleted(this.quests);
-            for (int i = 0; i < completed_quests.length; i++) {
-                CompletedQuestTask completed = completed_quests[i];
+            List<CompletedQuestTask> quests = getShownElements();
+            for (int i = 0; i < quests.size(); i++) {
+                CompletedQuestTask completed = quests.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.DELETE) {
-                        if (i < this.quests.length) {
-                            CompletedQuestTask[] newCompleted = new CompletedQuestTask[this.quests.length - 1];
-                            int id = 0;
-                            for (int j = 0; j < this.quests.length; j++) {
-                                if (j != i) {
-                                    newCompleted[id] = this.quests[j];
-                                    id++;
-                                }
-                            }
-                            this.quests = newCompleted;
+                        if (i < elements.size()) {
+                            elements.remove(i);
                             SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_REMOVE);
                         }
                     } else if (completed.getQuest() == null) {
-                        CompletedQuestTask copy = completed.copy();
-                        copy.setQuest(Quest.speciallySelectedQuestId);
-                        this.setTask(i, copy, player);
+                        completed.setQuest(Quest.speciallySelectedQuestId);
                         SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
                     }
                     
@@ -164,19 +143,19 @@ public class QuestTaskCompleted extends QuestTask {
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
             boolean[] other_completed_quests = ((QuestDataTaskCompleted) this.getData(player)).quests;
             
-            if (other_completed_quests.length < this.quests.length) {
+            if (other_completed_quests.length < elements.size()) {
                 boolean[] oldCompleted = ArrayUtils.addAll(other_completed_quests, (boolean[]) null);
-                other_completed_quests = new boolean[this.quests.length];
+                other_completed_quests = new boolean[elements.size()];
                 System.arraycopy(oldCompleted, 0, other_completed_quests, 0, oldCompleted.length);
                 ((QuestDataTaskCompleted) this.getData(player)).quests = other_completed_quests;
             }
             
             boolean completed = true;
             
-            for (int i = 0; i < this.quests.length; i++) {
+            for (int i = 0; i < elements.size(); i++) {
                 if (other_completed_quests[i]) continue;
                 
-                CompletedQuestTask task_quest = this.quests[i];
+                CompletedQuestTask task_quest = elements.get(i);
                 if (task_quest == null || task_quest.getName() == null || task_quest.getQuest() == null) continue;
                 
                 Quest quest = task_quest.getQuest();
@@ -192,7 +171,7 @@ public class QuestTaskCompleted extends QuestTask {
                 }
             }
             
-            if (completed && this.quests.length > 0) {
+            if (completed && !elements.isEmpty()) {
                 completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
@@ -208,7 +187,7 @@ public class QuestTaskCompleted extends QuestTask {
             }
         }
         
-        return (float) completed / quests.length;
+        return (float) completed / elements.size();
     }
     
     @Override
@@ -233,7 +212,7 @@ public class QuestTaskCompleted extends QuestTask {
     @Override
     public void autoComplete(UUID uuid, boolean status) {
         boolean[] completed = ((QuestDataTaskCompleted) getData(uuid)).quests;
-        for (int i = 0; i < quests.length; i++) {
+        for (int i = 0; i < elements.size(); i++) {
             completed[i] = status;
         }
     }
@@ -253,7 +232,7 @@ public class QuestTaskCompleted extends QuestTask {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (CompletedQuestTask quest : quests) {
+        for (CompletedQuestTask quest : elements) {
             array.add(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.toJsonTree(quest));
         }
         builder.add(COMPLETED_QUESTS, array.build());
@@ -261,25 +240,17 @@ public class QuestTaskCompleted extends QuestTask {
     
     @Override
     public void read(JsonObject object) {
-        List<CompletedQuestTask> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray())) {
             CompletedQuestTask task = QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element);
             if (task != null)
-                list.add(task);
+                elements.add(task);
         }
-        quests = list.toArray(new CompletedQuestTask[0]);
     }
     
     public static class CompletedQuestTask {
         private UUID quest_id;
-        
-        private CompletedQuestTask copy() {
-            CompletedQuestTask completed = new CompletedQuestTask();
-            completed.quest_id = quest_id;
-            
-            return completed;
-        }
-        
+    
         public ItemStack getIconStack() {
             Quest q = getQuest();
             return (q != null) ? q.getIconStack() : ItemStack.EMPTY;

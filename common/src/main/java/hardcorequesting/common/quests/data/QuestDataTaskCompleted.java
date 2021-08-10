@@ -15,7 +15,7 @@ public class QuestDataTaskCompleted extends QuestDataTask {
     
     public QuestDataTaskCompleted(QuestTask task) {
         super(task);
-        this.quests = new boolean[((QuestTaskCompleted) task).quests.length];
+        this.quests = new boolean[((QuestTaskCompleted) task).elements.size()];
     }
     
     protected QuestDataTaskCompleted() {
