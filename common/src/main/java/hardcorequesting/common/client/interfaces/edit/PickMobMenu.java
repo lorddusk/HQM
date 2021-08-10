@@ -164,6 +164,11 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     @Override
+    protected boolean isArrowVisible() {
+        return false;   //There is currently no precision for mobs. Change this if precision is ever added back
+    }
+    
+    @Override
     protected void onArrowClick(boolean left) {
 //        mob.setExact(!mob.isExact());
     }
