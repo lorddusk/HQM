@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuMob;
+import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -111,8 +111,8 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Tame tame) {
         if (mode == EditMode.MOB) {
-            GuiEditMenuMob.display(gui, player, tame.getTame() == null ? null : ResourceLocation.tryParse(tame.getTame()), tame.getCount(), "tameTask",
-                    GuiEditMenuMob.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount(), player));
+            PickMobMenu.display(gui, player, tame.getTame() == null ? null : ResourceLocation.tryParse(tame.getTame()), tame.getCount(), "tameTask",
+                    PickMobMenu.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount(), player));
         }
     }
     

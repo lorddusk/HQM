@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuMob;
+import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -104,7 +104,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Mob mob) {
         if (mode == EditMode.MOB) {
-            GuiEditMenuMob.display(gui, player, mob.getMob(), mob.getCount(), "mobTask",
+            PickMobMenu.display(gui, player, mob.getMob(), mob.getCount(), "mobTask",
                     result -> setInfo(id, result.getMobId(), result.getAmount(), player));
         }
     }

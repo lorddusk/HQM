@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class GuiEditMenuMob extends GuiEditMenuExtended {
+public class PickMobMenu extends GuiEditMenuExtended {
     //TODO add support for entity tags to replace functionality of this special case
     public static final List<Entry> EXTRA_TAME_ENTRIES = ImmutableList.of(new Entry(TameMobsTask.ABSTRACT_HORSE, Translator.plain("Any Horse-like Entity")));
     
@@ -38,14 +38,14 @@ public class GuiEditMenuMob extends GuiEditMenuExtended {
     private final List<Entry> mobs;
     
     public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
+        gui.setEditMenu(new PickMobMenu(gui, player, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
     }
     
     public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuMob(gui, player, initMobId, initAmount, textKey, extraEntries, resultConsumer));
+        gui.setEditMenu(new PickMobMenu(gui, player, initMobId, initAmount, textKey, extraEntries, resultConsumer));
     }
     
-    private GuiEditMenuMob(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+    private PickMobMenu(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
         super(gui, player, false, 180, 70, 180, 150);
         
         this.resultConsumer = resultConsumer;
