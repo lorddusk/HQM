@@ -13,37 +13,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * A base class for tasks with sub-elements that uses item icons for display.
+ * Provides the layout of a vertical list of elements, where each entry has an item icon, a name, and any extra info.
  */
-public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends QuestTask {
+public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends ListTask<T> {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    public final List<T> elements;
-    private final List<T> elementsWithEmpty;
-    
     public IconQuestTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-        
-        List<T> list = new ArrayList<>();
-        list.add(createEmpty());
-        elements = list.subList(0, 0);
-        elementsWithEmpty = Collections.unmodifiableList(list);
     }
-    
-    protected abstract T createEmpty();
-    
-    protected abstract void onAddElement(Player player);
-    
-    protected abstract void onModifyElement();
     
     protected abstract void onRemoveElement();
     
@@ -52,26 +37,6 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Qu
     
     @Environment(EnvType.CLIENT)
     protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T element);
-    
-    protected final List<T> getShownElements() {
-        if (Quest.canQuestsBeEdited()) {
-            return elementsWithEmpty;
-        } else {
-            return elements;
-        }
-    }
-    
-    protected final T getOrCreateForModify(int id, Player player) {
-        if (id >= elements.size()) {
-            T element = createEmpty();
-            elements.add(element);
-            onAddElement(player);
-            return element;
-        } else {
-            onModifyElement();
-            return elements.get(id);
-        }
-    }
     
     protected void setIcon(int id, ItemStack stack, Player player) {
         getOrCreateForModify(id, player).setIconStack(stack);
