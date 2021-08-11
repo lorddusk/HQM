@@ -123,7 +123,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         return data.progress[id];
     }
     
-    private List<Positioned<Part>> getPositionedItems(List<Part> items) {
+    protected List<Positioned<Part>> getPositionedItems(List<Part> items) {
         List<Positioned<Part>> list = new ArrayList<>(items.size());
         int x = START_X;
         int y = START_Y;
