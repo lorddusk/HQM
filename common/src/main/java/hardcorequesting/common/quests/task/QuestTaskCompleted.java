@@ -45,7 +45,7 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     }
     
     @Override
-    protected void onAddElement(Player player) {
+    protected void onAddElement() {
         SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
     }
     
@@ -59,8 +59,8 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     }
     
     @SuppressWarnings("unused")
-    public void setQuest(int id, UUID quest, Player player) {
-        getOrCreateForModify(id, player).setQuest(quest);
+    public void setQuest(int id, UUID quest) {
+        getOrCreateForModify(id).setQuest(quest);
     }
     
     @Override

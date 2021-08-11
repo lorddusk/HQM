@@ -46,7 +46,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     }
     
     @Override
-    protected void onAddElement(Player player) {
+    protected void onAddElement() {
         SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
     }
     
@@ -70,8 +70,8 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
         return null;
     }
     
-    private void setInfo(int id, ResourceLocation mobId, int amount, Player player) {
-        Mob mob = getOrCreateForModify(id, player);
+    private void setInfo(int id, ResourceLocation mobId, int amount) {
+        Mob mob = getOrCreateForModify(id);
         mob.setMob(mobId);
         mob.setCount(amount);
     }
@@ -102,7 +102,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Mob mob) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, player, mob.getMob(), mob.getCount(), "mobTask",
-                    result -> setInfo(id, result.getMobId(), result.getAmount(), player));
+                    result -> setInfo(id, result.getMobId(), result.getAmount()));
         }
     }
     
@@ -113,12 +113,13 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     
     @Override
     public float getCompletedRatio(UUID playerID) {
+        QuestDataTaskMob data = (QuestDataTaskMob) getData(playerID);
         int killed = 0;
         int total = 0;
         
         for (int i = 0; i < elements.size(); i++) {
             int req = elements.get(i).count;
-            killed += Math.min(req, ((QuestDataTaskMob) getData(playerID)).getValue(i));
+            killed += Math.min(req, data.getValue(i));
             total += req;
         }
         
@@ -152,7 +153,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
             }
         } else {
             for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, elements.get(i).count);
+                data.setValue(i, 0);
             }
         }
     }

@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task;
 
 import hardcorequesting.common.quests.Quest;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +26,7 @@ public abstract class ListTask<T> extends QuestTask {
     
     protected abstract T createEmpty();
     
-    protected abstract void onAddElement(Player player);
+    protected abstract void onAddElement();
     
     protected abstract void onModifyElement();
     
@@ -39,11 +38,11 @@ public abstract class ListTask<T> extends QuestTask {
         }
     }
     
-    protected final T getOrCreateForModify(int id, Player player) {
+    protected final T getOrCreateForModify(int id) {
         if (id >= elements.size()) {
             T element = createEmpty();
             elements.add(element);
-            onAddElement(player);
+            onAddElement();
             return element;
         } else {
             onModifyElement();

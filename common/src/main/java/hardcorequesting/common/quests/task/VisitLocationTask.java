@@ -50,7 +50,7 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
     }
     
     @Override
-    protected void onAddElement(Player player) {
+    protected void onAddElement() {
         SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
     }
     
@@ -107,8 +107,8 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
         return ((QuestDataTaskLocation) getData(player)).getValue(id);
     }
     
-    private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, Player player) {
-        Location location = getOrCreateForModify(id, player);
+    private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
+        Location location = getOrCreateForModify(id);
         location.setVisibility(visibility);
         location.setPosition(pos);
         location.setRadius(radius);
@@ -154,7 +154,7 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Location location) {
         if (mode == EditMode.LOCATION) {
             GuiEditMenuLocation.display(gui, player, location.getVisibility(), location.getPosition(), location.radius, location.dimension,
-                    result -> setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension(), player));
+                    result -> setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
         }
     }
     

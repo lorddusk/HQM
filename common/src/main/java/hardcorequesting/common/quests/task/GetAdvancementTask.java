@@ -48,7 +48,7 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     }
     
     @Override
-    protected void onAddElement(Player player) {
+    protected void onAddElement() {
         SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
     }
     
@@ -66,8 +66,8 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
         return ((QuestDataTaskAdvancement) getData(player)).getValue(id);
     }
     
-    private void setAdvancement(int id, String advancement, Player player) {
-        getOrCreateForModify(id, player).setAdvancement(advancement);
+    private void setAdvancement(int id, String advancement) {
+        getOrCreateForModify(id).setAdvancement(advancement);
     }
     
     @Override
@@ -88,7 +88,7 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, AdvancementTask task) {
         if (mode == EditMode.LOCATION) {
             GuiEditMenuAdvancement.display(gui, player, task.getAdvancement(),
-                    result -> setAdvancement(id, result, player));
+                    result -> setAdvancement(id, result));
         }
     }
     

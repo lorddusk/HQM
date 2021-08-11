@@ -38,12 +38,12 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Li
     @Environment(EnvType.CLIENT)
     protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T element);
     
-    protected void setIcon(int id, ItemStack stack, Player player) {
-        getOrCreateForModify(id, player).setIconStack(stack);
+    protected void setIcon(int id, ItemStack stack) {
+        getOrCreateForModify(id).setIconStack(stack);
     }
     
-    protected void setName(int id, String str, Player player) {
-        getOrCreateForModify(id, player).setName(str);
+    protected void setName(int id, String str) {
+        getOrCreateForModify(id).setName(str);
     }
     
     @Environment(EnvType.CLIENT)
@@ -78,11 +78,11 @@ public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends Li
                     switch (gui.getCurrentMode()) {
                         case ITEM:
                             PickItemMenu.display(gui, player, element.getIconStack(), PickItemMenu.Type.ITEM,
-                                    result -> setIcon(id, result.get(), player));
+                                    result -> setIcon(id, result.get()));
                             break;
                         case RENAME:
                             GuiEditMenuTextEditor.display(gui, player, element.getName(), 110,
-                                    result -> setName(id, result, player));
+                                    result -> setName(id, result));
                             break;
                         case DELETE:
                             if (i < this.elements.size()) {

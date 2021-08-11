@@ -29,7 +29,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -51,9 +50,7 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     }
     
     @Override
-    protected void onAddElement(Player player) {
-        QuestDataTaskTame data = (QuestDataTaskTame) getData(player);
-        data.tamed = Arrays.copyOf(data.tamed, data.tamed.length + 1);
+    protected void onAddElement() {
         SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
     }
     
@@ -68,9 +65,9 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     }
     
     @Environment(EnvType.CLIENT)
-    private void setInfo(int id, String entityId, int amount, Player player) {
+    private void setInfo(int id, String entityId, int amount) {
         
-        Tame tame = getOrCreateForModify(id, player);
+        Tame tame = getOrCreateForModify(id);
         tame.setTame(entityId);
         tame.setCount(amount);
         
@@ -87,7 +84,7 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     }
     
     private int tamed(int id, Player player) {
-        return id < elements.size() ? ((QuestDataTaskTame) getData(player)).tamed[id] : 0;
+        return ((QuestDataTaskTame) getData(player)).getValue(id);
     }
     
     @Override
@@ -112,7 +109,7 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Tame tame) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, player, tame.getTame() == null ? null : ResourceLocation.tryParse(tame.getTame()), tame.getCount(), "tameTask",
-                    PickMobMenu.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount(), player));
+                    PickMobMenu.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount()));
         }
     }
     
@@ -123,12 +120,14 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     
     @Override
     public float getCompletedRatio(UUID uuid) {
+        QuestDataTaskTame data = (QuestDataTaskTame) getData(uuid);
         int tamed = 0;
         int total = 0;
         
         for (int i = 0; i < elements.size(); i++) {
-            tamed += ((QuestDataTaskTame) getData(uuid)).tamed[i];
-            total += elements.get(i).count;
+            int req = elements.get(i).count;
+            tamed += Math.min(req, data.getValue(i));
+            total += req;
         }
         
         return (float) tamed / total;
@@ -136,14 +135,14 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     
     @Override
     public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
-        int[] tamed = ((QuestDataTaskTame) own).tamed;
-        int[] otherTamed = ((QuestDataTaskTame) other).tamed;
-        
+        QuestDataTaskTame data = (QuestDataTaskTame) own;
+        data.merge((QuestDataTaskTame) other);
+    
         boolean all = true;
-        for (int i = 0; i < tamed.length; i++) {
-            tamed[i] = Math.max(tamed[i], otherTamed[i]);
-            if (tamed[i] < elements.get(i).count) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (data.getValue(i) < elements.get(i).count) {
                 all = false;
+                break;
             }
         }
         
@@ -154,43 +153,41 @@ public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        int[] tamed = ((QuestDataTaskTame) getData(uuid)).tamed;
-        int q = tamed.length;
-        for (int i = 0; i < q; i++) {
-            // This can sometimes cause an array-out-of-bounds error
-            if (q != tamed.length) q = tamed.length;
-            if (status) {
-                tamed[i] = elements.get(i).count;
-            } else {
-                tamed[i] = 0;
+        QuestDataTaskTame data = (QuestDataTaskTame) getData(uuid);
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, elements.get(i).count);
+            }
+        } else {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, 0);
             }
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        int[] tamed = ((QuestDataTaskTame) own).tamed;
-        System.arraycopy(((QuestDataTaskTame) other).tamed, 0, tamed, 0, tamed.length);
+        own.update(other);
     }
     
     @Override
     public void onAnimalTame(Player tamer, Entity entity) {
         if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
+            QuestDataTaskTame data = (QuestDataTaskTame) getData(tamer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
                 Tame tame = elements.get(i);
-                if (tame.count > ((QuestDataTaskTame) getData(tamer)).tamed[i] && tame.tame != null) {
+                if (tame.count > data.getValue(i) && tame.tame != null) {
                     if (tame.tame.equals(ABSTRACT_HORSE.toString())) {
                         if (entity instanceof AbstractHorse) {
-                            ((QuestDataTaskTame) getData(tamer)).tamed[i]++;
+                            data.setValue(i, data.getValue(i) + 1);
                             updated = true;
                         }
                     } else {
                         EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(tame.tame));
                         if (type != null) {
                             if (type.equals(entity.getType())) {
-                                ((QuestDataTaskTame) getData(tamer)).tamed[i]++;
+                                data.setValue(i, data.getValue(i) + 1);
                                 updated = true;
                             }
                         }
