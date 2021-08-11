@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -80,17 +81,18 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
-        List<Part> renderSettings = getShownElements();
+        List<Positioned<Part>> renderSettings = positionParts(getShownElements());
         for (int i = 0; i < renderSettings.size(); i++) {
-            Part setting = renderSettings.get(i);
+            Positioned<Part> pos = renderSettings.get(i);
+            Part part = pos.getElement();
             
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            if (setting.reputation == null) {
-                gui.drawRect(START_X + Reputation.BAR_X, START_Y + startOffsetY + i * OFFSET_Y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
+            if (part.reputation == null) {
+                gui.drawRect(pos.getX() + Reputation.BAR_X, pos.getY() + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             } else {
-                info = setting.reputation.draw(matrices, gui, START_X, START_Y + startOffsetY + i * OFFSET_Y, mX, mY, info, getPlayerForRender(player), true, setting.lower, setting.upper, setting.inverted, null, null, getData(player).completed);
+                info = part.reputation.draw(matrices, gui, pos.getX(), pos.getY(), mX, mY, info, getPlayerForRender(player), true, part.lower, part.upper, part.inverted, null, null, getData(player).completed);
             }
         }
         
@@ -103,13 +105,14 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     @Environment(EnvType.CLIENT)
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Part> renderSettings = getShownElements();
+            List<Positioned<Part>> renderSettings = positionParts(getShownElements());
             for (int i = 0; i < renderSettings.size(); i++) {
-                Part setting = renderSettings.get(i);
+                Positioned<Part> pos = renderSettings.get(i);
+                Part part = pos.getElement();
                 
-                if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
+                if (gui.inBounds(pos.getX(), pos.getY(), Reputation.BAR_WIDTH, 20, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-                        gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, setting));
+                        gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, part));
                     } else if (gui.getCurrentMode() == EditMode.DELETE && i < elements.size()) {
                         removeSetting(i);
                         SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_REMOVE);
@@ -118,6 +121,17 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
                 }
             }
         }
+    }
+    
+    protected List<Positioned<Part>> positionParts(List<Part> parts) {
+        List<Positioned<Part>> list = new ArrayList<>(parts.size());
+        int x = START_X;
+        int y = START_Y + startOffsetY;
+        for (Part part : parts) {
+            list.add(new Positioned<>(x, y, part));
+            y += OFFSET_Y;
+        }
+        return list;
     }
     
     @Override
