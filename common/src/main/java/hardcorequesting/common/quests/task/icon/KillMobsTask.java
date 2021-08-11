@@ -223,7 +223,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
         }
     }
     
-    public static class Mob extends IconTask {
+    public static class Mob extends IconLayoutTask.IconTask {
         
         private ResourceLocation mob = Registry.ENTITY_TYPE.getDefaultKey();
         private int count = 1;

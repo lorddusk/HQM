@@ -257,7 +257,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
         }
     }
     
-    public static class Location extends IconTask {
+    public static class Location extends IconLayoutTask.IconTask {
         
         private BlockPos pos;
         private int radius = 3;

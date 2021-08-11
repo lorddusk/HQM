@@ -234,7 +234,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
         }
     }
     
-    public static class Tame extends IconTask {
+    public static class Tame extends IconLayoutTask.IconTask {
         private String tame;
         private int count = 1;
         

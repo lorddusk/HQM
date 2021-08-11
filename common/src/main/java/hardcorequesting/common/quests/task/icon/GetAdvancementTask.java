@@ -217,7 +217,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
         }
     }
     
-    public static class AdvancementTask extends IconTask {
+    public static class AdvancementTask extends IconLayoutTask.IconTask {
         
         private Visibility visible = Visibility.FULL;
         private String adv_name;
