@@ -5,7 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.LargeButton;
 import hardcorequesting.common.client.interfaces.TextBoxGroup;
-import hardcorequesting.common.quests.task.VisitLocationTask;
+import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;

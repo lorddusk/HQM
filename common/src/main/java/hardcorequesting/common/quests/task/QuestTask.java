@@ -38,8 +38,8 @@ import java.util.*;
 
 public abstract class QuestTask {
     
-    static final int START_X = 180;
-    static final int START_Y = 95;
+    protected static final int START_X = 180;
+    protected static final int START_Y = 95;
     public String description;
     protected Quest parent;
     private List<QuestTask> requirements;

@@ -1,9 +1,9 @@
 package hardcorequesting.forge.tileentity;
 
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
-import hardcorequesting.common.quests.task.ConsumeItemTask;
-import hardcorequesting.common.quests.task.ItemRequirementTask;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.item.ConsumeItemTask;
+import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.forge.ForgeFluidStack;
 import net.minecraft.core.Direction;

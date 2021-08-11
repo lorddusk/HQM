@@ -11,8 +11,8 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
-import hardcorequesting.common.quests.task.ItemRequirementTask;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;

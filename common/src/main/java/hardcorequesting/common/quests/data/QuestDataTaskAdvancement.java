@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.task.GetAdvancementTask;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;

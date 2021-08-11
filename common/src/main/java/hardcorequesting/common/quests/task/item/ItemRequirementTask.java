@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task;
+package hardcorequesting.common.quests.task.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -16,6 +16,7 @@ import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.task.ListTask;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;

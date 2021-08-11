@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.TameMobsTask;
+import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;

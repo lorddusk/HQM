@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task;
+package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;

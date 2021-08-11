@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task;
+package hardcorequesting.common.quests.task.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
