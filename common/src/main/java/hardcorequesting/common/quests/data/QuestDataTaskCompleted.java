@@ -17,17 +17,15 @@ public class QuestDataTaskCompleted extends QuestDataTask {
     private final List<Boolean> quests;
     
     public QuestDataTaskCompleted(QuestTask task) {
-        super(task);
-        int size = ((QuestTaskCompleted) task).elements.size();
-        this.quests = new ArrayList<>(size);
-        while (quests.size() < size) {
-          quests.add(false);
-        }
+        this(((QuestTaskCompleted) task).elements.size());
     }
     
     protected QuestDataTaskCompleted(int size) {
         super();
         this.quests = new ArrayList<>(size);
+        while (quests.size() < size) {
+            quests.add(false);
+        }
     }
     
     public static QuestDataTask construct(JsonObject in) {

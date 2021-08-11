@@ -25,9 +25,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -53,8 +51,6 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
     
     @Override
     protected void onAddElement(Player player) {
-        QuestDataTaskLocation data = (QuestDataTaskLocation) getData(player);
-        data.visited = Arrays.copyOf(data.visited, data.visited.length + 1);
         SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
     }
     
@@ -76,19 +72,14 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
             
             Level world = player.getCommandSenderWorld();
             if (!world.isClientSide) {
-                boolean[] visited = ((QuestDataTaskLocation) this.getData(player)).visited;
+                QuestDataTaskLocation data = (QuestDataTaskLocation) this.getData(player);
                 boolean all = true;
                 boolean updated = false;
                 
                 for (int i = 0; i < elements.size(); ++i) {
                     Location location = this.elements.get(i);
-                    if (visited.length < i) { // Fix to make sure than the visited array is as long as the location array (#400)
-                        boolean[] oldVisited = ArrayUtils.addAll(visited, (boolean[]) null);
-                        visited = new boolean[i];
-                        System.arraycopy(oldVisited, 0, visited, 0, oldVisited.length);
-                        ((QuestDataTaskLocation) this.getData(player)).visited = visited;
-                    }
-                    if (!visited[i] && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
+                    
+                    if (!data.getValue(i) && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
                         int current = (int) player.distanceToSqr((double) location.pos.getX() + 0.5D, (double) location.pos.getY() + 0.5D, (double) location.pos.getZ() + 0.5D);
                         int target = location.radius * location.radius;
                         if (location.radius >= 0 && current > target) {
@@ -96,7 +87,7 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
                         } else {
                             if (!this.isCompleted(player) && this.isVisible(player) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
                                 updated = true;
-                                visited[i] = true;
+                                data.complete(i);
                             }
                         }
                     }
@@ -113,7 +104,7 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
     }
     
     private boolean visited(int id, Player player) {
-        return id < elements.size() && ((QuestDataTaskLocation) getData(player)).visited[id];
+        return ((QuestDataTaskLocation) getData(player)).getValue(id);
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, Player player) {
@@ -174,48 +165,33 @@ public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location>
     
     @Override
     public float getCompletedRatio(UUID playerID) {
-        int visited = 0;
-        for (boolean b : ((QuestDataTaskLocation) getData(playerID)).visited) {
-            if (b) {
-                visited++;
-            }
-        }
-        
-        return (float) visited / elements.size();
+        return ((QuestDataTaskLocation) getData(playerID)).getCompletedRatio(elements.size());
     }
     
     @Override
     public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
-        boolean[] visited = ((QuestDataTaskLocation) own).visited;
-        boolean[] otherVisited = ((QuestDataTaskLocation) other).visited;
+        ((QuestDataTaskLocation) own).mergeResult((QuestDataTaskLocation) other);
         
-        boolean all = true;
-        for (int i = 0; i < visited.length; i++) {
-            if (otherVisited[i]) {
-                visited[i] = true;
-            } else if (!visited[i]) {
-                all = false;
-            }
-        }
-        
-        if (all) {
+        if (((QuestDataTaskLocation) own).areAllCompleted(elements.size())) {
             completeTask(playerID);
         }
     }
     
     @Override
     public void autoComplete(UUID playerID, boolean status) {
-        boolean[] visited = ((QuestDataTaskLocation) getData(playerID)).visited;
-        for (int i = 0; i < visited.length; i++) {
-            visited[i] = status;
+        QuestDataTaskLocation data = (QuestDataTaskLocation) getData(playerID);
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.complete(i);
+            }
+        } else {
+            data.clear();
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        boolean[] visited = ((QuestDataTaskLocation) own).visited;
-        System.arraycopy(((QuestDataTaskLocation) other).visited, 0, visited, 0, visited.length);
+        own.update(other);
     }
     
     @Override

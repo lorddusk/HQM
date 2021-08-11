@@ -18,17 +18,15 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     private final List<Boolean> advanced;
     
     public QuestDataTaskAdvancement(QuestTask task) {
-        super(task);
-        int size = ((GetAdvancementTask) task).elements.size();
-        this.advanced = new ArrayList<>(size);
-        while (advanced.size() < size) {
-            advanced.add(false);
-        }
+        this(((GetAdvancementTask) task).elements.size());
     }
     
     protected QuestDataTaskAdvancement(int size) {
         super();
         this.advanced = new ArrayList<>(size);
+        while (advanced.size() < size) {
+            advanced.add(false);
+        }
     }
     
     public static QuestDataTask construct(JsonObject in) {
