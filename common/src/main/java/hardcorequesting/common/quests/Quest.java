@@ -271,63 +271,6 @@ public class Quest {
                     taskType.addTask(Quest.this);
                 }
             });
-            
-            if (QuestTaskItems.class.isAssignableFrom(taskType.clazz)) {
-                buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (itemIds % 2) * 65, 50 + (itemIds / 2) * 35) {
-                    @Override
-                    public boolean isEnabled(GuiBase gui, Player player) {
-                        return selectedTask instanceof QuestTaskItems;
-                    }
-                    
-                    @Override
-                    public boolean isVisible(GuiBase gui, Player player) {
-                        return false; // canQuestsBeEdited() && selectedTask != null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.CHANGE_TASK;
-                    }
-                    
-                    @Override
-                    public void onClick(GuiBase gui, Player player) {
-                        TaskType oldTaskType = TaskType.getType(selectedTask.getClass());
-                        if (oldTaskType == null) return;
-                        
-                        nextTaskId--;
-                        Class<? extends QuestTask> clazz = taskType.clazz;
-                        try {
-                            Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                            QuestTask task = constructor.newInstance(Quest.this, taskType.getLangKeyName(), taskType.getLangKeyDescription());
-                            
-                            selectedTask.getRequirements().forEach(task::addRequirement);
-                            for (QuestTask questTask : tasks) {
-                                List<QuestTask> requirements = questTask.getRequirements();
-                                for (int j = 0; j < requirements.size(); j++) {
-                                    if (requirements.get(j).equals(selectedTask)) {
-                                        requirements.set(j, task);
-                                    }
-                                }
-                            }
-                            for (int j = 0; j < tasks.size(); j++) {
-                                if (tasks.get(j).equals(selectedTask)) {
-                                    tasks.set(j, task);
-                                    break;
-                                }
-                            }
-                            
-                            if (!selectedTask.getLangKeyDescription().equals(oldTaskType.getLangKeyName())) {
-                                task.setDescription(selectedTask.getLangKeyDescription());
-                            }
-                            if (!selectedTask.getLangKeyLongDescription().equals(oldTaskType.getLangKeyDescription())) {
-                                task.setLongDescription(selectedTask.getLangKeyLongDescription());
-                            }
-                            ((QuestTaskItems) task).setItems(((QuestTaskItems) selectedTask).getItems());
-                            task.setId(selectedTask.getId());
-                            selectedTask = task;
-                            SaveHelper.add(SaveHelper.EditType.TASK_CHANGE_TYPE);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-                itemIds++;
-            }
         }
     }
     
