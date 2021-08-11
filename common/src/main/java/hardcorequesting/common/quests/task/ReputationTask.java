@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ReputationTask extends ListTask<ReputationTask.ReputationSetting> {
+public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
@@ -36,17 +36,17 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
         this.startOffsetY = startOffsetY;
     }
     
-    public List<ReputationSetting> getSettings() {
+    public List<Part> getSettings() {
         return elements;
     }
     
-    public void setSetting(int id, ReputationSetting setting) {
+    public void setSetting(int id, Part setting) {
         setElement(id, setting);
     }
     
     @Override
-    protected ReputationSetting createEmpty() {
-        return new ReputationSetting(null, null, null, false);
+    protected Part createEmpty() {
+        return new Part(null, null, null, false);
     }
     
     @Override
@@ -64,7 +64,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
             
             QuestDataTask data = getData(player);
             if (!data.completed && !player.getCommandSenderWorld().isClientSide) {
-                for (ReputationSetting setting : elements) {
+                for (Part setting : elements) {
                     if (!setting.isValid(player.getUUID())) {
                         return false;
                     }
@@ -80,9 +80,9 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
-        List<ReputationSetting> renderSettings = getShownElements();
+        List<Part> renderSettings = getShownElements();
         for (int i = 0; i < renderSettings.size(); i++) {
-            ReputationSetting setting = renderSettings.get(i);
+            Part setting = renderSettings.get(i);
             
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -103,9 +103,9 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
     @Environment(EnvType.CLIENT)
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<ReputationSetting> renderSettings = getShownElements();
+            List<Part> renderSettings = getShownElements();
             for (int i = 0; i < renderSettings.size(); i++) {
-                ReputationSetting setting = renderSettings.get(i);
+                Part setting = renderSettings.get(i);
                 
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
@@ -128,7 +128,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
         }
         
         int valid = 0;
-        for (ReputationSetting setting : elements) {
+        for (Part setting : elements) {
             if (setting.isValid(playerID)) {
                 valid++;
             }
@@ -160,7 +160,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (ReputationSetting setting : elements) {
+        for (Part setting : elements) {
             array.add(QuestTaskAdapter.REPUTATION_TASK_ADAPTER.toJsonTree(setting));
         }
         builder.add(REPUTATION, array.build());
@@ -177,14 +177,14 @@ public abstract class ReputationTask extends ListTask<ReputationTask.ReputationS
         QuestTaskAdapter.taskReputationListMap.put(this, list);
     }
     
-    public static class ReputationSetting {
+    public static class Part {
         
         private Reputation reputation;
         private ReputationMarker lower;
         private ReputationMarker upper;
         private boolean inverted;
         
-        public ReputationSetting(Reputation reputation, ReputationMarker lower, ReputationMarker upper, boolean inverted) {
+        public Part(Reputation reputation, ReputationMarker lower, ReputationMarker upper, boolean inverted) {
             this.reputation = reputation;
             this.lower = lower;
             this.upper = upper;

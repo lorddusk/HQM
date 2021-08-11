@@ -20,7 +20,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
         boolean updated = false;
         
         for (int i = 0; i < elements.size(); i++) {
-            ItemRequirement item = elements.get(i);
+            Part item = elements.get(i);
             if (item.fluid == null || item.required == data.progress[i]) {
                 continue;
             }

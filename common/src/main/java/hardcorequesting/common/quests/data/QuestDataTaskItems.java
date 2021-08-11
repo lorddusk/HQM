@@ -64,7 +64,7 @@ public class QuestDataTaskItems extends QuestDataTask {
         return 0;
     }
     
-    public boolean isDone(int index, ItemRequirementTask.ItemRequirement requirement) {
+    public boolean isDone(int index, ItemRequirementTask.Part requirement) {
         return this.getProgressFor(index) >= requirement.required;
     }
 }

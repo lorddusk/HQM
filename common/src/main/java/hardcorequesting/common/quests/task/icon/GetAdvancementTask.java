@@ -33,7 +33,7 @@ import java.util.UUID;
 /**
  * A task where the player has to complete advancements.
  */
-public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.AdvancementTask> {
+public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> {
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {
@@ -43,8 +43,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
     }
     
     @Override
-    protected AdvancementTask createEmpty() {
-        return new AdvancementTask();
+    protected Part createEmpty() {
+        return new Part();
     }
     
     @Override
@@ -77,7 +77,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, AdvancementTask task, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part task, int index, int x, int y) {
         if (advanced(index, player)) {
             gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         }
@@ -85,7 +85,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, AdvancementTask task) {
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part task) {
         if (mode == EditMode.LOCATION) {
             GuiEditMenuAdvancement.display(gui, player, task.getAdvancement(),
                     result -> setAdvancement(id, result));
@@ -114,10 +114,10 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
             for (int i = 0; i < elements.size(); i++) {
                 if (data.getValue(i)) continue;
                 
-                AdvancementTask advancement = this.elements.get(i);
-                if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
+                Part part = this.elements.get(i);
+                if (part == null || part.getName() == null || part.getAdvancement() == null) continue;
                 
-                ResourceLocation advResource = new ResourceLocation(advancement.getAdvancement());
+                ResourceLocation advResource = new ResourceLocation(part.getAdvancement());
                 
                 Advancement advAdvancement = manager.getAdvancement(advResource);
                 
@@ -181,8 +181,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (AdvancementTask advancement : elements) {
-            array.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.toJsonTree(advancement));
+        for (Part part : elements) {
+            array.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.toJsonTree(part));
         }
         builder.add(ADVANCEMENTS, array.build());
     }
@@ -191,9 +191,9 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray())) {
-            AdvancementTask advancementTask = QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element);
-            if (advancementTask != null)
-                elements.add(advancementTask);
+            Part part = QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element);
+            if (part != null)
+                elements.add(part);
         }
     }
     
@@ -217,7 +217,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Advanc
         }
     }
     
-    public static class AdvancementTask extends IconLayoutTask.IconTask {
+    public static class Part extends IconLayoutTask.Part {
         
         private Visibility visible = Visibility.FULL;
         private String adv_name;

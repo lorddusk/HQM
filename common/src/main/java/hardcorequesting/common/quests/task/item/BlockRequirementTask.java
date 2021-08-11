@@ -43,7 +43,7 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (ItemRequirement item : getItems()) {
+        for (Part item : getItems()) {
             array.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.toJsonTree(item));
         }
         builder.add(BLOCKS, array.build());
@@ -53,7 +53,7 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray())) {
-            ItemRequirement requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
+            Part requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
             if (requirement != null)
                 elements.add(requirement);
         }

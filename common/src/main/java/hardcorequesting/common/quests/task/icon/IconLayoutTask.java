@@ -20,7 +20,7 @@ import java.util.List;
  * A base class for tasks with sub-elements that uses item icons for display.
  * Provides the layout of a vertical list of elements, where each entry has an item icon, a name, and any extra info.
  */
-public abstract class IconLayoutTask<T extends IconLayoutTask.IconTask> extends ListTask<T> {
+public abstract class IconLayoutTask<T extends IconLayoutTask.Part> extends ListTask<T> {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
@@ -34,10 +34,10 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.IconTask> extends 
     protected abstract void onRemoveElement();
     
     @Environment(EnvType.CLIENT)
-    protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, T element, int index, int x, int y);
+    protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, T part, int index, int x, int y);
     
     @Environment(EnvType.CLIENT)
-    protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T element);
+    protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T part);
     
     protected void setIcon(int id, ItemStack stack) {
         getOrCreateForModify(id).setIconStack(stack);
@@ -101,7 +101,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.IconTask> extends 
         }
     }
     
-    protected abstract static class IconTask {
+    protected abstract static class Part {
         private ItemStack iconStack = ItemStack.EMPTY;
         private String name = "New";
         

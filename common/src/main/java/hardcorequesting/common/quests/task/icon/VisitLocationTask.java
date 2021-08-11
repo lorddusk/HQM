@@ -32,7 +32,7 @@ import java.util.UUID;
 /**
  * A task where the player has to visit certain locations.
  */
-public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location> {
+public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     private static final String LOCATIONS = "locations";
     
     private static final int CHECK_DELAY = 20;
@@ -45,8 +45,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     }
     
     @Override
-    protected Location createEmpty() {
-        return new Location();
+    protected Part createEmpty() {
+        return new Part();
     }
     
     @Override
@@ -77,12 +77,12 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
                 boolean updated = false;
                 
                 for (int i = 0; i < elements.size(); ++i) {
-                    Location location = this.elements.get(i);
+                    Part part = this.elements.get(i);
                     
-                    if (!data.getValue(i) && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
-                        int current = (int) player.distanceToSqr((double) location.pos.getX() + 0.5D, (double) location.pos.getY() + 0.5D, (double) location.pos.getZ() + 0.5D);
-                        int target = location.radius * location.radius;
-                        if (location.radius >= 0 && current > target) {
+                    if (!data.getValue(i) && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.dimension)) {
+                        int current = (int) player.distanceToSqr((double) part.pos.getX() + 0.5D, (double) part.pos.getY() + 0.5D, (double) part.pos.getZ() + 0.5D);
+                        int target = part.radius * part.radius;
+                        if (part.radius >= 0 && current > target) {
                             all = false;
                         } else {
                             if (!this.isCompleted(player) && this.isVisible(player) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
@@ -108,11 +108,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
-        Location location = getOrCreateForModify(id);
-        location.setVisibility(visibility);
-        location.setPosition(pos);
-        location.setRadius(radius);
-        location.setDimension(dimension);
+        Part part = getOrCreateForModify(id);
+        part.setVisibility(visibility);
+        part.setPosition(pos);
+        part.setRadius(radius);
+        part.setDimension(dimension);
     }
     
     @Override
@@ -122,23 +122,23 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Location location, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
         if (visited(index, player)) {
             gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
-        } else if (location.visibility.doShowCoordinate()) {
+        } else if (part.visibility.doShowCoordinate()) {
             int row = 0;
-            if (location.radius >= 0) {
-                gui.drawString(matrices, Translator.plain("(" + location.pos.toShortString() + ")"), x, y, 0.7F, 0x404040);
+            if (part.radius >= 0) {
+                gui.drawString(matrices, Translator.plain("(" + part.pos.toShortString() + ")"), x, y, 0.7F, 0x404040);
                 row++;
             }
         
-            if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), location.dimension)) {
-                if (location.radius >= 0) {
+            if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.dimension)) {
+                if (part.radius >= 0) {
                     FormattedText str;
-                    int distance = (int) player.distanceToSqr(location.pos.getX() + 0.5, location.pos.getY() + 0.5, location.pos.getZ() + 0.5);
+                    int distance = (int) player.distanceToSqr(part.pos.getX() + 0.5, part.pos.getY() + 0.5, part.pos.getZ() + 0.5);
                     str = Translator.translatable("hqm.locationMenu.mAway", distance);
-                    if (location.visibility.doShowRadius()) {
-                        str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", location.radius), Translator.plain("]"));
+                    if (part.visibility.doShowRadius()) {
+                        str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.radius), Translator.plain("]"));
                     }
                     gui.drawString(matrices, str, x, y + 6*row, 0.7F, 0x404040);
                 }
@@ -151,9 +151,9 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Location location) {
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
         if (mode == EditMode.LOCATION) {
-            GuiEditMenuLocation.display(gui, player, location.getVisibility(), location.getPosition(), location.radius, location.dimension,
+            GuiEditMenuLocation.display(gui, player, part.getVisibility(), part.getPosition(), part.radius, part.dimension,
                     result -> setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
         }
     }
@@ -209,8 +209,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Location location : elements) {
-            array.add(QuestTaskAdapter.LOCATION_ADAPTER.toJsonTree(location));
+        for (Part part : elements) {
+            array.add(QuestTaskAdapter.LOCATION_ADAPTER.toJsonTree(part));
         }
         builder.add(LOCATIONS, array.build());
     }
@@ -219,9 +219,9 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray())) {
-            Location location = QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element);
-            if (location != null)
-                elements.add(location);
+            Part part = QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element);
+            if (part != null)
+                elements.add(part);
         }
     }
     
@@ -257,7 +257,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location
         }
     }
     
-    public static class Location extends IconLayoutTask.IconTask {
+    public static class Part extends IconLayoutTask.Part {
         
         private BlockPos pos;
         private int radius = 3;

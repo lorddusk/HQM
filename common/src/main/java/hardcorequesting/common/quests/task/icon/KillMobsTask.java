@@ -32,7 +32,7 @@ import java.util.UUID;
 /**
  * A task where the player has to kill certain mobs.
  */
-public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
+public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part> {
     private static final String MOBS = "mobs";
     
     public KillMobsTask(Quest parent, String description, String longDescription) {
@@ -41,8 +41,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     }
     
     @Override
-    protected Mob createEmpty() {
-        return new Mob();
+    protected Part createEmpty() {
+        return new Part();
     }
     
     @Override
@@ -71,9 +71,9 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     }
     
     private void setInfo(int id, ResourceLocation mobId, int amount) {
-        Mob mob = getOrCreateForModify(id);
-        mob.setMob(mobId);
-        mob.setCount(amount);
+        Part part = getOrCreateForModify(id);
+        part.setMob(mobId);
+        part.setCount(amount);
     }
     
     private int killed(int id, Player player) {
@@ -87,21 +87,21 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Mob mob, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
         int killed = killed(index, player);
-        if (killed == mob.count) {
+        if (killed == part.count) {
             gui.drawString(matrices, Translator.translatable("hqm.mobTask.allKilled", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         } else {
-            gui.drawString(matrices, Translator.translatable("hqm.mobTask.partKills", killed, (100 * killed / mob.count)), x, y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.mobTask.partKills", killed, (100 * killed / part.count)), x, y, 0.7F, 0x404040);
         }
-        gui.drawString(matrices, Translator.translatable("hqm.mobTask.totalKills", mob.count), x, y + 6, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.mobTask.totalKills", part.count), x, y + 6, 0.7F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Mob mob) {
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
         if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, player, mob.getMob(), mob.getCount(), "mobTask",
+            PickMobMenu.display(gui, player, part.getMob(), part.getCount(), "mobTask",
                     result -> setInfo(id, result.getMobId(), result.getAmount()));
         }
     }
@@ -171,9 +171,9 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
             QuestDataTaskMob data = (QuestDataTaskMob) getData(killer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
-                Mob mob = elements.get(i);
-                if (mob.count > data.getValue(i)) {
-                    EntityType<?> type = Registry.ENTITY_TYPE.get(mob.mob);
+                Part part = elements.get(i);
+                if (part.count > data.getValue(i)) {
+                    EntityType<?> type = Registry.ENTITY_TYPE.get(part.mobId);
                     if (type != null) {
                         if (type.equals(entity.getType())) {
                             data.setValue(i, data.getValue(i) + 1);
@@ -186,9 +186,9 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
             if (updated) {
                 boolean done = true;
                 for (int i = 0; i < elements.size(); i++) {
-                    Mob mob = elements.get(i);
+                    Part part = elements.get(i);
                     
-                    if (killed(i, killer) < mob.count) {
+                    if (killed(i, killer) < part.count) {
                         done = false;
                         break;
                     }
@@ -207,8 +207,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Mob mob : elements) {
-            array.add(QuestTaskAdapter.MOB_ADAPTER.toJsonTree(mob));
+        for (Part part : elements) {
+            array.add(QuestTaskAdapter.MOB_ADAPTER.toJsonTree(part));
         }
         builder.add(MOBS, array.build());
     }
@@ -217,26 +217,26 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, MOBS, new JsonArray())) {
-            Mob mob = QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element);
-            if (mob != null)
-                elements.add(mob);
+            Part part = QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element);
+            if (part != null)
+                elements.add(part);
         }
     }
     
-    public static class Mob extends IconLayoutTask.IconTask {
+    public static class Part extends IconLayoutTask.Part {
         
-        private ResourceLocation mob = Registry.ENTITY_TYPE.getDefaultKey();
+        private ResourceLocation mobId = Registry.ENTITY_TYPE.getDefaultKey();
         private int count = 1;
         
         public ResourceLocation getMob() {
-            return mob;
+            return mobId;
         }
         
-        public void setMob(ResourceLocation mob) {
-            if (Registry.ENTITY_TYPE.getOptional(mob).isPresent()) {
-                this.mob = mob;
+        public void setMob(ResourceLocation mobId) {
+            if (Registry.ENTITY_TYPE.getOptional(mobId).isPresent()) {
+                this.mobId = mobId;
             } else {
-                this.mob = Registry.ENTITY_TYPE.getDefaultKey();
+                this.mobId = Registry.ENTITY_TYPE.getDefaultKey();
             }
         }
         

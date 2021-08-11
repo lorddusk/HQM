@@ -30,7 +30,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private ReputationTask task;
     private int id;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.ReputationSetting setting) {
+    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.Part setting) {
         super(gui, player, true, 25, 25, -1, -1);
         
         this.task = task;
@@ -173,7 +173,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         if (reputation != null) {
-            task.setSetting(id, new ReputationTask.ReputationSetting(reputation, lower, upper, inverted));
+            task.setSetting(id, new ReputationTask.Part(reputation, lower, upper, inverted));
         }
     }
 }

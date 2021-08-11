@@ -166,7 +166,7 @@ public class Reputation {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof ReputationTask) {
                                     ReputationTask reputationTask = (ReputationTask) task;
-                                    List<ReputationTask.ReputationSetting> settings = reputationTask.getSettings();
+                                    List<ReputationTask.Part> settings = reputationTask.getSettings();
                                     settings.removeIf(setting -> reputation.equals(setting.getReputation()));
                                 }
                             }
@@ -214,7 +214,7 @@ public class Reputation {
                             for (QuestTask task : quest.getTasks()) {
                                 if (task instanceof ReputationTask) {
                                     ReputationTask reputationTask = (ReputationTask) task;
-                                    for (ReputationTask.ReputationSetting setting : reputationTask.getSettings()) {
+                                    for (ReputationTask.Part setting : reputationTask.getSettings()) {
                                         if (selectedReputation.markers.get(i).equals(setting.getLower())) {
                                             setting.setLower(null);
                                         }

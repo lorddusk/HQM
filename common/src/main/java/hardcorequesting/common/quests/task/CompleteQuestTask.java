@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.UUID;
 
-public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuestTask> {
+public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
     private static final String COMPLETED_QUESTS = "completed_quests";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -40,8 +40,8 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
     }
     
     @Override
-    protected CompletedQuestTask createEmpty() {
-        return new CompletedQuestTask();
+    protected Part createEmpty() {
+        return new Part();
     }
     
     @Override
@@ -71,9 +71,9 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<CompletedQuestTask> quests = getShownElements();
+        List<Part> quests = getShownElements();
         for (int i = 0; i < quests.size(); i++) {
-            CompletedQuestTask completed = quests.get(i);
+            Part completed = quests.get(i);
             
             int x = START_X;
             int y = START_Y + i * Y_OFFSET;
@@ -96,9 +96,9 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited()) {
-            List<CompletedQuestTask> quests = getShownElements();
+            List<Part> quests = getShownElements();
             for (int i = 0; i < quests.size(); i++) {
-                CompletedQuestTask completed = quests.get(i);
+                Part completed = quests.get(i);
                 
                 int x = START_X;
                 int y = START_Y + i * Y_OFFSET;
@@ -144,7 +144,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
             for (int i = 0; i < elements.size(); i++) {
                 if (data.getValue(i)) continue;
                 
-                CompletedQuestTask task_quest = elements.get(i);
+                Part task_quest = elements.get(i);
                 if (task_quest == null || task_quest.getName() == null || task_quest.getQuest() == null) continue;
                 
                 Quest quest = task_quest.getQuest();
@@ -205,7 +205,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (CompletedQuestTask quest : elements) {
+        for (Part quest : elements) {
             array.add(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.toJsonTree(quest));
         }
         builder.add(COMPLETED_QUESTS, array.build());
@@ -215,13 +215,13 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuest
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray())) {
-            CompletedQuestTask task = QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element);
+            Part task = QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element);
             if (task != null)
                 elements.add(task);
         }
     }
     
-    public static class CompletedQuestTask {
+    public static class Part {
         private UUID quest_id;
     
         public ItemStack getIconStack() {

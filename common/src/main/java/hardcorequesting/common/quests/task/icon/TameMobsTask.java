@@ -32,10 +32,10 @@ import net.minecraft.world.item.SpawnEggItem;
 import java.util.UUID;
 
 /**
- * A task where the player needs to tame certain mobs.
+ * A task where the player needs to part certain mobs.
  */
-public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
-    private static final String TAME = "tame";
+public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
+    private static final String TAME = "part";
     
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
@@ -45,8 +45,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     }
     
     @Override
-    protected Tame createEmpty() {
-        return new Tame();
+    protected Part createEmpty() {
+        return new Part();
     }
     
     @Override
@@ -67,16 +67,16 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     @Environment(EnvType.CLIENT)
     private void setInfo(int id, String entityId, int amount) {
         
-        Tame tame = getOrCreateForModify(id);
-        tame.setTame(entityId);
-        tame.setCount(amount);
+        Part part = getOrCreateForModify(id);
+        part.setTame(entityId);
+        part.setCount(amount);
         
-        if(entityId != null && (tame.getIconStack().isEmpty() || tame.getIconStack().getItem() instanceof SpawnEggItem)) {
+        if(entityId != null && (part.getIconStack().isEmpty() || part.getIconStack().getItem() instanceof SpawnEggItem)) {
             EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityId));
             if(entityType != null) {
                 Item egg = SpawnEggItem.byId(entityType);
                 if(egg != null) {
-                    tame.setIconStack(new ItemStack(egg));
+                    part.setIconStack(new ItemStack(egg));
                 }
             }
         }
@@ -94,21 +94,21 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Tame tame, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
         int tamed = tamed(index, player);
-        if (tamed == tame.count) {
+        if (tamed == part.count) {
             gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         } else {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / tame.count)), x, y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.count)), x, y, 0.7F, 0x404040);
         }
-        gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", tame.count), x, y + 6, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", part.count), x, y + 6, 0.7F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Tame tame) {
+    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
         if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, player, tame.getTame() == null ? null : ResourceLocation.tryParse(tame.getTame()), tame.getCount(), "tameTask",
+            PickMobMenu.display(gui, player, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
                     PickMobMenu.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount()));
         }
     }
@@ -176,15 +176,15 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
             QuestDataTaskTame data = (QuestDataTaskTame) getData(tamer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
-                Tame tame = elements.get(i);
-                if (tame.count > data.getValue(i) && tame.tame != null) {
-                    if (tame.tame.equals(ABSTRACT_HORSE.toString())) {
+                Part part = elements.get(i);
+                if (part.count > data.getValue(i) && part.mobId != null) {
+                    if (part.mobId.equals(ABSTRACT_HORSE.toString())) {
                         if (entity instanceof AbstractHorse) {
                             data.setValue(i, data.getValue(i) + 1);
                             updated = true;
                         }
                     } else {
-                        EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(tame.tame));
+                        EntityType<?> type = Registry.ENTITY_TYPE.get(new ResourceLocation(part.mobId));
                         if (type != null) {
                             if (type.equals(entity.getType())) {
                                 data.setValue(i, data.getValue(i) + 1);
@@ -198,9 +198,9 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
             if (updated) {
                 boolean done = true;
                 for (int i = 0; i < elements.size(); i++) {
-                    Tame tame = elements.get(i);
+                    Part part = elements.get(i);
                     
-                    if (tamed(i, tamer) < tame.count) {
+                    if (tamed(i, tamer) < part.count) {
                         done = false;
                         break;
                     }
@@ -218,8 +218,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Tame tame : elements) {
-            array.add(QuestTaskAdapter.TAME_ADAPTER.toJsonTree(tame));
+        for (Part part : elements) {
+            array.add(QuestTaskAdapter.TAME_ADAPTER.toJsonTree(part));
         }
         builder.add(TAME, array.build());
     }
@@ -228,22 +228,22 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     public void read(JsonObject object) {
         elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, TAME, new JsonArray())) {
-            Tame tame = QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element);
-            if (tame != null)
-                elements.add(tame);
+            Part part = QuestTaskAdapter.TAME_ADAPTER.fromJsonTree(element);
+            if (part != null)
+                elements.add(part);
         }
     }
     
-    public static class Tame extends IconLayoutTask.IconTask {
-        private String tame;
+    public static class Part extends IconLayoutTask.Part {
+        private String mobId;
         private int count = 1;
         
         public String getTame() {
-            return tame;
+            return mobId;
         }
         
-        public void setTame(String tame) {
-            this.tame = tame;
+        public void setTame(String part) {
+            this.mobId = part;
         }
         
         public int getCount() {
