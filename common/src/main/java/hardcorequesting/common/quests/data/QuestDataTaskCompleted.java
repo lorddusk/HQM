@@ -8,30 +8,69 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.QuestTaskCompleted;
 import net.minecraft.util.GsonHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QuestDataTaskCompleted extends QuestDataTask {
     private static final String COUNT = "count";
     private static final String QUESTS = "quests";
-    public boolean[] quests;
+    private final List<Boolean> quests;
     
     public QuestDataTaskCompleted(QuestTask task) {
         super(task);
-        this.quests = new boolean[((QuestTaskCompleted) task).elements.size()];
+        int size = ((QuestTaskCompleted) task).elements.size();
+        this.quests = new ArrayList<>(size);
+        while (quests.size() < size) {
+          quests.add(false);
+        }
     }
     
-    protected QuestDataTaskCompleted() {
+    protected QuestDataTaskCompleted(int size) {
         super();
-        this.quests = new boolean[0];
+        this.quests = new ArrayList<>(size);
     }
     
     public static QuestDataTask construct(JsonObject in) {
-        QuestDataTaskCompleted data = new QuestDataTaskCompleted();
+        QuestDataTaskCompleted data = new QuestDataTaskCompleted(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
-        data.quests = new boolean[GsonHelper.getAsInt(in, COUNT)];
         JsonArray array = GsonHelper.getAsJsonArray(in, QUESTS);
         for (int i = 0; i < array.size(); i++) {
-            data.quests[i] = array.get(i).getAsBoolean();
+            if (array.get(i).getAsBoolean())
+                data.complete(i);
         }
         return data;
+    }
+    
+    public boolean getValue(int id) {
+        if (quests.size() <= id)
+            return false;
+        else return quests.get(id);
+    }
+    
+    public void complete(int id) {
+        while (id >= quests.size()) {
+            quests.add(false);
+        }
+        quests.set(id, true);
+    }
+    
+    public void clear() {
+        quests.clear();
+    }
+    
+    public void mergeResult(QuestDataTaskCompleted other) {
+        for (int i = 0; i < other.quests.size(); i++) {
+            if (other.quests.get(i))
+                complete(i);
+        }
+    }
+    
+    public float getCompletedRatio(int size) {
+        return (float) quests.stream().limit(size).filter(Boolean::booleanValue).count() / size;
+    }
+    
+    public boolean isComplete(int size) {
+        return quests.stream().limit(size).allMatch(Boolean::booleanValue);
     }
     
     @Override
@@ -42,14 +81,15 @@ public class QuestDataTaskCompleted extends QuestDataTask {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         super.write(builder);
-        builder.add(COUNT, quests.length);
-        builder.add(QUESTS, Adapter.array(quests).build());
+        builder.add(COUNT, quests.size());
+        builder.add(QUESTS, Adapter.array(quests.toArray()).build());
     }
     
     @Override
     public void update(QuestDataTask taskData) {
         super.update(taskData);
-        this.quests = ((QuestDataTaskCompleted) taskData).quests;
+        this.quests.clear();
+        this.quests.addAll(((QuestDataTaskCompleted) taskData).quests);
     }
 }
 

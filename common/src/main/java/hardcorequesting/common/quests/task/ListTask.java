@@ -14,14 +14,15 @@ public abstract class ListTask<T> extends QuestTask {
     
     public final List<T> elements;
     private final List<T> elementsWithEmpty;
-    
-    public ListTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
-    
+    {
         List<T> list = new ArrayList<>();
         list.add(createEmpty());
         elements = list.subList(0, 0);
         elementsWithEmpty = Collections.unmodifiableList(list);
+    }
+    
+    public ListTask(Quest parent, String description, String longDescription) {
+        super(parent, description, longDescription);
     }
     
     protected abstract T createEmpty();

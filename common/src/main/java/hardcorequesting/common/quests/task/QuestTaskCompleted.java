@@ -21,9 +21,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,8 +46,6 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     
     @Override
     protected void onAddElement(Player player) {
-        QuestDataTaskCompleted data = (QuestDataTaskCompleted) getData(player);
-        data.quests = Arrays.copyOf(data.quests, data.quests.length + 1);
         SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
     }
     
@@ -59,7 +55,7 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     }
     
     private boolean completed(int id, Player player) {
-        return id < elements.size() && ((QuestDataTaskCompleted) getData(player)).quests[id];
+        return ((QuestDataTaskCompleted) getData(player)).getValue(id);
     }
     
     @SuppressWarnings("unused")
@@ -141,19 +137,12 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     private void checkCompleted(Player player) {
         Level world = player.getCommandSenderWorld();
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
-            boolean[] other_completed_quests = ((QuestDataTaskCompleted) this.getData(player)).quests;
-            
-            if (other_completed_quests.length < elements.size()) {
-                boolean[] oldCompleted = ArrayUtils.addAll(other_completed_quests, (boolean[]) null);
-                other_completed_quests = new boolean[elements.size()];
-                System.arraycopy(oldCompleted, 0, other_completed_quests, 0, oldCompleted.length);
-                ((QuestDataTaskCompleted) this.getData(player)).quests = other_completed_quests;
-            }
+            QuestDataTaskCompleted data = ((QuestDataTaskCompleted) this.getData(player));
             
             boolean completed = true;
             
             for (int i = 0; i < elements.size(); i++) {
-                if (other_completed_quests[i]) continue;
+                if (data.getValue(i)) continue;
                 
                 CompletedQuestTask task_quest = elements.get(i);
                 if (task_quest == null || task_quest.getName() == null || task_quest.getQuest() == null) continue;
@@ -161,9 +150,8 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
                 Quest quest = task_quest.getQuest();
                 if (quest != null) {
                     if (quest.isCompleted(player)) {
-                        other_completed_quests[i] = true;
+                        data.complete(i);
                     } else {
-                        other_completed_quests[i] = false;
                         completed = false;
                     }
                 } else {
@@ -180,48 +168,33 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     
     @Override
     public float getCompletedRatio(UUID uuid) {
-        int completed = 0;
-        for (boolean b : ((QuestDataTaskCompleted) getData(uuid)).quests) {
-            if (b) {
-                completed++;
-            }
-        }
-        
-        return (float) completed / elements.size();
+        return ((QuestDataTaskCompleted) getData(uuid)).getCompletedRatio(elements.size());
     }
     
     @Override
     public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
-        boolean[] completed = ((QuestDataTaskCompleted) own).quests;
-        boolean[] otherCompleted = ((QuestDataTaskCompleted) other).quests;
+        ((QuestDataTaskCompleted) own).mergeResult((QuestDataTaskCompleted) other);
         
-        boolean all = true;
-        for (int i = 0; i < completed.length; i++) {
-            if (otherCompleted[i]) {
-                completed[i] = true;
-            } else if (!completed[i]) {
-                all = false;
-            }
-        }
-        
-        if (all) {
+        if (((QuestDataTaskCompleted) own).isComplete(elements.size())) {
             completeTask(uuid);
         }
     }
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        boolean[] completed = ((QuestDataTaskCompleted) getData(uuid)).quests;
-        for (int i = 0; i < elements.size(); i++) {
-            completed[i] = status;
+        QuestDataTaskCompleted data = ((QuestDataTaskCompleted) getData(uuid));
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.complete(i);
+            }
+        } else {
+            data.clear();
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        boolean[] completed = ((QuestDataTaskCompleted) own).quests;
-        System.arraycopy(((QuestDataTaskCompleted) other).quests, 0, completed, 0, completed.length);
+        own.update(other);
     }
     
     @Override
