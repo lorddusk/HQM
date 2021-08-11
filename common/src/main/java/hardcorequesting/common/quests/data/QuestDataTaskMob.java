@@ -9,31 +9,54 @@ import hardcorequesting.common.quests.task.KillMobsTask;
 import hardcorequesting.common.quests.task.QuestTask;
 import net.minecraft.util.GsonHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QuestDataTaskMob extends QuestDataTask {
     
     private static final String COUNT = "count";
     private static final String KILLED = "killed";
-    public int[] killed;
+    private final List<Integer> killed;
     
     public QuestDataTaskMob(QuestTask task) {
-        super(task);
-        this.killed = new int[((KillMobsTask) task).elements.size()];
+        this(((KillMobsTask) task).elements.size());
     }
     
-    protected QuestDataTaskMob() {
+    protected QuestDataTaskMob(int size) {
         super();
-        this.killed = new int[0];
+        this.killed = new ArrayList<>(size);
+        while (killed.size() < size) {
+            killed.add(0);
+        }
     }
     
     public static QuestDataTask construct(JsonObject in) {
-        QuestDataTaskMob data = new QuestDataTaskMob();
+        QuestDataTaskMob data = new QuestDataTaskMob(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
-        data.killed = new int[GsonHelper.getAsInt(in, COUNT)];
         JsonArray array = GsonHelper.getAsJsonArray(in, KILLED);
         for (int i = 0; i < array.size(); i++) {
-            data.killed[i] = array.get(i).getAsInt();
+            data.setValue(i, array.get(i).getAsInt());
         }
         return data;
+    }
+    
+    public int getValue(int id) {
+        if (killed.size() <= id)
+            return 0;
+        else return killed.get(id);
+    }
+    
+    public void setValue(int id, int amount) {
+        while (id >= killed.size()) {
+            killed.add(0);
+        }
+        killed.set(id, amount);
+    }
+    
+    public void merge(QuestDataTaskMob other) {
+        for (int i = 0; i < other.killed.size(); i++) {
+            setValue(i, Math.max(this.getValue(i), other.getValue(i)));
+        }
     }
     
     @Override
@@ -44,13 +67,14 @@ public class QuestDataTaskMob extends QuestDataTask {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         super.write(builder);
-        builder.add(COUNT, killed.length);
-        builder.add(KILLED, Adapter.array(killed).build());
+        builder.add(COUNT, killed.size());
+        builder.add(KILLED, Adapter.array(killed.toArray()).build());
     }
     
     @Override
     public void update(QuestDataTask taskData) {
         super.update(taskData);
-        this.killed = ((QuestDataTaskMob) taskData).killed;
+        this.killed.clear();
+        this.killed.addAll(((QuestDataTaskMob) taskData).killed);
     }
 }

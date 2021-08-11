@@ -27,7 +27,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -48,8 +47,6 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     
     @Override
     protected void onAddElement(Player player) {
-        QuestDataTaskMob data = (QuestDataTaskMob) getData(player);
-        data.killed = Arrays.copyOf(data.killed, data.killed.length + 1);
         SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
     }
     
@@ -80,7 +77,7 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     }
     
     private int killed(int id, Player player) {
-        return id < elements.size() ? ((QuestDataTaskMob) getData(player)).killed[id] : 0;
+        return ((QuestDataTaskMob) getData(player)).getValue(id);
     }
     
     @Override
@@ -120,8 +117,9 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
         int total = 0;
         
         for (int i = 0; i < elements.size(); i++) {
-            killed += ((QuestDataTaskMob) getData(playerID)).killed[i];
-            total += elements.get(i).count;
+            int req = elements.get(i).count;
+            killed += Math.min(req, ((QuestDataTaskMob) getData(playerID)).getValue(i));
+            total += req;
         }
         
         return (float) killed / total;
@@ -129,14 +127,14 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     
     @Override
     public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
-        int[] killed = ((QuestDataTaskMob) own).killed;
-        int[] otherKilled = ((QuestDataTaskMob) other).killed;
+        QuestDataTaskMob data = (QuestDataTaskMob) own;
+        data.merge((QuestDataTaskMob) other);
         
         boolean all = true;
-        for (int i = 0; i < killed.length; i++) {
-            killed[i] = Math.max(killed[i], otherKilled[i]);
-            if (killed[i] < elements.get(i).count) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (data.getValue(i) < elements.get(i).count) {
                 all = false;
+                break;
             }
         }
         
@@ -147,21 +145,21 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
     
     @Override
     public void autoComplete(UUID playerID, boolean status) {
-        int[] killed = ((QuestDataTaskMob) getData(playerID)).killed;
-        for (int i = 0; i < killed.length; i++) {
-            if (status) {
-                killed[i] = elements.get(i).count;
-            } else {
-                killed[i] = 0;
+        QuestDataTaskMob data = (QuestDataTaskMob) getData(playerID);
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, elements.get(i).count);
+            }
+        } else {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, elements.get(i).count);
             }
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        int[] killed = ((QuestDataTaskMob) own).killed;
-        System.arraycopy(((QuestDataTaskMob) other).killed, 0, killed, 0, killed.length);
+        own.update(other);
     }
     
     @Override
@@ -169,14 +167,15 @@ public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
         Player killer = getKiller(source);
         
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
+            QuestDataTaskMob data = (QuestDataTaskMob) getData(killer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
                 Mob mob = elements.get(i);
-                if (mob.count > ((QuestDataTaskMob) getData(killer)).killed[i]) {
+                if (mob.count > data.getValue(i)) {
                     EntityType<?> type = Registry.ENTITY_TYPE.get(mob.mob);
                     if (type != null) {
                         if (type.equals(entity.getType())) {
-                            ((QuestDataTaskMob) getData(killer)).killed[i]++;
+                            data.setValue(i, data.getValue(i) + 1);
                             updated = true;
                         }
                     }
