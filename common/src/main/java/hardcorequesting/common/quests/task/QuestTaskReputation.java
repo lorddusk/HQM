@@ -22,43 +22,49 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class QuestTaskReputation extends QuestTask {
+public abstract class QuestTaskReputation extends ListTask<QuestTaskReputation.ReputationSetting> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
-    public ReputationSetting[] settings = new ReputationSetting[0];
     
     public QuestTaskReputation(Quest parent, String description, String longDescription, int startOffsetY) {
         super(parent, description, longDescription);
         this.startOffsetY = startOffsetY;
     }
     
-    public ReputationSetting[] getSettings() {
-        return settings;
+    public List<ReputationSetting> getSettings() {
+        return elements;
     }
     
     public void setSetting(int id, ReputationSetting setting) {
-        if (id >= settings.length) {
-            settings = Arrays.copyOf(settings, settings.length + 1);
-            SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CREATE);
-        } else {
-            SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CHANGE);
-        }
-        
-        settings[id] = setting;
+        setElement(id, setting);
+    }
+    
+    @Override
+    protected ReputationSetting createEmpty() {
+        return new ReputationSetting(null, null, null, false);
+    }
+    
+    @Override
+    protected void onAddElement() {
+        SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement() {
+        SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CHANGE);
     }
     
     protected boolean isPlayerInRange(Player player) {
-        if (settings.length > 0) {
+        if (!elements.isEmpty()) {
             
             QuestDataTask data = getData(player);
             if (!data.completed && !player.getCommandSenderWorld().isClientSide) {
-                for (ReputationSetting setting : settings) {
+                for (ReputationSetting setting : elements) {
                     if (!setting.isValid(player.getUUID())) {
                         return false;
                     }
@@ -74,15 +80,16 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
-        int size = Quest.canQuestsBeEdited() ? settings.length + 1 : settings.length;
-        for (int i = 0; i < size; i++) {
+        List<ReputationSetting> renderSettings = getShownElements();
+        for (int i = 0; i < renderSettings.size(); i++) {
+            ReputationSetting setting = renderSettings.get(i);
+            
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            if (i >= settings.length) {
+            if (setting.reputation == null) {
                 gui.drawRect(START_X + Reputation.BAR_X, START_Y + startOffsetY + i * OFFSET_Y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             } else {
-                ReputationSetting setting = settings[i];
                 info = setting.reputation.draw(matrices, gui, START_X, START_Y + startOffsetY + i * OFFSET_Y, mX, mY, info, getPlayerForRender(player), true, setting.lower, setting.upper, setting.inverted, null, null, getData(player).completed);
             }
         }
@@ -96,12 +103,14 @@ public abstract class QuestTaskReputation extends QuestTask {
     @Environment(EnvType.CLIENT)
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            int size = settings.length + 1;
-            for (int i = 0; i < size; i++) {
+            List<ReputationSetting> renderSettings = getShownElements();
+            for (int i = 0; i < renderSettings.size(); i++) {
+                ReputationSetting setting = renderSettings.get(i);
+                
                 if (gui.inBounds(START_X, START_Y + startOffsetY + i * OFFSET_Y, Reputation.BAR_WIDTH, 20, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-                        gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, i >= settings.length ? null : settings[i]));
-                    } else if (gui.getCurrentMode() == EditMode.DELETE && i < settings.length) {
+                        gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, setting));
+                    } else if (gui.getCurrentMode() == EditMode.DELETE && i < elements.size()) {
                         removeSetting(i);
                         SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_REMOVE);
                     }
@@ -113,13 +122,13 @@ public abstract class QuestTaskReputation extends QuestTask {
     
     @Override
     public float getCompletedRatio(UUID playerID) {
-        int count = settings.length;
+        int count = elements.size();
         if (count == 0) {
             return 0;
         }
         
         int valid = 0;
-        for (ReputationSetting setting : settings) {
+        for (ReputationSetting setting : elements) {
             if (setting.isValid(playerID)) {
                 valid++;
             }
@@ -145,21 +154,13 @@ public abstract class QuestTaskReputation extends QuestTask {
     }
     
     public void removeSetting(int i) {
-        int id = 0;
-        ReputationSetting[] settings = new ReputationSetting[this.settings.length - 1];
-        for (int j = 0; j < this.settings.length; j++) {
-            if (j != i) {
-                settings[id] = this.settings[j];
-                id++;
-            }
-        }
-        this.settings = settings;
+        elements.remove(i);
     }
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         Adapter.JsonArrayBuilder array = Adapter.array();
-        for (ReputationSetting setting : settings) {
+        for (ReputationSetting setting : elements) {
             array.add(QuestTaskAdapter.REPUTATION_TASK_ADAPTER.toJsonTree(setting));
         }
         builder.add(REPUTATION, array.build());

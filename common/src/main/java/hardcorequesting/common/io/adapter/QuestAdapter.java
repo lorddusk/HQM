@@ -393,14 +393,14 @@ public class QuestAdapter {
         }
         reputationRewardMapping.clear();
         for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
-            List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();
+            List<QuestTaskReputation.ReputationSetting> reputationSettingList = entry.getKey().getSettings();
+            reputationSettingList.clear();
             for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {
                 QuestTaskReputation.ReputationSetting setting = constructor.constructReputationSetting();
                 if (setting != null) {
                     reputationSettingList.add(setting);
                 }
             }
-            entry.getKey().settings = reputationSettingList.toArray(new QuestTaskReputation.ReputationSetting[0]);
         }
         QuestTaskAdapter.taskReputationListMap.clear();
         nameToQuestMap.clear();

@@ -36,7 +36,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
         this.task = task;
         this.id = id;
         ReputationManager reputationManager = ReputationManager.getInstance();
-        if (setting == null || setting.getReputation() == null) {
+        if (setting.getReputation() == null) {
             if (!reputationManager.getReputations().isEmpty()) {
                 reputation = reputationManager.getReputationList().get(0);
                 reputationId = 0;

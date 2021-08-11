@@ -5,6 +5,7 @@ import hardcorequesting.common.quests.Quest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A base class for tasks with sub-elements.
@@ -47,6 +48,17 @@ public abstract class ListTask<T> extends QuestTask {
         } else {
             onModifyElement();
             return elements.get(id);
+        }
+    }
+    
+    protected final void setElement(int id, T element) {
+        Objects.requireNonNull(element);
+        if (id >= elements.size()) {
+            elements.add(element);
+            onAddElement();
+        } else {
+            elements.set(id, element);
+            onModifyElement();
         }
     }
 }
