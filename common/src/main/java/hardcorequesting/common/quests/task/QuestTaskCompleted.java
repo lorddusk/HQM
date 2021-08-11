@@ -175,7 +175,7 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
         ((QuestDataTaskCompleted) own).mergeResult((QuestDataTaskCompleted) other);
         
-        if (((QuestDataTaskCompleted) own).isComplete(elements.size())) {
+        if (((QuestDataTaskCompleted) own).areAllCompleted(elements.size())) {
             completeTask(uuid);
         }
     }

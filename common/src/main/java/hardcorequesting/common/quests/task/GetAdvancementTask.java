@@ -27,9 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -51,8 +49,6 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     
     @Override
     protected void onAddElement(Player player) {
-        QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) getData(player);
-        data.advanced = Arrays.copyOf(data.advanced, data.advanced.length + 1);
         SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
     }
     
@@ -67,7 +63,7 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     }
     
     private boolean advanced(int id, Player player) {
-        return id < elements.size() && ((QuestDataTaskAdvancement) getData(player)).advanced[id];
+        return ((QuestDataTaskAdvancement) getData(player)).getValue(id);
     }
     
     private void setAdvancement(int id, String advancement, Player player) {
@@ -109,21 +105,14 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     private void checkAdvancement(Player player) {
         Level world = player.getCommandSenderWorld();
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
-            boolean[] advanced = ((QuestDataTaskAdvancement) this.getData(player)).advanced;
-            
-            if (advanced.length < elements.size()) {
-                boolean[] oldVisited = ArrayUtils.addAll(advanced, (boolean[]) null);
-                advanced = new boolean[elements.size()];
-                System.arraycopy(oldVisited, 0, advanced, 0, oldVisited.length);
-                ((QuestDataTaskAdvancement) this.getData(player)).advanced = advanced;
-            }
+            QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) this.getData(player);
             
             boolean completed = true;
             ServerAdvancementManager manager = player.getServer().getAdvancements();
             PlayerAdvancements playerAdvancements = player.getServer().getPlayerList().getPlayerAdvancements((ServerPlayer) player);
             
             for (int i = 0; i < elements.size(); i++) {
-                if (advanced[i]) continue;
+                if (data.getValue(i)) continue;
                 
                 AdvancementTask advancement = this.elements.get(i);
                 if (advancement == null || advancement.getName() == null || advancement.getAdvancement() == null) continue;
@@ -138,7 +127,7 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
                     AdvancementProgress progress = playerAdvancements.getOrStartProgress(advAdvancement);
                     
                     if (progress.isDone()) {
-                        advanced[i] = true;
+                        data.complete(i);
                     } else {
                         completed = false;
                     }
@@ -154,48 +143,34 @@ public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.Advance
     
     @Override
     public float getCompletedRatio(UUID uuid) {
-        int advanced = 0;
-        for (boolean b : ((QuestDataTaskAdvancement) getData(uuid)).advanced) {
-            if (b) {
-                advanced++;
-            }
-        }
         
-        return (float) advanced / elements.size();
+        return ((QuestDataTaskAdvancement) getData(uuid)).getCompletedRatio(elements.size());
     }
     
     @Override
     public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
-        boolean[] advanced = ((QuestDataTaskAdvancement) own).advanced;
-        boolean[] otherVisited = ((QuestDataTaskAdvancement) other).advanced;
+        ((QuestDataTaskAdvancement) own).mergeResult((QuestDataTaskAdvancement) other);
         
-        boolean all = true;
-        for (int i = 0; i < advanced.length; i++) {
-            if (otherVisited[i]) {
-                advanced[i] = true;
-            } else if (!advanced[i]) {
-                all = false;
-            }
-        }
-        
-        if (all) {
+        if (((QuestDataTaskAdvancement) own).areAllCompleted(elements.size())) {
             completeTask(uuid);
         }
     }
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        boolean[] advanced = ((QuestDataTaskAdvancement) getData(uuid)).advanced;
-        for (int i = 0; i < advanced.length; i++) {
-            advanced[i] = status;
+        QuestDataTaskAdvancement data = ((QuestDataTaskAdvancement) getData(uuid));
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.complete(i);
+            }
+        } else {
+            data.clear();
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        boolean[] advanced = ((QuestDataTaskAdvancement) own).advanced;
-        System.arraycopy(((QuestDataTaskAdvancement) other).advanced, 0, advanced, 0, advanced.length);
+        own.update(other);
     }
     
     @Override

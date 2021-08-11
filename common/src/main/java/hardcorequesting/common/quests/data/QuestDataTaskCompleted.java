@@ -69,7 +69,7 @@ public class QuestDataTaskCompleted extends QuestDataTask {
         return (float) quests.stream().limit(size).filter(Boolean::booleanValue).count() / size;
     }
     
-    public boolean isComplete(int size) {
+    public boolean areAllCompleted(int size) {
         return quests.stream().limit(size).allMatch(Boolean::booleanValue);
     }
     
