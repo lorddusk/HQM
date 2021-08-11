@@ -6,8 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class QuestTaskBlockBreak extends QuestTaskBlock {
-    public QuestTaskBlockBreak(Quest parent, String description, String longDescription) {
+public class BreakBlockTask extends BlockRequirementTask {
+    public BreakBlockTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.BLOCK_BROKEN);

@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class QuestTaskItems extends ListTask<QuestTaskItems.ItemRequirement> {
+public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.ItemRequirement> {
     
     private static final String ITEMS = "items";
     private static final int MAX_X = 300;
@@ -48,7 +48,7 @@ public abstract class QuestTaskItems extends ListTask<QuestTaskItems.ItemRequire
     private static final int TEXT_HEIGHT = 9;
     private int lastClicked;
     
-    public QuestTaskItems(Quest parent, String description, String longDescription) {
+    public ItemRequirementTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
     

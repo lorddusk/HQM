@@ -47,14 +47,14 @@ public class QuestTaskAdapter {
             return QuestDataType.valueOf(GsonHelper.getAsString(object, TYPE)).construct(object);
         }
     };
-    public static final TypeAdapter<QuestTaskItems.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<QuestTaskItems.ItemRequirement>() {
+    public static final TypeAdapter<ItemRequirementTask.ItemRequirement> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<ItemRequirementTask.ItemRequirement>() {
         private static final String ITEM = "item";
         private static final String FLUID = "fluid";
         private static final String REQUIRED = "required";
         private static final String PRECISION = "precision";
         
         @Override
-        public void write(JsonWriter out, QuestTaskItems.ItemRequirement value) throws IOException {
+        public void write(JsonWriter out, ItemRequirementTask.ItemRequirement value) throws IOException {
             ItemStack stack = value.getStack();
             FluidStack fluid = value.fluid;
             int required = value.required;
@@ -77,7 +77,7 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskItems.ItemRequirement read(JsonReader in) throws IOException {
+        public ItemRequirementTask.ItemRequirement read(JsonReader in) throws IOException {
             in.beginObject();
             ItemStack itemStack = ItemStack.EMPTY;
             FluidStack fluidVolume = null;
@@ -99,11 +99,11 @@ public class QuestTaskAdapter {
                 }
             }
             in.endObject();
-            QuestTaskItems.ItemRequirement result;
+            ItemRequirementTask.ItemRequirement result;
             if (!itemStack.isEmpty()) {
-                result = new QuestTaskItems.ItemRequirement(itemStack, required);
+                result = new ItemRequirementTask.ItemRequirement(itemStack, required);
             } else if (fluidVolume != null) {
-                result = new QuestTaskItems.ItemRequirement(fluidVolume, required);
+                result = new ItemRequirementTask.ItemRequirement(fluidVolume, required);
             } else {
                 return null;
             }
@@ -157,14 +157,14 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static final Adapter<QuestTaskReputation.ReputationSetting> REPUTATION_TASK_ADAPTER = new Adapter<QuestTaskReputation.ReputationSetting>() {
+    public static final Adapter<ReputationTask.ReputationSetting> REPUTATION_TASK_ADAPTER = new Adapter<ReputationTask.ReputationSetting>() {
         private static final String REPUTATION = "reputation";
         private static final String LOWER = "lower";
         private static final String UPPER = "upper";
         private static final String INVERTED = "inverted";
         
         @Override
-        public JsonElement serialize(QuestTaskReputation.ReputationSetting src) {
+        public JsonElement serialize(ReputationTask.ReputationSetting src) {
             JsonObjectBuilder builder = object()
                     .add(REPUTATION, src.getReputation().getId())
                     .add(INVERTED, src.isInverted());
@@ -176,7 +176,7 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskReputation.ReputationSetting deserialize(JsonElement json) {
+        public ReputationTask.ReputationSetting deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             Reputation reputation = ReputationManager.getInstance().getReputation(GsonHelper.getAsString(object, REPUTATION, null));
             ReputationMarker lower = null;
@@ -184,7 +184,7 @@ public class QuestTaskAdapter {
             if (object.has(LOWER)) lower = reputation.getMarker(GsonHelper.getAsInt(object, LOWER));
             if (object.has(UPPER)) upper = reputation.getMarker(GsonHelper.getAsInt(object, UPPER));
             if (reputation == null) return null;
-            return new QuestTaskReputation.ReputationSetting(
+            return new ReputationTask.ReputationSetting(
                     reputation,
                     lower,
                     upper,
@@ -280,12 +280,12 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<QuestTaskCompleted.CompletedQuestTask> QUEST_COMPLETED_ADAPTER = new TypeAdapter<QuestTaskCompleted.CompletedQuestTask>() {
+    public static final TypeAdapter<CompleteQuestTask.CompletedQuestTask> QUEST_COMPLETED_ADAPTER = new TypeAdapter<CompleteQuestTask.CompletedQuestTask>() {
         private final String VISIBLE = "visible";
         private final String QUEST_UUID = "quest_uuid";
         
         @Override
-        public void write(JsonWriter out, QuestTaskCompleted.CompletedQuestTask value) throws IOException {
+        public void write(JsonWriter out, CompleteQuestTask.CompletedQuestTask value) throws IOException {
             out.beginObject();
             if (value.getQuest() != null) {
                 out.name(QUEST_UUID).value(value.getQuestId().toString());
@@ -294,9 +294,9 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTaskCompleted.CompletedQuestTask read(JsonReader in) throws IOException {
+        public CompleteQuestTask.CompletedQuestTask read(JsonReader in) throws IOException {
             in.beginObject();
-            QuestTaskCompleted.CompletedQuestTask result = new QuestTaskCompleted.CompletedQuestTask();
+            CompleteQuestTask.CompletedQuestTask result = new CompleteQuestTask.CompletedQuestTask();
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(QUEST_UUID)) {
@@ -345,7 +345,7 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static Map<QuestTaskReputation, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
+    public static Map<ReputationTask, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
     protected static final Adapter<QuestTask> TASK_ADAPTER = new Adapter<QuestTask>() {
         private static final String TYPE = "type";
         private static final String DESCRIPTION = "description";
@@ -427,7 +427,7 @@ public class QuestTaskAdapter {
             );
         }
         
-        public QuestTaskReputation.ReputationSetting constructReputationSetting() {
+        public ReputationTask.ReputationSetting constructReputationSetting() {
             Reputation reputation = ReputationManager.getInstance().getReputations().get(this.reputation);
             if (reputation != null) {
                 ReputationMarker lower = null, upper = null;
@@ -435,7 +435,7 @@ public class QuestTaskAdapter {
                     lower = reputation.getMarker(this.lower);
                 if (this.upper >= 0 && this.upper < reputation.getMarkerCount())
                     upper = reputation.getMarker(this.upper);
-                return new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted);
+                return new ReputationTask.ReputationSetting(reputation, lower, upper, inverted);
             }
             return null;
         }

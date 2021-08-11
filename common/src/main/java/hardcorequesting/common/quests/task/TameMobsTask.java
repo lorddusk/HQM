@@ -34,7 +34,7 @@ import java.util.UUID;
 /**
  * A task where the player needs to tame certain mobs.
  */
-public class TameMobsTask extends IconQuestTask<TameMobsTask.Tame> {
+public class TameMobsTask extends IconLayoutTask<TameMobsTask.Tame> {
     private static final String TAME = "tame";
     
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");

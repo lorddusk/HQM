@@ -10,9 +10,9 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class QuestTaskItemsConsume extends QuestTaskItems {
+public class ConsumeItemTask extends ItemRequirementTask {
     
-    public QuestTaskItemsConsume(Quest parent, String description, String longDescription) {
+    public ConsumeItemTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
     

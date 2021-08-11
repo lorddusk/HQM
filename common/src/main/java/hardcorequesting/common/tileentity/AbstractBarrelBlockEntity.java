@@ -6,9 +6,9 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.task.ConsumeItemTask;
+import hardcorequesting.common.quests.task.ItemRequirementTask;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskItems;
-import hardcorequesting.common.quests.task.QuestTaskItemsConsume;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
@@ -62,10 +62,10 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     @Override
     public void setItem(int i, @NotNull ItemStack stack) {
         QuestTask task = getCurrentTask();
-        if (task instanceof QuestTaskItemsConsume) {
+        if (task instanceof ConsumeItemTask) {
             NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
-            if (((QuestTaskItemsConsume) task).increaseItems(list, (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
+            if (((ConsumeItemTask) task).increaseItems(list, (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
                 this.updateState();
                 this.doSync();
             }
@@ -91,10 +91,10 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     @Override
     public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
         QuestTask task = getCurrentTask();
-        if (task instanceof QuestTaskItemsConsume) {
-            QuestTaskItemsConsume consumeTask = (QuestTaskItemsConsume) task;
+        if (task instanceof ConsumeItemTask) {
+            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
             for (int i = 0; i < consumeTask.getItems().size(); i++) {
-                QuestTaskItems.ItemRequirement requirement = consumeTask.getItems().get(i);
+                ItemRequirementTask.ItemRequirement requirement = consumeTask.getItems().get(i);
                 if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
                     QuestDataTaskItems data = (QuestDataTaskItems) task.getData(this.getPlayerUUID());
                     if (data.progress.length > i) {

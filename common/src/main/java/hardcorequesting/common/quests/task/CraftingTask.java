@@ -9,9 +9,9 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class QuestTaskItemsCrafting extends QuestTaskItems {
+public class CraftingTask extends ItemRequirementTask {
     
-    public QuestTaskItemsCrafting(Quest parent, String description, String longDescription) {
+    public CraftingTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         register(EventTrigger.Type.CRAFTING);
     }

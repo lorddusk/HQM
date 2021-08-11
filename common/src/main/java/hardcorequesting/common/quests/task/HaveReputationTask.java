@@ -4,9 +4,9 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import net.minecraft.world.entity.player.Player;
 
-public class QuestTaskReputationTarget extends QuestTaskReputation {
+public class HaveReputationTask extends ReputationTask {
     
-    public QuestTaskReputationTarget(Quest parent, String description, String longDescription) {
+    public HaveReputationTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 0);
         
         register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);

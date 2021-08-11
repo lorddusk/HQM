@@ -9,7 +9,7 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskReputation;
+import hardcorequesting.common.quests.task.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -392,11 +392,11 @@ public class QuestAdapter {
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();
-        for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
-            List<QuestTaskReputation.ReputationSetting> reputationSettingList = entry.getKey().getSettings();
+        for (Map.Entry<ReputationTask, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
+            List<ReputationTask.ReputationSetting> reputationSettingList = entry.getKey().getSettings();
             reputationSettingList.clear();
             for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {
-                QuestTaskReputation.ReputationSetting setting = constructor.constructReputationSetting();
+                ReputationTask.ReputationSetting setting = constructor.constructReputationSetting();
                 if (setting != null) {
                     reputationSettingList.add(setting);
                 }

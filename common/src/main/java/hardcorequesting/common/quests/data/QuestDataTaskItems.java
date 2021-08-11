@@ -5,8 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
+import hardcorequesting.common.quests.task.ItemRequirementTask;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskItems;
 import net.minecraft.util.GsonHelper;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ public class QuestDataTaskItems extends QuestDataTask {
     
     public QuestDataTaskItems(QuestTask task) {
         super(task);
-        this.progress = new int[((QuestTaskItems) task).getItems().size()];
+        this.progress = new int[((ItemRequirementTask) task).getItems().size()];
     }
     
     protected QuestDataTaskItems() {
@@ -64,7 +64,7 @@ public class QuestDataTaskItems extends QuestDataTask {
         return 0;
     }
     
-    public boolean isDone(int index, QuestTaskItems.ItemRequirement requirement) {
+    public boolean isDone(int index, ItemRequirementTask.ItemRequirement requirement) {
         return this.getProgressFor(index) >= requirement.required;
     }
 }

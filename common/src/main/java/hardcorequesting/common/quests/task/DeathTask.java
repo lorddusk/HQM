@@ -21,11 +21,11 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 
-public class QuestTaskDeath extends QuestTask {
+public class DeathTask extends QuestTask {
     private static final String DEATHS = "deaths";
     private int deaths;
     
-    public QuestTaskDeath(Quest parent, String description, String longDescription) {
+    public DeathTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.DEATH);

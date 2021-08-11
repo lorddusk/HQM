@@ -4,8 +4,8 @@ import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.fluid.FluidInsertable;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.task.ConsumeItemTask;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskItemsConsume;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.fabric.FabricFluidStack;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
@@ -16,8 +16,8 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements Flui
     @Override
     public FluidVolume attemptInsertion(FluidVolume fluidVolume, Simulation simulation) {
         QuestTask task = getCurrentTask();
-        if (task instanceof QuestTaskItemsConsume) {
-            if (((QuestTaskItemsConsume) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID(), true)) {
+        if (task instanceof ConsumeItemTask) {
+            if (((ConsumeItemTask) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID(), true)) {
                 this.updateState();
                 this.doSync();
             }

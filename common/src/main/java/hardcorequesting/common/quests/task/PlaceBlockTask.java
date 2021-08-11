@@ -9,8 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class QuestTaskBlockPlace extends QuestTaskItems {
-    public QuestTaskBlockPlace(Quest parent, String description, String longDescription) {
+public class PlaceBlockTask extends ItemRequirementTask {
+    public PlaceBlockTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.ITEM_USED);

@@ -33,7 +33,7 @@ import java.util.UUID;
 /**
  * A task where the player has to complete advancements.
  */
-public class GetAdvancementTask extends IconQuestTask<GetAdvancementTask.AdvancementTask> {
+public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.AdvancementTask> {
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {

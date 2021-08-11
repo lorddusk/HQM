@@ -19,11 +19,11 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class QuestTaskReputationKill extends QuestTaskReputation {
+public class KillReputationTask extends ReputationTask {
     private static final String KILLS = "kills";
     private int kills;
     
-    public QuestTaskReputationKill(Quest parent, String description, String longDescription) {
+    public KillReputationTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 20);
         
         register(EventTrigger.Type.DEATH);

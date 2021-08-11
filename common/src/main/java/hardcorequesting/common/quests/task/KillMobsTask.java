@@ -32,7 +32,7 @@ import java.util.UUID;
 /**
  * A task where the player has to kill certain mobs.
  */
-public class KillMobsTask extends IconQuestTask<KillMobsTask.Mob> {
+public class KillMobsTask extends IconLayoutTask<KillMobsTask.Mob> {
     private static final String MOBS = "mobs";
     
     public KillMobsTask(Quest parent, String description, String longDescription) {

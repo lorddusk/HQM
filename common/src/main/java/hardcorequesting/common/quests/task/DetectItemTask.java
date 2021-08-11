@@ -13,9 +13,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-public class QuestTaskItemsDetect extends QuestTaskItems {
+public class DetectItemTask extends ItemRequirementTask {
     
-    public QuestTaskItemsDetect(Quest parent, String description, String longDescription) {
+    public DetectItemTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);

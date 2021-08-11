@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.lang.reflect.Method;
 
-public abstract class QuestTaskBlock extends QuestTaskItems {
+public abstract class BlockRequirementTask extends ItemRequirementTask {
     public static Method getSilkTouchDrop = null;
     public static final String NULL_NAME = "item.null.name";
     private static final String BLOCKS = "blocks";
     
-    public QuestTaskBlock(Quest parent, String description, String longDescription) {
+    public BlockRequirementTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
     

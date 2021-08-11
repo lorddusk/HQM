@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.quests.task.QuestTaskDeath;
+import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -9,9 +9,9 @@ import net.minecraft.world.entity.player.Player;
 public class GuiEditMenuDeathTask extends GuiEditMenuExtended {
     
     private int deaths;
-    private QuestTaskDeath task;
+    private DeathTask task;
     
-    public GuiEditMenuDeathTask(GuiBase gui, Player player, QuestTaskDeath task) {
+    public GuiEditMenuDeathTask(GuiBase gui, Player player, DeathTask task) {
         super(gui, player, true, -1, -1, 25, 30);
         
         deaths = task.getDeaths();

@@ -192,13 +192,13 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskDeath && Quest.canQuestsBeEdited();
+                return selectedTask != null && selectedTask instanceof DeathTask && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuDeathTask(gui, player, (QuestTaskDeath) selectedTask));
+                gui.setEditMenu(new GuiEditMenuDeathTask(gui, player, (DeathTask) selectedTask));
             }
         });
         
@@ -212,13 +212,13 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskReputationKill && Quest.canQuestsBeEdited();
+                return selectedTask != null && selectedTask instanceof KillReputationTask && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuReputationKillTask(gui, player, (QuestTaskReputationKill) selectedTask));
+                gui.setEditMenu(new GuiEditMenuReputationKillTask(gui, player, (KillReputationTask) selectedTask));
             }
         });
         
@@ -235,7 +235,7 @@ public class Quest {
             
             @Override
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
+                return selectedTask instanceof ConsumeItemTask && !selectedTask.isCompleted(player);
             }
             
             @Environment(EnvType.CLIENT)
@@ -1559,20 +1559,20 @@ public class Quest {
     }
     
     public enum TaskType {
-        CONSUME(QuestTaskItemsConsume.class, "consume"),
-        CRAFT(QuestTaskItemsCrafting.class, "craft"),
+        CONSUME(ConsumeItemTask.class, "consume"),
+        CRAFT(CraftingTask.class, "craft"),
         LOCATION(VisitLocationTask.class, "location"),
-        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
-        DETECT(QuestTaskItemsDetect.class, "detect"),
+        CONSUME_QDS(ConsumeItemQDSTask.class, "consumeQDS"),
+        DETECT(DetectItemTask.class, "detect"),
         KILL(KillMobsTask.class, "kill"),
         TAME(TameMobsTask.class, "tame"),
-        DEATH(QuestTaskDeath.class, "death"),
-        REPUTATION(QuestTaskReputationTarget.class, "reputation"),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill"),
+        DEATH(DeathTask.class, "death"),
+        REPUTATION(HaveReputationTask.class, "reputation"),
+        REPUTATION_KILL(KillReputationTask.class, "reputationKill"),
         ADVANCEMENT(GetAdvancementTask.class, "advancement"),
-        COMPLETION(QuestTaskCompleted.class, "completion"),
-        BLOCK_BREAK(QuestTaskBlockBreak.class, "break"),
-        BLOCK_PLACE(QuestTaskBlockPlace.class, "place");
+        COMPLETION(CompleteQuestTask.class, "completion"),
+        BLOCK_BREAK(BreakBlockTask.class, "break"),
+        BLOCK_PLACE(PlaceBlockTask.class, "place");
         
         private final Class<? extends QuestTask> clazz;
         private final String id;

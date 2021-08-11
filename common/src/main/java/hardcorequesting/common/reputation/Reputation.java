@@ -11,7 +11,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskReputation;
+import hardcorequesting.common.quests.task.ReputationTask;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -164,9 +164,9 @@ public class Reputation {
 
                         for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask task : quest.getTasks()) {
-                                if (task instanceof QuestTaskReputation) {
-                                    QuestTaskReputation reputationTask = (QuestTaskReputation) task;
-                                    List<QuestTaskReputation.ReputationSetting> settings = reputationTask.getSettings();
+                                if (task instanceof ReputationTask) {
+                                    ReputationTask reputationTask = (ReputationTask) task;
+                                    List<ReputationTask.ReputationSetting> settings = reputationTask.getSettings();
                                     settings.removeIf(setting -> reputation.equals(setting.getReputation()));
                                 }
                             }
@@ -212,9 +212,9 @@ public class Reputation {
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask task : quest.getTasks()) {
-                                if (task instanceof QuestTaskReputation) {
-                                    QuestTaskReputation reputationTask = (QuestTaskReputation) task;
-                                    for (QuestTaskReputation.ReputationSetting setting : reputationTask.getSettings()) {
+                                if (task instanceof ReputationTask) {
+                                    ReputationTask reputationTask = (ReputationTask) task;
+                                    for (ReputationTask.ReputationSetting setting : reputationTask.getSettings()) {
                                         if (selectedReputation.markers.get(i).equals(setting.getLower())) {
                                             setting.setLower(null);
                                         }

@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQuestTask> {
+public class CompleteQuestTask extends ListTask<CompleteQuestTask.CompletedQuestTask> {
     private static final String COMPLETED_QUESTS = "completed_quests";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -33,7 +33,7 @@ public class QuestTaskCompleted extends ListTask<QuestTaskCompleted.CompletedQue
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    public QuestTaskCompleted(Quest parent, String description, String longDescription) {
+    public CompleteQuestTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);

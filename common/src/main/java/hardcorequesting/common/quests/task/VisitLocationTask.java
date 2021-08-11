@@ -32,7 +32,7 @@ import java.util.UUID;
 /**
  * A task where the player has to visit certain locations.
  */
-public class VisitLocationTask extends IconQuestTask<VisitLocationTask.Location> {
+public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Location> {
     private static final String LOCATIONS = "locations";
     
     private static final int CHECK_DELAY = 20;

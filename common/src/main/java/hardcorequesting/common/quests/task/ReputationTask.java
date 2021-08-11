@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class QuestTaskReputation extends ListTask<QuestTaskReputation.ReputationSetting> {
+public abstract class ReputationTask extends ListTask<ReputationTask.ReputationSetting> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
     
-    public QuestTaskReputation(Quest parent, String description, String longDescription, int startOffsetY) {
+    public ReputationTask(Quest parent, String description, String longDescription, int startOffsetY) {
         super(parent, description, longDescription);
         this.startOffsetY = startOffsetY;
     }

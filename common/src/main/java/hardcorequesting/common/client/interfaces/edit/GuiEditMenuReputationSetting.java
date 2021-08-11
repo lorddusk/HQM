@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.quests.task.QuestTaskReputation;
+import hardcorequesting.common.quests.task.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
@@ -27,10 +27,10 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
-    private QuestTaskReputation task;
+    private ReputationTask task;
     private int id;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, QuestTaskReputation task, int id, QuestTaskReputation.ReputationSetting setting) {
+    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.ReputationSetting setting) {
         super(gui, player, true, 25, 25, -1, -1);
         
         this.task = task;
@@ -173,7 +173,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         if (reputation != null) {
-            task.setSetting(id, new QuestTaskReputation.ReputationSetting(reputation, lower, upper, inverted));
+            task.setSetting(id, new ReputationTask.ReputationSetting(reputation, lower, upper, inverted));
         }
     }
 }

@@ -19,14 +19,14 @@ import java.util.List;
  * A base class for tasks with sub-elements that uses item icons for display.
  * Provides the layout of a vertical list of elements, where each entry has an item icon, a name, and any extra info.
  */
-public abstract class IconQuestTask<T extends IconQuestTask.IconTask> extends ListTask<T> {
+public abstract class IconLayoutTask<T extends IconLayoutTask.IconTask> extends ListTask<T> {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    public IconQuestTask(Quest parent, String description, String longDescription) {
+    public IconLayoutTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
     

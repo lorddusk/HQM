@@ -2,9 +2,9 @@ package hardcorequesting.common.quests.task;
 
 import hardcorequesting.common.quests.Quest;
 
-public class QuestTaskItemsConsumeQDS extends QuestTaskItemsConsume {
+public class ConsumeItemQDSTask extends ConsumeItemTask {
     
-    public QuestTaskItemsConsumeQDS(Quest parent, String description, String longDescription) {
+    public ConsumeItemQDSTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
     }
     
