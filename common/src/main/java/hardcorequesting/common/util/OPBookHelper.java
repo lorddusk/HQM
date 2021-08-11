@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.UUID;
 
 public final class OPBookHelper {
@@ -88,15 +89,15 @@ public final class OPBookHelper {
                 
                 if (task instanceof QuestTaskItems) {
                     QuestTaskItems itemTask = (QuestTaskItems) task;
-                    QuestTaskItems.ItemRequirement[] requirements = itemTask.getItems();
-                    if (requirement >= 0 && requirement < requirements.length) {
+                    List<QuestTaskItems.ItemRequirement> requirements = itemTask.getItems();
+                    if (requirement >= 0 && requirement < requirements.size()) {
                         QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUUID());
-                        if (qData.progress[requirement] == requirements[requirement].required) {
+                        if (qData.progress[requirement] == requirements.get(requirement).required) {
                             qData.progress[requirement] = 0;
                             itemTask.getData(subject.getUUID()).completed = false;
                             QuestingDataManager.getInstance().getQuestingData(subject).getTeam().refreshData();
                         } else {
-                            qData.progress[requirement] = requirements[requirement].required;
+                            qData.progress[requirement] = requirements.get(requirement).required;
                             itemTask.doCompletionCheck(qData, subject.getUUID());
                         }
                         quest.sendUpdatedDataToTeam(subject);

@@ -30,8 +30,8 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
     @Override
     public void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
         boolean isDone = true;
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        for (int i = 0; i < elements.size(); i++) {
+            ItemRequirement item = elements.get(i);
             if (item.required > data.progress[i]) {
                 data.progress[i] = 0; //Clear unfinished ones
                 isDone = false;
@@ -89,10 +89,10 @@ public class QuestTaskItemsDetect extends QuestTaskItems {
         
         boolean updated = false;
         
-        if (data.progress.length < items.length)
-            data.progress = Arrays.copyOf(data.progress, items.length);
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        if (data.progress.length < elements.size())
+            data.progress = Arrays.copyOf(data.progress, elements.size());
+        for (int i = 0; i < elements.size(); i++) {
+            ItemRequirement item = elements.get(i);
             if (!item.hasItem || item.required == data.progress[i]) {
                 continue;
             }

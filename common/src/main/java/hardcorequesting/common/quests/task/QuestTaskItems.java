@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class QuestTaskItems extends QuestTask {
+public abstract class QuestTaskItems extends ListTask<QuestTaskItems.ItemRequirement> {
     
     private static final String ITEMS = "items";
     private static final int MAX_X = 300;
@@ -47,11 +47,24 @@ public abstract class QuestTaskItems extends QuestTask {
     private static final int SIZE = 18;
     private static final int TEXT_HEIGHT = 9;
     private int lastClicked;
-    ItemRequirement[] items;
     
     public QuestTaskItems(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-        setItems(new ItemRequirement[0]);
+    }
+    
+    @Override
+    protected ItemRequirement createEmpty() {
+        return new ItemRequirement(ItemStack.EMPTY, 1);
+    }
+    
+    @Override
+    protected void onAddElement() {
+        SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CREATE);
+    }
+    
+    @Override
+    protected void onModifyElement() {
+        SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CHANGE);
     }
     
     @Override
@@ -65,51 +78,39 @@ public abstract class QuestTaskItems extends QuestTask {
     
     @Override
     public void read(JsonObject object) {
-        List<ItemRequirement> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray())) {
             ItemRequirement requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
             if (requirement != null)
-                list.add(requirement);
+                elements.add(requirement);
         }
-        setItems(list.toArray(new ItemRequirement[0]));
     }
     
-    public ItemRequirement[] getItems() {
-        return items;
-    }
-    
-    public void setItems(ItemRequirement[] items) {
-        this.items = items;
+    public List<ItemRequirement> getItems() {
+        return elements;
     }
     
     @Environment(EnvType.CLIENT)
     public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
         
-        if (id >= items.length) {
-            this.items = getEditFriendlyItems(items);
-            SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CREATE);
-        } else {
-            SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CHANGE);
-        }
-        
-        if (id < items.length) {
-            item.ifLeft(itemStack -> {
-                items[id].hasItem = true;
-                items[id].fluid = null;
-                items[id].stack = itemStack;
-            }).ifRight(fluidStack -> {
-                items[id].hasItem = false;
-                items[id].fluid = fluidStack;
-                items[id].stack = null;
-            });
-            items[id].required = amount;
-            items[id].precision = precision;
-            items[id].permutations = null;
-        }
+        ItemRequirement requirement = getOrCreateForModify(id);
+    
+        item.ifLeft(itemStack -> {
+            requirement.hasItem = true;
+            requirement.fluid = null;
+            requirement.stack = itemStack;
+        }).ifRight(fluidStack -> {
+            requirement.hasItem = false;
+            requirement.fluid = fluidStack;
+            requirement.stack = null;
+        });
+        requirement.required = amount;
+        requirement.precision = precision;
+        requirement.permutations = null;
     }
     
     private int getProgress(Player player, int id) {
-        if (id >= items.length) {
+        if (id >= elements.size()) {
             return 0;
         }
         
@@ -121,8 +122,8 @@ public abstract class QuestTaskItems extends QuestTask {
         return data.progress[id];
     }
     
-    private List<Positioned<ItemRequirement>> getPositionedItems(ItemRequirement[] items) {
-        List<Positioned<ItemRequirement>> list = new ArrayList<>(items.length);
+    private List<Positioned<ItemRequirement>> getPositionedItems(List<ItemRequirement> items) {
+        List<Positioned<ItemRequirement>> list = new ArrayList<>(items.size());
         int x = START_X;
         int y = START_Y;
     
@@ -140,18 +141,6 @@ public abstract class QuestTaskItems extends QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    private ItemRequirement[] getEditFriendlyItems(ItemRequirement[] items) {
-        if (Quest.canQuestsBeEdited()) {
-            items = Arrays.copyOf(items, items.length + 1);
-            items[items.length - 1] = new ItemRequirement(ItemStack.EMPTY, 1);
-            return items;
-        } else {
-            return items;
-        }
-        
-    }
-    
-    @Environment(EnvType.CLIENT)
     protected abstract boolean mayUseFluids();
     
     public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, QuestDataTaskItems data, UUID playerId) {
@@ -159,8 +148,8 @@ public abstract class QuestTaskItems extends QuestTask {
         
         boolean updated = false;
         
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        for (int i = 0; i < elements.size(); i++) {
+            ItemRequirement item = elements.get(i);
             if (!item.hasItem || data.isDone(i, item)) {
                 continue;
             }
@@ -190,8 +179,8 @@ public abstract class QuestTaskItems extends QuestTask {
     
     public void doCompletionCheck(QuestDataTaskItems data, UUID playerId) {
         boolean isDone = true;
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        for (int i = 0; i < elements.size(); i++) {
+            ItemRequirement item = elements.get(i);
             if (!data.isDone(i, item)) {
                 isDone = false;
                 break;
@@ -212,7 +201,7 @@ public abstract class QuestTaskItems extends QuestTask {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Positioned<ItemRequirement>> items = getPositionedItems(getEditFriendlyItems(this.items));
+        List<Positioned<ItemRequirement>> items = getPositionedItems(getShownElements());
         
         for (int i = 0; i < items.size(); i++) {
             Positioned<ItemRequirement> pos = items.get(i);
@@ -276,7 +265,7 @@ public abstract class QuestTaskItems extends QuestTask {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();
         boolean doubleClick = false;
         if (Quest.canQuestsBeEdited() || isOpBookWithShiftKeyDown) {
-            List<Positioned<ItemRequirement>> items = getPositionedItems(getEditFriendlyItems(this.items));
+            List<Positioned<ItemRequirement>> items = getPositionedItems(getShownElements());
             
             for (int i = 0; i < items.size(); i++) {
                 Positioned<ItemRequirement> pos = items.get(i);
@@ -306,15 +295,7 @@ public abstract class QuestTaskItems extends QuestTask {
                             }
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
-                            ItemRequirement[] newItems = new ItemRequirement[this.items.length - 1];
-                            int id = 0;
-                            for (int j = 0; j < this.items.length; j++) {
-                                if (j != i) {
-                                    newItems[id] = this.items[j];
-                                    id++;
-                                }
-                            }
-                            setItems(newItems);
+                            elements.remove(i);
                             SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
                         }
                     }
@@ -342,7 +323,7 @@ public abstract class QuestTaskItems extends QuestTask {
         for (int count : data.progress) {
             done += count;
         }
-        for (ItemRequirement item : items) {
+        for (ItemRequirement item : elements) {
             total += item.required;
         }
         
@@ -357,7 +338,7 @@ public abstract class QuestTaskItems extends QuestTask {
         boolean completed = true;
         for (int i = 0; i < ownProgress.length; i++) {
             ownProgress[i] = Math.max(ownProgress[i], otherProgress[i]);
-            if (ownProgress[i] != items[i].required) {
+            if (ownProgress[i] != elements.get(i).required) {
                 completed = false;
             }
         }
@@ -370,9 +351,9 @@ public abstract class QuestTaskItems extends QuestTask {
     @Override
     public void autoComplete(UUID playerId, boolean status) {
         QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
-        for (int i = 0; i < items.length; i++) {
+        for (int i = 0; i < elements.size(); i++) {
             if (status) {
-                data.progress[i] = items[i].required;
+                data.progress[i] = elements.get(i).required;
             } else {
                 data.progress[i] = 0;
             }

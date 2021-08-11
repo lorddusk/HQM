@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.UUID;
 
 public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
@@ -45,9 +46,9 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
             if (task instanceof QuestTaskItemsConsume) {
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
                 QuestDataTaskItems data = (QuestDataTaskItems) task.getData(playerUUID);
-                QuestTaskItems.ItemRequirement[] items = ((QuestTaskItemsConsume) task).getItems();
-                for (int i = 0; i < items.length; i++) {
-                    QuestTaskItems.ItemRequirement item = items[i];
+                List<QuestTaskItems.ItemRequirement> items = ((QuestTaskItemsConsume) task).getItems();
+                for (int i = 0; i < items.size(); i++) {
+                    QuestTaskItems.ItemRequirement item = items.get(i);
                     if (item.fluid == null || item.required == data.progress[i]) {
                         continue;
                     }

@@ -92,8 +92,9 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
         QuestTask task = getCurrentTask();
         if (task instanceof QuestTaskItemsConsume) {
-            for (int i = 0; i < ((QuestTaskItemsConsume) task).getItems().length; i++) {
-                QuestTaskItems.ItemRequirement requirement = ((QuestTaskItemsConsume) task).getItems()[i];
+            QuestTaskItemsConsume consumeTask = (QuestTaskItemsConsume) task;
+            for (int i = 0; i < consumeTask.getItems().size(); i++) {
+                QuestTaskItems.ItemRequirement requirement = consumeTask.getItems().get(i);
                 if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
                     QuestDataTaskItems data = (QuestDataTaskItems) task.getData(this.getPlayerUUID());
                     if (data.progress.length > i) {

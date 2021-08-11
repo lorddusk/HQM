@@ -15,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class QuestTaskBlock extends QuestTaskItems {
     public static Method getSilkTouchDrop = null;
@@ -53,13 +51,12 @@ public abstract class QuestTaskBlock extends QuestTaskItems {
     
     @Override
     public void read(JsonObject object) {
-        List<ItemRequirement> list = new ArrayList<>();
+        elements.clear();
         for (JsonElement element : GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray())) {
             ItemRequirement requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
             if (requirement != null)
-                list.add(requirement);
+                elements.add(requirement);
         }
-        setItems(list.toArray(new ItemRequirement[0]));
     }
 }
 

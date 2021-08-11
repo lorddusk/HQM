@@ -19,8 +19,8 @@ public class QuestTaskItemsConsume extends QuestTaskItems {
     public boolean increaseFluid(FluidStack fluidVolume, QuestDataTaskItems data, UUID playerId, boolean action) {
         boolean updated = false;
         
-        for (int i = 0; i < items.length; i++) {
-            ItemRequirement item = items[i];
+        for (int i = 0; i < elements.size(); i++) {
+            ItemRequirement item = elements.get(i);
             if (item.fluid == null || item.required == data.progress[i]) {
                 continue;
             }

@@ -19,7 +19,7 @@ public class QuestDataTaskItems extends QuestDataTask {
     
     public QuestDataTaskItems(QuestTask task) {
         super(task);
-        this.progress = new int[((QuestTaskItems) task).getItems().length];
+        this.progress = new int[((QuestTaskItems) task).getItems().size()];
     }
     
     protected QuestDataTaskItems() {
