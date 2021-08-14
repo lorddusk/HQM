@@ -69,7 +69,7 @@ public class TextBoxLogic {
     private String getValidText(String txt) {
         StringBuilder builder = new StringBuilder();
         for (char c : txt.toCharArray()) {
-            if (isCharacterValid(c)) {
+            if (isCharacterValid(c, builder.toString())) {
                 builder.append(c);
             }
         }
@@ -173,7 +173,7 @@ public class TextBoxLogic {
         } else if (k == 269) {
             cursor = text.length();
             updateCursor();
-        } else if (isCharacterValid(c)) {
+        } else if (isCharacterValid(c, getText())) {
             addText(gui, Character.toString(c));
         }
     }
@@ -183,7 +183,7 @@ public class TextBoxLogic {
         updateCursor();
     }
     
-    protected boolean isCharacterValid(char c) {
+    protected boolean isCharacterValid(char c, String rest) {
         return SharedConstants.isAllowedChatCharacter(c);
     }
     

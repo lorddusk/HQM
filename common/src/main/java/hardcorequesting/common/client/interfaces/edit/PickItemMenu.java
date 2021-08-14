@@ -113,7 +113,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         if (amountInput) {
             textBoxes.add(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
-                protected boolean isCharacterValid(char c) {
+                protected boolean isCharacterValid(char c, String rest) {
                     return Character.isDigit(c);
                 }
                 

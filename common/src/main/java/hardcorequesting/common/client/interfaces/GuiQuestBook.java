@@ -217,8 +217,8 @@ public class GuiQuestBook extends GuiBase {
         textBoxes = new TextBoxGroup();
         textBoxes.add(textBoxGroupAmount = new TextBoxGroup.TextBox(this, "0", 180, 30, false) {
             @Override
-            protected boolean isCharacterValid(char c) {
-                return getText().length() < 3 && Character.isDigit(c);
+            protected boolean isCharacterValid(char c, String rest) {
+                return rest.length() < 3 && Character.isDigit(c);
             }
             
             @Override
@@ -572,7 +572,9 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
-        } else if (KeyboardHandler.pressedHotkey(this, keyCode, getButtons())) {
+        } else if (isBagPage && selectedGroup != null) {
+			textBoxes.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+		} else if (KeyboardHandler.pressedHotkey(this, keyCode, getButtons())) {
             onButtonClicked();
         }
         return false;

@@ -127,8 +127,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         }
         
         @Override
-        protected boolean isCharacterValid(char c) {
-            return getText().length() < 32 && (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
+        protected boolean isCharacterValid(char c, String rest) {
+            return rest.length() < 32 && (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
         }
         
         protected boolean isNegativeAllowed() {
