@@ -42,8 +42,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
             final int id = i;
             textBoxes.add(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
                 @Override
-                protected boolean isCharacterValid(char c) {
-                    return getText().length() < 6 && Character.isDigit(c);
+                protected boolean isCharacterValid(char c, String rest) {
+                    return rest.length() < 6 && Character.isDigit(c);
                 }
                 
                 @Override
