@@ -572,7 +572,9 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
-        } else if (KeyboardHandler.pressedHotkey(this, keyCode, getButtons())) {
+        } else if (isBagPage && selectedGroup != null) {
+			textBoxes.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+		} else if (KeyboardHandler.pressedHotkey(this, keyCode, getButtons())) {
             onButtonClicked();
         }
         return false;
