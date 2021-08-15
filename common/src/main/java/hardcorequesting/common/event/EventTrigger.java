@@ -99,60 +99,80 @@ public class EventTrigger {
     }
     
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
+        if (entity.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.DEATH)) {
             task.onLivingDeath(entity, source);
         }
     }
     
     public void onCrafting(Player player, ItemStack stack) {
+        if (player.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack);
         }
     }
     
     public void onAnvilCrafting(Player player, ItemStack stack) {
+        if (player.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack);
         }
     }
     
     public void onSmelting(Player player, ItemStack stack) {
+        if (player.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack);
         }
     }
     
     public void onItemPickUp(Player playerEntity, ItemStack stack) {
+        if (playerEntity.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.PICK_UP)) {
             task.onItemPickUp(playerEntity, stack);
         }
     }
     
     public void onBookOpening(BookOpeningEvent event) {
+        if (event.getPlayer().level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.OPEN_BOOK)) {
             task.onOpenBook(event);
         }
     }
     
     public void onQuestComplete(QuestCompletedEvent event) {
+        if (event.player.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.QUEST_COMPLETED)) {
             task.onQuestCompleted(event);
         }
     }
     
     public void onQuestSelected(QuestSelectedEvent event) {
+        if (event.getPlayer().level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.QUEST_SELECTED)) {
             task.onQuestSelected(event);
         }
     }
     
     public void onReputationChange(ReputationEvent event) {
+        if (event.getPlayer().level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.REPUTATION_CHANGE)) {
             task.onReputationChange(event);
         }
     }
     
     public void onAnimalTame(Player tamer, Entity entity) {
+        if (entity.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.ANIMAL_TAME)) {
             task.onAnimalTame(tamer, entity);
         }
@@ -165,24 +185,32 @@ public class EventTrigger {
     }
     
     public void onBlockBreak(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
+        if (player.level.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
             task.onBlockBroken(pos, state, player);
         }
     }
     
     public void onBlockPlaced(Level world, BlockPos pos, BlockState state, LivingEntity placer) {
+        if (world.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.BLOCK_PLACED)) {
             task.onBlockPlaced(world, state, placer);
         }
     }
     
     private void onItemUsed(Player playerEntity, Level world, InteractionHand hand) {
+        if (world.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
             task.onItemUsed(playerEntity, world, hand);
         }
     }
     
     private void onBlockUsed(Player playerEntity, Level world, InteractionHand hand, BlockPos pos, Direction face) {
+        if (world.isClientSide)
+            return;
         for (QuestTask task : getTasks(Type.ITEM_USED)) {
             task.onBlockUsed(playerEntity, world, hand);
         }
@@ -248,7 +276,9 @@ public class EventTrigger {
             this.questCompleted = questCompleted;
         }
         
-        public UUID getQuestCompleted() { return questCompleted; }
+        public UUID getQuestCompleted() {
+            return questCompleted;
+        }
         
         public Player getPlayer() {
             return player;
@@ -260,7 +290,9 @@ public class EventTrigger {
             super(player, questSelected);
         }
         
-        public UUID getQuestSelected() { return getQuestCompleted(); }
+        public UUID getQuestSelected() {
+            return getQuestCompleted();
+        }
     }
     
     public static class ReputationEvent {

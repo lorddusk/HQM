@@ -3,6 +3,7 @@ package hardcorequesting.common.quests;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.*;
@@ -37,6 +38,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
@@ -1304,6 +1306,10 @@ public class Quest {
     }
     
     public void sendUpdatedDataToTeam(Team team) {
+        MinecraftServer server = HardcoreQuestingCore.getServer();
+        if (server == null || !server.isSameThread())
+            throw new IllegalStateException("Tried sending data to players from the client-side. Something is being called client-side when it shouldn't be!");
+        
         for (PlayerEntry entry : team.getPlayers()) {
             sendUpdatedData(entry.getPlayerMP());
         }
