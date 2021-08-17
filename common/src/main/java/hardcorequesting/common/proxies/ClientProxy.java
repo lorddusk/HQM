@@ -1,5 +1,6 @@
 package hardcorequesting.common.proxies;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
@@ -16,7 +17,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void init() {
         super.init();
-        Quest.clientTicker = QuestTicker.initClientTicker();
+        Quest.clientTicker = new QuestTicker();
+        HardcoreQuestingCore.platform.registerOnClientTick(minecraftClient -> Quest.clientTicker.tick(minecraftClient.level, true));
     }
     
     @Override
