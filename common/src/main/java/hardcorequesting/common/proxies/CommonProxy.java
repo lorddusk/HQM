@@ -1,5 +1,6 @@
 package hardcorequesting.common.proxies;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestTicker;
@@ -9,7 +10,8 @@ public class CommonProxy {
     public void initSounds() {}
     
     public void init() {
-        Quest.serverTicker = QuestTicker.initServerTicker();
+        Quest.serverTicker = new QuestTicker();
+        HardcoreQuestingCore.platform.registerOnServerTick(minecraftServer -> Quest.serverTicker.tick(minecraftServer.overworld(), false));
     }
     
     public boolean isClient() {
