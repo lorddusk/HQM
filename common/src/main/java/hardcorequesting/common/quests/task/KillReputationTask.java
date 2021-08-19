@@ -76,6 +76,11 @@ public class KillReputationTask extends ReputationTask {
     }
     
     @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskReputationKill();
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

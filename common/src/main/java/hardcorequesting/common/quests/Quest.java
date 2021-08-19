@@ -1221,14 +1221,7 @@ public class Quest {
     public boolean addTaskData(QuestData data) {
         data.tasks = new QuestDataTask[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
-            try {
-                Constructor<? extends QuestDataTask> constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
-                QuestDataTask obj = constructor.newInstance(tasks.get(i));
-                data.tasks[i] = obj;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return false;
-            }
+            data.tasks[i] = tasks.get(i).newQuestData();
         }
         
         return true;

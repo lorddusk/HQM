@@ -58,6 +58,11 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
         return QuestDataTaskCompleted.class;
     }
     
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskCompleted(elements.size());
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {

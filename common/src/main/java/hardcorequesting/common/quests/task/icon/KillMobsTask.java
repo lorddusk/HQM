@@ -69,6 +69,11 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part> {
         return QuestDataTaskMob.class;
     }
     
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskMob(elements.size());
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {

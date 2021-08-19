@@ -5,8 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -18,11 +16,7 @@ public class QuestDataTaskMob extends QuestDataTask {
     private static final String KILLED = "killed";
     private final List<Integer> killed;
     
-    public QuestDataTaskMob(QuestTask task) {
-        this(((KillMobsTask) task).elements.size());
-    }
-    
-    protected QuestDataTaskMob(int size) {
+    public QuestDataTaskMob(int size) {
         super();
         this.killed = new ArrayList<>(size);
         while (killed.size() < size) {

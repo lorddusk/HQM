@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
@@ -22,11 +21,6 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     
     public BlockRequirementTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
-    }
-    
-    @Override
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTaskItems.class;
     }
     
     @Override

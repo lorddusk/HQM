@@ -4,7 +4,6 @@ package hardcorequesting.common.quests.data;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.task.QuestTask;
 import net.minecraft.util.GsonHelper;
 
 public class QuestDataTaskReputationKill extends QuestDataTask {
@@ -12,11 +11,7 @@ public class QuestDataTaskReputationKill extends QuestDataTask {
     private static final String KILLS = "kills";
     public int kills;
     
-    public QuestDataTaskReputationKill(QuestTask task) {
-        super(task);
-    }
-    
-    protected QuestDataTaskReputationKill() {
+    public QuestDataTaskReputationKill() {
         super();
     }
     

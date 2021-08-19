@@ -33,7 +33,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 public abstract class QuestTask {
@@ -171,15 +170,8 @@ public abstract class QuestTask {
         return data;
     }
     
-    private QuestDataTask newQuestData() {
-        try {
-            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(QuestTask.class);
-            Object obj = constructor.newInstance(this);
-            return (QuestDataTask) obj;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    public QuestDataTask newQuestData() {
+        return new QuestDataTask();
     }
     
     public String getLangKeyDescription() {

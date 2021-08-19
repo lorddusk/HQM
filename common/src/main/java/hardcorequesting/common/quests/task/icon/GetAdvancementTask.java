@@ -59,6 +59,11 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
         return QuestDataTaskAdvancement.class;
     }
     
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskAdvancement(elements.size());
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part task, int index, int x, int y) {

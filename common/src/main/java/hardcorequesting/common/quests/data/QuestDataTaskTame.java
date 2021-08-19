@@ -5,8 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -18,11 +16,7 @@ public class QuestDataTaskTame extends QuestDataTask {
     private static final String TAMED = "tamed";
     private final List<Integer> tamed;
     
-    public QuestDataTaskTame(QuestTask task) {
-        this(((TameMobsTask) task).elements.size());
-    }
-    
-    protected QuestDataTaskTame(int size) {
+    public QuestDataTaskTame(int size) {
         super();
         this.tamed = new ArrayList<>(size);
         while (tamed.size() < size) {

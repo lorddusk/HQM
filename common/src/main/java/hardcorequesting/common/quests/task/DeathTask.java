@@ -36,6 +36,11 @@ public class DeathTask extends QuestTask {
         return QuestDataTaskDeath.class;
     }
     
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskDeath();
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {

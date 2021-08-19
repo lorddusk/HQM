@@ -4,8 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -17,11 +15,7 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     private static final String ADVANCED = "advanced";
     private final List<Boolean> advanced;
     
-    public QuestDataTaskAdvancement(QuestTask task) {
-        this(((GetAdvancementTask) task).elements.size());
-    }
-    
-    protected QuestDataTaskAdvancement(int size) {
+    public QuestDataTaskAdvancement(int size) {
         super();
         this.advanced = new ArrayList<>(size);
         while (advanced.size() < size) {

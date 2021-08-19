@@ -177,6 +177,11 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         return QuestDataTaskItems.class;
     }
     
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTaskItems(this);
+    }
+    
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
