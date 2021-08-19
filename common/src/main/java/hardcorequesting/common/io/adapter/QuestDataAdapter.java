@@ -3,7 +3,7 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.common.quests.QuestData;
+import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
 
 import java.io.IOException;

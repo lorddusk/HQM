@@ -15,6 +15,7 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
+import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.reward.CommandRewardList;
 import hardcorequesting.common.quests.reward.ItemStackRewardList;

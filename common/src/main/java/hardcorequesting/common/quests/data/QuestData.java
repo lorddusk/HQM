@@ -1,7 +1,7 @@
-package hardcorequesting.common.quests;
+package hardcorequesting.common.quests.data;
 
 
-import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import net.minecraft.world.entity.player.Player;

@@ -7,15 +7,14 @@ import com.google.gson.stream.JsonWriter;
 import hardcorequesting.common.io.adapter.TeamAdapter;
 import hardcorequesting.common.network.message.TeamUpdateMessage;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestData;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.reward.ReputationReward;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public enum TeamUpdateType {
     FULL {
