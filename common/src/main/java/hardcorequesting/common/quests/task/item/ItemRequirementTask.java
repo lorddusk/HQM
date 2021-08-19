@@ -15,6 +15,7 @@ import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.ListTask;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -294,8 +295,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     @Override
-    public float getCompletedRatio(UUID playerId) {
-        ItemsTaskData data = getData(playerId);
+    public float getCompletedRatio(Team team) {
+        ItemsTaskData data = getData(team);
         int done = 0;
         int total = 0;
         

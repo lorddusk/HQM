@@ -12,6 +12,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.LocationTaskData;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -152,8 +153,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     }
     
     @Override
-    public float getCompletedRatio(UUID playerID) {
-        return getData(playerID).getCompletedRatio(elements.size());
+    public float getCompletedRatio(Team team) {
+        return getData(team).getCompletedRatio(elements.size());
     }
     
     @Override

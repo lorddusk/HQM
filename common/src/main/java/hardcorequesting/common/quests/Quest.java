@@ -1489,10 +1489,9 @@ public class Quest {
     }
     
     public float getProgress(Team team) {
-        UUID uuid = team.getPlayers().get(0).getUUID();
         float data = 0;
-        for (QuestTask task : this.tasks) {
-            data += task.getCompletedRatio(uuid);
+        for (QuestTask<?> task : this.tasks) {
+            data += task.getCompletedRatio(team);
         }
         
         return data / this.tasks.size();

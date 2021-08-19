@@ -19,6 +19,7 @@ import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.team.RewardSetting;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -45,7 +46,7 @@ public abstract class QuestTask<Data extends TaskData> {
     protected static final int START_Y = 95;
     public String description;
     protected Quest parent;
-    private List<QuestTask<?>> requirements;
+    private final List<QuestTask<?>> requirements;
     private String longDescription;
     private int id;
     private List<FormattedText> cachedDescription;
@@ -154,7 +155,11 @@ public abstract class QuestTask<Data extends TaskData> {
         return getData(parent.getQuestData(uuid));
     }
     
-    public Data getData(QuestData questData) {
+    public Data getData(Team team) {
+        return getData(team.getQuestData(parent.getQuestId()));
+    }
+    
+    private Data getData(QuestData questData) {
         if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
@@ -248,7 +253,7 @@ public abstract class QuestTask<Data extends TaskData> {
         requirements.clear();
     }
     
-    public abstract float getCompletedRatio(UUID uuid);
+    public abstract float getCompletedRatio(Team team);
     
     public void mergeProgress(UUID playerId, QuestData own, QuestData other) {
         mergeProgress(playerId, getData(own), getData(other));

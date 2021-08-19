@@ -12,6 +12,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.AdvancementTaskData;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -130,9 +131,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public float getCompletedRatio(UUID uuid) {
-        
-        return getData(uuid).getCompletedRatio(elements.size());
+    public float getCompletedRatio(Team team) {
+        return getData(team).getCompletedRatio(elements.size());
     }
     
     @Override

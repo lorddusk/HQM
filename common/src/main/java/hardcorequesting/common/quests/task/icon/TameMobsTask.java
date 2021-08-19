@@ -12,6 +12,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TameTaskData;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -107,8 +108,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     }
     
     @Override
-    public float getCompletedRatio(UUID uuid) {
-        TameTaskData data = getData(uuid);
+    public float getCompletedRatio(Team team) {
+        TameTaskData data = getData(team);
         int tamed = 0;
         int total = 0;
         

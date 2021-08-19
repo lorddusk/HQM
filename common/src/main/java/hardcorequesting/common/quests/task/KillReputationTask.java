@@ -9,6 +9,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ReputationKillTaskData;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -42,8 +43,8 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     }
     
     @Override
-    public float getCompletedRatio(UUID playerID) {
-        return (float) getData(playerID).kills / kills;
+    public float getCompletedRatio(Team team) {
+        return (float) getData(team).kills / kills;
     }
     
     @Override

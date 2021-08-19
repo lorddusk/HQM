@@ -11,9 +11,11 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationSetti
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
@@ -57,7 +59,7 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
             TaskData data = getData(player);
             if (!data.completed && !player.getCommandSenderWorld().isClientSide) {
                 for (Part setting : elements) {
-                    if (!setting.isValid(player.getUUID())) {
+                    if (!setting.isValid(QuestingDataManager.getInstance().getQuestingData(player).getTeam())) {
                         return false;
                     }
                 }
@@ -123,23 +125,6 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
             y += OFFSET_Y;
         }
         return list;
-    }
-    
-    @Override
-    public float getCompletedRatio(UUID playerID) {
-        int count = elements.size();
-        if (count == 0) {
-            return 0;
-        }
-        
-        int valid = 0;
-        for (Part setting : elements) {
-            if (setting.isValid(playerID)) {
-                valid++;
-            }
-        }
-        
-        return (float) valid / count;
     }
     
     @Override
@@ -214,11 +199,11 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
             return inverted;
         }
         
-        public boolean isValid(UUID playerID) {
+        public boolean isValid(Team team) {
             if (getReputation() == null || !getReputation().isValid()) {
                 return false;
             }
-            ReputationMarker current = getReputation().getCurrentMarker(getReputation().getValue(playerID));
+            ReputationMarker current = getReputation().getCurrentMarker(team.getReputation(this.getReputation()));
             
             return ((lower == null || lower.getValue() <= current.getValue()) && (upper == null || current.getValue() <= upper.getValue())) != inverted;
         }

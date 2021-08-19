@@ -8,6 +8,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.DeathTaskData;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -64,8 +65,8 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     }
     
     @Override
-    public float getCompletedRatio(UUID playerID) {
-        return (float) getData(playerID).getDeaths() / deaths;
+    public float getCompletedRatio(Team team) {
+        return (float) getData(team).getDeaths() / deaths;
     }
     
     @Override

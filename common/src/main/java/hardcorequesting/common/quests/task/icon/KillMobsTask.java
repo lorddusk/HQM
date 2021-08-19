@@ -12,6 +12,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.MobTaskData;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -100,8 +101,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     }
     
     @Override
-    public float getCompletedRatio(UUID playerID) {
-        MobTaskData data = getData(playerID);
+    public float getCompletedRatio(Team team) {
+        MobTaskData data = getData(team);
         int killed = 0;
         int total = 0;
         
