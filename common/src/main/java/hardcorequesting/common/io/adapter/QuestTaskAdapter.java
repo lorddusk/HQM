@@ -7,11 +7,11 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
-import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.*;
 import hardcorequesting.common.quests.task.CompleteQuestTask;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.ReputationTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
@@ -359,7 +359,7 @@ public class QuestTaskAdapter {
         
         @Override
         public JsonElement serialize(QuestTask<?> src) {
-            Quest.TaskType type = Quest.TaskType.getType(src.getClass());
+            TaskType type = TaskType.getType(src.getClass());
             
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.name());
@@ -374,7 +374,7 @@ public class QuestTaskAdapter {
         @Override
         public QuestTask<?> deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
-            Quest.TaskType type = Quest.TaskType.valueOf(GsonHelper.getAsString(object, TYPE));
+            TaskType type = TaskType.valueOf(GsonHelper.getAsString(object, TYPE));
             QuestTask<?> TASK = type.addTask(QUEST);
             if (object.has(DESCRIPTION)) TASK.setDescription(GsonHelper.getAsString(object, DESCRIPTION));
             if (object.has(LONG_DESCRIPTION)) TASK.setLongDescription(GsonHelper.getAsString(object, LONG_DESCRIPTION));
