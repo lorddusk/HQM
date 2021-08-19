@@ -7,7 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskDeath;
+import hardcorequesting.common.quests.data.DeathTaskData;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,7 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 
 
-public class DeathTask extends QuestTask<QuestDataTaskDeath> {
+public class DeathTask extends QuestTask<DeathTaskData> {
     private static final String DEATHS = "deaths";
     private int deaths;
     
@@ -31,13 +31,13 @@ public class DeathTask extends QuestTask<QuestDataTaskDeath> {
     }
     
     @Override
-    public Class<QuestDataTaskDeath> getDataType() {
-        return QuestDataTaskDeath.class;
+    public Class<DeathTaskData> getDataType() {
+        return DeathTaskData.class;
     }
     
     @Override
-    public QuestDataTaskDeath newQuestData() {
-        return new QuestDataTaskDeath();
+    public DeathTaskData newQuestData() {
+        return new DeathTaskData();
     }
     
     @Environment(EnvType.CLIENT)
@@ -64,7 +64,7 @@ public class DeathTask extends QuestTask<QuestDataTaskDeath> {
     }
     
     @Override
-    public void mergeProgress(UUID playerID, QuestDataTaskDeath own, QuestDataTaskDeath other) {
+    public void mergeProgress(UUID playerID, DeathTaskData own, DeathTaskData other) {
         own.deaths = Math.max(own.deaths, other.deaths);
         
         if (own.deaths == deaths) {
@@ -82,7 +82,7 @@ public class DeathTask extends QuestTask<QuestDataTaskDeath> {
     }
     
     @Override
-    public void copyProgress(QuestDataTaskDeath own, QuestDataTaskDeath other) {
+    public void copyProgress(DeathTaskData own, DeathTaskData other) {
         super.copyProgress(own, other);
         
         own.deaths = other.deaths;
@@ -92,7 +92,7 @@ public class DeathTask extends QuestTask<QuestDataTaskDeath> {
     public void onLivingDeath(LivingEntity player, DamageSource source) {
         if (player instanceof ServerPlayer) {
             if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible((Player) player) && !isCompleted((Player) player)) {
-                QuestDataTaskDeath deathData = getData((Player) player);
+                DeathTaskData deathData = getData((Player) player);
                 if (deathData.deaths < deaths) {
                     deathData.deaths += 1;
                     

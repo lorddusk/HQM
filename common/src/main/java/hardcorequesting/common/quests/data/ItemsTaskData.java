@@ -11,13 +11,13 @@ import net.minecraft.util.GsonHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestDataTaskItems extends QuestDataTask {
+public class ItemsTaskData extends TaskData {
     
     private static final String COUNT = "count";
     private static final String PROGRESS = "progress";
     private final List<Integer> progress;
     
-    public QuestDataTaskItems(int size) {
+    public ItemsTaskData(int size) {
         super();
         this.progress = new ArrayList<>(size);
         while (progress.size() < size) {
@@ -25,8 +25,8 @@ public class QuestDataTaskItems extends QuestDataTask {
         }
     }
     
-    public static QuestDataTask construct(JsonObject in) {
-        QuestDataTaskItems data = new QuestDataTaskItems(GsonHelper.getAsInt(in, COUNT));
+    public static TaskData construct(JsonObject in) {
+        ItemsTaskData data = new ItemsTaskData(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         JsonArray array = GsonHelper.getAsJsonArray(in, PROGRESS);
         for (int i = 0; i < array.size(); i++) {
@@ -48,7 +48,7 @@ public class QuestDataTaskItems extends QuestDataTask {
         progress.set(id, amount);
     }
     
-    public void merge(QuestDataTaskItems other) {
+    public void merge(ItemsTaskData other) {
         for (int i = 0; i < other.progress.size(); i++) {
             setValue(i, Math.max(this.getValue(i), other.getValue(i)));
         }
@@ -71,9 +71,9 @@ public class QuestDataTaskItems extends QuestDataTask {
     }
     
     @Override
-    public void update(QuestDataTask taskData) {
+    public void update(TaskData taskData) {
         super.update(taskData);
         this.progress.clear();
-        this.progress.addAll(((QuestDataTaskItems) taskData).progress);
+        this.progress.addAll(((ItemsTaskData) taskData).progress);
     }
 }

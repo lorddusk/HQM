@@ -36,11 +36,11 @@ import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
 
 public class QuestTaskAdapter {
     
-    public static final Adapter<QuestDataTask> QUEST_DATA_TASK_ADAPTER = new Adapter<QuestDataTask>() {
+    public static final Adapter<TaskData> QUEST_DATA_TASK_ADAPTER = new Adapter<TaskData>() {
         private static final String TYPE = "type";
         
         @Override
-        public JsonElement serialize(QuestDataTask src) {
+        public JsonElement serialize(TaskData src) {
             JsonObjectBuilder builder = object()
                     .add(TYPE, String.valueOf(src.getDataType()));
             src.write(builder);
@@ -48,7 +48,7 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestDataTask deserialize(JsonElement json) {
+        public TaskData deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             return QuestDataType.valueOf(GsonHelper.getAsString(object, TYPE)).construct(object);
         }
@@ -384,23 +384,23 @@ public class QuestTaskAdapter {
     };
     
     public enum QuestDataType {
-        GENERIC(QuestDataTask::construct),
-        DEATH(QuestDataTaskDeath::construct),
-        ITEMS(QuestDataTaskItems::construct),
-        LOCATION(QuestDataTaskLocation::construct),
-        MOB(QuestDataTaskMob::construct),
-        REPUTATION_KILL(QuestDataTaskReputationKill::construct),
-        TAME(QuestDataTaskTame::construct),
-        ADVANCEMENT(QuestDataTaskAdvancement::construct),
-        COMPLETED(QuestDataTaskCompleted::construct);
+        GENERIC(TaskData::construct),
+        DEATH(DeathTaskData::construct),
+        ITEMS(ItemsTaskData::construct),
+        LOCATION(LocationTaskData::construct),
+        MOB(MobTaskData::construct),
+        REPUTATION_KILL(ReputationKillTaskData::construct),
+        TAME(TameTaskData::construct),
+        ADVANCEMENT(AdvancementTaskData::construct),
+        COMPLETED(CompleteQuestTaskData::construct);
         
-        private Function<JsonObject, QuestDataTask> func;
+        private Function<JsonObject, TaskData> func;
         
-        QuestDataType(Function<JsonObject, QuestDataTask> func) {
+        QuestDataType(Function<JsonObject, TaskData> func) {
             this.func = func;
         }
         
-        public QuestDataTask construct(JsonObject in) {
+        public TaskData construct(JsonObject in) {
             return func.apply(in);
         }
     }

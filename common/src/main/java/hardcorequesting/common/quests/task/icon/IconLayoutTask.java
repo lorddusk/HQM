@@ -6,7 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.ListTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
@@ -25,7 +25,7 @@ import java.util.List;
  * A base class for tasks with sub-elements that uses item icons for display.
  * Provides the layout of a vertical list of elements, where each entry has an item icon, a name, and any extra info.
  */
-public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends QuestDataTask> extends ListTask<T, Data> {
+public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends TaskData> extends ListTask<T, Data> {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;

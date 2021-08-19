@@ -1,6 +1,6 @@
 package hardcorequesting.forge.tileentity;
 
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
@@ -47,7 +47,7 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
                 ConsumeItemTask consumeTask = (ConsumeItemTask) task;
                 
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
-                QuestDataTaskItems data = consumeTask.getData(playerUUID);
+                ItemsTaskData data = consumeTask.getData(playerUUID);
                 List<ItemRequirementTask.Part> items = consumeTask.getItems();
                 for (int i = 0; i < items.size(); i++) {
                     ItemRequirementTask.Part item = items.get(i);

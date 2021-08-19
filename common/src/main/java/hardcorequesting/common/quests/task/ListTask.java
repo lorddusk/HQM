@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.TypeAdapter;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 
@@ -17,7 +17,7 @@ import java.util.Objects;
 /**
  * A base class for tasks with sub-elements.
  */
-public abstract class ListTask<T, Data extends QuestDataTask> extends QuestTask<Data> {
+public abstract class ListTask<T, Data extends TaskData> extends QuestTask<Data> {
     
     protected final EditType.Type type;
     public final List<T> elements;

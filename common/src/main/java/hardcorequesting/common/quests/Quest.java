@@ -15,7 +15,7 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.reward.CommandRewardList;
 import hardcorequesting.common.quests.reward.ItemStackRewardList;
 import hardcorequesting.common.quests.reward.ReputationReward;
@@ -1219,7 +1219,7 @@ public class Quest {
     }
     
     public boolean addTaskData(QuestData data) {
-        data.tasks = new QuestDataTask[tasks.size()];
+        data.tasks = new TaskData[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
             data.tasks[i] = tasks.get(i).newQuestData();
         }

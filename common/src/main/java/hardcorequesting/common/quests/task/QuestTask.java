@@ -13,7 +13,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.*;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.io.IOException;
 import java.util.*;
 
-public abstract class QuestTask<Data extends QuestDataTask> {
+public abstract class QuestTask<Data extends TaskData> {
     
     protected static final int START_X = 180;
     protected static final int START_Y = 95;
@@ -136,11 +136,11 @@ public abstract class QuestTask<Data extends QuestDataTask> {
     
     public abstract Class<Data> getDataType();
     
-    public void write(QuestDataTask task, JsonObject out) {
+    public void write(TaskData task, JsonObject out) {
         task.write(new Adapter.JsonObjectBuilder(out));
     }
     
-    public void read(QuestDataTask task, JsonReader in) throws IOException {
+    public void read(TaskData task, JsonReader in) throws IOException {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
@@ -163,7 +163,7 @@ public abstract class QuestTask<Data extends QuestDataTask> {
         return data;
     }
     
-    public Data validateData(QuestDataTask data) {
+    public Data validateData(TaskData data) {
         if (getDataType().isInstance(data)) {
             return getDataType().cast(data);
         } else return newQuestData();

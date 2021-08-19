@@ -2,7 +2,7 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
@@ -27,7 +27,7 @@ public class DetectItemTask extends ItemRequirementTask {
     }
     
     @Override
-    public void doCompletionCheck(QuestDataTaskItems data, UUID playerID) {
+    public void doCompletionCheck(ItemsTaskData data, UUID playerID) {
         boolean isDone = true;
         for (int i = 0; i < elements.size(); i++) {
             Part item = elements.get(i);
@@ -82,7 +82,7 @@ public class DetectItemTask extends ItemRequirementTask {
         }
     }
     
-    public void countItems(NonNullList<ItemStack> itemsToCount, QuestDataTaskItems data, UUID playerID) {
+    public void countItems(NonNullList<ItemStack> itemsToCount, ItemsTaskData data, UUID playerID) {
         if (!parent.isAvailable(playerID)) return;
         
         

@@ -9,13 +9,13 @@ import net.minecraft.util.GsonHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuestDataTaskAdvancement extends QuestDataTask {
+public class AdvancementTaskData extends TaskData {
     
     private static final String COUNT = "count";
     private static final String ADVANCED = "advanced";
     private final List<Boolean> advanced;
     
-    public QuestDataTaskAdvancement(int size) {
+    public AdvancementTaskData(int size) {
         super();
         this.advanced = new ArrayList<>(size);
         while (advanced.size() < size) {
@@ -23,8 +23,8 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
         }
     }
     
-    public static QuestDataTask construct(JsonObject in) {
-        QuestDataTaskAdvancement data = new QuestDataTaskAdvancement(GsonHelper.getAsInt(in, COUNT));
+    public static TaskData construct(JsonObject in) {
+        AdvancementTaskData data = new AdvancementTaskData(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         JsonArray array = GsonHelper.getAsJsonArray(in, ADVANCED);
         for (int i = 0; i < array.size(); i++) {
@@ -51,7 +51,7 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
         advanced.clear();
     }
     
-    public void mergeResult(QuestDataTaskAdvancement other) {
+    public void mergeResult(AdvancementTaskData other) {
         for (int i = 0; i < other.advanced.size(); i++) {
             if (other.advanced.get(i))
                 complete(i);
@@ -79,10 +79,10 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     }
     
     @Override
-    public void update(QuestDataTask taskData) {
+    public void update(TaskData taskData) {
         super.update(taskData);
         this.advanced.clear();
-        this.advanced.addAll(((QuestDataTaskAdvancement) taskData).advanced);
+        this.advanced.addAll(((AdvancementTaskData) taskData).advanced);
     }
 }
 

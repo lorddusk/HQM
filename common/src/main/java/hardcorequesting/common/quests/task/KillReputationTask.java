@@ -7,7 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskReputationKill;
+import hardcorequesting.common.quests.data.ReputationKillTaskData;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -19,7 +19,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
-public class KillReputationTask extends ReputationTask<QuestDataTaskReputationKill> {
+public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private static final String KILLS = "kills";
     private int kills;
     
@@ -47,7 +47,7 @@ public class KillReputationTask extends ReputationTask<QuestDataTaskReputationKi
     }
     
     @Override
-    public void mergeProgress(UUID playerID, QuestDataTaskReputationKill own, QuestDataTaskReputationKill other) {
+    public void mergeProgress(UUID playerID, ReputationKillTaskData own, ReputationKillTaskData other) {
         own.kills = Math.max(own.kills, other.kills);
         
         if (own.kills == kills) {
@@ -70,13 +70,13 @@ public class KillReputationTask extends ReputationTask<QuestDataTaskReputationKi
     }
     
     @Override
-    public Class<QuestDataTaskReputationKill> getDataType() {
-        return QuestDataTaskReputationKill.class;
+    public Class<ReputationKillTaskData> getDataType() {
+        return ReputationKillTaskData.class;
     }
     
     @Override
-    public QuestDataTaskReputationKill newQuestData() {
-        return new QuestDataTaskReputationKill();
+    public ReputationKillTaskData newQuestData() {
+        return new ReputationKillTaskData();
     }
     
     @Override
@@ -85,7 +85,7 @@ public class KillReputationTask extends ReputationTask<QuestDataTaskReputationKi
     }
     
     @Override
-    public void copyProgress(QuestDataTaskReputationKill own, QuestDataTaskReputationKill other) {
+    public void copyProgress(ReputationKillTaskData own, ReputationKillTaskData other) {
         super.copyProgress(own, other);
         
         own.kills = other.kills;
@@ -96,7 +96,7 @@ public class KillReputationTask extends ReputationTask<QuestDataTaskReputationKi
         Player killer = KillMobsTask.getKiller(source);
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
             if (entity instanceof Player && isPlayerInRange((Player) entity)) {
-                QuestDataTaskReputationKill killData = getData(killer);
+                ReputationKillTaskData killData = getData(killer);
                 if (killData.kills < kills) {
                     killData.kills += 1;
                     

@@ -6,16 +6,16 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
-public class QuestDataTask {
+public class TaskData {
     
     protected static final String COMPLETED = "completed";
     public boolean completed;
     
-    public QuestDataTask() {
+    public TaskData() {
     }
     
-    public static QuestDataTask construct(JsonObject in) {
-        QuestDataTask data = new QuestDataTask();
+    public static TaskData construct(JsonObject in) {
+        TaskData data = new TaskData();
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         return data;
     }
@@ -28,7 +28,7 @@ public class QuestDataTask {
         builder.add(COMPLETED, completed);
     }
     
-    public void update(QuestDataTask taskData) {
+    public void update(TaskData taskData) {
         this.completed = taskData.completed;
     }
 }

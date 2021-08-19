@@ -1,7 +1,7 @@
 package hardcorequesting.common.quests;
 
 
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +11,7 @@ public class QuestData {
     public boolean[] reward;
     public boolean completed;
     public boolean claimed;
-    public QuestDataTask[] tasks;
+    public TaskData[] tasks;
     public boolean available = true;
     public long time;
     

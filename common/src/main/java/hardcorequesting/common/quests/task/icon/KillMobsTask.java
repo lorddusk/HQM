@@ -11,7 +11,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskMob;
+import hardcorequesting.common.quests.data.MobTaskData;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * A task where the player has to kill certain mobs.
  */
-public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTaskMob> {
+public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData> {
     private static final String MOBS = "mobs";
     
     public KillMobsTask(Quest parent, String description, String longDescription) {
@@ -64,13 +64,13 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
     }
     
     @Override
-    public Class<QuestDataTaskMob> getDataType() {
-        return QuestDataTaskMob.class;
+    public Class<MobTaskData> getDataType() {
+        return MobTaskData.class;
     }
     
     @Override
-    public QuestDataTaskMob newQuestData() {
-        return new QuestDataTaskMob(elements.size());
+    public MobTaskData newQuestData() {
+        return new MobTaskData(elements.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -101,7 +101,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
     
     @Override
     public float getCompletedRatio(UUID playerID) {
-        QuestDataTaskMob data = getData(playerID);
+        MobTaskData data = getData(playerID);
         int killed = 0;
         int total = 0;
         
@@ -115,7 +115,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
     }
     
     @Override
-    public void mergeProgress(UUID playerID, QuestDataTaskMob own, QuestDataTaskMob other) {
+    public void mergeProgress(UUID playerID, MobTaskData own, MobTaskData other) {
         own.merge(other);
         
         boolean all = true;
@@ -133,7 +133,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
     
     @Override
     public void autoComplete(UUID playerID, boolean status) {
-        QuestDataTaskMob data = getData(playerID);
+        MobTaskData data = getData(playerID);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.setValue(i, elements.get(i).count);
@@ -146,7 +146,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
     }
     
     @Override
-    public void copyProgress(QuestDataTaskMob own, QuestDataTaskMob other) {
+    public void copyProgress(MobTaskData own, MobTaskData other) {
         own.update(other);
     }
     
@@ -155,7 +155,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, QuestDataTas
         Player killer = getKiller(source);
         
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
-            QuestDataTaskMob data = getData(killer);
+            MobTaskData data = getData(killer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
                 Part part = elements.get(i);

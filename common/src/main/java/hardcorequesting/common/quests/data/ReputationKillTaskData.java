@@ -6,36 +6,36 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
-public class QuestDataTaskDeath extends QuestDataTask {
+public class ReputationKillTaskData extends TaskData {
     
-    private static final String DEATHS = "deaths";
-    public int deaths;
+    private static final String KILLS = "kills";
+    public int kills;
     
-    public QuestDataTaskDeath() {
+    public ReputationKillTaskData() {
         super();
     }
     
-    public static QuestDataTask construct(JsonObject in) {
-        QuestDataTaskDeath data = new QuestDataTaskDeath();
+    public static TaskData construct(JsonObject in) {
+        ReputationKillTaskData data = new ReputationKillTaskData();
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
-        data.deaths = GsonHelper.getAsInt(in, DEATHS);
+        data.kills = GsonHelper.getAsInt(in, KILLS);
         return data;
     }
     
     @Override
     public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.DEATH;
+        return QuestTaskAdapter.QuestDataType.REPUTATION_KILL;
     }
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         super.write(builder);
-        builder.add(DEATHS, deaths);
+        builder.add(KILLS, kills);
     }
     
     @Override
-    public void update(QuestDataTask taskData) {
+    public void update(TaskData taskData) {
         super.update(taskData);
-        this.deaths = ((QuestDataTaskDeath) taskData).deaths;
+        this.kills = ((ReputationKillTaskData) taskData).kills;
     }
 }

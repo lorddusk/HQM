@@ -2,7 +2,7 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,7 +16,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
         super(parent, description, longDescription);
     }
     
-    public boolean increaseFluid(FluidStack fluidVolume, QuestDataTaskItems data, UUID playerId, boolean action) {
+    public boolean increaseFluid(FluidStack fluidVolume, ItemsTaskData data, UUID playerId, boolean action) {
         boolean updated = false;
         
         for (int i = 0; i < elements.size(); i++) {

@@ -11,7 +11,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
+import hardcorequesting.common.quests.data.AdvancementTaskData;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -31,7 +31,7 @@ import java.util.UUID;
 /**
  * A task where the player has to complete advancements.
  */
-public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, QuestDataTaskAdvancement> {
+public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, AdvancementTaskData> {
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {
@@ -54,13 +54,13 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public Class<QuestDataTaskAdvancement> getDataType() {
-        return QuestDataTaskAdvancement.class;
+    public Class<AdvancementTaskData> getDataType() {
+        return AdvancementTaskData.class;
     }
     
     @Override
-    public QuestDataTaskAdvancement newQuestData() {
-        return new QuestDataTaskAdvancement(elements.size());
+    public AdvancementTaskData newQuestData() {
+        return new AdvancementTaskData(elements.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -93,7 +93,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     private void checkAdvancement(Player player) {
         Level world = player.getCommandSenderWorld();
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
-            QuestDataTaskAdvancement data = this.getData(player);
+            AdvancementTaskData data = this.getData(player);
             
             boolean completed = true;
             ServerAdvancementManager manager = player.getServer().getAdvancements();
@@ -136,7 +136,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public void mergeProgress(UUID uuid, QuestDataTaskAdvancement own, QuestDataTaskAdvancement other) {
+    public void mergeProgress(UUID uuid, AdvancementTaskData own, AdvancementTaskData other) {
         own.mergeResult(other);
         
         if (own.areAllCompleted(elements.size())) {
@@ -146,7 +146,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        QuestDataTaskAdvancement data = getData(uuid);
+        AdvancementTaskData data = getData(uuid);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.complete(i);
@@ -157,7 +157,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public void copyProgress(QuestDataTaskAdvancement own, QuestDataTaskAdvancement other) {
+    public void copyProgress(AdvancementTaskData own, AdvancementTaskData other) {
         own.update(other);
     }
     

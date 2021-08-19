@@ -10,7 +10,7 @@ import hardcorequesting.common.network.message.OpActionMessage;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import net.minecraft.world.entity.player.Player;
@@ -91,7 +91,7 @@ public final class OPBookHelper {
                     ItemRequirementTask itemTask = (ItemRequirementTask) task;
                     List<ItemRequirementTask.Part> requirements = itemTask.getItems();
                     if (requirement >= 0 && requirement < requirements.size()) {
-                        QuestDataTaskItems qData = itemTask.getData(subject.getUUID());
+                        ItemsTaskData qData = itemTask.getData(subject.getUUID());
                         if (qData.isDone(requirement, requirements.get(requirement))) {
                             qData.setValue(requirement, 0);
                             itemTask.getData(subject.getUUID()).completed = false;

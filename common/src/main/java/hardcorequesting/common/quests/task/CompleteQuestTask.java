@@ -10,7 +10,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskCompleted;
+import hardcorequesting.common.quests.data.CompleteQuestTaskData;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -24,7 +24,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.UUID;
 
-public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDataTaskCompleted> {
+public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, CompleteQuestTaskData> {
     private static final String COMPLETED_QUESTS = "completed_quests";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -53,13 +53,13 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDat
     }
     
     @Override
-    public Class<QuestDataTaskCompleted> getDataType() {
-        return QuestDataTaskCompleted.class;
+    public Class<CompleteQuestTaskData> getDataType() {
+        return CompleteQuestTaskData.class;
     }
     
     @Override
-    public QuestDataTaskCompleted newQuestData() {
-        return new QuestDataTaskCompleted(elements.size());
+    public CompleteQuestTaskData newQuestData() {
+        return new CompleteQuestTaskData(elements.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -131,7 +131,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDat
     private void checkCompleted(Player player) {
         Level world = player.getCommandSenderWorld();
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
-            QuestDataTaskCompleted data = this.getData(player);
+            CompleteQuestTaskData data = this.getData(player);
             
             boolean completed = true;
             
@@ -166,7 +166,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDat
     }
     
     @Override
-    public void mergeProgress(UUID uuid, QuestDataTaskCompleted own, QuestDataTaskCompleted other) {
+    public void mergeProgress(UUID uuid, CompleteQuestTaskData own, CompleteQuestTaskData other) {
         own.mergeResult(other);
         
         if (own.areAllCompleted(elements.size())) {
@@ -176,7 +176,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDat
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        QuestDataTaskCompleted data = getData(uuid);
+        CompleteQuestTaskData data = getData(uuid);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.complete(i);
@@ -187,7 +187,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, QuestDat
     }
     
     @Override
-    public void copyProgress(QuestDataTaskCompleted own, QuestDataTaskCompleted other) {
+    public void copyProgress(CompleteQuestTaskData own, CompleteQuestTaskData other) {
         own.update(other);
     }
     

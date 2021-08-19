@@ -5,7 +5,7 @@ import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
@@ -99,7 +99,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
             for (int i = 0; i < consumeTask.getItems().size(); i++) {
                 ItemRequirementTask.Part requirement = consumeTask.getItems().get(i);
                 if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
-                    QuestDataTaskItems data = consumeTask.getData(this.getPlayerUUID());
+                    ItemsTaskData data = consumeTask.getData(this.getPlayerUUID());
                     return !data.isDone(i, requirement);
                 }
             }
