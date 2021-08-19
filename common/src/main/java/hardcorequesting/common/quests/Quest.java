@@ -96,10 +96,10 @@ public class Quest {
     private List<UUID> reversedRequirement;
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
-    private List<QuestTask> tasks;
+    private List<QuestTask<?>> tasks;
     private List<FormattedText> cachedDescription;
     private List<ReputationReward> reputationRewards;
-    private QuestTask selectedTask;
+    private QuestTask<?> selectedTask;
     private ItemStackRewardList rewards;
     private ItemStackRewardList rewardChoices;
     private CommandRewardList commandRewardList;
@@ -1232,7 +1232,7 @@ public class Quest {
         data.reward = new boolean[players];
     }
     
-    public List<QuestTask> getTasks() {
+    public List<QuestTask<?>> getTasks() {
         return tasks;
     }
     
@@ -1439,9 +1439,8 @@ public class Quest {
         
         
         for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask task = tasks.get(i);
-            own.tasks[i] = task.validateData(own.tasks[i]);
-            task.mergeProgress(playerId, own.tasks[i], task.validateData(other.tasks[i]));
+            QuestTask<?> task = tasks.get(i);
+            task.mergeProgress(playerId, own, other);
         }
     }
     
@@ -1450,14 +1449,13 @@ public class Quest {
         own.available = other.available;
         
         for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask task = tasks.get(i);
-            own.tasks[i] = task.validateData(own.tasks[i]);
-            task.copyProgress(own.tasks[i], task.validateData(other.tasks[i]));
+            QuestTask<?> task = tasks.get(i);
+            task.copyProgress(own, other);
         }
     }
     
     public void completeQuest(Player player) {
-        for (QuestTask task : tasks) {
+        for (QuestTask<?> task : tasks) {
             task.autoComplete(player.getUUID());
             task.getData(player).completed = true;
         }

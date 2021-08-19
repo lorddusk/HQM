@@ -45,7 +45,7 @@ public abstract class QuestTask<Data extends TaskData> {
     protected static final int START_Y = 95;
     public String description;
     protected Quest parent;
-    private List<QuestTask> requirements;
+    private List<QuestTask<?>> requirements;
     private String longDescription;
     private int id;
     private List<FormattedText> cachedDescription;
@@ -60,7 +60,7 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public static void completeQuest(Quest quest, UUID uuid) {
         if (!quest.isEnabled(uuid) || !quest.isAvailable(uuid)) return;
-        for (QuestTask questTask : quest.getTasks()) {
+        for (QuestTask<?> questTask : quest.getTasks()) {
             if (!questTask.getData(uuid).completed) {
                 return;
             }
@@ -77,9 +77,7 @@ public abstract class QuestTask<Data extends TaskData> {
             int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
         } else {
-            for (int i = 0; i < data.reward.length; i++) {
-                data.reward[i] = true;
-            }
+            Arrays.fill(data.reward, true);
         }
         quest.sendUpdatedDataToTeam(uuid);
         TeamLiteStat.refreshTeam(QuestingDataManager.getInstance().getQuestingData(uuid).getTeam());
@@ -129,8 +127,8 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public boolean isVisible(Player player) {
-        Iterator<QuestTask> itr = this.requirements.iterator();
-        QuestTask requirement;
+        Iterator<QuestTask<?>> itr = this.requirements.iterator();
+        QuestTask<?> requirement;
         do {
             if (!itr.hasNext()) return true;
             requirement = itr.next();
@@ -153,10 +151,14 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public Data getData(UUID uuid) {
+        return getData(parent.getQuestData(uuid));
+    }
+    
+    public Data getData(QuestData questData) {
         if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
-        QuestData questData = QuestingDataManager.getInstance().getQuestingData(uuid).getQuestData(parent.getQuestId());
+        
         if (id >= questData.tasks.length) {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
@@ -167,7 +169,7 @@ public abstract class QuestTask<Data extends TaskData> {
         return data;
     }
     
-    public Data validateData(TaskData data) {
+    private Data validateData(TaskData data) {
         if (getDataType().isInstance(data)) {
             return getDataType().cast(data);
         } else return newQuestData();
@@ -234,11 +236,11 @@ public abstract class QuestTask<Data extends TaskData> {
         return parent;
     }
     
-    public List<QuestTask> getRequirements() {
+    public List<QuestTask<?>> getRequirements() {
         return requirements;
     }
     
-    public void addRequirement(QuestTask task) {
+    public void addRequirement(QuestTask<?> task) {
         requirements.add(task);
     }
     
@@ -247,6 +249,10 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public abstract float getCompletedRatio(UUID uuid);
+    
+    public void mergeProgress(UUID playerId, QuestData own, QuestData other) {
+        mergeProgress(playerId, getData(own), getData(other));
+    }
     
     public abstract void mergeProgress(UUID playerId, Data own, Data other);
     
@@ -258,6 +264,10 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public abstract void autoComplete(UUID playerId, boolean status);
+    
+    public void copyProgress(QuestData own, QuestData other) {
+        copyProgress(getData(own), getData(other));
+    }
     
     public void copyProgress(Data own, Data other) {
         own.completed = other.completed;
