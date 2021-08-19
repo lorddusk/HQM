@@ -35,7 +35,7 @@ public class QuestDataTaskTame extends QuestDataTask {
     }
     
     public int getValue(int id) {
-        if (tamed.size() <= id)
+        if (id >= tamed.size())
             return 0;
         else return tamed.get(id);
     }

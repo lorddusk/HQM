@@ -35,7 +35,7 @@ public class QuestDataTaskAdvancement extends QuestDataTask {
     }
     
     public boolean getValue(int id) {
-        if (advanced.size() <= id)
+        if (id >= advanced.size())
             return false;
         else return advanced.get(id);
     }

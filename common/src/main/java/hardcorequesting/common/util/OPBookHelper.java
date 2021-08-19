@@ -92,12 +92,12 @@ public final class OPBookHelper {
                     List<ItemRequirementTask.Part> requirements = itemTask.getItems();
                     if (requirement >= 0 && requirement < requirements.size()) {
                         QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUUID());
-                        if (qData.progress[requirement] == requirements.get(requirement).required) {
-                            qData.progress[requirement] = 0;
+                        if (qData.isDone(requirement, requirements.get(requirement))) {
+                            qData.setValue(requirement, 0);
                             itemTask.getData(subject.getUUID()).completed = false;
                             QuestingDataManager.getInstance().getQuestingData(subject).getTeam().refreshData();
                         } else {
-                            qData.progress[requirement] = requirements.get(requirement).required;
+                            qData.setValue(requirement, requirements.get(requirement).required);
                             itemTask.doCompletionCheck(qData, subject.getUUID());
                         }
                         quest.sendUpdatedDataToTeam(subject);

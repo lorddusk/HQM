@@ -94,11 +94,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         }
         
         QuestDataTaskItems data = ((QuestDataTaskItems) getData(player));
-        if (id >= data.progress.length) {
-            data.progress = Arrays.copyOf(data.progress, data.progress.length + 1);
-        }
-        
-        return data.progress[id];
+        return data.getValue(id);
     }
     
     protected List<Positioned<Part>> getPositionedItems(List<Part> items) {
@@ -136,13 +132,13 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
             for (int j = 0; j < itemsToConsume.size(); j++) {
                 ItemStack stack = itemsToConsume.get(j);
                 if (item.precision.areItemsSame(stack, item.stack)) {
-                    int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
+                    int amount = Math.min(stack.getCount(), item.required - data.getValue(i));
                     if (amount > 0) {
                         stack.shrink(amount);
                         if (stack.getCount() == 0) {
                             itemsToConsume.set(j, ItemStack.EMPTY);
                         }
-                        data.progress[i] += amount;
+                        data.setValue(i, data.getValue(i) + amount);
                         updated = true;
                     }
                 }
@@ -179,7 +175,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public QuestDataTask newQuestData() {
-        return new QuestDataTaskItems(this);
+        return new QuestDataTaskItems(elements.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -304,11 +300,11 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
         int done = 0;
         int total = 0;
-        for (int count : data.progress) {
-            done += count;
-        }
-        for (Part item : elements) {
-            total += item.required;
+        
+        for (int i = 0; i < elements.size(); i++) {
+            int req = elements.get(i).required;
+            done += Math.min(req, data.getValue(i));
+            total += req;
         }
         
         return Math.max(0, Math.min(1, done / (float) total));
@@ -316,14 +312,14 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other) {
-        int[] ownProgress = ((QuestDataTaskItems) own).progress;
-        int[] otherProgress = ((QuestDataTaskItems) other).progress;
+        QuestDataTaskItems data = (QuestDataTaskItems) own;
+        data.merge((QuestDataTaskItems) other);
         
         boolean completed = true;
-        for (int i = 0; i < ownProgress.length; i++) {
-            ownProgress[i] = Math.max(ownProgress[i], otherProgress[i]);
-            if (ownProgress[i] != elements.get(i).required) {
+        for (int i = 0; i < elements.size(); i++) {
+            if (!data.isDone(i, elements.get(i))) {
                 completed = false;
+                break;
             }
         }
         
@@ -335,24 +331,20 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     @Override
     public void autoComplete(UUID playerId, boolean status) {
         QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
-        for (int i = 0; i < elements.size(); i++) {
-            if (status) {
-                data.progress[i] = elements.get(i).required;
-            } else {
-                data.progress[i] = 0;
+        if (status) {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, elements.get(i).required);
+            }
+        } else {
+            for (int i = 0; i < elements.size(); i++) {
+                data.setValue(i, 0);
             }
         }
     }
     
     @Override
     public void copyProgress(QuestDataTask own, QuestDataTask other) {
-        super.copyProgress(own, other);
-        
-        int[] ownProgress = ((QuestDataTaskItems) own).progress;
-        int[] otherProgress = ((QuestDataTaskItems) other).progress;
-        
-        
-        System.arraycopy(otherProgress, 0, ownProgress, 0, ownProgress.length);
+        own.update(other);
     }
     
     public static class Part {

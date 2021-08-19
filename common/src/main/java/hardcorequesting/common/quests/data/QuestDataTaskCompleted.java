@@ -34,7 +34,7 @@ public class QuestDataTaskCompleted extends QuestDataTask {
     }
     
     public boolean getValue(int id) {
-        if (quests.size() <= id)
+        if (id >= quests.size())
             return false;
         else return quests.get(id);
     }

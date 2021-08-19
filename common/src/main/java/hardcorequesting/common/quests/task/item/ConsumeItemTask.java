@@ -21,14 +21,14 @@ public class ConsumeItemTask extends ItemRequirementTask {
         
         for (int i = 0; i < elements.size(); i++) {
             Part item = elements.get(i);
-            if (item.fluid == null || item.required == data.progress[i]) {
+            if (item.fluid == null || data.isDone(i, item)) {
                 continue;
             }
             
             if (fluidVolume != null && fluidVolume.getFluid() != null && fluidVolume.getFluid() == item.fluid.getFluid()) {
-                Fraction amount = fluidVolume.getAmount().isLessThan(Fraction.ofWhole(item.required - data.progress[i])) ? fluidVolume.getAmount() : Fraction.ofWhole(item.required - data.progress[i]);
+                Fraction amount = fluidVolume.getAmount().isLessThan(Fraction.ofWhole(item.required - data.getValue(i))) ? fluidVolume.getAmount() : Fraction.ofWhole(item.required - data.getValue(i));
                 if (action)
-                    data.progress[i] += amount.intValue();
+                    data.setValue(i, data.getValue(i) + amount.intValue());
                 fluidVolume.split(amount);
                 updated = true;
                 break;

@@ -36,7 +36,7 @@ public class QuestDataTaskLocation extends QuestDataTask {
     }
     
     public boolean getValue(int id) {
-        if (visited.size() <= id)
+        if (id >= visited.size())
             return false;
         else return visited.get(id);
     }

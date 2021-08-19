@@ -97,11 +97,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
                 ItemRequirementTask.Part requirement = consumeTask.getItems().get(i);
                 if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
                     QuestDataTaskItems data = (QuestDataTaskItems) task.getData(this.getPlayerUUID());
-                    if (data.progress.length > i) {
-                        return data.progress[i] < requirement.required;
-                    } else {
-                        return true;
-                    }
+                    return !data.isDone(i, requirement);
                 }
             }
         }

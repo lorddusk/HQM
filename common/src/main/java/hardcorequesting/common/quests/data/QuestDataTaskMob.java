@@ -35,7 +35,7 @@ public class QuestDataTaskMob extends QuestDataTask {
     }
     
     public int getValue(int id) {
-        if (killed.size() <= id)
+        if (id >= killed.size())
             return 0;
         else return killed.get(id);
     }

@@ -49,7 +49,7 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
                 List<ItemRequirementTask.Part> items = ((ConsumeItemTask) task).getItems();
                 for (int i = 0; i < items.size(); i++) {
                     ItemRequirementTask.Part item = items.get(i);
-                    if (item.fluid == null || item.required == data.progress[i]) {
+                    if (item.fluid == null || data.isDone(i, item)) {
                         continue;
                     }
                     

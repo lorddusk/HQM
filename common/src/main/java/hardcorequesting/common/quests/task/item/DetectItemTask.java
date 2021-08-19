@@ -9,7 +9,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -32,8 +31,8 @@ public class DetectItemTask extends ItemRequirementTask {
         boolean isDone = true;
         for (int i = 0; i < elements.size(); i++) {
             Part item = elements.get(i);
-            if (item.required > data.progress[i]) {
-                data.progress[i] = 0; //Clear unfinished ones
+            if (!data.isDone(i, item)) {
+                data.setValue(i, 0); //Clear unfinished ones
                 isDone = false;
             }
         }
@@ -89,18 +88,16 @@ public class DetectItemTask extends ItemRequirementTask {
         
         boolean updated = false;
         
-        if (data.progress.length < elements.size())
-            data.progress = Arrays.copyOf(data.progress, elements.size());
         for (int i = 0; i < elements.size(); i++) {
             Part item = elements.get(i);
-            if (!item.hasItem || item.required == data.progress[i]) {
+            if (!item.hasItem || data.isDone(i, item)) {
                 continue;
             }
             
             for (ItemStack stack : itemsToCount) {
                 if (item.getPrecision().areItemsSame(stack, item.getStack())) {
-                    int amount = Math.min(stack.getCount(), item.required - data.progress[i]);
-                    data.progress[i] += amount;
+                    int amount = Math.min(stack.getCount(), item.required - data.getValue(i));
+                    data.setValue(i, data.getValue(i) + amount);
                     updated = true;
                 }
             }
