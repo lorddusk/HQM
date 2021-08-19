@@ -14,7 +14,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskLocation;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +38,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     private int delay = 1;
     
     public VisitLocationTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.LOCATION, parent, description, longDescription);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
@@ -47,21 +46,6 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     @Override
     protected Part createEmpty() {
         return new Part();
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.LOCATION_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.LOCATION_CHANGE);
-    }
-    
-    @Override
-    protected void onRemoveElement() {
-        SaveHelper.add(EditType.LOCATION_REMOVE);
     }
     
     private void tick(Player player, boolean isPlayerEvent) {

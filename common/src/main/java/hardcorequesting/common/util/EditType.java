@@ -70,8 +70,8 @@ public enum EditType {
     COMMAND_CHANGE(BaseEditType.CHANGE, Type.COMMAND),
     COMMAND_REMOVE(BaseEditType.REMOVE, Type.COMMAND);
     
-    private BaseEditType basType;
-    private Type type;
+    private final BaseEditType basType;
+    private final Type type;
     
     EditType(BaseEditType basType, Type type) {
         this.basType = basType;
@@ -82,18 +82,26 @@ public enum EditType {
         return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
     }
     
-    private enum BaseEditType {
+    public enum BaseEditType {
         ADD("added", GuiColor.GREEN),
         CHANGE("changed", GuiColor.ORANGE),
         MOVE("moved", GuiColor.ORANGE),
         REMOVE("removed", GuiColor.RED);
         
-        private String id;
-        private GuiColor colour;
+        private final String id;
+        private final GuiColor colour;
         
         BaseEditType(String id, GuiColor colour) {
             this.id = id;
             this.colour = colour;
+        }
+        
+        public EditType with(Type type) {
+            for (EditType editType : EditType.values()) {
+                if (this == editType.basType && editType.type == type)
+                    return editType;
+            }
+            throw new IllegalArgumentException("Type " + type + " does not have a base type " + this);
         }
         
         private String translate() {
@@ -101,7 +109,7 @@ public enum EditType {
         }
     }
     
-    private enum Type {
+    public enum Type {
         QUEST("quest"),
         TASK("task"),
         TASK_TYPE("taskType"),
@@ -135,7 +143,7 @@ public enum EditType {
         COMPLETION("questCompletion"),
         TASK_BLOCK("taskBlock");
         
-        private String id;
+        private final String id;
         
         Type(String id) {
             this.id = id;

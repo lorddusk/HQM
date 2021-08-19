@@ -14,7 +14,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskMob;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -36,28 +35,13 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part> {
     private static final String MOBS = "mobs";
     
     public KillMobsTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.MONSTER, parent, description, longDescription);
         register(EventTrigger.Type.DEATH);
     }
     
     @Override
     protected Part createEmpty() {
         return new Part();
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.MONSTER_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.MONSTER_CHANGE);
-    }
-    
-    @Override
-    protected void onRemoveElement() {
-        SaveHelper.add(EditType.MONSTER_REMOVE);
     }
     
     public static Player getKiller(DamageSource source) {

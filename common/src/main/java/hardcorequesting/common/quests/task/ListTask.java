@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.TypeAdapter;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.SaveHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +18,7 @@ import java.util.Objects;
  */
 public abstract class ListTask<T> extends QuestTask {
     
+    protected final EditType.Type type;
     public final List<T> elements;
     private final List<T> elementsWithEmpty;
     {
@@ -25,15 +28,12 @@ public abstract class ListTask<T> extends QuestTask {
         elementsWithEmpty = Collections.unmodifiableList(list);
     }
     
-    public ListTask(Quest parent, String description, String longDescription) {
+    public ListTask(EditType.Type type, Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
+        this.type = type;
     }
     
     protected abstract T createEmpty();
-    
-    protected abstract void onAddElement();
-    
-    protected abstract void onModifyElement();
     
     protected final List<T> getShownElements() {
         if (Quest.canQuestsBeEdited()) {
@@ -47,10 +47,10 @@ public abstract class ListTask<T> extends QuestTask {
         if (id >= elements.size()) {
             T element = createEmpty();
             elements.add(element);
-            onAddElement();
+            SaveHelper.add(EditType.BaseEditType.ADD.with(type));
             return element;
         } else {
-            onModifyElement();
+            SaveHelper.add(EditType.BaseEditType.CHANGE.with(type));
             return elements.get(id);
         }
     }
@@ -59,10 +59,10 @@ public abstract class ListTask<T> extends QuestTask {
         Objects.requireNonNull(element);
         if (id >= elements.size()) {
             elements.add(element);
-            onAddElement();
+            SaveHelper.add(EditType.BaseEditType.ADD.with(type));
         } else {
             elements.set(id, element);
-            onModifyElement();
+            SaveHelper.add(EditType.BaseEditType.CHANGE.with(type));
         }
     }
     

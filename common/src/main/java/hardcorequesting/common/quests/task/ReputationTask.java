@@ -34,7 +34,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     private final int startOffsetY;
     
     public ReputationTask(Quest parent, String description, String longDescription, int startOffsetY) {
-        super(parent, description, longDescription);
+        super(EditType.Type.REPUTATION_TASK, parent, description, longDescription);
         this.startOffsetY = startOffsetY;
     }
     
@@ -49,16 +49,6 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     @Override
     protected Part createEmpty() {
         return new Part(null, null, null, false);
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.REPUTATION_TASK_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.REPUTATION_TASK_CHANGE);
     }
     
     protected boolean isPlayerInRange(Player player) {

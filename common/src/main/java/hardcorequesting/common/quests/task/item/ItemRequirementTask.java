@@ -46,22 +46,12 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     private int lastClicked;
     
     public ItemRequirementTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.TASK_ITEM, parent, description, longDescription);
     }
     
     @Override
     protected Part createEmpty() {
         return new Part(ItemStack.EMPTY, 1);
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.TASK_ITEM_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.TASK_ITEM_CHANGE);
     }
     
     @Override

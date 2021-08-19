@@ -34,7 +34,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
     private static final int ITEM_SIZE = 18;
     
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.COMPLETION, parent, description, longDescription);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }
@@ -42,16 +42,6 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
     @Override
     protected Part createEmpty() {
         return new Part();
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.COMPLETE_CHECK_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
     }
     
     private boolean completed(int id, Player player) {

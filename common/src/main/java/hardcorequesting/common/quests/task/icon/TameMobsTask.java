@@ -14,7 +14,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskTame;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -40,28 +39,13 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
     public TameMobsTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.MONSTER, parent, description, longDescription);
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     
     @Override
     protected Part createEmpty() {
         return new Part();
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.MONSTER_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.MONSTER_CHANGE);
-    }
-    
-    @Override
-    protected void onRemoveElement() {
-        SaveHelper.add(EditType.MONSTER_REMOVE);
     }
     
     @Environment(EnvType.CLIENT)

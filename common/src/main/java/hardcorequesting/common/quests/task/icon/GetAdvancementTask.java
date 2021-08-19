@@ -14,7 +14,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -37,7 +36,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(EditType.Type.ADVANCEMENT, parent, description, longDescription);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }
@@ -45,21 +44,6 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     @Override
     protected Part createEmpty() {
         return new Part();
-    }
-    
-    @Override
-    protected void onAddElement() {
-        SaveHelper.add(EditType.ADVANCEMENT_CREATE);
-    }
-    
-    @Override
-    protected void onModifyElement() {
-        SaveHelper.add(EditType.ADVANCEMENT_CHANGE);
-    }
-    
-    @Override
-    protected void onRemoveElement() {
-        SaveHelper.add(EditType.ADVANCEMENT_REMOVE);
     }
     
     private boolean advanced(int id, Player player) {

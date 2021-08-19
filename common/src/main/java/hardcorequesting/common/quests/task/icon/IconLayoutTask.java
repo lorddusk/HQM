@@ -7,7 +7,9 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.ListTask;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
+import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,11 +31,9 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part> extends List
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    public IconLayoutTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public IconLayoutTask(EditType.Type type, Quest parent, String description, String longDescription) {
+        super(type, parent, description, longDescription);
     }
-    
-    protected abstract void onRemoveElement();
     
     @Environment(EnvType.CLIENT)
     protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, T part, int index, int x, int y);
@@ -87,7 +87,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part> extends List
                         case DELETE:
                             if (i < this.elements.size()) {
                                 this.elements.remove(i);
-                                onRemoveElement();
+                                SaveHelper.add(EditType.BaseEditType.REMOVE.with(type));
                             }
                             break;
                         default:
