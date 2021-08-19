@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -54,6 +55,6 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     public void save(GuiBase gui) {
         marker.setValue(value);
         GuiQuestBook.selectedReputation.sort();
-        SaveHelper.add(SaveHelper.EditType.REPUTATION_MARKER_CHANGE);
+        SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);
     }
 }

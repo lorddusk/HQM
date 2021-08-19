@@ -13,6 +13,7 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskLocation;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -50,17 +51,17 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.LOCATION_CREATE);
+        SaveHelper.add(EditType.LOCATION_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.LOCATION_CHANGE);
+        SaveHelper.add(EditType.LOCATION_CHANGE);
     }
     
     @Override
     protected void onRemoveElement() {
-        SaveHelper.add(SaveHelper.EditType.LOCATION_REMOVE);
+        SaveHelper.add(EditType.LOCATION_REMOVE);
     }
     
     private void tick(Player player, boolean isPlayerEvent) {

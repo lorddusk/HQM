@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.client.interfaces.*;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.world.entity.player.Player;
@@ -123,7 +124,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
     @Override
     public void save(GuiBase gui) {
         original.load(tier);
-        SaveHelper.add(SaveHelper.EditType.TIER_CHANGE);
+        SaveHelper.add(EditType.TIER_CHANGE);
     }
     
     private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {

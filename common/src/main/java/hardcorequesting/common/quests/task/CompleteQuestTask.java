@@ -12,6 +12,7 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskCompleted;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -45,12 +46,12 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CREATE);
+        SaveHelper.add(EditType.COMPLETE_CHECK_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
+        SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
     }
     
     private boolean completed(int id, Player player) {
@@ -106,11 +107,11 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
                     if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (i < elements.size()) {
                             elements.remove(i);
-                            SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_REMOVE);
+                            SaveHelper.add(EditType.COMPLETE_CHECK_REMOVE);
                         }
                     } else if (completed.getQuest() == null) {
                         completed.setQuest(Quest.speciallySelectedQuestId);
-                        SaveHelper.add(SaveHelper.EditType.COMPLETE_CHECK_CHANGE);
+                        SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
                     }
                     
                     break;

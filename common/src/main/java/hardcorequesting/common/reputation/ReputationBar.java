@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -99,14 +100,14 @@ public class ReputationBar {
             switch (gui.getCurrentMode()) {
                 case MOVE:
                     gui.modifyingBar = this;
-                    SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_MOVE);
+                    SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
                     gui.setEditMenu(new EditGui(gui, gui.getPlayer(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
-                    SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_REMOVE);
+                    SaveHelper.add(EditType.REPUTATION_BAR_REMOVE);
                 default:
                     break;
             }
@@ -178,9 +179,9 @@ public class ReputationBar {
         public void save(GuiBase gui) {
             if (isNew) {
                 Quest.getQuestSets().get(bar.questSet).addRepBar(bar);
-                SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_ADD);
+                SaveHelper.add(EditType.REPUTATION_BAR_ADD);
             } else {
-                SaveHelper.add(SaveHelper.EditType.REPUTATION_BAR_CHANGE);
+                SaveHelper.add(EditType.REPUTATION_BAR_CHANGE);
             }
         }
     }

@@ -13,6 +13,7 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskMob;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -46,17 +47,17 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part> {
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.MONSTER_CREATE);
+        SaveHelper.add(EditType.MONSTER_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.MONSTER_CHANGE);
+        SaveHelper.add(EditType.MONSTER_CHANGE);
     }
     
     @Override
     protected void onRemoveElement() {
-        SaveHelper.add(SaveHelper.EditType.MONSTER_REMOVE);
+        SaveHelper.add(EditType.MONSTER_REMOVE);
     }
     
     public static Player getKiller(DamageSource source) {

@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.LargeButton;
 import hardcorequesting.common.client.interfaces.TextBoxLogic;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -160,9 +161,9 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
         resultConsumer.accept(str);
         
         if (isName) {
-            SaveHelper.add(SaveHelper.EditType.NAME_CHANGE);
+            SaveHelper.add(EditType.NAME_CHANGE);
         } else {
-            SaveHelper.add(SaveHelper.EditType.DESCRIPTION_CHANGE);
+            SaveHelper.add(EditType.DESCRIPTION_CHANGE);
         }
     }
 }

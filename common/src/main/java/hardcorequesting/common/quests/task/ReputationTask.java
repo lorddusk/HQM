@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -52,12 +53,12 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CREATE);
+        SaveHelper.add(EditType.REPUTATION_TASK_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_CHANGE);
+        SaveHelper.add(EditType.REPUTATION_TASK_CHANGE);
     }
     
     protected boolean isPlayerInRange(Player player) {
@@ -115,7 +116,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
                         gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, part));
                     } else if (gui.getCurrentMode() == EditMode.DELETE && i < elements.size()) {
                         removeSetting(i);
-                        SaveHelper.add(SaveHelper.EditType.REPUTATION_TASK_REMOVE);
+                        SaveHelper.add(EditType.REPUTATION_TASK_REMOVE);
                     }
                     break;
                 }

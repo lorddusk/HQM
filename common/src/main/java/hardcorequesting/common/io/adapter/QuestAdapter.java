@@ -13,6 +13,7 @@ import hardcorequesting.common.quests.task.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
@@ -344,7 +345,7 @@ public class QuestAdapter {
             if (name != null && description != null && set == null) {
                 set = new QuestSet(name, description);
                 Quest.getQuestSets().add(set);
-                SaveHelper.add(SaveHelper.EditType.SET_CREATE);
+                SaveHelper.add(EditType.SET_CREATE);
             }
             if (set != null) {
                 for (Quest quest : quests) {

@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.ScrollBar;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.common.quests.QuestLine;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +40,7 @@ public class GroupTier {
                     case TIER:
                         if (gui.modifyingGroup != null) {
                             gui.modifyingGroup.setTier(groupTier);
-                            SaveHelper.add(SaveHelper.EditType.GROUP_CHANGE);
+                            SaveHelper.add(EditType.GROUP_CHANGE);
                         }
                         break;
                     case NORMAL:
@@ -56,7 +57,7 @@ public class GroupTier {
                                 }
                             }
                             tiers.remove(i);
-                            SaveHelper.add(SaveHelper.EditType.TIER_REMOVE);
+                            SaveHelper.add(EditType.TIER_REMOVE);
                         }
                         break;
                     default:

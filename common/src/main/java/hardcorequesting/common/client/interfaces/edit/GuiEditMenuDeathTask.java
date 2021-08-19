@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.quests.task.DeathTask;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -33,7 +34,7 @@ public class GuiEditMenuDeathTask extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         task.setDeaths(deaths);
-        SaveHelper.add(SaveHelper.EditType.DEATH_CHANGE);
+        SaveHelper.add(EditType.DEATH_CHANGE);
     }
     
     @Override

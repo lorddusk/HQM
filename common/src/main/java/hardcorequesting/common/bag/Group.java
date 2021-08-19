@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -149,7 +150,7 @@ public class Group {
                         break;
                     case DELETE:
                         remove(group.getId());
-                        SaveHelper.add(SaveHelper.EditType.GROUP_REMOVE);
+                        SaveHelper.add(EditType.GROUP_REMOVE);
                         break;
                     default:
                         break;
@@ -178,7 +179,7 @@ public class Group {
     
     public void setName(String name) {
         this.name = name;
-        SaveHelper.add(SaveHelper.EditType.NAME_CHANGE);
+        SaveHelper.add(EditType.NAME_CHANGE);
     }
     
     public boolean hasName() {
@@ -194,10 +195,10 @@ public class Group {
         
         if (id >= items.size()) {
             items.add(stack);
-            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CREATE);
+            SaveHelper.add(EditType.GROUP_ITEM_CREATE);
         } else {
             items.set(id, stack);
-            SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_CHANGE);
+            SaveHelper.add(EditType.GROUP_ITEM_CHANGE);
         }
     }
     
@@ -333,7 +334,7 @@ public class Group {
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {
                     this.removeItem(i);
-                    SaveHelper.add(SaveHelper.EditType.GROUP_ITEM_REMOVE);
+                    SaveHelper.add(EditType.GROUP_ITEM_REMOVE);
                 }
                 break;
             }

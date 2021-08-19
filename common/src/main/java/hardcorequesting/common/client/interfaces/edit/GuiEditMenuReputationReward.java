@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.LargeButton;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
@@ -172,6 +173,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         GuiQuestBook.selectedQuest.setReputationRewards(rewards.isEmpty() ? null : rewards);
-        SaveHelper.add(SaveHelper.EditType.REPUTATION_REWARD_CHANGE);
+        SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
     }
 }

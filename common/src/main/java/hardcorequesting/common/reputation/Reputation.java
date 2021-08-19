@@ -12,6 +12,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.ReputationTask;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -179,7 +180,7 @@ public class Reputation {
                         }
                         
                         reputationMap.remove(reputation.getId());
-                        SaveHelper.add(SaveHelper.EditType.REPUTATION_REMOVE);
+                        SaveHelper.add(EditType.REPUTATION_REMOVE);
                     }
                     return;
                 }
@@ -228,7 +229,7 @@ public class Reputation {
                         
                         selectedReputation.markers.remove(i);
                         selectedReputation.sort();
-                        SaveHelper.add(SaveHelper.EditType.REPUTATION_MARKER_REMOVE);
+                        SaveHelper.add(EditType.REPUTATION_MARKER_REMOVE);
                     }
                     
                     return;

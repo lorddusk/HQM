@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.ComponentCollector;
@@ -68,17 +69,17 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         
         if (this.added != null && !this.added.isEmpty()) {
             quest.addCommand(this.added);
-            SaveHelper.add(SaveHelper.EditType.COMMAND_ADD);
+            SaveHelper.add(EditType.COMMAND_ADD);
         }
         if (this.commands != null) {
             for (int i = this.commands.length - 1; i >= 0; i--) {
                 if (edited[i]) {
                     if (commands[i].isEmpty()) {
                         quest.removeCommand(i);
-                        SaveHelper.add(SaveHelper.EditType.COMMAND_REMOVE);
+                        SaveHelper.add(EditType.COMMAND_REMOVE);
                     } else {
                         quest.editCommand(i, this.commands[i]);
-                        SaveHelper.add(SaveHelper.EditType.COMMAND_CHANGE);
+                        SaveHelper.add(EditType.COMMAND_CHANGE);
                     }
                 }
             }

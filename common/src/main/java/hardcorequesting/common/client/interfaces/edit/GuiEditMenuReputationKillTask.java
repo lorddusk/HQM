@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.quests.task.KillReputationTask;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -32,7 +33,7 @@ public class GuiEditMenuReputationKillTask extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         task.setKills(kills);
-        SaveHelper.add(SaveHelper.EditType.KILLS_CHANGE);
+        SaveHelper.add(EditType.KILLS_CHANGE);
     }
     
     @Override

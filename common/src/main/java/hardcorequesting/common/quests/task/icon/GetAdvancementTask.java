@@ -13,6 +13,7 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -48,17 +49,17 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CREATE);
+        SaveHelper.add(EditType.ADVANCEMENT_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_CHANGE);
+        SaveHelper.add(EditType.ADVANCEMENT_CHANGE);
     }
     
     @Override
     protected void onRemoveElement() {
-        SaveHelper.add(SaveHelper.EditType.ADVANCEMENT_REMOVE);
+        SaveHelper.add(EditType.ADVANCEMENT_REMOVE);
     }
     
     private boolean advanced(int id, Player player) {

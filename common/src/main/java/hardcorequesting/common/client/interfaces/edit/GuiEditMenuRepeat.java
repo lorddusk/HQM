@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.RepeatInfo;
 import hardcorequesting.common.quests.RepeatType;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.world.entity.player.Player;
@@ -59,7 +60,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         quest.setRepeatInfo(new RepeatInfo(type, days, hours));
-        SaveHelper.add(SaveHelper.EditType.REPEATABILITY_CHANGED);
+        SaveHelper.add(EditType.REPEATABILITY_CHANGED);
     }
     
     @Override

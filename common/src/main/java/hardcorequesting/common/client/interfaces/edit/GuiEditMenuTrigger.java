@@ -4,6 +4,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -65,7 +66,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
         if (quest != null) {
             quest.setTriggerType(type);
             quest.setTriggerTasks(Math.max(1, triggerTasks));
-            SaveHelper.add(SaveHelper.EditType.VISIBILITY_CHANGED);
+            SaveHelper.add(EditType.VISIBILITY_CHANGED);
         }
     }
     

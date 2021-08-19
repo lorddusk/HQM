@@ -29,10 +29,7 @@ import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
-import hardcorequesting.common.util.HQMUtil;
-import hardcorequesting.common.util.OPBookHelper;
-import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -472,7 +469,7 @@ public class Quest {
         if (quest != null) {
             requirement.add(quest.getQuestId());
             quest.reversedRequirement.add(this.getQuestId());
-            SaveHelper.add(SaveHelper.EditType.REQUIREMENT_CHANGE);
+            SaveHelper.add(EditType.REQUIREMENT_CHANGE);
         }
     }
     
@@ -485,7 +482,7 @@ public class Quest {
     }
     
     public void clearRequirements() {
-        SaveHelper.add(SaveHelper.EditType.REQUIREMENT_REMOVE, requirement.size());
+        SaveHelper.add(EditType.REQUIREMENT_REMOVE, requirement.size());
         for (UUID questId : requirement)
             QuestSetsManager.getInstance().quests.get(questId).reversedRequirement.remove(getQuestId());
         requirement.clear();
@@ -507,14 +504,14 @@ public class Quest {
         
         Quest quest = QuestSetsManager.getInstance().quests.get(optionLinkId);
         if (quest != null) {
-            SaveHelper.add(SaveHelper.EditType.OPTION_CHANGE);
+            SaveHelper.add(EditType.OPTION_CHANGE);
             optionLinks.add(quest.getQuestId());
             quest.reversedOptionLinks.add(getQuestId());
         }
     }
     
     public void clearOptionLinks() {
-        SaveHelper.add(SaveHelper.EditType.OPTION_REMOVE, optionLinks.size());
+        SaveHelper.add(EditType.OPTION_REMOVE, optionLinks.size());
         for (UUID questId : reversedOptionLinks) {
             QuestSetsManager.getInstance().quests.get(questId).optionLinks.remove(getQuestId());
         }
@@ -1072,7 +1069,7 @@ public class Quest {
                             } else {
                                 this.rewards.set(rawRewards);
                             }
-                            SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
+                            SaveHelper.add(EditType.REWARD_REMOVE);
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
@@ -1135,7 +1132,7 @@ public class Quest {
                                 }
                                 
                                 addTaskData(getQuestData(player));
-                                SaveHelper.add(SaveHelper.EditType.TASK_REMOVE);
+                                SaveHelper.add(EditType.TASK_REMOVE);
                             }
                         } else if (task == selectedTask) {
                             selectedTask = null;
@@ -1390,9 +1387,9 @@ public class Quest {
         
         if (id < rewardList.size()) {
             rewardList.set(id, stack);
-            SaveHelper.add(SaveHelper.EditType.REWARD_CHANGE);
+            SaveHelper.add(EditType.REWARD_CHANGE);
         } else {
-            SaveHelper.add(SaveHelper.EditType.REWARD_CREATE);
+            SaveHelper.add(EditType.REWARD_CREATE);
             rewardList.add(stack);
         }
     }
@@ -1603,7 +1600,7 @@ public class Quest {
                     task.addRequirement(prev);
                 }
                 quest.getTasks().add(task);
-                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
+                SaveHelper.add(EditType.TASK_CREATE);
                 return task;
             } catch (Exception e) {
                 e.printStackTrace();

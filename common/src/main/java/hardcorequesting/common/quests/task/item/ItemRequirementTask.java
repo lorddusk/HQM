@@ -16,10 +16,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.quests.task.ListTask;
-import hardcorequesting.common.util.OPBookHelper;
-import hardcorequesting.common.util.Positioned;
-import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -59,12 +56,12 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     protected void onAddElement() {
-        SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CREATE);
+        SaveHelper.add(EditType.TASK_ITEM_CREATE);
     }
     
     @Override
     protected void onModifyElement() {
-        SaveHelper.add(SaveHelper.EditType.TASK_ITEM_CHANGE);
+        SaveHelper.add(EditType.TASK_ITEM_CHANGE);
     }
     
     @Override
@@ -288,7 +285,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
                             elements.remove(i);
-                            SaveHelper.add(SaveHelper.EditType.TASK_ITEM_REMOVE);
+                            SaveHelper.add(EditType.TASK_ITEM_REMOVE);
                         }
                     }
                     break;
