@@ -91,7 +91,7 @@ public final class OPBookHelper {
                     ItemRequirementTask itemTask = (ItemRequirementTask) task;
                     List<ItemRequirementTask.Part> requirements = itemTask.getItems();
                     if (requirement >= 0 && requirement < requirements.size()) {
-                        QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUUID());
+                        QuestDataTaskItems qData = itemTask.getData(subject.getUUID());
                         if (qData.isDone(requirement, requirements.get(requirement))) {
                             qData.setValue(requirement, 0);
                             itemTask.getData(subject.getUUID()).completed = false;

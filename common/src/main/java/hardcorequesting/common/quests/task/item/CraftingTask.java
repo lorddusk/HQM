@@ -2,7 +2,6 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
@@ -43,7 +42,7 @@ public class CraftingTask extends ItemRequirementTask {
                 }
                 NonNullList<ItemStack> list = NonNullList.create();
                 list.add(stack);
-                increaseItems(list, (QuestDataTaskItems) getData(player), player.getUUID());
+                increaseItems(list, getData(player), player.getUUID());
                 //}
             }
         }

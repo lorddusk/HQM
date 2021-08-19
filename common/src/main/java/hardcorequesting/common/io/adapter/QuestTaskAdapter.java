@@ -351,14 +351,14 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static Map<ReputationTask, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
-    protected static final Adapter<QuestTask> TASK_ADAPTER = new Adapter<QuestTask>() {
+    public static Map<ReputationTask<?>, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
+    protected static final Adapter<QuestTask<?>> TASK_ADAPTER = new Adapter<QuestTask<?>>() {
         private static final String TYPE = "type";
         private static final String DESCRIPTION = "description";
         private static final String LONG_DESCRIPTION = "longDescription";
         
         @Override
-        public JsonElement serialize(QuestTask src) {
+        public JsonElement serialize(QuestTask<?> src) {
             Quest.TaskType type = Quest.TaskType.getType(src.getClass());
             
             JsonObjectBuilder builder = object()
@@ -372,10 +372,10 @@ public class QuestTaskAdapter {
         }
         
         @Override
-        public QuestTask deserialize(JsonElement json) {
+        public QuestTask<?> deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             Quest.TaskType type = Quest.TaskType.valueOf(GsonHelper.getAsString(object, TYPE));
-            QuestTask TASK = type.addTask(QUEST);
+            QuestTask<?> TASK = type.addTask(QUEST);
             if (object.has(DESCRIPTION)) TASK.setDescription(GsonHelper.getAsString(object, DESCRIPTION));
             if (object.has(LONG_DESCRIPTION)) TASK.setLongDescription(GsonHelper.getAsString(object, LONG_DESCRIPTION));
             TASK.read(object);

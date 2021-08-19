@@ -3,7 +3,6 @@ package hardcorequesting.fabric.tileentity;
 import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.fluid.FluidInsertable;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
@@ -17,7 +16,9 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements Flui
     public FluidVolume attemptInsertion(FluidVolume fluidVolume, Simulation simulation) {
         QuestTask task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
-            if (((ConsumeItemTask) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID(), true)) {
+            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+            
+            if (consumeTask.increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), consumeTask.getData(this.getPlayerUUID()), this.getPlayerUUID(), true)) {
                 this.updateState();
                 this.doSync();
             }

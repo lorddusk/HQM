@@ -164,9 +164,9 @@ public class Reputation {
                         }
 
                         for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask task : quest.getTasks()) {
+                            for (QuestTask<?> task : quest.getTasks()) {
                                 if (task instanceof ReputationTask) {
-                                    ReputationTask reputationTask = (ReputationTask) task;
+                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
                                     List<ReputationTask.Part> settings = reputationTask.getSettings();
                                     settings.removeIf(setting -> reputation.equals(setting.getReputation()));
                                 }
@@ -212,9 +212,9 @@ public class Reputation {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask task : quest.getTasks()) {
-                                if (task instanceof ReputationTask) {
-                                    ReputationTask reputationTask = (ReputationTask) task;
+                            for (QuestTask<?> task : quest.getTasks()) {
+                                if (task instanceof ReputationTask<?>) {
+                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
                                     for (ReputationTask.Part setting : reputationTask.getSettings()) {
                                         if (selectedReputation.markers.get(i).equals(setting.getLower())) {
                                             setting.setLower(null);

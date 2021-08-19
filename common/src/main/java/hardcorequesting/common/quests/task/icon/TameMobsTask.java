@@ -11,7 +11,6 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskTame;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
@@ -33,7 +32,7 @@ import java.util.UUID;
 /**
  * A task where the player needs to part certain mobs.
  */
-public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
+public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, QuestDataTaskTame> {
     private static final String TAME = "part";
     
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
@@ -68,16 +67,16 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     }
     
     private int tamed(int id, Player player) {
-        return ((QuestDataTaskTame) getData(player)).getValue(id);
+        return getData(player).getValue(id);
     }
     
     @Override
-    public Class<? extends QuestDataTask> getDataType() {
+    public Class<QuestDataTaskTame> getDataType() {
         return QuestDataTaskTame.class;
     }
     
     @Override
-    public QuestDataTask newQuestData() {
+    public QuestDataTaskTame newQuestData() {
         return new QuestDataTaskTame(elements.size());
     }
     
@@ -109,7 +108,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     
     @Override
     public float getCompletedRatio(UUID uuid) {
-        QuestDataTaskTame data = (QuestDataTaskTame) getData(uuid);
+        QuestDataTaskTame data = getData(uuid);
         int tamed = 0;
         int total = 0;
         
@@ -123,13 +122,12 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     }
     
     @Override
-    public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
-        QuestDataTaskTame data = (QuestDataTaskTame) own;
-        data.merge((QuestDataTaskTame) other);
+    public void mergeProgress(UUID uuid, QuestDataTaskTame own, QuestDataTaskTame other) {
+        own.merge(other);
     
         boolean all = true;
         for (int i = 0; i < elements.size(); i++) {
-            if (data.getValue(i) < elements.get(i).count) {
+            if (own.getValue(i) < elements.get(i).count) {
                 all = false;
                 break;
             }
@@ -142,7 +140,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        QuestDataTaskTame data = (QuestDataTaskTame) getData(uuid);
+        QuestDataTaskTame data = getData(uuid);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.setValue(i, elements.get(i).count);
@@ -155,14 +153,14 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part> {
     }
     
     @Override
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(QuestDataTaskTame own, QuestDataTaskTame other) {
         own.update(other);
     }
     
     @Override
     public void onAnimalTame(Player tamer, Entity entity) {
         if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
-            QuestDataTaskTame data = (QuestDataTaskTame) getData(tamer);
+            QuestDataTaskTame data = getData(tamer);
             boolean updated = false;
             for (int i = 0; i < elements.size(); i++) {
                 Part part = elements.get(i);

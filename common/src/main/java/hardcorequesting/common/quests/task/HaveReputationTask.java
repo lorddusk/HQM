@@ -2,9 +2,10 @@ package hardcorequesting.common.quests.task;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.data.QuestDataTask;
 import net.minecraft.world.entity.player.Player;
 
-public class HaveReputationTask extends ReputationTask {
+public class HaveReputationTask extends ReputationTask<QuestDataTask> {
     
     public HaveReputationTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription, 0);
@@ -20,6 +21,16 @@ public class HaveReputationTask extends ReputationTask {
             }
             
         }
+    }
+    
+    @Override
+    public Class<QuestDataTask> getDataType() {
+        return QuestDataTask.class;
+    }
+    
+    @Override
+    public QuestDataTask newQuestData() {
+        return new QuestDataTask();
     }
     
     @Override

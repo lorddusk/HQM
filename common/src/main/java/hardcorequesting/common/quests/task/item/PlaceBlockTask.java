@@ -2,7 +2,6 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -38,7 +37,7 @@ public class PlaceBlockTask extends ItemRequirementTask {
         if (hand != InteractionHand.MAIN_HAND) return;
         
         NonNullList<ItemStack> consume = NonNullList.withSize(1, itemStack);
-        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUUID());
+        increaseItems(consume, getData(player), player.getUUID());
     }
 }
 

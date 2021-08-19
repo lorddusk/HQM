@@ -1569,26 +1569,26 @@ public class Quest {
         BLOCK_BREAK(BreakBlockTask.class, "break"),
         BLOCK_PLACE(PlaceBlockTask.class, "place");
         
-        private final Class<? extends QuestTask> clazz;
+        private final Class<? extends QuestTask<?>> clazz;
         private final String id;
         
-        TaskType(Class<? extends QuestTask> clazz, String id) {
+        TaskType(Class<? extends QuestTask<?>> clazz, String id) {
             this.clazz = clazz;
             this.id = id;
         }
         
-        public static TaskType getType(Class<? extends QuestTask> clazz) {
+        public static TaskType getType(Class<?> clazz) {
             for (TaskType type : values()) {
                 if (type.clazz == clazz) return type;
             }
             return CONSUME;
         }
         
-        public QuestTask addTask(Quest quest) {
-            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
+        public QuestTask<?> addTask(Quest quest) {
+            QuestTask<?> prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
             try {
-                Constructor<? extends QuestTask> ex = clazz.getConstructor(Quest.class, String.class, String.class);
-                QuestTask task = ex.newInstance(quest, getName(), getDescription());
+                Constructor<? extends QuestTask<?>> ex = clazz.getConstructor(Quest.class, String.class, String.class);
+                QuestTask<?> task = ex.newInstance(quest, getName(), getDescription());
                 if (prev != null) {
                     task.addRequirement(prev);
                 }

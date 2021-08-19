@@ -61,11 +61,13 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     
     @Override
     public void setItem(int i, @NotNull ItemStack stack) {
-        QuestTask task = getCurrentTask();
+        QuestTask<?> task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
+            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+            
             NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
-            if (((ConsumeItemTask) task).increaseItems(list, (QuestDataTaskItems) task.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
+            if (consumeTask.increaseItems(list, consumeTask.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
                 this.updateState();
                 this.doSync();
             }
@@ -90,13 +92,14 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     
     @Override
     public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
-        QuestTask task = getCurrentTask();
+        QuestTask<?> task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
             ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+            
             for (int i = 0; i < consumeTask.getItems().size(); i++) {
                 ItemRequirementTask.Part requirement = consumeTask.getItems().get(i);
                 if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
-                    QuestDataTaskItems data = (QuestDataTaskItems) task.getData(this.getPlayerUUID());
+                    QuestDataTaskItems data = consumeTask.getData(this.getPlayerUUID());
                     return !data.isDone(i, requirement);
                 }
             }

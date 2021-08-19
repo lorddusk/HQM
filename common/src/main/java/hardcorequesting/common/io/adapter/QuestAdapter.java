@@ -393,7 +393,7 @@ public class QuestAdapter {
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();
-        for (Map.Entry<ReputationTask, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
+        for (Map.Entry<ReputationTask<?>, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
             List<ReputationTask.Part> partList = entry.getKey().getSettings();
             partList.clear();
             for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {

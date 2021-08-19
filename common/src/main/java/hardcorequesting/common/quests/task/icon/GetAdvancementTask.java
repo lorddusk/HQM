@@ -11,7 +11,6 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskAdvancement;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
@@ -32,7 +31,7 @@ import java.util.UUID;
 /**
  * A task where the player has to complete advancements.
  */
-public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> {
+public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, QuestDataTaskAdvancement> {
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {
@@ -47,7 +46,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     }
     
     private boolean advanced(int id, Player player) {
-        return ((QuestDataTaskAdvancement) getData(player)).getValue(id);
+        return getData(player).getValue(id);
     }
     
     private void setAdvancement(int id, String advancement) {
@@ -55,12 +54,12 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     }
     
     @Override
-    public Class<? extends QuestDataTask> getDataType() {
+    public Class<QuestDataTaskAdvancement> getDataType() {
         return QuestDataTaskAdvancement.class;
     }
     
     @Override
-    public QuestDataTask newQuestData() {
+    public QuestDataTaskAdvancement newQuestData() {
         return new QuestDataTaskAdvancement(elements.size());
     }
     
@@ -94,7 +93,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     private void checkAdvancement(Player player) {
         Level world = player.getCommandSenderWorld();
         if (!world.isClientSide && !this.isCompleted(player) && player.getServer() != null) {
-            QuestDataTaskAdvancement data = (QuestDataTaskAdvancement) this.getData(player);
+            QuestDataTaskAdvancement data = this.getData(player);
             
             boolean completed = true;
             ServerAdvancementManager manager = player.getServer().getAdvancements();
@@ -133,21 +132,21 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     @Override
     public float getCompletedRatio(UUID uuid) {
         
-        return ((QuestDataTaskAdvancement) getData(uuid)).getCompletedRatio(elements.size());
+        return getData(uuid).getCompletedRatio(elements.size());
     }
     
     @Override
-    public void mergeProgress(UUID uuid, QuestDataTask own, QuestDataTask other) {
-        ((QuestDataTaskAdvancement) own).mergeResult((QuestDataTaskAdvancement) other);
+    public void mergeProgress(UUID uuid, QuestDataTaskAdvancement own, QuestDataTaskAdvancement other) {
+        own.mergeResult(other);
         
-        if (((QuestDataTaskAdvancement) own).areAllCompleted(elements.size())) {
+        if (own.areAllCompleted(elements.size())) {
             completeTask(uuid);
         }
     }
     
     @Override
     public void autoComplete(UUID uuid, boolean status) {
-        QuestDataTaskAdvancement data = ((QuestDataTaskAdvancement) getData(uuid));
+        QuestDataTaskAdvancement data = getData(uuid);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.complete(i);
@@ -158,7 +157,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     }
     
     @Override
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(QuestDataTaskAdvancement own, QuestDataTaskAdvancement other) {
         own.update(other);
     }
     
@@ -182,7 +181,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
         FULL("Full"),
         NONE("None");
         
-        private String id;
+        private final String id;
         
         Visibility(String id) {
             this.id = id;

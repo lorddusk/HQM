@@ -13,7 +13,6 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.quests.task.ListTask;
 import hardcorequesting.common.util.*;
@@ -36,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.Part> {
+public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.Part, QuestDataTaskItems> {
     
     private static final String ITEMS = "items";
     private static final int MAX_X = 300;
@@ -93,8 +92,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
             return 0;
         }
         
-        QuestDataTaskItems data = ((QuestDataTaskItems) getData(player));
-        return data.getValue(id);
+        return getData(player).getValue(id);
     }
     
     protected List<Positioned<Part>> getPositionedItems(List<Part> items) {
@@ -169,12 +167,12 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     @Override
-    public Class<? extends QuestDataTask> getDataType() {
+    public Class<QuestDataTaskItems> getDataType() {
         return QuestDataTaskItems.class;
     }
     
     @Override
-    public QuestDataTask newQuestData() {
+    public QuestDataTaskItems newQuestData() {
         return new QuestDataTaskItems(elements.size());
     }
     
@@ -297,7 +295,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public float getCompletedRatio(UUID playerId) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
+        QuestDataTaskItems data = getData(playerId);
         int done = 0;
         int total = 0;
         
@@ -311,13 +309,12 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     @Override
-    public void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other) {
-        QuestDataTaskItems data = (QuestDataTaskItems) own;
-        data.merge((QuestDataTaskItems) other);
+    public void mergeProgress(UUID playerId, QuestDataTaskItems own, QuestDataTaskItems other) {
+        own.merge(other);
         
         boolean completed = true;
         for (int i = 0; i < elements.size(); i++) {
-            if (!data.isDone(i, elements.get(i))) {
+            if (!own.isDone(i, elements.get(i))) {
                 completed = false;
                 break;
             }
@@ -330,7 +327,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public void autoComplete(UUID playerId, boolean status) {
-        QuestDataTaskItems data = (QuestDataTaskItems) getData(playerId);
+        QuestDataTaskItems data = getData(playerId);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.setValue(i, elements.get(i).required);
@@ -343,7 +340,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     @Override
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(QuestDataTaskItems own, QuestDataTaskItems other) {
         own.update(other);
     }
     

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +29,7 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     public void checkProgress(BlockState state, Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
         NonNullList<ItemStack> consume = NonNullList.withSize(1, drop);
-        increaseItems(consume, (QuestDataTaskItems) getData(player), player.getUUID());
+        increaseItems(consume, getData(player), player.getUUID());
     }
     
     @Override

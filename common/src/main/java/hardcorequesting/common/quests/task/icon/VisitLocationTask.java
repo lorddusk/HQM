@@ -11,7 +11,6 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.data.QuestDataTask;
 import hardcorequesting.common.quests.data.QuestDataTaskLocation;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
@@ -31,7 +30,7 @@ import java.util.UUID;
 /**
  * A task where the player has to visit certain locations.
  */
-public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
+public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, QuestDataTaskLocation> {
     private static final String LOCATIONS = "locations";
     
     private static final int CHECK_DELAY = 20;
@@ -56,7 +55,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
             
             Level world = player.getCommandSenderWorld();
             if (!world.isClientSide) {
-                QuestDataTaskLocation data = (QuestDataTaskLocation) this.getData(player);
+                QuestDataTaskLocation data = this.getData(player);
                 boolean all = true;
                 boolean updated = false;
                 
@@ -88,7 +87,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     }
     
     private boolean visited(int id, Player player) {
-        return ((QuestDataTaskLocation) getData(player)).getValue(id);
+        return getData(player).getValue(id);
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
@@ -100,12 +99,12 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     }
     
     @Override
-    public Class<? extends QuestDataTask> getDataType() {
+    public Class<QuestDataTaskLocation> getDataType() {
         return QuestDataTaskLocation.class;
     }
     
     @Override
-    public QuestDataTask newQuestData() {
+    public QuestDataTaskLocation newQuestData() {
         return new QuestDataTaskLocation(elements.size());
     }
     
@@ -154,21 +153,21 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     
     @Override
     public float getCompletedRatio(UUID playerID) {
-        return ((QuestDataTaskLocation) getData(playerID)).getCompletedRatio(elements.size());
+        return getData(playerID).getCompletedRatio(elements.size());
     }
     
     @Override
-    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
-        ((QuestDataTaskLocation) own).mergeResult((QuestDataTaskLocation) other);
+    public void mergeProgress(UUID playerID, QuestDataTaskLocation own, QuestDataTaskLocation other) {
+        own.mergeResult(other);
         
-        if (((QuestDataTaskLocation) own).areAllCompleted(elements.size())) {
+        if (own.areAllCompleted(elements.size())) {
             completeTask(playerID);
         }
     }
     
     @Override
     public void autoComplete(UUID playerID, boolean status) {
-        QuestDataTaskLocation data = (QuestDataTaskLocation) getData(playerID);
+        QuestDataTaskLocation data = getData(playerID);
         if (status) {
             for (int i = 0; i < elements.size(); i++) {
                 data.complete(i);
@@ -179,7 +178,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     }
     
     @Override
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(QuestDataTaskLocation own, QuestDataTaskLocation other) {
         own.update(other);
     }
     

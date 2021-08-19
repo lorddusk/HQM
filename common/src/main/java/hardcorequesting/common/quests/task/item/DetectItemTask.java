@@ -78,7 +78,7 @@ public class DetectItemTask extends ItemRequirementTask {
             if (!stack.isEmpty()) {
                 items.set(items.size() - 1, stack);
             }
-            countItems(items, (QuestDataTaskItems) getData(player), player.getUUID());
+            countItems(items, getData(player), player.getUUID());
         }
     }
     

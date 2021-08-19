@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
+public abstract class ReputationTask<Data extends QuestDataTask> extends ListTask<ReputationTask.Part, Data> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
@@ -143,7 +143,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     }
     
     @Override
-    public void mergeProgress(UUID playerID, QuestDataTask own, QuestDataTask other) {
+    public void mergeProgress(UUID playerID, Data own, Data other) {
         if (other.completed) {
             own.completed = true;
         }

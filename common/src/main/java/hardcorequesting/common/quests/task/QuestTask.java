@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.io.IOException;
 import java.util.*;
 
-public abstract class QuestTask {
+public abstract class QuestTask<Data extends QuestDataTask> {
     
     protected static final int START_X = 180;
     protected static final int START_Y = 95;
@@ -134,9 +134,7 @@ public abstract class QuestTask {
         return false;
     }
     
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTask.class;
-    }
+    public abstract Class<Data> getDataType();
     
     public void write(QuestDataTask task, JsonObject out) {
         task.write(new Adapter.JsonObjectBuilder(out));
@@ -146,11 +144,11 @@ public abstract class QuestTask {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
-    public QuestDataTask getData(Player player) {
+    public Data getData(Player player) {
         return getData(player.getUUID());
     }
     
-    public QuestDataTask getData(UUID uuid) {
+    public Data getData(UUID uuid) {
         if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
@@ -159,20 +157,19 @@ public abstract class QuestTask {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
         }
-        return questData.tasks[id] = validateData(questData.tasks[id]);
-    }
-    
-    public QuestDataTask validateData(QuestDataTask data) {
-        if (data == null || data.getClass() != getDataType()) {
-            return newQuestData();
-        }
         
+        Data data = validateData(questData.tasks[id]);
+        questData.tasks[id] = data;
         return data;
     }
     
-    public QuestDataTask newQuestData() {
-        return new QuestDataTask();
+    public Data validateData(QuestDataTask data) {
+        if (getDataType().isInstance(data)) {
+            return getDataType().cast(data);
+        } else return newQuestData();
     }
+    
+    public abstract Data newQuestData();
     
     public String getLangKeyDescription() {
         return description;
@@ -247,7 +244,7 @@ public abstract class QuestTask {
     
     public abstract float getCompletedRatio(UUID uuid);
     
-    public abstract void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other);
+    public abstract void mergeProgress(UUID playerId, Data own, Data other);
     
     public void autoComplete(UUID playerId) {
         autoComplete(playerId, true);
@@ -258,7 +255,7 @@ public abstract class QuestTask {
     
     public abstract void autoComplete(UUID playerId, boolean status);
     
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(Data own, Data other) {
         own.completed = other.completed;
     }
     

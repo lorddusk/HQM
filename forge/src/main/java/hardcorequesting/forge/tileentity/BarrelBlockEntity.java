@@ -42,11 +42,13 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         
         @Override
         public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-            QuestTask task = getCurrentTask();
+            QuestTask<?> task = getCurrentTask();
             if (task instanceof ConsumeItemTask) {
+                ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+                
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
-                QuestDataTaskItems data = (QuestDataTaskItems) task.getData(playerUUID);
-                List<ItemRequirementTask.Part> items = ((ConsumeItemTask) task).getItems();
+                QuestDataTaskItems data = consumeTask.getData(playerUUID);
+                List<ItemRequirementTask.Part> items = consumeTask.getItems();
                 for (int i = 0; i < items.size(); i++) {
                     ItemRequirementTask.Part item = items.get(i);
                     if (item.fluid == null || data.isDone(i, item)) {
@@ -64,11 +66,13 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            QuestTask task = getCurrentTask();
+            QuestTask<?> task = getCurrentTask();
             if (task instanceof ConsumeItemTask) {
+                ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+                
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
                 FluidStack duplicate = resource.copy();
-                if (((ConsumeItemTask) task).increaseFluid(new ForgeFluidStack(duplicate), (QuestDataTaskItems) task.getData(playerUUID), playerUUID, action.execute()) && action.execute()) {
+                if (consumeTask.increaseFluid(new ForgeFluidStack(duplicate), consumeTask.getData(playerUUID), playerUUID, action.execute()) && action.execute()) {
                     BarrelBlockEntity.this.updateState();
                     BarrelBlockEntity.this.doSync();
                 }
