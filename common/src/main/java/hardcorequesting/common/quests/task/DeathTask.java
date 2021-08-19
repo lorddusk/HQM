@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.data.DeathTaskData;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -43,8 +44,12 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        int died = getData(player).deaths;
-        gui.drawString(matrices, gui.getLinesFromText(Translator.plain(died == deaths ? GuiColor.GREEN + Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deaths", deaths).getString() : Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths).getString()), 1F, 130), START_X, START_Y, 1F, 0x404040);
+        int died = getData(player).getDeaths();
+        FormattedText text = died == deaths
+                ? Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, deaths)
+                : Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths);
+        
+        gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
@@ -60,32 +65,26 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Override
     public float getCompletedRatio(UUID playerID) {
-        return (float) getData(playerID).deaths / deaths;
+        return (float) getData(playerID).getDeaths() / deaths;
     }
     
     @Override
     public void mergeProgress(UUID playerID, DeathTaskData own, DeathTaskData other) {
-        own.deaths = Math.max(own.deaths, other.deaths);
+        own.merge(other);
         
-        if (own.deaths == deaths) {
+        if (own.getDeaths() == deaths) {
             completeTask(playerID);
         }
     }
     
     @Override
     public void autoComplete(UUID playerID, boolean status) {
-        if (status) {
-            deaths = getData(playerID).deaths;
-        } else {
-            deaths = 0;
-        }
+        getData(playerID).setDeaths(status ? deaths : 0);
     }
     
     @Override
     public void copyProgress(DeathTaskData own, DeathTaskData other) {
-        super.copyProgress(own, other);
-        
-        own.deaths = other.deaths;
+        own.update(other);
     }
     
     @Override
@@ -93,10 +92,10 @@ public class DeathTask extends QuestTask<DeathTaskData> {
         if (player instanceof ServerPlayer) {
             if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible((Player) player) && !isCompleted((Player) player)) {
                 DeathTaskData deathData = getData((Player) player);
-                if (deathData.deaths < deaths) {
-                    deathData.deaths += 1;
+                if (deathData.getDeaths() < deaths) {
+                    deathData.setDeaths(deathData.getDeaths() + 1);
                     
-                    if (deathData.deaths == deaths) {
+                    if (deathData.getDeaths() == deaths) {
                         completeTask(player.getUUID());
                     }
                     
@@ -110,13 +109,13 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     public void uncomplete(UUID playerId) {
         super.uncomplete(playerId);
         
-        getData(playerId).deaths = 0;
+        getData(playerId).setDeaths(0);
     }
     
     @Override
     public void completeTask(UUID uuid) {
         super.completeTask(uuid);
-        getData(uuid).deaths = deaths;
+        getData(uuid).setDeaths(deaths);
         completeQuest(parent, uuid);
     }
     

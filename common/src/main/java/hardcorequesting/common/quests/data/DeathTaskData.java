@@ -9,7 +9,7 @@ import net.minecraft.util.GsonHelper;
 public class DeathTaskData extends TaskData {
     
     private static final String DEATHS = "deaths";
-    public int deaths;
+    private int deaths;
     
     public DeathTaskData() {
         super();
@@ -20,6 +20,18 @@ public class DeathTaskData extends TaskData {
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         data.deaths = GsonHelper.getAsInt(in, DEATHS);
         return data;
+    }
+    
+    public int getDeaths() {
+        return deaths;
+    }
+    
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+    }
+    
+    public void merge(DeathTaskData data) {
+        deaths = Math.max(this.deaths, data.deaths);
     }
     
     @Override
