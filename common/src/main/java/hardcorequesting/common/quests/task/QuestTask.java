@@ -256,14 +256,14 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract void mergeProgress(UUID playerId, Data own, Data other);
     
-    public void autoComplete(UUID playerId) {
-        autoComplete(playerId, true);
+    public void resetData(UUID playerId) {
+        QuestData questData = parent.getQuestData(playerId);
+        if (id < questData.tasks.length) {
+            questData.tasks[id] = newQuestData();
+        }
     }
     
-    public void uncomplete(UUID playerId) {
-    }
-    
-    public abstract void autoComplete(UUID playerId, boolean status);
+    protected abstract void setComplete(Data data);
     
     public void copyProgress(QuestData own, QuestData other) {
         copyProgress(getData(own), getData(other));

@@ -78,8 +78,9 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     }
     
     @Override
-    public void autoComplete(UUID playerID, boolean status) {
-        getData(playerID).setDeaths(status ? deaths : 0);
+    public void setComplete(DeathTaskData data) {
+        data.setDeaths(deaths);
+        data.completed = true;
     }
     
     @Override
@@ -103,13 +104,6 @@ public class DeathTask extends QuestTask<DeathTaskData> {
                 }
             }
         }
-    }
-    
-    @Override
-    public void uncomplete(UUID playerId) {
-        super.uncomplete(playerId);
-        
-        getData(playerId).setDeaths(0);
     }
     
     @Override

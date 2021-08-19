@@ -46,10 +46,6 @@ public class CompleteQuestTaskData extends TaskData {
         quests.set(id, true);
     }
     
-    public void clear() {
-        quests.clear();
-    }
-    
     public void mergeResult(CompleteQuestTaskData other) {
         for (int i = 0; i < other.quests.size(); i++) {
             if (other.quests.get(i))

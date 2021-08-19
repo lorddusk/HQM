@@ -833,7 +833,7 @@ public class Quest {
         int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, tasks.size());
         for (int i = start; i < end; i++) {
-            QuestTask task = tasks.get(i);
+            QuestTask<?> task = tasks.get(i);
             boolean isVisible = task.isVisible(player);
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(player);
@@ -1456,8 +1456,7 @@ public class Quest {
     
     public void completeQuest(Player player) {
         for (QuestTask<?> task : tasks) {
-            task.autoComplete(player.getUUID());
-            task.getData(player).completed = true;
+            task.completeTask(player.getUUID());
         }
         QuestTask.completeQuest(this, player.getUUID());
     }

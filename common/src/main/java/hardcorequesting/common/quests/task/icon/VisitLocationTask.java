@@ -166,15 +166,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     }
     
     @Override
-    public void autoComplete(UUID playerID, boolean status) {
-        LocationTaskData data = getData(playerID);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.complete(i);
-            }
-        } else {
-            data.clear();
+    public void setComplete(LocationTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.complete(i);
         }
+        data.completed = true;
     }
     
     @Override

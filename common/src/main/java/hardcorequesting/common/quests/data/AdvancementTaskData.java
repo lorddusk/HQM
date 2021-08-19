@@ -47,10 +47,6 @@ public class AdvancementTaskData extends TaskData {
         advanced.set(id, true);
     }
     
-    public void clear() {
-        advanced.clear();
-    }
-    
     public void mergeResult(AdvancementTaskData other) {
         for (int i = 0; i < other.advanced.size(); i++) {
             if (other.advanced.get(i))

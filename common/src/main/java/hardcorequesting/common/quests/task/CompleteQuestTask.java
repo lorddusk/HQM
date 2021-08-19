@@ -175,15 +175,11 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     }
     
     @Override
-    public void autoComplete(UUID uuid, boolean status) {
-        CompleteQuestTaskData data = getData(uuid);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.complete(i);
-            }
-        } else {
-            data.clear();
+    public void setComplete(CompleteQuestTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.complete(i);
         }
+        data.completed = true;
     }
     
     @Override

@@ -326,17 +326,11 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     @Override
-    public void autoComplete(UUID playerId, boolean status) {
-        ItemsTaskData data = getData(playerId);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, elements.get(i).required);
-            }
-        } else {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, 0);
-            }
+    public void setComplete(ItemsTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.setValue(i, elements.get(i).required);
         }
+        data.completed = true;
     }
     
     @Override

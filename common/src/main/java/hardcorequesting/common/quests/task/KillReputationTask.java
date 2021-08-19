@@ -56,12 +56,9 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     }
     
     @Override
-    public void autoComplete(UUID playerID, boolean status) {
-        if (status) {
-            this.kills = getData(playerID).kills;
-        } else {
-            this.kills = 0;
-        }
+    public void setComplete(ReputationKillTaskData data) {
+        data.kills = kills;
+        super.setComplete(data);
     }
     
     @Override

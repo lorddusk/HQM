@@ -145,15 +145,11 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public void autoComplete(UUID uuid, boolean status) {
-        AdvancementTaskData data = getData(uuid);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.complete(i);
-            }
-        } else {
-            data.clear();
+    public void setComplete(AdvancementTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.complete(i);
         }
+        data.completed = true;
     }
     
     @Override

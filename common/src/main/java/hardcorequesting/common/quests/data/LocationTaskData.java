@@ -48,10 +48,6 @@ public class LocationTaskData extends TaskData {
         visited.set(id, true);
     }
     
-    public void clear() {
-        visited.clear();
-    }
-    
     public void mergeResult(LocationTaskData other) {
         for (int i = 0; i < other.visited.size(); i++) {
             if (other.visited.get(i))

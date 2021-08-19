@@ -139,17 +139,11 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     }
     
     @Override
-    public void autoComplete(UUID uuid, boolean status) {
-        TameTaskData data = getData(uuid);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, elements.get(i).count);
-            }
-        } else {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, 0);
-            }
+    public void setComplete(TameTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.setValue(i, elements.get(i).count);
         }
+        data.completed = true;
     }
     
     @Override

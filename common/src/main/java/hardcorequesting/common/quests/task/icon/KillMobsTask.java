@@ -131,18 +131,13 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         }
     }
     
+    
     @Override
-    public void autoComplete(UUID playerID, boolean status) {
-        MobTaskData data = getData(playerID);
-        if (status) {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, elements.get(i).count);
-            }
-        } else {
-            for (int i = 0; i < elements.size(); i++) {
-                data.setValue(i, 0);
-            }
+    public void setComplete(MobTaskData data) {
+        for (int i = 0; i < elements.size(); i++) {
+            data.setValue(i, elements.get(i).count);
         }
+        data.completed = true;
     }
     
     @Override

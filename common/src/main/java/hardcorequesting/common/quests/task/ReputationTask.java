@@ -144,14 +144,12 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
     
     @Override
     public void mergeProgress(UUID playerID, Data own, Data other) {
-        if (other.completed) {
-            own.completed = true;
-        }
+        own.completed |= other.completed;
     }
     
     @Override
-    public void autoComplete(UUID playerID, boolean status) {
-        getData(playerID).completed = status;
+    public void setComplete(Data data) {
+        data.completed = true;
     }
     
     protected Player getPlayerForRender(Player player) {
