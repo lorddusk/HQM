@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -204,21 +203,13 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part> {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part quest : elements) {
-            array.add(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.toJsonTree(quest));
-        }
-        builder.add(COMPLETED_QUESTS, array.build());
+        builder.add(COMPLETED_QUESTS, writeElements(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray())) {
-            Part task = QuestTaskAdapter.QUEST_COMPLETED_ADAPTER.fromJsonTree(element);
-            if (task != null)
-                elements.add(task);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray()), QuestTaskAdapter.QUEST_COMPLETED_ADAPTER);
     }
     
     public static class Part {

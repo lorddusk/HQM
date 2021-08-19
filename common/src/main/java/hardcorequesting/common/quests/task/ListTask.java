@@ -1,5 +1,9 @@
 package hardcorequesting.common.quests.task;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.TypeAdapter;
+import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 
 import java.util.ArrayList;
@@ -59,6 +63,23 @@ public abstract class ListTask<T> extends QuestTask {
         } else {
             elements.set(id, element);
             onModifyElement();
+        }
+    }
+    
+    protected final JsonArray writeElements(TypeAdapter<T> adapter) {
+        Adapter.JsonArrayBuilder array = Adapter.array();
+        for (T part : elements) {
+            array.add(adapter.toJsonTree(part));
+        }
+        return array.build();
+    }
+    
+    protected final void readElements(JsonArray array, TypeAdapter<T> adapter) {
+        elements.clear();
+        for (JsonElement element : array) {
+            T part = adapter.fromJsonTree(element);
+            if (part != null)
+                elements.add(part);
         }
     }
 }

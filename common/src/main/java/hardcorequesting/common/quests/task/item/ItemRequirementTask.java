@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task.item;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
@@ -70,21 +69,13 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part item : getItems()) {
-            array.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.toJsonTree(item));
-        }
-        builder.add(ITEMS, array.build());
+        builder.add(ITEMS, writeElements(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray())) {
-            Part requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
-            if (requirement != null)
-                elements.add(requirement);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
     }
     
     public List<Part> getItems() {

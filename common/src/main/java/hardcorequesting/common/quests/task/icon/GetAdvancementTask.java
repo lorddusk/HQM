@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -180,21 +179,13 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part> 
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part part : elements) {
-            array.add(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.toJsonTree(part));
-        }
-        builder.add(ADVANCEMENTS, array.build());
+        builder.add(ADVANCEMENTS, writeElements(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray())) {
-            Part part = QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER.fromJsonTree(element);
-            if (part != null)
-                elements.add(part);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray()), QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER);
     }
     
     public enum Visibility {

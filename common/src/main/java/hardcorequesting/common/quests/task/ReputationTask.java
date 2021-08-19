@@ -173,11 +173,7 @@ public abstract class ReputationTask extends ListTask<ReputationTask.Part> {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part setting : elements) {
-            array.add(QuestTaskAdapter.REPUTATION_TASK_ADAPTER.toJsonTree(setting));
-        }
-        builder.add(REPUTATION, array.build());
+        builder.add(REPUTATION, writeElements(QuestTaskAdapter.REPUTATION_TASK_ADAPTER));
     }
     
     @Override

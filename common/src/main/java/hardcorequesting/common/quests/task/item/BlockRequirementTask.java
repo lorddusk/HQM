@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task.item;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -42,21 +41,13 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part item : getItems()) {
-            array.add(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.toJsonTree(item));
-        }
-        builder.add(BLOCKS, array.build());
+        builder.add(BLOCKS, writeElements(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray())) {
-            Part requirement = QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER.fromJsonTree(element);
-            if (requirement != null)
-                elements.add(requirement);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
     }
 }
 

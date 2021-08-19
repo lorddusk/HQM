@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -206,21 +205,13 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part> {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part part : elements) {
-            array.add(QuestTaskAdapter.MOB_ADAPTER.toJsonTree(part));
-        }
-        builder.add(MOBS, array.build());
+        builder.add(MOBS, writeElements(QuestTaskAdapter.MOB_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, MOBS, new JsonArray())) {
-            Part part = QuestTaskAdapter.MOB_ADAPTER.fromJsonTree(element);
-            if (part != null)
-                elements.add(part);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, MOBS, new JsonArray()), QuestTaskAdapter.MOB_ADAPTER);
     }
     
     public static class Part extends IconLayoutTask.Part {

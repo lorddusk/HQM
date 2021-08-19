@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -208,21 +207,13 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        Adapter.JsonArrayBuilder array = Adapter.array();
-        for (Part part : elements) {
-            array.add(QuestTaskAdapter.LOCATION_ADAPTER.toJsonTree(part));
-        }
-        builder.add(LOCATIONS, array.build());
+        builder.add(LOCATIONS, writeElements(QuestTaskAdapter.LOCATION_ADAPTER));
     }
     
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        elements.clear();
-        for (JsonElement element : GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray())) {
-            Part part = QuestTaskAdapter.LOCATION_ADAPTER.fromJsonTree(element);
-            if (part != null)
-                elements.add(part);
-        }
+        readElements(GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray()), QuestTaskAdapter.LOCATION_ADAPTER);
     }
     
     public enum Visibility {
@@ -230,9 +221,9 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part> {
         LOCATION("Location", true, false),
         NONE("None", false, false);
         
-        private boolean showCoordinate;
-        private boolean showRadius;
-        private String id;
+        private final boolean showCoordinate;
+        private final boolean showRadius;
+        private final String id;
         
         Visibility(String id, boolean showCoordinate, boolean showRadius) {
             this.id = id;
