@@ -19,8 +19,8 @@ public class ConsumeItemTask extends ItemRequirementTask {
     public boolean increaseFluid(FluidStack fluidVolume, ItemsTaskData data, UUID playerId, boolean action) {
         boolean updated = false;
         
-        for (int i = 0; i < elements.size(); i++) {
-            Part item = elements.get(i);
+        for (int i = 0; i < parts.size(); i++) {
+            Part item = parts.get(i);
             if (item.fluid == null || data.isDone(i, item)) {
                 continue;
             }

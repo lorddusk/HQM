@@ -26,13 +26,13 @@ public class HaveReputationTask extends ReputationTask<TaskData> {
     
     @Override
     public float getCompletedRatio(Team team) {
-        int count = elements.size();
+        int count = parts.size();
         if (count == 0) {
             return 0;
         }
         
         int valid = 0;
-        for (Part setting : elements) {
+        for (Part setting : parts) {
             if (setting.isValid(team)) {
                 valid++;
             }

@@ -60,8 +60,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
                 boolean all = true;
                 boolean updated = false;
                 
-                for (int i = 0; i < elements.size(); ++i) {
-                    Part part = this.elements.get(i);
+                for (int i = 0; i < parts.size(); ++i) {
+                    Part part = this.parts.get(i);
                     
                     if (!data.getValue(i) && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.dimension)) {
                         int current = (int) player.distanceToSqr((double) part.pos.getX() + 0.5D, (double) part.pos.getY() + 0.5D, (double) part.pos.getZ() + 0.5D);
@@ -92,7 +92,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     }
     
     private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
-        Part part = getOrCreateForModify(id);
+        Part part = parts.getOrCreateForModify(id);
         part.setVisibility(visibility);
         part.setPosition(pos);
         part.setRadius(radius);
@@ -101,7 +101,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     @Override
     public LocationTaskData newQuestData() {
-        return new LocationTaskData(elements.size());
+        return new LocationTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -149,21 +149,21 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     @Override
     public float getCompletedRatio(Team team) {
-        return getData(team).getCompletedRatio(elements.size());
+        return getData(team).getCompletedRatio(parts.size());
     }
     
     @Override
     public void mergeProgress(UUID playerID, LocationTaskData own, LocationTaskData other) {
         own.mergeResult(other);
         
-        if (own.areAllCompleted(elements.size())) {
+        if (own.areAllCompleted(parts.size())) {
             completeTask(playerID);
         }
     }
     
     @Override
     public void setComplete(LocationTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
+        for (int i = 0; i < parts.size(); i++) {
             data.complete(i);
         }
         data.completed = true;
@@ -188,13 +188,13 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(LOCATIONS, writeElements(QuestTaskAdapter.LOCATION_ADAPTER));
+        builder.add(LOCATIONS, parts.write(QuestTaskAdapter.LOCATION_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray()), QuestTaskAdapter.LOCATION_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, LOCATIONS, new JsonArray()), QuestTaskAdapter.LOCATION_ADAPTER);
     }
     
     public enum Visibility {

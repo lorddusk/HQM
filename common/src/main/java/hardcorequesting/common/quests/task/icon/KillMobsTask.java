@@ -55,7 +55,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     }
     
     private void setInfo(int id, ResourceLocation mobId, int amount) {
-        Part part = getOrCreateForModify(id);
+        Part part = parts.getOrCreateForModify(id);
         part.setMob(mobId);
         part.setCount(amount);
     }
@@ -66,7 +66,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     
     @Override
     public MobTaskData newQuestData() {
-        return new MobTaskData(elements.size());
+        return new MobTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -101,8 +101,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         int killed = 0;
         int total = 0;
         
-        for (int i = 0; i < elements.size(); i++) {
-            int req = elements.get(i).count;
+        for (int i = 0; i < parts.size(); i++) {
+            int req = parts.get(i).count;
             killed += Math.min(req, data.getValue(i));
             total += req;
         }
@@ -115,8 +115,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         own.merge(other);
         
         boolean all = true;
-        for (int i = 0; i < elements.size(); i++) {
-            if (own.getValue(i) < elements.get(i).count) {
+        for (int i = 0; i < parts.size(); i++) {
+            if (own.getValue(i) < parts.get(i).count) {
                 all = false;
                 break;
             }
@@ -130,8 +130,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     
     @Override
     public void setComplete(MobTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
-            data.setValue(i, elements.get(i).count);
+        for (int i = 0; i < parts.size(); i++) {
+            data.setValue(i, parts.get(i).count);
         }
         data.completed = true;
     }
@@ -148,8 +148,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
             MobTaskData data = getData(killer);
             boolean updated = false;
-            for (int i = 0; i < elements.size(); i++) {
-                Part part = elements.get(i);
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i);
                 if (part.count > data.getValue(i)) {
                     EntityType<?> type = Registry.ENTITY_TYPE.get(part.mobId);
                     if (type != null) {
@@ -163,8 +163,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
             
             if (updated) {
                 boolean done = true;
-                for (int i = 0; i < elements.size(); i++) {
-                    Part part = elements.get(i);
+                for (int i = 0; i < parts.size(); i++) {
+                    Part part = parts.get(i);
                     
                     if (killed(i, killer) < part.count) {
                         done = false;
@@ -184,13 +184,13 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(MOBS, writeElements(QuestTaskAdapter.MOB_ADAPTER));
+        builder.add(MOBS, parts.write(QuestTaskAdapter.MOB_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, MOBS, new JsonArray()), QuestTaskAdapter.MOB_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, MOBS, new JsonArray()), QuestTaskAdapter.MOB_ADAPTER);
     }
     
     public static class Part extends IconLayoutTask.Part {

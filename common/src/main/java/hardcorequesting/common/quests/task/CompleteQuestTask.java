@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.UUID;
 
-public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, CompleteQuestTaskData> {
+public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     private static final String COMPLETED_QUESTS = "completed_quests";
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -33,15 +33,12 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION);
+    
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
-        super(CompleteQuestTaskData.class, EditType.Type.COMPLETION, parent, description, longDescription);
+        super(CompleteQuestTaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
-    }
-    
-    @Override
-    protected Part createEmpty() {
-        return new Part();
     }
     
     private boolean completed(int id, Player player) {
@@ -50,18 +47,18 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     
     @SuppressWarnings("unused")
     public void setQuest(int id, UUID quest) {
-        getOrCreateForModify(id).setQuest(quest);
+        parts.getOrCreateForModify(id).setQuest(quest);
     }
     
     @Override
     public CompleteQuestTaskData newQuestData() {
-        return new CompleteQuestTaskData(elements.size());
+        return new CompleteQuestTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Part> quests = getShownElements();
+        List<Part> quests = parts.getShownElements();
         for (int i = 0; i < quests.size(); i++) {
             Part completed = quests.get(i);
             
@@ -86,7 +83,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited()) {
-            List<Part> quests = getShownElements();
+            List<Part> quests = parts.getShownElements();
             for (int i = 0; i < quests.size(); i++) {
                 Part completed = quests.get(i);
                 
@@ -95,10 +92,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
                 
                 if (gui.inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.DELETE) {
-                        if (i < elements.size()) {
-                            elements.remove(i);
-                            SaveHelper.add(EditType.COMPLETE_CHECK_REMOVE);
-                        }
+                        parts.remove(i);
                     } else if (completed.getQuest() == null) {
                         completed.setQuest(Quest.speciallySelectedQuestId);
                         SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
@@ -131,10 +125,10 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
             
             boolean completed = true;
             
-            for (int i = 0; i < elements.size(); i++) {
+            for (int i = 0; i < parts.size(); i++) {
                 if (data.getValue(i)) continue;
                 
-                Part task_quest = elements.get(i);
+                Part task_quest = parts.get(i);
                 if (task_quest == null || task_quest.getName() == null || task_quest.getQuest() == null) continue;
                 
                 Quest quest = task_quest.getQuest();
@@ -149,7 +143,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
                 }
             }
             
-            if (completed && !elements.isEmpty()) {
+            if (completed && !parts.isEmpty()) {
                 completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
@@ -158,21 +152,21 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     
     @Override
     public float getCompletedRatio(Team team) {
-        return getData(team).getCompletedRatio(elements.size());
+        return getData(team).getCompletedRatio(parts.size());
     }
     
     @Override
     public void mergeProgress(UUID uuid, CompleteQuestTaskData own, CompleteQuestTaskData other) {
         own.mergeResult(other);
         
-        if (own.areAllCompleted(elements.size())) {
+        if (own.areAllCompleted(parts.size())) {
             completeTask(uuid);
         }
     }
     
     @Override
     public void setComplete(CompleteQuestTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
+        for (int i = 0; i < parts.size(); i++) {
             data.complete(i);
         }
         data.completed = true;
@@ -190,13 +184,13 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(COMPLETED_QUESTS, writeElements(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER));
+        builder.add(COMPLETED_QUESTS, parts.write(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray()), QuestTaskAdapter.QUEST_COMPLETED_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, COMPLETED_QUESTS, new JsonArray()), QuestTaskAdapter.QUEST_COMPLETED_ADAPTER);
     }
     
     public static class Part {

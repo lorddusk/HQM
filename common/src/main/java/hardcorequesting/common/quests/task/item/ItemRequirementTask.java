@@ -14,7 +14,8 @@ import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
-import hardcorequesting.common.quests.task.ListTask;
+import hardcorequesting.common.quests.task.PartList;
+import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
@@ -36,43 +37,42 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.Part, ItemsTaskData> {
+public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     private static final String ITEMS = "items";
     private static final int MAX_X = 300;
     private static final int OFFSET = 20;
     private static final int SIZE = 18;
     private static final int TEXT_HEIGHT = 9;
+    
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM);
     private int lastClicked;
     
-    public ItemRequirementTask(Quest parent, String description, String longDescription) {
-        super(ItemsTaskData.class, EditType.Type.TASK_ITEM, parent, description, longDescription);
-    }
     
-    @Override
-    protected Part createEmpty() {
-        return new Part(ItemStack.EMPTY, 1);
+    public ItemRequirementTask(Quest parent, String description, String longDescription) {
+        super(ItemsTaskData.class, parent, description, longDescription);
     }
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(ITEMS, writeElements(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
+        builder.add(ITEMS, parts.write(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
     }
     
+    @Deprecated
     public List<Part> getItems() {
-        return elements;
+        return parts.getElements();
     }
     
     @Environment(EnvType.CLIENT)
     public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
         
-        Part requirement = getOrCreateForModify(id);
+        Part requirement = parts.getOrCreateForModify(id);
     
         item.ifLeft(itemStack -> {
             requirement.hasItem = true;
@@ -89,7 +89,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     }
     
     private int getProgress(Player player, int id) {
-        if (id >= elements.size()) {
+        if (id >= parts.size()) {
             return 0;
         }
         
@@ -122,8 +122,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         
         boolean updated = false;
         
-        for (int i = 0; i < elements.size(); i++) {
-            Part item = elements.get(i);
+        for (int i = 0; i < parts.size(); i++) {
+            Part item = parts.get(i);
             if (!item.hasItem || data.isDone(i, item)) {
                 continue;
             }
@@ -153,8 +153,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     public void doCompletionCheck(ItemsTaskData data, UUID playerId) {
         boolean isDone = true;
-        for (int i = 0; i < elements.size(); i++) {
-            Part item = elements.get(i);
+        for (int i = 0; i < parts.size(); i++) {
+            Part item = parts.get(i);
             if (!data.isDone(i, item)) {
                 isDone = false;
                 break;
@@ -169,13 +169,13 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public ItemsTaskData newQuestData() {
-        return new ItemsTaskData(elements.size());
+        return new ItemsTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Positioned<Part>> items = getPositionedItems(getShownElements());
+        List<Positioned<Part>> items = getPositionedItems(parts.getShownElements());
         
         for (int i = 0; i < items.size(); i++) {
             Positioned<Part> pos = items.get(i);
@@ -239,7 +239,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();
         boolean doubleClick = false;
         if (Quest.canQuestsBeEdited() || isOpBookWithShiftKeyDown) {
-            List<Positioned<Part>> items = getPositionedItems(getShownElements());
+            List<Positioned<Part>> items = getPositionedItems(parts.getShownElements());
             
             for (int i = 0; i < items.size(); i++) {
                 Positioned<Part> pos = items.get(i);
@@ -269,7 +269,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
                             }
                             
                         } else if (gui.getCurrentMode() == EditMode.DELETE && ((item.stack != null && !item.stack.isEmpty()) || item.fluid != null)) {
-                            elements.remove(i);
+                            parts.remove(i);
                             SaveHelper.add(EditType.TASK_ITEM_REMOVE);
                         }
                     }
@@ -295,8 +295,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         int done = 0;
         int total = 0;
         
-        for (int i = 0; i < elements.size(); i++) {
-            int req = elements.get(i).required;
+        for (int i = 0; i < parts.size(); i++) {
+            int req = parts.get(i).required;
             done += Math.min(req, data.getValue(i));
             total += req;
         }
@@ -309,8 +309,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         own.merge(other);
         
         boolean completed = true;
-        for (int i = 0; i < elements.size(); i++) {
-            if (!own.isDone(i, elements.get(i))) {
+        for (int i = 0; i < parts.size(); i++) {
+            if (!own.isDone(i, parts.get(i))) {
                 completed = false;
                 break;
             }
@@ -323,8 +323,8 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     
     @Override
     public void setComplete(ItemsTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
-            data.setValue(i, elements.get(i).required);
+        for (int i = 0; i < parts.size(); i++) {
+            data.setValue(i, parts.get(i).required);
         }
         data.completed = true;
     }
@@ -345,6 +345,10 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
         private int cycleAt = -1;
         private int current = 0;
         private int last;
+        
+        private Part() {
+            this(ItemStack.EMPTY, 1);
+        }
         
         public Part(ItemStack stack, int required) {
             this.stack = stack;

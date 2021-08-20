@@ -29,8 +29,8 @@ public class DetectItemTask extends ItemRequirementTask {
     @Override
     public void doCompletionCheck(ItemsTaskData data, UUID playerID) {
         boolean isDone = true;
-        for (int i = 0; i < elements.size(); i++) {
-            Part item = elements.get(i);
+        for (int i = 0; i < parts.size(); i++) {
+            Part item = parts.get(i);
             if (!data.isDone(i, item)) {
                 data.setValue(i, 0); //Clear unfinished ones
                 isDone = false;
@@ -88,8 +88,8 @@ public class DetectItemTask extends ItemRequirementTask {
         
         boolean updated = false;
         
-        for (int i = 0; i < elements.size(); i++) {
-            Part item = elements.get(i);
+        for (int i = 0; i < parts.size(); i++) {
+            Part item = parts.get(i);
             if (!item.hasItem || data.isDone(i, item)) {
                 continue;
             }

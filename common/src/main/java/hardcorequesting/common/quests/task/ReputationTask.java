@@ -18,7 +18,6 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,36 +28,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ReputationTask<Data extends TaskData> extends ListTask<ReputationTask.Part, Data> {
+public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Data> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
     
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK);
+    
     public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription, int startOffsetY) {
-        super(dataType, EditType.Type.REPUTATION_TASK, parent, description, longDescription);
+        super(dataType, parent, description, longDescription);
         this.startOffsetY = startOffsetY;
     }
     
+    @Deprecated
     public List<Part> getSettings() {
-        return elements;
+        return parts.getElements();
     }
     
     public void setSetting(int id, Part setting) {
-        setElement(id, setting);
-    }
-    
-    @Override
-    protected Part createEmpty() {
-        return new Part(null, null, null, false);
+        parts.set(id, setting);
     }
     
     protected boolean isPlayerInRange(Player player) {
-        if (!elements.isEmpty()) {
+        if (!parts.isEmpty()) {
             
             TaskData data = getData(player);
             if (!data.completed && !player.getCommandSenderWorld().isClientSide) {
-                for (Part setting : elements) {
+                for (Part setting : parts) {
                     if (!setting.isValid(QuestingDataManager.getInstance().getQuestingData(player).getTeam())) {
                         return false;
                     }
@@ -74,14 +71,13 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
-        List<Positioned<Part>> renderSettings = positionParts(getShownElements());
-        for (int i = 0; i < renderSettings.size(); i++) {
-            Positioned<Part> pos = renderSettings.get(i);
+        List<Positioned<Part>> renderSettings = positionParts(parts.getShownElements());
+        for (Positioned<Part> pos : renderSettings) {
             Part part = pos.getElement();
-            
+        
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            
+        
             if (part.reputation == null) {
                 gui.drawRect(pos.getX() + Reputation.BAR_X, pos.getY() + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             } else {
@@ -98,7 +94,7 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
     @Environment(EnvType.CLIENT)
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Positioned<Part>> renderSettings = positionParts(getShownElements());
+            List<Positioned<Part>> renderSettings = positionParts(parts.getShownElements());
             for (int i = 0; i < renderSettings.size(); i++) {
                 Positioned<Part> pos = renderSettings.get(i);
                 Part part = pos.getElement();
@@ -106,9 +102,8 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
                 if (gui.inBounds(pos.getX(), pos.getY(), Reputation.BAR_WIDTH, 20, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
                         gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, part));
-                    } else if (gui.getCurrentMode() == EditMode.DELETE && i < elements.size()) {
-                        removeSetting(i);
-                        SaveHelper.add(EditType.REPUTATION_TASK_REMOVE);
+                    } else if (gui.getCurrentMode() == EditMode.DELETE) {
+                        parts.remove(i);
                     }
                     break;
                 }
@@ -141,13 +136,9 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
         return player;
     }
     
-    public void removeSetting(int i) {
-        elements.remove(i);
-    }
-    
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(REPUTATION, writeElements(QuestTaskAdapter.REPUTATION_TASK_ADAPTER));
+        builder.add(REPUTATION, parts.write(QuestTaskAdapter.REPUTATION_TASK_ADAPTER));
     }
     
     @Override
@@ -163,10 +154,14 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
     
     public static class Part {
         
-        private Reputation reputation;
+        private final Reputation reputation;
         private ReputationMarker lower;
         private ReputationMarker upper;
-        private boolean inverted;
+        private final boolean inverted;
+        
+        private Part() {
+            this(null, null, null, false);
+        }
         
         public Part(Reputation reputation, ReputationMarker lower, ReputationMarker upper, boolean inverted) {
             this.reputation = reputation;

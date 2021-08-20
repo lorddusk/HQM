@@ -34,13 +34,13 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(BLOCKS, writeElements(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
+        builder.add(BLOCKS, parts.write(QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, BLOCKS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
     }
 }
 

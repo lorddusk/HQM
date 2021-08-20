@@ -51,12 +51,12 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     private void setAdvancement(int id, String advancement) {
-        getOrCreateForModify(id).setAdvancement(advancement);
+        parts.getOrCreateForModify(id).setAdvancement(advancement);
     }
     
     @Override
     public AdvancementTaskData newQuestData() {
-        return new AdvancementTaskData(elements.size());
+        return new AdvancementTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -95,10 +95,10 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
             ServerAdvancementManager manager = player.getServer().getAdvancements();
             PlayerAdvancements playerAdvancements = player.getServer().getPlayerList().getPlayerAdvancements((ServerPlayer) player);
             
-            for (int i = 0; i < elements.size(); i++) {
+            for (int i = 0; i < parts.size(); i++) {
                 if (data.getValue(i)) continue;
                 
-                Part part = this.elements.get(i);
+                Part part = this.parts.get(i);
                 if (part == null || part.getName() == null || part.getAdvancement() == null) continue;
                 
                 ResourceLocation advResource = new ResourceLocation(part.getAdvancement());
@@ -118,7 +118,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
                 }
             }
             
-            if (completed && elements.size() > 0) {
+            if (completed && parts.size() > 0) {
                 completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);
             }
@@ -127,21 +127,21 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Override
     public float getCompletedRatio(Team team) {
-        return getData(team).getCompletedRatio(elements.size());
+        return getData(team).getCompletedRatio(parts.size());
     }
     
     @Override
     public void mergeProgress(UUID uuid, AdvancementTaskData own, AdvancementTaskData other) {
         own.mergeResult(other);
         
-        if (own.areAllCompleted(elements.size())) {
+        if (own.areAllCompleted(parts.size())) {
             completeTask(uuid);
         }
     }
     
     @Override
     public void setComplete(AdvancementTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
+        for (int i = 0; i < parts.size(); i++) {
             data.complete(i);
         }
         data.completed = true;
@@ -159,13 +159,13 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(ADVANCEMENTS, writeElements(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER));
+        builder.add(ADVANCEMENTS, parts.write(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray()), QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray()), QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER);
     }
     
     public enum Visibility {

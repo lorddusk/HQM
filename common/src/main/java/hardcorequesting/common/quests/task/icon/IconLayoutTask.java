@@ -7,10 +7,10 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
-import hardcorequesting.common.quests.task.ListTask;
+import hardcorequesting.common.quests.task.PartList;
+import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,16 +25,21 @@ import java.util.List;
  * A base class for tasks with sub-elements that uses item icons for display.
  * Provides the layout of a vertical list of elements, where each entry has an item icon, a name, and any extra info.
  */
-public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends TaskData> extends ListTask<T, Data> {
+public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends TaskData> extends QuestTask<Data> {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
     private static final int X_TEXT_INDENT = 0;
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
+    protected final PartList<T> parts;
+    
     public IconLayoutTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
-        super(dataType, type, parent, description, longDescription);
+        super(dataType, parent, description, longDescription);
+        parts = new PartList<>(this::createEmpty, type);
     }
+    
+    protected abstract T createEmpty();
     
     @Environment(EnvType.CLIENT)
     protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, T part, int index, int x, int y);
@@ -43,17 +48,17 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     protected abstract void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, T part);
     
     protected void setIcon(int id, ItemStack stack) {
-        getOrCreateForModify(id).setIconStack(stack);
+        parts.getOrCreateForModify(id).setIconStack(stack);
     }
     
     protected void setName(int id, String str) {
-        getOrCreateForModify(id).setName(str);
+        parts.getOrCreateForModify(id).setName(str);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        List<Positioned<T>> renderElements = positionParts(getShownElements());
+        List<Positioned<T>> renderElements = positionParts(parts.getShownElements());
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<T> pos = renderElements.get(i);
             T part = pos.getElement();
@@ -69,7 +74,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Positioned<T>> elements = positionParts(getShownElements());
+            List<Positioned<T>> elements = positionParts(parts.getShownElements());
             for (int i = 0; i < elements.size(); i++) {
                 Positioned<T> pos = elements.get(i);
                 T part = pos.getElement();
@@ -86,10 +91,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
                                     result -> setName(id, result));
                             break;
                         case DELETE:
-                            if (i < this.elements.size()) {
-                                this.elements.remove(i);
-                                SaveHelper.add(EditType.BaseEditType.REMOVE.with(type));
-                            }
+                            parts.remove(i);
                             break;
                         default:
                             handleElementEditClick(gui, player, gui.getCurrentMode(), id, part);

@@ -51,7 +51,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     @Environment(EnvType.CLIENT)
     private void setInfo(int id, String entityId, int amount) {
         
-        Part part = getOrCreateForModify(id);
+        Part part = parts.getOrCreateForModify(id);
         part.setTame(entityId);
         part.setCount(amount);
         
@@ -73,7 +73,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Override
     public TameTaskData newQuestData() {
-        return new TameTaskData(elements.size());
+        return new TameTaskData(parts.size());
     }
     
     @Environment(EnvType.CLIENT)
@@ -108,8 +108,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         int tamed = 0;
         int total = 0;
         
-        for (int i = 0; i < elements.size(); i++) {
-            int req = elements.get(i).count;
+        for (int i = 0; i < parts.size(); i++) {
+            int req = parts.get(i).count;
             tamed += Math.min(req, data.getValue(i));
             total += req;
         }
@@ -122,8 +122,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         own.merge(other);
     
         boolean all = true;
-        for (int i = 0; i < elements.size(); i++) {
-            if (own.getValue(i) < elements.get(i).count) {
+        for (int i = 0; i < parts.size(); i++) {
+            if (own.getValue(i) < parts.get(i).count) {
                 all = false;
                 break;
             }
@@ -136,8 +136,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Override
     public void setComplete(TameTaskData data) {
-        for (int i = 0; i < elements.size(); i++) {
-            data.setValue(i, elements.get(i).count);
+        for (int i = 0; i < parts.size(); i++) {
+            data.setValue(i, parts.get(i).count);
         }
         data.completed = true;
     }
@@ -152,8 +152,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
             TameTaskData data = getData(tamer);
             boolean updated = false;
-            for (int i = 0; i < elements.size(); i++) {
-                Part part = elements.get(i);
+            for (int i = 0; i < parts.size(); i++) {
+                Part part = parts.get(i);
                 if (part.count > data.getValue(i) && part.mobId != null) {
                     if (part.mobId.equals(ABSTRACT_HORSE.toString())) {
                         if (entity instanceof AbstractHorse) {
@@ -174,8 +174,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
             
             if (updated) {
                 boolean done = true;
-                for (int i = 0; i < elements.size(); i++) {
-                    Part part = elements.get(i);
+                for (int i = 0; i < parts.size(); i++) {
+                    Part part = parts.get(i);
                     
                     if (tamed(i, tamer) < part.count) {
                         done = false;
@@ -194,13 +194,13 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(TAME, writeElements(QuestTaskAdapter.TAME_ADAPTER));
+        builder.add(TAME, parts.write(QuestTaskAdapter.TAME_ADAPTER));
     }
     
     @SuppressWarnings("ConstantConditions")
     @Override
     public void read(JsonObject object) {
-        readElements(GsonHelper.getAsJsonArray(object, TAME, new JsonArray()), QuestTaskAdapter.TAME_ADAPTER);
+        parts.read(GsonHelper.getAsJsonArray(object, TAME, new JsonArray()), QuestTaskAdapter.TAME_ADAPTER);
     }
     
     public static class Part extends IconLayoutTask.Part {
