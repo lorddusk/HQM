@@ -52,7 +52,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected boolean mayUseFluids() {
+    public boolean mayUseFluids() {
         return true;
     }
     

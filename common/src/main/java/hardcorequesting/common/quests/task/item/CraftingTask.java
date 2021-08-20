@@ -27,7 +27,7 @@ public class CraftingTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected boolean mayUseFluids() {
+    public boolean mayUseFluids() {
         return false;
     }
     

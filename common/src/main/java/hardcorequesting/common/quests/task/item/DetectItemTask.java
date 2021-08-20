@@ -22,7 +22,7 @@ public class DetectItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected boolean mayUseFluids() {
+    public boolean mayUseFluids() {
         return false;   //TODO we could probably include fluids if we check items for fluid content
     }
     
