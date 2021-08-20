@@ -2,19 +2,18 @@ package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.DeathTaskData;
+import hardcorequesting.common.quests.task.client.DeathTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -27,6 +26,8 @@ import java.util.UUID;
 public class DeathTask extends QuestTask<DeathTaskData> {
     private static final String DEATHS = "deaths";
     private int deaths;
+    
+    private final TaskGraphic graphic = new DeathTaskGraphic(this);
     
     public DeathTask(Quest parent, String description, String longDescription) {
         super(DeathTaskData.class, parent, description, longDescription);
@@ -42,18 +43,13 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        int died = getData(player).getDeaths();
-        FormattedText text = died == deaths
-                ? Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, deaths)
-                : Translator.pluralTranslated(deaths != 0, "hqm.deathMenu.deathsOutOf", died, deaths);
-        
-        gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
+        graphic.draw(matrices, gui, player, mX, mY);
     }
     
     @Environment(EnvType.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        
+        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override

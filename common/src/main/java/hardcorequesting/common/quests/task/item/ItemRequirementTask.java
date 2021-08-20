@@ -14,6 +14,7 @@ import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.client.ItemTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -33,7 +34,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     protected static final int LIMIT = 5 * 7;
     
     public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
-    private final ItemTaskGraphic graphic = new ItemTaskGraphic(this);
+    private final TaskGraphic graphic = new ItemTaskGraphic(this);
     
     public ItemRequirementTask(Quest parent, String description, String longDescription) {
         super(ItemsTaskData.class, parent, description, longDescription);

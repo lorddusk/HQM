@@ -7,7 +7,6 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
@@ -26,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ItemTaskGraphic {
+public class ItemTaskGraphic implements TaskGraphic {
     
-    private static final int START_X = QuestTask.START_X;
-    private static final int START_Y = QuestTask.START_Y;
     private static final int MAX_X = 300;
     private static final int OFFSET = 20;
     private static final int SIZE = 18;
@@ -62,6 +59,7 @@ public class ItemTaskGraphic {
     }
     
     @Environment(EnvType.CLIENT)
+    @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         List<Positioned<ItemRequirementTask.Part>> items = getPositionedItems(task.parts.getShownElements());
     
@@ -122,6 +120,7 @@ public class ItemTaskGraphic {
     }
     
     @Environment(EnvType.CLIENT)
+    @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();
         boolean doubleClick = false;
