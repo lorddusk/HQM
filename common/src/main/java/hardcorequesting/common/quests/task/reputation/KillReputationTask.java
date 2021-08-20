@@ -10,6 +10,8 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ReputationKillTaskData;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
+import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -109,6 +111,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     
     public void setKills(int kills) {
         this.kills = kills;
+        SaveHelper.add(EditType.KILLS_CHANGE);
     }
     
     @Override
@@ -120,6 +123,6 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     public void read(JsonObject object) {
         super.read(object);
-        setKills(GsonHelper.getAsInt(object, KILLS, 0));
+        kills = GsonHelper.getAsInt(object, KILLS, 0);
     }
 }

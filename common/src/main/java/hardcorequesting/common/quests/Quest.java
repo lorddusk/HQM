@@ -220,7 +220,8 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new ReputationKillsMenu(gui, player, (KillReputationTask) selectedTask));
+                KillReputationTask task = (KillReputationTask) selectedTask;
+                ReputationKillsMenu.display(gui, player, task.getKills(), task::setKills);
             }
         });
         
