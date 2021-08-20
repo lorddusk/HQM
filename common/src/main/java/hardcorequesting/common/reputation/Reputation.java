@@ -11,7 +11,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.ReputationTask;
+import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;

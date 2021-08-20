@@ -6,6 +6,8 @@ import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.quests.task.item.*;
+import hardcorequesting.common.quests.task.reputation.HaveReputationTask;
+import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;

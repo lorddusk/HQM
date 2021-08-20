@@ -9,7 +9,7 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.ReputationTask;
+import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;

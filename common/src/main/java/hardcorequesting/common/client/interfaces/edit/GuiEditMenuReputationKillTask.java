@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.quests.task.KillReputationTask;
+import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
