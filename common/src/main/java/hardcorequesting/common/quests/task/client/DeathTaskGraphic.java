@@ -5,9 +5,12 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.util.Translator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
+@Environment(EnvType.CLIENT)
 public class DeathTaskGraphic implements TaskGraphic {
     
     private final DeathTask task;

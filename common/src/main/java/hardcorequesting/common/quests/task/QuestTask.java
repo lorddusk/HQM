@@ -40,9 +40,6 @@ import java.util.*;
 
 public abstract class QuestTask<Data extends TaskData> {
     
-    public static final int START_X = 180;
-    public static final int START_Y = 95;
-    
     private final Class<Data> dataType;
     public String description;
     protected Quest parent;

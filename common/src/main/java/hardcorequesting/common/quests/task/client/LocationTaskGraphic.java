@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.Objects;
 
+@Environment(EnvType.CLIENT)
 public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part> {
     
     private final VisitLocationTask task;
@@ -23,7 +24,6 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
         this.task = task;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, VisitLocationTask.Part part, int index, int x, int y) {
         if (task.visited(index, player)) {
@@ -52,13 +52,13 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
         }
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, VisitLocationTask.Part part) {
+    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, VisitLocationTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
             LocationMenu.display(gui, player, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
                     result -> task.setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
+        } else {
+            super.handlePartClick(gui, player, mode, part, id);
         }
     }
-    
 }

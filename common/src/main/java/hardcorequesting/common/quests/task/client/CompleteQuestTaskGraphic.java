@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class CompleteQuestTaskGraphic implements TaskGraphic {
     private static final int Y_OFFSET = 30;
     private static final int X_TEXT_OFFSET = 23;
@@ -29,7 +30,6 @@ public class CompleteQuestTaskGraphic implements TaskGraphic {
     }
     
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         List<CompleteQuestTask.Part> quests = task.parts.getShownElements();
@@ -53,7 +53,6 @@ public class CompleteQuestTaskGraphic implements TaskGraphic {
         }
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited()) {

@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+@Environment(EnvType.CLIENT)
 public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     
     private final TameMobsTask task;
@@ -21,7 +22,6 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
         this.task = task;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, TameMobsTask.Part part, int index, int x, int y) {
         int tamed = task.tamed(index, player);
@@ -33,13 +33,13 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
         gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", part.getCount()), x, y + 6, 0.7F, 0x404040);
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, TameMobsTask.Part part) {
+    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, TameMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, player, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
                     PickMobMenu.EXTRA_TAME_ENTRIES, result -> task.setInfo(id, result.getMobId().toString(), result.getAmount()));
+        } else {
+            super.handlePartClick(gui, player, mode, part, id);
         }
     }
-    
 }

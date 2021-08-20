@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+@Environment(EnvType.CLIENT)
 public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.Part> {
     
     private final GetAdvancementTask task;
@@ -20,7 +21,6 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
         this.task = task;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, GetAdvancementTask.Part part, int id, int x, int y) {
         if (task.advanced(id, player)) {
@@ -28,13 +28,13 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
         }
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, GetAdvancementTask.Part part) {
+    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, GetAdvancementTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
             PickAdvancementMenu.display(gui, player, part.getAdvancement(),
                     result -> task.setAdvancement(id, result));
+        } else {
+            super.handlePartClick(gui, player, mode, part, id);
         }
     }
-    
 }

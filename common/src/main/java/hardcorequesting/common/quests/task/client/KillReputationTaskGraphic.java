@@ -10,6 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+@Environment(EnvType.CLIENT)
 public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
     private final KillReputationTask task;
@@ -24,7 +25,6 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         return null;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         super.draw(matrices, gui, player, mX, mY);

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class ItemTaskGraphic implements TaskGraphic {
     
     private static final int MAX_X = 300;
@@ -58,7 +59,6 @@ public class ItemTaskGraphic implements TaskGraphic {
         return list;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         List<Positioned<ItemRequirementTask.Part>> items = getPositionedItems(task.parts.getShownElements());
@@ -119,7 +119,6 @@ public class ItemTaskGraphic implements TaskGraphic {
         }
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         boolean isOpBookWithShiftKeyDown = gui.isOpBook && Screen.hasShiftDown();

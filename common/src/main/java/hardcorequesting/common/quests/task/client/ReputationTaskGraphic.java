@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class ReputationTaskGraphic implements TaskGraphic {
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
@@ -48,7 +49,6 @@ public class ReputationTaskGraphic implements TaskGraphic {
         return player;
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         String info = null;
@@ -71,7 +71,6 @@ public class ReputationTaskGraphic implements TaskGraphic {
         }
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
