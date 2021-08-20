@@ -6,7 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.client.interfaces.edit.*;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
+import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
@@ -200,7 +203,7 @@ public class Quest {
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
                 DeathTask task = (DeathTask) selectedTask;
-                SetDeathMenu.display(gui, player, task.getDeaths(), task::setDeaths);
+                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeaths(), task::setDeaths);
             }
         });
         
@@ -221,7 +224,7 @@ public class Quest {
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
                 KillReputationTask task = (KillReputationTask) selectedTask;
-                ReputationKillsMenu.display(gui, player, task.getKills(), task::setKills);
+                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKills(), task::setKills);
             }
         });
         

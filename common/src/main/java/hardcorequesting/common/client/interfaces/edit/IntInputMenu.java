@@ -5,37 +5,37 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.IntConsumer;
 
-public class SetDeathMenu extends GuiEditMenuExtended {
+public class IntInputMenu extends GuiEditMenuExtended {
     
     private final IntConsumer resultConsumer;
-    private int deaths;
+    private int amount;
     
-    public static void display(GuiBase gui, Player player, int initDeaths, IntConsumer resultConsumer) {
-        gui.setEditMenu(new SetDeathMenu(gui, player, initDeaths, resultConsumer));
+    public static void display(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
+        gui.setEditMenu(new IntInputMenu(gui, player, title, initAmount, resultConsumer));
     }
     
-    public SetDeathMenu(GuiBase gui, Player player, int initDeaths, IntConsumer resultConsumer) {
+    public IntInputMenu(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
         super(gui, player, true, -1, -1, 25, 30);
         
         this.resultConsumer = resultConsumer;
-        deaths = initDeaths;
+        amount = initAmount;
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.deathTask.reqDeathCount") {
+        textBoxes.add(new TextBoxNumber(gui, 0, title) {
             @Override
             protected int getValue() {
-                return deaths;
+                return amount;
             }
             
             @Override
             protected void setValue(int number) {
-                deaths = number;
+                amount = number;
             }
         });
     }
     
     @Override
     public void save(GuiBase gui) {
-        resultConsumer.accept(deaths);
+        resultConsumer.accept(amount);
     }
     
     @Override
