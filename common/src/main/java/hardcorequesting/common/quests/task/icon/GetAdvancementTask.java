@@ -2,21 +2,16 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.PickAdvancementMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.AdvancementTaskData;
+import hardcorequesting.common.quests.task.client.AdvancementTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
@@ -42,38 +37,26 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
+    protected TaskGraphic createGraphic() {
+        return new AdvancementTaskGraphic(this);
+    }
+    
+    @Override
     protected Part createEmpty() {
         return new Part();
     }
     
-    private boolean advanced(int id, Player player) {
+    public boolean advanced(int id, Player player) {
         return getData(player).getValue(id);
     }
     
-    private void setAdvancement(int id, String advancement) {
+    public void setAdvancement(int id, String advancement) {
         parts.getOrCreateForModify(id).setAdvancement(advancement);
     }
     
     @Override
     public AdvancementTaskData newQuestData() {
         return new AdvancementTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part task, int index, int x, int y) {
-        if (advanced(index, player)) {
-            gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part task) {
-        if (mode == EditMode.LOCATION) {
-            PickAdvancementMenu.display(gui, player, task.getAdvancement(),
-                    result -> setAdvancement(id, result));
-        }
     }
     
     @Override

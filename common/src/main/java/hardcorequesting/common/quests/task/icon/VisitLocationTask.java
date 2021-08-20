@@ -2,23 +2,17 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.LocationMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.LocationTaskData;
+import hardcorequesting.common.quests.task.client.LocationTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
@@ -42,6 +36,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         super(LocationTaskData.class, EditType.Type.LOCATION, parent, description, longDescription);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
+    }
+    
+    @Override
+    protected TaskGraphic createGraphic() {
+        return new LocationTaskGraphic(this);
     }
     
     @Override
@@ -88,11 +87,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         }
     }
     
-    private boolean visited(int id, Player player) {
+    public boolean visited(int id, Player player) {
         return getData(player).getValue(id);
     }
     
-    private void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
+    public void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
         Part part = parts.getOrCreateForModify(id);
         part.setVisibility(visibility);
         part.setPosition(pos);
@@ -103,44 +102,6 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     @Override
     public LocationTaskData newQuestData() {
         return new LocationTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
-        if (visited(index, player)) {
-            gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
-        } else if (part.visibility.doShowCoordinate()) {
-            int row = 0;
-            if (part.radius >= 0) {
-                gui.drawString(matrices, Translator.plain("(" + part.pos.toShortString() + ")"), x, y, 0.7F, 0x404040);
-                row++;
-            }
-        
-            if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.dimension)) {
-                if (part.radius >= 0) {
-                    FormattedText str;
-                    int distance = (int) player.distanceToSqr(part.pos.getX() + 0.5, part.pos.getY() + 0.5, part.pos.getZ() + 0.5);
-                    str = Translator.translatable("hqm.locationMenu.mAway", distance);
-                    if (part.visibility.doShowRadius()) {
-                        str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.radius), Translator.plain("]"));
-                    }
-                    gui.drawString(matrices, str, x, y + 6*row, 0.7F, 0x404040);
-                }
-            
-            } else {
-                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, 0x404040);
-            }
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
-        if (mode == EditMode.LOCATION) {
-            LocationMenu.display(gui, player, part.getVisibility(), part.getPosition(), part.radius, part.dimension,
-                    result -> setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
-        }
     }
     
     @Override

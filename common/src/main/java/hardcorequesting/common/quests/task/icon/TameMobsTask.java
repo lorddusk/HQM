@@ -2,19 +2,15 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TameTaskData;
+import hardcorequesting.common.quests.task.client.TameMobsTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
@@ -44,12 +40,17 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     }
     
     @Override
+    protected TaskGraphic createGraphic() {
+        return new TameMobsTaskGraphic(this);
+    }
+    
+    @Override
     protected Part createEmpty() {
         return new Part();
     }
     
     @Environment(EnvType.CLIENT)
-    private void setInfo(int id, String entityId, int amount) {
+    public void setInfo(int id, String entityId, int amount) {
         
         Part part = parts.getOrCreateForModify(id);
         part.setTame(entityId);
@@ -67,34 +68,13 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     }
     
-    private int tamed(int id, Player player) {
+    public int tamed(int id, Player player) {
         return getData(player).getValue(id);
     }
     
     @Override
     public TameTaskData newQuestData() {
         return new TameTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
-        int tamed = tamed(index, player);
-        if (tamed == part.count) {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
-        } else {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.count)), x, y, 0.7F, 0x404040);
-        }
-        gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", part.count), x, y + 6, 0.7F, 0x404040);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
-        if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, player, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
-                    PickMobMenu.EXTRA_TAME_ENTRIES, result -> setInfo(id, result.getMobId().toString(), result.getAmount()));
-        }
     }
     
     @Override

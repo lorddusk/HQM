@@ -2,21 +2,15 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.MobTaskData;
+import hardcorequesting.common.quests.task.client.KillMobsTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -40,6 +34,11 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     }
     
     @Override
+    protected TaskGraphic createGraphic() {
+        return new KillMobsTaskGraphic(this);
+    }
+    
+    @Override
     protected Part createEmpty() {
         return new Part();
     }
@@ -54,40 +53,19 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         return null;
     }
     
-    private void setInfo(int id, ResourceLocation mobId, int amount) {
+    public void setInfo(int id, ResourceLocation mobId, int amount) {
         Part part = parts.getOrCreateForModify(id);
         part.setMob(mobId);
         part.setCount(amount);
     }
     
-    private int killed(int id, Player player) {
+    public int killed(int id, Player player) {
         return getData(player).getValue(id);
     }
     
     @Override
     public MobTaskData newQuestData() {
         return new MobTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int index, int x, int y) {
-        int killed = killed(index, player);
-        if (killed == part.count) {
-            gui.drawString(matrices, Translator.translatable("hqm.mobTask.allKilled", GuiColor.GREEN), x, y, 0.7F, 0x404040);
-        } else {
-            gui.drawString(matrices, Translator.translatable("hqm.mobTask.partKills", killed, (100 * killed / part.count)), x, y, 0.7F, 0x404040);
-        }
-        gui.drawString(matrices, Translator.translatable("hqm.mobTask.totalKills", part.count), x, y + 6, 0.7F, 0x404040);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
-        if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, player, part.getMob(), part.getCount(), "mobTask",
-                    result -> setInfo(id, result.getMobId(), result.getAmount()));
-        }
     }
     
     @Override
