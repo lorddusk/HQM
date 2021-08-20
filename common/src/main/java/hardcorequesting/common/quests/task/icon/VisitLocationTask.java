@@ -24,6 +24,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -231,7 +232,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     public static class Part extends IconLayoutTask.Part {
         
-        private BlockPos pos;
+        @NotNull
+        private BlockPos pos = BlockPos.ZERO;
         private int radius = 3;
         private Visibility visibility = Visibility.LOCATION;
         private String dimension;
