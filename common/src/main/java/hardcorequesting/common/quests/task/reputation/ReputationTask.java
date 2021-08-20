@@ -34,9 +34,11 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
     private static final int OFFSET_Y = 27;
-    private final int startOffsetY;
     
-    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK);
+    protected static final int LIMIT = 4;
+    
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
+    private final int startOffsetY;
     
     public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription, int startOffsetY) {
         super(dataType, parent, description, longDescription);

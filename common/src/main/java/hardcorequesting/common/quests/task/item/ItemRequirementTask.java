@@ -45,7 +45,9 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     private static final int SIZE = 18;
     private static final int TEXT_HEIGHT = 9;
     
-    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM);
+    protected static final int LIMIT = 5 * 7;
+    
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
     private int lastClicked;
     
     

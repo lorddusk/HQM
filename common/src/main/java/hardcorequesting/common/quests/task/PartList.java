@@ -15,14 +15,16 @@ import java.util.function.Supplier;
 public final class PartList<Part> implements Iterable<Part> {
     private final Supplier<Part> emptySupplier;
     private final EditType.Type type;
+    private final int limit;
     
     private final List<Part> elements;
     private final List<Part> elementsWithEmpty;
     
-    public PartList(Supplier<Part> emptySupplier, EditType.Type type) {
+    public PartList(Supplier<Part> emptySupplier, EditType.Type type, int limit) {
         this.emptySupplier = emptySupplier;
         this.type = type;
-        
+        this.limit = limit;
+    
         List<Part> list = new ArrayList<>();
         list.add(emptySupplier.get());
         elements = list.subList(0, 0);
@@ -30,7 +32,7 @@ public final class PartList<Part> implements Iterable<Part> {
     }
     
     public List<Part> getShownElements() {
-        if (Quest.canQuestsBeEdited()) {
+        if (Quest.canQuestsBeEdited() && elements.size() < limit) {
             return elementsWithEmpty;
         } else {
             return elements;

@@ -32,11 +32,13 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
+    protected static final int LIMIT = 4;
+    
     protected final PartList<T> parts;
     
     public IconLayoutTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
         super(dataType, parent, description, longDescription);
-        parts = new PartList<>(this::createEmpty, type);
+        parts = new PartList<>(this::createEmpty, type, LIMIT);
     }
     
     protected abstract T createEmpty();

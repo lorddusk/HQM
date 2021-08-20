@@ -33,7 +33,9 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION);
+    protected static final int LIMIT = 3;
+    
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION, LIMIT);
     
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
         super(CompleteQuestTaskData.class, parent, description, longDescription);
