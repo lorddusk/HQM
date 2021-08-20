@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 public class HaveReputationTask extends ReputationTask<TaskData> {
     
     public HaveReputationTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription, 0);
+        super(TaskData.class, parent, description, longDescription, 0);
         
         register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);
     }
@@ -39,11 +39,6 @@ public class HaveReputationTask extends ReputationTask<TaskData> {
         }
         
         return (float) valid / count;
-    }
-    
-    @Override
-    public Class<TaskData> getDataType() {
-        return TaskData.class;
     }
     
     @Override

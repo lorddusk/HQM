@@ -44,6 +44,8 @@ public abstract class QuestTask<Data extends TaskData> {
     
     protected static final int START_X = 180;
     protected static final int START_Y = 95;
+    
+    private final Class<Data> dataType;
     public String description;
     protected Quest parent;
     private final List<QuestTask<?>> requirements;
@@ -51,7 +53,8 @@ public abstract class QuestTask<Data extends TaskData> {
     private int id;
     private List<FormattedText> cachedDescription;
     
-    public QuestTask(Quest parent, String description, String longDescription) {
+    public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
+        this.dataType = dataType;
         this.parent = parent;
         this.requirements = new ArrayList<>();
         this.description = description;
@@ -137,8 +140,6 @@ public abstract class QuestTask<Data extends TaskData> {
         return false;
     }
     
-    public abstract Class<Data> getDataType();
-    
     public void write(TaskData task, JsonObject out) {
         task.write(new Adapter.JsonObjectBuilder(out));
     }
@@ -175,8 +176,8 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     private Data validateData(TaskData data) {
-        if (getDataType().isInstance(data)) {
-            return getDataType().cast(data);
+        if (dataType.isInstance(data)) {
+            return dataType.cast(data);
         } else return newQuestData();
     }
     

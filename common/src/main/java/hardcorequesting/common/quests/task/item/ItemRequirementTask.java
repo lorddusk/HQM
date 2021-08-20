@@ -46,7 +46,7 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
     private int lastClicked;
     
     public ItemRequirementTask(Quest parent, String description, String longDescription) {
-        super(EditType.Type.TASK_ITEM, parent, description, longDescription);
+        super(ItemsTaskData.class, EditType.Type.TASK_ITEM, parent, description, longDescription);
     }
     
     @Override
@@ -165,11 +165,6 @@ public abstract class ItemRequirementTask extends ListTask<ItemRequirementTask.P
             completeTask(playerId);
         }
         parent.sendUpdatedDataToTeam(playerId);
-    }
-    
-    @Override
-    public Class<ItemsTaskData> getDataType() {
-        return ItemsTaskData.class;
     }
     
     @Override

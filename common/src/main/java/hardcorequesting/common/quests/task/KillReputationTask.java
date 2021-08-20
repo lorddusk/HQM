@@ -25,7 +25,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private int kills;
     
     public KillReputationTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription, 20);
+        super(ReputationKillTaskData.class, parent, description, longDescription, 20);
         
         register(EventTrigger.Type.DEATH);
     }
@@ -65,11 +65,6 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     protected Player getPlayerForRender(Player player) {
         return null;
-    }
-    
-    @Override
-    public Class<ReputationKillTaskData> getDataType() {
-        return ReputationKillTaskData.class;
     }
     
     @Override

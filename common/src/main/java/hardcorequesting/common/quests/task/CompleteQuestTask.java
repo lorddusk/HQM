@@ -34,7 +34,7 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     private static final int ITEM_SIZE = 18;
     
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
-        super(EditType.Type.COMPLETION, parent, description, longDescription);
+        super(CompleteQuestTaskData.class, EditType.Type.COMPLETION, parent, description, longDescription);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }
@@ -51,11 +51,6 @@ public class CompleteQuestTask extends ListTask<CompleteQuestTask.Part, Complete
     @SuppressWarnings("unused")
     public void setQuest(int id, UUID quest) {
         getOrCreateForModify(id).setQuest(quest);
-    }
-    
-    @Override
-    public Class<CompleteQuestTaskData> getDataType() {
-        return CompleteQuestTaskData.class;
     }
     
     @Override

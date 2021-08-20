@@ -32,8 +32,8 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     private static final int Y_TEXT_OFFSET = 0;
     private static final int ITEM_SIZE = 18;
     
-    public IconLayoutTask(EditType.Type type, Quest parent, String description, String longDescription) {
-        super(type, parent, description, longDescription);
+    public IconLayoutTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
+        super(dataType, type, parent, description, longDescription);
     }
     
     @Environment(EnvType.CLIENT)

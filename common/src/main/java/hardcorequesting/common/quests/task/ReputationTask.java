@@ -35,8 +35,8 @@ public abstract class ReputationTask<Data extends TaskData> extends ListTask<Rep
     private static final int OFFSET_Y = 27;
     private final int startOffsetY;
     
-    public ReputationTask(Quest parent, String description, String longDescription, int startOffsetY) {
-        super(EditType.Type.REPUTATION_TASK, parent, description, longDescription);
+    public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription, int startOffsetY) {
+        super(dataType, EditType.Type.REPUTATION_TASK, parent, description, longDescription);
         this.startOffsetY = startOffsetY;
     }
     

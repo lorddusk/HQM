@@ -39,7 +39,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
     public TameMobsTask(Quest parent, String description, String longDescription) {
-        super(EditType.Type.MONSTER, parent, description, longDescription);
+        super(TameTaskData.class, EditType.Type.MONSTER, parent, description, longDescription);
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     
@@ -69,11 +69,6 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     private int tamed(int id, Player player) {
         return getData(player).getValue(id);
-    }
-    
-    @Override
-    public Class<TameTaskData> getDataType() {
-        return TameTaskData.class;
     }
     
     @Override

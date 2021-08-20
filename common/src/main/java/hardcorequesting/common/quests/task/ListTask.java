@@ -29,8 +29,8 @@ public abstract class ListTask<T, Data extends TaskData> extends QuestTask<Data>
         elementsWithEmpty = Collections.unmodifiableList(list);
     }
     
-    public ListTask(EditType.Type type, Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public ListTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
+        super(dataType, parent, description, longDescription);
         this.type = type;
     }
     
