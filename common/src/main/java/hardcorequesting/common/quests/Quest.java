@@ -199,7 +199,8 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new SetDeathMenu(gui, player, (DeathTask) selectedTask));
+                DeathTask task = (DeathTask) selectedTask;
+                SetDeathMenu.display(gui, player, task.getDeaths(), task::setDeaths);
             }
         });
         

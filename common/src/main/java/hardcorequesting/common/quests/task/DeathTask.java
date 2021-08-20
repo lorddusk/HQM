@@ -9,6 +9,8 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.DeathTaskData;
 import hardcorequesting.common.team.Team;
+import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -115,6 +117,7 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     public void setDeaths(int deaths) {
         this.deaths = deaths;
+        SaveHelper.add(EditType.DEATH_CHANGE);
     }
     
     @Override
@@ -124,6 +127,6 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Override
     public void read(JsonObject object) {
-        setDeaths(GsonHelper.getAsInt(object, DEATHS, 0));
+        deaths = GsonHelper.getAsInt(object, DEATHS, 0);
     }
 }

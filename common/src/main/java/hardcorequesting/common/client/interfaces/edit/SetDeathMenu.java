@@ -1,22 +1,24 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.quests.task.DeathTask;
-import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.function.IntConsumer;
 
 public class SetDeathMenu extends GuiEditMenuExtended {
     
+    private final IntConsumer resultConsumer;
     private int deaths;
-    private DeathTask task;
     
-    public SetDeathMenu(GuiBase gui, Player player, DeathTask task) {
+    public static void display(GuiBase gui, Player player, int initDeaths, IntConsumer resultConsumer) {
+        gui.setEditMenu(new SetDeathMenu(gui, player, initDeaths, resultConsumer));
+    }
+    
+    public SetDeathMenu(GuiBase gui, Player player, int initDeaths, IntConsumer resultConsumer) {
         super(gui, player, true, -1, -1, 25, 30);
         
-        deaths = task.getDeaths();
-        this.task = task;
+        this.resultConsumer = resultConsumer;
+        deaths = initDeaths;
         
         textBoxes.add(new TextBoxNumber(gui, 0, "hqm.deathTask.reqDeathCount") {
             @Override
@@ -33,8 +35,7 @@ public class SetDeathMenu extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        task.setDeaths(deaths);
-        SaveHelper.add(EditType.DEATH_CHANGE);
+        resultConsumer.accept(deaths);
     }
     
     @Override
