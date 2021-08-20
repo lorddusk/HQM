@@ -94,7 +94,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
                     if (gui.getCurrentMode() == EditMode.DELETE) {
                         parts.remove(i);
                     } else if (completed.getQuest() == null) {
-                        completed.setQuest(Quest.speciallySelectedQuestId);
+                        parts.getOrCreateForModify(i).setQuest(Quest.speciallySelectedQuestId);
                         SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
                     }
                     
