@@ -1,8 +1,6 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
@@ -27,29 +25,21 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     private static final String DEATHS = "deaths";
     private int deaths;
     
-    private final TaskGraphic graphic = new DeathTaskGraphic(this);
-    
     public DeathTask(Quest parent, String description, String longDescription) {
         super(DeathTaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.DEATH);
     }
     
+    @Environment(EnvType.CLIENT)
+    @Override
+    protected TaskGraphic createGraphic() {
+        return new DeathTaskGraphic(this);
+    }
+    
     @Override
     public DeathTaskData newQuestData() {
         return new DeathTaskData();
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        graphic.draw(matrices, gui, player, mX, mY);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override

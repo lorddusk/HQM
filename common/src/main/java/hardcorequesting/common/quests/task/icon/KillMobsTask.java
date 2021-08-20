@@ -11,6 +11,8 @@ import hardcorequesting.common.quests.task.client.KillMobsTaskGraphic;
 import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -33,6 +35,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         register(EventTrigger.Type.DEATH);
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
         return new KillMobsTaskGraphic(this);

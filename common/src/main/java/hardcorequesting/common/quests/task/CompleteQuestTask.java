@@ -2,8 +2,6 @@ package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -13,8 +11,6 @@ import hardcorequesting.common.quests.task.client.CompleteQuestTaskGraphic;
 import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,12 +24,16 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     protected static final int LIMIT = 3;
     
     public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION, LIMIT);
-    private final TaskGraphic graphic = new CompleteQuestTaskGraphic(this);
     
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
         super(CompleteQuestTaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
+    }
+    
+    @Override
+    protected TaskGraphic createGraphic() {
+        return new CompleteQuestTaskGraphic(this);
     }
     
     public boolean completed(int id, Player player) {
@@ -48,18 +48,6 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     @Override
     public CompleteQuestTaskData newQuestData() {
         return new CompleteQuestTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        graphic.draw(matrices, gui, player, mX, mY);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override

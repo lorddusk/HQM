@@ -2,9 +2,7 @@ package hardcorequesting.common.quests.task.item;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -34,10 +32,15 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     protected static final int LIMIT = 5 * 7;
     
     public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
-    private final TaskGraphic graphic = new ItemTaskGraphic(this);
     
     public ItemRequirementTask(Quest parent, String description, String longDescription) {
         super(ItemsTaskData.class, parent, description, longDescription);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    protected TaskGraphic createGraphic() {
+        return new ItemTaskGraphic(this);
     }
     
     @Override
@@ -139,18 +142,6 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     @Override
     public ItemsTaskData newQuestData() {
         return new ItemsTaskData(parts.size());
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        graphic.draw(matrices, gui, player, mX, mY);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override

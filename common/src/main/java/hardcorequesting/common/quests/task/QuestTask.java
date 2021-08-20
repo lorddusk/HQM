@@ -1,12 +1,9 @@
 package hardcorequesting.common.quests.task;
 
-
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -18,6 +15,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
@@ -223,10 +221,17 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY);
+    private TaskGraphic graphic;
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b);
+    protected abstract TaskGraphic createGraphic();
+    
+    @Environment(EnvType.CLIENT)
+    public final TaskGraphic getGraphic() {
+        if (graphic == null)
+            graphic = Objects.requireNonNull(createGraphic());
+        return graphic;
+    }
     
     public abstract void onUpdate(Player player);
     

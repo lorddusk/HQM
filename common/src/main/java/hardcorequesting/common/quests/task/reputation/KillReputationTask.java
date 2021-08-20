@@ -11,6 +11,8 @@ import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,6 +30,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
         register(EventTrigger.Type.DEATH);
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
         return new KillReputationTaskGraphic(this);

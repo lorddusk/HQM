@@ -924,7 +924,7 @@ public class Quest {
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
-            selectedTask.draw(matrices, gui, player, mX, mY);
+            selectedTask.getGraphic().draw(matrices, gui, player, mX, mY);
             //}
         } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
@@ -1165,7 +1165,7 @@ public class Quest {
             }
             
             if (selectedTask != null) {
-                selectedTask.onClick(gui, player, mX, mY, b);
+                selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
             }
             
             

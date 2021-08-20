@@ -39,6 +39,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
         return new TameMobsTaskGraphic(this);

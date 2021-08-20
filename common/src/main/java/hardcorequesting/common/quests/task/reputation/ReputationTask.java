@@ -3,8 +3,6 @@ package hardcorequesting.common.quests.task.reputation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -34,12 +32,13 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     protected static final int LIMIT = 4;
     
     public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
-    private final TaskGraphic graphic = createGraphic();
     
     public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
         super(dataType, parent, description, longDescription);
     }
     
+    @Environment(EnvType.CLIENT)
+    @Override
     protected TaskGraphic createGraphic() {
         return new ReputationTaskGraphic(this);
     }
@@ -68,18 +67,6 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
             }
         }
         return false;
-    }
-    
-    @Override
-    @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        graphic.draw(matrices, gui, player, mX, mY);
-    }
-    
-    @Override
-    @Environment(EnvType.CLIENT)
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override
