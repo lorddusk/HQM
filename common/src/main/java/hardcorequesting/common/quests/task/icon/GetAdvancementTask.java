@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuAdvancement;
+import hardcorequesting.common.client.interfaces.edit.PickAdvancementMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -71,7 +71,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part task) {
         if (mode == EditMode.LOCATION) {
-            GuiEditMenuAdvancement.display(gui, player, task.getAdvancement(),
+            PickAdvancementMenu.display(gui, player, task.getAdvancement(),
                     result -> setAdvancement(id, result));
         }
     }

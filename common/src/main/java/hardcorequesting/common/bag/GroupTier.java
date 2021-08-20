@@ -3,8 +3,8 @@ package hardcorequesting.common.bag;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ScrollBar;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -47,7 +47,7 @@ public class GroupTier {
                         gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer(), groupTier));
                         break;
                     case RENAME:
-                        GuiEditMenuTextEditor.display(gui, gui.getPlayer(), groupTier.getName(), 110, groupTier::setName);
+                        TextMenu.display(gui, gui.getPlayer(), groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {

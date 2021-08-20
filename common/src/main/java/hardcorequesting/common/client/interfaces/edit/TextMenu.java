@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
-public class GuiEditMenuTextEditor extends GuiEditMenu {
+public class TextMenu extends GuiEditMenu {
     
     private static final int TEXT_HEIGHT = 9;
     private static final int START_X = 20;
@@ -31,14 +31,14 @@ public class GuiEditMenuTextEditor extends GuiEditMenu {
     private final boolean isName;
     
     public static void display(GuiQuestBook gui, Player player, String txt, boolean isName, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, txt, isName, -1, resultConsumer));
+        gui.setEditMenu(new TextMenu(gui, player, txt, isName, -1, resultConsumer));
     }
     
     public static void display(GuiQuestBook gui, Player player, String txt, int limit, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, txt, true, limit, resultConsumer));
+        gui.setEditMenu(new TextMenu(gui, player, txt, true, limit, resultConsumer));
     }
     
-    protected GuiEditMenuTextEditor(GuiQuestBook gui, Player player, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
+    protected TextMenu(GuiQuestBook gui, Player player, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
         super(gui, player, false);
     
         this.resultConsumer = resultConsumer;

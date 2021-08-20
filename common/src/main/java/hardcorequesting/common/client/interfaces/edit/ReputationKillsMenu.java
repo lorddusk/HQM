@@ -1,40 +1,39 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.quests.task.DeathTask;
+import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.world.entity.player.Player;
 
-
-public class GuiEditMenuDeathTask extends GuiEditMenuExtended {
+public class ReputationKillsMenu extends GuiEditMenuExtended {
     
-    private int deaths;
-    private DeathTask task;
+    private int kills;
+    private KillReputationTask task;
     
-    public GuiEditMenuDeathTask(GuiBase gui, Player player, DeathTask task) {
+    public ReputationKillsMenu(GuiBase gui, Player player, KillReputationTask task) {
         super(gui, player, true, -1, -1, 25, 30);
         
-        deaths = task.getDeaths();
+        kills = task.getKills();
         this.task = task;
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.deathTask.reqDeathCount") {
+        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.mobTask.reqKills") {
             @Override
             protected int getValue() {
-                return deaths;
+                return kills;
             }
             
             @Override
             protected void setValue(int number) {
-                deaths = number;
+                kills = number;
             }
         });
     }
     
     @Override
     public void save(GuiBase gui) {
-        task.setDeaths(deaths);
-        SaveHelper.add(EditType.DEATH_CHANGE);
+        task.setKills(kills);
+        SaveHelper.add(EditType.KILLS_CHANGE);
     }
     
     @Override

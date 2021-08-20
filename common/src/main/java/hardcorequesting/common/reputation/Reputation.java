@@ -6,7 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
@@ -157,7 +157,7 @@ public class Reputation {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        GuiEditMenuTextEditor.display(gui, player, reputation.getName(), true, reputation::setName);
+                        TextMenu.display(gui, player, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
@@ -192,7 +192,7 @@ public class Reputation {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    GuiEditMenuTextEditor.display(gui, player, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
+                    TextMenu.display(gui, player, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
                 }
                 return;
             }
@@ -207,7 +207,7 @@ public class Reputation {
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
                         ReputationMarker marker = selectedReputation.markers.get(i);
-                        GuiEditMenuTextEditor.display(gui, player, marker.getName(), true, marker::setName);
+                        TextMenu.display(gui, player, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {

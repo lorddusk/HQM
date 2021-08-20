@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
 
-public class GuiEditMenuLocation extends GuiEditMenuExtended {
+public class LocationMenu extends GuiEditMenuExtended {
     
     private final Consumer<Result> resultConsumer;
     private VisitLocationTask.Visibility visibility;
@@ -21,10 +21,10 @@ public class GuiEditMenuLocation extends GuiEditMenuExtended {
     private String dimension;
     
     public static void display(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuLocation(gui, player, visibility, initPos, initRadius, initDimension, resultConsumer));
+        gui.setEditMenu(new LocationMenu(gui, player, visibility, initPos, initRadius, initDimension, resultConsumer));
     }
     
-    private GuiEditMenuLocation(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+    private LocationMenu(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         super(gui, player, true, 180, 30, 20, 30);
     
         this.resultConsumer = resultConsumer;

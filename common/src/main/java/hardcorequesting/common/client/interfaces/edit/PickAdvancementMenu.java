@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
+public class PickAdvancementMenu extends GuiEditMenuExtended {
     
     private static final int START_X = 20;
     private static final int START_Y = 20;
@@ -29,10 +29,10 @@ public class GuiEditMenuAdvancement extends GuiEditMenuExtended {
     private List<String> advancementNames;
     
     public static void display(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new GuiEditMenuAdvancement(gui, player, advancement, resultConsumer));
+        gui.setEditMenu(new PickAdvancementMenu(gui, player, advancement, resultConsumer));
     }
     
-    private GuiEditMenuAdvancement(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
+    private PickAdvancementMenu(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
         super(gui, player, false, 180, 70, 180, 150);
         
         this.resultConsumer = resultConsumer;

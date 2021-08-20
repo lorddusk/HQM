@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuLocation;
+import hardcorequesting.common.client.interfaces.edit.LocationMenu;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -138,7 +138,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     @Override
     protected void handleElementEditClick(GuiQuestBook gui, Player player, EditMode mode, int id, Part part) {
         if (mode == EditMode.LOCATION) {
-            GuiEditMenuLocation.display(gui, player, part.getVisibility(), part.getPosition(), part.radius, part.dimension,
+            LocationMenu.display(gui, player, part.getVisibility(), part.getPosition(), part.radius, part.dimension,
                     result -> setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
         }
     }

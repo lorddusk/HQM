@@ -940,7 +940,7 @@ public class GuiQuestBook extends GuiBase {
             }
         } else {
             if (Quest.canQuestsBeEdited() && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                GuiEditMenuTextEditor.display(this, player, Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
+                TextMenu.display(this, player, Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
             }
         }
     }

@@ -3,8 +3,8 @@ package hardcorequesting.common.quests.task.icon;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
@@ -89,7 +89,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
                                     result -> setIcon(id, result.get()));
                             break;
                         case RENAME:
-                            GuiEditMenuTextEditor.display(gui, player, part.getName(), 110,
+                            TextMenu.display(gui, player, part.getName(), 110,
                                     result -> setName(id, result));
                             break;
                         case DELETE:

@@ -199,7 +199,7 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuDeathTask(gui, player, (DeathTask) selectedTask));
+                gui.setEditMenu(new SetDeathMenu(gui, player, (DeathTask) selectedTask));
             }
         });
         
@@ -219,7 +219,7 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuReputationKillTask(gui, player, (KillReputationTask) selectedTask));
+                gui.setEditMenu(new ReputationKillsMenu(gui, player, (KillReputationTask) selectedTask));
             }
         });
         
@@ -1108,7 +1108,7 @@ public class Quest {
                         }
                         if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
-                                GuiEditMenuTextEditor.display(gui, player, task.getDescription(), true,
+                                TextMenu.display(gui, player, task.getDescription(), true,
                                         task::setDescription);
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
                                 if (i + 1 < tasks.size()) {
@@ -1173,11 +1173,11 @@ public class Quest {
             
             if (gui.getCurrentMode() == EditMode.RENAME) {
                 if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    GuiEditMenuTextEditor.display(gui, player, getName(), true, this::setName);
+                    TextMenu.display(gui, player, getName(), true, this::setName);
                 } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    GuiEditMenuTextEditor.display(gui, player, getDescription(), false, this::setDescription);
+                    TextMenu.display(gui, player, getDescription(), false, this::setDescription);
                 } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    GuiEditMenuTextEditor.display(gui, player, selectedTask.getDescription(), false,
+                    TextMenu.display(gui, player, selectedTask.getDescription(), false,
                             selectedTask::setDescription);
                 }
             }
