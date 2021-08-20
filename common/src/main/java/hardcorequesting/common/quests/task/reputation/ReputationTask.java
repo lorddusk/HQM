@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationSetting;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -15,12 +12,12 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.client.ReputationTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.Positioned;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
@@ -33,16 +30,18 @@ import java.util.UUID;
 public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Data> {
     //for this task to be completed, all reputation settings (up to 4) has to be completed at the same time, therefore it's not saved whether you've completed one of these reputation settings, just if you've completed it all
     private static final String REPUTATION = "reputation";
-    private static final int OFFSET_Y = 27;
     
     protected static final int LIMIT = 4;
     
-    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
-    private final int startOffsetY;
+    public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
+    private final TaskGraphic graphic = createGraphic();
     
-    public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription, int startOffsetY) {
+    public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
         super(dataType, parent, description, longDescription);
-        this.startOffsetY = startOffsetY;
+    }
+    
+    protected TaskGraphic createGraphic() {
+        return new ReputationTaskGraphic(this);
     }
     
     @Deprecated
@@ -74,56 +73,13 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     @Override
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        String info = null;
-        List<Positioned<Part>> renderSettings = positionParts(parts.getShownElements());
-        for (Positioned<Part> pos : renderSettings) {
-            Part part = pos.getElement();
-        
-            gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        
-            if (part.reputation == null) {
-                gui.drawRect(pos.getX() + Reputation.BAR_X, pos.getY() + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
-            } else {
-                info = part.reputation.draw(matrices, gui, pos.getX(), pos.getY(), mX, mY, info, getPlayerForRender(player), true, part.lower, part.upper, part.inverted, null, null, getData(player).completed);
-            }
-        }
-        
-        if (info != null) {
-            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
-        }
+        graphic.draw(matrices, gui, player, mX, mY);
     }
     
     @Override
     @Environment(EnvType.CLIENT)
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Positioned<Part>> renderSettings = positionParts(parts.getShownElements());
-            for (int i = 0; i < renderSettings.size(); i++) {
-                Positioned<Part> pos = renderSettings.get(i);
-                Part part = pos.getElement();
-                
-                if (gui.inBounds(pos.getX(), pos.getY(), Reputation.BAR_WIDTH, 20, mX, mY)) {
-                    if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-                        gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, this, i, part));
-                    } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                        parts.remove(i);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-    
-    protected List<Positioned<Part>> positionParts(List<Part> parts) {
-        List<Positioned<Part>> list = new ArrayList<>(parts.size());
-        int x = START_X;
-        int y = START_Y + startOffsetY;
-        for (Part part : parts) {
-            list.add(new Positioned<>(x, y, part));
-            y += OFFSET_Y;
-        }
-        return list;
+        graphic.onClick(gui, player, mX, mY, b);
     }
     
     @Override
@@ -134,10 +90,6 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     @Override
     public void setComplete(Data data) {
         data.completed = true;
-    }
-    
-    protected Player getPlayerForRender(Player player) {
-        return player;
     }
     
     @Override

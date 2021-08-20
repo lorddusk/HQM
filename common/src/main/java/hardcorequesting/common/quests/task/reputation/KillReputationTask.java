@@ -1,20 +1,16 @@
 package hardcorequesting.common.quests.task.reputation;
 
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ReputationKillTaskData;
+import hardcorequesting.common.quests.task.client.KillReputationTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,21 +23,14 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private int kills;
     
     public KillReputationTask(Quest parent, String description, String longDescription) {
-        super(ReputationKillTaskData.class, parent, description, longDescription, 20);
+        super(ReputationKillTaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.DEATH);
     }
     
-    @Environment(EnvType.CLIENT)
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        super.draw(matrices, gui, player, mX, mY);
-        int killCount = getData(player).kills;
-        if (Quest.canQuestsBeEdited()) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.pluralTranslated(kills != 1, "hqm.repKil.kills", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
-        } else {
-            gui.drawString(matrices, gui.getLinesFromText(killCount == kills ? Translator.pluralTranslated(kills != 1, "hqm.repKil.killCount", GuiColor.GREEN, kills) : Translator.translatable("hqm.repKil.killCountOutOf", killCount, kills), 1F, 130), START_X, START_Y, 1F, 0x404040);
-        }
+    protected TaskGraphic createGraphic() {
+        return new KillReputationTaskGraphic(this);
     }
     
     @Override
@@ -62,11 +51,6 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     public void setComplete(ReputationKillTaskData data) {
         data.kills = kills;
         super.setComplete(data);
-    }
-    
-    @Override
-    protected Player getPlayerForRender(Player player) {
-        return null;
     }
     
     @Override
