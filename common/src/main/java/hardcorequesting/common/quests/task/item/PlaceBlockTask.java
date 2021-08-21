@@ -37,7 +37,7 @@ public class PlaceBlockTask extends ItemRequirementTask {
         if (hand != InteractionHand.MAIN_HAND) return;
         
         NonNullList<ItemStack> consume = NonNullList.withSize(1, itemStack);
-        increaseItems(consume, getData(player), player.getUUID());
+        increaseItems(consume, player.getUUID());
     }
 }
 

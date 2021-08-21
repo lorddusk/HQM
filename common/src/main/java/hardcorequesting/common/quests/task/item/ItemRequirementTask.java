@@ -8,6 +8,7 @@ import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
@@ -22,7 +23,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
 import java.util.UUID;
 
 public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
@@ -52,11 +52,6 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     @Override
     public void read(JsonObject object) {
         parts.read(GsonHelper.getAsJsonArray(object, ITEMS, new JsonArray()), QuestTaskAdapter.ITEM_REQUIREMENT_ADAPTER);
-    }
-    
-    @Deprecated
-    public List<Part> getItems() {
-        return parts.getElements();
     }
     
     @Environment(EnvType.CLIENT)
@@ -89,9 +84,11 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     @Environment(EnvType.CLIENT)
     public abstract boolean mayUseFluids();
     
-    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, ItemsTaskData data, UUID playerId) {
+    public boolean increaseItems(NonNullList<ItemStack> itemsToConsume, UUID playerId) {
         if (!parent.isAvailable(playerId)) return false;
-        
+    
+        ItemsTaskData data = getData(playerId);
+    
         boolean updated = false;
         
         for (int i = 0; i < parts.size(); i++) {
@@ -182,6 +179,22 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             data.setValue(i, parts.get(i).required);
         }
         data.completed = true;
+    }
+    
+    public void switchPartStatus(int id, UUID playerId) {
+        if (id >= 0 && id < parts.size()) {
+            Part part = parts.get(id);
+            ItemsTaskData qData = getData(playerId);
+            if (qData.isDone(id, part)) {
+                qData.setValue(id, 0);
+                qData.completed = false;
+                QuestingDataManager.getInstance().getQuestingData(playerId).getTeam().refreshData();
+            } else {
+                qData.setValue(id, part.required);
+                doCompletionCheck(qData, playerId);
+            }
+            parent.sendUpdatedDataToTeam(playerId);
+        }
     }
     
     @Override

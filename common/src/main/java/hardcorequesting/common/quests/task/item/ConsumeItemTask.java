@@ -7,6 +7,8 @@ import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.UUID;
 
@@ -16,8 +18,9 @@ public class ConsumeItemTask extends ItemRequirementTask {
         super(parent, description, longDescription);
     }
     
-    public boolean increaseFluid(FluidStack fluidVolume, ItemsTaskData data, UUID playerId, boolean action) {
+    public boolean increaseFluid(FluidStack fluidVolume, UUID playerId, boolean action) {
         boolean updated = false;
+        ItemsTaskData data = getData(playerId);
         
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
@@ -43,9 +46,33 @@ public class ConsumeItemTask extends ItemRequirementTask {
         return updated;
     }
     
+    public boolean canTakeItem(ItemStack stack, UUID playerId) {
+        ItemsTaskData data = getData(playerId);
+        for (int i = 0; i < parts.size(); i++) {
+            ItemRequirementTask.Part part = parts.get(i);
+            if (part.hasItem && part.getPrecision().areItemsSame(part.getStack(), stack)
+                    && !data.isDone(i, part)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean canTakeFluid(Fluid fluid, UUID playerId) {
+        ItemsTaskData data = getData(playerId);
+        for (int i = 0; i < parts.size(); i++) {
+            ItemRequirementTask.Part part = parts.get(i);
+            if (part.fluid != null && fluid == part.fluid.getFluid()
+                    && !data.isDone(i, part)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     @Override
     public void onUpdate(Player player) {
-        if (increaseItems(player.inventory.items, getData(player), player.getUUID())) {
+        if (increaseItems(player.inventory.items, player.getUUID())) {
             player.inventory.setChanged();
         }
     }

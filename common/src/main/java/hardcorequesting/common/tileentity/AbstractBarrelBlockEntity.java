@@ -5,10 +5,8 @@ import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
-import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
@@ -67,7 +65,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
             
             NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
-            if (consumeTask.increaseItems(list, consumeTask.getData(this.getPlayerUUID()), this.getPlayerUUID())) {
+            if (consumeTask.increaseItems(list, this.getPlayerUUID())) {
                 this.updateState();
                 this.doSync();
             }
@@ -94,15 +92,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
         QuestTask<?> task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
-            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
-            
-            for (int i = 0; i < consumeTask.getItems().size(); i++) {
-                ItemRequirementTask.Part requirement = consumeTask.getItems().get(i);
-                if (requirement.hasItem && requirement.getPrecision().areItemsSame(requirement.getStack(), stack)) {
-                    ItemsTaskData data = consumeTask.getData(this.getPlayerUUID());
-                    return !data.isDone(i, requirement);
-                }
-            }
+            return ((ConsumeItemTask) task).canTakeItem(stack, getPlayerUUID());
         }
         return false;
     }

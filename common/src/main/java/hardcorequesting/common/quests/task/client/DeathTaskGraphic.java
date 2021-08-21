@@ -21,10 +21,10 @@ public class DeathTaskGraphic implements TaskGraphic {
     
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        int died = task.getData(player).getDeaths();
-        FormattedText text = died == task.getDeaths()
-                ? Translator.pluralTranslated(task.getDeaths() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeaths())
-                : Translator.pluralTranslated(task.getDeaths() != 0, "hqm.deathMenu.deathsOutOf", died, task.getDeaths());
+        int died = task.getDeaths(player.getUUID());
+        FormattedText text = died == task.getDeathsRequired()
+                ? Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeathsRequired())
+                : Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deathsOutOf", died, task.getDeathsRequired());
     
         gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     }

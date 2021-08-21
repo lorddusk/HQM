@@ -92,7 +92,11 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
         }
     }
     
-    public int getKills() {
+    public int getKills(UUID id) {
+        return getData(id).kills;
+    }
+    
+    public int getKillsRequirement() {
         return kills;
     }
     
@@ -104,7 +108,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         super.write(builder);
-        builder.add(KILLS, getKills());
+        builder.add(KILLS, getKillsRequirement());
     }
     
     @Override

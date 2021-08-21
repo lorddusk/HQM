@@ -14,11 +14,9 @@ import org.jetbrains.annotations.NotNull;
 public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements FluidInsertable, BlockEntityClientSerializable {
     @Override
     public FluidVolume attemptInsertion(FluidVolume fluidVolume, Simulation simulation) {
-        QuestTask task = getCurrentTask();
+        QuestTask<?> task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
-            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
-            
-            if (consumeTask.increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), consumeTask.getData(this.getPlayerUUID()), this.getPlayerUUID(), true)) {
+            if (((ConsumeItemTask) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), this.getPlayerUUID(), true)) {
                 this.updateState();
                 this.doSync();
             }

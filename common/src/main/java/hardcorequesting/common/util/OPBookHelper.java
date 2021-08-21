@@ -10,14 +10,12 @@ import hardcorequesting.common.network.message.OpActionMessage;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
 import java.util.UUID;
 
 public final class OPBookHelper {
@@ -88,19 +86,7 @@ public final class OPBookHelper {
                 
                 if (task instanceof ItemRequirementTask) {
                     ItemRequirementTask itemTask = (ItemRequirementTask) task;
-                    List<ItemRequirementTask.Part> requirements = itemTask.getItems();
-                    if (requirement >= 0 && requirement < requirements.size()) {
-                        ItemsTaskData qData = itemTask.getData(subject.getUUID());
-                        if (qData.isDone(requirement, requirements.get(requirement))) {
-                            qData.setValue(requirement, 0);
-                            itemTask.getData(subject.getUUID()).completed = false;
-                            QuestingDataManager.getInstance().getQuestingData(subject).getTeam().refreshData();
-                        } else {
-                            qData.setValue(requirement, requirements.get(requirement).required);
-                            itemTask.doCompletionCheck(qData, subject.getUUID());
-                        }
-                        quest.sendUpdatedDataToTeam(subject);
-                    }
+                    itemTask.switchPartStatus(requirement, subject.getUUID());
                 }
             }
         };

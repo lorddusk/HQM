@@ -97,7 +97,11 @@ public class DeathTask extends QuestTask<DeathTaskData> {
         completeQuest(parent, uuid);
     }
     
-    public int getDeaths() {
+    public int getDeaths(UUID id) {
+        return getData(id).getDeaths();
+    }
+    
+    public int getDeathsRequired() {
         return deaths;
     }
     
@@ -108,7 +112,7 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Override
     public void write(Adapter.JsonObjectBuilder builder) {
-        builder.add(DEATHS, getDeaths());
+        builder.add(DEATHS, getDeathsRequired());
     }
     
     @Override

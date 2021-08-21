@@ -29,7 +29,7 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     public void checkProgress(BlockState state, Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
         NonNullList<ItemStack> consume = NonNullList.withSize(1, drop);
-        increaseItems(consume, getData(player), player.getUUID());
+        increaseItems(consume, player.getUUID());
     }
     
     @Override

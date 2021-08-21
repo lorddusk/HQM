@@ -143,15 +143,15 @@ public abstract class QuestTask<Data extends TaskData> {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
-    public Data getData(Player player) {
+    protected Data getData(Player player) {
         return getData(player.getUUID());
     }
     
-    public Data getData(UUID uuid) {
+    protected Data getData(UUID uuid) {
         return getData(parent.getQuestData(uuid));
     }
     
-    public Data getData(Team team) {
+    protected Data getData(Team team) {
         return getData(team.getQuestData(parent.getQuestId()));
     }
     

@@ -42,7 +42,7 @@ public class CraftingTask extends ItemRequirementTask {
                 }
                 NonNullList<ItemStack> list = NonNullList.create();
                 list.add(stack);
-                increaseItems(list, getData(player), player.getUUID());
+                increaseItems(list, player.getUUID());
                 //}
             }
         }

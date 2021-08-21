@@ -203,7 +203,7 @@ public class Quest {
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
                 DeathTask task = (DeathTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeaths(), task::setDeaths);
+                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
         
@@ -224,7 +224,7 @@ public class Quest {
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
                 KillReputationTask task = (KillReputationTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKills(), task::setKills);
+                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
         
