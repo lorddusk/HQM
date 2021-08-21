@@ -54,15 +54,17 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
             PickItemMenu.display(gui, player, part.getIconStack(), PickItemMenu.Type.ITEM,
                     result -> task.setIcon(id, result.get()));
+            return true;
         } else if (mode == EditMode.RENAME) {
             TextMenu.display(gui, player, part.getName(), 110,
                     result -> task.setName(id, result));
+            return true;
         } else {
-            super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, player, mode, part, id);
         }
     }
     

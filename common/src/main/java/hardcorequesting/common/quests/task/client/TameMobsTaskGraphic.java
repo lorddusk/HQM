@@ -34,12 +34,13 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     }
     
     @Override
-    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, TameMobsTask.Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, TameMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, player, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
                     PickMobMenu.EXTRA_TAME_ENTRIES, result -> task.setInfo(id, result.getMobId().toString(), result.getAmount()));
+            return true;
         } else {
-            super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, player, mode, part, id);
         }
     }
 }

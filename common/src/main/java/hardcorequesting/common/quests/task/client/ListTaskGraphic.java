@@ -27,10 +27,12 @@ public abstract class ListTaskGraphic<Part> implements TaskGraphic {
     
     protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
     
-    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
         if (mode == EditMode.DELETE) {
             parts.remove(id);
+            return true;
         }
+        return false;
     }
     
     @Override

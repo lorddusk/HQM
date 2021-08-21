@@ -33,12 +33,13 @@ public class KillMobsTaskGraphic extends IconTaskGraphic<KillMobsTask.Part> {
     }
     
     @Override
-    protected void handlePartClick(GuiQuestBook gui, Player player, EditMode mode, KillMobsTask.Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, KillMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, player, part.getMob(), part.getCount(), "mobTask",
                     result -> task.setInfo(id, result.getMobId(), result.getAmount()));
+            return true;
         } else {
-            super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, player, mode, part, id);
         }
     }
 }
