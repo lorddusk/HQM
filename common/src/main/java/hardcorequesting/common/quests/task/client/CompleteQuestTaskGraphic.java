@@ -63,7 +63,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, CompleteQuestTask.Part part, int id) {
         if (super.handlePartClick(gui, player, mode, part, id)) {
             return true;
-        } else if (part.getQuest() == null) {
+        } else if (Quest.speciallySelectedQuestId != null) {
             task.parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
             SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
             return true;
