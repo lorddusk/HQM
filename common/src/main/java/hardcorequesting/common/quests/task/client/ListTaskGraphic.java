@@ -24,7 +24,7 @@ public abstract class ListTaskGraphic<Part> implements TaskGraphic {
     
     protected abstract List<Positioned<Part>> positionParts(List<Part> parts);
     
-    protected abstract FormattedText drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
+    protected abstract List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
     
     protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
     
@@ -39,34 +39,36 @@ public abstract class ListTaskGraphic<Part> implements TaskGraphic {
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
-        FormattedText tooltip = null;
+        List<FormattedText> tooltip = null;
         
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
-            FormattedText newTooltip = drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
+            List<FormattedText> newTooltip = drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
             if (newTooltip != null)
                 tooltip = newTooltip;
         }
         
         if (tooltip != null)
-            gui.renderTooltip(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
+            gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
     }
     
     @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            List<Positioned<Part>> elements = positionParts(parts.getShownElements());
-            for (int i = 0; i < elements.size(); i++) {
-                Positioned<Part> pos = elements.get(i);
-                Part part = pos.getElement();
-                
-                if (isInPartBounds(gui, mX, mY, pos)) {
-                    handlePartClick(gui, player, gui.getCurrentMode(), part, i);
-                    break;
-                }
-            }
+            int id = getClickedPart(gui, mX, mY);
+            if (id >= 0)
+                handlePartClick(gui, player, gui.getCurrentMode(), parts.get(id), id);
         }
     }
     
+    protected final int getClickedPart(GuiQuestBook gui, int mX, int mY) {
+        List<Positioned<Part>> elements = positionParts(parts.getShownElements());
+        for (int i = 0; i < elements.size(); i++) {
+            if (isInPartBounds(gui, mX, mY, elements.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

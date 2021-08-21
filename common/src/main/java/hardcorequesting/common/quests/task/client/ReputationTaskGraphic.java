@@ -15,6 +15,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -53,7 +54,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected FormattedText drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
@@ -61,7 +62,8 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
             gui.drawRect(x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             return null;
         } else {
-            return Translator.plain(part.getReputation().draw(matrices, gui, x, y, mX, mY, null, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.getData(player).completed));
+            String text = part.getReputation().draw(matrices, gui, x, y, mX, mY, null, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.getData(player).completed);
+            return Collections.singletonList(Translator.plain(text));
         }
     }
     
