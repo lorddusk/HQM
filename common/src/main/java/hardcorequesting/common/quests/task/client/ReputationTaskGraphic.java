@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationSetting;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.util.Positioned;
@@ -25,14 +26,14 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     
     private final ReputationTask<?> task;
     
-    public ReputationTaskGraphic(ReputationTask<?> task) {
-        super(task.parts);
+    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts) {
+        super(parts);
         this.task = task;
         startOffsetY = 0;
     }
     
-    protected ReputationTaskGraphic(ReputationTask<?> task, int startOffsetY) {
-        super(task.parts);
+    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, int startOffsetY) {
+        super(parts);
         this.task = task;
         this.startOffsetY = startOffsetY;
     }

@@ -16,7 +16,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     
     protected static final int LIMIT = 4;
     
-    public final PartList<T> parts;
+    protected final PartList<T> parts;
     
     public IconLayoutTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
         super(dataType, parent, description, longDescription);

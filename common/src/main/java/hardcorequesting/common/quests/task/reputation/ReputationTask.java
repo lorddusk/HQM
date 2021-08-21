@@ -31,7 +31,7 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     protected static final int LIMIT = 4;
     
-    public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
     
     public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
         super(dataType, parent, description, longDescription);
@@ -40,7 +40,7 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
-        return new ReputationTaskGraphic(this);
+        return new ReputationTaskGraphic(this, parts);
     }
     
     @Deprecated

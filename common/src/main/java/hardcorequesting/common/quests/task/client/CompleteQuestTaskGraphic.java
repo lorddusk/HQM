@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.CompleteQuestTask;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
@@ -28,8 +29,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     
     private final CompleteQuestTask task;
     
-    public CompleteQuestTaskGraphic(CompleteQuestTask task) {
-        super(task.parts);
+    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts) {
+        super(parts);
         this.task = task;
     }
     
@@ -66,7 +67,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
         if (super.handlePartClick(gui, player, mode, part, id)) {
             return true;
         } else if (Quest.speciallySelectedQuestId != null) {
-            task.parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
+            parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
             SaveHelper.add(EditType.COMPLETE_CHECK_CHANGE);
             return true;
         }

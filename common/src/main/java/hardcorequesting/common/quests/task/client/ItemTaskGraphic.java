@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.Positioned;
@@ -39,8 +40,8 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
     private final ItemRequirementTask task;
     
-    public ItemTaskGraphic(ItemRequirementTask task) {
-        super(task.parts);
+    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts) {
+        super(parts);
         this.task = task;
     }
     

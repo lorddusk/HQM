@@ -4,7 +4,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.reputation.KillReputationTask;
+import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -15,8 +17,8 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
     private final KillReputationTask task;
     
-    public KillReputationTaskGraphic(KillReputationTask task) {
-        super(task, 20);
+    public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts) {
+        super(task, parts, 20);
         this.task = task;
     }
     

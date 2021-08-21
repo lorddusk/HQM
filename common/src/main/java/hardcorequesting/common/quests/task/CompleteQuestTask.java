@@ -23,7 +23,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     protected static final int LIMIT = 3;
     
-    public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION, LIMIT);
+    private final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION, LIMIT);
     
     public CompleteQuestTask(Quest parent, String description, String longDescription) {
         super(CompleteQuestTaskData.class, parent, description, longDescription);
@@ -33,7 +33,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     @Override
     protected TaskGraphic createGraphic() {
-        return new CompleteQuestTaskGraphic(this);
+        return new CompleteQuestTaskGraphic(this, parts);
     }
     
     public boolean completed(int id, Player player) {

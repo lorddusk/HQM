@@ -16,7 +16,7 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public abstract class ListTaskGraphic<Part> implements TaskGraphic {
     
-    private final PartList<Part> parts;
+    protected final PartList<Part> parts;
     
     public ListTaskGraphic(PartList<Part> parts) {
         this.parts = parts;

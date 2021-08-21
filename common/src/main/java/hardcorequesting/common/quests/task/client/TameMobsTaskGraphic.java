@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -17,8 +18,8 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     
     private final TameMobsTask task;
     
-    public TameMobsTaskGraphic(TameMobsTask task) {
-        super(task);
+    public TameMobsTaskGraphic(TameMobsTask task, PartList<TameMobsTask.Part> parts) {
+        super(task, parts);
         this.task = task;
     }
     

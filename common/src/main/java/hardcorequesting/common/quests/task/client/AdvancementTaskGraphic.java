@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickAdvancementMenu;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -16,8 +17,8 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     
     private final GetAdvancementTask task;
     
-    public AdvancementTaskGraphic(GetAdvancementTask task) {
-        super(task);
+    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts) {
+        super(task, parts);
         this.task = task;
     }
     

@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -16,8 +17,8 @@ public class KillMobsTaskGraphic extends IconTaskGraphic<KillMobsTask.Part> {
     
     private final KillMobsTask task;
     
-    public KillMobsTaskGraphic(KillMobsTask task) {
-        super(task);
+    public KillMobsTaskGraphic(KillMobsTask task, PartList<KillMobsTask.Part> parts) {
+        super(task, parts);
         this.task = task;
     }
     

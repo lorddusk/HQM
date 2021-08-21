@@ -42,7 +42,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
-        return new TameMobsTaskGraphic(this);
+        return new TameMobsTaskGraphic(this, parts);
     }
     
     @Override

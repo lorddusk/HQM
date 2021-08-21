@@ -31,7 +31,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     protected static final int LIMIT = 5 * 7;
     
-    public final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
+    protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
     
     public ItemRequirementTask(Quest parent, String description, String longDescription) {
         super(ItemsTaskData.class, parent, description, longDescription);
@@ -40,7 +40,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
-        return new ItemTaskGraphic(this);
+        return new ItemTaskGraphic(this, parts);
     }
     
     @Override

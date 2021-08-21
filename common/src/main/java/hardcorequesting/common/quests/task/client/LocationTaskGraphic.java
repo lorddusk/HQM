@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.LocationMenu;
+import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -19,8 +20,8 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     
     private final VisitLocationTask task;
     
-    public LocationTaskGraphic(VisitLocationTask task) {
-        super(task);
+    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts) {
+        super(task, parts);
         this.task = task;
     }
     
