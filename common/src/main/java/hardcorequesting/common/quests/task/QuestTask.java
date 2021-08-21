@@ -34,11 +34,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
 
 public abstract class QuestTask<Data extends TaskData> {
+    private static final Logger LOGGER = LogManager.getLogger();
     
     private final Class<Data> dataType;
     public String description;
@@ -165,15 +168,15 @@ public abstract class QuestTask<Data extends TaskData> {
             questData.tasks[id] = newQuestData();
         }
         
-        Data data = validateData(questData.tasks[id]);
-        questData.tasks[id] = data;
-        return data;
-    }
-    
-    private Data validateData(TaskData data) {
+        TaskData data = questData.tasks[id];
         if (dataType.isInstance(data)) {
             return dataType.cast(data);
-        } else return newQuestData();
+        } else {
+            LOGGER.warn("Found task data of wrong type. Expected {}, was {}. Replacing with empty data of the correct type.", dataType, data == null ? null : data.getClass());
+            Data newData = newQuestData();
+            questData.tasks[id] = newData;
+            return newData;
+        }
     }
     
     public abstract Data newQuestData();
