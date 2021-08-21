@@ -64,7 +64,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
             return null;
         } else {
             String text = part.getReputation().draw(matrices, gui, x, y, mX, mY, null, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(player));
-            return Collections.singletonList(Translator.plain(text));
+            return text == null ? null : Collections.singletonList(Translator.plain(text));
         }
     }
     
