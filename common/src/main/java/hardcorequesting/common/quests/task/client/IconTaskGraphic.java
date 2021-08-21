@@ -10,6 +10,7 @@ import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -45,12 +46,13 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {
+    protected FormattedText drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {
         int textX = x + X_TEXT_OFFSET, textY = y + Y_TEXT_OFFSET;
     
         gui.drawItemStack(part.getIconStack(), x, y, mX, mY, false);
         gui.drawString(matrices, Translator.plain(part.getName()), textX, textY, 0x404040);
         drawElementText(matrices, gui, player, part, id, textX + X_TEXT_INDENT, textY + 9);
+        return null;
     }
     
     @Override

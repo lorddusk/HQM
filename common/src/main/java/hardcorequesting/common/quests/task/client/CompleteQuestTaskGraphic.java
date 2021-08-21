@@ -12,6 +12,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected FormattedText drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.drawItemStack(part.getIconStack(), x, y, mX, mY, false);
         if (part.getQuest() != null) {
             gui.drawString(matrices, Translator.plain(part.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
@@ -57,6 +58,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.secondline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.thirdline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
         }
+        return null;
     }
     
     @Override
