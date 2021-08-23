@@ -2,7 +2,6 @@ package hardcorequesting.common.items;
 
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.Group;
-import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
@@ -52,7 +51,7 @@ public class BagItem extends Item {
                             group.open(player);
                             player.inventory.setChanged();
                             openClientInterface(player, group.getId(), tierOrdinal);
-                            world.playSound(player, player.blockPosition(), Sounds.BAG.getSound(), SoundSource.MASTER, 1, 1);
+                            world.playSound(null, player.blockPosition(), Sounds.BAG.getSound(), SoundSource.MASTER, 1, 1);
                             break;
                         } else {
                             rng -= weight;
@@ -95,6 +94,5 @@ public class BagItem extends Item {
                 .filter(group -> group.getLimit() != 0)
                 .map(group -> group.getRetrievalCount(player))
                 .toArray(Integer[]::new)));
-        SoundHandler.play(Sounds.BAG, player);
     }
 }
