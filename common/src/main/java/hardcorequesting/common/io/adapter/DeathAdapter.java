@@ -62,6 +62,10 @@ public class DeathAdapter {
                 
                 int i = 0;
                 for (JsonElement element : array) {
+                    if (i >= DeathType.values().length) {
+                        HardcoreQuestingCore.LOGGER.error("JsonArray for 'Death Stat' with uuid '" + deathStat.getUuid() + "' exceeded its expected size!");
+                        break;
+                    }
                     if (GsonHelper.isNumberValue(element)) {
                         deathStat.increaseDeath(DeathType.values()[i++], element.getAsInt(), false);
                     } else {

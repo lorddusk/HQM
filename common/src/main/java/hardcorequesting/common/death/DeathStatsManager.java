@@ -105,7 +105,7 @@ public class DeathStatsManager extends SimpleSerializable {
             DeathStat stat = new DeathStat(uuid);
             int count = buf.readByte();
             for (int j = 0; j < count; j++) {
-                DeathType type = DeathType.values()[buf.readByte()];
+                DeathType type = DeathType.getClamped(buf.readByte());
                 stat.increaseDeath(type, buf.readShort(), false);
             }
             deathMap.put(uuid, stat);

@@ -1,6 +1,7 @@
 package hardcorequesting.common.death;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -129,6 +130,10 @@ public enum DeathType {
         return I18n.get("hqm.deathType." + name);
     }
 
+    public static DeathType getClamped(int i) {
+        return DeathType.values()[Mth.clamp(i, 0, DeathType.values().length)];
+    }
+    
     /*Fire: inFire, onFire, fireball
     Lava: lava
     Suffocation: inWall
