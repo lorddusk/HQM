@@ -30,7 +30,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -75,7 +74,6 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nonnull;
@@ -400,6 +398,11 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public Block getBlock(ResourceLocation resourceLocation) {
         return ForgeRegistries.BLOCKS.getValue(resourceLocation);
+    }
+    
+    @Override
+    public SoundEvent getSoundEvent(ResourceLocation location) {
+        return ForgeRegistries.SOUND_EVENTS.getValue(location);
     }
     
     @Override

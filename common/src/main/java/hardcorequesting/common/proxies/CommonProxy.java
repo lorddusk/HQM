@@ -7,8 +7,6 @@ import hardcorequesting.common.quests.QuestTicker;
 import net.minecraft.world.entity.player.Player;
 
 public class CommonProxy {
-    public void initSounds() {}
-    
     public void init() {
         Quest.serverTicker = new QuestTicker();
         HardcoreQuestingCore.platform.registerOnServerTick(minecraftServer -> Quest.serverTicker.tick(minecraftServer.overworld(), false));

@@ -86,7 +86,7 @@ public class GuiReward extends GuiBase {
             if (group.getLimit() != 0)
                 group.setRetrievalCount(player, limits[i++]);
         
-        if (BagItem.displayGui) {
+        if (BagItem.displayGui && rewardGroup != null) {
             Minecraft.getInstance().setScreen(new GuiReward(rewardGroup, bag, player));
         }
     }

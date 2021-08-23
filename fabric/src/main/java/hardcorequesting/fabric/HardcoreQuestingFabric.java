@@ -270,6 +270,11 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
+    public SoundEvent getSoundEvent(ResourceLocation location) {
+        return Registry.SOUND_EVENT.get(location);
+    }
+    
+    @Override
     public Item getItem(ResourceLocation location) {
         return Registry.ITEM.get(location);
     }

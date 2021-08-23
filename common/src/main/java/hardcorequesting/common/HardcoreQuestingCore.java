@@ -59,7 +59,6 @@ public class HardcoreQuestingCore {
         HQMConfig.loadConfig();
         
         proxy.init();
-        proxy.initSounds();
         
         new PlayerDeathEventListener();
         new PlayerTracker();
