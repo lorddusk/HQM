@@ -135,7 +135,7 @@ public class SoundHandler {
     }
     
     public static void handleSoundPacket(Sounds sound) {
-        play(sound.getSoundName(), 1F, 1F);
+        play(sound.getSoundId(), 1F, 1F);
     }
     
     @Environment(EnvType.CLIENT)
