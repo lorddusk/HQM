@@ -7,21 +7,24 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.UUID;
+import java.util.*;
 
 public class DeathStat {
-    private static final DeathComparator[] deathTypeComparator = new DeathComparator[DeathType.values().length];
+    private static final Map<DeathType, Comparator<DeathStat>> deathTypeComparator = new EnumMap<>(DeathType.class);
     
     static {
-        for (int i = 0; i < deathTypeComparator.length; i++) {
-            deathTypeComparator[i] = new DeathComparator(i);
+        for (DeathType type : DeathType.values()) {
+            deathTypeComparator.put(type, Comparator.comparingInt(stat -> stat.getDeaths(type)));
         }
     }
     
-    protected int[] deaths = new int[DeathType.values().length];
-    private UUID uuid;
+    protected final Map<DeathType, Integer> deaths = new EnumMap<>(DeathType.class);
+    {
+        for (DeathType type : DeathType.values()) {
+            deaths.put(type, 0);
+        }
+    }
+    private final UUID uuid;
     private String cachedName;
     int totalDeaths = -1;
     
@@ -57,18 +60,16 @@ public class DeathStat {
         this.cachedName = cachedName;
     }
     
-    public String getDescription(int id) {
-        return DeathType.values()[id].getName() + ": " + deaths[id];
+    public String getDescription(DeathType type) {
+        return type.getName() + ": " + deaths.get(type);
     }
     
-    public void increaseDeath(int id) {
-        deaths[id]++;
-        totalDeaths = -1;
-        DeathStatsManager.getInstance().resync();
+    public void increaseDeath(DeathType type) {
+        increaseDeath(type, 1, true);
     }
     
-    public void increaseDeath(int id, int count, boolean resync) {
-        deaths[id] += count;
+    public void increaseDeath(DeathType type, int count, boolean resync) {
+        deaths.merge(type, count, Integer::sum);
         totalDeaths = -1;
         if (resync) DeathStatsManager.getInstance().resync();
     }
@@ -76,54 +77,37 @@ public class DeathStat {
     public int getTotalDeaths() {
         if (totalDeaths == -1) {
             totalDeaths = 0;
-            for (int death : deaths)
+            for (int death : deaths.values())
                 totalDeaths += death;
         }
         
         return totalDeaths;
     }
     
-    public int getDeaths(int id) {
-        return deaths[id];
-    }
-    
-    static class DeathComparator implements Comparator<DeathStat> {
-        private int id;
-        
-        DeathComparator(int id) {
-            this.id = id;
-        }
-        
-        @Override
-        public int compare(DeathStat o1, DeathStat o2) {
-            if (id == -1) {
-                return Integer.compare(o2.getTotalDeaths(), o1.getTotalDeaths());
-            } else {
-                return Integer.compare(o2.getDeaths(id), o1.getDeaths(id));
-            }
-        }
+    public int getDeaths(DeathType type) {
+        return deaths.get(type);
     }
     
     public static class DeathStatBest extends DeathStat {
         
         private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
-        private String[] messages = new String[DeathType.values().length];
+        private final Map<DeathType, String> messages = new EnumMap<>(DeathType.class);
         
         public DeathStatBest(DeathStat[] clientDeathList) {
             super(null);
-            for (int i = 0; i < messages.length; i++) {
-                Arrays.sort(clientDeathList, deathTypeComparator[i]);
+            for (DeathType type : DeathType.values()) {
+                Arrays.sort(clientDeathList, deathTypeComparator.get(type));
                 if (clientDeathList.length < 1) {
-                    deaths[i] = 0;
-                    messages[i] = GuiColor.RED + I18n.get("hqm.deathStat.noOneDied");
+                    deaths.put(type, 0);
+                    messages.put(type, GuiColor.RED + I18n.get("hqm.deathStat.noOneDied"));
                 } else {
-                    deaths[i] = clientDeathList[0].getDeaths(i);
-                    messages[i] = "";
+                    deaths.put(type, clientDeathList[0].getDeaths(type));
+                    StringBuilder builder = new StringBuilder();
                     int currentValue = 0;
                     int standing = 0;
                     for (int j = 0; j < clientDeathList.length; j++) {
-                        int value = clientDeathList[j].getDeaths(i);
+                        int value = clientDeathList[j].getDeaths(type);
                         if (value < currentValue) {
                             standing = j;
                             if (value == 0 || standing >= 3) {
@@ -132,12 +116,12 @@ public class DeathStat {
                         }
                         currentValue = value;
                         if (j != 0) {
-                            messages[i] += "\n";
+                            builder.append("\n");
                         }
-                        messages[i] += colourPrefixes[standing] + I18n.get("hqm.deathStat." + placePrefixes[standing]);
-                        messages[i] += GuiColor.WHITE + " " + clientDeathList[j].getName() + ": " + clientDeathList[j].getDeaths(i);
+                        builder.append(colourPrefixes[standing]).append(I18n.get("hqm.deathStat." + placePrefixes[standing]));
+                        builder.append(GuiColor.WHITE + " ").append(clientDeathList[j].getName()).append(": ").append(clientDeathList[j].getDeaths(type));
                     }
-                    
+                    messages.put(type, builder.toString());
                 }
             }
         }
@@ -148,34 +132,36 @@ public class DeathStat {
         }
         
         @Override
-        public String getDescription(int id) {
-            return DeathType.values()[id].getName() + "\n\n" + messages[id];
+        public String getDescription(DeathType type) {
+            return type.getName() + "\n\n" + messages.get(type);
         }
     }
     
     public static class DeathStatTotal extends DeathStat {
         
-        public int[] count = new int[DeathType.values().length];
+        public Map<DeathType, Integer> counts = new EnumMap<>(DeathType.class);
         
         public DeathStatTotal(DeathStat[] clientDeathList) {
             super(null);
-            for (int i = 0; i < count.length; i++) {
+            for (DeathType type : DeathType.values()) {
+                int counter = 0;
                 for (DeathStat deathStat : clientDeathList) {
-                    deaths[i] += deathStat.getDeaths(i);
-                    if (deathStat.getDeaths(i) > 0) {
-                        count[i]++;
+                    deaths.merge(type, deathStat.getDeaths(type), Integer::sum);
+                    if (deathStat.getDeaths(type) > 0) {
+                        counter++;
                     }
                 }
-                
+                counts.put(type, counter);
             }
         }
         
         @Override
-        public String getDescription(int id) {
-            return super.getDescription(id) + "\n\n" +
-                   (count[id] == 0 ?
+        public String getDescription(DeathType type) {
+            int count = counts.get(type);
+            return super.getDescription(type) + "\n\n" +
+                   (count == 0 ?
                            GuiColor.RED + I18n.get("hqm.deathStat.noOneDied") :
-                           GuiColor.GREEN.toString() + count[id] + " " + I18n.get("hqm.deathStat.player" + (count[id] == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
+                           GuiColor.GREEN.toString() + count + " " + I18n.get("hqm.deathStat.player" + (count == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
         }
         
         @Override

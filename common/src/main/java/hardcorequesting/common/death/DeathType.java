@@ -119,7 +119,7 @@ public enum DeathType {
     }
     
     public void onDeath(Player player) {
-        DeathStatsManager.getInstance().getDeathStat(player).increaseDeath(ordinal());
+        DeathStatsManager.getInstance().getDeathStat(player).increaseDeath(this);
     }
     
     //is only accurate if called in the values() order

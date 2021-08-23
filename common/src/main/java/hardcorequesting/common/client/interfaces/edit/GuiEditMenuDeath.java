@@ -105,11 +105,12 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             gui.drawString(matrices, Translator.plain(stats.getName()), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
             
-            for (int i = 0; i < DeathType.values().length; i++) {
+            for (DeathType type : DeathType.values()) {
+                int i = type.ordinal();
                 int x = i % 3;
                 int y = i / 3;
                 
-                FormattedText text = Translator.plain(stats.getDeaths(i) + "");
+                FormattedText text = Translator.plain(stats.getDeaths(type) + "");
                 String str = Translator.rawString(text);
                 if (str.length() > 5)
                     text = Translator.translatable("hqm.deathMenu.lots");
@@ -130,13 +131,14 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
         DeathStat stats = getDeathStat();
         if (stats != null) {
-            for (int i = 0; i < DeathType.values().length; i++) {
+            for (DeathType type : DeathType.values()) {
+                int i = type.ordinal();
                 int x = i % 3;
                 int y = i / 3;
                 
                 
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
-                    gui.renderTooltip(matrices, Translator.plain(stats.getDescription(i)), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltip(matrices, Translator.plain(stats.getDescription(type)), mX + gui.getLeft(), mY + gui.getTop());
                     break;
                 }
             }
