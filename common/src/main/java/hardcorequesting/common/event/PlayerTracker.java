@@ -29,8 +29,7 @@ public class PlayerTracker {
     }
     
     public void onPlayerLogin(ServerPlayer player) {
-        if (!HardcoreQuestingCore.platform.isClient())
-            QuestLine.sendDataToClient(player);
+        QuestLine.sendDataToClient(player);
         
         QuestingDataManager questingData = QuestingDataManager.getInstance();
         if (!questingData.hasData(player)) {
