@@ -135,6 +135,8 @@ public interface AbstractPlatform {
     
     Block getBlock(ResourceLocation location);
     
+    SoundEvent getSoundEvent(ResourceLocation location);
+    
     Item getItem(ResourceLocation location);
     
     BlockEntityType<?> getBlockEntity(ResourceLocation location);

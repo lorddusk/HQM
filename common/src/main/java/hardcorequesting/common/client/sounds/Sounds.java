@@ -19,8 +19,8 @@ public enum Sounds {
     DEATH("ban"),
     ROTTEN("rotten");
     
-    private static Map<Sounds, Supplier<SoundEvent>> sounds = new HashMap<>();
-    private String sound;
+    private static final Map<Sounds, Supplier<SoundEvent>> sounds = new HashMap<>();
+    private final String sound;
     
     static Set<Tuple<Supplier<SoundEvent>, ResourceLocation>> registeredSounds = Sets.newHashSet();
     
@@ -37,9 +37,8 @@ public enum Sounds {
     }
     
     private static Supplier<SoundEvent> registerSound(ResourceLocation identifier) {
-        Supplier<SoundEvent> event = () -> new SoundEvent(identifier);
-        registeredSounds.add(new Tuple<>(event, identifier));
-        return event;
+        registeredSounds.add(new Tuple<>(() -> new SoundEvent(identifier), identifier));
+        return () -> HardcoreQuestingCore.platform.getSoundEvent(identifier);
     }
     
     public String getSoundName() {
