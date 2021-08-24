@@ -11,6 +11,8 @@ import hardcorequesting.common.quests.task.client.CompleteQuestTaskGraphic;
 import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +33,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     protected TaskGraphic createGraphic() {
         return new CompleteQuestTaskGraphic(this, parts);

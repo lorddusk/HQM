@@ -58,7 +58,7 @@ public abstract class ListTaskGraphic<Part> implements TaskGraphic {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             int id = getClickedPart(gui, mX, mY);
             if (id >= 0)
-                handlePartClick(gui, player, gui.getCurrentMode(), parts.get(id), id);
+                handlePartClick(gui, player, gui.getCurrentMode(), parts.getShownElements().get(id), id);
         }
     }
     
