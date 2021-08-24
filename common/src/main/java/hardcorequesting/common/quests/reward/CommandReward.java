@@ -3,6 +3,7 @@ package hardcorequesting.common.quests.reward;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public class CommandReward extends QuestReward<CommandReward.Command> {
     
+    private static final String NAME = "Mod-HQM";
     private static final int PERMISSION_LEVEL = 2;
     
     public CommandReward(Command command) {
@@ -25,7 +27,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         
         public void execute(Player player) {
             CommandSourceStack sourceStack = new CommandSourceStack(new WrapperCommandSource(player), player.position(), player.getRotationVector(),
-                    player.level instanceof ServerLevel ? (ServerLevel)player.level : null, PERMISSION_LEVEL, player.getName().getString(), player.getDisplayName(), player.level.getServer(), player);
+                    player.level instanceof ServerLevel ? (ServerLevel)player.level : null, PERMISSION_LEVEL, NAME, new TextComponent(NAME), player.level.getServer(), player);
             player.getServer().getCommands().performCommand(sourceStack, commandString);
         }
         
