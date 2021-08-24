@@ -1,9 +1,7 @@
 package hardcorequesting.forge.tileentity;
 
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskItems;
-import hardcorequesting.common.quests.task.QuestTaskItemsConsume;
+import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.forge.ForgeFluidStack;
 import net.minecraft.core.Direction;
@@ -22,7 +20,7 @@ import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
-    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
+    private final LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
         @Override
         public int getTanks() {
             return 1;
@@ -41,21 +39,12 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         
         @Override
         public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-            QuestTask task = getCurrentTask();
-            if (task instanceof QuestTaskItemsConsume) {
+            QuestTask<?> task = getCurrentTask();
+            if (task instanceof ConsumeItemTask) {
+                ConsumeItemTask consumeTask = (ConsumeItemTask) task;
+                
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
-                QuestDataTaskItems data = (QuestDataTaskItems) task.getData(playerUUID);
-                QuestTaskItems.ItemRequirement[] items = ((QuestTaskItemsConsume) task).getItems();
-                for (int i = 0; i < items.length; i++) {
-                    QuestTaskItems.ItemRequirement item = items[i];
-                    if (item.fluid == null || item.required == data.progress[i]) {
-                        continue;
-                    }
-                    
-                    if (stack.getFluid() == item.fluid.getFluid()) {
-                        return true;
-                    }
-                }
+                return consumeTask.canTakeFluid(stack.getFluid(), playerUUID);
             }
             
             return false;
@@ -63,11 +52,12 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            QuestTask task = getCurrentTask();
-            if (task instanceof QuestTaskItemsConsume) {
+            QuestTask<?> task = getCurrentTask();
+            if (task instanceof ConsumeItemTask) {
+    
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
                 FluidStack duplicate = resource.copy();
-                if (((QuestTaskItemsConsume) task).increaseFluid(new ForgeFluidStack(duplicate), (QuestDataTaskItems) task.getData(playerUUID), playerUUID, action.execute()) && action.execute()) {
+                if (((ConsumeItemTask) task).increaseFluid(new ForgeFluidStack(duplicate), playerUUID, action.execute()) && action.execute()) {
                     BarrelBlockEntity.this.updateState();
                     BarrelBlockEntity.this.doSync();
                 }

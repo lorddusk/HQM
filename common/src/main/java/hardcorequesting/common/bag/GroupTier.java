@@ -3,9 +3,10 @@ package hardcorequesting.common.bag;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ScrollBar;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.quests.QuestLine;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,14 +40,14 @@ public class GroupTier {
                     case TIER:
                         if (gui.modifyingGroup != null) {
                             gui.modifyingGroup.setTier(groupTier);
-                            SaveHelper.add(SaveHelper.EditType.GROUP_CHANGE);
+                            SaveHelper.add(EditType.GROUP_CHANGE);
                         }
                         break;
                     case NORMAL:
                         gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer(), groupTier));
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), groupTier));
+                        TextMenu.display(gui, gui.getPlayer(), groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {
@@ -56,7 +57,7 @@ public class GroupTier {
                                 }
                             }
                             tiers.remove(i);
-                            SaveHelper.add(SaveHelper.EditType.TIER_REMOVE);
+                            SaveHelper.add(EditType.TIER_REMOVE);
                         }
                         break;
                     default:
@@ -82,7 +83,7 @@ public class GroupTier {
         return name == null || name.equals("") ? I18n.get("hqm.bag.unknown") : name;
     }
     
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
     

@@ -9,10 +9,11 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskReputation;
+import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
@@ -344,7 +345,7 @@ public class QuestAdapter {
             if (name != null && description != null && set == null) {
                 set = new QuestSet(name, description);
                 Quest.getQuestSets().add(set);
-                SaveHelper.add(SaveHelper.EditType.SET_CREATE);
+                SaveHelper.add(EditType.SET_CREATE);
             }
             if (set != null) {
                 for (Quest quest : quests) {
@@ -392,15 +393,15 @@ public class QuestAdapter {
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();
-        for (Map.Entry<QuestTaskReputation, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
-            List<QuestTaskReputation.ReputationSetting> reputationSettingList = new ArrayList<>();
+        for (Map.Entry<ReputationTask<?>, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
+            List<ReputationTask.Part> partList = entry.getKey().getSettings();
+            partList.clear();
             for (QuestTaskAdapter.ReputationSettingConstructor constructor : entry.getValue()) {
-                QuestTaskReputation.ReputationSetting setting = constructor.constructReputationSetting();
+                ReputationTask.Part setting = constructor.constructReputationSetting();
                 if (setting != null) {
-                    reputationSettingList.add(setting);
+                    partList.add(setting);
                 }
             }
-            entry.getKey().settings = reputationSettingList.toArray(new QuestTaskReputation.ReputationSetting[0]);
         }
         QuestTaskAdapter.taskReputationListMap.clear();
         nameToQuestMap.clear();

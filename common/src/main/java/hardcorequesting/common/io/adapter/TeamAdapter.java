@@ -3,7 +3,7 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import hardcorequesting.common.quests.QuestData;
+import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.*;

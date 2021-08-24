@@ -1,20 +1,23 @@
 package hardcorequesting.common.quests.task;
 
-
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.network.NetworkManager;
-import hardcorequesting.common.quests.*;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestingData;
+import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.RepeatType;
+import hardcorequesting.common.quests.data.QuestData;
+import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.RewardSetting;
+import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -31,23 +34,25 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.*;
 
-public abstract class QuestTask {
+public abstract class QuestTask<Data extends TaskData> {
+    private static final Logger LOGGER = LogManager.getLogger();
     
-    static final int START_X = 180;
-    static final int START_Y = 95;
+    private final Class<Data> dataType;
     public String description;
     protected Quest parent;
-    private List<QuestTask> requirements;
+    private final List<QuestTask<?>> requirements;
     private String longDescription;
     private int id;
     private List<FormattedText> cachedDescription;
     
-    public QuestTask(Quest parent, String description, String longDescription) {
+    public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
+        this.dataType = dataType;
         this.parent = parent;
         this.requirements = new ArrayList<>();
         this.description = description;
@@ -57,7 +62,7 @@ public abstract class QuestTask {
     
     public static void completeQuest(Quest quest, UUID uuid) {
         if (!quest.isEnabled(uuid) || !quest.isAvailable(uuid)) return;
-        for (QuestTask questTask : quest.getTasks()) {
+        for (QuestTask<?> questTask : quest.getTasks()) {
             if (!questTask.getData(uuid).completed) {
                 return;
             }
@@ -74,9 +79,7 @@ public abstract class QuestTask {
             int rewardId = (int) (Math.random() * data.reward.length);
             data.reward[rewardId] = true;
         } else {
-            for (int i = 0; i < data.reward.length; i++) {
-                data.reward[i] = true;
-            }
+            Arrays.fill(data.reward, true);
         }
         quest.sendUpdatedDataToTeam(uuid);
         TeamLiteStat.refreshTeam(QuestingDataManager.getInstance().getQuestingData(uuid).getTeam());
@@ -126,8 +129,8 @@ public abstract class QuestTask {
     }
     
     public boolean isVisible(Player player) {
-        Iterator<QuestTask> itr = this.requirements.iterator();
-        QuestTask requirement;
+        Iterator<QuestTask<?>> itr = this.requirements.iterator();
+        QuestTask<?> requirement;
         do {
             if (!itr.hasNext()) return true;
             requirement = itr.next();
@@ -135,52 +138,48 @@ public abstract class QuestTask {
         return false;
     }
     
-    public Class<? extends QuestDataTask> getDataType() {
-        return QuestDataTask.class;
-    }
-    
-    public void write(QuestDataTask task, JsonObject out) {
+    public void write(TaskData task, JsonObject out) {
         task.write(new Adapter.JsonObjectBuilder(out));
     }
     
-    public void read(QuestDataTask task, JsonReader in) throws IOException {
+    public void read(TaskData task, JsonReader in) throws IOException {
         task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
-    public QuestDataTask getData(Player player) {
+    protected Data getData(Player player) {
         return getData(player.getUUID());
     }
     
-    public QuestDataTask getData(UUID uuid) {
+    protected Data getData(UUID uuid) {
+        return getData(parent.getQuestData(uuid));
+    }
+    
+    protected Data getData(Team team) {
+        return getData(team.getQuestData(parent.getQuestId()));
+    }
+    
+    private Data getData(QuestData questData) {
         if (this.id < 0) {
             return newQuestData(); // possible fix for #247
         }
-        QuestData questData = QuestingDataManager.getInstance().getQuestingData(uuid).getQuestData(parent.getQuestId());
+        
         if (id >= questData.tasks.length) {
             questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
             questData.tasks[id] = newQuestData();
         }
-        return questData.tasks[id] = validateData(questData.tasks[id]);
-    }
-    
-    public QuestDataTask validateData(QuestDataTask data) {
-        if (data == null || data.getClass() != getDataType()) {
-            return newQuestData();
-        }
         
-        return data;
+        TaskData data = questData.tasks[id];
+        if (dataType.isInstance(data)) {
+            return dataType.cast(data);
+        } else {
+            LOGGER.warn("Found task data of wrong type. Expected {}, was {}. Replacing with empty data of the correct type.", dataType, data == null ? null : data.getClass());
+            Data newData = newQuestData();
+            questData.tasks[id] = newData;
+            return newData;
+        }
     }
     
-    private QuestDataTask newQuestData() {
-        try {
-            Constructor<? extends QuestDataTask> constructor = getDataType().getConstructor(QuestTask.class);
-            Object obj = constructor.newInstance(this);
-            return (QuestDataTask) obj;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
+    public abstract Data newQuestData();
     
     public String getLangKeyDescription() {
         return description;
@@ -222,10 +221,17 @@ public abstract class QuestTask {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY);
+    private TaskGraphic graphic;
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b);
+    protected abstract TaskGraphic createGraphic();
+    
+    @Environment(EnvType.CLIENT)
+    public final TaskGraphic getGraphic() {
+        if (graphic == null)
+            graphic = Objects.requireNonNull(createGraphic());
+        return graphic;
+    }
     
     public abstract void onUpdate(Player player);
     
@@ -241,11 +247,11 @@ public abstract class QuestTask {
         return parent;
     }
     
-    public List<QuestTask> getRequirements() {
+    public List<QuestTask<?>> getRequirements() {
         return requirements;
     }
     
-    public void addRequirement(QuestTask task) {
+    public void addRequirement(QuestTask<?> task) {
         requirements.add(task);
     }
     
@@ -253,20 +259,28 @@ public abstract class QuestTask {
         requirements.clear();
     }
     
-    public abstract float getCompletedRatio(UUID uuid);
+    public abstract float getCompletedRatio(Team team);
     
-    public abstract void mergeProgress(UUID playerId, QuestDataTask own, QuestDataTask other);
-    
-    public void autoComplete(UUID playerId) {
-        autoComplete(playerId, true);
+    public void mergeProgress(UUID playerId, QuestData own, QuestData other) {
+        mergeProgress(playerId, getData(own), getData(other));
     }
     
-    public void uncomplete(UUID playerId) {
+    public abstract void mergeProgress(UUID playerId, Data own, Data other);
+    
+    public void resetData(UUID playerId) {
+        QuestData questData = parent.getQuestData(playerId);
+        if (id < questData.tasks.length) {
+            questData.tasks[id] = newQuestData();
+        }
     }
     
-    public abstract void autoComplete(UUID playerId, boolean status);
+    protected abstract void setComplete(Data data);
     
-    public void copyProgress(QuestDataTask own, QuestDataTask other) {
+    public void copyProgress(QuestData own, QuestData other) {
+        copyProgress(getData(own), getData(other));
+    }
+    
+    public void copyProgress(Data own, Data other) {
         own.completed = other.completed;
     }
     

@@ -9,6 +9,7 @@ import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.LivesUpdate;
+import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.team.*;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.Util;

@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.ComponentCollector;
@@ -16,7 +17,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
 
-public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
+public class GuiEditMenuCommandEditor extends TextMenu {
     
     private Quest quest;
     private int id;
@@ -25,7 +26,7 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
     private String added;
     
     public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
-        super(gui, player, "", false);
+        super(gui, player, "", false, -1, null);
         this.quest = GuiQuestBook.selectedQuest;
         this.commands = this.quest.getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];
@@ -68,17 +69,17 @@ public class GuiEditMenuCommandEditor extends GuiEditMenuTextEditor {
         
         if (this.added != null && !this.added.isEmpty()) {
             quest.addCommand(this.added);
-            SaveHelper.add(SaveHelper.EditType.COMMAND_ADD);
+            SaveHelper.add(EditType.COMMAND_ADD);
         }
         if (this.commands != null) {
             for (int i = this.commands.length - 1; i >= 0; i--) {
                 if (edited[i]) {
                     if (commands[i].isEmpty()) {
                         quest.removeCommand(i);
-                        SaveHelper.add(SaveHelper.EditType.COMMAND_REMOVE);
+                        SaveHelper.add(EditType.COMMAND_REMOVE);
                     } else {
                         quest.editCommand(i, this.commands[i]);
-                        SaveHelper.add(SaveHelper.EditType.COMMAND_CHANGE);
+                        SaveHelper.add(EditType.COMMAND_CHANGE);
                     }
                 }
             }

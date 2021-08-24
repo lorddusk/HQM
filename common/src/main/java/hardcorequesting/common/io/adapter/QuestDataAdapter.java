@@ -3,8 +3,8 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import hardcorequesting.common.quests.QuestData;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.QuestData;
+import hardcorequesting.common.quests.data.TaskData;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ public class QuestDataAdapter {
             out.name(TIME).value(value.time);
             out.name(TASKS_SIZE).value(value.tasks.length);
             out.name(TASKS).beginArray();
-            for (QuestDataTask task : value.tasks)
+            for (TaskData task : value.tasks)
                 if (task != null)
                     QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
             out.endArray();
@@ -71,7 +71,7 @@ public class QuestDataAdapter {
                         data.time = in.nextLong();
                         break;
                     case TASKS_SIZE:
-                        data.tasks = new QuestDataTask[in.nextInt()];
+                        data.tasks = new TaskData[in.nextInt()];
                         break;
                     case TASKS:
                         in.beginArray();

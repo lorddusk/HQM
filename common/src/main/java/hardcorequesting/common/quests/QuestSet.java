@@ -9,15 +9,20 @@ import hardcorequesting.common.client.interfaces.edit.*;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.reputation.ReputationBar;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -221,13 +226,18 @@ public class QuestSet {
                             Quest.getQuestSets().get(j).decreaseId();
                         }
                         Quest.getQuestSets().remove(questSet);
-                        SaveHelper.add(SaveHelper.EditType.SET_REMOVE);
+                        SaveHelper.add(EditType.SET_REMOVE);
                         break;
                     case SWAP_SELECT:
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), questSet, true));
+                        TextMenu.display(gui, gui.getPlayer(), questSet.getName(), true,
+                                result -> {
+                                    if (!questSet.setName(result)) {
+                                        gui.getPlayer().sendMessage(new TranslatableComponent("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)), Util.NIL_UUID);
+                                    }
+                                });
                         break;
                     default:
                         int thisClicked = gui.getPlayer().tickCount - lastClicked;
@@ -254,7 +264,7 @@ public class QuestSet {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
-                gui.setEditMenu(new GuiEditMenuTextEditor(gui, gui.getPlayer(), GuiQuestBook.selectedSet, false));
+                TextMenu.display(gui, gui.getPlayer(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
             }
         }
     }
@@ -756,7 +766,7 @@ public class QuestSet {
                         newQuest.setGuiCenterX(x);
                         newQuest.setGuiCenterY(y);
                         newQuest.setQuestSet(this);
-                        SaveHelper.add(SaveHelper.EditType.QUEST_CREATE);
+                        SaveHelper.add(EditType.QUEST_CREATE);
                     }
                     break;
                 case REP_BAR_CREATE:
@@ -774,7 +784,7 @@ public class QuestSet {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
                                 gui.modifyingQuest = quest;
-                                SaveHelper.add(SaveHelper.EditType.QUEST_MOVE);
+                                SaveHelper.add(EditType.QUEST_MOVE);
                                 break;
                             case REQUIREMENT:
                                 if (gui.modifyingQuest == quest) {
@@ -793,7 +803,7 @@ public class QuestSet {
                                 quest.setBigIcon(!quest.useBigIcon());
                                 quest.setGuiCenterX(cX);
                                 quest.setGuiCenterY(cY);
-                                SaveHelper.add(SaveHelper.EditType.QUEST_SIZE_CHANGE);
+                                SaveHelper.add(EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
                                 PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
@@ -803,17 +813,17 @@ public class QuestSet {
                                             } catch (Exception e) {
                                                 System.out.println("Tell LordDusk that he found the issue.");
                                             }
-                                            SaveHelper.add(SaveHelper.EditType.ICON_CHANGE);
+                                            SaveHelper.add(EditType.ICON_CHANGE);
                                         });
                                 break;
                             case DELETE:
                                 Quest.removeQuest(quest);
-                                SaveHelper.add(SaveHelper.EditType.QUEST_REMOVE);
+                                SaveHelper.add(EditType.QUEST_REMOVE);
                                 break;
                             case SWAP:
                                 if (gui.modifyingQuestSet != null && gui.modifyingQuestSet != this) {
                                     quest.setQuestSet(gui.modifyingQuestSet);
-                                    SaveHelper.add(SaveHelper.EditType.QUEST_CHANGE_SET);
+                                    SaveHelper.add(EditType.QUEST_CHANGE_SET);
                                 }
                                 break;
                             case REPEATABLE:

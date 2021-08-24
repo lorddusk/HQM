@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Player;
@@ -56,6 +57,6 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         quest.setParentRequirementCount(showModifiedParentRequirement ? parentRequirementCount : -1);
-        SaveHelper.add(SaveHelper.EditType.PARENT_REQUIREMENT_CHANGED);
+        SaveHelper.add(EditType.PARENT_REQUIREMENT_CHANGED);
     }
 }

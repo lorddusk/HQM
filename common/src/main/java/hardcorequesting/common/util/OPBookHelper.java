@@ -10,9 +10,8 @@ import hardcorequesting.common.network.message.OpActionMessage;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.QuestDataTaskItems;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskItems;
+import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
@@ -70,8 +69,7 @@ public final class OPBookHelper {
                 
                 if (task != null) {
                     if (task.isCompleted(subject)) {
-                        task.getData(subject).completed = false;
-                        task.uncomplete(subject.getUUID());
+                        task.resetData(subject.getUUID());
                         QuestingDataManager.getInstance().getQuestingData(subject).getTeam().resetCompletion(quest); // automatically reset progress
                     } else {
                         task.completeTask(subject.getUUID());
@@ -86,21 +84,9 @@ public final class OPBookHelper {
                 fromJson(data);
                 if (quest == null || task == null) return;
                 
-                if (task instanceof QuestTaskItems) {
-                    QuestTaskItems itemTask = (QuestTaskItems) task;
-                    QuestTaskItems.ItemRequirement[] requirements = itemTask.getItems();
-                    if (requirement >= 0 && requirement < requirements.length) {
-                        QuestDataTaskItems qData = (QuestDataTaskItems) task.getData(subject.getUUID());
-                        if (qData.progress[requirement] == requirements[requirement].required) {
-                            qData.progress[requirement] = 0;
-                            itemTask.getData(subject.getUUID()).completed = false;
-                            QuestingDataManager.getInstance().getQuestingData(subject).getTeam().refreshData();
-                        } else {
-                            qData.progress[requirement] = requirements[requirement].required;
-                            itemTask.doCompletionCheck(qData, subject.getUUID());
-                        }
-                        quest.sendUpdatedDataToTeam(subject);
-                    }
+                if (task instanceof ItemRequirementTask) {
+                    ItemRequirementTask itemTask = (ItemRequirementTask) task;
+                    itemTask.switchPartStatus(requirement, subject.getUUID());
                 }
             }
         };

@@ -24,6 +24,7 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -294,7 +295,7 @@ public class GuiQuestBook extends GuiBase {
                     if (set.getName().startsWith("Unnamed set")) i++;
                 }
                 Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
-                SaveHelper.add(SaveHelper.EditType.SET_CREATE);
+                SaveHelper.add(EditType.SET_CREATE);
             }
         });
         
@@ -312,7 +313,7 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, Player player) {
                 Group.add(new Group(null));
-                SaveHelper.add(SaveHelper.EditType.GROUP_CREATE);
+                SaveHelper.add(EditType.GROUP_CREATE);
             }
         });
         
@@ -330,7 +331,7 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, Player player) {
                 GroupTierManager.getInstance().getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
-                SaveHelper.add(SaveHelper.EditType.TIER_CREATE);
+                SaveHelper.add(EditType.TIER_CREATE);
             }
         });
         
@@ -365,7 +366,7 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, Player player) {
                 ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
-                SaveHelper.add(SaveHelper.EditType.REPUTATION_ADD);
+                SaveHelper.add(EditType.REPUTATION_ADD);
             }
         });
         
@@ -383,7 +384,7 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui, Player player) {
                 selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
-                SaveHelper.add(SaveHelper.EditType.REPUTATION_MARKER_CREATE);
+                SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
             }
         });
     }
@@ -941,7 +942,7 @@ public class GuiQuestBook extends GuiBase {
             }
         } else {
             if (Quest.canQuestsBeEdited() && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                editMenu = new GuiEditMenuTextEditor(this, player);
+                TextMenu.display(this, player, Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
             }
         }
     }

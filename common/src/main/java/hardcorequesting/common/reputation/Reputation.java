@@ -6,12 +6,13 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTextEditor;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.QuestTaskReputation;
+import hardcorequesting.common.quests.task.reputation.ReputationTask;
+import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -156,23 +157,18 @@ public class Reputation {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, reputation));
+                        TextMenu.display(gui, player, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
                         }
 
                         for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask task : quest.getTasks()) {
-                                if (task instanceof QuestTaskReputation) {
-                                    QuestTaskReputation reputationTask = (QuestTaskReputation) task;
-                                    QuestTaskReputation.ReputationSetting[] settings = reputationTask.getSettings();
-                                    for (int j = settings.length - 1; j >= 0; j--) {
-                                        QuestTaskReputation.ReputationSetting setting = settings[j];
-                                        if (reputation.equals(setting.getReputation())) {
-                                            reputationTask.removeSetting(j);
-                                        }
-                                    }
+                            for (QuestTask<?> task : quest.getTasks()) {
+                                if (task instanceof ReputationTask) {
+                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
+                                    List<ReputationTask.Part> settings = reputationTask.getSettings();
+                                    settings.removeIf(setting -> reputation.equals(setting.getReputation()));
                                 }
                             }
                             
@@ -184,7 +180,7 @@ public class Reputation {
                         }
                         
                         reputationMap.remove(reputation.getId());
-                        SaveHelper.add(SaveHelper.EditType.REPUTATION_REMOVE);
+                        SaveHelper.add(EditType.REPUTATION_REMOVE);
                     }
                     return;
                 }
@@ -196,7 +192,7 @@ public class Reputation {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.neutral));
+                    TextMenu.display(gui, player, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
                 }
                 return;
             }
@@ -210,15 +206,16 @@ public class Reputation {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedReputation.markers.get(i)));
+                        ReputationMarker marker = selectedReputation.markers.get(i);
+                        TextMenu.display(gui, player, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask task : quest.getTasks()) {
-                                if (task instanceof QuestTaskReputation) {
-                                    QuestTaskReputation reputationTask = (QuestTaskReputation) task;
-                                    for (QuestTaskReputation.ReputationSetting setting : reputationTask.getSettings()) {
+                            for (QuestTask<?> task : quest.getTasks()) {
+                                if (task instanceof ReputationTask<?>) {
+                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
+                                    for (ReputationTask.Part setting : reputationTask.getSettings()) {
                                         if (selectedReputation.markers.get(i).equals(setting.getLower())) {
                                             setting.setLower(null);
                                         }
@@ -232,7 +229,7 @@ public class Reputation {
                         
                         selectedReputation.markers.remove(i);
                         selectedReputation.sort();
-                        SaveHelper.add(SaveHelper.EditType.REPUTATION_MARKER_REMOVE);
+                        SaveHelper.add(EditType.REPUTATION_MARKER_REMOVE);
                     }
                     
                     return;

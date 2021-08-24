@@ -6,7 +6,7 @@ import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestData;
+import hardcorequesting.common.quests.data.QuestData;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.io.IOException;

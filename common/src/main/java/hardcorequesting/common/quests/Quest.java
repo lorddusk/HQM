@@ -7,7 +7,10 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.client.interfaces.edit.*;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
+import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
+import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
@@ -16,19 +19,21 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
-import hardcorequesting.common.quests.data.QuestDataTask;
+import hardcorequesting.common.quests.data.QuestData;
+import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.reward.CommandRewardList;
 import hardcorequesting.common.quests.reward.ItemStackRewardList;
 import hardcorequesting.common.quests.reward.ReputationReward;
-import hardcorequesting.common.quests.task.*;
+import hardcorequesting.common.quests.task.DeathTask;
+import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
+import hardcorequesting.common.quests.task.item.ConsumeItemTask;
+import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
-import hardcorequesting.common.util.HQMUtil;
-import hardcorequesting.common.util.OPBookHelper;
-import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -46,7 +51,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import java.awt.*;
-import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -95,10 +99,10 @@ public class Quest {
     private List<UUID> reversedRequirement;
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
-    private List<QuestTask> tasks;
+    private List<QuestTask<?>> tasks;
     private List<FormattedText> cachedDescription;
     private List<ReputationReward> reputationRewards;
-    private QuestTask selectedTask;
+    private QuestTask<?> selectedTask;
     private ItemStackRewardList rewards;
     private ItemStackRewardList rewardChoices;
     private CommandRewardList commandRewardList;
@@ -194,13 +198,14 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskDeath && Quest.canQuestsBeEdited();
+                return selectedTask != null && selectedTask instanceof DeathTask && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuDeathTask(gui, player, (QuestTaskDeath) selectedTask));
+                DeathTask task = (DeathTask) selectedTask;
+                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
         
@@ -214,13 +219,14 @@ public class Quest {
             @Override
             @Environment(EnvType.CLIENT)
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof QuestTaskReputationKill && Quest.canQuestsBeEdited();
+                return selectedTask != null && selectedTask instanceof KillReputationTask && Quest.canQuestsBeEdited();
             }
             
             @Override
             @Environment(EnvType.CLIENT)
             public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuReputationKillTask(gui, player, (QuestTaskReputationKill) selectedTask));
+                KillReputationTask task = (KillReputationTask) selectedTask;
+                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
         
@@ -237,7 +243,7 @@ public class Quest {
             
             @Override
             public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask instanceof QuestTaskItemsConsume && !selectedTask.isCompleted(player);
+                return selectedTask instanceof ConsumeItemTask && !selectedTask.isCompleted(player);
             }
             
             @Environment(EnvType.CLIENT)
@@ -273,63 +279,6 @@ public class Quest {
                     taskType.addTask(Quest.this);
                 }
             });
-            
-            if (QuestTaskItems.class.isAssignableFrom(taskType.clazz)) {
-                buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (itemIds % 2) * 65, 50 + (itemIds / 2) * 35) {
-                    @Override
-                    public boolean isEnabled(GuiBase gui, Player player) {
-                        return selectedTask instanceof QuestTaskItems;
-                    }
-                    
-                    @Override
-                    public boolean isVisible(GuiBase gui, Player player) {
-                        return false; // canQuestsBeEdited() && selectedTask != null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.CHANGE_TASK;
-                    }
-                    
-                    @Override
-                    public void onClick(GuiBase gui, Player player) {
-                        TaskType oldTaskType = TaskType.getType(selectedTask.getClass());
-                        if (oldTaskType == null) return;
-                        
-                        nextTaskId--;
-                        Class<? extends QuestTask> clazz = taskType.clazz;
-                        try {
-                            Constructor<? extends QuestTask> constructor = clazz.getConstructor(Quest.class, String.class, String.class);
-                            QuestTask task = constructor.newInstance(Quest.this, taskType.getLangKeyName(), taskType.getLangKeyDescription());
-                            
-                            selectedTask.getRequirements().forEach(task::addRequirement);
-                            for (QuestTask questTask : tasks) {
-                                List<QuestTask> requirements = questTask.getRequirements();
-                                for (int j = 0; j < requirements.size(); j++) {
-                                    if (requirements.get(j).equals(selectedTask)) {
-                                        requirements.set(j, task);
-                                    }
-                                }
-                            }
-                            for (int j = 0; j < tasks.size(); j++) {
-                                if (tasks.get(j).equals(selectedTask)) {
-                                    tasks.set(j, task);
-                                    break;
-                                }
-                            }
-                            
-                            if (!selectedTask.getLangKeyDescription().equals(oldTaskType.getLangKeyName())) {
-                                task.setDescription(selectedTask.getLangKeyDescription());
-                            }
-                            if (!selectedTask.getLangKeyLongDescription().equals(oldTaskType.getLangKeyDescription())) {
-                                task.setLongDescription(selectedTask.getLangKeyLongDescription());
-                            }
-                            ((QuestTaskItems) task).setItems(((QuestTaskItems) selectedTask).getItems());
-                            task.setId(selectedTask.getId());
-                            selectedTask = task;
-                            SaveHelper.add(SaveHelper.EditType.TASK_CHANGE_TYPE);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-                itemIds++;
-            }
         }
     }
     
@@ -526,7 +475,7 @@ public class Quest {
         if (quest != null) {
             requirement.add(quest.getQuestId());
             quest.reversedRequirement.add(this.getQuestId());
-            SaveHelper.add(SaveHelper.EditType.REQUIREMENT_CHANGE);
+            SaveHelper.add(EditType.REQUIREMENT_CHANGE);
         }
     }
     
@@ -539,7 +488,7 @@ public class Quest {
     }
     
     public void clearRequirements() {
-        SaveHelper.add(SaveHelper.EditType.REQUIREMENT_REMOVE, requirement.size());
+        SaveHelper.add(EditType.REQUIREMENT_REMOVE, requirement.size());
         for (UUID questId : requirement)
             QuestSetsManager.getInstance().quests.get(questId).reversedRequirement.remove(getQuestId());
         requirement.clear();
@@ -561,14 +510,14 @@ public class Quest {
         
         Quest quest = QuestSetsManager.getInstance().quests.get(optionLinkId);
         if (quest != null) {
-            SaveHelper.add(SaveHelper.EditType.OPTION_CHANGE);
+            SaveHelper.add(EditType.OPTION_CHANGE);
             optionLinks.add(quest.getQuestId());
             quest.reversedOptionLinks.add(getQuestId());
         }
     }
     
     public void clearOptionLinks() {
-        SaveHelper.add(SaveHelper.EditType.OPTION_REMOVE, optionLinks.size());
+        SaveHelper.add(EditType.OPTION_REMOVE, optionLinks.size());
         for (UUID questId : reversedOptionLinks) {
             QuestSetsManager.getInstance().quests.get(questId).optionLinks.remove(getQuestId());
         }
@@ -889,7 +838,7 @@ public class Quest {
         int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, tasks.size());
         for (int i = start; i < end; i++) {
-            QuestTask task = tasks.get(i);
+            QuestTask<?> task = tasks.get(i);
             boolean isVisible = task.isVisible(player);
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(player);
@@ -977,7 +926,7 @@ public class Quest {
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
-            selectedTask.draw(matrices, gui, player, mX, mY);
+            selectedTask.getGraphic().draw(matrices, gui, player, mX, mY);
             //}
         } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
@@ -1126,7 +1075,7 @@ public class Quest {
                             } else {
                                 this.rewards.set(rawRewards);
                             }
-                            SaveHelper.add(SaveHelper.EditType.REWARD_REMOVE);
+                            SaveHelper.add(EditType.REWARD_REMOVE);
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
@@ -1166,7 +1115,8 @@ public class Quest {
                         }
                         if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
-                                gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, task, true));
+                                TextMenu.display(gui, player, task.getDescription(), true,
+                                        task::setDescription);
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
                                 if (i + 1 < tasks.size()) {
                                     tasks.get(i + 1).clearRequirements();
@@ -1188,7 +1138,7 @@ public class Quest {
                                 }
                                 
                                 addTaskData(getQuestData(player));
-                                SaveHelper.add(SaveHelper.EditType.TASK_REMOVE);
+                                SaveHelper.add(EditType.TASK_REMOVE);
                             }
                         } else if (task == selectedTask) {
                             selectedTask = null;
@@ -1217,7 +1167,7 @@ public class Quest {
             }
             
             if (selectedTask != null) {
-                selectedTask.onClick(gui, player, mX, mY, b);
+                selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
             }
             
             
@@ -1230,11 +1180,12 @@ public class Quest {
             
             if (gui.getCurrentMode() == EditMode.RENAME) {
                 if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, true));
+                    TextMenu.display(gui, player, getName(), true, this::setName);
                 } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, this, false));
+                    TextMenu.display(gui, player, getDescription(), false, this::setDescription);
                 } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuTextEditor(gui, player, selectedTask, false));
+                    TextMenu.display(gui, player, selectedTask.getDescription(), false,
+                            selectedTask::setDescription);
                 }
             }
             
@@ -1274,16 +1225,9 @@ public class Quest {
     }
     
     public boolean addTaskData(QuestData data) {
-        data.tasks = new QuestDataTask[tasks.size()];
+        data.tasks = new TaskData[tasks.size()];
         for (int i = 0; i < tasks.size(); i++) {
-            try {
-                Constructor<? extends QuestDataTask> constructor = tasks.get(i).getDataType().getConstructor(QuestTask.class);
-                QuestDataTask obj = constructor.newInstance(tasks.get(i));
-                data.tasks[i] = obj;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                return false;
-            }
+            data.tasks[i] = tasks.get(i).newQuestData();
         }
         
         return true;
@@ -1293,7 +1237,7 @@ public class Quest {
         data.reward = new boolean[players];
     }
     
-    public List<QuestTask> getTasks() {
+    public List<QuestTask<?>> getTasks() {
         return tasks;
     }
     
@@ -1446,9 +1390,9 @@ public class Quest {
         
         if (id < rewardList.size()) {
             rewardList.set(id, stack);
-            SaveHelper.add(SaveHelper.EditType.REWARD_CHANGE);
+            SaveHelper.add(EditType.REWARD_CHANGE);
         } else {
-            SaveHelper.add(SaveHelper.EditType.REWARD_CREATE);
+            SaveHelper.add(EditType.REWARD_CREATE);
             rewardList.add(stack);
         }
     }
@@ -1504,9 +1448,8 @@ public class Quest {
         
         
         for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask task = tasks.get(i);
-            own.tasks[i] = task.validateData(own.tasks[i]);
-            task.mergeProgress(playerId, own.tasks[i], task.validateData(other.tasks[i]));
+            QuestTask<?> task = tasks.get(i);
+            task.mergeProgress(playerId, own, other);
         }
     }
     
@@ -1515,16 +1458,14 @@ public class Quest {
         own.available = other.available;
         
         for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask task = tasks.get(i);
-            own.tasks[i] = task.validateData(own.tasks[i]);
-            task.copyProgress(own.tasks[i], task.validateData(other.tasks[i]));
+            QuestTask<?> task = tasks.get(i);
+            task.copyProgress(own, other);
         }
     }
     
     public void completeQuest(Player player) {
-        for (QuestTask task : tasks) {
-            task.autoComplete(player.getUUID());
-            task.getData(player).completed = true;
+        for (QuestTask<?> task : tasks) {
+            task.completeTask(player.getUUID());
         }
         QuestTask.completeQuest(this, player.getUUID());
     }
@@ -1559,10 +1500,9 @@ public class Quest {
     }
     
     public float getProgress(Team team) {
-        UUID uuid = team.getPlayers().get(0).getUUID();
         float data = 0;
-        for (QuestTask task : this.tasks) {
-            data += task.getCompletedRatio(uuid);
+        for (QuestTask<?> task : this.tasks) {
+            data += task.getCompletedRatio(team);
         }
         
         return data / this.tasks.size();
@@ -1619,71 +1559,6 @@ public class Quest {
         isEditing = enabled;
     }
     
-    public enum TaskType {
-        CONSUME(QuestTaskItemsConsume.class, "consume"),
-        CRAFT(QuestTaskItemsCrafting.class, "craft"),
-        LOCATION(QuestTaskLocation.class, "location"),
-        CONSUME_QDS(QuestTaskItemsConsumeQDS.class, "consumeQDS"),
-        DETECT(QuestTaskItemsDetect.class, "detect"),
-        KILL(QuestTaskMob.class, "kill"),
-        TAME(QuestTaskTame.class, "tame"),
-        DEATH(QuestTaskDeath.class, "death"),
-        REPUTATION(QuestTaskReputationTarget.class, "reputation"),
-        REPUTATION_KILL(QuestTaskReputationKill.class, "reputationKill"),
-        ADVANCEMENT(QuestTaskAdvancement.class, "advancement"),
-        COMPLETION(QuestTaskCompleted.class, "completion"),
-        BLOCK_BREAK(QuestTaskBlockBreak.class, "break"),
-        BLOCK_PLACE(QuestTaskBlockPlace.class, "place");
-        
-        private final Class<? extends QuestTask> clazz;
-        private final String id;
-        
-        TaskType(Class<? extends QuestTask> clazz, String id) {
-            this.clazz = clazz;
-            this.id = id;
-        }
-        
-        public static TaskType getType(Class<? extends QuestTask> clazz) {
-            for (TaskType type : values()) {
-                if (type.clazz == clazz) return type;
-            }
-            return CONSUME;
-        }
-        
-        public QuestTask addTask(Quest quest) {
-            QuestTask prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
-            try {
-                Constructor<? extends QuestTask> ex = clazz.getConstructor(Quest.class, String.class, String.class);
-                QuestTask task = ex.newInstance(quest, getName(), getDescription());
-                if (prev != null) {
-                    task.addRequirement(prev);
-                }
-                quest.getTasks().add(task);
-                SaveHelper.add(SaveHelper.EditType.TASK_CREATE);
-                return task;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-        
-        public String getLangKeyDescription() {
-            return "hqm.taskType." + id + ".desc";
-        }
-        
-        public String getLangKeyName() {
-            return "hqm.taskType." + id + ".title";
-        }
-        
-        public String getDescription() {
-            return Translator.get(getLangKeyDescription());
-        }
-        
-        public String getName() {
-            return Translator.get(getLangKeyName());
-        }
-    }
-    
     private abstract class ParentEvaluator {
         
         protected abstract boolean isValid(UUID uuid, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache);
@@ -1709,5 +1584,4 @@ public class Quest {
         }
         
     }
-    
 }
