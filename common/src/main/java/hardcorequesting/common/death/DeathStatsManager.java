@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.*;
 
 public class DeathStatsManager extends SimpleSerializable {
-    private static final DeathStat.DeathComparator DEATH_COMPARATOR = new DeathStat.DeathComparator(-1);
+    private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths);
     private final Map<UUID, DeathStat> deathMap = new HashMap<>();
     private DeathStat[] clientDeathList;
     private DeathStat clientBest;
@@ -79,18 +79,19 @@ public class DeathStatsManager extends SimpleSerializable {
         buf.writeInt(deathMap.size());
         for (Map.Entry<UUID, DeathStat> entry : deathMap.entrySet()) {
             buf.writeUUID(entry.getKey());
-            int[] deaths = entry.getValue().deaths;
+            Map<DeathType, Integer> deaths = entry.getValue().deaths;
             int count = 0;
-            for (int death : deaths) {
+            for (int death : deaths.values()) {
                 if (death != 0) {
                     count++;
                 }
             }
             buf.writeByte(count);
-            for (int i = 0; i < deaths.length; i++) {
-                if (deaths[i] != 0) {
-                    buf.writeByte(i);
-                    buf.writeShort((short) deaths[i]);
+            for (DeathType type : DeathType.values()) {
+                int deathCount = deaths.get(type);
+                if (deathCount != 0) {
+                    buf.writeByte(type.ordinal());
+                    buf.writeShort((short) deathCount);
                 }
             }
         }
@@ -104,7 +105,8 @@ public class DeathStatsManager extends SimpleSerializable {
             DeathStat stat = new DeathStat(uuid);
             int count = buf.readByte();
             for (int j = 0; j < count; j++) {
-                stat.increaseDeath(buf.readByte(), buf.readShort(), false);
+                DeathType type = DeathType.getClamped(buf.readByte());
+                stat.increaseDeath(type, buf.readShort(), false);
             }
             deathMap.put(uuid, stat);
         }

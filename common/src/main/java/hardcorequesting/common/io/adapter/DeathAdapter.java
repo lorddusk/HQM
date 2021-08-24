@@ -22,7 +22,7 @@ public class DeathAdapter {
         @Override
         public JsonElement serialize(DeathStat src) {
             return object()
-                    .add(src.getUuid().toString(), array().use(builder -> Arrays.stream(DeathType.values()).forEach(deathType -> builder.add(src.getDeaths(deathType.ordinal())))).build())
+                    .add(src.getUuid().toString(), array().use(builder -> Arrays.stream(DeathType.values()).forEach(deathType -> builder.add(src.getDeaths(deathType)))).build())
                     .add(NAME, src.getCachedName())
                     .build();
         }
@@ -62,8 +62,12 @@ public class DeathAdapter {
                 
                 int i = 0;
                 for (JsonElement element : array) {
+                    if (i >= DeathType.values().length) {
+                        HardcoreQuestingCore.LOGGER.error("JsonArray for 'Death Stat' with uuid '" + deathStat.getUuid() + "' exceeded its expected size!");
+                        break;
+                    }
                     if (GsonHelper.isNumberValue(element)) {
-                        deathStat.increaseDeath(i++, element.getAsInt(), false);
+                        deathStat.increaseDeath(DeathType.values()[i++], element.getAsInt(), false);
                     } else {
                         HardcoreQuestingCore.LOGGER.error("JsonArray for 'Death Stat' with uuid '" + deathStat.getUuid() + "' does contain a invalid non-integer type!");
                     }
