@@ -480,10 +480,16 @@ public class Quest {
     }
     
     private boolean lookForId(UUID questId, boolean reversed) {
-        List<UUID> currentRequirements = reversed ? reversedRequirement : requirement;
-        for (UUID id : currentRequirements)
-            if (id.equals(questId) || QuestSetsManager.getInstance().quests.get(id).lookForId(questId, reversed))
-                return true;
+        return lookForId(questId, new HashSet<>(), reversed);
+    }
+    
+    private boolean lookForId(UUID questId, Set<UUID> visited, boolean reversed) {
+        if (visited.add(this.getQuestId())) {
+            List<UUID> currentRequirements = reversed ? reversedRequirement : requirement;
+            for (UUID id : currentRequirements)
+                if (id.equals(questId) || QuestSetsManager.getInstance().quests.get(id).lookForId(questId, visited, reversed))
+                    return true;
+        }
         return false;
     }
     
