@@ -467,7 +467,6 @@ public class QuestSet {
         for (Quest quest : getQuests().values()) {
             if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
                 
-                RenderSystem.pushMatrix();
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 
@@ -489,7 +488,6 @@ public class QuestSet {
                 }
                 
                 gui.drawItemStack(quest.getIconStack(), iconX, iconY, true);
-                RenderSystem.popMatrix();
                 //ResourceHelper.bindResource(QUEST_ICONS);
                 //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
             }

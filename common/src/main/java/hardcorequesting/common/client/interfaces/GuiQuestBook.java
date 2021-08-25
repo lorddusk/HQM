@@ -780,7 +780,7 @@ public class GuiQuestBook extends GuiBase {
                 drawString(matrices, Translator.translatable("hqm.questBook.deadOut", GuiColor.RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
             
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             int lives = manager.getQuestingData(player).getLives();
             int count, spacing, heartX;
             if (lives < 8) {

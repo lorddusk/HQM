@@ -1,8 +1,8 @@
 package hardcorequesting.common.client.interfaces;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
@@ -16,7 +16,7 @@ public abstract class ResourceHelper {
     }
     
     public static void bindResource(ResourceLocation resource) {
-        Minecraft.getInstance().getTextureManager().bind(resource);
+        RenderSystem.setShaderTexture(0, resource);
     }
     
 }

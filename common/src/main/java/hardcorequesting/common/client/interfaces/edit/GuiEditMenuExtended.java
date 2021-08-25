@@ -45,7 +45,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         if (isArrowVisible()) {
             drawArrow(gui, mX, mY, true);
             drawArrow(gui, mX, mY, false);

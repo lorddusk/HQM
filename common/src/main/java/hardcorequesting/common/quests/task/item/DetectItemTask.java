@@ -73,8 +73,8 @@ public class DetectItemTask extends ItemRequirementTask {
     
     private void countItems(Player player, ItemStack stack) {
         if (!player.getCommandSenderWorld().isClientSide) {
-            NonNullList<ItemStack> items = NonNullList.withSize(player.inventory.items.size() + 1, ItemStack.EMPTY);
-            Collections.copy(items, player.inventory.items);
+            NonNullList<ItemStack> items = NonNullList.withSize(player.getInventory().items.size() + 1, ItemStack.EMPTY);
+            Collections.copy(items, player.getInventory().items);
             if (!stack.isEmpty()) {
                 items.set(items.size() - 1, stack);
             }

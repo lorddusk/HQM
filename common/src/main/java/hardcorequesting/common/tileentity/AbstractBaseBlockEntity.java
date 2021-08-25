@@ -1,5 +1,6 @@
 package hardcorequesting.common.tileentity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -8,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractBaseBlockEntity extends BlockEntity {
     
-    public AbstractBaseBlockEntity(BlockEntityType<?> type) {
-        super(type);
+    public AbstractBaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
     
     @Override
-    public final void load(BlockState state, CompoundTag compound) {
-        super.load(state, compound);
+    public final void load(CompoundTag compound) {
+        super.load(compound);
         this.readTile(compound, NBTType.SAVE);
     }
     

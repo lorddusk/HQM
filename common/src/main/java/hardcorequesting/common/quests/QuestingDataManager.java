@@ -187,7 +187,7 @@ public class QuestingDataManager {
             hqmTag.putBoolean(PlayerTracker.RECEIVED_BOOK, true);
             extraTag.put(PlayerTracker.HQ_TAG, hqmTag);
             ItemStack stack = new ItemStack(ModItems.book.get());
-            if (!player.inventory.add(stack)) {
+            if (!player.getInventory().add(stack)) {
                 spawnItemAtPlayer(player, stack);
             }
         }

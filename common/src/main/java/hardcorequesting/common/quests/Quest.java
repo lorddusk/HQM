@@ -353,17 +353,17 @@ public class Quest {
     }
     
     public static void addItems(Player player, List<ItemStack> itemsToAdd) {
-        for (int i = 0; i < player.inventory.items.size(); i++) {
+        for (int i = 0; i < player.getInventory().items.size(); i++) {
             Iterator<ItemStack> iterator = itemsToAdd.iterator();
             while (iterator.hasNext()) {
                 ItemStack nextStack = iterator.next();
-                ItemStack stack = player.inventory.items.get(i);
+                ItemStack stack = player.getInventory().items.get(i);
                 
                 if (stack.isEmpty()) {
                     int amount = Math.min(nextStack.getMaxStackSize(), nextStack.getCount());
                     ItemStack copyStack = nextStack.copy();
                     copyStack.setCount(amount);
-                    player.inventory.items.set(i, copyStack);
+                    player.getInventory().items.set(i, copyStack);
                     nextStack.shrink(amount);
                     if (nextStack.getCount() <= 0) {
                         iterator.remove();
@@ -875,7 +875,7 @@ public class Quest {
         for (LargeButton button : buttons) {
             button.draw(matrices, gui, player, mX, mY);
         }
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);
@@ -1313,10 +1313,10 @@ public class Quest {
                 for (ItemStack stack : itemsToAdd) {
                     itemsToCheck.add(stack.copy());
                 }
-                for (int i = 0; i < player.inventory.items.size(); i++) {
+                for (int i = 0; i < player.getInventory().items.size(); i++) {
                     for (ItemStack stack1 : itemsToCheck) {
                         if (stack1.getCount() > 0) {
-                            ItemStack stack = player.inventory.items.get(i);
+                            ItemStack stack = player.getInventory().items.get(i);
                             if (stack == ItemStack.EMPTY) {
                                 stack1.shrink(stack1.getMaxStackSize());
                                 break;
@@ -1340,7 +1340,7 @@ public class Quest {
                 
                 if (valid) {
                     addItems(player, itemsToAdd);
-                    player.inventory.setChanged();
+                    player.getInventory().setChanged();
                     QuestData data = getQuestData(player);
                     Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {

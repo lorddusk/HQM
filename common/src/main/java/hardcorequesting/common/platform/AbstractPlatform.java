@@ -29,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -38,6 +39,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -147,5 +149,5 @@ public interface AbstractPlatform {
     
     void registerItem(ResourceLocation location, Supplier<Item> item);
     
-    void registerBlockEntity(ResourceLocation location, Supplier<BlockEntityType<?>> type);
+    void registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor);
 }

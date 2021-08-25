@@ -3,13 +3,16 @@ package hardcorequesting.common.util;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.items.ModItems;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -46,8 +49,8 @@ public class RegisterHelper {
         ModItems.init();
     }
     
-    public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, Supplier<T> blockEntitySupplier) {
-        HardcoreQuestingCore.platform.registerBlockEntity(new ResourceLocation(HardcoreQuestingCore.ID, id), () -> BlockEntityType.Builder.of(blockEntitySupplier).build(null));
+    public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, BiFunction<BlockPos, BlockState, T> blockEntitySupplier) {
+        HardcoreQuestingCore.platform.registerBlockEntity(new ResourceLocation(HardcoreQuestingCore.ID, id), blockEntitySupplier);
         return (Supplier) delegateBlockEntity(id);
     }
 }

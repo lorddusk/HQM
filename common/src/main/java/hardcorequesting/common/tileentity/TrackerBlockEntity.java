@@ -17,12 +17,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.UUID;
 
-public class TrackerBlockEntity extends BlockEntity implements TickableBlockEntity {
+public class TrackerBlockEntity extends BlockEntity {
     
     private static final String NBT_QUEST = "Quest";
     private static final String NBT_RADIUS = "Radius";
@@ -33,8 +32,8 @@ public class TrackerBlockEntity extends BlockEntity implements TickableBlockEnti
     private TrackerType type = TrackerType.TEAM;
     private int delay = 0;
     
-    public TrackerBlockEntity() {
-        super(ModBlocks.typeTracker.get());
+    public TrackerBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlocks.typeTracker.get(), pos, state);
     }
     
     private static TrackerBlockEntity getTracker(Level world, BlockPos pos) {
@@ -65,8 +64,8 @@ public class TrackerBlockEntity extends BlockEntity implements TickableBlockEnti
     }
     
     @Override
-    public void load(BlockState state, CompoundTag compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         
         // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
         if (compound.contains(NBT_QUEST)) {
@@ -98,11 +97,10 @@ public class TrackerBlockEntity extends BlockEntity implements TickableBlockEnti
         return compound;
     }
     
-    @Override
-    public void tick() {
-        if (quest == null && questId != null) {
-            quest = Quest.getQuest(questId);
-            questId = null;
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TrackerBlockEntity blockEntity) {
+        if (blockEntity.quest == null && blockEntity.questId != null) {
+            blockEntity.quest = Quest.getQuest(blockEntity.questId);
+            blockEntity.questId = null;
         }
 
 //        if (!world.isClient && delay++ == 20) {

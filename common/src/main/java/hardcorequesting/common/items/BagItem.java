@@ -49,7 +49,7 @@ public class BagItem extends Item {
                         int weight = group.getTier().getWeights()[tierOrdinal];
                         if (rng < weight) {
                             group.open(player);
-                            player.inventory.setChanged();
+                            player.getInventory().setChanged();
                             openClientInterface(player, group.getId(), tierOrdinal);
                             world.playSound(null, player.blockPosition(), Sounds.BAG.getSound(), SoundSource.MASTER, 1, 1);
                             break;

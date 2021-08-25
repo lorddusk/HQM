@@ -42,8 +42,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraftforge.api.distmarker.Dist;
@@ -80,6 +82,7 @@ import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -431,7 +434,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public void registerBlockEntity(ResourceLocation resourceLocation, Supplier<BlockEntityType<?>> supplier) {
-        tileEntityType.register(resourceLocation.getPath(), supplier);
+    public void registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
+        tileEntityType.register(resourceLocation.getPath(), () -> BlockEntityType.Builder.of(constructor::apply).build(null));
     }
 }
