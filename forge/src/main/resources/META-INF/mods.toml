@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[33,)"
+loaderVersion = "[37,)"
 logoFile = "icon.png"
 authors = ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp", "ArclightTW", "shedaniel"]
 license = "GNU-3.0"
@@ -10,3 +10,17 @@ displayName = "Hardcore Questing Mode"
 description = '''
 This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.
 '''
+
+[[dependencies.hardcorequesting]]
+modId = "forge"
+mandatory = true
+versionRange = "[37,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hardcorequesting]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.17.1,)"
+ordering = "NONE"
+side = "BOTH"

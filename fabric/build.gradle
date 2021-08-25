@@ -32,7 +32,7 @@ dependencies {
     modApi("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    modRuntime("me.shedaniel:RoughlyEnoughItems:${project.roughlyenoughitems}") {
+    modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     depend("org.jetbrains:annotations:19.0.0")
