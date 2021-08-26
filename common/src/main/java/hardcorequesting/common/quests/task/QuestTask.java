@@ -209,7 +209,7 @@ public abstract class QuestTask<Data extends TaskData> {
     @Environment(EnvType.CLIENT)
     public List<FormattedText> getCachedLongDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.translatable(longDescription), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(Translator.plain(longDescription), 0.7F, 130);
         }
         
         return cachedDescription;
