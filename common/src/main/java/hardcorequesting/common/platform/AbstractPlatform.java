@@ -113,7 +113,7 @@ public interface AbstractPlatform {
     
     BlockBehaviour.Properties createDeliveryBlockProperties();
     
-    AbstractBarrelBlockEntity createBarrelBlockEntity();
+    AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
     
     void setCraftingRemainingItem(Item item, Item craftingRemainingItem);
     

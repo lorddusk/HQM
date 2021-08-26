@@ -229,8 +229,8 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
-    public AbstractBarrelBlockEntity createBarrelBlockEntity() {
-        return new BarrelBlockEntity();
+    public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
+        return new BarrelBlockEntity(pos, state);
     }
     
     @Override

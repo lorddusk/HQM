@@ -4,10 +4,12 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.forge.ForgeFluidStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -80,6 +82,10 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
             return FluidStack.EMPTY;
         }
     });
+    
+    public BarrelBlockEntity(BlockPos pos, BlockState state) {
+        super(pos, state);
+    }
     
     @Override
     public void syncToClientsNearby() {

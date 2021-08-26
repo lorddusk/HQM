@@ -3,6 +3,7 @@ package hardcorequesting.forge;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.math.Matrix4f;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -53,7 +54,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -73,7 +73,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -92,7 +92,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
-    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, HardcoreQuestingCore.ID);
+    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
         NetworkingManager.init();
@@ -117,7 +117,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                     ItemEntity entityItem = iter.next();
                     ItemStack stack = entityItem.getItem();
                     if (!stack.isEmpty() && stack.getItem().equals(ModItems.book.get())) {
-                        player.inventory.add(stack);
+                        player.getInventory().add(stack);
                         iter.remove();
                     }
                 }
@@ -131,15 +131,15 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 return;
             }
             
-            if (event.getOriginal().inventory.contains(new ItemStack(ModItems.book.get()))) {
+            if (event.getOriginal().getInventory().contains(new ItemStack(ModItems.book.get()))) {
                 ItemStack bookStack = new ItemStack(ModItems.book.get());
-                for (ItemStack stack : event.getOriginal().inventory.armor) {
+                for (ItemStack stack : event.getOriginal().getInventory().armor) {
                     if (bookStack.sameItem(stack)) {
                         bookStack = stack.copy();
                         break;
                     }
                 }
-                event.getPlayer().inventory.add(bookStack);
+                event.getPlayer().getInventory().add(bookStack);
             }
         });
     }
@@ -322,12 +322,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public BlockBehaviour.Properties createDeliveryBlockProperties() {
-        return BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.WOOD).requiresCorrectToolForDrops().strength(1.0F).harvestTool(ToolType.AXE).harvestLevel(0);
+        return BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.WOOD).requiresCorrectToolForDrops().strength(1.0F);
     }
     
     @Override
-    public AbstractBarrelBlockEntity createBarrelBlockEntity() {
-        return new BarrelBlockEntity();
+    public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
+        return new BarrelBlockEntity(pos, state);
     }
     
     @Override
@@ -357,19 +357,27 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 .orElse(net.minecraftforge.fluids.FluidStack.EMPTY));
     }
     
+    // Private class extending RenderType as a simple workaround to access protected fields.
     @OnlyIn(Dist.CLIENT)
-    public static RenderType createFluid(ResourceLocation location) {
-        return RenderType.create(
-                HardcoreQuestingCore.ID + ":fluid_type",
-                DefaultVertexFormat.POSITION_TEX_COLOR, 7, 256, true, false,
-                RenderType.CompositeState.builder()
-                        .setShadeModelState(RenderStateShard.SMOOTH_SHADE)
-                        .setLightmapState(RenderStateShard.LIGHTMAP)
-                        .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
-                        .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                        .createCompositeState(false));
-    }
+    private static class CustomRenderTypes extends RenderType {
+        private CustomRenderTypes(String string, VertexFormat arg, VertexFormat.Mode arg2, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {
+            super(string, arg, arg2, i, bl, bl2, runnable, runnable2);
+            throw new IllegalStateException("This class is not meant to be constructed!");
+        }
+        
+        private static RenderType createFluid(ResourceLocation location) {
+            return RenderType.create(
+                    HardcoreQuestingCore.ID + ":fluid_type",
+                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 256, true, false,
+                    RenderType.CompositeState.builder()
+                            .setShaderState(RenderStateShard.RENDERTYPE_TRANSLUCENT_SHADER)
+                            .setLightmapState(RenderStateShard.LIGHTMAP)
+                            .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
+                            .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
+                            .createCompositeState(false));
+        }
     
+    }
     @OnlyIn(Dist.CLIENT)
     @Override
     public void renderFluidStack(FluidStack fluidStack, PoseStack matrices, int x1, int y1, int x2, int y2) {
@@ -384,7 +392,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         int g = (color >> 8 & 255);
         int b = (color & 255);
         MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-        VertexConsumer builder = blockMaterial.buffer(source, HardcoreQuestingForge::createFluid);
+        VertexConsumer builder = blockMaterial.buffer(source, HardcoreQuestingForge.CustomRenderTypes::createFluid);
         Matrix4f matrix = matrices.last().pose();
         builder.vertex(matrix, x2, y1, 0).uv(sprite.getU1(), sprite.getV0()).color(r, g, b, a).endVertex();
         builder.vertex(matrix, x1, y1, 0).uv(sprite.getU0(), sprite.getV0()).color(r, g, b, a).endVertex();
@@ -415,7 +423,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public BlockEntityType<?> getBlockEntity(ResourceLocation resourceLocation) {
-        return ForgeRegistries.TILE_ENTITIES.getValue(resourceLocation);
+        return ForgeRegistries.BLOCK_ENTITIES.getValue(resourceLocation);
     }
     
     @Override

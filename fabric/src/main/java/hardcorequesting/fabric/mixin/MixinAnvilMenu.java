@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.function.BiConsumer;
 
@@ -23,7 +23,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     }
     
     @Inject(method = "onTake", at = @At(value = "HEAD"))
-    private void postCraft(Player player, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
+    private void postCraft(Player player, ItemStack itemStack, CallbackInfo ci) {
         for (BiConsumer<Player, ItemStack> consumer : HardcoreQuestingFabric.CRAFTING) {
             consumer.accept(player, itemStack);
         }

@@ -35,7 +35,7 @@ public class DeliveryBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return HardcoreQuestingCore.platform.createBarrelBlockEntity();
+        return HardcoreQuestingCore.platform.createBarrelBlockEntity(pos, state);
     }
     
     @Override
