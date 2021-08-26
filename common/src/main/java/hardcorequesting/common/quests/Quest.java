@@ -1190,8 +1190,8 @@ public class Quest {
                 } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
                     TextMenu.display(gui, player, getDescription(), false, this::setDescription);
                 } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, player, selectedTask.getDescription(), false,
-                            selectedTask::setDescription);
+                    TextMenu.display(gui, player, selectedTask.getLongDescription(), false,
+                            selectedTask::setLongDescription);
                 }
             }
             
