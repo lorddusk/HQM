@@ -86,7 +86,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void onInitialize() {
         HardcoreQuestingCore.initialize(this);
-        ModCapabilities.init();
     }
     
     @Override
