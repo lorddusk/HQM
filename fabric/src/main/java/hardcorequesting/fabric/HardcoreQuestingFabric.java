@@ -251,7 +251,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public FluidStack findFluidIn(ItemStack stack) {
         FluidKey fluid = FluidItemUtil.getContainedFluid(stack);
-        return new FabricFluidStack(fluid.withAmount(FluidAmount.ONE));
+        return new FabricFluidStack(fluid.withAmount(fluid.entry.isEmpty() ? FluidAmount.ZERO : FluidAmount.ONE));
     }
     
     @Override
