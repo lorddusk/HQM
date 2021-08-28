@@ -48,7 +48,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
@@ -333,11 +332,6 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public void setCraftingRemainingItem(Item item, Item item1) {
         item.craftingRemainingItem = item1;
-    }
-    
-    @Override
-    public LevelStorageSource.LevelStorageAccess getStorageSourceOfServer(MinecraftServer minecraftServer) {
-        return minecraftServer.storageSource;
     }
     
     @Override

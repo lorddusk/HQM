@@ -61,7 +61,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
@@ -235,11 +234,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void setCraftingRemainingItem(Item item, Item craftingRemainingItem) {
         item.craftingRemainingItem = craftingRemainingItem;
-    }
-    
-    @Override
-    public LevelStorageSource.LevelStorageAccess getStorageSourceOfServer(MinecraftServer server) {
-        return server.storageSource;
     }
     
     @Override

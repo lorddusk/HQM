@@ -34,7 +34,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
@@ -116,8 +115,6 @@ public interface AbstractPlatform {
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
     
     void setCraftingRemainingItem(Item item, Item craftingRemainingItem);
-    
-    LevelStorageSource.LevelStorageAccess getStorageSourceOfServer(MinecraftServer server);
     
     FluidStack createEmptyFluidStack();
     
