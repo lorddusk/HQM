@@ -44,7 +44,6 @@ processResources {
 shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.forge"
     relocate "blue.endless.jankson", "hardcorequesting.common.forge.blue.endless.jankson"
-    exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowCommon]
     classifier "dev-shadow"
