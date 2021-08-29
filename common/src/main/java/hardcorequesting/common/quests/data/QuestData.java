@@ -9,7 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class QuestData {
@@ -18,7 +19,7 @@ public class QuestData {
     public boolean[] reward;
     public boolean completed;
     public boolean claimed;
-    private TaskData[] tasks;
+    private final List<TaskData> tasks = new ArrayList<>();
     public boolean available = true;
     public long time;
     
@@ -60,49 +61,50 @@ public class QuestData {
     
     @Deprecated //Refer to Quest instead
     public int getTaskSize() {
-        return tasks.length;
+        return tasks.size();
     }
     
     @Nullable
     public TaskData getTaskData(int id) {
-        if (id >= tasks.length)
+        if (id >= tasks.size())
             return null;
-        else return tasks[id];
+        else return tasks.get(id);
     }
     
     public <Data extends TaskData> Data getTaskData(int id, Class<Data> clazz, Supplier<Data> emptySupplier) {
-        if (id >= tasks.length) {
-            tasks = Arrays.copyOf(tasks, id + 1);
+        if (id >= tasks.size()) {
+            while (id > tasks.size())
+                tasks.add(null);
             Data newData = emptySupplier.get();
-            tasks[id] = newData;
+            tasks.add(newData);
             return newData;
         }
     
-        TaskData data = tasks[id];
+        TaskData data = tasks.get(id);
         if (clazz.isInstance(data)) {
             return clazz.cast(data);
         } else {
             LOGGER.warn("Found task data of wrong type. Expected {}, was {}. Replacing with empty data of the correct type.", clazz, data == null ? null : data.getClass());
             Data newData = emptySupplier.get();
-            tasks[id] = newData;
+            tasks.set(id, newData);
             return newData;
         }
     }
     
-    public void clearTaskDataWithSize(int size) {
-        tasks = new TaskData[size];
+    public void clearTaskData() {
+        tasks.clear();
     }
     
     public void setTaskData(int id, TaskData data) {
-        if (id >= tasks.length) {
-            tasks = Arrays.copyOf(tasks, id + 1);
+        while (id >= tasks.size()) {
+            tasks.add(null);
         }
-        tasks[id] = data;
+        tasks.set(id, data);
     }
     
     public void resetTaskData(int id, Supplier<? extends TaskData> emptySupplier) {
-        if (id < tasks.length) {
-            tasks[id] = emptySupplier.get();
+        if (id < tasks.size()) {
+            tasks.set(id, emptySupplier.get());
         }
     }
 }

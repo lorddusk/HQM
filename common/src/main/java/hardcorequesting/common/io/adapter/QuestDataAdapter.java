@@ -75,7 +75,6 @@ public class QuestDataAdapter {
                         break;
                     case TASKS_SIZE:
                         taskSize = in.nextInt();
-                        data.clearTaskDataWithSize(taskSize);
                         break;
                     case TASKS:
                         in.beginArray();

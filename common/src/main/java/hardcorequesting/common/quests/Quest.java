@@ -1230,7 +1230,7 @@ public class Quest {
     }
     
     public boolean addTaskData(QuestData data) {
-        data.clearTaskDataWithSize(tasks.size());
+        data.clearTaskData();
         for (int i = 0; i < tasks.size(); i++) {
             data.setTaskData(i, tasks.get(i).newQuestData());
         }
