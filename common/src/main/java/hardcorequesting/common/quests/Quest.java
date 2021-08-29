@@ -20,7 +20,6 @@ import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
 import hardcorequesting.common.quests.data.QuestData;
-import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.reward.CommandRewardList;
 import hardcorequesting.common.quests.reward.ItemStackRewardList;
 import hardcorequesting.common.quests.reward.ReputationReward;
@@ -1231,9 +1230,9 @@ public class Quest {
     }
     
     public boolean addTaskData(QuestData data) {
-        data.tasks = new TaskData[tasks.size()];
+        data.clearTaskDataWithSize(tasks.size());
         for (int i = 0; i < tasks.size(); i++) {
-            data.tasks[i] = tasks.get(i).newQuestData();
+            data.setTaskData(i, tasks.get(i).newQuestData());
         }
         
         return true;
@@ -1451,10 +1450,9 @@ public class Quest {
                 own.available = true;
             }
         }
-        
-        
-        for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask<?> task = tasks.get(i);
+    
+    
+        for (QuestTask<?> task : tasks) {
             task.mergeProgress(playerId, own, other);
         }
     }
@@ -1462,9 +1460,8 @@ public class Quest {
     public void copyProgress(QuestData own, QuestData other) {
         own.completed = other.completed;
         own.available = other.available;
-        
-        for (int i = 0; i < own.tasks.length; i++) {
-            QuestTask<?> task = tasks.get(i);
+    
+        for (QuestTask<?> task : tasks) {
             task.copyProgress(own, other);
         }
     }

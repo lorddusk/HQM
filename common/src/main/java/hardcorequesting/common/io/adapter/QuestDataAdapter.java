@@ -32,11 +32,13 @@ public class QuestDataAdapter {
             out.name(CLAIMED).value(value.claimed);
             out.name(AVAILABLE).value(value.available);
             out.name(TIME).value(value.time);
-            out.name(TASKS_SIZE).value(value.tasks.length);
+            out.name(TASKS_SIZE).value(value.getTaskSize());
             out.name(TASKS).beginArray();
-            for (TaskData task : value.tasks)
-                if (task != null)
-                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
+            for (int i = 0; i < value.getTaskSize(); i++) {
+                TaskData data = value.getTaskData(i);
+                if (data != null)
+                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, data);
+            }
             out.endArray();
             out.endObject();
         }
@@ -46,6 +48,7 @@ public class QuestDataAdapter {
             QuestData data = new QuestData(1);
             in.beginObject();
             int i;
+            int taskSize = 0;
             while (in.hasNext()) {
                 switch (in.nextName()) {
                     case PLAYERS:
@@ -71,13 +74,14 @@ public class QuestDataAdapter {
                         data.time = in.nextLong();
                         break;
                     case TASKS_SIZE:
-                        data.tasks = new TaskData[in.nextInt()];
+                        taskSize = in.nextInt();
+                        data.clearTaskDataWithSize(taskSize);
                         break;
                     case TASKS:
                         in.beginArray();
                         i = 0;
-                        while (in.hasNext() && i < data.tasks.length)
-                            data.tasks[i++] = QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in);
+                        while (in.hasNext() && i < taskSize)
+                            data.setTaskData(i++, QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
                         in.endArray();
                         break;
                     default:
