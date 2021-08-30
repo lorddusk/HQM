@@ -124,14 +124,16 @@ public class GuiBase extends Screen {
                 break;
         }
         
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
         bufferBuilder.vertex(x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
-        bufferBuilder.end();
-        BufferUploader.end(bufferBuilder);
+        tesselator.end();
     }
     
     public void renderTooltip(PoseStack matrices, FormattedText stringRenderable, int x, int y) {
@@ -182,30 +184,6 @@ public class GuiBase extends Screen {
     
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
         HardcoreQuestingCore.platform.renderFluidStack(fluid, stack, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
-        /*//IIcon icon = fluid.getIconStack();
-        Item stack = null;
-
-        if (icon == null) {
-            if (FluidRegistry.WATER.equals(fluid)) {
-                icon = Blocks.water.getIconStack(0, 0);
-            } else if (FluidRegistry.LAVA.equals(fluid)) {
-                icon = Blocks.water.getIconStack(0, 0);
-            }
-        }
-
-        if (icon != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-            ResourceHelper.bindResource(MAP_TEXTURE);
-
-            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
-
-            ResourceHelper.bindResource(TERRAIN);
-            setColor(fluid.getColor());
-            drawIcon(icon, x, y);
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        }*/
     }
     
     public void applyColor(int color) {
