@@ -46,7 +46,7 @@ public class ItemHeart extends Item {
                     int lives = questingDataManager.getQuestingData(player).getLives();
                     player.sendMessage(Translator.translatable("hqm.message.haveRemaining", lives), Util.NIL_UUID);
                     SoundHandler.play(Sounds.LIFE, player);
-                    if (!player.abilities.instabuild) {
+                    if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                         
                     }
@@ -63,7 +63,7 @@ public class ItemHeart extends Item {
                     questingDataManager.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
                     
-                    if (!player.abilities.instabuild)
+                    if (!player.getAbilities().instabuild)
                         stack.grow(1);
                 }
                 

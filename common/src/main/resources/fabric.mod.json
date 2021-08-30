@@ -1,7 +1,0 @@
-{
-  "_comment": "This file is here to make fabric load this on Knot classloader.",
-  "schemaVersion": 1,
-  "id": "hardcorequesting-core",
-  "name": "Hardcore Questing Mode Core",
-  "version": "0.0.1"
-}

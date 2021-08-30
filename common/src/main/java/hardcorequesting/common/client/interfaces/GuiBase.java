@@ -124,13 +124,12 @@ public class GuiBase extends Screen {
         }
         
         BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        bufferBuilder.begin(7, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
         bufferBuilder.vertex(x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
         bufferBuilder.end();
-        RenderSystem.enableAlphaTest();
         BufferUploader.end(bufferBuilder);
     }
     
@@ -204,7 +203,7 @@ public class GuiBase extends Screen {
         float g = (float) (color >> 8 & 255) / 255.0F;
         float b = (float) (color & 255) / 255.0F;
         
-        RenderSystem.color4f(r, g, b, a);
+        RenderSystem.setShaderColor(r, g, b, a);
     }
     
     public void drawIcon(ItemStack stack, int x, int y) {
@@ -213,7 +212,7 @@ public class GuiBase extends Screen {
     }
     
     public void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
         ResourceHelper.bindResource(MAP_TEXTURE);
         
@@ -240,23 +239,20 @@ public class GuiBase extends Screen {
         for (int i = 0; i < colorComponents.length; i++) {
             colorComponents[i] = ((color & (255 << (i * 8))) >> (i * 8)) / 255F;
         }
-        RenderSystem.color4f(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
+        RenderSystem.setShaderColor(colorComponents[2], colorComponents[1], colorComponents[0], 1F);
     }
     
     
     public void drawItemStack(@NotNull ItemStack stack, int x, int y, boolean renderEffect) {
         try {
-            RenderSystem.pushMatrix();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.enableDepthTest();
-            RenderSystem.enableRescaleNormal();
             
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
             renderer.renderAndDecorateFakeItem(stack, getLeft() + x, getTop() + y);
             renderer.renderGuiItemDecorations(font, stack, getLeft() + x, getTop() + y);
             
-            RenderSystem.popMatrix();
         } catch (Exception ignored) {
         }
     }
@@ -286,7 +282,6 @@ public class GuiBase extends Screen {
     }
     
     public void drawString(PoseStack matrices, FormattedText str, int x, int y, boolean shadow, float mult, int color) {
-        RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         matrices.pushPose();
@@ -297,7 +292,6 @@ public class GuiBase extends Screen {
         immediate.endBatch();
         
         matrices.popPose();
-        RenderSystem.popMatrix();
     }
     
     public void drawStringWithShadow(PoseStack matrices, FormattedText str, int x, int y, float mult, int color) {

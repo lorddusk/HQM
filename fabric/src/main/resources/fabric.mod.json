@@ -23,6 +23,9 @@
   "entrypoints": {
     "main": [
       "hardcorequesting.fabric.HardcoreQuestingFabric"
+    ],
+    "cardinal-components": [
+      "hardcorequesting.fabric.capabilities.ModCapabilities"
     ]
   },
   "mixins": [
@@ -30,7 +33,14 @@
   ],
   "accessWidener": "hqm.accesswidener",
   "depends": {
-    "fabricloader": ">=0.8.2",
-    "fabric": "*"
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "custom": {
+    "cardinal-components": [
+      "hardcorequesting:player_extra_data"
+    ]
   }
 }

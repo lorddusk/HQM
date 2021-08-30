@@ -26,7 +26,7 @@ public class WorldEventListener {
     }
     
     private static Path getWorldPath(ServerLevel world) {
-        return HardcoreQuestingCore.platform.getStorageSourceOfServer(world.getServer()).getLevelPath(LevelResource.ROOT).toAbsolutePath().normalize();
+        return world.getServer().getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
     }
     
 }

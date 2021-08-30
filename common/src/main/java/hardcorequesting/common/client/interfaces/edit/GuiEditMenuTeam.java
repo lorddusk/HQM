@@ -274,7 +274,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(gui);
         }
@@ -358,7 +358,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             gui.drawRect(INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             gui.drawRect(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             

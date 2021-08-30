@@ -20,14 +20,14 @@ public class OpSubCommand implements CommandHandler.SubCommand {
                         .executes(context -> {
                             Player player = EntityArgument.getPlayer(context, "targets");
                             if (QuestingDataManager.getInstance().hasData(player)) {
-                                player.inventory.add(QuestBookItem.getOPBook(player));
+                                player.getInventory().add(QuestBookItem.getOPBook(player));
                             } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
                     Player player = (Player) context.getSource().getEntity();
                     if (QuestingDataManager.getInstance().hasData(player)) {
-                        player.inventory.add(QuestBookItem.getOPBook(player));
+                        player.getInventory().add(QuestBookItem.getOPBook(player));
                     } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
                     return 1;
                 });

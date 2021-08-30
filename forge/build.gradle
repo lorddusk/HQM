@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 configurations {
@@ -19,7 +19,7 @@ dependencies {
     forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${project.forge_version}"
 
     compileOnly("org.jetbrains:annotations:19.0.0")
-    implementation("blue.endless:jankson:1.2.0")
+    forgeDependencies(implementation("blue.endless:jankson:1.2.0"))
     shadowCommon("blue.endless:jankson:1.2.0")
 
     implementation(project(path: ":common")) {
@@ -44,7 +44,6 @@ processResources {
 shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.forge"
     relocate "blue.endless.jankson", "hardcorequesting.common.forge.blue.endless.jankson"
-    exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowCommon]
     classifier "dev-shadow"

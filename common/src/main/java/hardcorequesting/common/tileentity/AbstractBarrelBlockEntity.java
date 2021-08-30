@@ -7,11 +7,13 @@ import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -25,8 +27,8 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     public int selectedTask;
     private UUID playerId;
     
-    public AbstractBarrelBlockEntity() {
-        super(ModBlocks.typeBarrel.get());
+    public AbstractBarrelBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlocks.typeBarrel.get(), pos, state);
     }
     
     @Override

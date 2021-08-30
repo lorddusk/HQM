@@ -27,15 +27,18 @@ public class MixinLanguage {
     @Inject(method = "loadDefault",
             at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap$Builder;build()Lcom/google/common/collect/ImmutableMap;"),
             locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    private static void loadDefault(CallbackInfoReturnable<Language> cir, ImmutableMap.Builder<String, String> builder, BiConsumer biConsumer) {
-        String s = FabricLoader.getInstance().isDevelopmentEnvironment() ? "hardcorequesting-core" : HardcoreQuestingCore.ID;
-        try {
-            Path path = FabricLoader.getInstance().getModContainer(s).get().getPath("assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json");
-            try (InputStream inputStream = Files.newInputStream(path)) {
-                Language.loadFromJson(inputStream, biConsumer);
+    private static void loadDefault(CallbackInfoReturnable<Language> cir, ImmutableMap.Builder<String, String> builder, BiConsumer<String, String> biConsumer) {
+        String s = HardcoreQuestingCore.ID;
+        FabricLoader.getInstance().getModContainer(s).ifPresent(modContainer -> {
+            try {
+                Path path = modContainer.getPath("assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json");
+                try (InputStream inputStream = Files.newInputStream(path)) {
+                    Language.loadFromJson(inputStream, biConsumer);
+                }
+            } catch (JsonParseException | IOException var15) {
+                LOGGER.error("Couldn't read strings from /assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json", var15);
             }
-        } catch (JsonParseException | IOException var15) {
-            LOGGER.error("Couldn't read strings from /assets/" + HardcoreQuestingCore.ID + "/lang/en_us.json", var15);
-        }
+        });
+        
     }
 }

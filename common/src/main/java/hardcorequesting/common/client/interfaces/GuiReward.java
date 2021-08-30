@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces;
 
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.config.HQMConfig;
@@ -131,7 +130,7 @@ public class GuiReward extends GuiBase {
             } catch (Throwable ignored) {
             }
         }
-        RenderSystem.disableLighting();
+        
         for (Reward reward : rewards) {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {

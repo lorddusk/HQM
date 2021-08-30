@@ -32,11 +32,11 @@ public abstract class MixinServerPlayerEntity extends Player {
     private void copyFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
         if (!HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
         if (!alive && !oldPlayer.isSpectator() && !this.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
-            int invSize = oldPlayer.inventory.getContainerSize();
+            int invSize = oldPlayer.getInventory().getContainerSize();
             for (int i = 0; i < invSize; i++) {
-                ItemStack stack = oldPlayer.inventory.getItem(i);
+                ItemStack stack = oldPlayer.getInventory().getItem(i);
                 if (stack.getItem() instanceof QuestBookItem) {
-                    this.inventory.setItem(i, stack);
+                    this.getInventory().setItem(i, stack);
                 }
             }
         }

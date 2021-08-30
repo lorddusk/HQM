@@ -82,7 +82,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             gui.drawString(matrices, Translator.text(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
         }
         
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         

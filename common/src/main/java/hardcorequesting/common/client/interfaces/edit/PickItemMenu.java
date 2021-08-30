@@ -178,7 +178,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         textBoxes.draw(matrices, gui);
         
         if (usePrecision()) {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
@@ -393,7 +393,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private static List<ItemStack> getPlayerItems(Player player) {
         List<ItemStack> playerItems = new ArrayList<>();
         
-        Inventory inventory = player.inventory;
+        Inventory inventory = player.getInventory();
         int itemLength = inventory.getContainerSize();
         for (int i = 0; i < itemLength; i++) {
             ItemStack invStack = inventory.getItem(i);
@@ -414,7 +414,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         List<FluidStack> playerFluids = new ArrayList<>();
         Set<Fluid> fluids = new HashSet<>();
         
-        Inventory inventory = player.inventory;
+        Inventory inventory = player.getInventory();
         int itemLength = inventory.getContainerSize();
         for (int i = 0; i < itemLength; i++) {
             ItemStack stack = inventory.getItem(i);

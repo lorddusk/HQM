@@ -240,7 +240,7 @@ public class QuestingData {
             }
         }
         
-        player.inventory.clearContent(); //had some problem with tconstruct, clear all items to prevent it
+        player.getInventory().clearContent(); //had some problem with tconstruct, clear all items to prevent it
         
         MinecraftServer mcServer = player.getServer();
         

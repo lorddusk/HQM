@@ -84,7 +84,7 @@ public class TextBoxGroup {
         protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Vec2 mouse = Points.ofMouse();
             gui.drawRect(x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mouse.x - gui.left, mouse.y - gui.top) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
             gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);

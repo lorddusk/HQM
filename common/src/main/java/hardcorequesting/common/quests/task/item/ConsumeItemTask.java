@@ -72,8 +72,8 @@ public class ConsumeItemTask extends ItemRequirementTask {
     
     @Override
     public void onUpdate(Player player) {
-        if (increaseItems(player.inventory.items, player.getUUID())) {
-            player.inventory.setChanged();
+        if (increaseItems(player.getInventory().items, player.getUUID())) {
+            player.getInventory().setChanged();
         }
     }
     
