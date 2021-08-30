@@ -155,7 +155,8 @@ public class GuiBase extends Screen {
         applyColor(color);
         RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
         RenderSystem.disableTexture();
-        RenderSystem.lineWidth(1 + thickness * this.width / 500F);
+        float scale = (float) this.minecraft.getWindow().getGuiScale();
+        RenderSystem.lineWidth(1 + thickness * scale / 2F);
     
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
