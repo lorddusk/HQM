@@ -73,10 +73,9 @@ public abstract class QuestTask<Data extends TaskData> {
         
         
         if (QuestingDataManager.getInstance().getQuestingData(uuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
-            int rewardId = (int) (Math.random() * data.reward.length);
-            data.reward[rewardId] = true;
+            data.unlockRewardForRandom();
         } else {
-            Arrays.fill(data.reward, true);
+           data.unlockRewardForAll();
         }
         quest.sendUpdatedDataToTeam(uuid);
         TeamLiteStat.refreshTeam(QuestingDataManager.getInstance().getQuestingData(uuid).getTeam());

@@ -991,7 +991,7 @@ public class Quest {
     }
     
     public boolean hasReward(Player player) {
-        return (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
+        return (getQuestData(player).canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
     }
     
     @Environment(EnvType.CLIENT)
@@ -1227,10 +1227,6 @@ public class Quest {
         return data;
     }
     
-    public void initRewards(int players, QuestData data) {
-        data.reward = new boolean[players];
-    }
-    
     public List<QuestTask<?>> getTasks() {
         return tasks;
     }
@@ -1266,7 +1262,7 @@ public class Quest {
     public void claimReward(Player player, int selectedReward) {
         if (hasReward(player)) {
             boolean sentInfo = false;
-            if (getQuestData(player).getReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
+            if (getQuestData(player).canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
                 List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
                     for (ItemStack stack : rewards.toList()) {
@@ -1332,7 +1328,7 @@ public class Quest {
                     QuestData data = getQuestData(player);
                     Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
                     if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                        Arrays.fill(data.reward, false);
+                        data.claimFullReward();
                         sendUpdatedDataToTeam(player);
                     } else {
                         data.claimReward(player);

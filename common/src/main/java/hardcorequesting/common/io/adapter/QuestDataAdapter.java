@@ -26,10 +26,10 @@ public class QuestDataAdapter {
         @Override
         public void write(JsonWriter out, QuestData value) throws IOException {
             out.beginObject();
-            out.name(PLAYERS).value(value.reward.length);
+            out.name(PLAYERS).value(value.getPlayers());
             out.name(REWARDS).beginArray();
-            for (boolean bool : value.reward)
-                out.value(bool);
+            for (int i = 0; i < value.getPlayers(); i++)
+                out.value(value.canClaimReward(i));
             out.endArray();
             out.name(COMPLETED).value(value.completed);
             out.name(CLAIMED).value(value.claimed);
@@ -57,8 +57,8 @@ public class QuestDataAdapter {
                     case REWARDS:
                         in.beginArray();
                         int i = 0;
-                        while (in.hasNext() && i < data.reward.length)
-                            data.reward[i++] = in.nextBoolean();
+                        while (in.hasNext() && i < data.getPlayers())
+                            data.setCanClaimReward(i++, in.nextBoolean());
                         in.endArray();
                         break;
                     case COMPLETED:

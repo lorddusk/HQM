@@ -10,13 +10,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class QuestData {
     private static final Logger LOGGER = LogManager.getLogger();
     
-    public boolean[] reward;
+    private boolean[] reward;
     public boolean completed;
     public boolean claimed;
     private final List<TaskData> tasks = new ArrayList<>();
@@ -24,10 +25,53 @@ public class QuestData {
     public long time;
     
     public QuestData(int players) {
+        clearRewardClaims(players);
+    }
+    
+    @Deprecated
+    public int getPlayers() {
+        return reward.length;
+    }
+    
+    public void clearRewardClaims(int players) {
         reward = new boolean[players];
     }
     
-    public boolean getReward(Player player) {
+    public boolean canClaimReward(int playerId) {
+        return reward[playerId];
+    }
+    
+    public void setCanClaimReward(int playerId, boolean canClaim) {
+        reward[playerId] = canClaim;
+    }
+    
+    public void removePlayer(int playerId) {
+        boolean[] old = reward;
+        reward = new boolean[old.length - 1];
+        for (int j = 0; j < reward.length; j++) {
+            if (j < playerId) {
+                reward[j] = old[j];
+            } else {
+                reward[j] = old[j + 1];
+            }
+        }
+    }
+    
+    public void insertPlayer(int playerId, boolean canClaim) {
+        boolean[] old = reward;
+        reward = new boolean[old.length + 1];
+        for (int j = 0; j < reward.length; j++) {
+            if (j == playerId) {
+                reward[j] = canClaim;
+            } else if (j < playerId) {
+                reward[j] = old[j];
+            } else {
+                reward[j] = old[j - 1];
+            }
+        }
+    }
+    
+    public boolean canClaimReward(Player player) {
         int id = getId(player);
         return (id >= 0 && id < reward.length) && reward[id];
     }
@@ -37,6 +81,19 @@ public class QuestData {
         if (id >= 0 && id < reward.length) {
             reward[id] = false;
         }
+    }
+    
+    public void claimFullReward() {
+        Arrays.fill(reward, false);
+    }
+    
+    public void unlockRewardForAll() {
+        Arrays.fill(reward, true);
+    }
+    
+    public void unlockRewardForRandom() {
+        int rewardId = (int) (Math.random() * reward.length);
+        reward[rewardId] = true;
     }
     
     private int getId(Player player) {
