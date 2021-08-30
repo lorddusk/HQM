@@ -90,12 +90,12 @@ public class DetectItemTask extends ItemRequirementTask {
         
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
-            if (!item.hasItem || data.isDone(i, item)) {
+            if (!item.hasItem() || data.isDone(i, item)) {
                 continue;
             }
             
             for (ItemStack stack : itemsToCount) {
-                if (item.getPrecision().areItemsSame(stack, item.getStack())) {
+                if (item.isStack(stack)) {
                     int amount = Math.min(stack.getCount(), item.required - data.getValue(i));
                     data.setValue(i, data.getValue(i) + amount);
                     updated = true;

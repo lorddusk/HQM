@@ -22,7 +22,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,37 +65,32 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
     @Override
     protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
-        if (part.hasItem) {
-            gui.drawItemStack(matrices, part.getPermutatedItem(), x, y, mX, mY, false);
-        } else if (part.fluid != null) {
-            gui.drawFluid(part.fluid, matrices, x, y, mX, mY);
-        }
+        part.stack.ifLeft(itemStack -> gui.drawItemStack(matrices, part.getPermutatedItem(), x, y, mX, mY, false))
+                .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
     
         FormattedText progressText = Translator.plain((task.getProgress(player, id) * 100 / part.required) + "%");
         matrices.pushPose();
         matrices.translate(0, 0, 200);// magic z value to write over stack render
         float textSize = 0.8F;
-        gui.drawStringWithShadow(matrices, progressText, (int) (x + SIZE - gui.getStringWidth(progressText) * textSize), (int) (y + SIZE - (part.hasItem && !part.getStack().isEmpty() && part.getStack().getCount() != 1 ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, task.getProgress(player, id) == part.required ? 0x308030 : 0xFFFFFF);
+        boolean hasCountLine = part.stack.left().map(itemStack -> itemStack.getCount() > 1).orElse(false);
+        gui.drawStringWithShadow(matrices, progressText, (int) (x + SIZE - gui.getStringWidth(progressText) * textSize), (int) (y + SIZE - (hasCountLine ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, task.getProgress(player, id) == part.required ? 0x308030 : 0xFFFFFF);
         matrices.popPose();
     
         if (gui.inBounds(x, y, SIZE, SIZE, mX, mY)) {
             GuiQuestBook.setSelectedStack(part.getStack());
-            ItemStack stack = part.getStack();
             List<FormattedText> str = new ArrayList<>();
-            if (part.fluid != null) {
+            part.stack.ifRight(fluidStack -> {
                 List<Component> list = new ArrayList<>();
-                str.add(new TextComponent(part.fluid.getName().getString()));
+                str.add(new TextComponent(fluidStack.getName().getString()));
                 if (Minecraft.getInstance().options.advancedItemTooltips) {
-                    String entryId = Registry.FLUID.getKey(part.fluid.getFluid()).toString();
+                    String entryId = Registry.FLUID.getKey(fluidStack.getFluid()).toString();
                     list.add(new TextComponent(entryId).withStyle(ChatFormatting.DARK_GRAY));
                 }
                 str.addAll(list);
-            } else if (stack != null && !stack.isEmpty()) {
-                str.addAll(gui.getTooltipFromItem(stack));
-            }
-        
+            }).ifLeft(itemStack -> str.addAll(gui.getTooltipFromItem(itemStack)));
+            
             str.add(FormattedText.composite(Translator.translatable("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + task.getProgress(player, id) + "/" + part.required)));
-            if (part.fluid == null && Quest.canQuestsBeEdited()) {
+            if (part.hasItem() && Quest.canQuestsBeEdited()) {
                 str.add(FormattedText.EMPTY);
                 str.add(Translator.text(part.getPrecision().getName(), GuiColor.GRAY));
             }
@@ -153,7 +147,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
             if (task.mayUseFluids()) {
-                PickItemMenu.display(gui, player, part.hasItem ? Either.left(part.getStack()) : Either.right(part.fluid), PickItemMenu.Type.ITEM_FLUID, part.required, part.getPrecision(),
+                PickItemMenu.display(gui, player, part.stack, PickItemMenu.Type.ITEM_FLUID, part.required, part.getPrecision(),
                         result -> task.setItem(result.get(), result.getAmount(), result.getPrecision(), id));
             } else {
                 PickItemMenu.display(gui, player, part.getStack(), PickItemMenu.Type.ITEM, part.required, part.getPrecision(),

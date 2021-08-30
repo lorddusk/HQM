@@ -24,11 +24,11 @@ public class ConsumeItemTask extends ItemRequirementTask {
         
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
-            if (item.fluid == null || data.isDone(i, item)) {
+            if (data.isDone(i, item)) {
                 continue;
             }
             
-            if (fluidVolume != null && fluidVolume.getFluid() != null && fluidVolume.getFluid() == item.fluid.getFluid()) {
+            if (fluidVolume != null && item.isFluid(fluidVolume.getFluid())) {
                 Fraction amount = fluidVolume.getAmount().isLessThan(Fraction.ofWhole(item.required - data.getValue(i))) ? fluidVolume.getAmount() : Fraction.ofWhole(item.required - data.getValue(i));
                 if (action)
                     data.setValue(i, data.getValue(i) + amount.intValue());
@@ -50,8 +50,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
         ItemsTaskData data = getData(playerId);
         for (int i = 0; i < parts.size(); i++) {
             ItemRequirementTask.Part part = parts.get(i);
-            if (part.hasItem && part.getPrecision().areItemsSame(part.getStack(), stack)
-                    && !data.isDone(i, part)) {
+            if (part.isStack(stack) && !data.isDone(i, part)) {
                 return true;
             }
         }
@@ -62,8 +61,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
         ItemsTaskData data = getData(playerId);
         for (int i = 0; i < parts.size(); i++) {
             ItemRequirementTask.Part part = parts.get(i);
-            if (part.fluid != null && fluid == part.fluid.getFluid()
-                    && !data.isDone(i, part)) {
+            if (part.isFluid(fluid) && !data.isDone(i, part)) {
                 return true;
             }
         }

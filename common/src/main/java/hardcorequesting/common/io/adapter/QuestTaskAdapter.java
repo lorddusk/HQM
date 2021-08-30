@@ -26,10 +26,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
@@ -61,15 +58,15 @@ public class QuestTaskAdapter {
         
         @Override
         public void write(JsonWriter out, ItemRequirementTask.Part value) throws IOException {
-            ItemStack stack = value.getStack();
-            FluidStack fluid = value.fluid;
+            Optional<ItemStack> stack = value.stack.left();
+            Optional<FluidStack> fluid = value.stack.right();
             int required = value.required;
             ItemPrecision precision = value.getPrecision();
             out.beginObject();
-            if (value.hasItem && !stack.isEmpty()) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack);
-            } else if (fluid != null) {
-                MinecraftAdapter.FLUID.write(out.name(FLUID), fluid);
+            if (stack.isPresent()) {
+                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack.get());
+            } else if (fluid.isPresent()) {
+                MinecraftAdapter.FLUID.write(out.name(FLUID), fluid.get());
             } else {
                 out.nullValue();
                 out.endObject();
