@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.locale.Language;
@@ -143,16 +144,25 @@ public class GuiBase extends Screen {
     }
     
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
-        RenderSystem.disableTexture();
+        // This block was written with insufficient knowledge on normals, adapted so that the line shows up correctly
+        // Feel free to have the normals changed if you feel more knowledgeable on the subject
+        if (y2 < y1) {
+            drawLine(x2, y2, x1, y1, thickness, color);
+            return;
+        }
+        int dx = x2 - x1, dy = y2 - y1;
+        
         applyColor(color);
-        
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glLineWidth(1 + thickness * this.width / 500F);
-        
-        GL11.glBegin(GL11.GL_LINES);
-        GL11.glVertex3f(x1, y1, 0);
-        GL11.glVertex3f(x2, y2, 0);
-        GL11.glEnd();
+        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+        RenderSystem.disableTexture();
+        RenderSystem.lineWidth(1 + thickness * this.width / 500F);
+    
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder builder = tesselator.getBuilder();
+        builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+        builder.vertex(x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        tesselator.end();
         
         RenderSystem.enableTexture();
     }
