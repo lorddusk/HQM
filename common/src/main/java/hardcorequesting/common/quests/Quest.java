@@ -1108,7 +1108,7 @@ public class Quest {
             int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_TASKS, tasks.size());
             for (int i = start; i < end; i++) {
-                QuestTask task = tasks.get(i);
+                QuestTask<?> task = tasks.get(i);
                 if (task.isVisible(player) || canQuestsBeEdited()) {
                     if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
                         if (gui.isOpBook && Screen.hasShiftDown()) {
@@ -1138,11 +1138,11 @@ public class Quest {
                                 
                                 tasks.remove(i);
                                 nextTaskId = 0;
-                                for (QuestTask questTask : tasks) {
+                                for (QuestTask<?> questTask : tasks) {
                                     questTask.updateId();
                                 }
-                                
-                                addTaskData(getQuestData(player));
+    
+                                getQuestData(player).clearTaskData(this);
                                 SaveHelper.add(EditType.TASK_REMOVE);
                             }
                         } else if (task == selectedTask) {
@@ -1223,19 +1223,8 @@ public class Quest {
     
     public QuestData createData(int players) {
         QuestData data = new QuestData(players);
-        if (!addTaskData(data)) {
-            return null;
-        }
+        data.verifyTasksSize(this);
         return data;
-    }
-    
-    public boolean addTaskData(QuestData data) {
-        data.clearTaskData();
-        for (int i = 0; i < tasks.size(); i++) {
-            data.setTaskData(i, tasks.get(i).newQuestData());
-        }
-        
-        return true;
     }
     
     public void initRewards(int players, QuestData data) {
@@ -1479,7 +1468,7 @@ public class Quest {
     
     public void reset(QuestData data) {
         data.available = true;
-        addTaskData(data);
+        data.clearTaskData(this);
     }
     
     public void resetAll() {

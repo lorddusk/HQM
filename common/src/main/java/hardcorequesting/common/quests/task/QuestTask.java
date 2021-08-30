@@ -160,7 +160,7 @@ public abstract class QuestTask<Data extends TaskData> {
             return newQuestData(); // possible fix for #247
         }
         
-        return questData.getTaskData(id, dataType, this::newQuestData);
+        return questData.getTaskData(parent, id, dataType, this::newQuestData);
     }
     
     public abstract Data newQuestData();

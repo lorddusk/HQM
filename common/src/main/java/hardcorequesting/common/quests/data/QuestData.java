@@ -1,13 +1,13 @@
 package hardcorequesting.common.quests.data;
 
 
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,6 @@ public class QuestData {
     public QuestData(int players) {
         reward = new boolean[players];
     }
-    
     
     public boolean getReward(Player player) {
         int id = getId(player);
@@ -59,27 +58,24 @@ public class QuestData {
         return completed && !claimed;
     }
     
-    @Deprecated //Refer to Quest instead
-    public int getTaskSize() {
-        return tasks.size();
+    public void setTaskDataFromSerialization(List<TaskData> taskData) {
+        tasks.clear();
+        tasks.addAll(taskData);
     }
     
-    @Nullable
-    public TaskData getTaskData(int id) {
-        if (id >= tasks.size())
-            return null;
-        else return tasks.get(id);
+    public Iterable<TaskData> getTaskDataForSerialization() {
+        return tasks;
     }
     
-    public <Data extends TaskData> Data getTaskData(int id, Class<Data> clazz, Supplier<Data> emptySupplier) {
-        if (id >= tasks.size()) {
-            while (id > tasks.size())
-                tasks.add(null);
-            Data newData = emptySupplier.get();
-            tasks.add(newData);
-            return newData;
+    public void verifyTasksSize(Quest quest) {
+        while (tasks.size() < quest.getTasks().size()) {
+            tasks.add(quest.getTasks().get(tasks.size()).newQuestData());
         }
+    }
     
+    public <Data extends TaskData> Data getTaskData(Quest quest, int id, Class<Data> clazz, Supplier<Data> emptySupplier) {
+        verifyTasksSize(quest);
+        
         TaskData data = tasks.get(id);
         if (clazz.isInstance(data)) {
             return clazz.cast(data);
@@ -91,15 +87,9 @@ public class QuestData {
         }
     }
     
-    public void clearTaskData() {
+    public void clearTaskData(Quest quest) {
         tasks.clear();
-    }
-    
-    public void setTaskData(int id, TaskData data) {
-        while (id >= tasks.size()) {
-            tasks.add(null);
-        }
-        tasks.set(id, data);
+        verifyTasksSize(quest);
     }
     
     public void resetTaskData(int id, Supplier<? extends TaskData> emptySupplier) {
