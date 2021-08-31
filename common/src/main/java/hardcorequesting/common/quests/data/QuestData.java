@@ -4,7 +4,9 @@ package hardcorequesting.common.quests.data;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
+import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,14 +79,31 @@ public class QuestData {
         return (id >= 0 && id < claimableRewards.size()) && claimableRewards.get(id);
     }
     
-    public void claimReward(Player player) {
+    public void claimReward(Quest quest, Player player) {
+        boolean updateTeam = !teamRewardClaimed;
+        teamRewardClaimed = true;
+        Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+        if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
+            claimFullReward();
+            updateTeam = true;
+        } else {
+            claimReward(player);
+        }
+        
+        if (updateTeam) {
+            quest.sendUpdatedDataToTeam(player);
+        } else if (player instanceof ServerPlayer)
+            quest.sendUpdatedData((ServerPlayer) player);
+    }
+    
+    private void claimReward(Player player) {
         int id = getId(player);
         if (id >= 0 && id < claimableRewards.size()) {
             claimableRewards.set(id, false);
         }
     }
     
-    public void claimFullReward() {
+    private void claimFullReward() {
         Collections.fill(claimableRewards, false);
     }
     

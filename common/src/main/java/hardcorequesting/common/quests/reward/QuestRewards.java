@@ -15,8 +15,6 @@ import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.QuestData;
-import hardcorequesting.common.team.RewardSetting;
-import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -26,7 +24,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -144,16 +141,7 @@ public class QuestRewards {
         claimedAny |= tryClaimCommandReward(player, data);
     
         if (claimedAny) {
-            data.teamRewardClaimed = true;
-            Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
-            if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                data.claimFullReward();
-                quest.sendUpdatedDataToTeam(player);
-            } else {
-                data.claimReward(player);
-                if (player instanceof ServerPlayer)
-                    quest.sendUpdatedData((ServerPlayer) player);
-            }
+            data.claimReward(quest, player);
             SoundHandler.play(Sounds.COMPLETE, player);
         }
     }
