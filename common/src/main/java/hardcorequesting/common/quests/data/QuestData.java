@@ -10,14 +10,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
 public class QuestData {
     private static final Logger LOGGER = LogManager.getLogger();
     
-    private boolean[] reward;
+    private final List<Boolean> reward = new ArrayList<>();
     public boolean completed;
     public boolean claimed;
     private final List<TaskData> tasks = new ArrayList<>();
@@ -30,70 +30,54 @@ public class QuestData {
     
     @Deprecated
     public int getPlayers() {
-        return reward.length;
+        return reward.size();
     }
     
     public void clearRewardClaims(int players) {
-        reward = new boolean[players];
+        reward.clear();
+        for (int i = 0; i < players; i++)
+            reward.add(false);
     }
     
     public boolean canClaimReward(int playerId) {
-        return reward[playerId];
+        return reward.get(playerId);
     }
     
     public void setCanClaimReward(int playerId, boolean canClaim) {
-        reward[playerId] = canClaim;
+        reward.set(playerId, canClaim);
     }
     
     public void removePlayer(int playerId) {
-        boolean[] old = reward;
-        reward = new boolean[old.length - 1];
-        for (int j = 0; j < reward.length; j++) {
-            if (j < playerId) {
-                reward[j] = old[j];
-            } else {
-                reward[j] = old[j + 1];
-            }
-        }
+        reward.remove(playerId);
     }
     
     public void insertPlayer(int playerId, boolean canClaim) {
-        boolean[] old = reward;
-        reward = new boolean[old.length + 1];
-        for (int j = 0; j < reward.length; j++) {
-            if (j == playerId) {
-                reward[j] = canClaim;
-            } else if (j < playerId) {
-                reward[j] = old[j];
-            } else {
-                reward[j] = old[j - 1];
-            }
-        }
+        reward.add(playerId, canClaim);
     }
     
     public boolean canClaimReward(Player player) {
         int id = getId(player);
-        return (id >= 0 && id < reward.length) && reward[id];
+        return (id >= 0 && id < reward.size()) && reward.get(id);
     }
     
     public void claimReward(Player player) {
         int id = getId(player);
-        if (id >= 0 && id < reward.length) {
-            reward[id] = false;
+        if (id >= 0 && id < reward.size()) {
+            reward.set(id, false);
         }
     }
     
     public void claimFullReward() {
-        Arrays.fill(reward, false);
+        Collections.fill(reward, false);
     }
     
     public void unlockRewardForAll() {
-        Arrays.fill(reward, true);
+        Collections.fill(reward, true);
     }
     
     public void unlockRewardForRandom() {
-        int rewardId = (int) (Math.random() * reward.length);
-        reward[rewardId] = true;
+        int rewardId = (int) (Math.random() * reward.size());
+        reward.set(rewardId, true);
     }
     
     private int getId(Player player) {
