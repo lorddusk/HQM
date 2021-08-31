@@ -34,14 +34,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
 
 public abstract class QuestTask<Data extends TaskData> {
-    private static final Logger LOGGER = LogManager.getLogger();
     
     private final Class<Data> dataType;
     public String description;
@@ -70,16 +67,15 @@ public abstract class QuestTask<Data extends TaskData> {
         QuestData data = quest.getQuestData(uuid);
         
         data.completed = true;
-        data.claimed = false;
+        data.teamRewardClaimed = false;
         data.available = false;
         data.time = Quest.serverTicker.getHours();
         
         
         if (QuestingDataManager.getInstance().getQuestingData(uuid).getTeam().getRewardSetting() == RewardSetting.RANDOM) {
-            int rewardId = (int) (Math.random() * data.reward.length);
-            data.reward[rewardId] = true;
+            data.unlockRewardForRandom();
         } else {
-            Arrays.fill(data.reward, true);
+           data.unlockRewardForAll();
         }
         quest.sendUpdatedDataToTeam(uuid);
         TeamLiteStat.refreshTeam(QuestingDataManager.getInstance().getQuestingData(uuid).getTeam());
@@ -163,20 +159,7 @@ public abstract class QuestTask<Data extends TaskData> {
             return newQuestData(); // possible fix for #247
         }
         
-        if (id >= questData.tasks.length) {
-            questData.tasks = Arrays.copyOf(questData.tasks, id + 1);
-            questData.tasks[id] = newQuestData();
-        }
-        
-        TaskData data = questData.tasks[id];
-        if (dataType.isInstance(data)) {
-            return dataType.cast(data);
-        } else {
-            LOGGER.warn("Found task data of wrong type. Expected {}, was {}. Replacing with empty data of the correct type.", dataType, data == null ? null : data.getClass());
-            Data newData = newQuestData();
-            questData.tasks[id] = newData;
-            return newData;
-        }
+        return questData.getTaskData(parent, id, dataType, this::newQuestData);
     }
     
     public abstract Data newQuestData();
@@ -268,10 +251,7 @@ public abstract class QuestTask<Data extends TaskData> {
     public abstract void mergeProgress(UUID playerId, Data own, Data other);
     
     public void resetData(UUID playerId) {
-        QuestData questData = parent.getQuestData(playerId);
-        if (id < questData.tasks.length) {
-            questData.tasks[id] = newQuestData();
-        }
+        parent.getQuestData(playerId).resetTaskData(id, this::newQuestData);
     }
     
     protected abstract void setComplete(Data data);

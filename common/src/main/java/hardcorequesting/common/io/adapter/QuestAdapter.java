@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.*;
+import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
@@ -157,6 +158,7 @@ public class QuestAdapter {
         
         @Override
         public JsonElement serialize(Quest src) {
+            QuestRewards rewards = src.getRewards();
             return object()
                     .add(UUID, src.getQuestId().toString())
                     .add(NAME, src.getName())
@@ -183,9 +185,9 @@ public class QuestAdapter {
                             }
                             builder.add(TASKS, array.build());
                         }
-                        if (src.getReputationRewards() != null && !src.getReputationRewards().isEmpty()) {
+                        if (rewards.getReputationRewards() != null && !rewards.getReputationRewards().isEmpty()) {
                             JsonArrayBuilder array = array();
-                            for (ReputationReward reward : src.getReputationRewards()) {
+                            for (ReputationReward reward : rewards.getReputationRewards()) {
                                 array.add(REPUTATION_REWARD_ADAPTER.serialize(reward));
                             }
                             builder.add(REWARDS_REPUTATION, array.build());
@@ -193,9 +195,9 @@ public class QuestAdapter {
                     })
                     .add(PREREQUISITES, writeQuestList(src.getRequirements()))
                     .add(OPTIONLINKS, writeQuestList(src.getOptionLinks()))
-                    .add(REWARDS, writeItemStackList(src.getReward()))
-                    .add(REWARDS_CHOICE, writeItemStackList(src.getRewardChoice()))
-                    .add(REWARDS_COMMAND, SaveHandler.GSON.toJsonTree(src.getCommandRewardsAsStrings()))
+                    .add(REWARDS, writeItemStackList(rewards.getReward()))
+                    .add(REWARDS_CHOICE, writeItemStackList(rewards.getRewardChoice()))
+                    .add(REWARDS_COMMAND, SaveHandler.GSON.toJsonTree(rewards.getCommandRewardsAsStrings()))
                     .build();
         }
         
@@ -233,8 +235,9 @@ public class QuestAdapter {
             for (JsonElement element : GsonHelper.getAsJsonArray(object, TASKS, EMPTY_ARRAY)) {
                 QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
             }
-            QUEST.setReward(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
-            QUEST.setRewardChoice(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS_CHOICE, EMPTY_ARRAY)));
+            QuestRewards rewards = QUEST.getRewards();
+            rewards.setReward(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
+            rewards.setRewardChoice(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS_CHOICE, EMPTY_ARRAY)));
             if (object.has(REWARDS_REPUTATION)) {
                 List<ReputationReward> reputationRewards = new ArrayList<>();
                 for (JsonElement element : GsonHelper.getAsJsonArray(object, REWARDS_REPUTATION, EMPTY_ARRAY)) {
@@ -242,10 +245,10 @@ public class QuestAdapter {
                     if (reward != null)
                         reputationRewards.add(reward);
                 }
-                QUEST.setReputationRewards(reputationRewards);
+                rewards.setReputationRewards(reputationRewards);
             }
             if (object.has(REWARDS_COMMAND))
-                QUEST.setCommandRewards(SaveHandler.GSON.<List<String>>fromJson(object.get(REWARDS_COMMAND), STRING_LIST_TYPE).toArray(new String[0]));
+                rewards.setCommandRewards(SaveHandler.GSON.<List<String>>fromJson(object.get(REWARDS_COMMAND), STRING_LIST_TYPE).toArray(new String[0]));
             if (hasUuid && QUEST.getQuestId() != null) {
                 optionalAdd(requirementMapping, requirement.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 optionalAdd(optionMapping, options.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));

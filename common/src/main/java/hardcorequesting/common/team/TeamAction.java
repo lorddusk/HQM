@@ -91,18 +91,7 @@ public enum TeamAction {
                                 QuestData joinData = team.getQuestData().get(questId);
                                 QuestData questData = inviteTeam.getQuestData().get(questId);
                                 if (questData != null) {
-                                    boolean[] old = questData.reward;
-                                    questData.reward = new boolean[old.length + 1];
-                                    for (int j = 0; j < questData.reward.length; j++) {
-                                        if (j == id) {
-                                            questData.reward[j] = joinData.reward[0]; //you keep your reward
-                                        } else if (j < id) {
-                                            questData.reward[j] = old[j];
-                                        } else {
-                                            questData.reward[j] = old[j - 1];
-                                        }
-                                        
-                                    }
+                                    questData.insertPlayer(id, joinData.canClaimPlayerReward(0));
                                 }
                             }
                             

@@ -1,16 +1,20 @@
 package hardcorequesting.common.io.adapter;
 
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QuestDataAdapter {
     
-    public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<QuestData>() {
+    public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<>() {
         public static final String PLAYERS = "players";
         public static final String REWARDS = "rewards";
         public static final String COMPLETED = "completed";
@@ -23,46 +27,47 @@ public class QuestDataAdapter {
         @Override
         public void write(JsonWriter out, QuestData value) throws IOException {
             out.beginObject();
-            out.name(PLAYERS).value(value.reward.length);
             out.name(REWARDS).beginArray();
-            for (boolean bool : value.reward)
-                out.value(bool);
+            for (boolean canClaim : value.getRewardsForSerialization())
+                out.value(canClaim);
             out.endArray();
             out.name(COMPLETED).value(value.completed);
-            out.name(CLAIMED).value(value.claimed);
+            out.name(CLAIMED).value(value.teamRewardClaimed);
             out.name(AVAILABLE).value(value.available);
             out.name(TIME).value(value.time);
-            out.name(TASKS_SIZE).value(value.tasks.length);
             out.name(TASKS).beginArray();
-            for (TaskData task : value.tasks)
-                if (task != null)
-                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, task);
+            for (TaskData data : value.getTaskDataForSerialization()) {
+                if (data != null)
+                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, data);
+                else Streams.write(new JsonObject(), out);  //Add empty object to keep order of task data
+            }
             out.endArray();
             out.endObject();
         }
         
         @Override
         public QuestData read(JsonReader in) throws IOException {
-            QuestData data = new QuestData(1);
+            QuestData data = new QuestData();
             in.beginObject();
-            int i;
             while (in.hasNext()) {
                 switch (in.nextName()) {
                     case PLAYERS:
-                        data = new QuestData(in.nextInt());
+                    case TASKS_SIZE:
+                        in.nextInt();   //Sizes are no longer used. Read it for backwards-compatibility
                         break;
                     case REWARDS:
                         in.beginArray();
-                        i = 0;
-                        while (in.hasNext() && i < data.reward.length)
-                            data.reward[i++] = in.nextBoolean();
+                        List<Boolean> claimableRewards = new ArrayList<>();
+                        while (in.hasNext())
+                            claimableRewards.add(in.nextBoolean());
+                        data.setRewardsFromSerialization(claimableRewards);
                         in.endArray();
                         break;
                     case COMPLETED:
                         data.completed = in.nextBoolean();
                         break;
                     case CLAIMED:
-                        data.claimed = in.nextBoolean();
+                        data.teamRewardClaimed = in.nextBoolean();
                         break;
                     case AVAILABLE:
                         data.available = in.nextBoolean();
@@ -70,14 +75,12 @@ public class QuestDataAdapter {
                     case TIME:
                         data.time = in.nextLong();
                         break;
-                    case TASKS_SIZE:
-                        data.tasks = new TaskData[in.nextInt()];
-                        break;
                     case TASKS:
                         in.beginArray();
-                        i = 0;
-                        while (in.hasNext() && i < data.tasks.length)
-                            data.tasks[i++] = QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in);
+                        List<TaskData> taskData = new ArrayList<>();
+                        while (in.hasNext())
+                            taskData.add(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
+                        data.setTaskDataFromSerialization(taskData);
                         in.endArray();
                         break;
                     default:

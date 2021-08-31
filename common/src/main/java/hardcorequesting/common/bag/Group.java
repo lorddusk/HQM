@@ -7,9 +7,9 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ScrollBar;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -212,7 +212,7 @@ public class Group {
         
         List<ItemStack> itemsToAdd = items.stream().map(ItemStack::copy).collect(Collectors.toList());
         
-        Quest.addItems(player, itemsToAdd);
+        QuestRewards.addItems(player, itemsToAdd);
         
         itemsToAdd.stream().filter(item -> item.getCount() > 0).forEach(item -> {
             ItemEntity entityItem = new ItemEntity(player.getCommandSenderWorld(), player.getX() + 0.5D, player.getY() + 0.5D, player.getZ() + 0.5D, item);

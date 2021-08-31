@@ -80,7 +80,7 @@ public class Team {
     public void resetCompletion(Quest quest) {
         QuestData data = getQuestData(quest.getQuestId());
         data.completed = false;
-        data.claimed = false;
+        data.teamRewardClaimed = false;
         data.available = true;
         refreshData();
     }
@@ -176,17 +176,9 @@ public class Team {
                     QuestData leaveData = newSingleTeam.questData.get(i);
                     QuestData data = questData.get(i);
                     if (data != null) {
-                        boolean[] old = data.reward;
-                        data.reward = new boolean[old.length - 1];
-                        for (int j = 0; j < data.reward.length; j++) {
-                            if (j < id) {
-                                data.reward[j] = old[j];
-                            } else {
-                                data.reward[j] = old[j + 1];
-                            }
-                        }
+                        leaveData.setCanClaimReward(0, data.canClaimPlayerReward(id));
                         
-                        leaveData.reward[0] = old[id];
+                        data.removePlayer(id);
                     }
                 }
                 
@@ -261,7 +253,7 @@ public class Team {
         int playerCount = getPlayerCount();
         for (Quest quest : Quest.getQuests().values()) {
             if (quest != null && questData.get(quest.getQuestId()) != null) {
-                quest.initRewards(playerCount, questData.get(quest.getQuestId()));
+                questData.get(quest.getQuestId()).clearRewardClaims(playerCount);
             }
         }
         refreshData();
