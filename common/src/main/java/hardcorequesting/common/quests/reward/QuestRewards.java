@@ -128,60 +128,82 @@ public class QuestRewards {
     }
     
     public boolean hasReward(QuestData data, Player player) {
-        return (data.canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (data.canClaimTeamRewards() && (reputationRewards != null || !commandRewardList.isEmpty()));
+        return isItemRewardAvailable(player, data) || isRepRewardAvailable(data) || isCommandRewardAvailable(data);
     }
     
     public void claimReward(Player player, int selectedReward) {
         QuestData data = quest.getQuestData(player);
-        if (hasReward(data, player)) {
-            boolean claimedAny = false;
-            if (data.canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
-                List<ItemStack> items = new ArrayList<>();
-                if (!rewards.isEmpty()) {
-                    items.addAll(rewards.toList());
-                }
-                if (!rewardChoices.isEmpty()) {
-                    if (selectedReward >= 0 && selectedReward < rewardChoices.size()) {
-                        items.add(rewardChoices.getReward(selectedReward));
-                    } else {
-                        return;
-                    }
-                }
     
-                List<ItemStack> itemsToAdd = copyAndMergeStacks(items);
+        Result result = tryClaimItemReward(player, selectedReward, data);
+        if (result == Result.FAIL)
+            return;
+        boolean claimedAny = result == Result.SUCCESS;
     
-                if (!canInventoryHoldAll(player, itemsToAdd))
-                    return;
-                
-                addItems(player, itemsToAdd);
-                player.getInventory().setChanged();
-                Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
-                if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                    data.claimFullReward();
-                    quest.sendUpdatedDataToTeam(player);
-                } else {
-                    data.claimReward(player);
-                    if (player instanceof ServerPlayer)
-                        quest.sendUpdatedData((ServerPlayer) player);
-                }
-                claimedAny = true;
+        claimedAny |= tryClaimReputationReward(player, data);
+    
+        claimedAny |= tryClaimCommandReward(player, data);
+    
+        if (claimedAny) {
+            data.teamRewardClaimed = true;
+            Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+            if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
+                data.claimFullReward();
+                quest.sendUpdatedDataToTeam(player);
+            } else {
+                data.claimReward(player);
+                if (player instanceof ServerPlayer)
+                    quest.sendUpdatedData((ServerPlayer) player);
             }
-            
-    
-            claimedAny |= tryClaimReputationReward(player, data);
-    
-            claimedAny |= tryClaimCommandReward(player, data);
-            
-            if (claimedAny) {
-                data.claimed = true;
-                SoundHandler.play(Sounds.COMPLETE, player);
-            }
-            
+            SoundHandler.play(Sounds.COMPLETE, player);
         }
     }
     
+    private enum Result {
+        SUCCESS,
+        PASS,
+        FAIL
+    }
+    
+    private boolean isItemRewardAvailable(Player player, QuestData data) {
+        return (!rewards.isEmpty() || !rewardChoices.isEmpty()) && data.canClaimPlayerReward(player);
+    }
+    
+    private boolean isRepRewardAvailable(QuestData data) {
+        return reputationRewards != null && data.canClaimTeamRewards();
+    }
+    
+    private boolean isCommandRewardAvailable(QuestData data) {
+        return !commandRewardList.isEmpty() && data.canClaimTeamRewards();
+    }
+    
+    private Result tryClaimItemReward(Player player, int selectedReward, QuestData data) {
+        if (isItemRewardAvailable(player, data)) {
+            List<ItemStack> items = new ArrayList<>();
+            if (!rewards.isEmpty()) {
+                items.addAll(rewards.toList());
+            }
+            if (!rewardChoices.isEmpty()) {
+                if (selectedReward >= 0 && selectedReward < rewardChoices.size()) {
+                    items.add(rewardChoices.getReward(selectedReward));
+                } else {
+                    return Result.FAIL;
+                }
+            }
+        
+            List<ItemStack> itemsToAdd = copyAndMergeStacks(items);
+        
+            if (!canInventoryHoldAll(player, itemsToAdd))
+                return Result.FAIL;
+        
+            addItems(player, itemsToAdd);
+            player.getInventory().setChanged();
+            return Result.SUCCESS;
+        }
+        return Result.PASS;
+    }
+    
     private boolean tryClaimReputationReward(Player player, QuestData data) {
-        if (reputationRewards != null && data.canClaimTeamRewards()) {
+        if (isRepRewardAvailable(data)) {
             QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(quest, reputationRewards);
             EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
             return true;
@@ -190,7 +212,7 @@ public class QuestRewards {
     }
     
     private boolean tryClaimCommandReward(Player player, QuestData data) {
-        if (!commandRewardList.isEmpty() && data.canClaimTeamRewards()) {
+        if (isCommandRewardAvailable(data)) {
             commandRewardList.executeAll(player);
             return true;
         }
@@ -264,7 +286,7 @@ public class QuestRewards {
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
         if (reputationRewards != null || Quest.canQuestsBeEdited()) {
-            boolean claimed = data.claimed || reputationRewards == null;
+            boolean claimed = data.teamRewardClaimed || reputationRewards == null;
             
             int backgroundIndex = claimed ? 2 : isOnReputationIcon(gui, mX, mY) ? 1 : 0;
             int foregroundIndex;
@@ -306,7 +328,7 @@ public class QuestRewards {
                 
             }
             
-            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translatable("hqm.quest.partyRepReward" + (data.claimed ? "Claimed" : "")), 1, 200);
+            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translatable("hqm.quest.partyRepReward" + (data.teamRewardClaimed ? "Claimed" : "")), 1, 200);
             if (commentLines != null) {
                 str.add(FormattedText.EMPTY);
                 for (FormattedText commentLine : commentLines) {

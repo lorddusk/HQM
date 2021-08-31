@@ -91,7 +91,7 @@ public enum TeamAction {
                                 QuestData joinData = team.getQuestData().get(questId);
                                 QuestData questData = inviteTeam.getQuestData().get(questId);
                                 if (questData != null) {
-                                    questData.insertPlayer(id, joinData.canClaimReward(0));
+                                    questData.insertPlayer(id, joinData.canClaimPlayerReward(0));
                                 }
                             }
                             

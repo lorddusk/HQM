@@ -80,7 +80,7 @@ public class Team {
     public void resetCompletion(Quest quest) {
         QuestData data = getQuestData(quest.getQuestId());
         data.completed = false;
-        data.claimed = false;
+        data.teamRewardClaimed = false;
         data.available = true;
         refreshData();
     }
@@ -176,7 +176,7 @@ public class Team {
                     QuestData leaveData = newSingleTeam.questData.get(i);
                     QuestData data = questData.get(i);
                     if (data != null) {
-                        leaveData.setCanClaimReward(0, data.canClaimReward(id));
+                        leaveData.setCanClaimReward(0, data.canClaimPlayerReward(id));
                         
                         data.removePlayer(id);
                     }

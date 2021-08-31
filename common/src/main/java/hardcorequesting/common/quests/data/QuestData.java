@@ -20,7 +20,7 @@ public class QuestData {
     private final List<Boolean> claimableRewards = new ArrayList<>();
     private final List<TaskData> taskData = new ArrayList<>();
     public boolean completed;
-    public boolean claimed;
+    public boolean teamRewardClaimed;
     public boolean available = true;
     public long time;
     
@@ -56,7 +56,7 @@ public class QuestData {
             claimableRewards.add(false);
     }
     
-    public boolean canClaimReward(int playerId) {
+    public boolean canClaimPlayerReward(int playerId) {
         return claimableRewards.get(playerId);
     }
     
@@ -72,7 +72,7 @@ public class QuestData {
         claimableRewards.add(playerId, canClaim);
     }
     
-    public boolean canClaimReward(Player player) {
+    public boolean canClaimPlayerReward(Player player) {
         int id = getId(player);
         return (id >= 0 && id < claimableRewards.size()) && claimableRewards.get(id);
     }
@@ -113,7 +113,7 @@ public class QuestData {
     }
     
     public boolean canClaimTeamRewards() {
-        return completed && !claimed;
+        return completed && !teamRewardClaimed;
     }
     
     public void verifyTasksSize(Quest quest) {

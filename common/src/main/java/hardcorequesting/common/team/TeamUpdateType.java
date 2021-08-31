@@ -56,7 +56,7 @@ public enum TeamUpdateType {
             if (quest != null) {
                 QuestData questData = team.getQuestData(quest.getQuestId());
                 if (questData != null) {
-                    questData.claimed = true;
+                    questData.teamRewardClaimed = true;
                     for (JsonElement element : object.get(REPUTATIONS).getAsJsonArray()) {
                         String id = element.getAsJsonObject().get(ID).getAsString();
                         int val = element.getAsJsonObject().get(VAL).getAsInt();

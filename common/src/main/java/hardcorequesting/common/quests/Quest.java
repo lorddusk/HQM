@@ -1003,7 +1003,7 @@ public class Quest {
             own.completed = true;
             
             //If a quest is marked both claimed & available, then repeatable quests will never reset.
-            if (other.available && !own.claimed) {
+            if (other.available && !own.teamRewardClaimed) {
                 own.available = true;
             }
         }

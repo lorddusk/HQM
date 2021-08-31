@@ -32,7 +32,7 @@ public class QuestDataAdapter {
                 out.value(canClaim);
             out.endArray();
             out.name(COMPLETED).value(value.completed);
-            out.name(CLAIMED).value(value.claimed);
+            out.name(CLAIMED).value(value.teamRewardClaimed);
             out.name(AVAILABLE).value(value.available);
             out.name(TIME).value(value.time);
             out.name(TASKS).beginArray();
@@ -67,7 +67,7 @@ public class QuestDataAdapter {
                         data.completed = in.nextBoolean();
                         break;
                     case CLAIMED:
-                        data.claimed = in.nextBoolean();
+                        data.teamRewardClaimed = in.nextBoolean();
                         break;
                     case AVAILABLE:
                         data.available = in.nextBoolean();

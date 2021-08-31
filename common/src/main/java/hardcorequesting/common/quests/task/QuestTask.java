@@ -67,7 +67,7 @@ public abstract class QuestTask<Data extends TaskData> {
         QuestData data = quest.getQuestData(uuid);
         
         data.completed = true;
-        data.claimed = false;
+        data.teamRewardClaimed = false;
         data.available = false;
         data.time = Quest.serverTicker.getHours();
         
