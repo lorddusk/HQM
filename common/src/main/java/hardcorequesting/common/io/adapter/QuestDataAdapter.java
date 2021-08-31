@@ -15,10 +15,12 @@ import java.util.List;
 public class QuestDataAdapter {
     
     public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<>() {
+        public static final String PLAYERS = "players";
         public static final String REWARDS = "rewards";
         public static final String COMPLETED = "completed";
         public static final String CLAIMED = "claimed";
         public static final String TASKS = "tasks";
+        public static final String TASKS_SIZE = "tasksSize";
         public static final String AVAILABLE = "available";
         public static final String TIME = "time";
         
@@ -49,6 +51,10 @@ public class QuestDataAdapter {
             in.beginObject();
             while (in.hasNext()) {
                 switch (in.nextName()) {
+                    case PLAYERS:
+                    case TASKS_SIZE:
+                        in.nextInt();   //Sizes are no longer used. Read it for backwards-compatibility
+                        break;
                     case REWARDS:
                         in.beginArray();
                         List<Boolean> claimableRewards = new ArrayList<>();
