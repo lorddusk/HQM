@@ -17,10 +17,10 @@ import java.util.function.Supplier;
 public class QuestData {
     private static final Logger LOGGER = LogManager.getLogger();
     
-    private final List<Boolean> reward = new ArrayList<>();
+    private final List<Boolean> claimableRewards = new ArrayList<>();
+    private final List<TaskData> taskData = new ArrayList<>();
     public boolean completed;
     public boolean claimed;
-    private final List<TaskData> tasks = new ArrayList<>();
     public boolean available = true;
     public long time;
     
@@ -33,68 +33,68 @@ public class QuestData {
     public QuestData() {}
     
     public void setRewardsFromSerialization(List<Boolean> claimableRewards) {
-        reward.clear();
-        reward.addAll(claimableRewards);
+        this.claimableRewards.clear();
+        this.claimableRewards.addAll(claimableRewards);
     }
     
     public Iterable<Boolean> getRewardsForSerialization() {
-        return reward;
+        return claimableRewards;
     }
     
     public void setTaskDataFromSerialization(List<TaskData> taskData) {
-        tasks.clear();
-        tasks.addAll(taskData);
+        this.taskData.clear();
+        this.taskData.addAll(taskData);
     }
     
     public Iterable<TaskData> getTaskDataForSerialization() {
-        return tasks;
+        return taskData;
     }
     
     public void clearRewardClaims(int players) {
-        reward.clear();
+        claimableRewards.clear();
         for (int i = 0; i < players; i++)
-            reward.add(false);
+            claimableRewards.add(false);
     }
     
     public boolean canClaimReward(int playerId) {
-        return reward.get(playerId);
+        return claimableRewards.get(playerId);
     }
     
     public void setCanClaimReward(int playerId, boolean canClaim) {
-        reward.set(playerId, canClaim);
+        claimableRewards.set(playerId, canClaim);
     }
     
     public void removePlayer(int playerId) {
-        reward.remove(playerId);
+        claimableRewards.remove(playerId);
     }
     
     public void insertPlayer(int playerId, boolean canClaim) {
-        reward.add(playerId, canClaim);
+        claimableRewards.add(playerId, canClaim);
     }
     
     public boolean canClaimReward(Player player) {
         int id = getId(player);
-        return (id >= 0 && id < reward.size()) && reward.get(id);
+        return (id >= 0 && id < claimableRewards.size()) && claimableRewards.get(id);
     }
     
     public void claimReward(Player player) {
         int id = getId(player);
-        if (id >= 0 && id < reward.size()) {
-            reward.set(id, false);
+        if (id >= 0 && id < claimableRewards.size()) {
+            claimableRewards.set(id, false);
         }
     }
     
     public void claimFullReward() {
-        Collections.fill(reward, false);
+        Collections.fill(claimableRewards, false);
     }
     
     public void unlockRewardForAll() {
-        Collections.fill(reward, true);
+        Collections.fill(claimableRewards, true);
     }
     
     public void unlockRewardForRandom() {
-        int rewardId = (int) (Math.random() * reward.size());
-        reward.set(rewardId, true);
+        int rewardId = (int) (Math.random() * claimableRewards.size());
+        claimableRewards.set(rewardId, true);
     }
     
     private int getId(Player player) {
@@ -117,33 +117,33 @@ public class QuestData {
     }
     
     public void verifyTasksSize(Quest quest) {
-        while (tasks.size() < quest.getTasks().size()) {
-            tasks.add(quest.getTasks().get(tasks.size()).newQuestData());
+        while (taskData.size() < quest.getTasks().size()) {
+            taskData.add(quest.getTasks().get(taskData.size()).newQuestData());
         }
     }
     
     public <Data extends TaskData> Data getTaskData(Quest quest, int id, Class<Data> clazz, Supplier<Data> emptySupplier) {
         verifyTasksSize(quest);
         
-        TaskData data = tasks.get(id);
+        TaskData data = taskData.get(id);
         if (clazz.isInstance(data)) {
             return clazz.cast(data);
         } else {
             LOGGER.warn("Found task data of wrong type. Expected {}, was {}. Replacing with empty data of the correct type.", clazz, data == null ? null : data.getClass());
             Data newData = emptySupplier.get();
-            tasks.set(id, newData);
+            taskData.set(id, newData);
             return newData;
         }
     }
     
     public void clearTaskData(Quest quest) {
-        tasks.clear();
+        taskData.clear();
         verifyTasksSize(quest);
     }
     
     public void resetTaskData(int id, Supplier<? extends TaskData> emptySupplier) {
-        if (id < tasks.size()) {
-            tasks.set(id, emptySupplier.get());
+        if (id < taskData.size()) {
+            taskData.set(id, emptySupplier.get());
         }
     }
 }
