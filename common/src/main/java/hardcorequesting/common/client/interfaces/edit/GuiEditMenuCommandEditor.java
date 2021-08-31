@@ -28,7 +28,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
         super(gui, player, "", false, -1, null);
         this.quest = GuiQuestBook.selectedQuest;
-        this.commands = this.quest.getCommandRewardsAsStrings();
+        this.commands = this.quest.getRewards().getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];
         this.id = -1;
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
@@ -68,17 +68,17 @@ public class GuiEditMenuCommandEditor extends TextMenu {
         }
         
         if (this.added != null && !this.added.isEmpty()) {
-            quest.addCommand(this.added);
+            quest.getRewards().addCommand(this.added);
             SaveHelper.add(EditType.COMMAND_ADD);
         }
         if (this.commands != null) {
             for (int i = this.commands.length - 1; i >= 0; i--) {
                 if (edited[i]) {
                     if (commands[i].isEmpty()) {
-                        quest.removeCommand(i);
+                        quest.getRewards().removeCommand(i);
                         SaveHelper.add(EditType.COMMAND_REMOVE);
                     } else {
-                        quest.editCommand(i, this.commands[i]);
+                        quest.getRewards().editCommand(i, this.commands[i]);
                         SaveHelper.add(EditType.COMMAND_CHANGE);
                     }
                 }

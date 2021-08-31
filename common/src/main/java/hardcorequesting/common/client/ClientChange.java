@@ -96,7 +96,7 @@ public enum ClientChange {
             JsonObject root = parser.parse(data).getAsJsonObject();
             Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
             if (quest != null)
-                quest.claimReward(player, root.get(REWARD).getAsInt());
+                quest.getRewards().claimReward(player, root.get(REWARD).getAsInt());
         }
     }),
     TRACKER_UPDATE(new ClientUpdater<TrackerBlockEntity>() {

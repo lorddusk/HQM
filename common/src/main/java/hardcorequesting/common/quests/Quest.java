@@ -1,18 +1,13 @@
 package hardcorequesting.common.quests;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
 import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.client.sounds.SoundHandler;
-import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
@@ -20,34 +15,26 @@ import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
 import hardcorequesting.common.quests.data.QuestData;
-import hardcorequesting.common.quests.reward.CommandRewardList;
-import hardcorequesting.common.quests.reward.ItemStackRewardList;
-import hardcorequesting.common.quests.reward.ReputationReward;
+import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.team.PlayerEntry;
-import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 
 import java.awt.*;
 import java.util.List;
@@ -59,7 +46,7 @@ public class Quest {
     private static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
     //region pixelinfo
-    private static final int START_X = 20;
+    public static final int START_X = 20;
     private static final int TEXT_HEIGHT = 9;
     private static final int TASK_LABEL_START_Y = 100;
     private static final int TASK_MARGIN = 2;
@@ -67,19 +54,6 @@ public class Quest {
     private static final int DESCRIPTION_START_Y = 30;
     private static final int TASK_DESCRIPTION_X = 180;
     private static final int TASK_DESCRIPTION_Y = 20;
-    private static final int REWARD_STR_Y = 140;
-    private static final int REWARD_Y = 150;
-    private static final int REWARD_Y_OFFSET = 40;
-    private static final int REWARD_OFFSET = 20;
-    private static final int ITEM_SIZE = 18;
-    private static final int REPUTATION_X = 142;
-    private static final int REPUTATION_Y = 133;
-    private static final int REPUTATION_Y_LOWER = 150;
-    private static final int REPUTATION_SIZE = 16;
-    private static final int REPUTATION_SRC_X = 30;
-    private static final int REPUTATION_SRC_Y = 82;
-    private static final int MAX_REWARD_SLOTS = 7;
-    private static final int MAX_SELECT_REWARD_SLOTS = 4;
     @Deprecated
     public static boolean isEditing = false;
     public static UUID speciallySelectedQuestId = null;
@@ -90,6 +64,8 @@ public class Quest {
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
     private final List<ScrollBar> scrollBars = new ArrayList<>();
+    
+    private final QuestRewards rewards = new QuestRewards(this);
     public int nextTaskId;
     private UUID questId;
     private String name;
@@ -100,11 +76,7 @@ public class Quest {
     private List<UUID> reversedOptionLinks;
     private List<QuestTask<?>> tasks;
     private List<FormattedText> cachedDescription;
-    private List<ReputationReward> reputationRewards;
     private QuestTask<?> selectedTask;
-    private ItemStackRewardList rewards;
-    private ItemStackRewardList rewardChoices;
-    private CommandRewardList commandRewardList;
     private RepeatInfo repeatInfo = new RepeatInfo(RepeatType.NONE, 0, 0);
     private TriggerType triggerType = TriggerType.NONE;
     private int triggerTasks = 1;
@@ -114,8 +86,6 @@ public class Quest {
     private boolean isBig;
     private ItemStack iconStack = ItemStack.EMPTY;
     private QuestSet set;
-    private int selectedReward = -1;
-    private int lastClicked;
     private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
         @Override
         protected boolean isValid(UUID playerId, Quest parent, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
@@ -136,23 +106,6 @@ public class Quest {
     };
     
     {
-        buttons.add(new LargeButton("hqm.quest.claim", 100, 190) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return canPlayerClaimReward(player);
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return hasReward(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<>(getQuestId(), rewardChoices.isEmpty() ? -1 : selectedReward)));
-            }
-        });
-        
         buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
@@ -321,9 +274,6 @@ public class Quest {
         optionLinks = new ArrayList<>();
         reversedOptionLinks = new ArrayList<>();
         tasks = new ArrayList<>();
-        rewards = new ItemStackRewardList();
-        rewardChoices = new ItemStackRewardList();
-        commandRewardList = new CommandRewardList();
         
         QuestSetsManager.getInstance().quests.put(getQuestId(), this);
     }
@@ -349,36 +299,6 @@ public class Quest {
         if (questId == null) return null;
         
         return QuestSetsManager.getInstance().quests.get(questId);
-    }
-    
-    public static void addItems(Player player, List<ItemStack> itemsToAdd) {
-        for (int i = 0; i < player.getInventory().items.size(); i++) {
-            Iterator<ItemStack> iterator = itemsToAdd.iterator();
-            while (iterator.hasNext()) {
-                ItemStack nextStack = iterator.next();
-                ItemStack stack = player.getInventory().items.get(i);
-                
-                if (stack.isEmpty()) {
-                    int amount = Math.min(nextStack.getMaxStackSize(), nextStack.getCount());
-                    ItemStack copyStack = nextStack.copy();
-                    copyStack.setCount(amount);
-                    player.getInventory().items.set(i, copyStack);
-                    nextStack.shrink(amount);
-                    if (nextStack.getCount() <= 0) {
-                        iterator.remove();
-                    }
-                    break;
-                } else if (stack.sameItemStackIgnoreDurability(nextStack) && ItemStack.tagMatches(nextStack, stack)) {
-                    int amount = Math.min(nextStack.getMaxStackSize() - stack.getCount(), nextStack.getCount());
-                    stack.grow(amount);
-                    nextStack.shrink(amount);
-                    if (nextStack.getCount() <= 0) {
-                        iterator.remove();
-                    }
-                    break;
-                }
-            }
-        }
     }
     
     public static void removeQuest(Quest quest) {
@@ -421,40 +341,12 @@ public class Quest {
         this.y = y;
     }
     
-    public NonNullList<ItemStack> getReward() {
-        return rewards.toList();
+    public QuestRewards getRewards() {
+        return rewards;
     }
     
-    public void setReward(NonNullList<ItemStack> reward) {
-        this.rewards.set(reward);
-    }
-    
-    public NonNullList<ItemStack> getRewardChoice() {
-        return rewardChoices.toList();
-    }
-    
-    public void setRewardChoice(NonNullList<ItemStack> rewardChoice) {
-        this.rewardChoices.set(rewardChoice);
-    }
-    
-    public String[] getCommandRewardsAsStrings() {
-        return this.commandRewardList.asStrings();
-    }
-    
-    public void setCommandRewards(String[] commands) {
-        this.commandRewardList.set(commands);
-    }
-    
-    public void addCommand(String command) {
-        this.commandRewardList.add(command);
-    }
-    
-    public void editCommand(int id, String command) {
-        this.commandRewardList.set(id, command);
-    }
-    
-    public void removeCommand(int id) {
-        this.commandRewardList.remove(id);
+    public boolean hasReward(Player player) {
+        return getRewards().hasReward(getQuestData(player), player);
     }
     
     public RepeatInfo getRepeatInfo() {
@@ -653,14 +545,6 @@ public class Quest {
         return result;
     }
     
-    public List<ReputationReward> getReputationRewards() {
-        return reputationRewards;
-    }
-    
-    public void setReputationRewards(List<ReputationReward> reputationRewards) {
-        this.reputationRewards = reputationRewards;
-    }
-    
     public boolean isAvailable(Player player) {
         return isAvailable(player.getUUID());
     }
@@ -760,11 +644,12 @@ public class Quest {
     
     @Environment(EnvType.CLIENT)
     public int getColorFilter(Player player, int tick) {
+        boolean hasReward = hasReward(player);
         if (canQuestsBeEdited() && !isVisible(player)) {
             return HQMConfig.QUEST_INVISIBLE;
         } else if (!isEnabled(player)) {
             return HQMConfig.QUEST_DISABLED;
-        } else if (!isAvailable(player) && !hasReward(player)) {
+        } else if (!isAvailable(player) && !hasReward) {
             return getRepeatInfo().getType() == RepeatType.NONE ? HQMConfig.QUEST_COMPLETE : HQMConfig.QUEST_COMPLETE_REPEATABLE;
         } else {
             if (HQMConfig.getInstance().Interface.Quests.SINGLE_COLOUR) return HQMConfig.QUEST_AVAILABLE;
@@ -775,8 +660,8 @@ public class Quest {
             int component = componentBase + componentVariable;
             
             
-            int red = hasReward(player) ? componentBase : component;
-            int green = hasReward(player) ? component * 3 / 4 : component;
+            int red = hasReward ? componentBase : component;
+            int green = hasReward ? component * 3 / 4 : component;
             int blue = component;
             
             return (0xFF << 24) |
@@ -826,6 +711,7 @@ public class Quest {
     
     @Environment(EnvType.CLIENT)
     public void drawMenu(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+        QuestData data = getQuestData(player);
         if (!canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
             if (tasks.size() > 0) {
                 selectedTask = tasks.get(0);
@@ -856,21 +742,6 @@ public class Quest {
             }
         }
         
-        if (selectedReward != -1 && !hasReward(player)) {
-            selectedReward = -1;
-        }
-        if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
-            if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
-                drawRewards(gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
-            }
-        } else if (!rewardChoices.isEmpty()) {
-            gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
-        }
-        
         for (LargeButton button : buttons) {
             button.draw(matrices, gui, player, mX, mY);
         }
@@ -880,44 +751,7 @@ public class Quest {
             scrollBar.draw(gui);
         }
         
-        
-        boolean claimed = getQuestData(player).claimed;
-        int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited() ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
-        boolean hover = gui.inBounds(REPUTATION_X, y, REPUTATION_SIZE, REPUTATION_SIZE, mX, mY);
-        
-        
-        if (reputationRewards != null || canQuestsBeEdited()) {
-            if (reputationRewards == null) {
-                claimed = true;
-            }
-            
-            int backgroundIndex = claimed ? 2 : hover ? 1 : 0;
-            int foregroundIndex;
-            if (claimed) {
-                foregroundIndex = 3;
-            } else {
-                boolean positive = false;
-                boolean negative = false;
-                for (ReputationReward reputationReward : reputationRewards) {
-                    if (reputationReward.getValue() < 0) {
-                        negative = true;
-                    } else if (reputationReward.getValue() > 0) {
-                        positive = true;
-                    }
-                }
-                
-                if (negative == positive) {
-                    foregroundIndex = 2;
-                } else {
-                    foregroundIndex = positive ? 0 : 1;
-                }
-            }
-            
-            
-            foregroundIndex += 3;
-            gui.drawRect(REPUTATION_X, y, REPUTATION_SRC_X + backgroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
-            gui.drawRect(REPUTATION_X, y, REPUTATION_SRC_X + foregroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
-        }
+        rewards.draw(matrices, gui, player, mX, mY, data);
         
         if (selectedTask != null) {
             /*if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
@@ -938,37 +772,12 @@ public class Quest {
         /*} else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
         }
-        
-        if (!rewards.isEmpty() || canQuestsBeEdited()) {
-            drawRewardMouseOver(matrices, gui, rewards.toList(), REWARD_Y, -1, mX, mY);
-            if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
-            }
-        } else if (!rewardChoices.isEmpty()) {
-            drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY);
-        }
+    
         for (LargeButton button : buttons) {
             button.renderTooltip(matrices, gui, player, mX, mY);
         }
-        
-        if (reputationRewards != null && hover) {
-            List<FormattedText> str = new ArrayList<>();
-            for (ReputationReward reputationReward : reputationRewards) {
-                if (reputationReward.getValue() != 0 && reputationReward.getReward() != null && reputationReward.getReward().isValid()) {
-                    str.add(Translator.plain(reputationReward.getLabel()));
-                }
-                
-            }
-            
-            List<FormattedText> commentLines = gui.getLinesFromText(Translator.translatable("hqm.quest.partyRepReward" + (claimed ? "Claimed" : "")), 1, 200);
-            if (commentLines != null) {
-                str.add(FormattedText.EMPTY);
-                for (FormattedText commentLine : commentLines) {
-                    str.add(Translator.text(Translator.rawString(commentLine), GuiColor.GRAY));
-                }
-            }
-            gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
-        }
+    
+        rewards.drawTooltips(matrices, gui, player, mX, mY, data);
     }
     
     @Environment(EnvType.CLIENT)
@@ -978,120 +787,12 @@ public class Quest {
         }
         
         int count = 0;
-        for (QuestTask task : tasks) {
+        for (QuestTask<?> task : tasks) {
             if (task.isVisible(((GuiQuestBook) gui).getPlayer())) {
                 count++;
             }
         }
         return count;
-    }
-    
-    private boolean canPlayerClaimReward(Player player) {
-        return hasReward(player) && (rewardChoices.isEmpty() || selectedReward != -1) && isEnabled(player);
-    }
-    
-    public boolean hasReward(Player player) {
-        return (getQuestData(player).canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (getQuestData(player).canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private void drawRewards(GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY, int max) {
-        rewards = getEditFriendlyRewards(rewards, max);
-        
-        
-        for (int i = 0; i < rewards.size(); i++) {
-            gui.drawItemStack(rewards.get(i), START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private void drawRewardMouseOver(PoseStack matrices, GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY) {
-        if (rewards != null) {
-            for (int i = 0; i < rewards.size(); i++) {
-                if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                    if (!rewards.get(i).isEmpty()) {
-                        GuiQuestBook.setSelectedStack(rewards.get(i));
-                        List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
-                        List<FormattedText> list2 = Lists.newArrayList(str);
-                        if (selected == i) {
-                            list2.add(FormattedText.EMPTY);
-                            list2.add(Translator.translatable("hqm.quest.selected", GuiColor.GREEN));
-                        }
-                        gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
-                    }
-                    break;
-                }
-            }
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private NonNullList<ItemStack> getEditFriendlyRewards(NonNullList<ItemStack> rewards, int max) {
-        if (rewards.isEmpty()) {
-            return NonNullList.withSize(1, ItemStack.EMPTY);
-        } else if (canQuestsBeEdited() && rewards.size() < max) {
-            NonNullList<ItemStack> rewardsWithEmpty = NonNullList.create();
-            rewardsWithEmpty.addAll(rewards);
-            rewardsWithEmpty.add(ItemStack.EMPTY);
-            return rewardsWithEmpty;
-        } else {
-            return rewards;
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private void handleRewardClick(GuiQuestBook gui, Player player, NonNullList<ItemStack> rawRewards, int y, boolean canSelect, int mX, int mY) {
-        NonNullList<ItemStack> rewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
-        
-        boolean doubleClick = false;
-        
-        for (int i = 0; i < rewards.size(); i++) {
-            if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
-                if (gui.getCurrentMode() == EditMode.NORMAL) {
-                    int lastDiff = player.tickCount - lastClicked;
-                    if (lastDiff < 0) {
-                        lastClicked = player.tickCount;
-                    } else if (lastDiff < 6) {
-                        doubleClick = true;
-                    } else {
-                        lastClicked = player.tickCount;
-                    }
-                }
-                if (canSelect && (!canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
-                    if (selectedReward == i) {
-                        selectedReward = -1;
-                    } else if (!rewards.get(i).isEmpty()) {
-                        selectedReward = i;
-                    }
-                } else if (canQuestsBeEdited()) {
-                    if (gui.getCurrentMode() == EditMode.DELETE) {
-                        if (i < rawRewards.size()) {
-                            rawRewards.remove(i);
-                            if (canSelect && selectedReward != -1) {
-                                if (selectedReward == i) {
-                                    selectedReward = -1;
-                                } else if (selectedReward > i) {
-                                    selectedReward--;
-                                }
-                            }
-                            
-                            if (canSelect) {
-                                this.rewardChoices.set(rawRewards);
-                            } else {
-                                this.rewards.set(rawRewards);
-                            }
-                            SaveHelper.add(EditType.REWARD_REMOVE);
-                        }
-                    } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
-                        final int id = i;
-                        PickItemMenu.display(gui, player, rewards.get(i), PickItemMenu.Type.ITEM, rewards.get(i).isEmpty() ? 1 : rewards.get(i).getCount(),
-                                result -> this.setReward(result.getWithAmount(), id, !canSelect));
-                    }
-                }
-                
-                break;
-            }
-        }
     }
     
     @Environment(EnvType.CLIENT)
@@ -1161,16 +862,9 @@ public class Quest {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onClick(gui, mX, mY);
             }
-            
-            if (!rewards.isEmpty() || canQuestsBeEdited()) {
-                handleRewardClick(gui, player, rewards.toList(), REWARD_Y, false, mX, mY);
-                if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
-                    handleRewardClick(gui, player, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
-                }
-            } else if (!rewardChoices.isEmpty()) {
-                handleRewardClick(gui, player, rewardChoices.toList(), REWARD_Y, true, mX, mY);
-            }
-            
+    
+            rewards.onClick(gui, player, mX, mY);
+    
             if (selectedTask != null) {
                 selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
             }
@@ -1196,13 +890,6 @@ public class Quest {
             
             if (canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
                 selectedTask = null;
-            }
-            
-            if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
-                int y = rewards == null || rewards.size() <= MAX_REWARD_SLOTS - (canQuestsBeEdited() ? 2 : 1) ? REPUTATION_Y_LOWER : REPUTATION_Y;
-                if (gui.inBounds(REPUTATION_X, y, REPUTATION_SIZE, REPUTATION_SIZE, mX, mY)) {
-                    gui.setEditMenu(new GuiEditMenuReputationReward(gui, player, reputationRewards));
-                }
             }
         }
     }
@@ -1249,7 +936,7 @@ public class Quest {
         }
     }
     
-    private void sendUpdatedData(ServerPlayer player) {
+    public void sendUpdatedData(ServerPlayer player) {
         if (player == null) return; // Don't send to nobody you silly goose
         IMessage update = new QuestDataUpdateMessage(
                 getQuestId(),
@@ -1257,109 +944,6 @@ public class Quest {
                 QuestingDataManager.getInstance().getQuestingData(player).getQuestData(getQuestId())
         );
         NetworkManager.sendToPlayer(update, player);
-    }
-    
-    public void claimReward(Player player, int selectedReward) {
-        if (hasReward(player)) {
-            boolean sentInfo = false;
-            if (getQuestData(player).canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
-                List<ItemStack> items = new ArrayList<>();
-                if (!rewards.isEmpty()) {
-                    for (ItemStack stack : rewards.toList()) {
-                        items.add(stack.copy());
-                    }
-                }
-                if (!rewardChoices.isEmpty()) {
-                    if (selectedReward >= 0 && selectedReward < rewardChoices.size()) {
-                        items.add(rewardChoices.getReward(selectedReward).copy());
-                    } else {
-                        return;
-                    }
-                }
-                
-                List<ItemStack> itemsToAdd = new ArrayList<>();
-                for (ItemStack stack : items) {
-                    boolean added = false;
-                    for (ItemStack stack1 : itemsToAdd) {
-                        if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack, stack1)) {
-                            stack1.grow(stack.getCount());
-                            added = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!added) {
-                        itemsToAdd.add(stack.copy());
-                    }
-                }
-                
-                List<ItemStack> itemsToCheck = new ArrayList<>();
-                for (ItemStack stack : itemsToAdd) {
-                    itemsToCheck.add(stack.copy());
-                }
-                for (int i = 0; i < player.getInventory().items.size(); i++) {
-                    for (ItemStack stack1 : itemsToCheck) {
-                        if (stack1.getCount() > 0) {
-                            ItemStack stack = player.getInventory().items.get(i);
-                            if (stack == ItemStack.EMPTY) {
-                                stack1.shrink(stack1.getMaxStackSize());
-                                break;
-                            } else if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack1, stack)) {
-                                stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
-                                break;
-                            }
-                        }
-                    }
-                    
-                }
-                
-                
-                boolean valid = true;
-                for (ItemStack stack : itemsToCheck) {
-                    if (stack.getCount() > 0) {
-                        valid = false;
-                        break;
-                    }
-                }
-                
-                if (valid) {
-                    addItems(player, itemsToAdd);
-                    player.getInventory().setChanged();
-                    QuestData data = getQuestData(player);
-                    Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
-                    if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                        data.claimFullReward();
-                        sendUpdatedDataToTeam(player);
-                    } else {
-                        data.claimReward(player);
-                        if (player instanceof ServerPlayer)
-                            sendUpdatedData((ServerPlayer) player);
-                    }
-                    sentInfo = true;
-                } else {
-                    return;
-                }
-            }
-            
-            
-            if (reputationRewards != null && getQuestData(player).canClaim()) {
-                getQuestData(player).claimed = true;
-                QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
-                EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
-                sentInfo = true;
-            }
-            
-            if (commandRewardList != null && getQuestData(player).canClaim()) {
-                getQuestData(player).claimed = true;
-                commandRewardList.executeAll(player);
-                sentInfo = true;
-            }
-            
-            if (sentInfo) {
-                SoundHandler.play(Sounds.COMPLETE, player);
-            }
-            
-        }
     }
     
     public void setBigIcon(boolean b) {
@@ -1373,18 +957,6 @@ public class Quest {
     public void setDescription(String description) {
         this.description = description;
         cachedDescription = null;
-    }
-    
-    private void setReward(ItemStack stack, int id, boolean isStandardReward) {
-        ItemStackRewardList rewardList = isStandardReward ? this.rewards : this.rewardChoices;
-        
-        if (id < rewardList.size()) {
-            rewardList.set(id, stack);
-            SaveHelper.add(EditType.REWARD_CHANGE);
-        } else {
-            SaveHelper.add(EditType.REWARD_CREATE);
-            rewardList.add(stack);
-        }
     }
     
     public boolean hasSameSetAs(Quest child) {

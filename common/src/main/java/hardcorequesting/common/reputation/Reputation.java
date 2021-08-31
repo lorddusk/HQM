@@ -172,7 +172,7 @@ public class Reputation {
                                 }
                             }
                             
-                            List<ReputationReward> rewards = quest.getReputationRewards();
+                            List<ReputationReward> rewards = quest.getRewards().getReputationRewards();
                             if (rewards != null) {
                                 rewards.removeIf(reward -> reputation.equals(reward.getReward()));
                             }
