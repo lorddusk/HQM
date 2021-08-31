@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.locale.Language;
@@ -123,14 +124,16 @@ public class GuiBase extends Screen {
                 break;
         }
         
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
         bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
         bufferBuilder.vertex(x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
-        bufferBuilder.end();
-        BufferUploader.end(bufferBuilder);
+        tesselator.end();
     }
     
     public void renderTooltip(PoseStack matrices, FormattedText stringRenderable, int x, int y) {
@@ -143,16 +146,26 @@ public class GuiBase extends Screen {
     }
     
     public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
-        RenderSystem.disableTexture();
+        // This block was written with insufficient knowledge on normals, adapted so that the line shows up correctly
+        // Feel free to have the normals changed if you feel more knowledgeable on the subject
+        if (y2 < y1) {
+            drawLine(x2, y2, x1, y1, thickness, color);
+            return;
+        }
+        int dx = x2 - x1, dy = y2 - y1;
+        
         applyColor(color);
-        
-        GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glLineWidth(1 + thickness * this.width / 500F);
-        
-        GL11.glBegin(GL11.GL_LINES);
-        GL11.glVertex3f(x1, y1, 0);
-        GL11.glVertex3f(x2, y2, 0);
-        GL11.glEnd();
+        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+        RenderSystem.disableTexture();
+        float scale = (float) this.minecraft.getWindow().getGuiScale();
+        RenderSystem.lineWidth(1 + thickness * scale / 2F);
+    
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder builder = tesselator.getBuilder();
+        builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+        builder.vertex(x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        tesselator.end();
         
         RenderSystem.enableTexture();
     }
@@ -171,30 +184,6 @@ public class GuiBase extends Screen {
     
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
         HardcoreQuestingCore.platform.renderFluidStack(fluid, stack, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
-        /*//IIcon icon = fluid.getIconStack();
-        Item stack = null;
-
-        if (icon == null) {
-            if (FluidRegistry.WATER.equals(fluid)) {
-                icon = Blocks.water.getIconStack(0, 0);
-            } else if (FluidRegistry.LAVA.equals(fluid)) {
-                icon = Blocks.water.getIconStack(0, 0);
-            }
-        }
-
-        if (icon != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-            ResourceHelper.bindResource(MAP_TEXTURE);
-
-            drawRect(x, y, 256 - 16, 256 - 16, 16, 16);
-
-            ResourceHelper.bindResource(TERRAIN);
-            setColor(fluid.getColor());
-            drawIcon(icon, x, y);
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        }*/
     }
     
     public void applyColor(int color) {
