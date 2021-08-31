@@ -250,6 +250,25 @@ public class QuestRewards {
         if (selectedReward != -1 && !hasReward(data, player)) {
             selectedReward = -1;
         }
+        
+        drawItemRewards(matrices, gui, mX, mY);
+    
+        claimButton.draw(matrices, gui, player, mX, mY);
+        
+        drawReputationIcon(gui, mX, mY, data);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public void drawTooltips(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY, QuestData data) {
+        drawItemRewardTooltips(matrices, gui, mX, mY);
+    
+        claimButton.renderTooltip(matrices, gui, player, mX, mY);
+    
+        drawRepIconTooltip(matrices, gui, mX, mY, data);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void drawItemRewards(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (!rewards.isEmpty() || Quest.canQuestsBeEdited()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
@@ -261,16 +280,28 @@ public class QuestRewards {
             gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
             drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
-        
-        claimButton.draw(matrices, gui, player, mX, mY);
-        
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void drawItemRewardTooltips(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        if (!rewards.isEmpty() || Quest.canQuestsBeEdited()) {
+            drawRewardMouseOver(matrices, gui, rewards.toList(), REWARD_Y, -1, mX, mY);
+            if (!rewardChoices.isEmpty() || Quest.canQuestsBeEdited()) {
+                drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
+            }
+        } else if (!rewardChoices.isEmpty()) {
+            drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY);
+        }
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void drawReputationIcon(GuiQuestBook gui, int mX, int mY, QuestData data) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-    
         if (reputationRewards != null || Quest.canQuestsBeEdited()) {
             boolean claimed = data.claimed || reputationRewards == null;
-        
+            
             int backgroundIndex = claimed ? 2 : isOnReputationIcon(gui, mX, mY) ? 1 : 0;
             int foregroundIndex;
             if (claimed) {
@@ -285,7 +316,7 @@ public class QuestRewards {
                         positive = true;
                     }
                 }
-            
+                
                 if (negative == positive) {
                     foregroundIndex = 2;
                 } else {
@@ -301,18 +332,7 @@ public class QuestRewards {
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawTooltips(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY, QuestData data) {
-        if (!rewards.isEmpty() || Quest.canQuestsBeEdited()) {
-            drawRewardMouseOver(matrices, gui, rewards.toList(), REWARD_Y, -1, mX, mY);
-            if (!rewardChoices.isEmpty() || Quest.canQuestsBeEdited()) {
-                drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY);
-            }
-        } else if (!rewardChoices.isEmpty()) {
-            drawRewardMouseOver(matrices, gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY);
-        }
-    
-        claimButton.renderTooltip(matrices, gui, player, mX, mY);
-        
+    private void drawRepIconTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY, QuestData data) {
         if (reputationRewards != null && isOnReputationIcon(gui, mX, mY)) {
             List<FormattedText> str = new ArrayList<>();
             for (ReputationReward reputationReward : reputationRewards) {
