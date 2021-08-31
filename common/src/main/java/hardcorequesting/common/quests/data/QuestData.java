@@ -112,7 +112,7 @@ public class QuestData {
         return -1;
     }
     
-    public boolean canClaim() {
+    public boolean canClaimTeamRewards() {
         return completed && !claimed;
     }
     

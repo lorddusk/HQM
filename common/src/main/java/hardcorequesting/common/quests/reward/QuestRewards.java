@@ -31,6 +31,7 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -127,109 +128,73 @@ public class QuestRewards {
     }
     
     public boolean hasReward(QuestData data, Player player) {
-        return (data.canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (data.canClaim() && (reputationRewards != null || !commandRewardList.isEmpty()));
+        return (data.canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) || (data.canClaimTeamRewards() && (reputationRewards != null || !commandRewardList.isEmpty()));
     }
     
     public void claimReward(Player player, int selectedReward) {
         QuestData data = quest.getQuestData(player);
         if (hasReward(data, player)) {
-            boolean sentInfo = false;
+            boolean claimedAny = false;
             if (data.canClaimReward(player) && (!rewards.isEmpty() || !rewardChoices.isEmpty())) {
                 List<ItemStack> items = new ArrayList<>();
                 if (!rewards.isEmpty()) {
-                    for (ItemStack stack : rewards.toList()) {
-                        items.add(stack.copy());
-                    }
+                    items.addAll(rewards.toList());
                 }
                 if (!rewardChoices.isEmpty()) {
                     if (selectedReward >= 0 && selectedReward < rewardChoices.size()) {
-                        items.add(rewardChoices.getReward(selectedReward).copy());
+                        items.add(rewardChoices.getReward(selectedReward));
                     } else {
                         return;
                     }
                 }
-                
-                List<ItemStack> itemsToAdd = new ArrayList<>();
-                for (ItemStack stack : items) {
-                    boolean added = false;
-                    for (ItemStack stack1 : itemsToAdd) {
-                        if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack, stack1)) {
-                            stack1.grow(stack.getCount());
-                            added = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!added) {
-                        itemsToAdd.add(stack.copy());
-                    }
-                }
-                
-                List<ItemStack> itemsToCheck = new ArrayList<>();
-                for (ItemStack stack : itemsToAdd) {
-                    itemsToCheck.add(stack.copy());
-                }
-                for (int i = 0; i < player.getInventory().items.size(); i++) {
-                    for (ItemStack stack1 : itemsToCheck) {
-                        if (stack1.getCount() > 0) {
-                            ItemStack stack = player.getInventory().items.get(i);
-                            if (stack == ItemStack.EMPTY) {
-                                stack1.shrink(stack1.getMaxStackSize());
-                                break;
-                            } else if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack1, stack)) {
-                                stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
-                                break;
-                            }
-                        }
-                    }
-                    
-                }
-                
-                
-                boolean valid = true;
-                for (ItemStack stack : itemsToCheck) {
-                    if (stack.getCount() > 0) {
-                        valid = false;
-                        break;
-                    }
-                }
-                
-                if (valid) {
-                    addItems(player, itemsToAdd);
-                    player.getInventory().setChanged();
-                    Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
-                    if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
-                        data.claimFullReward();
-                        quest.sendUpdatedDataToTeam(player);
-                    } else {
-                        data.claimReward(player);
-                        if (player instanceof ServerPlayer)
-                            quest.sendUpdatedData((ServerPlayer) player);
-                    }
-                    sentInfo = true;
-                } else {
+    
+                List<ItemStack> itemsToAdd = copyAndMergeStacks(items);
+    
+                if (!canInventoryHoldAll(player, itemsToAdd))
                     return;
+                
+                addItems(player, itemsToAdd);
+                player.getInventory().setChanged();
+                Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+                if (!team.isSingle() && team.getRewardSetting() == RewardSetting.ANY) {
+                    data.claimFullReward();
+                    quest.sendUpdatedDataToTeam(player);
+                } else {
+                    data.claimReward(player);
+                    if (player instanceof ServerPlayer)
+                        quest.sendUpdatedData((ServerPlayer) player);
                 }
+                claimedAny = true;
             }
             
+    
+            claimedAny |= tryClaimReputationReward(player, data);
+    
+            claimedAny |= tryClaimCommandReward(player, data);
             
-            if (reputationRewards != null && data.canClaim()) {
-                QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(quest, reputationRewards);
-                EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
-                sentInfo = true;
-            }
-            
-            if (data.canClaim()) {
-                commandRewardList.executeAll(player);
-                sentInfo = true;
-            }
-            data.claimed = true;
-            
-            if (sentInfo) {
+            if (claimedAny) {
+                data.claimed = true;
                 SoundHandler.play(Sounds.COMPLETE, player);
             }
             
         }
+    }
+    
+    private boolean tryClaimReputationReward(Player player, QuestData data) {
+        if (reputationRewards != null && data.canClaimTeamRewards()) {
+            QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(quest, reputationRewards);
+            EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean tryClaimCommandReward(Player player, QuestData data) {
+        if (!commandRewardList.isEmpty() && data.canClaimTeamRewards()) {
+            commandRewardList.executeAll(player);
+            return true;
+        }
+        return false;
     }
     
     private void setReward(ItemStack stack, int id, boolean isStandardReward) {
@@ -482,6 +447,51 @@ public class QuestRewards {
     @Environment(EnvType.CLIENT)
     private boolean isOnReputationIcon(GuiQuestBook gui, int mX, int mY) {
         return gui.inBounds(REPUTATION_X, getRepIconY(), REPUTATION_SIZE, REPUTATION_SIZE, mX, mY);
+    }
+    
+    @NotNull
+    public static List<ItemStack> copyAndMergeStacks(List<ItemStack> items) {
+        List<ItemStack> itemsToAdd = new ArrayList<>();
+        for (ItemStack stack : items) {
+            boolean added = false;
+            for (ItemStack stack1 : itemsToAdd) {
+                if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack, stack1)) {
+                    stack1.grow(stack.getCount());
+                    added = true;
+                    break;
+                }
+            }
+            
+            if (!added) {
+                itemsToAdd.add(stack.copy());
+            }
+        }
+        return itemsToAdd;
+    }
+    
+    public static boolean canInventoryHoldAll(Player player, List<ItemStack> items) {
+        List<ItemStack> itemsToCheck = new ArrayList<>();
+        for (ItemStack stack : items) {
+            itemsToCheck.add(stack.copy());
+        }
+        
+        for (int i = 0; i < player.getInventory().items.size(); i++) {
+            ItemStack stack = player.getInventory().items.get(i);
+            for (ItemStack stack1 : itemsToCheck) {
+                if (!stack1.isEmpty()) {
+                    if (stack.isEmpty()) {
+                        stack1.shrink(stack1.getMaxStackSize());
+                        break;
+                    } else if (stack.sameItemStackIgnoreDurability(stack1) && ItemStack.tagMatches(stack1, stack)) {
+                        stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
+                        break;
+                    }
+                }
+            }
+            
+        }
+        
+        return itemsToCheck.stream().allMatch(ItemStack::isEmpty);
     }
     
     public static void addItems(Player player, List<ItemStack> itemsToAdd) {
