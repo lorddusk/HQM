@@ -24,13 +24,30 @@ public class QuestData {
     public boolean available = true;
     public long time;
     
+    // Create new data
     public QuestData(int players) {
         clearRewardClaims(players);
     }
     
-    @Deprecated
-    public int getPlayers() {
-        return reward.size();
+    // Initialize data from serialization
+    public QuestData() {}
+    
+    public void setRewardsFromSerialization(List<Boolean> claimableRewards) {
+        reward.clear();
+        reward.addAll(claimableRewards);
+    }
+    
+    public Iterable<Boolean> getRewardsForSerialization() {
+        return reward;
+    }
+    
+    public void setTaskDataFromSerialization(List<TaskData> taskData) {
+        tasks.clear();
+        tasks.addAll(taskData);
+    }
+    
+    public Iterable<TaskData> getTaskDataForSerialization() {
+        return tasks;
     }
     
     public void clearRewardClaims(int players) {
@@ -97,15 +114,6 @@ public class QuestData {
     
     public boolean canClaim() {
         return completed && !claimed;
-    }
-    
-    public void setTaskDataFromSerialization(List<TaskData> taskData) {
-        tasks.clear();
-        tasks.addAll(taskData);
-    }
-    
-    public Iterable<TaskData> getTaskDataForSerialization() {
-        return tasks;
     }
     
     public void verifyTasksSize(Quest quest) {

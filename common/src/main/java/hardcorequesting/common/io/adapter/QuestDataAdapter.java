@@ -15,7 +15,6 @@ import java.util.List;
 public class QuestDataAdapter {
     
     public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<>() {
-        public static final String PLAYERS = "players";
         public static final String REWARDS = "rewards";
         public static final String COMPLETED = "completed";
         public static final String CLAIMED = "claimed";
@@ -26,10 +25,9 @@ public class QuestDataAdapter {
         @Override
         public void write(JsonWriter out, QuestData value) throws IOException {
             out.beginObject();
-            out.name(PLAYERS).value(value.getPlayers());
             out.name(REWARDS).beginArray();
-            for (int i = 0; i < value.getPlayers(); i++)
-                out.value(value.canClaimReward(i));
+            for (boolean canClaim : value.getRewardsForSerialization())
+                out.value(canClaim);
             out.endArray();
             out.name(COMPLETED).value(value.completed);
             out.name(CLAIMED).value(value.claimed);
@@ -47,18 +45,16 @@ public class QuestDataAdapter {
         
         @Override
         public QuestData read(JsonReader in) throws IOException {
-            QuestData data = new QuestData(1);
+            QuestData data = new QuestData();
             in.beginObject();
             while (in.hasNext()) {
                 switch (in.nextName()) {
-                    case PLAYERS:
-                        data = new QuestData(in.nextInt());
-                        break;
                     case REWARDS:
                         in.beginArray();
-                        int i = 0;
-                        while (in.hasNext() && i < data.getPlayers())
-                            data.setCanClaimReward(i++, in.nextBoolean());
+                        List<Boolean> claimableRewards = new ArrayList<>();
+                        while (in.hasNext())
+                            claimableRewards.add(in.nextBoolean());
+                        data.setRewardsFromSerialization(claimableRewards);
                         in.endArray();
                         break;
                     case COMPLETED:
