@@ -217,6 +217,7 @@ public class QuestRewards {
             SaveHelper.add(EditType.REWARD_CREATE);
             rewardList.add(stack);
         }
+        quest.setIconIfEmpty(stack);
     }
     
     @Environment(EnvType.CLIENT)

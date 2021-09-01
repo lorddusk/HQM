@@ -619,6 +619,27 @@ public class Quest {
     public void setIconStack(Either<ItemStack, FluidStack> iconStack) {
         this.iconStack = iconStack;
     }
+    
+    public void setIconIfEmpty(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            stack = stack.copy();
+            stack.setCount(1);
+            setIconIfEmpty(Either.left(stack));
+        }
+    }
+    
+    public void setIconIfEmpty(FluidStack stack) {
+        if (!stack.isEmpty())
+            setIconIfEmpty(Either.right(stack));
+    }
+    
+    public void setIconIfEmpty(Either<ItemStack, FluidStack> iconStack) {
+        if (this.iconStack.map(ItemStack::isEmpty, FluidStack::isEmpty)) {
+            setIconStack(iconStack);
+            SaveHelper.add(EditType.ICON_CHANGE);
+        }
+    }
+    
     //endregion
     
     public boolean useBigIcon() {

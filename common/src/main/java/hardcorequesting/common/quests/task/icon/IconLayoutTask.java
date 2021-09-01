@@ -30,6 +30,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     
     public void setIcon(int id, Either<ItemStack, FluidStack> stack) {
         parts.getOrCreateForModify(id).setIconStack(stack);
+        parent.setIconIfEmpty(stack);
     }
     
     public void setName(int id, String str) {

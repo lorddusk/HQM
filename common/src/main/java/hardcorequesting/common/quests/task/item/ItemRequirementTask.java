@@ -56,14 +56,16 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
+    public void setItem(Either<ItemStack, FluidStack> stack, int amount, ItemPrecision precision, int id) {
         
         Part requirement = parts.getOrCreateForModify(id);
     
-        requirement.stack = item;
+        requirement.stack = stack;
         requirement.required = amount;
         requirement.precision = precision;
         requirement.permutations = null;
+        
+        parent.setIconIfEmpty(stack);
     }
     
     public int getProgress(Player player, int id) {

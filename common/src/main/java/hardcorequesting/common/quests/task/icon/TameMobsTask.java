@@ -64,6 +64,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
                 Item egg = SpawnEggItem.byId(entityType);
                 if(egg != null) {
                     part.setIconStack(Either.left(new ItemStack(egg)));
+                    parent.setIconIfEmpty(new ItemStack(egg));
                 }
             }
         }
