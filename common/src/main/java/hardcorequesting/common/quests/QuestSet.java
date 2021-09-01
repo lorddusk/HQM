@@ -422,6 +422,7 @@ public class QuestSet {
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int x0, int y0, int x, int y) {
+        
         if (gui.isOpBook) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
         }
@@ -436,7 +437,9 @@ public class QuestSet {
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
     
         drawConnectingLines(gui, player, isVisibleCache, isLinkFreeCache);
-    
+        
+        gui.setBlitOffset(50);
+        
         drawQuestIcons(gui, x, y, player, isVisibleCache, isLinkFreeCache);
     
         for (Quest quest : getQuests().values()) {

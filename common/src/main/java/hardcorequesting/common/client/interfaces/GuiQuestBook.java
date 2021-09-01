@@ -449,6 +449,8 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void render(PoseStack matrices, int x0, int y0, float f) {
+        setBlitOffset(0);
+        
         selectedStack = null;
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;

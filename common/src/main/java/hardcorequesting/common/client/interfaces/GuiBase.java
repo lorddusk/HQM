@@ -163,8 +163,8 @@ public class GuiBase extends Screen {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-        builder.vertex(x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        builder.vertex(x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(x1, y1, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(x2, y2, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
         tesselator.end();
         
         RenderSystem.enableTexture();
