@@ -1,6 +1,8 @@
 package hardcorequesting.common.quests.task.item;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import net.fabricmc.api.EnvType;
@@ -23,7 +25,7 @@ public class DetectItemTask extends ItemRequirementTask {
     @Environment(EnvType.CLIENT)
     @Override
     public boolean mayUseFluids() {
-        return false;   //TODO we could probably include fluids if we check items for fluid content
+        return true;
     }
     
     @Override
@@ -89,16 +91,25 @@ public class DetectItemTask extends ItemRequirementTask {
         boolean updated = false;
         
         for (int i = 0; i < parts.size(); i++) {
-            Part item = parts.get(i);
-            if (!item.hasItem() || data.isDone(i, item)) {
+            Part part = parts.get(i);
+            if (data.isDone(i, part)) {
                 continue;
             }
             
             for (ItemStack stack : itemsToCount) {
-                if (item.isStack(stack)) {
-                    int amount = Math.min(stack.getCount(), item.required - data.getValue(i));
+                if (part.isStack(stack)) {
+                    int amount = Math.min(stack.getCount(), part.required - data.getValue(i));
                     data.setValue(i, data.getValue(i) + amount);
                     updated = true;
+                }
+                if (!part.hasItem()) {
+                    for (FluidStack fluidStack : HardcoreQuestingCore.platform.findFluidsIn(stack)) {
+                        if (part.isFluid(fluidStack.getFluid())) {
+                            int amount = Math.min(fluidStack.getAmount().intValue(), part.required - data.getValue(i));
+                            data.setValue(i, data.getValue(i) + amount);
+                            updated = true;
+                        }
+                    }
                 }
             }
         }
