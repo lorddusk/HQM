@@ -100,11 +100,11 @@ public class GuiReward extends GuiBase {
         this.left = (this.width - TEXTURE_WIDTH) / 2;
         this.top = (this.height - height) / 2;
         
-        drawRect(0, 0, 0, TOP_SRC_Y, TEXTURE_WIDTH, TOP_HEIGHT);
+        drawRect(matrices, 0, 0, 0, TOP_SRC_Y, TEXTURE_WIDTH, TOP_HEIGHT);
         for (int i = 0; i < lines; i++) {
-            drawRect(0, TOP_HEIGHT + i * MIDDLE_HEIGHT, 0, MIDDLE_SRC_Y, TEXTURE_WIDTH, MIDDLE_HEIGHT);
+            drawRect(matrices, 0, TOP_HEIGHT + i * MIDDLE_HEIGHT, 0, MIDDLE_SRC_Y, TEXTURE_WIDTH, MIDDLE_HEIGHT);
         }
-        drawRect(0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0, BOTTOM_SRC_Y, TEXTURE_WIDTH, BOTTOM_HEIGHT);
+        drawRect(matrices, 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0, BOTTOM_SRC_Y, TEXTURE_WIDTH, BOTTOM_HEIGHT);
         
         
         int mX = mX0 - left;

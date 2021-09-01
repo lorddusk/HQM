@@ -436,11 +436,11 @@ public class QuestSet {
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
     
-        drawConnectingLines(gui, player, isVisibleCache, isLinkFreeCache);
+        drawConnectingLines(matrices, gui, player, isVisibleCache, isLinkFreeCache);
         
         gui.setBlitOffset(50);
         
-        drawQuestIcons(gui, x, y, player, isVisibleCache, isLinkFreeCache);
+        drawQuestIcons(matrices, gui, x, y, player, isVisibleCache, isLinkFreeCache);
     
         for (Quest quest : getQuests().values()) {
             boolean editing = Quest.canQuestsBeEdited() && !Screen.hasControlDown();
@@ -702,14 +702,14 @@ public class QuestSet {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawConnectingLines(GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest child : getQuests().values()) {
             if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirements()) {
                     if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
                             int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
-                            gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                            gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
                                     color);
@@ -723,7 +723,7 @@ public class QuestSet {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
                         int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
-                        gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                        gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                 5,
                                 color);
@@ -734,7 +734,7 @@ public class QuestSet {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawQuestIcons(GuiQuestBook gui, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawQuestIcons(PoseStack matrices, GuiQuestBook gui, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest quest : getQuests().values()) {
             if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
                 
@@ -748,7 +748,7 @@ public class QuestSet {
                 
                 gui.applyColor(color);
                 ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
-                gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
+                gui.drawRect(matrices, quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
                 
                 int iconX = quest.getGuiCenterX() - 8;
                 int iconY = quest.getGuiCenterY() - 8;

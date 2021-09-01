@@ -47,8 +47,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         if (isArrowVisible()) {
-            drawArrow(gui, mX, mY, true);
-            drawArrow(gui, mX, mY, false);
+            drawArrow(matrices, gui, mX, mY, true);
+            drawArrow(matrices, gui, mX, mY, false);
             
             gui.drawCenteredString(matrices, Translator.plain(getArrowText()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
             String description = getArrowDescription();
@@ -95,11 +95,11 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         return ARROW_Y != -1;
     }
     
-    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(matrices, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
     
     private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {

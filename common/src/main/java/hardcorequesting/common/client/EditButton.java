@@ -54,10 +54,10 @@ public class EditButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         int srcY = guiQuestBook.getCurrentMode() == mode ? 2 : guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
-        guiQuestBook.drawRect(x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
-        guiQuestBook.drawRect(x + 2, y + 2,
+        guiQuestBook.drawRect(matrices, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        guiQuestBook.drawRect(matrices, x + 2, y + 2,
                 BUTTON_ICON_SRC_X + (mode.ordinal() % EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SRC_Y + (mode.ordinal() / EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SIZE, BUTTON_ICON_SIZE);

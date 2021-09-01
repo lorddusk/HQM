@@ -67,7 +67,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     @Override
     protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
         if (part.hasItem) {
-            gui.drawItemStack(part.getPermutatedItem(), x, y, mX, mY, false);
+            gui.drawItemStack(matrices, part.getPermutatedItem(), x, y, mX, mY, false);
         } else if (part.fluid != null) {
             gui.drawFluid(part.fluid, matrices, x, y, mX, mY);
         }

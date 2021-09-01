@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -41,10 +42,10 @@ public class ScrollBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(GuiBase gui) {
+    public void draw(PoseStack matrices, GuiBase gui) {
         if (isVisible(gui)) {
-            gui.drawRect(x, y, u, v, SCROLL_WIDTH, h);
-            gui.drawRect(x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
+            gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
+            gui.drawRect(matrices, x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
     

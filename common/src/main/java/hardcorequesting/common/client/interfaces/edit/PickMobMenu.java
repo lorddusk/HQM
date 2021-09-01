@@ -118,7 +118,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        scrollBar.draw(gui);
+        scrollBar.draw(matrices, gui);
         
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);

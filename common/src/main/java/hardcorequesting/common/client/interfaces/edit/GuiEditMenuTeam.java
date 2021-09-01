@@ -276,7 +276,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(gui);
+            scrollBar.draw(matrices, gui);
         }
         
         if (team.isSingle() && inviteTeam == null) {
@@ -359,8 +359,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            gui.drawRect(INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
-            gui.drawRect(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
+            gui.drawRect(matrices, INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
+            gui.drawRect(matrices, INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             
             gui.drawString(matrices, Translator.translatable("hqm.party.lifeSetting", infoTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.party.rewardSetting", infoTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);

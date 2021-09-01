@@ -151,11 +151,11 @@ public class PickItemMenu<T> extends GuiEditMenu {
         return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
     }
     
-    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(matrices, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
     
     private boolean usePrecision() {
@@ -182,8 +182,8 @@ public class PickItemMenu<T> extends GuiEditMenu {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            drawArrow(gui, mX, mY, true);
-            drawArrow(gui, mX, mY, false);
+            drawArrow(matrices, gui, mX, mY, true);
+            drawArrow(matrices, gui, mX, mY, false);
             gui.drawCenteredString(matrices, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         }
     }
@@ -303,7 +303,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
     
             @Override
             protected void draw(ItemStack item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-                gui.drawItemStack(item, x, y, mX, mY, false);
+                gui.drawItemStack(matrices, item, x, y, mX, mY, false);
             }
     
             @Override
@@ -345,7 +345,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
     
             @Override
             protected void draw(Either<ItemStack, FluidStack> item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-                item.ifLeft(stack -> gui.drawItemStack(stack, x, y, mX, mY, false))
+                item.ifLeft(stack -> gui.drawItemStack(matrices, stack, x, y, mX, mY, false))
                         .ifRight(stack -> gui.drawFluid(stack, matrices, x, y, mX, mY));
             }
     

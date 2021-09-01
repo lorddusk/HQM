@@ -86,8 +86,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        drawArrow(gui, mX, mY, true);
-        drawArrow(gui, mX, mY, false);
+        drawArrow(matrices, gui, mX, mY, true);
+        drawArrow(matrices, gui, mX, mY, false);
         gui.drawCenteredString(matrices, Translator.plain(tier.getColor().getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         
         textBoxes.draw(matrices, gui);
@@ -131,10 +131,10 @@ public class GuiEditMenuTier extends GuiEditMenu {
         return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
     }
     
-    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(matrices, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
 }
