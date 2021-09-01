@@ -2,9 +2,11 @@ package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
+import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.CompleteQuestTaskData;
 import hardcorequesting.common.quests.task.client.CompleteQuestTaskGraphic;
@@ -145,9 +147,9 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     public static class Part {
         private UUID quest_id;
     
-        public ItemStack getIconStack() {
+        public Either<ItemStack, FluidStack> getIconStack() {
             Quest q = getQuest();
-            return (q != null) ? q.getIconStack() : ItemStack.EMPTY;
+            return (q != null) ? q.getIconStack() : Either.left(ItemStack.EMPTY);
         }
         
         public String getName() {
