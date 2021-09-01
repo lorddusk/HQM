@@ -19,11 +19,7 @@ import net.minecraft.world.level.material.Fluid;
  * Created by lang2 on 10/12/2015.
  */
 public class MinecraftAdapter {
-    public static final Adapter<ItemStack> ITEM_STACK = new Adapter<ItemStack>() {
-        private static final String ID = "id";
-        private static final String DAMAGE = "damage";
-        private static final String STACK_SIZE = "amount";
-        private static final String NBT = "nbt";
+    public static final Adapter<ItemStack> ITEM_STACK = new Adapter<>() {
         
         @Override
         public JsonElement serialize(ItemStack src) {
@@ -38,6 +34,26 @@ public class MinecraftAdapter {
             if (json.isJsonNull())
                 return ItemStack.EMPTY;
             return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, json));
+        }
+    };
+    // A more restrictive version of ITEM_STACK that caps stack sizes at 1
+    public static final Adapter<ItemStack> ICON_ITEM_STACK = new Adapter<>() {
+        
+        @Override
+        public JsonElement serialize(ItemStack src) {
+            if (src.getCount() > 1) {
+                src = src.copy();
+                src.setCount(1);
+            }
+            return ITEM_STACK.serialize(src);
+        }
+        
+        @Override
+        public ItemStack deserialize(JsonElement json) {
+            ItemStack stack = ITEM_STACK.deserialize(json);
+            if (stack.getCount() > 1)
+                stack.setCount(1);
+            return stack;
         }
     };
     public static final Adapter<FluidStack> FLUID = new Adapter<FluidStack>() {

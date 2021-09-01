@@ -65,7 +65,9 @@ public class QuestTaskAdapter {
             ItemPrecision precision = value.getPrecision();
             out.beginObject();
             if (stack.isPresent()) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack.get());
+                // Item stack count doesn't track task requirement; "required" does that.
+                // So we are fine to keep the stack count at 1.
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ITEM), stack.get());
             } else if (fluid.isPresent()) {
                 MinecraftAdapter.FLUID.write(out.name(FLUID), fluid.get());
             } else {
@@ -90,7 +92,7 @@ public class QuestTaskAdapter {
             while (in.hasNext()) {
                 String next = in.nextName();
                 if (next.equalsIgnoreCase(ITEM)) {
-                    itemStack = MinecraftAdapter.ITEM_STACK.read(in);
+                    itemStack = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                 } else if (next.equalsIgnoreCase(FLUID)) {
                     fluidVolume = MinecraftAdapter.FLUID.read(in);
                 } else if (next.equalsIgnoreCase(REQUIRED)) {
@@ -139,7 +141,7 @@ public class QuestTaskAdapter {
                     .use(builder -> {
                         Optional<ItemStack> item = src.getIconStack().left();
                         Optional<FluidStack> fluid = src.getIconStack().right();
-                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(itemStack)));
+                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.serialize(itemStack)));
                         fluid.ifPresent(fluidStack -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.serialize(fluidStack)));
                     })
                     .build();
@@ -155,7 +157,7 @@ public class QuestTaskAdapter {
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
             result.setVisibility(VisitLocationTask.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
             if (object.has(ICON)) {
-                result.setIconStack(Either.left(MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON))));
+                result.setIconStack(Either.left(MinecraftAdapter.ICON_ITEM_STACK.deserialize(object.get(ICON))));
             }
             if(object.has(FLUID_ICON)) {
                 result.setIconStack(Either.right(MinecraftAdapter.FLUID.deserialize(object.get(FLUID_ICON))));
@@ -214,7 +216,7 @@ public class QuestTaskAdapter {
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), item.get());
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ICON), item.get());
             }
             if (fluid.isPresent()) {
                 MinecraftAdapter.FLUID.write(out.name(FLUID_ICON), fluid.get());
@@ -233,7 +235,7 @@ public class QuestTaskAdapter {
                 if (name.equalsIgnoreCase(NAME)) {
                     result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                    ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                     if (icon != null) {
                         result.setIconStack(Either.left(icon));
                     }
@@ -253,13 +255,13 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<GetAdvancementTask.Part> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<GetAdvancementTask.Part>() {
+    public static final TypeAdapter<GetAdvancementTask.Part> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<>() {
         private final String ICON = "icon";
         private static final String FLUID_ICON = "fluid_icon";
         private final String VISIBLE = "visible";
         private final String NAME = "name";
         private final String ADV_NAME = "adv_name";
-        
+    
         @Override
         public void write(JsonWriter out, GetAdvancementTask.Part value) throws IOException {
             out.beginObject();
@@ -267,7 +269,7 @@ public class QuestTaskAdapter {
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), item.get());
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ICON), item.get());
             }
             if (fluid.isPresent()) {
                 MinecraftAdapter.FLUID.write(out.name(FLUID_ICON), fluid.get());
@@ -279,7 +281,7 @@ public class QuestTaskAdapter {
                 out.name(VISIBLE).value(value.getVisible().name());
             out.endObject();
         }
-        
+    
         @Override
         public GetAdvancementTask.Part read(JsonReader in) throws IOException {
             in.beginObject();
@@ -289,11 +291,11 @@ public class QuestTaskAdapter {
                 if (name.equalsIgnoreCase(NAME)) {
                     result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
+                    ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                     if (icon != null) {
                         result.setIconStack(Either.left(icon));
                     }
-                } else if(name.equalsIgnoreCase(FLUID_ICON)) {
+                } else if (name.equalsIgnoreCase(FLUID_ICON)) {
                     FluidStack fluid = MinecraftAdapter.FLUID.read(in);
                     if (fluid != null) {
                         result.setIconStack(Either.right(fluid));
@@ -351,7 +353,7 @@ public class QuestTaskAdapter {
                     .use(builder -> {
                         Optional<ItemStack> item = src.getIconStack().left();
                         Optional<FluidStack> fluid = src.getIconStack().right();
-                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ITEM_STACK.toJsonTree(itemStack)));
+                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.toJsonTree(itemStack)));
                         fluid.ifPresent(fluidStack -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.toJsonTree(fluidStack)));
                     })
                     .add(MOB, src.getMob().toString())
@@ -367,7 +369,7 @@ public class QuestTaskAdapter {
             result.setMob(new ResourceLocation(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
             result.setCount(GsonHelper.getAsInt(object, KILLS, result.getCount()));
             if (object.has(ICON)) {
-                ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));
+                ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));
                 result.setIconStack(Either.left(icon));
             }
             if(object.has(FLUID_ICON)) {

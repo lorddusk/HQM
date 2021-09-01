@@ -171,7 +171,7 @@ public class QuestAdapter {
                     .use(builder -> {
                         if (src.useBigIcon())
                             builder.add(BIG_ICON, true);
-                        src.getIconStack().ifLeft(item -> builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(item)));
+                        src.getIconStack().ifLeft(item -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.serialize(item)));
                         src.getIconStack().ifRight(fluid -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.serialize(fluid)));
                         if (src.getRepeatInfo().getType() != RepeatType.NONE)
                             builder.add(REPEAT, REPEAT_INFO_ADAPTER.serialize(src.getRepeatInfo()));
@@ -224,7 +224,7 @@ public class QuestAdapter {
             QUEST.setTriggerTasks(GsonHelper.getAsInt(object, TRIGGER_TASKS, QUEST.getTriggerTasks()));
             QUEST.setParentRequirementCount(GsonHelper.getAsInt(object, PARENT_REQUIREMENT, QUEST._getParentRequirementCount()));
             if (object.has(ICON)) {
-                ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON));
+                ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.deserialize(object.get(ICON));
                 QUEST.setIconStack(Either.left(icon));
             }
             if (object.has(FLUID_ICON)) {
