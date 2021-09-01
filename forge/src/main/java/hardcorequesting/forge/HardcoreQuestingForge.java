@@ -67,6 +67,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -76,10 +77,14 @@ import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -345,10 +350,21 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public FluidStack findFluidIn(ItemStack stack) {
-        return new ForgeFluidStack(stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
-                .map(handler -> handler.getFluidInTank(0))
-                .orElse(net.minecraftforge.fluids.FluidStack.EMPTY));
+    public List<FluidStack> findFluidsIn(ItemStack stack) {
+        return stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+                .map(HardcoreQuestingForge::getAllFluidsIn)
+                .orElse(Collections.emptyList());
+    }
+    
+    @NotNull
+    private static List<FluidStack> getAllFluidsIn(IFluidHandlerItem handler) {
+        List<FluidStack> fluids = new ArrayList<>();
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            net.minecraftforge.fluids.FluidStack fluid = handler.getFluidInTank(tank);
+            if (!fluid.isEmpty())
+                fluids.add(new ForgeFluidStack(fluid));
+        }
+        return fluids;
     }
     
     // Private class extending RenderType as a simple workaround to access protected fields.

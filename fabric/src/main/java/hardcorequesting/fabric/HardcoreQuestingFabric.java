@@ -1,7 +1,8 @@
 package hardcorequesting.fabric;
 
-import alexiil.mc.lib.attributes.fluid.FluidItemUtil;
+import alexiil.mc.lib.attributes.fluid.FluidAttributes;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
+import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
@@ -64,7 +65,10 @@ import net.minecraft.world.level.material.Material;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -247,9 +251,17 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
-    public FluidStack findFluidIn(ItemStack stack) {
-        FluidKey fluid = FluidItemUtil.getContainedFluid(stack);
-        return new FabricFluidStack(fluid.withAmount(fluid.entry.isEmpty() ? FluidAmount.ZERO : FluidAmount.ONE));
+    public List<FluidStack> findFluidsIn(ItemStack stack) {
+        GroupedFluidInvView inv = FluidAttributes.GROUPED_INV_VIEW.get(stack);
+        Set<FluidKey> fluidTypes = inv.getStoredFluids();
+        if (fluidTypes.isEmpty())
+            return Collections.emptyList();
+        else {
+            List<FluidStack> fluids = new ArrayList<>();
+            for (FluidKey fluid : fluidTypes)
+                fluids.add(new FabricFluidStack(fluid.withAmount(inv.getAmount_F(fluid))));
+            return fluids;
+        }
     }
     
     @Override

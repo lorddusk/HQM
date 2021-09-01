@@ -37,6 +37,7 @@ import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -121,11 +122,10 @@ public interface AbstractPlatform {
     FluidStack createFluidStack(Fluid fluid, Fraction amount);
     
     /**
-     * Obtains the fluid contained in the item stack.
-     * If there is no fluid in the item stack, an empty fluid stack will be returned.
-     * Only the fluid type is guaranteed to match. The amount returned might not match the amount in the item stack.
+     * Obtains any fluids contained in the item stack.
+     * If there is no fluid in the item stack, an empty list will be returned.
      */
-    FluidStack findFluidIn(ItemStack stack);
+    List<FluidStack> findFluidsIn(ItemStack stack);
     
     @Environment(EnvType.CLIENT)
     void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2);
