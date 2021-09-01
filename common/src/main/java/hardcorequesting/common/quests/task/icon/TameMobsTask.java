@@ -2,6 +2,7 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -57,12 +58,12 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         part.setTame(entityId);
         part.setCount(amount);
         
-        if(entityId != null && (part.getIconStack().isEmpty() || part.getIconStack().getItem() instanceof SpawnEggItem)) {
+        if(entityId != null && (part.hasNoIcon() || part.getIconStack().left().orElse(ItemStack.EMPTY).getItem() instanceof SpawnEggItem)) {
             EntityType<?> entityType = Registry.ENTITY_TYPE.get(new ResourceLocation(entityId));
             if(entityType != null) {
                 Item egg = SpawnEggItem.byId(entityType);
                 if(egg != null) {
-                    part.setIconStack(new ItemStack(egg));
+                    part.setIconStack(Either.left(new ItemStack(egg)));
                 }
             }
         }

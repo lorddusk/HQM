@@ -49,8 +49,9 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     @Override
     protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {
         int textX = x + X_TEXT_OFFSET, textY = y + Y_TEXT_OFFSET;
-    
-        gui.drawItemStack(matrices, part.getIconStack(), x, y, mX, mY, false);
+        part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
+                .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
+        
         gui.drawString(matrices, Translator.plain(part.getName()), textX, textY, 0x404040);
         drawElementText(matrices, gui, player, part, id, textX + X_TEXT_INDENT, textY + 9);
         return null;
@@ -59,7 +60,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     @Override
     protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
-            PickItemMenu.display(gui, player, part.getIconStack(), PickItemMenu.Type.ITEM,
+            PickItemMenu.display(gui, player, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                     result -> task.setIcon(id, result.get()));
             return true;
         } else if (mode == EditMode.RENAME) {

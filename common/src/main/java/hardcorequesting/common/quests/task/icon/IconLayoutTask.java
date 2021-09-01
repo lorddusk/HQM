@@ -1,5 +1,7 @@
 package hardcorequesting.common.quests.task.icon;
 
+import com.mojang.datafixers.util.Either;
+import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
@@ -26,7 +28,7 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     
     protected abstract T createEmpty();
     
-    public void setIcon(int id, ItemStack stack) {
+    public void setIcon(int id, Either<ItemStack, FluidStack> stack) {
         parts.getOrCreateForModify(id).setIconStack(stack);
     }
     
@@ -35,14 +37,18 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     }
     
     public abstract static class Part {
-        private ItemStack iconStack = ItemStack.EMPTY;
+        private Either<ItemStack, FluidStack> iconStack = Either.left(ItemStack.EMPTY);
         private String name = "New";
         
-        public ItemStack getIconStack() {
+        public Either<ItemStack, FluidStack> getIconStack() {
             return iconStack;
         }
-    
-        public void setIconStack(@NotNull ItemStack iconStack) {
+        
+        public boolean hasNoIcon() {
+            return iconStack.map(ItemStack::isEmpty, FluidStack::isEmpty);
+        }
+        
+        public void setIconStack(@NotNull Either<ItemStack, FluidStack> iconStack) {
             this.iconStack = iconStack;
         }
     
