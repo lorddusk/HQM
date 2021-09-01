@@ -378,9 +378,9 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         private static RenderType createFluid(ResourceLocation location) {
             return RenderType.create(
                     HardcoreQuestingCore.ID + ":fluid_type",
-                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 256, true, false,
+                    DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, true, false,
                     RenderType.CompositeState.builder()
-                            .setShaderState(RenderStateShard.RENDERTYPE_TRANSLUCENT_SHADER)
+                            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_SHADER)
                             .setLightmapState(RenderStateShard.LIGHTMAP)
                             .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
                             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
@@ -404,10 +404,10 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
         VertexConsumer builder = blockMaterial.buffer(source, HardcoreQuestingForge.CustomRenderTypes::createFluid);
         Matrix4f matrix = matrices.last().pose();
-        builder.vertex(matrix, x2, y1, 0).uv(sprite.getU1(), sprite.getV0()).color(r, g, b, a).endVertex();
-        builder.vertex(matrix, x1, y1, 0).uv(sprite.getU0(), sprite.getV0()).color(r, g, b, a).endVertex();
-        builder.vertex(matrix, x1, y2, 0).uv(sprite.getU0(), sprite.getV1()).color(r, g, b, a).endVertex();
-        builder.vertex(matrix, x2, y2, 0).uv(sprite.getU1(), sprite.getV1()).color(r, g, b, a).endVertex();
+        builder.vertex(matrix, x2, y1, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV0()).endVertex();
+        builder.vertex(matrix, x1, y1, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV0()).endVertex();
+        builder.vertex(matrix, x1, y2, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV1()).endVertex();
+        builder.vertex(matrix, x2, y2, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV1()).endVertex();
         source.endBatch();
     }
     
