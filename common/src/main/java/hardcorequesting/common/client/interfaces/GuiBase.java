@@ -43,7 +43,7 @@ public class GuiBase extends Screen {
     }
     
     public void drawRect(PoseStack matrices, int x, int y, int u, int v, int w, int h) {
-        drawRect(matrices, x, y, u, v, w, h, RenderRotation.NORMAL);
+        blit(matrices, x + left, y + top, u, v, w, h);
     }
     
     public void drawRect(PoseStack matrices, int x, int y, int u, int v, int w, int h, RenderRotation rotation) {
@@ -55,8 +55,8 @@ public class GuiBase extends Screen {
         x += left;
         y += top;
         
-        float fw = 0.00390625F;
-        float fy = 0.00390625F;
+        float fw = 1/256F;
+        float fy = 1/256F;
         
         double a = (float) (u) * fw;
         double b = (float) (u + w) * fw;
