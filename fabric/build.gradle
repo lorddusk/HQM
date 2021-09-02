@@ -107,3 +107,14 @@ sourcesJar {
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
+
+loom {
+    runs {
+        gametest {
+            server()
+            name = "Game Test"
+            vmArg "-Dfabric-api.gametest.server=true"
+        }
+    }
+}
+test.dependsOn runGametest
