@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.data.*;
@@ -26,10 +27,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
@@ -61,15 +59,17 @@ public class QuestTaskAdapter {
         
         @Override
         public void write(JsonWriter out, ItemRequirementTask.Part value) throws IOException {
-            ItemStack stack = value.getStack();
-            FluidStack fluid = value.fluid;
+            Optional<ItemStack> stack = value.stack.left();
+            Optional<FluidStack> fluid = value.stack.right();
             int required = value.required;
             ItemPrecision precision = value.getPrecision();
             out.beginObject();
-            if (value.hasItem && !stack.isEmpty()) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ITEM), stack);
-            } else if (fluid != null) {
-                MinecraftAdapter.FLUID.write(out.name(FLUID), fluid);
+            if (stack.isPresent()) {
+                // Item stack count doesn't track task requirement; "required" does that.
+                // So we are fine to keep the stack count at 1.
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ITEM), stack.get());
+            } else if (fluid.isPresent()) {
+                MinecraftAdapter.FLUID.write(out.name(FLUID), fluid.get());
             } else {
                 out.nullValue();
                 out.endObject();
@@ -92,7 +92,7 @@ public class QuestTaskAdapter {
             while (in.hasNext()) {
                 String next = in.nextName();
                 if (next.equalsIgnoreCase(ITEM)) {
-                    itemStack = MinecraftAdapter.ITEM_STACK.read(in);
+                    itemStack = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                 } else if (next.equalsIgnoreCase(FLUID)) {
                     fluidVolume = MinecraftAdapter.FLUID.read(in);
                 } else if (next.equalsIgnoreCase(REQUIRED)) {
@@ -117,16 +117,17 @@ public class QuestTaskAdapter {
             return result;
         }
     };
-    public static final Adapter<VisitLocationTask.Part> LOCATION_ADAPTER = new Adapter<VisitLocationTask.Part>() {
+    public static final Adapter<VisitLocationTask.Part> LOCATION_ADAPTER = new Adapter<>() {
         private static final String X = "x";
         private static final String Y = "y";
         private static final String Z = "z";
         private static final String DIM = "dim";
         private static final String ICON = "icon";
+        private static final String FLUID_ICON = "fluid_icon";
         private static final String RADIUS = "radius";
         private static final String VISIBLE = "visible";
         private static final String NAME = "name";
-        
+    
         @Override
         public JsonElement serialize(VisitLocationTask.Part src) {
             return object()
@@ -138,16 +139,14 @@ public class QuestTaskAdapter {
                     .add(RADIUS, src.getRadius())
                     .add(VISIBLE, src.getVisibility().name())
                     .use(builder -> {
-                        ItemStack stack = src.getIconStack();
-                        if (stack != null) {
-                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(stack));
-                        } else {
-                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(ItemStack.EMPTY));
-                        }
+                        Optional<ItemStack> item = src.getIconStack().left();
+                        Optional<FluidStack> fluid = src.getIconStack().right();
+                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.serialize(itemStack)));
+                        fluid.ifPresent(fluidStack -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.serialize(fluidStack)));
                     })
                     .build();
         }
-        
+    
         @Override
         public VisitLocationTask.Part deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
@@ -158,17 +157,20 @@ public class QuestTaskAdapter {
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
             result.setVisibility(VisitLocationTask.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
             if (object.has(ICON)) {
-                result.setIconStack(MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON)));
+                result.setIconStack(Either.left(MinecraftAdapter.ICON_ITEM_STACK.deserialize(object.get(ICON))));
+            }
+            if(object.has(FLUID_ICON)) {
+                result.setIconStack(Either.right(MinecraftAdapter.FLUID.deserialize(object.get(FLUID_ICON))));
             }
             return result;
         }
     };
-    public static final Adapter<ReputationTask.Part> REPUTATION_TASK_ADAPTER = new Adapter<ReputationTask.Part>() {
+    public static final Adapter<ReputationTask.Part> REPUTATION_TASK_ADAPTER = new Adapter<>() {
         private static final String REPUTATION = "reputation";
         private static final String LOWER = "lower";
         private static final String UPPER = "upper";
         private static final String INVERTED = "inverted";
-        
+    
         @Override
         public JsonElement serialize(ReputationTask.Part src) {
             JsonObjectBuilder builder = object()
@@ -180,7 +182,7 @@ public class QuestTaskAdapter {
                 builder.add(UPPER, src.getUpper().getId());
             return builder.build();
         }
-        
+    
         @Override
         public ReputationTask.Part deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
@@ -199,26 +201,31 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<TameMobsTask.Part> TAME_ADAPTER = new TypeAdapter<TameMobsTask.Part>() {
+    public static final TypeAdapter<TameMobsTask.Part> TAME_ADAPTER = new TypeAdapter<>() {
         private static final String TAMES = "tames";
         private static final String EXACT = "exact";
         private static final String TAME = "tame";
         private static final String ICON = "icon";
+        private static final String FLUID_ICON = "fluid_icon";
         private static final String NAME = "name";
-        
+    
         @Override
         public void write(JsonWriter out, TameMobsTask.Part value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIconStack();
-            if (stack != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
+            Optional<ItemStack> item = value.getIconStack().left();
+            Optional<FluidStack> fluid = value.getIconStack().right();
+            if (item.isPresent()) {
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ICON), item.get());
+            }
+            if (fluid.isPresent()) {
+                MinecraftAdapter.FLUID.write(out.name(FLUID_ICON), fluid.get());
             }
             out.name(TAME).value(value.getTame());
             out.name(TAMES).value(value.getCount());
             out.endObject();
         }
-        
+    
         @Override
         public TameMobsTask.Part read(JsonReader in) throws IOException {
             in.beginObject();
@@ -228,9 +235,14 @@ public class QuestTaskAdapter {
                 if (name.equalsIgnoreCase(NAME)) {
                     result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    ItemStack icon = MinecraftAdapter.ITEM_STACK.read(in);
-                    if (!icon.isEmpty()) {
-                        result.setIconStack(icon);
+                    ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
+                    if (icon != null) {
+                        result.setIconStack(Either.left(icon));
+                    }
+                } else if(name.equalsIgnoreCase(FLUID_ICON)) {
+                    FluidStack fluid = MinecraftAdapter.FLUID.read(in);
+                    if (fluid != null) {
+                        result.setIconStack(Either.right(fluid));
                     }
                 } else if (name.equalsIgnoreCase(TAME)) {
                     result.setTame(in.nextString());
@@ -243,19 +255,24 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<GetAdvancementTask.Part> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<GetAdvancementTask.Part>() {
+    public static final TypeAdapter<GetAdvancementTask.Part> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<>() {
         private final String ICON = "icon";
+        private static final String FLUID_ICON = "fluid_icon";
         private final String VISIBLE = "visible";
         private final String NAME = "name";
         private final String ADV_NAME = "adv_name";
-        
+    
         @Override
         public void write(JsonWriter out, GetAdvancementTask.Part value) throws IOException {
             out.beginObject();
             out.name(NAME).value(value.getName());
-            ItemStack stack = value.getIconStack();
-            if (stack != null) {
-                MinecraftAdapter.ITEM_STACK.write(out.name(ICON), stack);
+            Optional<ItemStack> item = value.getIconStack().left();
+            Optional<FluidStack> fluid = value.getIconStack().right();
+            if (item.isPresent()) {
+                MinecraftAdapter.ICON_ITEM_STACK.write(out.name(ICON), item.get());
+            }
+            if (fluid.isPresent()) {
+                MinecraftAdapter.FLUID.write(out.name(FLUID_ICON), fluid.get());
             }
             if (value.getAdvancement() != null) {
                 out.name(ADV_NAME).value(value.getAdvancement());
@@ -264,7 +281,7 @@ public class QuestTaskAdapter {
                 out.name(VISIBLE).value(value.getVisible().name());
             out.endObject();
         }
-        
+    
         @Override
         public GetAdvancementTask.Part read(JsonReader in) throws IOException {
             in.beginObject();
@@ -274,7 +291,15 @@ public class QuestTaskAdapter {
                 if (name.equalsIgnoreCase(NAME)) {
                     result.setName(in.nextString());
                 } else if (name.equalsIgnoreCase(ICON)) {
-                    result.setIconStack(MinecraftAdapter.ITEM_STACK.read(in));
+                    ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
+                    if (icon != null) {
+                        result.setIconStack(Either.left(icon));
+                    }
+                } else if (name.equalsIgnoreCase(FLUID_ICON)) {
+                    FluidStack fluid = MinecraftAdapter.FLUID.read(in);
+                    if (fluid != null) {
+                        result.setIconStack(Either.right(fluid));
+                    }
                 } else if (name.equalsIgnoreCase(ADV_NAME)) {
                     result.setAdvancement(in.nextString());
                 } else if (name.equalsIgnoreCase(VISIBLE)) {
@@ -314,27 +339,28 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final Adapter<KillMobsTask.Part> MOB_ADAPTER = new Adapter<KillMobsTask.Part>() {
+    public static final Adapter<KillMobsTask.Part> MOB_ADAPTER = new Adapter<>() {
         private static final String KILLS = "kills";
         private static final String MOB = "mob";
         private static final String ICON = "icon";
+        private static final String FLUID_ICON = "fluid_icon";
         private static final String NAME = "name";
-        
+    
         @Override
         public JsonElement serialize(KillMobsTask.Part src) {
             return object()
                     .add(NAME, src.getName())
                     .use(builder -> {
-                        ItemStack stack = src.getIconStack();
-                        if (stack != null) {
-                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.toJsonTree(stack));
-                        }
+                        Optional<ItemStack> item = src.getIconStack().left();
+                        Optional<FluidStack> fluid = src.getIconStack().right();
+                        item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.toJsonTree(itemStack)));
+                        fluid.ifPresent(fluidStack -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.toJsonTree(fluidStack)));
                     })
                     .add(MOB, src.getMob().toString())
                     .add(KILLS, src.getCount())
                     .build();
         }
-        
+    
         @Override
         public KillMobsTask.Part deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
@@ -343,24 +369,26 @@ public class QuestTaskAdapter {
             result.setMob(new ResourceLocation(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
             result.setCount(GsonHelper.getAsInt(object, KILLS, result.getCount()));
             if (object.has(ICON)) {
-                ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));
-                if (!icon.isEmpty()) {
-                    result.setIconStack(icon);
-                }
+                ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));
+                result.setIconStack(Either.left(icon));
+            }
+            if(object.has(FLUID_ICON)) {
+                FluidStack fluid = MinecraftAdapter.FLUID.deserialize(GsonHelper.getAsJsonObject(object, FLUID_ICON));
+                result.setIconStack(Either.right(fluid));
             }
             return result;
         }
     };
     public static Map<ReputationTask<?>, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
-    protected static final Adapter<QuestTask<?>> TASK_ADAPTER = new Adapter<QuestTask<?>>() {
+    protected static final Adapter<QuestTask<?>> TASK_ADAPTER = new Adapter<>() {
         private static final String TYPE = "type";
         private static final String DESCRIPTION = "description";
         private static final String LONG_DESCRIPTION = "longDescription";
-        
+    
         @Override
         public JsonElement serialize(QuestTask<?> src) {
             TaskType type = TaskType.getType(src.getClass());
-            
+        
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.name());
             if (!src.getDescription().equals(type.getName()))
@@ -370,7 +398,7 @@ public class QuestTaskAdapter {
             src.write(builder);
             return builder.build();
         }
-        
+    
         @Override
         public QuestTask<?> deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();

@@ -758,7 +758,9 @@ public class QuestSet {
                     iconY++;
                 }
                 
-                gui.drawItemStack(quest.getIconStack(), iconX, iconY, true);
+                final int iconX_ = iconX, iconY_ = iconY;
+                quest.getIconStack().ifLeft(itemStack -> gui.drawItemStack(itemStack, iconX_, iconY_, true))
+                        .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, iconX_, iconY_));
                 //ResourceHelper.bindResource(QUEST_ICONS);
                 //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
             }
@@ -816,7 +818,7 @@ public class QuestSet {
                                 SaveHelper.add(EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM,
+                                PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                                         result -> {
                                             try {
                                                 quest.setIconStack(result.get());

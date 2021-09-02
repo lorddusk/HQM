@@ -2,6 +2,7 @@ package hardcorequesting.common.quests;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
@@ -14,6 +15,7 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
+import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.quests.task.DeathTask;
@@ -84,7 +86,7 @@ public class Quest {
     private int x;
     private int y;
     private boolean isBig;
-    private ItemStack iconStack = ItemStack.EMPTY;
+    private Either<ItemStack, FluidStack> iconStack = Either.left(ItemStack.EMPTY);
     private QuestSet set;
     private ParentEvaluator enabledParentEvaluator = new ParentEvaluator() {
         @Override
@@ -610,16 +612,34 @@ public class Quest {
         this.y = y - getGuiH() / 2;
     }
     
-    public ItemStack getIconStack() {
+    public Either<ItemStack, FluidStack> getIconStack() {
         return iconStack;
     }
     
-    public void setIconStack(ItemStack iconStack) {
+    public void setIconStack(Either<ItemStack, FluidStack> iconStack) {
         this.iconStack = iconStack;
-        if (iconStack != null) {
-            iconStack.setCount(1);
+    }
+    
+    public void setIconIfEmpty(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            stack = stack.copy();
+            stack.setCount(1);
+            setIconIfEmpty(Either.left(stack));
         }
     }
+    
+    public void setIconIfEmpty(FluidStack stack) {
+        if (!stack.isEmpty())
+            setIconIfEmpty(Either.right(stack));
+    }
+    
+    public void setIconIfEmpty(Either<ItemStack, FluidStack> iconStack) {
+        if (this.iconStack.map(ItemStack::isEmpty, FluidStack::isEmpty)) {
+            setIconStack(iconStack);
+            SaveHelper.add(EditType.ICON_CHANGE);
+        }
+    }
+    
     //endregion
     
     public boolean useBigIcon() {

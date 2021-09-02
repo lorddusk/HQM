@@ -419,9 +419,10 @@ public class PickItemMenu<T> extends GuiEditMenu {
         for (int i = 0; i < itemLength; i++) {
             ItemStack stack = inventory.getItem(i);
             
-            FluidStack fluid = HardcoreQuestingCore.platform.findFluidIn(stack);
-            if (!fluid.isEmpty() && fluids.add(fluid.getFluid())) {
-                playerFluids.add(fluid);
+            for (FluidStack fluid : HardcoreQuestingCore.platform.findFluidsIn(stack)) {
+                if (!fluid.isEmpty() && fluids.add(fluid.getFluid())) {
+                    playerFluids.add(fluid);
+                }
             }
         }
         

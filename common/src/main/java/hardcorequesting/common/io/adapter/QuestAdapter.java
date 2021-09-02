@@ -5,7 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.quests.reward.ReputationReward;
@@ -119,6 +121,7 @@ public class QuestAdapter {
         private static final String X = "x";
         private static final String Y = "y";
         private static final String ICON = "icon";
+        private static final String FLUID_ICON = "fluid_icon";
         private static final String BIG_ICON = "bigicon";
         private static final String REQUIREMENTS = "requirements";
         private static final String PREREQUISITES = "prerequisites";
@@ -168,8 +171,8 @@ public class QuestAdapter {
                     .use(builder -> {
                         if (src.useBigIcon())
                             builder.add(BIG_ICON, true);
-                        if (src.getIconStack() != null)
-                            builder.add(ICON, MinecraftAdapter.ITEM_STACK.serialize(src.getIconStack()));
+                        src.getIconStack().ifLeft(item -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.serialize(item)));
+                        src.getIconStack().ifRight(fluid -> builder.add(FLUID_ICON, MinecraftAdapter.FLUID.serialize(fluid)));
                         if (src.getRepeatInfo().getType() != RepeatType.NONE)
                             builder.add(REPEAT, REPEAT_INFO_ADAPTER.serialize(src.getRepeatInfo()));
                         if (src.getTriggerType() != TriggerType.NONE)
@@ -221,10 +224,12 @@ public class QuestAdapter {
             QUEST.setTriggerTasks(GsonHelper.getAsInt(object, TRIGGER_TASKS, QUEST.getTriggerTasks()));
             QUEST.setParentRequirementCount(GsonHelper.getAsInt(object, PARENT_REQUIREMENT, QUEST._getParentRequirementCount()));
             if (object.has(ICON)) {
-                ItemStack icon = MinecraftAdapter.ITEM_STACK.deserialize(object.get(ICON));
-                if (!icon.isEmpty()) {
-                    QUEST.setIconStack(icon);
-                }
+                ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.deserialize(object.get(ICON));
+                QUEST.setIconStack(Either.left(icon));
+            }
+            if (object.has(FLUID_ICON)) {
+                FluidStack icon = MinecraftAdapter.FLUID.deserialize(object.get(FLUID_ICON));
+                QUEST.setIconStack(Either.right(icon));
             }
             if (object.has(REQUIREMENTS)) requirement = SaveHandler.GSON.fromJson(object.get(REQUIREMENTS), STRING_LIST_TYPE);
             if (object.has(OPTIONS)) options = SaveHandler.GSON.fromJson(object.get(OPTIONS), STRING_LIST_TYPE);

@@ -22,6 +22,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.UUID;
 
@@ -55,22 +56,16 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    public void setItem(Either<ItemStack, FluidStack> item, int amount, ItemPrecision precision, int id) {
+    public void setItem(Either<ItemStack, FluidStack> stack, int amount, ItemPrecision precision, int id) {
         
         Part requirement = parts.getOrCreateForModify(id);
     
-        item.ifLeft(itemStack -> {
-            requirement.hasItem = true;
-            requirement.fluid = null;
-            requirement.stack = itemStack;
-        }).ifRight(fluidStack -> {
-            requirement.hasItem = false;
-            requirement.fluid = fluidStack;
-            requirement.stack = null;
-        });
+        requirement.stack = stack;
         requirement.required = amount;
         requirement.precision = precision;
         requirement.permutations = null;
+        
+        parent.setIconIfEmpty(stack);
     }
     
     public int getProgress(Player player, int id) {
@@ -93,13 +88,13 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
-            if (!item.hasItem || data.isDone(i, item)) {
+            if (!item.hasItem() || data.isDone(i, item)) {
                 continue;
             }
             
             for (int j = 0; j < itemsToConsume.size(); j++) {
                 ItemStack stack = itemsToConsume.get(j);
-                if (item.precision.areItemsSame(stack, item.stack)) {
+                if (item.isStack(stack)) {
                     int amount = Math.min(stack.getCount(), item.required - data.getValue(i));
                     if (amount > 0) {
                         stack.shrink(amount);
@@ -204,10 +199,9 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     public static class Part {
         private static int CYCLE_TIME = 2;//2 second cycle
-        public FluidStack fluid;
+        
+        public Either<ItemStack, FluidStack> stack;
         public int required;
-        public boolean hasItem;
-        private ItemStack stack = ItemStack.EMPTY;
         private ItemPrecision precision = ItemPrecision.PRECISE;
         private ItemStack[] permutations;
         private int cycleAt = -1;
@@ -219,15 +213,13 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         }
         
         public Part(ItemStack stack, int required) {
-            this.stack = stack;
+            this.stack = Either.left(stack);
             this.required = required;
-            this.hasItem = true;
         }
         
         public Part(FluidStack fluid, int required) {
-            this.fluid = fluid;
+            this.stack = Either.right(fluid);
             this.required = required;
-            this.hasItem = false;
         }
         
         public ItemPrecision getPrecision() {
@@ -239,29 +231,42 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             permutations = null;
         }
         
+        public boolean hasItem() {
+            return stack.left().isPresent();
+        }
+        
         public ItemStack getStack() {
-            return stack;
+            return stack.left().orElse(ItemStack.EMPTY);
+        }
+        
+        public boolean isStack(ItemStack otherStack) {
+            return stack.left().map(itemStack -> getPrecision().areItemsSame(itemStack, otherStack)).orElse(false);
+        }
+        
+        public boolean isFluid(Fluid fluid) {
+            return stack.right().map(fluidStack -> fluidStack.getFluid() == fluid).orElse(false);
         }
         
         public void setStack(ItemStack stack) {
-            this.stack = stack;
+            this.stack = Either.left(stack);
             this.permutations = null;
         }
         
         private void setPermutations() {
-            if (stack == null) return;
-            permutations = precision.getPermutations(stack);
-            if (permutations != null && permutations.length > 0) {
-                last = permutations.length - 1;
-                cycleAt = -1;
-            }
+            stack.ifLeft(itemStack -> {
+                permutations = precision.getPermutations(itemStack);
+                if (permutations != null && permutations.length > 0) {
+                    last = permutations.length - 1;
+                    cycleAt = -1;
+                }
+            });
         }
         
         public ItemStack getPermutatedItem() {
             if (permutations == null && precision.hasPermutations())
                 setPermutations();
             if (permutations == null || permutations.length < 2)
-                return stack != null ? stack : ItemStack.EMPTY;
+                return stack.left().orElse(ItemStack.EMPTY);
             int ticks = (int) (System.currentTimeMillis() / 1000);
             if (cycleAt == -1)
                 cycleAt = ticks + CYCLE_TIME;
