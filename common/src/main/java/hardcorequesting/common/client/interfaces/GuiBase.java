@@ -42,11 +42,11 @@ public class GuiBase extends Screen {
     public void setEditMenu(GuiEditMenu menu) {
     }
     
-    public void drawRect(int x, int y, int u, int v, int w, int h) {
-        drawRect(x, y, u, v, w, h, RenderRotation.NORMAL);
+    public void drawRect(PoseStack matrices, int x, int y, int u, int v, int w, int h) {
+        blit(matrices, x + left, y + top, u, v, w, h);
     }
     
-    public void drawRect(int x, int y, int u, int v, int w, int h, RenderRotation rotation) {
+    public void drawRect(PoseStack matrices, int x, int y, int u, int v, int w, int h, RenderRotation rotation) {
         boolean rotate = rotation == RenderRotation.ROTATE_90 || rotation == RenderRotation.ROTATE_270 || rotation == RenderRotation.ROTATE_90_FLIP || rotation == RenderRotation.ROTATE_270_FLIP;
         
         int targetW = rotate ? h : w;
@@ -55,8 +55,8 @@ public class GuiBase extends Screen {
         x += left;
         y += top;
         
-        float fw = 0.00390625F;
-        float fy = 0.00390625F;
+        float fw = 1/256F;
+        float fy = 1/256F;
         
         double a = (float) (u) * fw;
         double b = (float) (u + w) * fw;
@@ -129,10 +129,10 @@ public class GuiBase extends Screen {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
-        bufferBuilder.vertex(x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
-        bufferBuilder.vertex(x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
-        bufferBuilder.vertex(x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
         tesselator.end();
     }
     
@@ -145,11 +145,11 @@ public class GuiBase extends Screen {
         renderTooltip(matrices, Language.getInstance().getVisualOrder((List<FormattedText>) stringRenderables), x, y);
     }
     
-    public void drawLine(int x1, int y1, int x2, int y2, int thickness, int color) {
+    public void drawLine(PoseStack matrices, int x1, int y1, int x2, int y2, int thickness, int color) {
         // This block was written with insufficient knowledge on normals, adapted so that the line shows up correctly
         // Feel free to have the normals changed if you feel more knowledgeable on the subject
         if (y2 < y1) {
-            drawLine(x2, y2, x1, y1, thickness, color);
+            drawLine(matrices, x2, y2, x1, y1, thickness, color);
             return;
         }
         int dx = x2 - x1, dy = y2 - y1;
@@ -163,8 +163,8 @@ public class GuiBase extends Screen {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-        builder.vertex(x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        builder.vertex(x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(matrices.last().pose(), x1, y1, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(matrices.last().pose(), x2, y2, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
         tesselator.end();
         
         RenderSystem.enableTexture();
@@ -176,7 +176,7 @@ public class GuiBase extends Screen {
     }
     
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y, int mX, int mY) {
-        drawItemBackground(x, y, mX, mY, false);
+        drawItemBackground(stack, x, y, mX, mY, false);
         if (fluid != null) {
             drawFluid(fluid, stack, x + 1, y + 1);
         }
@@ -200,19 +200,19 @@ public class GuiBase extends Screen {
         //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
     }
     
-    public void drawItemBackground(int x, int y, int mX, int mY, boolean selected) {
+    public void drawItemBackground(PoseStack matrices, int x, int y, int mX, int mY, boolean selected) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
         ResourceHelper.bindResource(MAP_TEXTURE);
         
-        drawRect(x, y, inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? ITEM_SIZE : 0, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
+        drawRect(matrices, x, y, inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? ITEM_SIZE : 0, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
         if (selected) {
-            drawRect(x, y, ITEM_SIZE * 2, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
+            drawRect(matrices, x, y, ITEM_SIZE * 2, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
         }
     }
     
-    public void drawItemStack(ItemStack stack, int x, int y, int mX, int mY, boolean selected) {
-        drawItemBackground(x, y, mX, mY, selected);
+    public void drawItemStack(PoseStack matrices, ItemStack stack, int x, int y, int mX, int mY, boolean selected) {
+        drawItemBackground(matrices, x, y, mX, mY, selected);
         
         if (!stack.isEmpty()) {
             drawItemStack(stack, x + 1, y + 1, true);

@@ -42,9 +42,9 @@ public class GuiWrapperEditMenu extends GuiBase {
         ResourceHelper.bindResource(BG_TEXTURE);
         
         
-        drawRect(0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        drawRect(matrices, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
         if (doublePage) {
-            drawRect(TEXTURE_WIDTH, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
+            drawRect(matrices, TEXTURE_WIDTH, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
         }
         
         applyColor(0xFFFFFFFF);

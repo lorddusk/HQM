@@ -748,7 +748,7 @@ public class Quest {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(gui);
+            scrollBar.draw(matrices, gui);
         }
         
         rewards.draw(matrices, gui, player, mX, mY, data);

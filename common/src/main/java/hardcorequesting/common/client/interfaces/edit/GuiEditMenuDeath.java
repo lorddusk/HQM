@@ -69,7 +69,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
-        scrollBar.draw(gui);
+        scrollBar.draw(matrices, gui);
         
         DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
         int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
@@ -98,8 +98,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int x = i % 3;
                 int y = i / 3;
                 
-                gui.drawRect(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
-                gui.drawRect(TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
+                gui.drawRect(matrices, TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
+                gui.drawRect(matrices, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
             gui.drawString(matrices, Translator.plain(stats.getName()), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);

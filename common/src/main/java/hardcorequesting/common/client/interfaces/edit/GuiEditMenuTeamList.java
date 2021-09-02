@@ -37,8 +37,8 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
         
-        drawArrow(gui, mX, mY, true);
-        drawArrow(gui, mX, mY, false);
+        drawArrow(matrices, gui, mX, mY, true);
+        drawArrow(matrices, gui, mX, mY, false);
         
         TeamLiteStat[] teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
@@ -82,14 +82,14 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         
     }
     
-    private void drawArrow(GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
         int x = left ? ARROW_X_LEFT : ARROW_X_RIGHT;
         int srcY = 0;
         
         if (isArrowEnabled(left)) {
             srcY = gui.inBounds(x, ARROW_Y, ARROW_W, ARROW_H, mX, mY) ? 2 : 1;
         }
-        gui.drawRect(x, ARROW_Y, ARROW_SRC_X, ARROW_SRC_Y + srcY * ARROW_W, ARROW_H, ARROW_W, left ? RenderRotation.ROTATE_90 : RenderRotation.ROTATE_270);
+        gui.drawRect(matrices, x, ARROW_Y, ARROW_SRC_X, ARROW_SRC_Y + srcY * ARROW_W, ARROW_H, ARROW_W, left ? RenderRotation.ROTATE_90 : RenderRotation.ROTATE_270);
     }
     
     private boolean isArrowEnabled(boolean left) {

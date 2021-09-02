@@ -60,7 +60,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
         if (part.getReputation() == null) {
-            gui.drawRect(x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
+            gui.drawRect(matrices, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
             return null;
         } else {
             String text = part.getReputation().draw(matrices, gui, x, y, mX, mY, null, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(player));

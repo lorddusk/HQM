@@ -285,7 +285,7 @@ public class Group {
             int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
             int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
             
-            gui.drawItemStack(stack, xPos, yPos, x, y, false);
+            gui.drawItemStack(matrices, stack, xPos, yPos, x, y, false);
         }
         
         for (int i = 0; i < items.size(); i++) {

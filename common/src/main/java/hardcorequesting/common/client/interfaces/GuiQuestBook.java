@@ -449,6 +449,8 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void render(PoseStack matrices, int x0, int y0, float f) {
+        setBlitOffset(0);
+        
         selectedStack = null;
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
@@ -459,8 +461,8 @@ public class GuiQuestBook extends GuiBase {
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(BG_TEXTURE);
         
-        drawRect(0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
-        drawRect(PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
+        drawRect(matrices, 0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
+        drawRect(matrices, PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
         
         if (Quest.canQuestsBeEdited()) {
             applyColor(0xFFFFFFFF);
@@ -478,20 +480,20 @@ public class GuiQuestBook extends GuiBase {
         
         
         if (shouldDisplayControlArrow(false)) {
-            drawRect(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inArrowBounds(false, x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
+            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inArrowBounds(false, x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
         }
         if (shouldDisplayControlArrow(true)) {
-            drawRect(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inArrowBounds(true, x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
+            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inArrowBounds(true, x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
         }
         
         if (editMenu == null) {
             if (Quest.canQuestsBeEdited()) {
                 for (EditButton button : getButtons()) {
-                    button.draw(x, y);
+                    button.draw(matrices, x, y);
                 }
             }
             for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.draw(this);
+                scrollBar.draw(matrices, this);
             }
             
             if (isMainPageOpen) {
@@ -865,7 +867,7 @@ public class GuiQuestBook extends GuiBase {
         if (questLine.front != null) {
             ResourceHelper.bindResource(questLine.front);
             applyColor(0xFFFFFFFF);
-            drawRect(20, 20, 0, 0, 140, 180);
+            drawRect(matrices, 20, 20, 0, 0, 140, 180);
         }
     }
     

@@ -422,6 +422,7 @@ public class QuestSet {
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int x0, int y0, int x, int y) {
+        
         if (gui.isOpBook) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
         }
@@ -434,66 +435,13 @@ public class QuestSet {
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
+    
+        drawConnectingLines(matrices, gui, player, isVisibleCache, isLinkFreeCache);
         
-        for (Quest child : getQuests().values()) {
-            if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                for (Quest parent : child.getRequirements()) {
-                    if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                        if (parent.hasSameSetAs(child)) {
-                            int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
-                            gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
-                                    gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
-                                    5,
-                                    color);
-                        }
-                    }
-                }
-            }
-        }
-        if (Quest.canQuestsBeEdited()) {
-            for (Quest child : getQuests().values()) {
-                for (Quest parent : child.getOptionLinks()) {
-                    if (parent.hasSameSetAs(child)) {
-                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
-                        gui.drawLine(gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
-                                gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
-                                5,
-                                color);
-                    }
-                }
-            }
-        }
+        gui.setBlitOffset(50);
         
-        for (Quest quest : getQuests().values()) {
-            if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
-                
-                RenderSystem.enableBlend();
-                RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                
-                int color;
-                if (quest == gui.modifyingQuest) color = 0xffbbffbb;
-                else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = 0xfff8bbff;
-                else color = quest.getColorFilter(player, gui.getTick());
-                
-                gui.applyColor(color);
-                ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
-                gui.drawRect(quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
-                
-                int iconX = quest.getGuiCenterX() - 8;
-                int iconY = quest.getGuiCenterY() - 8;
-                
-                if (quest.useBigIcon()) {
-                    iconX++;
-                    iconY++;
-                }
-                
-                gui.drawItemStack(quest.getIconStack(), iconX, iconY, true);
-                //ResourceHelper.bindResource(QUEST_ICONS);
-                //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
-            }
-        }
-        
-        
+        drawQuestIcons(matrices, gui, x, y, player, isVisibleCache, isLinkFreeCache);
+    
         for (Quest quest : getQuests().values()) {
             boolean editing = Quest.canQuestsBeEdited() && !Screen.hasControlDown();
             if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
@@ -599,7 +547,7 @@ public class QuestSet {
                     if (editing) {
                         int totalTasks = 0;
                         int completedTasks = 0;
-                        for (QuestTask task : quest.getTasks()) {
+                        for (QuestTask<?> task : quest.getTasks()) {
                             totalTasks++;
                             if (task.isCompleted(player)) {
                                 completedTasks++;
@@ -613,7 +561,7 @@ public class QuestSet {
                             
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_T)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
-                                for (QuestTask task : quest.getTasks()) {
+                                for (QuestTask<?> task : quest.getTasks()) {
                                     txt += "\n" + GuiColor.CYAN + task.getDescription();
                                     if (task.isCompleted(player)) {
                                         txt += GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
@@ -751,6 +699,70 @@ public class QuestSet {
             }
         }
         
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+        for (Quest child : getQuests().values()) {
+            if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+                for (Quest parent : child.getRequirements()) {
+                    if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+                        if (parent.hasSameSetAs(child)) {
+                            int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
+                            gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                                    gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
+                                    5,
+                                    color);
+                        }
+                    }
+                }
+            }
+        }
+        if (Quest.canQuestsBeEdited()) {
+            for (Quest child : getQuests().values()) {
+                for (Quest parent : child.getOptionLinks()) {
+                    if (parent.hasSameSetAs(child)) {
+                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
+                        gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                                gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
+                                5,
+                                color);
+                    }
+                }
+            }
+        }
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private void drawQuestIcons(PoseStack matrices, GuiQuestBook gui, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+        for (Quest quest : getQuests().values()) {
+            if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
+                
+                RenderSystem.enableBlend();
+                RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                
+                int color;
+                if (quest == gui.modifyingQuest) color = 0xffbbffbb;
+                else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = 0xfff8bbff;
+                else color = quest.getColorFilter(player, gui.getTick());
+                
+                gui.applyColor(color);
+                ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
+                gui.drawRect(matrices, quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
+                
+                int iconX = quest.getGuiCenterX() - 8;
+                int iconY = quest.getGuiCenterY() - 8;
+                
+                if (quest.useBigIcon()) {
+                    iconX++;
+                    iconY++;
+                }
+                
+                gui.drawItemStack(quest.getIconStack(), iconX, iconY, true);
+                //ResourceHelper.bindResource(QUEST_ICONS);
+                //drawRect(quest.getIconX(), quest.getIconY(), quest.getIconU(), quest.getIconV(), quest.getIconSize(), quest.getIconSize());
+            }
+        }
     }
     
     @Environment(EnvType.CLIENT)

@@ -229,7 +229,7 @@ public class QuestRewards {
     
         claimButton.draw(matrices, gui, player, mX, mY);
         
-        drawReputationIcon(gui, mX, mY, data);
+        drawReputationIcon(matrices, gui, mX, mY, data);
     }
     
     @Environment(EnvType.CLIENT)
@@ -245,14 +245,14 @@ public class QuestRewards {
     private void drawItemRewards(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         if (!rewards.isEmpty() || Quest.canQuestsBeEdited()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
+            drawRewards(matrices, gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
             if (!rewardChoices.isEmpty() || Quest.canQuestsBeEdited()) {
                 gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
-                drawRewards(gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+                drawRewards(matrices, gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
             }
         } else if (!rewardChoices.isEmpty()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+            drawRewards(matrices, gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
         }
     }
     
@@ -269,7 +269,7 @@ public class QuestRewards {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawReputationIcon(GuiQuestBook gui, int mX, int mY, QuestData data) {
+    private void drawReputationIcon(PoseStack matrices, GuiQuestBook gui, int mX, int mY, QuestData data) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
@@ -300,8 +300,8 @@ public class QuestRewards {
             
             int y = getRepIconY();
             foregroundIndex += 3;
-            gui.drawRect(REPUTATION_X, y, REPUTATION_SRC_X + backgroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
-            gui.drawRect(REPUTATION_X, y, REPUTATION_SRC_X + foregroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
+            gui.drawRect(matrices, REPUTATION_X, y, REPUTATION_SRC_X + backgroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
+            gui.drawRect(matrices, REPUTATION_X, y, REPUTATION_SRC_X + foregroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
         }
     }
     
@@ -364,12 +364,12 @@ public class QuestRewards {
     }
     
     @Environment(EnvType.CLIENT)
-    private void drawRewards(GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY, int max) {
+    private void drawRewards(PoseStack matrices, GuiQuestBook gui, NonNullList<ItemStack> rewards, int y, int selected, int mX, int mY, int max) {
         rewards = getEditFriendlyRewards(rewards, max);
         
         
         for (int i = 0; i < rewards.size(); i++) {
-            gui.drawItemStack(rewards.get(i), START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
+            gui.drawItemStack(matrices, rewards.get(i), START_X + i * REWARD_OFFSET, y, mX, mY, selected == i);
         }
     }
     

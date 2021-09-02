@@ -267,7 +267,7 @@ public class Reputation {
         String error = getError();
         
         if (error != null) {
-            gui.drawRect(x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
+            gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
             gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, GuiColor.RED.getHexColor());
             return info;
         }
@@ -337,7 +337,7 @@ public class Reputation {
             selectedSrcY = BAR_SRC_Y;
         }
         
-        gui.drawRect(x + BAR_X, y + BAR_Y, BAR_SRC_X, normalSrcY, BAR_WIDTH, BAR_HEIGHT);
+        gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, normalSrcY, BAR_WIDTH, BAR_HEIGHT);
         if (effects) {
             int leftX = getPointerPosition(lowerValue, lowerOnMarker);
             if (lowerMoved) {
@@ -347,7 +347,7 @@ public class Reputation {
             if (upperMoved) {
                 rightX -= upperMovedInner ? 1 : ARROW_MARKER_OFFSET;
             }
-            gui.drawRect(x + BAR_X + leftX, y + BAR_Y, BAR_SRC_X + leftX, selectedSrcY, rightX - leftX, BAR_HEIGHT);
+            gui.drawRect(matrices, x + BAR_X + leftX, y + BAR_Y, BAR_SRC_X + leftX, selectedSrcY, rightX - leftX, BAR_HEIGHT);
         }
         
         for (int i = 0; i < markers.size(); i++) {
@@ -364,7 +364,7 @@ public class Reputation {
             
             
             boolean selected = markers.get(i).equals(active) || (effects && ((lowerValue <= value && value <= upperValue) != inverted));
-            gui.drawRect(markerX, markerY, srcX, ARROW_SRC_Y + (selected ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
+            gui.drawRect(matrices, markerX, markerY, srcX, ARROW_SRC_Y + (selected ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
         }
         
         ReputationMarker current = null;
@@ -374,11 +374,11 @@ public class Reputation {
             current = getCurrentMarker(value);
             
             
-            if (drawPointer(gui, value, x, y, ARROW_POINTER_Y, ARROW_SRC_POINTER_X, mX, mY, false)) {
+            if (drawPointer(matrices, gui, value, x, y, ARROW_POINTER_Y, ARROW_SRC_POINTER_X, mX, mY, false)) {
                 info = current.getName() + " (" + value + ")";
             }
         }
-        if (drawPointer(gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)))) {
+        if (drawPointer(matrices, gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)))) {
             info = neutral.getName();
         }
         
@@ -468,7 +468,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    private boolean drawPointer(GuiQuestBook gui, int value, int x, int y, int offsetY, int srcX, int mX, int mY, boolean selectedTexture) {
+    private boolean drawPointer(PoseStack matrices, GuiQuestBook gui, int value, int x, int y, int offsetY, int srcX, int mX, int mY, boolean selectedTexture) {
         boolean flag = false;
         int pointerX = x + BAR_X - ARROW_SIZE / 2 + getPointerPosition(value, true);
         int pointerY = y + BAR_Y + offsetY;
@@ -476,7 +476,7 @@ public class Reputation {
             srcX += ARROW_SIZE;
             flag = true;
         }
-        gui.drawRect(pointerX, pointerY, srcX, ARROW_SRC_Y + (selectedTexture ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
+        gui.drawRect(matrices, pointerX, pointerY, srcX, ARROW_SRC_Y + (selectedTexture ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
         
         return flag;
     }

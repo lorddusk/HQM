@@ -176,7 +176,7 @@ public abstract class GuiEditMenu {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
-            gui.drawRect(x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
+            gui.drawRect(matrices, x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
             gui.drawString(matrices, cached, x + 12, y + 2, 0.7F, 0x404040);
         }
         
