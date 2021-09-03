@@ -22,7 +22,7 @@ public class BookCatalystRecipe extends ShapedRecipe {
         for (int i = 0; i < remaining.size(); i++) {
             ItemStack stack = container.getItem(i);
             if (stack.is(ModItems.book.get()) || stack.is(ModItems.enabledBook.get())) {
-                remaining.set(i, stack);
+                remaining.set(i, stack.copy());
             }
         }
         return remaining;
