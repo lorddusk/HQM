@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class QuestBookItem extends Item {
     private static final String NBT_PLAYER = "UseAsPlayer";
-    private boolean enabled;
+    private final boolean enabled;
     
     public QuestBookItem(boolean enabled) {
         super(new Item.Properties().stacksTo(1).tab(ModCreativeTabs.HQMTab));
@@ -67,7 +67,7 @@ public class QuestBookItem extends Item {
             if (!questingData.isQuestActive()) {
                 player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
             } else {
-                if (stack.getItem() == ModItems.enabledBook.get()) {
+                if (enabled) {
                     CompoundTag compound = stack.getTagElement("hqm");
                     if (compound != null && compound.contains(NBT_PLAYER)) {
                         String uuidS = compound.getString(NBT_PLAYER);
@@ -116,7 +116,7 @@ public class QuestBookItem extends Item {
     
     @Override
     public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
-        if (stack.getItem() == ModItems.enabledBook.get()) {
+        if (enabled) {
             CompoundTag compound = stack.getTagElement("hqm");
             if (compound != null && compound.contains(NBT_PLAYER)) {
                 Player useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
@@ -128,6 +128,6 @@ public class QuestBookItem extends Item {
     
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.getItem() == ModItems.enabledBook.get();
+        return enabled;
     }
 }
