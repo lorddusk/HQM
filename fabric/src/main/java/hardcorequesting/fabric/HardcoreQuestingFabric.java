@@ -271,46 +271,30 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public Fraction getBucketAmount() {
-        return Fraction.ofWhole(1);
+        return Fraction.of(FluidAmount.BUCKET.whole, FluidAmount.BUCKET.numerator, FluidAmount.BUCKET.denominator);
     }
     
     @Override
-    public Block getBlock(ResourceLocation location) {
-        return Registry.BLOCK.get(location);
-    }
-    
-    @Override
-    public SoundEvent getSoundEvent(ResourceLocation location) {
-        return Registry.SOUND_EVENT.get(location);
-    }
-    
-    @Override
-    public Item getItem(ResourceLocation location) {
-        return Registry.ITEM.get(location);
-    }
-    
-    @Override
-    public BlockEntityType<?> getBlockEntity(ResourceLocation location) {
-        return Registry.BLOCK_ENTITY_TYPE.get(location);
-    }
-    
-    @Override
-    public void registerBlock(ResourceLocation location, Supplier<Block> block) {
+    public Supplier<Block> registerBlock(ResourceLocation location, Supplier<Block> block) {
         Registry.register(Registry.BLOCK, location, block.get());
+        return () -> Registry.BLOCK.get(location);
     }
     
     @Override
-    public void registerSound(ResourceLocation location, Supplier<SoundEvent> sound) {
+    public Supplier<SoundEvent> registerSound(ResourceLocation location, Supplier<SoundEvent> sound) {
         Registry.register(Registry.SOUND_EVENT, location, sound.get());
+        return () -> Registry.SOUND_EVENT.get(location);
     }
     
     @Override
-    public void registerItem(ResourceLocation location, Supplier<Item> item) {
+    public Supplier<Item> registerItem(ResourceLocation location, Supplier<Item> item) {
         Registry.register(Registry.ITEM, location, item.get());
+        return () -> Registry.ITEM.get(location);
     }
     
     @Override
-    public void registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
+    public Supplier<BlockEntityType<?>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
         Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
+        return () -> Registry.BLOCK_ENTITY_TYPE.get(location);
     }
 }

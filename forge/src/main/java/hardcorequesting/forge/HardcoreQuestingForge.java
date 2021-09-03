@@ -417,42 +417,22 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public Block getBlock(ResourceLocation resourceLocation) {
-        return ForgeRegistries.BLOCKS.getValue(resourceLocation);
+    public Supplier<Block> registerBlock(ResourceLocation resourceLocation, Supplier<Block> supplier) {
+        return block.register(resourceLocation.getPath(), supplier);
     }
     
     @Override
-    public SoundEvent getSoundEvent(ResourceLocation location) {
-        return ForgeRegistries.SOUND_EVENTS.getValue(location);
+    public Supplier<SoundEvent> registerSound(ResourceLocation resourceLocation, Supplier<SoundEvent> supplier) {
+        return sounds.register(resourceLocation.getPath(), supplier);
     }
     
     @Override
-    public Item getItem(ResourceLocation resourceLocation) {
-        return ForgeRegistries.ITEMS.getValue(resourceLocation);
+    public Supplier<Item> registerItem(ResourceLocation resourceLocation, Supplier<Item> supplier) {
+        return item.register(resourceLocation.getPath(), supplier);
     }
     
     @Override
-    public BlockEntityType<?> getBlockEntity(ResourceLocation resourceLocation) {
-        return ForgeRegistries.BLOCK_ENTITIES.getValue(resourceLocation);
-    }
-    
-    @Override
-    public void registerBlock(ResourceLocation resourceLocation, Supplier<Block> supplier) {
-        block.register(resourceLocation.getPath(), supplier);
-    }
-    
-    @Override
-    public void registerSound(ResourceLocation resourceLocation, Supplier<SoundEvent> supplier) {
-        sounds.register(resourceLocation.getPath(), supplier);
-    }
-    
-    @Override
-    public void registerItem(ResourceLocation resourceLocation, Supplier<Item> supplier) {
-        item.register(resourceLocation.getPath(), supplier);
-    }
-    
-    @Override
-    public void registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
-        tileEntityType.register(resourceLocation.getPath(), () -> BlockEntityType.Builder.of(constructor::apply).build(null));
+    public Supplier<BlockEntityType<?>> registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
+        return tileEntityType.register(resourceLocation.getPath(), () -> BlockEntityType.Builder.of(constructor::apply).build(null));
     }
 }
