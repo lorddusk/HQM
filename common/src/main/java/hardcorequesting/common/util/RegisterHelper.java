@@ -19,13 +19,13 @@ import java.util.function.Supplier;
 public class RegisterHelper {
     
     public static <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block, Function<T, BlockItem> itemFunction) {
-        Supplier<Block> supplier = HardcoreQuestingCore.platform.registerBlock(new ResourceLocation(HardcoreQuestingCore.ID, id), (Supplier<Block>) block);
-        registerItem(id, () -> itemFunction.apply((T) supplier.get()));
-        return (Supplier<T>) supplier;
+        Supplier<T> supplier = HardcoreQuestingCore.platform.registerBlock(new ResourceLocation(HardcoreQuestingCore.ID, id), block);
+        registerItem(id, () -> itemFunction.apply(supplier.get()));
+        return supplier;
     }
     
     public static <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
-        return (Supplier<T>) HardcoreQuestingCore.platform.registerItem(new ResourceLocation(HardcoreQuestingCore.ID, id), (Supplier<Item>) item);
+        return HardcoreQuestingCore.platform.registerItem(new ResourceLocation(HardcoreQuestingCore.ID, id), item);
     }
     
     public static void register() {
@@ -35,6 +35,6 @@ public class RegisterHelper {
     }
     
     public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, BiFunction<BlockPos, BlockState, T> blockEntitySupplier) {
-        return (Supplier) HardcoreQuestingCore.platform.registerBlockEntity(new ResourceLocation(HardcoreQuestingCore.ID, id), blockEntitySupplier);
+        return HardcoreQuestingCore.platform.registerBlockEntity(new ResourceLocation(HardcoreQuestingCore.ID, id), blockEntitySupplier);
     }
 }

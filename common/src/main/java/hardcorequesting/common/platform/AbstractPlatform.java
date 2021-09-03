@@ -132,11 +132,11 @@ public interface AbstractPlatform {
     
     Fraction getBucketAmount();
     
-    Supplier<Block> registerBlock(ResourceLocation location, Supplier<Block> block);
+    <T extends Block> Supplier<T> registerBlock(ResourceLocation location, Supplier<T> block);
     
     Supplier<SoundEvent> registerSound(ResourceLocation location, Supplier<SoundEvent> sound);
     
-    Supplier<Item> registerItem(ResourceLocation location, Supplier<Item> item);
+    <T extends Item> Supplier<T> registerItem(ResourceLocation location, Supplier<T> item);
     
-    Supplier<BlockEntityType<?>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor);
+    <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, T> constructor);
 }

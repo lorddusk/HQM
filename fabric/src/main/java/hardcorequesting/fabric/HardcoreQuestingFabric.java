@@ -274,10 +274,11 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         return Fraction.of(FluidAmount.BUCKET.whole, FluidAmount.BUCKET.numerator, FluidAmount.BUCKET.denominator);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public Supplier<Block> registerBlock(ResourceLocation location, Supplier<Block> block) {
+    public <T extends Block> Supplier<T> registerBlock(ResourceLocation location, Supplier<T> block) {
         Registry.register(Registry.BLOCK, location, block.get());
-        return () -> Registry.BLOCK.get(location);
+        return () -> (T) Registry.BLOCK.get(location);
     }
     
     @Override
@@ -286,15 +287,17 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         return () -> Registry.SOUND_EVENT.get(location);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public Supplier<Item> registerItem(ResourceLocation location, Supplier<Item> item) {
+    public <T extends Item> Supplier<T> registerItem(ResourceLocation location, Supplier<T> item) {
         Registry.register(Registry.ITEM, location, item.get());
-        return () -> Registry.ITEM.get(location);
+        return () -> (T) Registry.ITEM.get(location);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public Supplier<BlockEntityType<?>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, T> constructor) {
         Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
-        return () -> Registry.BLOCK_ENTITY_TYPE.get(location);
+        return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
     }
 }

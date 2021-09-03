@@ -417,7 +417,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public Supplier<Block> registerBlock(ResourceLocation resourceLocation, Supplier<Block> supplier) {
+    public <T extends Block> Supplier<T> registerBlock(ResourceLocation resourceLocation, Supplier<T> supplier) {
         return block.register(resourceLocation.getPath(), supplier);
     }
     
@@ -427,12 +427,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public Supplier<Item> registerItem(ResourceLocation resourceLocation, Supplier<Item> supplier) {
+    public <T extends Item> Supplier<T> registerItem(ResourceLocation resourceLocation, Supplier<T> supplier) {
         return item.register(resourceLocation.getPath(), supplier);
     }
     
     @Override
-    public Supplier<BlockEntityType<?>> registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, T> constructor) {
         return tileEntityType.register(resourceLocation.getPath(), () -> BlockEntityType.Builder.of(constructor::apply).build(null));
     }
 }
