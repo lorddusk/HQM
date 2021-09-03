@@ -413,26 +413,26 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public Fraction getBucketAmount() {
-        return Fraction.ofWhole(1000);
+        return Fraction.ofWhole(FluidAttributes.BUCKET_VOLUME);
     }
     
     @Override
-    public <T extends Block> Supplier<T> registerBlock(ResourceLocation resourceLocation, Supplier<T> supplier) {
-        return block.register(resourceLocation.getPath(), supplier);
+    public <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> supplier) {
+        return block.register(id, supplier);
     }
     
     @Override
-    public Supplier<SoundEvent> registerSound(ResourceLocation resourceLocation, Supplier<SoundEvent> supplier) {
-        return sounds.register(resourceLocation.getPath(), supplier);
+    public Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> supplier) {
+        return sounds.register(id, supplier);
     }
     
     @Override
-    public <T extends Item> Supplier<T> registerItem(ResourceLocation resourceLocation, Supplier<T> supplier) {
-        return item.register(resourceLocation.getPath(), supplier);
+    public <T extends Item> Supplier<T> registerItem(String id, Supplier<T> supplier) {
+        return item.register(id, supplier);
     }
     
     @Override
-    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(ResourceLocation resourceLocation, BiFunction<BlockPos, BlockState, T> constructor) {
-        return tileEntityType.register(resourceLocation.getPath(), () -> BlockEntityType.Builder.of(constructor::apply).build(null));
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
+        return tileEntityType.register(id, () -> BlockEntityType.Builder.of(constructor::apply).build(null));
     }
 }

@@ -276,27 +276,31 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Block> Supplier<T> registerBlock(ResourceLocation location, Supplier<T> block) {
+    public <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.BLOCK, location, block.get());
         return () -> (T) Registry.BLOCK.get(location);
     }
     
     @Override
-    public Supplier<SoundEvent> registerSound(ResourceLocation location, Supplier<SoundEvent> sound) {
+    public Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> sound) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.SOUND_EVENT, location, sound.get());
         return () -> Registry.SOUND_EVENT.get(location);
     }
     
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Item> Supplier<T> registerItem(ResourceLocation location, Supplier<T> item) {
+    public <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.ITEM, location, item.get());
         return () -> (T) Registry.ITEM.get(location);
     }
     
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, T> constructor) {
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
         return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
     }
