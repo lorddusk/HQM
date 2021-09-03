@@ -3,7 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.EditType;

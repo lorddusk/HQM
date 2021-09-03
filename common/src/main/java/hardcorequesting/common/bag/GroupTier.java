@@ -2,9 +2,9 @@ package hardcorequesting.common.bag;
 
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.ScrollBar;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;

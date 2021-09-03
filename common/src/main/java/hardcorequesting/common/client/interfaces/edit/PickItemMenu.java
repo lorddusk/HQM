@@ -8,7 +8,7 @@ import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;

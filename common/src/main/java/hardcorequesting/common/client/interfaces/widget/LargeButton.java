@@ -1,7 +1,10 @@
-package hardcorequesting.common.client.interfaces;
+package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -69,7 +72,7 @@ public abstract class LargeButton {
                 lines = gui.getLinesFromText(getDescription(), 1, 200);
             }
             
-            gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + gui.left, mY + gui.top);
+            gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
