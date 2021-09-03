@@ -54,6 +54,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -303,5 +304,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
         return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
+    }
+    
+    @Override
+    public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        Registry.register(Registry.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
+        return () -> Registry.RECIPE_SERIALIZER.get(location);
     }
 }

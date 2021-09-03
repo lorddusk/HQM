@@ -3,6 +3,7 @@ package hardcorequesting.common.util;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.crafting.ModRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -31,6 +32,7 @@ public class RegisterHelper {
         ModBlocks.init();
         ModBlocks.registerTileEntities();
         ModItems.init();
+        ModRecipes.init();
     }
     
     public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, BiFunction<BlockPos, BlockState, T> blockEntitySupplier) {

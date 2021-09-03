@@ -40,6 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -96,6 +97,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
+    private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, HardcoreQuestingCore.ID);
     private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
@@ -105,6 +107,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         sounds.register(FMLJavaModLoadingContext.get().getModEventBus());
         block.register(FMLJavaModLoadingContext.get().getModEventBus());
         item.register(FMLJavaModLoadingContext.get().getModEventBus());
+        recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
             if (event.getEntityLiving() instanceof Player) {
@@ -434,5 +437,10 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
         return tileEntityType.register(id, () -> BlockEntityType.Builder.of(constructor::apply).build(null));
+    }
+    
+    @Override
+    public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
+        return recipe.register(id, BookCatalystRecipeSerializer::new);
     }
 }

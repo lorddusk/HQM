@@ -26,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -139,4 +140,7 @@ public interface AbstractPlatform {
     <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item);
     
     <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor);
+    
+    Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id);
+    
 }
