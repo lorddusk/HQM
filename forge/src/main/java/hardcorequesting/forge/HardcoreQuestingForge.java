@@ -338,11 +338,6 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public void setCraftingRemainingItem(Item item, Item item1) {
-        item.craftingRemainingItem = item1;
-    }
-    
-    @Override
     public FluidStack createEmptyFluidStack() {
         return new ForgeFluidStack();
     }

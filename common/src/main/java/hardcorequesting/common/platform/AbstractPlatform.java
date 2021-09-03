@@ -116,8 +116,6 @@ public interface AbstractPlatform {
     
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
     
-    void setCraftingRemainingItem(Item item, Item craftingRemainingItem);
-    
     FluidStack createEmptyFluidStack();
     
     FluidStack createFluidStack(Fluid fluid, Fraction amount);

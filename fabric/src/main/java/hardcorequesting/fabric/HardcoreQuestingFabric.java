@@ -237,11 +237,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
-    public void setCraftingRemainingItem(Item item, Item craftingRemainingItem) {
-        item.craftingRemainingItem = craftingRemainingItem;
-    }
-    
-    @Override
     public FluidStack createEmptyFluidStack() {
         return new FabricFluidStack(FluidVolumeUtil.EMPTY);
     }
