@@ -54,6 +54,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -236,11 +237,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
-    public void setCraftingRemainingItem(Item item, Item craftingRemainingItem) {
-        item.craftingRemainingItem = craftingRemainingItem;
-    }
-    
-    @Override
     public FluidStack createEmptyFluidStack() {
         return new FabricFluidStack(FluidVolumeUtil.EMPTY);
     }
@@ -271,46 +267,44 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public Fraction getBucketAmount() {
-        return Fraction.ofWhole(1);
+        return Fraction.of(FluidAmount.BUCKET.whole, FluidAmount.BUCKET.numerator, FluidAmount.BUCKET.denominator);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public Block getBlock(ResourceLocation location) {
-        return Registry.BLOCK.get(location);
-    }
-    
-    @Override
-    public SoundEvent getSoundEvent(ResourceLocation location) {
-        return Registry.SOUND_EVENT.get(location);
-    }
-    
-    @Override
-    public Item getItem(ResourceLocation location) {
-        return Registry.ITEM.get(location);
-    }
-    
-    @Override
-    public BlockEntityType<?> getBlockEntity(ResourceLocation location) {
-        return Registry.BLOCK_ENTITY_TYPE.get(location);
-    }
-    
-    @Override
-    public void registerBlock(ResourceLocation location, Supplier<Block> block) {
+    public <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.BLOCK, location, block.get());
+        return () -> (T) Registry.BLOCK.get(location);
     }
     
     @Override
-    public void registerSound(ResourceLocation location, Supplier<SoundEvent> sound) {
+    public Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> sound) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.SOUND_EVENT, location, sound.get());
+        return () -> Registry.SOUND_EVENT.get(location);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public void registerItem(ResourceLocation location, Supplier<Item> item) {
+    public <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(Registry.ITEM, location, item.get());
+        return () -> (T) Registry.ITEM.get(location);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
+        return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
     }
     
     @Override
-    public void registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor) {
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
+    public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        Registry.register(Registry.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
+        return () -> Registry.RECIPE_SERIALIZER.get(location);
     }
 }

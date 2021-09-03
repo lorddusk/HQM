@@ -26,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -115,8 +116,6 @@ public interface AbstractPlatform {
     
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
     
-    void setCraftingRemainingItem(Item item, Item craftingRemainingItem);
-    
     FluidStack createEmptyFluidStack();
     
     FluidStack createFluidStack(Fluid fluid, Fraction amount);
@@ -132,19 +131,14 @@ public interface AbstractPlatform {
     
     Fraction getBucketAmount();
     
-    Block getBlock(ResourceLocation location);
+    <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block);
     
-    SoundEvent getSoundEvent(ResourceLocation location);
+    Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> sound);
     
-    Item getItem(ResourceLocation location);
+    <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item);
     
-    BlockEntityType<?> getBlockEntity(ResourceLocation location);
+    <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor);
     
-    void registerBlock(ResourceLocation location, Supplier<Block> block);
+    Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id);
     
-    void registerSound(ResourceLocation location, Supplier<SoundEvent> sound);
-    
-    void registerItem(ResourceLocation location, Supplier<Item> item);
-    
-    void registerBlockEntity(ResourceLocation location, BiFunction<BlockPos, BlockState, ? extends BlockEntity> constructor);
 }

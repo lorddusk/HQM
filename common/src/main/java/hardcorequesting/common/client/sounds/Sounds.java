@@ -5,6 +5,8 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 
+import java.util.function.Supplier;
+
 public enum Sounds {
     COMPLETE("complete"),
     LIFE("heart"),
@@ -13,6 +15,7 @@ public enum Sounds {
     ROTTEN("rotten");
     
     private final ResourceLocation soundId;
+    private Supplier<SoundEvent> supplier;
     
     Sounds(String soundName) {
         this.soundId = new ResourceLocation(HardcoreQuestingCore.ID, soundName);
@@ -23,12 +26,12 @@ public enum Sounds {
     }
     
     public SoundEvent getSound() {
-        return HardcoreQuestingCore.platform.getSoundEvent(soundId);
+        return supplier.get();
     }
     
     public static void registerSounds() {
         for (Sounds sound : Sounds.values()) {
-            HardcoreQuestingCore.platform.registerSound(sound.soundId, () -> new SoundEvent(sound.soundId));
+            sound.supplier = HardcoreQuestingCore.platform.registerSound(sound.soundId.getPath(), () -> new SoundEvent(sound.soundId));
         }
     }
 }

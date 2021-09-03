@@ -1,7 +1,6 @@
 package hardcorequesting.common.items;
 
 
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.util.RegisterHelper;
 
@@ -24,16 +23,8 @@ public class ModItems {
     public static Supplier<ItemHeart> rottenHeart;
     
     public static void init() {
-        book = RegisterHelper.registerItem("quest_book", () -> {
-            QuestBookItem item = new QuestBookItem(false);
-            HardcoreQuestingCore.platform.setCraftingRemainingItem(item, item);
-            return item;
-        });
-        enabledBook = RegisterHelper.registerItem("enabled_quest_book", () -> {
-            QuestBookItem item = new QuestBookItem(true);
-            HardcoreQuestingCore.platform.setCraftingRemainingItem(item, item);
-            return item;
-        });
+        book = RegisterHelper.registerItem("quest_book", () -> new QuestBookItem(false));
+        enabledBook = RegisterHelper.registerItem("enabled_quest_book", () -> new QuestBookItem(true));
         basicBag = RegisterHelper.registerItem("basic_bag", () -> new BagItem(BagTier.BASIC));
         goodBag = RegisterHelper.registerItem("good_bag", () -> new BagItem(BagTier.GOOD));
         greaterBag = RegisterHelper.registerItem("greater_bag", () -> new BagItem(BagTier.GREATER));
