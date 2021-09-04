@@ -36,7 +36,9 @@ public class PlaceBlockTask extends ItemRequirementTask {
     private void handleRightClick(InteractionHand hand, Player player, ItemStack itemStack) {
         if (hand != InteractionHand.MAIN_HAND) return;
         
-        NonNullList<ItemStack> consume = NonNullList.withSize(1, itemStack);
+        ItemStack placed = itemStack.copy();
+        placed.setCount(1);
+        NonNullList<ItemStack> consume = NonNullList.withSize(1, placed);
         increaseItems(consume, player.getUUID());
     }
 }
