@@ -512,7 +512,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedQuest == null) {
                 selectedSet.draw(matrices, this, x0, y0, x, y);
             } else {
-                selectedQuest.drawMenu(matrices, this, player, x, y);
+                selectedQuest.getGraphic().drawMenu(matrices, this, player, x, y);
             }
             
             if (Quest.canQuestsBeEdited()) {
@@ -670,7 +670,7 @@ public class GuiQuestBook extends GuiBase {
                         selectedSet.mouseClicked(this, x, y);
                     }
                 } else {
-                    selectedQuest.onClick(this, player, x, y, button);
+                    selectedQuest.getGraphic().onClick(this, player, x, y, button);
                 }
             }
         } else {
@@ -696,7 +696,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.onRelease(this, player, x, y, button);
+            selectedQuest.getGraphic().onRelease(this, player, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
@@ -717,7 +717,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.onDrag(this, player, x, y, button);
+            selectedQuest.getGraphic().onDrag(this, player, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);
@@ -731,7 +731,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onScroll(this, x, y, scroll);
         } else if (selectedQuest != null) {
-            selectedQuest.onScroll(this, x, y, scroll);
+            selectedQuest.getGraphic().onScroll(this, x, y, scroll);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onScroll(this, x, y, scroll);

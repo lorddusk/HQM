@@ -873,7 +873,7 @@ public class QuestSet {
                                 } // deliberate drop through
                             default:
                                 GuiQuestBook.selectedQuest = quest;
-                                quest.onOpen(gui, player);
+                                quest.getGraphic().onOpen(gui, player);
                                 break;
                         }
                     } else {
@@ -881,7 +881,7 @@ public class QuestSet {
                             OPBookHelper.reverseQuestCompletion(quest, player);
                         } else {
                             GuiQuestBook.selectedQuest = quest;
-                            quest.onOpen(gui, player);
+                            quest.getGraphic().onOpen(gui, player);
                         }
                     }
                     break;
