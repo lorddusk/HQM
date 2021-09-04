@@ -70,11 +70,11 @@ public class TextBoxGroup {
         
         private static final int WIDTH = 60;
         protected int offsetY = 3;
-        private int x;
-        private int y;
+        protected final int x;
+        protected final int y;
         private int start;
         private String visibleText;
-        private boolean scrollable;
+        private final boolean scrollable;
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
             super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH, false);

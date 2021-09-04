@@ -139,7 +139,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
             super.draw(matrices, gui, selected);
             
-            gui.drawString(matrices, Translator.translatable(title), BOX_X, BOX_Y + BOX_OFFSET * id + TEXT_OFFSET, 0x404040);
+            gui.drawString(matrices, Translator.translatable(title), x, y + TEXT_OFFSET, 0x404040);
         }
         
         @Override
