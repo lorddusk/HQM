@@ -11,6 +11,7 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.team.TeamManager;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -63,14 +64,10 @@ public class QuestingDataManager {
     }
     
     public void activateHardcore() {
-        Boolean hardCore = null;
-        try {
-            hardCore = HardcoreQuestingCore.getServer().isHardcore();
-        } catch (Exception e) {
-            e.printStackTrace(); // todo exception handling
-        }
-        if (hardCore != null) {
-            if (!hardcoreActive && !hardCore) {
+        MinecraftServer server = HardcoreQuestingCore.getServer();
+        
+        if (server != null) {
+            if (!hardcoreActive && !server.isHardcore()) {
                 hardcoreActive = true;
             }
         }
