@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
@@ -63,7 +64,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
             }
         };
         
-        textBoxes.add(new TextBoxNumber(gui, 180, 150, "hqm." + textKey + ".reqKills") {
+        textBoxes.add(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {
             @Override
             protected int getValue() {
                 return amount;

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
@@ -81,7 +82,7 @@ public class LocationMenu extends GuiEditMenuExtended {
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
                 
-                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + TEXT_OFFSET, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
             }
         });
         locationBox.recalculateCursor(gui);
@@ -122,8 +123,8 @@ public class LocationMenu extends GuiEditMenuExtended {
                 pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
                 dimension = player.level.dimension().location().toString();
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
-                    if (textBox instanceof TextBoxNumber)
-                        textBox.setTextAndCursor(gui, String.valueOf(((TextBoxNumber) textBox).getValue()));
+                    if (textBox instanceof NumberTextBox)
+                        textBox.reloadText(gui);
                     else
                         textBox.recalculateCursor(gui);
                 }
@@ -155,7 +156,7 @@ public class LocationMenu extends GuiEditMenuExtended {
         resultConsumer.accept(new Result(visibility, pos.immutable(), radius, dimension));
     }
     
-    private abstract class TextBoxNumberNegative extends TextBoxNumber {
+    private abstract class TextBoxNumberNegative extends NumberTextBox {
         public TextBoxNumberNegative(GuiQuestBook gui, int x, int y, String title) {
             super(gui, x, y, title);
         }

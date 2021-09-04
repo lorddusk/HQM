@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -21,7 +22,7 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
         this.showModifiedParentRequirement = quest.getUseModifiedParentRequirement();
         if (!showModifiedParentRequirement) this.parentRequirementCount = quest.getRequirements().size();
         
-        textBoxes.add(new TextBoxNumber(gui, 25, 105, "hqm.parentCount.count") {
+        textBoxes.add(new NumberTextBox(gui, 25, 105, "hqm.parentCount.count") {
             @Override
             protected int getValue() {
                 return parentRequirementCount;

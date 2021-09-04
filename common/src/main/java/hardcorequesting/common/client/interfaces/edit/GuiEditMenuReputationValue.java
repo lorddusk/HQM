@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -18,7 +19,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
         this.marker = marker;
         this.value = marker.getValue();
         
-        textBoxes.add(new TextBoxNumber(gui, 25, 30, "hqm.repValue.tierValue") {
+        textBoxes.add(new NumberTextBox(gui, 25, 30, "hqm.repValue.tierValue") {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;

@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.IntConsumer;
@@ -20,7 +21,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        textBoxes.add(new TextBoxNumber(gui, 25, 30, title) {
+        textBoxes.add(new NumberTextBox(gui, 25, 30, title) {
             @Override
             protected int getValue() {
                 return amount;

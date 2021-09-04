@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
 import hardcorequesting.common.util.Translator;
@@ -16,7 +17,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
         
         this.tracker = tracker;
         
-        textBoxes.add(new TextBoxNumber(gui, 20, 130, "hqm.menuTracker.radius.title") {
+        textBoxes.add(new NumberTextBox(gui, 20, 130, "hqm.menuTracker.radius.title") {
             @Override
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);

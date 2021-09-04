@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.EditType;
@@ -23,7 +24,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();
         
-        textBoxes.add(new TextBoxNumber(gui, 25, 135, "hqm.menuTrigger.taskCount") {
+        textBoxes.add(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount") {
             @Override
             protected int getValue() {
                 return triggerTasks;

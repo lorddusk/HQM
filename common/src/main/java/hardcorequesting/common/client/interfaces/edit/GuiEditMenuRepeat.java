@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.RepeatInfo;
 import hardcorequesting.common.quests.RepeatType;
@@ -82,7 +83,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         return type.getDescription();
     }
     
-    private abstract class TextBoxHidden extends TextBoxNumber {
+    private abstract class TextBoxHidden extends NumberTextBox {
         
         public TextBoxHidden(GuiQuestBook gui, int x, int y, String title) {
             super(gui, x, y, title);
