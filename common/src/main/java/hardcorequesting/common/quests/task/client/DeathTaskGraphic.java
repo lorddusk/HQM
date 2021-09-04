@@ -11,7 +11,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 @Environment(EnvType.CLIENT)
-public class DeathTaskGraphic implements TaskGraphic {
+public class DeathTaskGraphic extends TaskGraphic {
     
     private final DeathTask task;
     

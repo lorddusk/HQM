@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public abstract class ListTaskGraphic<Part> implements TaskGraphic {
+public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected final PartList<Part> parts;
     

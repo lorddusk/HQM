@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class QuestGraphic {
+public class QuestGraphic extends Graphic {
     
     private static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
