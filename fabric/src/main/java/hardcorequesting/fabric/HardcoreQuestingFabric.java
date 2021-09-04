@@ -4,8 +4,11 @@ import alexiil.mc.lib.attributes.fluid.FluidAttributes;
 import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
 import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
+import alexiil.mc.lib.attributes.fluid.render.FluidRenderFace;
+import alexiil.mc.lib.attributes.fluid.render.FluidVolumeRenderer;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
+import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
@@ -261,8 +264,17 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
-    public void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2) {
-        ((FabricFluidStack) fluid)._volume.renderGuiRect(x1, y1, x2, y2);
+    public void renderFluidStack(FluidStack fluid, PoseStack matrices, int x1, int y1, int x2, int y2) {
+        // Behaves like FluidVolume.renderGuiRect(), but uses the provided PoseStack
+        List<FluidRenderFace> faces = new ArrayList<>();
+        faces.add(FluidRenderFace.createFlatFaceZ(0, 0, 0, x2 - x1, y2 - y1, 0, 1 / 16.0, false, false));
+        FluidVolume volume = ((FabricFluidStack) fluid)._volume;
+        
+        matrices.pushPose();
+        matrices.translate(x1, y1, 0);
+        volume.render(faces, FluidVolumeRenderer.VCPS, matrices);
+        FluidVolumeRenderer.VCPS.draw();
+        matrices.popPose();
     }
     
     @Override

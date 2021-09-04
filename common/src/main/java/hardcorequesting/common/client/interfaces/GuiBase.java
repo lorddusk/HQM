@@ -183,7 +183,10 @@ public class GuiBase extends Screen {
     }
     
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
+        stack.pushPose();
+        stack.translate(0, 0, getBlitOffset());
         HardcoreQuestingCore.platform.renderFluidStack(fluid, stack, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
+        stack.popPose();
     }
     
     public void applyColor(int color) {
