@@ -78,7 +78,7 @@ public class ReputationBar {
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        String info = reputation.draw(matrices, gui, this.x, this.y, mX, mY, null, player, false, null, null, false, null, null, false);
+        String info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, player, false, null, null, false, null, null, false);
         
         if (info != null) {
             gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());

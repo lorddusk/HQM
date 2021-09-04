@@ -90,7 +90,7 @@ public class Reputation {
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputations.get(i).draw(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, player, false, null, null, false, null, null, false);
+            info = reputations.get(i).drawAndGetTooltip(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, player, false, null, null, false, null, null, false);
         }
         
         if (info != null) {
@@ -263,13 +263,19 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+        draw(matrices, gui, x, y, mX, mY, player, effects, lower, upper, inverted, active, text, completed);
+        return info != null ? info : getTooltip(gui, x, y, mX, mY, player);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
         String error = getError();
         
         if (error != null) {
             gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
             gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, GuiColor.RED.getHexColor());
-            return info;
+            return;
         }
         
         int lowerValue = 0;
@@ -357,11 +363,9 @@ public class Reputation {
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
             int srcX = ARROW_SRC_MARKER_X;
             int value = markers.get(i).getValue();
-            if (info == null && gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
+            if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
                 srcX += ARROW_SIZE;
-                info = markers.get(i).getName() + " (" + value + ")";
             }
-            
             
             boolean selected = markers.get(i).equals(active) || (effects && ((lowerValue <= value && value <= upperValue) != inverted));
             gui.drawRect(matrices, markerX, markerY, srcX, ARROW_SRC_Y + (selected ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
@@ -372,15 +376,11 @@ public class Reputation {
         if (player != null) {
             value = getValue(player);
             current = getCurrentMarker(value);
-            
-            
-            if (drawPointer(matrices, gui, value, x, y, ARROW_POINTER_Y, ARROW_SRC_POINTER_X, mX, mY, false)) {
-                info = current.getName() + " (" + value + ")";
-            }
+    
+    
+            drawPointer(matrices, gui, value, x, y, ARROW_POINTER_Y, ARROW_SRC_POINTER_X, mX, mY, false);
         }
-        if (drawPointer(matrices, gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)))) {
-            info = neutral.getName();
-        }
+        drawPointer(matrices, gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)));
         
         String str;
         boolean selected = false;
@@ -421,8 +421,40 @@ public class Reputation {
         }
         
         gui.drawString(matrices, Translator.plain(str), x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public String getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, Player player) {
+    
+        if (getError() != null) {
+            return null;
+        }
         
-        return info;
+        for (int i = 0; i < markers.size(); i++) {
+            int position = i * (BAR_WIDTH - ARROW_MARKER_OFFSET * 2) / (markers.size() - 1);
+            int markerX = x + BAR_X - ARROW_SIZE / 2 + position + ARROW_MARKER_OFFSET;
+            
+            int markerY = y + BAR_Y + ARROW_MARKER_Y;
+            int value = markers.get(i).getValue();
+            if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
+                return markers.get(i).getName() + " (" + value + ")";
+            }
+        }
+        
+        if (player != null) {
+            int value = getValue(player);
+            ReputationMarker current = getCurrentMarker(value);
+            
+            if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
+                return current.getName() + " (" + value + ")";
+            }
+        }
+        
+        if (isOnPointer(gui, 0, x, y, ARROW_MARKER_Y, mX, mY)) {
+            return neutral.getName();
+        }
+        
+        return null;
     }
     
     @Environment(EnvType.CLIENT)
@@ -468,17 +500,20 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    private boolean drawPointer(PoseStack matrices, GuiQuestBook gui, int value, int x, int y, int offsetY, int srcX, int mX, int mY, boolean selectedTexture) {
-        boolean flag = false;
+    private void drawPointer(PoseStack matrices, GuiQuestBook gui, int value, int x, int y, int offsetY, int srcX, int mX, int mY, boolean selectedTexture) {
         int pointerX = x + BAR_X - ARROW_SIZE / 2 + getPointerPosition(value, true);
         int pointerY = y + BAR_Y + offsetY;
         if (gui.inBounds(pointerX, pointerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
             srcX += ARROW_SIZE;
-            flag = true;
         }
         gui.drawRect(matrices, pointerX, pointerY, srcX, ARROW_SRC_Y + (selectedTexture ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
-        
-        return flag;
+    }
+    
+    @Environment(EnvType.CLIENT)
+    private boolean isOnPointer(GuiQuestBook gui, int value, int x, int y, int offsetY, int mX, int mY) {
+        int pointerX = x + BAR_X - ARROW_SIZE / 2 + getPointerPosition(value, true);
+        int pointerY = y + BAR_Y + offsetY;
+        return gui.inBounds(pointerX, pointerY, ARROW_SIZE, ARROW_SIZE, mX, mY);
     }
     
     private int getPointerPosition(int value, boolean onMarker) {
