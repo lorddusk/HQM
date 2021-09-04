@@ -19,13 +19,13 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     private int hours;
     
     public GuiEditMenuRepeat(GuiQuestBook gui, Player player, Quest quest) {
-        super(gui, player, true, 25, 20, 25, 100);
+        super(gui, player, true, 25, 20);
         this.quest = quest;
         this.type = quest.getRepeatInfo().getType();
         days = quest.getRepeatInfo().getDays();
         hours = quest.getRepeatInfo().getHours();
         
-        textBoxes.add(new TextBoxHidden(gui, 0, "hqm.repeatMenu.days") {
+        textBoxes.add(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days") {
             @Override
             protected int getValue() {
                 return days;
@@ -37,7 +37,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
             }
         });
         
-        textBoxes.add(new TextBoxHidden(gui, 1, "hqm.repeatMenu.hours") {
+        textBoxes.add(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours") {
             @Override
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);
@@ -84,8 +84,8 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     
     private abstract class TextBoxHidden extends TextBoxNumber {
         
-        public TextBoxHidden(GuiQuestBook gui, int id, String title) {
-            super(gui, id, title);
+        public TextBoxHidden(GuiQuestBook gui, int x, int y, String title) {
+            super(gui, x, y, title);
         }
         
         @Override

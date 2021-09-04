@@ -37,7 +37,7 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     }
     
     private PickAdvancementMenu(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        super(gui, player, false, 180, 70, 180, 150);
+        super(gui, player, false, 180, 70);
         
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;

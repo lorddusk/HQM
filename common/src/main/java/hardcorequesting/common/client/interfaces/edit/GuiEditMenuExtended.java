@@ -15,10 +15,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     private static final int ARROW_SRC_Y = 176;
     private static final int ARROW_W = 6;
     private static final int ARROW_H = 10;
-    protected final int BOX_X;
-    protected final int BOX_Y;
-    protected final int BOX_OFFSET = 30;
-    protected final int TEXT_OFFSET = -10;
+    protected static final int BOX_OFFSET = 30;
+    protected static final int TEXT_OFFSET = -10;
     private final int ARROW_X_LEFT;
     private final int ARROW_Y;
     private final int ARROW_DESCRIPTION_Y;
@@ -26,7 +24,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     protected TextBoxGroup textBoxes;
     private boolean clicked;
     
-    protected GuiEditMenuExtended(GuiBase gui, Player player, boolean isControlOnFirstPage, int arrowX, int arrowY, int boxX, int boxY) {
+    protected GuiEditMenuExtended(GuiBase gui, Player player, boolean isControlOnFirstPage, int arrowX, int arrowY) {
         super(gui, player, isControlOnFirstPage);
         
         this.textBoxes = new TextBoxGroup();
@@ -34,8 +32,6 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         ARROW_Y = arrowY;
         ARROW_DESCRIPTION_Y = ARROW_Y + 20;
         ARROW_X_RIGHT = ARROW_X_LEFT + 130;
-        BOX_X = boxX;
-        BOX_Y = boxY;
     }
     
     @Override
@@ -112,18 +108,16 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     
     protected abstract String getArrowDescription();
     
-    protected abstract class TextBoxNumber extends TextBoxGroup.TextBox {
+    protected static abstract class TextBoxNumber extends TextBoxGroup.TextBox {
         
         private String title;
-        private int id;
         private boolean loaded;
         
-        public TextBoxNumber(GuiBase gui, int id, String title) {
-            super(gui, "", BOX_X, BOX_Y + BOX_OFFSET * id, false);
+        public TextBoxNumber(GuiBase gui, int x, int y, String title) {
+            super(gui, "", x, y, false);
             loaded = true;
             reloadText(gui);
             this.title = title;
-            this.id = id;
         }
         
         @Override

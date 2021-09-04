@@ -14,14 +14,14 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
     private Quest quest;
     
     public GuiEditMenuParentCount(GuiBase gui, Player player, Quest quest) {
-        super(gui, player, true, 25, 20, 25, 105);
+        super(gui, player, true, 25, 20);
         
         this.quest = quest;
         this.parentRequirementCount = quest._getParentRequirementCount();
         this.showModifiedParentRequirement = quest.getUseModifiedParentRequirement();
         if (!showModifiedParentRequirement) this.parentRequirementCount = quest.getRequirements().size();
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.parentCount.count") {
+        textBoxes.add(new TextBoxNumber(gui, 25, 105, "hqm.parentCount.count") {
             @Override
             protected int getValue() {
                 return parentRequirementCount;

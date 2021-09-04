@@ -26,7 +26,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private List<FormattedText> error;
     
     public GuiEditMenuReputationReward(GuiBase gui, Player player, List<ReputationReward> rewards) {
-        super(gui, player, true, 185, 25, 185, 55);
+        super(gui, player, true, 185, 25);
         
         this.rewards = new ArrayList<>();
         if (rewards != null) {
@@ -35,7 +35,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         }
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repReward.value") {
+        textBoxes.add(new TextBoxNumber(gui, 185, 55, "hqm.repReward.value") {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;

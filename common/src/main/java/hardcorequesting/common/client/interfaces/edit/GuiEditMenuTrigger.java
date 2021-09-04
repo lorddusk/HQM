@@ -17,13 +17,13 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     private UUID questId;
     
     public GuiEditMenuTrigger(GuiQuestBook gui, Player player, Quest quest) {
-        super(gui, player, true, 25, 20, 25, 135);
+        super(gui, player, true, 25, 20);
         
         this.questId = quest.getQuestId();
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTrigger.taskCount") {
+        textBoxes.add(new TextBoxNumber(gui, 25, 135, "hqm.menuTrigger.taskCount") {
             @Override
             protected int getValue() {
                 return triggerTasks;

@@ -12,11 +12,11 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     private TrackerBlockEntity tracker;
     
     public GuiEditMenuTracker(GuiBase gui, Player player, final TrackerBlockEntity tracker) {
-        super(gui, player, true, 20, 30, 20, 130);
+        super(gui, player, true, 20, 30);
         
         this.tracker = tracker;
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.menuTracker.radius.title") {
+        textBoxes.add(new TextBoxNumber(gui, 20, 130, "hqm.menuTracker.radius.title") {
             @Override
             protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
                 super.draw(matrices, gui, selected);

@@ -50,7 +50,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     private PickMobMenu(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        super(gui, player, false, 180, 70, 180, 150);
+        super(gui, player, false, 180, 70);
         
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;
@@ -63,7 +63,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
             }
         };
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm." + textKey + ".reqKills") {
+        textBoxes.add(new TextBoxNumber(gui, 180, 150, "hqm." + textKey + ".reqKills") {
             @Override
             protected int getValue() {
                 return amount;

@@ -25,7 +25,7 @@ public class LocationMenu extends GuiEditMenuExtended {
     }
     
     private LocationMenu(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        super(gui, player, true, 180, 30, 20, 30);
+        super(gui, player, true, 180, 30);
     
         this.resultConsumer = resultConsumer;
         this.visibility = visibility;
@@ -33,7 +33,7 @@ public class LocationMenu extends GuiEditMenuExtended {
         this.radius = initRadius;
         this.dimension = initDimension;
         
-        textBoxes.add(new TextBoxNumberNegative(gui, 0, "hqm.locationMenu.xTarget") {
+        textBoxes.add(new TextBoxNumberNegative(gui, 20, 30, "hqm.locationMenu.xTarget") {
             @Override
             protected void setValue(int number) {
                 pos.setX(number);
@@ -45,7 +45,7 @@ public class LocationMenu extends GuiEditMenuExtended {
             }
         });
         
-        textBoxes.add(new TextBoxNumberNegative(gui, 1, "hqm.locationMenu.yTarget") {
+        textBoxes.add(new TextBoxNumberNegative(gui, 20, 30 + BOX_OFFSET, "hqm.locationMenu.yTarget") {
             @Override
             protected void setValue(int number) {
                 pos.setY(number);
@@ -57,7 +57,7 @@ public class LocationMenu extends GuiEditMenuExtended {
             }
         });
         
-        textBoxes.add(new TextBoxNumberNegative(gui, 2, "hqm.locationMenu.zTarget") {
+        textBoxes.add(new TextBoxNumberNegative(gui, 20, 30 + 2 * BOX_OFFSET, "hqm.locationMenu.zTarget") {
             @Override
             protected void setValue(int number) {
                 pos.setZ(number);
@@ -70,7 +70,7 @@ public class LocationMenu extends GuiEditMenuExtended {
         });
         
         TextBoxGroup.TextBox locationBox;
-        textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, initDimension, BOX_X, BOX_Y + BOX_OFFSET * 3, true) {
+        textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
             @Override
             public void textChanged(GuiBase gui) {
                 super.textChanged(gui);
@@ -86,7 +86,7 @@ public class LocationMenu extends GuiEditMenuExtended {
         });
         locationBox.recalculateCursor(gui);
         
-        textBoxes.add(new TextBoxNumberNegative(gui, 4, "hqm.locationMenu.radius") {
+        textBoxes.add(new TextBoxNumberNegative(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius") {
             @Override
             protected int getValue() {
                 return radius;
@@ -156,8 +156,8 @@ public class LocationMenu extends GuiEditMenuExtended {
     }
     
     private abstract class TextBoxNumberNegative extends TextBoxNumber {
-        public TextBoxNumberNegative(GuiQuestBook gui, int id, String title) {
-            super(gui, id, title);
+        public TextBoxNumberNegative(GuiQuestBook gui, int x, int y, String title) {
+            super(gui, x, y, title);
         }
         
         @Override

@@ -15,12 +15,12 @@ public class IntInputMenu extends GuiEditMenuExtended {
     }
     
     public IntInputMenu(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
-        super(gui, player, true, -1, -1, 25, 30);
+        super(gui, player, true, -1, -1);
         
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        textBoxes.add(new TextBoxNumber(gui, 0, title) {
+        textBoxes.add(new TextBoxNumber(gui, 25, 30, title) {
             @Override
             protected int getValue() {
                 return amount;

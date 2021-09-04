@@ -31,7 +31,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private int id;
     
     public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.Part setting) {
-        super(gui, player, true, 25, 25, -1, -1);
+        super(gui, player, true, 25, 25);
         
         this.task = task;
         this.id = id;
