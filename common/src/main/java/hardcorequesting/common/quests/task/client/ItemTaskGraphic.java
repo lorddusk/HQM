@@ -78,8 +78,9 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
-        if (gui.inBounds(x, y, SIZE, SIZE, mX, mY)) {
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Positioned<ItemRequirementTask.Part> pos, int id, int mX, int mY) {
+        ItemRequirementTask.Part part = pos.getElement();
+        if (isInPartBounds(gui, mX, mY, pos)) {
             GuiQuestBook.setSelectedStack(part.getStack());
             List<FormattedText> str = new ArrayList<>();
             part.stack.ifRight(fluidStack -> {

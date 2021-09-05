@@ -67,9 +67,10 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Positioned<ReputationTask.Part> pos, int id, int mX, int mY) {
+        ReputationTask.Part part = pos.getElement();
         if (part.getReputation() != null) {
-            String text = part.getReputation().getTooltip(gui, x, y, mX, mY, player);
+            String text = part.getReputation().getTooltip(gui, pos.getX(), pos.getY(), mX, mY, player);
             if (text != null)
                 return Collections.singletonList(Translator.plain(text));
         }

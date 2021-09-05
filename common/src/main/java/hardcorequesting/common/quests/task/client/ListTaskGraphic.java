@@ -26,7 +26,7 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected abstract void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
     
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {return null;}
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Positioned<Part> pos, int id, int mX, int mY) {return null;}
     
     protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
     
@@ -41,19 +41,26 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
-        List<FormattedText> tooltip = null;
         
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
             drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
-            List<FormattedText> newTooltip = getPartTooltip(gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
-            if (newTooltip != null)
-                tooltip = newTooltip;
         }
-        
-        if (tooltip != null)
-            gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
+    }
+    
+    @Override
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+        List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
+    
+        for (int i = 0; i < renderElements.size(); i++) {
+            Positioned<Part> pos = renderElements.get(i);
+            List<FormattedText> tooltip = getPartTooltip(gui, player, pos, i, mX, mY);
+            if (tooltip != null) {
+                gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
+                return;
+            }
+        }
     }
     
     @Override

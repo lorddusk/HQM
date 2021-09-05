@@ -276,6 +276,10 @@ public class QuestGraphic extends Graphic {
             gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
         }
         
+        if (selectedTask != null) {
+            selectedTask.getGraphic().drawTooltip(matrices, gui, player, mX, mY);
+        }
+        
         for (LargeButton button : buttons) {
             button.renderTooltip(matrices, gui, player, mX, mY);
         }

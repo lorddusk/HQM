@@ -14,6 +14,9 @@ public abstract class TaskGraphic extends Graphic {
     
     public abstract void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY);
     
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    }
+    
     public abstract void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b);
     
 }
