@@ -27,10 +27,7 @@ public class DeathTaskGraphic extends TaskGraphic {
                 : Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deathsOutOf", died, task.getDeathsRequired());
     
         gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
-    }
     
-    @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-    
+        super.draw(matrices, gui, player, mX, mY);
     }
 }

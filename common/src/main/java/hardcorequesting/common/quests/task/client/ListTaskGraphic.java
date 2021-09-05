@@ -47,6 +47,8 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
             Part part = pos.getElement();
             drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
         }
+        
+        super.draw(matrices, gui, player, mX, mY);
     }
     
     @Override
@@ -61,6 +63,8 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
                 return;
             }
         }
+        
+        super.drawTooltip(matrices, gui, player, mX, mY);
     }
     
     @Override
@@ -70,6 +74,8 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
             if (id >= 0)
                 handlePartClick(gui, player, gui.getCurrentMode(), parts.getShownElements().get(id), id);
         }
+        
+        super.onClick(gui, player, mX, mY, b);
     }
     
     protected final int getClickedPart(GuiQuestBook gui, int mX, int mY) {

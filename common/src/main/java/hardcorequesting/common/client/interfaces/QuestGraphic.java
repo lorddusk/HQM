@@ -53,7 +53,6 @@ public class QuestGraphic extends Graphic {
     private final Quest quest;
     private QuestTask<?> selectedTask;
     
-    private final List<LargeButton> buttons = new ArrayList<>();
     private final ScrollBar descriptionScroll;
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
@@ -61,7 +60,7 @@ public class QuestGraphic extends Graphic {
     private List<FormattedText> cachedDescription;
     
     {
-        buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
+        addButton(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
                 return selectedTask.allowManual();
@@ -78,7 +77,7 @@ public class QuestGraphic extends Graphic {
             }
         });
         
-        buttons.add(new LargeButton("hqm.quest.manualDetect", 185, 200) {
+        addButton(new LargeButton("hqm.quest.manualDetect", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
                 return selectedTask.allowDetect();
@@ -94,8 +93,8 @@ public class QuestGraphic extends Graphic {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
             }
         });
-        
-        buttons.add(new LargeButton("hqm.quest.requirement", 185, 200) {
+    
+        addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
@@ -112,8 +111,8 @@ public class QuestGraphic extends Graphic {
                 IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
-        
-        buttons.add(new LargeButton("hqm.quest.requirement", 250, 95) {
+    
+        addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
                 return true;
@@ -130,9 +129,9 @@ public class QuestGraphic extends Graphic {
                 IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
-        
-        
-        buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
+    
+    
+        addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
                 QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
@@ -161,7 +160,7 @@ public class QuestGraphic extends Graphic {
         });
         
         for (final TaskType taskType : TaskType.values()) {
-            buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
+            addButton(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
                 public boolean isEnabled(GuiBase gui, Player player) {
                     return true;
@@ -245,10 +244,6 @@ public class QuestGraphic extends Graphic {
             }
         }
         
-        for (LargeButton button : buttons) {
-            button.draw(matrices, gui, player, mX, mY);
-        }
-        
         super.draw(matrices, gui, player, mX, mY);
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -276,10 +271,6 @@ public class QuestGraphic extends Graphic {
     
         if (selectedTask != null) {
             selectedTask.getGraphic().drawTooltip(matrices, gui, player, mX, mY);
-        }
-    
-        for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, gui, player, mX, mY);
         }
     
         quest.getRewards().drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
@@ -372,13 +363,7 @@ public class QuestGraphic extends Graphic {
                 selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
             }
             
-            
-            for (LargeButton button : buttons) {
-                if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui, player) && button.isEnabled(gui, player)) {
-                    button.onClick(gui, player);
-                    break;
-                }
-            }
+            super.onClick(gui, player, mX, mY, b);
             
             if (gui.getCurrentMode() == EditMode.RENAME) {
                 if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
