@@ -55,18 +55,25 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
         if (part.getReputation() == null) {
             gui.drawRect(matrices, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
-            return null;
         } else {
             part.getReputation().draw(matrices, gui, x, y, mX, mY, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(player));
-            String text = part.getReputation().getTooltip(gui, x, y, mX, mY, player);
-            return text == null ? null : Collections.singletonList(Translator.plain(text));
         }
+    }
+    
+    @Override
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+        if (part.getReputation() != null) {
+            String text = part.getReputation().getTooltip(gui, x, y, mX, mY, player);
+            if (text != null)
+                return Collections.singletonList(Translator.plain(text));
+        }
+        return null;
     }
     
     @Override

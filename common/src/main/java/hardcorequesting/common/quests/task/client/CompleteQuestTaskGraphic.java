@@ -47,7 +47,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
@@ -61,7 +61,6 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.secondline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.thirdline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
         }
-        return null;
     }
     
     @Override

@@ -24,7 +24,9 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected abstract List<Positioned<Part>> positionParts(List<Part> parts);
     
-    protected abstract List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
+    protected abstract void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
+    
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {return null;}
     
     protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
     
@@ -44,7 +46,8 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
-            List<FormattedText> newTooltip = drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
+            drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
+            List<FormattedText> newTooltip = getPartTooltip(gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
             if (newTooltip != null)
                 tooltip = newTooltip;
         }

@@ -64,7 +64,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
         part.stack.ifLeft(itemStack -> gui.drawItemStack(matrices, part.getPermutatedItem(), x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
     
@@ -75,7 +75,10 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
         boolean hasCountLine = part.stack.left().map(itemStack -> itemStack.getCount() > 1).orElse(false);
         gui.drawStringWithShadow(matrices, progressText, (int) (x + SIZE - gui.getStringWidth(progressText) * textSize), (int) (y + SIZE - (hasCountLine ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, task.getProgress(player, id) == part.required ? 0x308030 : 0xFFFFFF);
         matrices.popPose();
+    }
     
+    @Override
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
         if (gui.inBounds(x, y, SIZE, SIZE, mX, mY)) {
             GuiQuestBook.setSelectedStack(part.getStack());
             List<FormattedText> str = new ArrayList<>();
@@ -88,7 +91,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
                 }
                 str.addAll(list);
             }).ifLeft(itemStack -> str.addAll(gui.getTooltipFromItem(itemStack)));
-            
+        
             str.add(FormattedText.composite(Translator.translatable("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + task.getProgress(player, id) + "/" + part.required)));
             if (part.hasItem() && Quest.canQuestsBeEdited()) {
                 str.add(FormattedText.EMPTY);
