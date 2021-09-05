@@ -1,8 +1,11 @@
 package hardcorequesting.common.quests.task.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.reputation.KillReputationTask;
@@ -20,6 +23,24 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts) {
         super(task, parts, 20);
         this.task = task;
+        
+        addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
+            @Override
+            public boolean isEnabled(GuiBase gui, Player player) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui, Player player) {
+                return Quest.canQuestsBeEdited();
+            }
+        
+            @Override
+            public void onClick(GuiBase gui, Player player) {
+                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
+            }
+        });
+    
     }
     
     @Override

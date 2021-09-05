@@ -94,43 +94,6 @@ public class QuestGraphic extends Graphic {
             }
         });
     
-        addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof DeathTask && Quest.canQuestsBeEdited();
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                DeathTask task = (DeathTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
-            }
-        });
-    
-        addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof KillReputationTask && Quest.canQuestsBeEdited();
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                KillReputationTask task = (KillReputationTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
-            }
-        });
-    
-    
         addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {

@@ -1,8 +1,12 @@
 package hardcorequesting.common.quests.task.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -17,6 +21,23 @@ public class DeathTaskGraphic extends TaskGraphic {
     
     public DeathTaskGraphic(DeathTask task) {
         this.task = task;
+    
+        addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
+            @Override
+            public boolean isEnabled(GuiBase gui, Player player) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui, Player player) {
+                return Quest.canQuestsBeEdited();
+            }
+        
+            @Override
+            public void onClick(GuiBase gui, Player player) {
+                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
+            }
+        });
     }
     
     @Override
