@@ -54,7 +54,7 @@ public class HardcoreQuestingCore {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        QuestLine.reset(Optional.of(packDir), Optional.of(dataDir)).loadAll();
+        QuestLine.reset(Optional.of(packDir), Optional.of(dataDir));
         
         HQMConfig.loadConfig();
         

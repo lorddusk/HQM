@@ -124,5 +124,6 @@ public class QuestSetsManager implements Serializable {
         } catch (IOException e) {
             HardcoreQuestingCore.LOGGER.warn("Failed loading quest sets for remote", e);
         }
+        HardcoreQuestingCore.LOGGER.info("Loaded %d quests from %d quest sets.", quests.size(), questSets.size());
     }
 }
