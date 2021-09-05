@@ -213,8 +213,8 @@ public class QuestGraphic extends Graphic {
         return cachedDescription;
     }
     
-    public void drawMenu(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        QuestData data = quest.getQuestData(player);
+    @Override
+    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         if (!Quest.canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
             if (quest.getTasks().size() > 0) {
                 selectedTask = quest.getTasks().get(0);
@@ -248,13 +248,16 @@ public class QuestGraphic extends Graphic {
         for (LargeButton button : buttons) {
             button.draw(matrices, gui, player, mX, mY);
         }
+        
+        super.draw(matrices, gui, player, mX, mY);
+        
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(matrices, gui);
         }
         
-        quest.getRewards().draw(matrices, gui, player, mX, mY, data);
+        quest.getRewards().draw(matrices, gui, player, mX, mY, quest.getQuestData(player));
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
@@ -265,16 +268,21 @@ public class QuestGraphic extends Graphic {
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
-        
+    }
+    
+    @Override
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+        super.drawTooltip(matrices, gui, player, mX, mY);
+    
         if (selectedTask != null) {
             selectedTask.getGraphic().drawTooltip(matrices, gui, player, mX, mY);
         }
-        
+    
         for (LargeButton button : buttons) {
             button.renderTooltip(matrices, gui, player, mX, mY);
         }
-        
-        quest.getRewards().drawTooltips(matrices, gui, player, mX, mY, data);
+    
+        quest.getRewards().drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
     }
     
     private int getVisibleTasks(GuiBase gui) {
@@ -295,6 +303,7 @@ public class QuestGraphic extends Graphic {
         return TASK_LABEL_START_Y + id * (TEXT_HEIGHT + TASK_MARGIN);
     }
     
+    @Override
     public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
         if (b == 1) {
             gui.loadMap();

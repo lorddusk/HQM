@@ -512,7 +512,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedQuest == null) {
                 selectedSet.draw(matrices, this, x0, y0, x, y);
             } else {
-                selectedQuest.getGraphic().drawMenu(matrices, this, player, x, y);
+                selectedQuest.getGraphic().drawFull(matrices, this, player, x, y);
             }
             
             if (Quest.canQuestsBeEdited()) {
