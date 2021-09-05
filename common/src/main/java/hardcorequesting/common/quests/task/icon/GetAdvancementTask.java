@@ -139,11 +139,6 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
-    public boolean allowDetect() {
-        return true;
-    }
-    
-    @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         builder.add(ADVANCEMENTS, parts.write(QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER));
     }

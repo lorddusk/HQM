@@ -3,10 +3,15 @@ package hardcorequesting.common.quests.task.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestingData;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import hardcorequesting.common.util.OPBookHelper;
@@ -21,6 +26,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -42,6 +48,46 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts) {
         super(parts);
         this.task = task;
+    }
+    
+    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts);
+        graphic.addDetectButton(task);
+        return graphic;
+    }
+    
+    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, boolean hasSubmitButton) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts);
+        if (hasSubmitButton)
+            graphic.addSubmitButton(task);
+    
+        graphic.addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
+            @Override
+            public boolean isEnabled(GuiBase gui, Player player) {
+                QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+                if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(task.getParent().getQuestId())) {
+                    return data.selectedTask != task.getId();
+                }
+                return false;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui, Player player) {
+                return !task.isCompleted(player);
+            }
+        
+            @Override
+            public void onClick(GuiBase gui, Player player) {
+                //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
+                QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = task.getParent().getQuestId();
+                QuestingDataManager.getInstance().getQuestingData(player).selectedTask = task.getId();
+            
+                player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", task.getDescription()).withStyle(ChatFormatting.GREEN), false);
+            
+                GeneralUsage.sendBookSelectTaskUpdate(task);
+            }
+        });
+        return graphic;
     }
     
     @Override

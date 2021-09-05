@@ -32,6 +32,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts) {
         super(parts);
         this.task = task;
+        addDetectButton(task);
     }
     
     @Override

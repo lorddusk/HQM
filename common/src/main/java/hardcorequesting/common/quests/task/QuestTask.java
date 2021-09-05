@@ -112,10 +112,6 @@ public abstract class QuestTask<Data extends TaskData> {
         return false;
     }
     
-    public boolean allowDetect() {
-        return false;
-    }
-    
     public boolean isCompleted(Player player) {
         return getData(player).completed;
     }

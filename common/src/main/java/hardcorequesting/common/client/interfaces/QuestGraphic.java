@@ -2,34 +2,24 @@ package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
-import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.data.QuestData;
-import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
-import hardcorequesting.common.quests.task.item.ConsumeItemTask;
-import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -60,68 +50,6 @@ public class QuestGraphic extends Graphic {
     private List<FormattedText> cachedDescription;
     
     {
-        addButton(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return selectedTask.allowManual();
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask.allowManual() && !selectedTask.isCompleted(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
-            }
-        });
-        
-        addButton(new LargeButton("hqm.quest.manualDetect", 185, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return selectedTask.allowDetect();
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask.allowDetect() && !selectedTask.isCompleted(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
-            }
-        });
-    
-        addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
-                if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(quest.getQuestId())) {
-                    return data.selectedTask != selectedTask.getId();
-                }
-                return false;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask instanceof ConsumeItemTask && !selectedTask.isCompleted(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
-                QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = quest.getQuestId();
-                QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask.getId();
-                
-                player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).withStyle(ChatFormatting.GREEN), false);
-                
-                //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
-                GeneralUsage.sendBookSelectTaskUpdate(selectedTask);
-            }
-        });
-        
         for (final TaskType taskType : TaskType.values()) {
             addButton(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override

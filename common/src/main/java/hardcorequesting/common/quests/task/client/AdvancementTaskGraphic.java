@@ -20,6 +20,7 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts) {
         super(task, parts);
         this.task = task;
+        addDetectButton(task);
     }
     
     @Override

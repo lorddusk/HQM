@@ -5,6 +5,8 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
+import hardcorequesting.common.quests.task.client.ItemTaskGraphic;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
@@ -20,6 +22,12 @@ public class DetectItemTask extends ItemRequirementTask {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    protected TaskGraphic createGraphic() {
+        return ItemTaskGraphic.createDetectGraphic(this, parts);
     }
     
     @Environment(EnvType.CLIENT)
@@ -118,11 +126,6 @@ public class DetectItemTask extends ItemRequirementTask {
         if (updated) {
             doCompletionCheck(data, playerID);
         }
-    }
-    
-    @Override
-    public boolean allowDetect() {
-        return true;
     }
     
 }

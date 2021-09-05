@@ -129,11 +129,6 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     }
     
     @Override
-    public boolean allowDetect() {
-        return true;
-    }
-    
-    @Override
     public void write(Adapter.JsonObjectBuilder builder) {
         builder.add(COMPLETED_QUESTS, parts.write(QuestTaskAdapter.QUEST_COMPLETED_ADAPTER));
     }
