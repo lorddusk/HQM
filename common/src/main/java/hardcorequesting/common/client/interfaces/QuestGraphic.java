@@ -257,23 +257,13 @@ public class QuestGraphic extends Graphic {
         quest.getRewards().draw(matrices, gui, player, mX, mY, data);
         
         if (selectedTask != null) {
-            /*if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
-                if (selectedTask instanceof QuestTaskItems) {
-                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskChangeTo"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-                } else {
-                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-                }
-            } else {*/
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
             
             selectedTask.getGraphic().draw(matrices, gui, player, mX, mY);
-            //}
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-        /*} else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
-            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
         }
         
         if (selectedTask != null) {
