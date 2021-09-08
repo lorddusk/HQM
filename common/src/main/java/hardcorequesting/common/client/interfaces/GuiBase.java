@@ -148,7 +148,8 @@ public class GuiBase extends Screen {
         applyColor(color);
         
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
-        GL11.glLineWidth(1 + thickness * this.width / 500F);
+        float scale = (float) this.minecraft.getWindow().getGuiScale();
+        GL11.glLineWidth(1 + thickness * scale / 2F);
         
         GL11.glBegin(GL11.GL_LINES);
         GL11.glVertex3f(x1, y1, 0);

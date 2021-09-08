@@ -1359,17 +1359,16 @@ public class Quest {
             
             
             if (reputationRewards != null && getQuestData(player).canClaim()) {
-                getQuestData(player).claimed = true;
                 QuestingDataManager.getInstance().getQuestingData(player).getTeam().receiveAndSyncReputation(this, reputationRewards);
                 EventTrigger.instance().onReputationChange(new EventTrigger.ReputationEvent(player));
                 sentInfo = true;
             }
             
             if (commandRewardList != null && getQuestData(player).canClaim()) {
-                getQuestData(player).claimed = true;
                 commandRewardList.executeAll(player);
                 sentInfo = true;
             }
+            getQuestData(player).claimed = true;
             
             if (sentInfo) {
                 SoundHandler.play(Sounds.COMPLETE, player);
