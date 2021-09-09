@@ -696,7 +696,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.getGraphic().onRelease(this, player, x, y, button);
+            selectedQuest.getGraphic().onRelease(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
@@ -717,7 +717,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.getGraphic().onDrag(this, player, x, y, button);
+            selectedQuest.getGraphic().onDrag(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);

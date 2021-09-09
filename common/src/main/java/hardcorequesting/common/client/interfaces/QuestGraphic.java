@@ -1,6 +1,5 @@
 package hardcorequesting.common.client.interfaces;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -22,11 +21,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class QuestGraphic extends Graphic {
+public final class QuestGraphic extends Graphic {
     
     private static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
@@ -46,7 +44,6 @@ public class QuestGraphic extends Graphic {
     private final ScrollBar descriptionScroll;
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
-    private final List<ScrollBar> scrollBars = new ArrayList<>();
     private List<FormattedText> cachedDescription;
     
     {
@@ -71,20 +68,20 @@ public class QuestGraphic extends Graphic {
     }
     
     {
-        scrollBars.add(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
+        addScrollBar(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return getCachedDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
-        scrollBars.add(taskDescriptionScroll = new ScrollBar(312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
+        addScrollBar(taskDescriptionScroll = new ScrollBar(312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return selectedTask != null && selectedTask.getCachedLongDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
         
-        scrollBars.add(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
+        addScrollBar(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks(gui) > VISIBLE_TASKS;
@@ -136,12 +133,6 @@ public class QuestGraphic extends Graphic {
         }
         
         super.draw(matrices, gui, player, mX, mY);
-        
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices, gui);
-        }
         
         quest.getRewards().draw(matrices, gui, player, mX, mY, quest.getQuestData(player));
         
@@ -244,10 +235,6 @@ public class QuestGraphic extends Graphic {
                 }
             }
             
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onClick(gui, mX, mY);
-            }
-            
             quest.getRewards().onClick(gui, player, mX, mY);
             
             if (selectedTask != null) {
@@ -276,22 +263,25 @@ public class QuestGraphic extends Graphic {
         }
     }
     
-    public void onDrag(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(gui, mX, mY);
-        }
+    @Override
+    public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onDrag(gui, mX, mY, b);
+        if (selectedTask != null)
+            selectedTask.getGraphic().onDrag(gui, mX, mY, b);
     }
     
-    public void onRelease(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(gui, mX, mY);
-        }
+    @Override
+    public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onRelease(gui, mX, mY, b);
+        if (selectedTask != null)
+            selectedTask.getGraphic().onRelease(gui, mX, mY, b);
     }
     
+    @Override
     public void onScroll(GuiQuestBook gui, double x, double y, double scroll) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onScroll(gui, x, y, scroll);
-        }
+        super.onScroll(gui, x, y, scroll);
+        if (selectedTask != null)
+            selectedTask.getGraphic().onScroll(gui, x, y, scroll);
     }
     
     public void onOpen(GuiQuestBook gui, Player player) {

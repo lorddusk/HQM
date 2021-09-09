@@ -3,6 +3,8 @@ package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -45,6 +47,7 @@ public class ScrollBar {
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiBase gui) {
         if (isVisible(gui)) {
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
             gui.drawRect(matrices, x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }

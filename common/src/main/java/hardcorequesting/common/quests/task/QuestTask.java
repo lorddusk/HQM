@@ -108,10 +108,6 @@ public abstract class QuestTask<Data extends TaskData> {
         this.id = parent.nextTaskId++;
     }
     
-    public boolean allowManual() {
-        return false;
-    }
-    
     public boolean isCompleted(Player player) {
         return getData(player).completed;
     }

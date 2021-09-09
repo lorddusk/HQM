@@ -226,6 +226,7 @@ public class QuestRewards {
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY, QuestData data) {
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         if (selectedReward != -1 && !hasReward(data, player)) {
             selectedReward = -1;
         }
