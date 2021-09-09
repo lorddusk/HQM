@@ -31,7 +31,7 @@ public enum GeneralUsage {
     BOOK_OPEN {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            Minecraft.getInstance().execute(() -> GuiQuestBook.displayGui(player, nbt.getBoolean("OP")));
+            GuiQuestBook.displayGui(player, nbt.getBoolean("OP"));
         }
     },
     BOOK_SELECT_TASK {
