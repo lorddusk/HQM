@@ -42,12 +42,14 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
     
     @Override
     public IMessage onMessage(GeneralUpdateMessage message, PacketContext ctx) {
-        if (message.data != null && message.usage >= 0) {
-            GeneralUsage usage = GeneralUsage.values()[message.usage];
-            if (message.player != null) {
-                usage.receiveData(message.player, message.data);
+        ctx.getTaskQueue().accept(() -> {
+            if (message.data != null && message.usage >= 0) {
+                GeneralUsage usage = GeneralUsage.values()[message.usage];
+                if (message.player != null) {
+                    usage.receiveData(message.player, message.data);
+                }
             }
-        }
+        });
         return null;
     }
 }
