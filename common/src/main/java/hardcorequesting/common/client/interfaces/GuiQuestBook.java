@@ -398,7 +398,7 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
-        questGraphic = new QuestGraphic(selectedQuest);
+        questGraphic = new QuestGraphic(player.getUUID(), selectedQuest);
         
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
@@ -1012,8 +1012,8 @@ public class GuiQuestBook extends GuiBase {
     
     public void showQuest(Quest quest) {
         selectedQuest = quest;
-        questGraphic = new QuestGraphic(quest);
-        questGraphic.onOpen(this, player);
+        questGraphic = new QuestGraphic(player.getUUID(), quest);
+        questGraphic.onOpen(player);
     }
     
     public static Quest getShownQuest() {

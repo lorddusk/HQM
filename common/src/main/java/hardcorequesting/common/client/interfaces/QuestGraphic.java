@@ -22,6 +22,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public final class QuestGraphic extends Graphic {
@@ -38,6 +39,7 @@ public final class QuestGraphic extends Graphic {
     private static final int TASK_DESCRIPTION_X = 180;
     private static final int TASK_DESCRIPTION_Y = 20;
     
+    private final UUID playerId;
     private final Quest quest;
     private QuestTask<?> selectedTask;
     
@@ -89,7 +91,8 @@ public final class QuestGraphic extends Graphic {
         });
     }
     
-    public QuestGraphic(Quest quest) {
+    public QuestGraphic(UUID playerId, Quest quest) {
+        this.playerId = playerId;
         this.quest = quest;
     }
     
@@ -284,10 +287,10 @@ public final class QuestGraphic extends Graphic {
             selectedTask.getGraphic().onScroll(gui, x, y, scroll);
     }
     
-    public void onOpen(GuiQuestBook gui, Player player) {
+    public void onOpen(Player player) {
         if (selectedTask == null) {
             for (QuestTask<?> task : quest.getTasks()) {
-                if (!task.isCompleted(player)) {
+                if (!task.isCompleted(playerId)) {
                     selectedTask = task;
                     break;
                 }
@@ -297,10 +300,9 @@ public final class QuestGraphic extends Graphic {
         if (selectedTask == null && quest.getTasks().size() > 0)
             selectedTask = quest.getTasks().get(0);
         
-        QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = quest.getQuestId();
-        QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
+        QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = quest.getQuestId();
+        QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
         if (selectedTask != null) {
-            //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
             GeneralUsage.sendBookSelectTaskUpdate(selectedTask);
         }
         
