@@ -118,6 +118,7 @@ public class GuiQuestBook extends GuiBase {
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
     private static Quest selectedQuest;
+    private QuestGraphic questGraphic;
     public static Group selectedGroup;
     public static Reputation selectedReputation;
     private static boolean isSetOpened;
@@ -397,6 +398,8 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
+        questGraphic = new QuestGraphic(selectedQuest);
+        
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
         }
@@ -512,7 +515,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedQuest == null) {
                 selectedSet.draw(matrices, this, x0, y0, x, y);
             } else {
-                selectedQuest.getGraphic().drawFull(matrices, this, player, x, y);
+                questGraphic.drawFull(matrices, this, player, x, y);
             }
             
             if (Quest.canQuestsBeEdited()) {
@@ -670,7 +673,7 @@ public class GuiQuestBook extends GuiBase {
                         selectedSet.mouseClicked(this, x, y);
                     }
                 } else {
-                    selectedQuest.getGraphic().onClick(this, player, x, y, button);
+                    questGraphic.onClick(this, player, x, y, button);
                 }
             }
         } else {
@@ -696,7 +699,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.getGraphic().onRelease(this, x, y, button);
+            questGraphic.onRelease(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
@@ -717,7 +720,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
         } else if (selectedQuest != null) {
-            selectedQuest.getGraphic().onDrag(this, x, y, button);
+            questGraphic.onDrag(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);
@@ -731,7 +734,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onScroll(this, x, y, scroll);
         } else if (selectedQuest != null) {
-            selectedQuest.getGraphic().onScroll(this, x, y, scroll);
+            questGraphic.onScroll(this, x, y, scroll);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onScroll(this, x, y, scroll);
@@ -1009,7 +1012,8 @@ public class GuiQuestBook extends GuiBase {
     
     public void showQuest(Quest quest) {
         selectedQuest = quest;
-        quest.getGraphic().onOpen(this, player);
+        questGraphic = new QuestGraphic(quest);
+        questGraphic.onOpen(this, player);
     }
     
     public static Quest getShownQuest() {

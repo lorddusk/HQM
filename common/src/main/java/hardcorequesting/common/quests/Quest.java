@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.QuestGraphic;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
@@ -537,16 +536,6 @@ public class Quest {
         }
         
         return poly.contains(x, y);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private QuestGraphic graphic;
-    
-    @Environment(EnvType.CLIENT)
-    public QuestGraphic getGraphic() {
-        if (graphic == null)
-            graphic = new QuestGraphic(this);
-        return graphic;
     }
     
     public QuestData createData(int players) {
