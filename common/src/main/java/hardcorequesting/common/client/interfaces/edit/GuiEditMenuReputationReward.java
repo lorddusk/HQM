@@ -173,7 +173,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        GuiQuestBook.selectedQuest.getRewards().setReputationRewards(rewards.isEmpty() ? null : rewards);
+        GuiQuestBook.getShownQuest().getRewards().setReputationRewards(rewards.isEmpty() ? null : rewards);
         SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
     }
 }

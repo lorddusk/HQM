@@ -117,7 +117,7 @@ public class GuiQuestBook extends GuiBase {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
-    public static Quest selectedQuest;
+    private static Quest selectedQuest;
     public static Group selectedGroup;
     public static Reputation selectedReputation;
     private static boolean isSetOpened;
@@ -1005,5 +1005,14 @@ public class GuiQuestBook extends GuiBase {
     
     private boolean shouldDisplayAndIsInArrowBounds(boolean isMenuArrow, int mX, int mY) {
         return shouldDisplayControlArrow(isMenuArrow) && inArrowBounds(isMenuArrow, mX, mY);
+    }
+    
+    public void showQuest(Quest quest) {
+        selectedQuest = quest;
+        quest.getGraphic().onOpen(this, player);
+    }
+    
+    public static Quest getShownQuest() {
+        return selectedQuest;
     }
 }
