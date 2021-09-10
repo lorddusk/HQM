@@ -164,8 +164,8 @@ public class Quest {
         return rewards;
     }
     
-    public boolean hasReward(Player player) {
-        return getRewards().hasReward(getQuestData(player), player);
+    public boolean hasReward(UUID playerId) {
+        return getRewards().hasReward(getQuestData(playerId), playerId);
     }
     
     public RepeatInfo getRepeatInfo() {
@@ -481,7 +481,7 @@ public class Quest {
     
     @Environment(EnvType.CLIENT)
     public int getColorFilter(Player player, int tick) {
-        boolean hasReward = hasReward(player);
+        boolean hasReward = hasReward(player.getUUID());
         if (canQuestsBeEdited() && !isVisible(player)) {
             return HQMConfig.QUEST_INVISIBLE;
         } else if (!isEnabled(player)) {

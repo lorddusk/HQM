@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 public class QuestRewards {
     public static final int START_X = Quest.START_X;
@@ -59,12 +60,12 @@ public class QuestRewards {
     private final LargeButton claimButton = new LargeButton("hqm.quest.claim", 100, 190) {
         @Override
         public boolean isEnabled(GuiBase gui, Player player) {
-            return hasReward(quest.getQuestData(player), player) && (rewardChoices.isEmpty() || selectedReward != -1) && quest.isEnabled(player);
+            return hasReward(quest.getQuestData(player), player.getUUID()) && (rewardChoices.isEmpty() || selectedReward != -1) && quest.isEnabled(player);
         }
     
         @Override
         public boolean isVisible(GuiBase gui, Player player) {
-            return hasReward(quest.getQuestData(player), player);
+            return hasReward(quest.getQuestData(player), player.getUUID());
         }
     
         @Override
@@ -128,8 +129,8 @@ public class QuestRewards {
         this.reputationRewards = reputationRewards;
     }
     
-    public boolean hasReward(QuestData data, Player player) {
-        return isItemRewardAvailable(player, data) || isRepRewardAvailable(data) || isCommandRewardAvailable(data);
+    public boolean hasReward(QuestData data, UUID playerId) {
+        return isItemRewardAvailable(playerId, data) || isRepRewardAvailable(data) || isCommandRewardAvailable(data);
     }
     
     public void claimReward(Player player, int selectedReward) {
@@ -156,8 +157,8 @@ public class QuestRewards {
         FAIL
     }
     
-    private boolean isItemRewardAvailable(Player player, QuestData data) {
-        return (!rewards.isEmpty() || !rewardChoices.isEmpty()) && data.canClaimPlayerReward(player);
+    private boolean isItemRewardAvailable(UUID playerId, QuestData data) {
+        return (!rewards.isEmpty() || !rewardChoices.isEmpty()) && data.canClaimPlayerReward(playerId);
     }
     
     private boolean isRepRewardAvailable(QuestData data) {
@@ -169,7 +170,7 @@ public class QuestRewards {
     }
     
     private Result tryClaimItemReward(Player player, int selectedReward, QuestData data) {
-        if (isItemRewardAvailable(player, data)) {
+        if (isItemRewardAvailable(player.getUUID(), data)) {
             List<ItemStack> items = new ArrayList<>();
             if (!rewards.isEmpty()) {
                 items.addAll(rewards.toList());
@@ -227,7 +228,7 @@ public class QuestRewards {
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY, QuestData data) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        if (selectedReward != -1 && !hasReward(data, player)) {
+        if (selectedReward != -1 && !hasReward(data, player.getUUID())) {
             selectedReward = -1;
         }
         

@@ -90,7 +90,7 @@ public abstract class QuestTask<Data extends TaskData> {
         }
         
         Player player = QuestingData.getPlayer(uuid);
-        if (player instanceof ServerPlayer && !quest.hasReward(player)) {
+        if (player instanceof ServerPlayer && !quest.hasReward(uuid)) {
             // when there is no reward and it just completes the quest play the music
             NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (ServerPlayer) player);
         }

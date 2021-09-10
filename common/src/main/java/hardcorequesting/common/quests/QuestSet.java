@@ -92,7 +92,7 @@ public class QuestSet {
                 if (completed && !quest.isCompleted(player) && quest.isLinkFree(player, isLinkFreeCache)) {
                     completed = false;
                 }
-                if (quest.isCompleted(player) && quest.hasReward(player)) unclaimed++;
+                if (quest.isCompleted(player) && quest.hasReward(player.getUUID())) unclaimed++;
             }
             boolean selected = questSet == GuiQuestBook.selectedSet;
             boolean inBounds = gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y);
@@ -181,7 +181,7 @@ public class QuestSet {
                         enabled++;
                         if (quest.isCompleted(player)) {
                             completed++;
-                            if (quest.hasReward(player)) {
+                            if (quest.hasReward(player.getUUID())) {
                                 reward++;
                             }
                         }
@@ -539,7 +539,7 @@ public class QuestSet {
                     if (quest.isCompleted(player)) {
                         txt += "\n" + GuiColor.GREEN + I18n.get("hqm.questBook.completed");
                     }
-                    if (quest.hasReward(player)) {
+                    if (quest.hasReward(player.getUUID())) {
                         txt += "\n" + GuiColor.PURPLE + I18n.get("hqm.questBook.unclaimedReward");
                     }
                     
