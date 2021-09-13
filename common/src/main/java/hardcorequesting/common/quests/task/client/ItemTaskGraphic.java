@@ -32,6 +32,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
@@ -45,26 +46,26 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
     private final ItemRequirementTask task;
     
-    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts) {
-        super(parts);
+    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId) {
+        super(parts, playerId);
         this.task = task;
     }
     
-    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts);
+    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId);
         graphic.addDetectButton(task);
         return graphic;
     }
     
-    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, boolean hasSubmitButton) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts);
+    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, boolean hasSubmitButton) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId);
         if (hasSubmitButton)
             graphic.addSubmitButton(task);
     
         graphic.addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled(GuiBase gui, Player player) {
-                QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+                QuestingData data = QuestingDataManager.getInstance().getQuestingData(playerId);
                 if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(task.getParent().getQuestId())) {
                     return data.selectedTask != task.getId();
                 }
@@ -73,14 +74,14 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
         
             @Override
             public boolean isVisible(GuiBase gui, Player player) {
-                return !task.isCompleted(player);
+                return !task.isCompleted(playerId);
             }
         
             @Override
             public void onClick(GuiBase gui, Player player) {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
-                QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = task.getParent().getQuestId();
-                QuestingDataManager.getInstance().getQuestingData(player).selectedTask = task.getId();
+                QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = task.getParent().getQuestId();
+                QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = task.getId();
             
                 player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", task.getDescription()).withStyle(ChatFormatting.GREEN), false);
             

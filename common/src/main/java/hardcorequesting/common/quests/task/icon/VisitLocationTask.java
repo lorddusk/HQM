@@ -42,8 +42,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new LocationTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new LocationTaskGraphic(this, parts, playerId);
     }
     
     @Override

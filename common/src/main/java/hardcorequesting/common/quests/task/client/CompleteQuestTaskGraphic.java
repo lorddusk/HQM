@@ -13,11 +13,11 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.Part> {
@@ -29,8 +29,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     
     private final CompleteQuestTask task;
     
-    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts) {
-        super(parts);
+    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId) {
+        super(parts, playerId);
         this.task = task;
         addDetectButton(task);
     }

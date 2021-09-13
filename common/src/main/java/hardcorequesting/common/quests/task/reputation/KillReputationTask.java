@@ -32,8 +32,8 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new KillReputationTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new KillReputationTaskGraphic(this, parts, playerId);
     }
     
     @Override

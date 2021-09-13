@@ -12,13 +12,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.Part> {
     
     private final GetAdvancementTask task;
     
-    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts) {
-        super(task, parts);
+    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts, UUID playerId) {
+        super(task, parts, playerId);
         this.task = task;
         addDetectButton(task);
     }

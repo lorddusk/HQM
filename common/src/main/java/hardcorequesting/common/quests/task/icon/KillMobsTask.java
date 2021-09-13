@@ -37,8 +37,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new KillMobsTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new KillMobsTaskGraphic(this, parts, playerId);
     }
     
     @Override

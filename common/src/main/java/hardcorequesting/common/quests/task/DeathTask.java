@@ -33,8 +33,8 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new DeathTaskGraphic(this);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new DeathTaskGraphic(this, playerId);
     }
     
     @Override

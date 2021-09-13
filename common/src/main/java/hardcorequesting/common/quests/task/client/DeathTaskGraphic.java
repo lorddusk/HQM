@@ -14,12 +14,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public class DeathTaskGraphic extends TaskGraphic {
     
     private final DeathTask task;
     
-    public DeathTaskGraphic(DeathTask task) {
+    public DeathTaskGraphic(DeathTask task, UUID playerId) {
+        super(playerId);
         this.task = task;
     
         addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
@@ -42,7 +45,7 @@ public class DeathTaskGraphic extends TaskGraphic {
     
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        int died = task.getDeaths(player.getUUID());
+        int died = task.getDeaths(playerId);
         FormattedText text = died == task.getDeathsRequired()
                 ? Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeathsRequired())
                 : Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deathsOutOf", died, task.getDeathsRequired());

@@ -22,8 +22,8 @@ public class ConsumeItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return ItemTaskGraphic.createConsumeGraphic(this, parts, true);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return ItemTaskGraphic.createConsumeGraphic(this, parts, playerId, true);
     }
     
     public boolean increaseFluid(FluidStack fluidVolume, UUID playerId, boolean action) {

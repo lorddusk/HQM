@@ -313,6 +313,6 @@ public final class QuestGraphic extends Graphic {
     
     private void setSelectedTask(@Nullable QuestTask<?> task) {
         selectedTask = task;
-        taskGraphic = task == null ? null : task.createGraphic();
+        taskGraphic = task == null ? null : task.createGraphic(playerId);
     }
 }

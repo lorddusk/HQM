@@ -11,11 +11,11 @@ import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends ListTaskGraphic<Part> {
@@ -27,8 +27,8 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     
     private final IconLayoutTask<Part, ?> task;
     
-    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts) {
-        super(parts);
+    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId) {
+        super(parts, playerId);
         this.task = task;
     }
     

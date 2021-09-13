@@ -12,13 +12,15 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected final PartList<Part> parts;
     
-    public ListTaskGraphic(PartList<Part> parts) {
+    public ListTaskGraphic(PartList<Part> parts, UUID playerId) {
+        super(playerId);
         this.parts = parts;
     }
     

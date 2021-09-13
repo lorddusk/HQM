@@ -10,10 +10,17 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public abstract class TaskGraphic extends Graphic {
     protected static final int START_X = 180;
     protected static final int START_Y = 95;
+    protected final UUID playerId;
+    
+    protected TaskGraphic(UUID playerId) {
+        this.playerId = playerId;
+    }
     
     protected void addSubmitButton(QuestTask<?> task) {
         addButton(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
@@ -24,7 +31,7 @@ public abstract class TaskGraphic extends Graphic {
         
             @Override
             public boolean isVisible(GuiBase gui, Player player) {
-                return !task.isCompleted(player);
+                return !task.isCompleted(playerId);
             }
         
             @Override
@@ -43,7 +50,7 @@ public abstract class TaskGraphic extends Graphic {
         
             @Override
             public boolean isVisible(GuiBase gui, Player player) {
-                return !task.isCompleted(player);
+                return !task.isCompleted(playerId);
             }
         
             @Override

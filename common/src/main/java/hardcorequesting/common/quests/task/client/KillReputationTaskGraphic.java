@@ -15,13 +15,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
     private final KillReputationTask task;
     
-    public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts) {
-        super(task, parts, 20);
+    public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts, UUID playerId) {
+        super(task, parts, playerId, 20);
         this.task = task;
         
         addButton(new LargeButton("hqm.quest.requirement", 250, 95) {

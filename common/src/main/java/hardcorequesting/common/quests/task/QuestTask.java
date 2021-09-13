@@ -199,7 +199,7 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract TaskGraphic createGraphic();
+    public abstract TaskGraphic createGraphic(UUID playerId);
     
     public abstract void onUpdate(Player player);
     

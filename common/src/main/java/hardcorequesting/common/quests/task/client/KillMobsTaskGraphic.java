@@ -12,13 +12,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public class KillMobsTaskGraphic extends IconTaskGraphic<KillMobsTask.Part> {
     
     private final KillMobsTask task;
     
-    public KillMobsTaskGraphic(KillMobsTask task, PartList<KillMobsTask.Part> parts) {
-        super(task, parts);
+    public KillMobsTaskGraphic(KillMobsTask task, PartList<KillMobsTask.Part> parts, UUID playerId) {
+        super(task, parts, playerId);
         this.task = task;
     }
     

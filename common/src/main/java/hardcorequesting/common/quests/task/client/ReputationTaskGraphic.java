@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> {
@@ -26,14 +27,14 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     
     private final ReputationTask<?> task;
     
-    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts) {
-        super(parts);
+    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId) {
+        super(parts, playerId);
         this.task = task;
         startOffsetY = 0;
     }
     
-    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, int startOffsetY) {
-        super(parts);
+    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, int startOffsetY) {
+        super(parts, playerId);
         this.task = task;
         this.startOffsetY = startOffsetY;
     }

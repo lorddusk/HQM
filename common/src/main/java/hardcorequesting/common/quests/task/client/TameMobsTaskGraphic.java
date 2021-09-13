@@ -13,13 +13,15 @@ import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
+
 @Environment(EnvType.CLIENT)
 public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     
     private final TameMobsTask task;
     
-    public TameMobsTaskGraphic(TameMobsTask task, PartList<TameMobsTask.Part> parts) {
-        super(task, parts);
+    public TameMobsTaskGraphic(TameMobsTask task, PartList<TameMobsTask.Part> parts, UUID playerId) {
+        super(task, parts, playerId);
         this.task = task;
     }
     

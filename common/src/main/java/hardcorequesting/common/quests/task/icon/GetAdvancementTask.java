@@ -40,8 +40,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new AdvancementTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new AdvancementTaskGraphic(this, parts, playerId);
     }
     
     @Override

@@ -37,8 +37,8 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic() {
-        return new CompleteQuestTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId) {
+        return new CompleteQuestTaskGraphic(this, parts, playerId);
     }
     
     public boolean completed(int id, Player player) {

@@ -14,14 +14,15 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part> {
     
     private final VisitLocationTask task;
     
-    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts) {
-        super(task, parts);
+    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts, UUID playerId) {
+        super(task, parts, playerId);
         this.task = task;
     }
     
