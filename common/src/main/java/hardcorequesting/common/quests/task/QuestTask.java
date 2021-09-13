@@ -36,7 +36,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
     
@@ -196,17 +199,7 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    private TaskGraphic graphic;
-    
-    @Environment(EnvType.CLIENT)
-    protected abstract TaskGraphic createGraphic();
-    
-    @Environment(EnvType.CLIENT)
-    public final TaskGraphic getGraphic() {
-        if (graphic == null)
-            graphic = Objects.requireNonNull(createGraphic());
-        return graphic;
-    }
+    public abstract TaskGraphic createGraphic();
     
     public abstract void onUpdate(Player player);
     

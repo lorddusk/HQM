@@ -40,7 +40,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return new ItemTaskGraphic(this, parts);
     }
     

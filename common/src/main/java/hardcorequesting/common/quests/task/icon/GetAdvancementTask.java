@@ -40,7 +40,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return new AdvancementTaskGraphic(this, parts);
     }
     

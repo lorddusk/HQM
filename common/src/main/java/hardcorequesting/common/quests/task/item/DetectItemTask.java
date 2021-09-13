@@ -26,7 +26,7 @@ public class DetectItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return ItemTaskGraphic.createDetectGraphic(this, parts);
     }
     

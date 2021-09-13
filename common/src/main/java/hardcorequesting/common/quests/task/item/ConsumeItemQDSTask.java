@@ -14,7 +14,7 @@ public class ConsumeItemQDSTask extends ConsumeItemTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return ItemTaskGraphic.createConsumeGraphic(this, parts, false);
     }
 }

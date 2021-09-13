@@ -39,7 +39,7 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return new ReputationTaskGraphic(this, parts);
     }
     

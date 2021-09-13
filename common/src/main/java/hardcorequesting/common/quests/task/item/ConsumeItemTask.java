@@ -22,7 +22,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
+    public TaskGraphic createGraphic() {
         return ItemTaskGraphic.createConsumeGraphic(this, parts, true);
     }
     

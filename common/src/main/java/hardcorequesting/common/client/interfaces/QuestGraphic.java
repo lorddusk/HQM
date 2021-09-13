@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
+import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
@@ -20,6 +21,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +44,7 @@ public final class QuestGraphic extends Graphic {
     private final UUID playerId;
     private final Quest quest;
     private QuestTask<?> selectedTask;
+    private TaskGraphic taskGraphic;
     
     private final QuestRewardsGraphic rewardsGraphic;
     
@@ -109,11 +112,7 @@ public final class QuestGraphic extends Graphic {
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         if (!Quest.canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
-            if (quest.getTasks().size() > 0) {
-                selectedTask = quest.getTasks().get(0);
-            } else {
-                selectedTask = null;
-            }
+            setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
         gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
@@ -146,8 +145,8 @@ public final class QuestGraphic extends Graphic {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
-            
-            selectedTask.getGraphic().draw(matrices, gui, player, mX, mY);
+    
+            taskGraphic.draw(matrices, gui, player, mX, mY);
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
@@ -157,8 +156,8 @@ public final class QuestGraphic extends Graphic {
     public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
         super.drawTooltip(matrices, gui, player, mX, mY);
     
-        if (selectedTask != null) {
-            selectedTask.getGraphic().drawTooltip(matrices, gui, player, mX, mY);
+        if (taskGraphic != null) {
+            taskGraphic.drawTooltip(matrices, gui, player, mX, mY);
         }
     
         rewardsGraphic.drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
@@ -214,7 +213,7 @@ public final class QuestGraphic extends Graphic {
                                     }
                                 }
                                 if (selectedTask == task) {
-                                    selectedTask = null;
+                                    setSelectedTask(null);
                                 }
                                 
                                 task.onDelete();
@@ -229,9 +228,9 @@ public final class QuestGraphic extends Graphic {
                                 SaveHelper.add(EditType.TASK_REMOVE);
                             }
                         } else if (task == selectedTask) {
-                            selectedTask = null;
+                            setSelectedTask(null);
                         } else {
-                            selectedTask = task;
+                            setSelectedTask(task);
                             taskDescriptionScroll.resetScroll();
                         }
                         break;
@@ -243,8 +242,8 @@ public final class QuestGraphic extends Graphic {
     
             rewardsGraphic.onClick(gui, player, mX, mY);
             
-            if (selectedTask != null) {
-                selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
+            if (taskGraphic != null) {
+                taskGraphic.onClick(gui, player, mX, mY, b);
             }
             
             super.onClick(gui, player, mX, mY, b);
@@ -264,7 +263,7 @@ public final class QuestGraphic extends Graphic {
             }
             
             if (Quest.canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
-                selectedTask = null;
+                setSelectedTask(null);
             }
         }
     }
@@ -272,36 +271,36 @@ public final class QuestGraphic extends Graphic {
     @Override
     public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
         super.onDrag(gui, mX, mY, b);
-        if (selectedTask != null)
-            selectedTask.getGraphic().onDrag(gui, mX, mY, b);
+        if (taskGraphic != null)
+            taskGraphic.onDrag(gui, mX, mY, b);
     }
     
     @Override
     public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
         super.onRelease(gui, mX, mY, b);
-        if (selectedTask != null)
-            selectedTask.getGraphic().onRelease(gui, mX, mY, b);
+        if (taskGraphic != null)
+            taskGraphic.onRelease(gui, mX, mY, b);
     }
     
     @Override
     public void onScroll(GuiQuestBook gui, double x, double y, double scroll) {
         super.onScroll(gui, x, y, scroll);
-        if (selectedTask != null)
-            selectedTask.getGraphic().onScroll(gui, x, y, scroll);
+        if (taskGraphic != null)
+            taskGraphic.onScroll(gui, x, y, scroll);
     }
     
     public void onOpen(Player player) {
         if (selectedTask == null) {
             for (QuestTask<?> task : quest.getTasks()) {
                 if (!task.isCompleted(playerId)) {
-                    selectedTask = task;
+                    setSelectedTask(task);
                     break;
                 }
             }
         }
         
         if (selectedTask == null && quest.getTasks().size() > 0)
-            selectedTask = quest.getTasks().get(0);
+            setSelectedTask(quest.getTasks().get(0));
         
         QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = quest.getQuestId();
         QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
@@ -312,4 +311,8 @@ public final class QuestGraphic extends Graphic {
         EventTrigger.instance().onQuestSelected(new EventTrigger.QuestSelectedEvent(player, quest.getQuestId()));
     }
     
+    private void setSelectedTask(@Nullable QuestTask<?> task) {
+        selectedTask = task;
+        taskGraphic = task == null ? null : task.createGraphic();
+    }
 }
