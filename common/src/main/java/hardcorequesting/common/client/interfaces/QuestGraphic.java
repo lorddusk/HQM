@@ -139,7 +139,7 @@ public final class QuestGraphic extends Graphic {
         
         super.draw(matrices, gui, player, mX, mY);
         
-        rewardsGraphic.draw(matrices, gui, player, mX, mY, quest.getQuestData(player));
+        rewardsGraphic.draw(matrices, gui, player, mX, mY);
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
@@ -160,7 +160,7 @@ public final class QuestGraphic extends Graphic {
             taskGraphic.drawTooltip(matrices, gui, player, mX, mY);
         }
     
-        rewardsGraphic.drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
+        rewardsGraphic.drawTooltip(matrices, gui, player, mX, mY);
     }
     
     private int getVisibleTasks(GuiBase gui) {
@@ -240,7 +240,7 @@ public final class QuestGraphic extends Graphic {
                 }
             }
     
-            rewardsGraphic.onClick(gui, player, mX, mY);
+            rewardsGraphic.onClick(gui, player, mX, mY, b);
             
             if (taskGraphic != null) {
                 taskGraphic.onClick(gui, player, mX, mY, b);
