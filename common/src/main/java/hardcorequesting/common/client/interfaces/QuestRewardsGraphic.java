@@ -29,6 +29,7 @@ import net.minecraft.world.item.TooltipFlag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class QuestRewardsGraphic extends Graphic {
     
@@ -52,12 +53,12 @@ public class QuestRewardsGraphic extends Graphic {
     private final LargeButton claimButton = new LargeButton("hqm.quest.claim", 100, 190) {
         @Override
         public boolean isEnabled(GuiBase gui, Player player) {
-            return rewards.hasReward(player.getUUID()) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(player);
+            return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(player);
         }
         
         @Override
         public boolean isVisible(GuiBase gui, Player player) {
-            return rewards.hasReward(player.getUUID());
+            return rewards.hasReward(playerId);
         }
         
         @Override
@@ -68,10 +69,12 @@ public class QuestRewardsGraphic extends Graphic {
     
     private final Quest quest;
     private final QuestRewards rewards;
+    private final UUID playerId;
     
-    public QuestRewardsGraphic(Quest quest) {
+    public QuestRewardsGraphic(Quest quest, UUID playerId) {
         this.quest = quest;
         this.rewards = quest.getRewards();
+        this.playerId = playerId;
     }
     
     @Environment(EnvType.CLIENT)

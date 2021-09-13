@@ -99,7 +99,7 @@ public final class QuestGraphic extends Graphic {
     public QuestGraphic(UUID playerId, Quest quest) {
         this.playerId = playerId;
         this.quest = quest;
-        rewardsGraphic = new QuestRewardsGraphic(quest);
+        rewardsGraphic = new QuestRewardsGraphic(quest, playerId);
     }
     
     private List<FormattedText> getCachedDescription(GuiBase gui) {
