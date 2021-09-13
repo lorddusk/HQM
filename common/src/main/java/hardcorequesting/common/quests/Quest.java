@@ -165,7 +165,7 @@ public class Quest {
     }
     
     public boolean hasReward(UUID playerId) {
-        return getRewards().hasReward(getQuestData(playerId), playerId);
+        return getRewards().hasReward(playerId);
     }
     
     public RepeatInfo getRepeatInfo() {

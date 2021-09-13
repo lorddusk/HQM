@@ -43,6 +43,8 @@ public final class QuestGraphic extends Graphic {
     private final Quest quest;
     private QuestTask<?> selectedTask;
     
+    private final QuestRewardsGraphic rewardsGraphic;
+    
     private final ScrollBar descriptionScroll;
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
@@ -94,6 +96,7 @@ public final class QuestGraphic extends Graphic {
     public QuestGraphic(UUID playerId, Quest quest) {
         this.playerId = playerId;
         this.quest = quest;
+        rewardsGraphic = new QuestRewardsGraphic(quest);
     }
     
     private List<FormattedText> getCachedDescription(GuiBase gui) {
@@ -137,7 +140,7 @@ public final class QuestGraphic extends Graphic {
         
         super.draw(matrices, gui, player, mX, mY);
         
-        quest.getRewards().draw(matrices, gui, player, mX, mY, quest.getQuestData(player));
+        rewardsGraphic.draw(matrices, gui, player, mX, mY, quest.getQuestData(player));
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
@@ -158,7 +161,7 @@ public final class QuestGraphic extends Graphic {
             selectedTask.getGraphic().drawTooltip(matrices, gui, player, mX, mY);
         }
     
-        quest.getRewards().drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
+        rewardsGraphic.drawTooltips(matrices, gui, player, mX, mY, quest.getQuestData(player));
     }
     
     private int getVisibleTasks(GuiBase gui) {
@@ -237,8 +240,8 @@ public final class QuestGraphic extends Graphic {
                     id++;
                 }
             }
-            
-            quest.getRewards().onClick(gui, player, mX, mY);
+    
+            rewardsGraphic.onClick(gui, player, mX, mY);
             
             if (selectedTask != null) {
                 selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
