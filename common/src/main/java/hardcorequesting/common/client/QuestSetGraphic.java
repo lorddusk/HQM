@@ -3,10 +3,7 @@ package hardcorequesting.common.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.*;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuParentCount;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuRepeat;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTrigger;
@@ -36,15 +33,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class QuestSetGraphic {
+@Environment(EnvType.CLIENT)
+public class QuestSetGraphic extends Graphic {
     private final QuestSet set;
     
     public QuestSetGraphic(QuestSet set) {
         this.set = set;
     }
     
-    @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, int x0, int y0, int x, int y) {
+    @Override
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        
+        super.draw(matrices, gui, mX, mY);
         
         if (gui.isOpBook) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
@@ -53,7 +53,7 @@ public class QuestSetGraphic {
         Player player = gui.getPlayer();
         
         for (ReputationBar bar : set.getReputationBars()) {
-            bar.draw(matrices, gui, x, y, player.getUUID());
+            bar.draw(matrices, gui, mX, mY, player.getUUID());
         }
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
@@ -63,26 +63,37 @@ public class QuestSetGraphic {
         
         gui.setBlitOffset(50);
         
-        drawQuestIcons(matrices, gui, x, y, player, isVisibleCache, isLinkFreeCache);
+        drawQuestIcons(matrices, gui, mX, mY, player, isVisibleCache, isLinkFreeCache);
+        
+    }
+    
+    @Override
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.drawTooltip(matrices, gui, mX, mY);
+        
+        Player player = gui.getPlayer();
+    
+        HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
+        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         
         for (Quest quest : set.getQuests().values()) {
             boolean editing = Quest.canQuestsBeEdited() && !Screen.hasControlDown();
-            if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
+            if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(mX, mY)) {
                 boolean shouldDrawText = false;
                 boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
                 String txt = "";
-                
+            
                 if (enabled || editing) {
                     txt += quest.getName();
                 }
-                
+            
                 if (!enabled) {
                     if (editing) {
                         txt += "\n";
                     }
                     txt += GuiColor.GRAY + I18n.get("hqm.questBook.lockedQuest");
                 }
-                
+            
                 if (!enabled || editing) {
                     int totalParentCount = 0;
                     int totalCompletedCount = 0;
@@ -102,12 +113,12 @@ public class QuestSetGraphic {
                                 completed++;
                             }
                         }
-                        
-                    }
                     
+                    }
+                
                     if (editing && totalParentCount > 0) {
                         txt += "\n" + GuiColor.GRAY + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), totalParentCount));
-                        
+                    
                         if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_R)) {
                             txt += " [" + I18n.get("hqm.questBook.holding", "R") + "]";
                             for (Quest parent : quest.getRequirements()) {
@@ -120,7 +131,7 @@ public class QuestSetGraphic {
                             txt += " [" + I18n.get("hqm.questBook.hold", "R") + "]";
                         }
                     }
-                    
+                
                     int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
                     if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
                         txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), totalParentCount));
@@ -139,7 +150,7 @@ public class QuestSetGraphic {
                             }
                         }
                     }
-                    
+                
                     if (editing && quest.getUseModifiedParentRequirement()) {
                         txt += "\n" + GuiColor.MAGENTA;
                         int amount = quest.getParentRequirementCount();
@@ -150,10 +161,10 @@ public class QuestSetGraphic {
                         } else {
                             txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqAll", amount));
                         }
-                        
+                    
                     }
                 }
-                
+            
                 if (enabled || editing) {
                     if (quest.isCompleted(player)) {
                         txt += "\n" + GuiColor.GREEN + I18n.get("hqm.questBook.completed");
@@ -161,12 +172,12 @@ public class QuestSetGraphic {
                     if (quest.hasReward(player.getUUID())) {
                         txt += "\n" + GuiColor.PURPLE + I18n.get("hqm.questBook.unclaimedReward");
                     }
-                    
+                
                     String repeatMessage = enabled ? quest.getRepeatInfo().getMessage(quest, player) : quest.getRepeatInfo().getShortMessage();
                     if (repeatMessage != null) {
                         txt += "\n" + repeatMessage;
                     }
-                    
+                
                     if (editing) {
                         int totalTasks = 0;
                         int completedTasks = 0;
@@ -176,12 +187,12 @@ public class QuestSetGraphic {
                                 completedTasks++;
                             }
                         }
-                        
+                    
                         if (totalTasks == 0) {
                             txt += "\n" + GuiColor.RED + I18n.get("hqm.questBook.noTasks");
                         } else {
                             txt += "\n" + GuiColor.CYAN + I18n.get("hqm.questBook.completedTasks", completedTasks, totalTasks);
-                            
+                        
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_T)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
                                 for (QuestTask<?> task : quest.getTasks()) {
@@ -194,12 +205,12 @@ public class QuestSetGraphic {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
                             }
                         }
-                        
+                    
                         String triggerMessage = quest.getTriggerType().getMessage(quest);
                         if (triggerMessage != null) {
                             txt += "\n" + triggerMessage;
                         }
-                        
+                    
                         if (!quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                             String invisibilityMessage;
                             if (quest.isLinkFree(player, isLinkFreeCache)) {
@@ -210,8 +221,8 @@ public class QuestSetGraphic {
                                         break;
                                     }
                                 }
-                                
-                                
+                            
+                            
                                 switch (quest.getTriggerType()) {
                                     case ANTI_TRIGGER:
                                         invisibilityMessage = I18n.get("hqm.questBook.invisLocked");
@@ -226,7 +237,7 @@ public class QuestSetGraphic {
                                     default:
                                         invisibilityMessage = null;
                                 }
-                                
+                            
                                 if (parentInvisible) {
                                     String parentText = I18n.get("hqm.questBook.invisInherit");
                                     if (invisibilityMessage == null) {
@@ -235,17 +246,17 @@ public class QuestSetGraphic {
                                         invisibilityMessage = parentText + " " + I18n.get("hqm.questBook.and") + " " + invisibilityMessage;
                                     }
                                 }
-                                
+                            
                             } else {
                                 invisibilityMessage = I18n.get("hqm.questBook.invisOption");
                             }
-                            
+                        
                             if (invisibilityMessage != null) {
                                 txt += "\n" + GuiColor.LIGHT_BLUE + invisibilityMessage;
                             }
                         }
-                        
-                        
+                    
+                    
                         List<UUID> ids = new ArrayList<>();
                         for (Quest option : quest.getOptionLinks()) {
                             ids.add(option.getQuestId());
@@ -259,7 +270,7 @@ public class QuestSetGraphic {
                         int optionLinks = ids.size();
                         if (optionLinks > 0) {
                             txt += "\n" + GuiColor.BLUE + Translator.rawString(Translator.pluralTranslated(optionLinks != 1, "hqm.questBook.optionLinks", optionLinks));
-                            
+                        
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_O)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "O") + "]";
                                 for (UUID id : ids) {
@@ -273,10 +284,10 @@ public class QuestSetGraphic {
                                 txt += " [" + I18n.get("hqm.questBook.hold", "O") + "]";
                             }
                         }
-                        
+                    
                     }
-                    
-                    
+                
+                
                     List<Quest> externalQuests = new ArrayList<>();
                     int childCount = 0;
                     for (Quest child : quest.getReversedRequirement()) {
@@ -285,7 +296,7 @@ public class QuestSetGraphic {
                             externalQuests.add(child);
                         }
                     }
-                    
+                
                     if (childCount > 0) {
                         txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(childCount != 1, "hqm.questBook.childUnlocks", childCount));
                         if (editing) {
@@ -300,13 +311,13 @@ public class QuestSetGraphic {
                         }
                     }
                     shouldDrawText = true;
-                    
-                }
                 
+                }
+            
                 if (editing) {
                     txt += "\n\n" + GuiColor.GRAY + I18n.get("hqm.questBook.ctrlNonEditor");
                 }
-                
+            
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (quest.isCompleted(player)) {
                         txt += "\n\n" + GuiColor.RED + I18n.get("hqm.questBook.resetQuest");
@@ -314,17 +325,15 @@ public class QuestSetGraphic {
                         txt += "\n\n" + GuiColor.ORANGE + I18n.get("hqm.questBook.completeQuest");
                     }
                 }
-                
+            
                 if (shouldDrawText && gui.getCurrentMode() != EditMode.MOVE) {
-                    gui.renderTooltipL(matrices, Stream.of(txt.split("\n")).map(FormattedText::of).collect(Collectors.toList()), x0, y0);
+                    gui.renderTooltipL(matrices, Stream.of(txt.split("\n")).map(FormattedText::of).collect(Collectors.toList()), mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
         }
-        
     }
     
-    @Environment(EnvType.CLIENT)
     private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest child : set.getQuests().values()) {
             if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
@@ -356,7 +365,6 @@ public class QuestSetGraphic {
         }
     }
     
-    @Environment(EnvType.CLIENT)
     private void drawQuestIcons(PoseStack matrices, GuiQuestBook gui, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest quest : set.getQuests().values()) {
             if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
@@ -388,22 +396,24 @@ public class QuestSetGraphic {
         }
     }
     
-    @Environment(EnvType.CLIENT)
-    public void mouseClicked(GuiQuestBook gui, int x, int y) {
+    @Override
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onClick(gui, mX, mY, b);
+        
         Player player = gui.getPlayer();
         if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {
             switch (gui.getCurrentMode()) {
                 case CREATE:
-                    if (x > 0) {
+                    if (mX > 0) {
                         Quest newQuest = new Quest("Unnamed", "Unnamed quest", 0, 0, false);
-                        newQuest.setGuiCenterX(x);
-                        newQuest.setGuiCenterY(y);
+                        newQuest.setGuiCenterX(mX);
+                        newQuest.setGuiCenterY(mY);
                         newQuest.setQuestSet(set);
                         SaveHelper.add(EditType.QUEST_CREATE);
                     }
                     break;
                 case REP_BAR_CREATE:
-                    gui.setEditMenu(new ReputationBar.EditGui(gui, player.getUUID(), x, y, set.getId()));
+                    gui.setEditMenu(new ReputationBar.EditGui(gui, player.getUUID(), mX, mY, set.getId()));
                     break;
                 default:
                     break;
@@ -412,7 +422,7 @@ public class QuestSetGraphic {
             HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
             HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
             for (Quest quest : set.getQuests().values()) {
-                if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(x, y)) {
+                if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(mX, mY)) {
                     if (Quest.canQuestsBeEdited()) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
@@ -506,6 +516,6 @@ public class QuestSetGraphic {
         
         if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(set.getReputationBars()))
-                reputationBar.mouseClicked(gui, x, y);
+                reputationBar.mouseClicked(gui, mX, mY);
     }
 }

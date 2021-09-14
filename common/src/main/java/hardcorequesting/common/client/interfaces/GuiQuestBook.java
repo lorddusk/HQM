@@ -518,7 +518,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedSet == null || !isSetOpened) {
                 QuestSet.drawOverview(matrices, this, setScroll, descriptionScroll, x, y);
             } else if (selectedQuest == null) {
-                questSetGraphic.draw(matrices, this, x0, y0, x, y);
+                questSetGraphic.drawFull(matrices, this, x, y);
             } else {
                 questGraphic.drawFull(matrices, this, x, y);
             }
@@ -676,7 +676,7 @@ public class GuiQuestBook extends GuiBase {
                     if (button == 1) {
                         isSetOpened = false;
                     } else {
-                        questSetGraphic.mouseClicked(this, x, y);
+                        questSetGraphic.onClick(this, x, y, button);
                     }
                 } else {
                     questGraphic.onClick(this, x, y, button);
