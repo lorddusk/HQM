@@ -33,7 +33,7 @@ import java.util.UUID;
 @Environment(EnvType.CLIENT)
 public class QuestRewardsGraphic extends Graphic {
     
-    public static final int START_X = Quest.START_X;
+    public static final int START_X = QuestGraphic.START_X;
     private static final int REWARD_STR_Y = 140;
     private static final int REWARD_Y = 150;
     private static final int REWARD_Y_OFFSET = 40;

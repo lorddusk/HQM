@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Quest {
-    public static final int START_X = 20;
     
     @Deprecated
     public static boolean isEditing = false;

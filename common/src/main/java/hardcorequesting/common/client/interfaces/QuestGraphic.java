@@ -32,7 +32,7 @@ public final class QuestGraphic extends Graphic {
     private static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
     //region pixelinfo
-    private static final int START_X = Quest.START_X;
+    public static final int START_X = 20;
     private static final int TEXT_HEIGHT = 9;
     private static final int TASK_LABEL_START_Y = 100;
     private static final int TASK_MARGIN = 2;
