@@ -119,13 +119,13 @@ public abstract class QuestTask<Data extends TaskData> {
         return getData(uuid).completed;
     }
     
-    public boolean isVisible(Player player) {
+    public boolean isVisible(UUID playerId) {
         Iterator<QuestTask<?>> itr = this.requirements.iterator();
         QuestTask<?> requirement;
         do {
             if (!itr.hasNext()) return true;
             requirement = itr.next();
-        } while (requirement.isCompleted(player) && requirement.isVisible(player));
+        } while (requirement.isCompleted(playerId) && requirement.isVisible(playerId));
         return false;
     }
     

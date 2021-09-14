@@ -11,7 +11,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -26,8 +25,8 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, TameMobsTask.Part part, int index, int x, int y) {
-        int tamed = task.tamed(index, player);
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, TameMobsTask.Part part, int index, int x, int y) {
+        int tamed = task.tamed(index, playerId);
         if (tamed == part.getCount()) {
             gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         } else {
@@ -37,13 +36,13 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, TameMobsTask.Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, TameMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, player, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
+            PickMobMenu.display(gui, playerId, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
                     PickMobMenu.EXTRA_TAME_ENTRIES, result -> task.setInfo(id, result.getMobId().toString(), result.getAmount()));
             return true;
         } else {
-            return super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, mode, part, id);
         }
     }
 }

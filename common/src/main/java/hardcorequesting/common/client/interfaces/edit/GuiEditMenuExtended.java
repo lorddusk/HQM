@@ -7,7 +7,8 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public abstract class GuiEditMenuExtended extends GuiEditMenu {
     
@@ -23,8 +24,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     protected TextBoxGroup textBoxes;
     private boolean clicked;
     
-    protected GuiEditMenuExtended(GuiBase gui, Player player, boolean isControlOnFirstPage, int arrowX, int arrowY) {
-        super(gui, player, isControlOnFirstPage);
+    protected GuiEditMenuExtended(UUID playerId, boolean isControlOnFirstPage, int arrowX, int arrowY) {
+        super(playerId, isControlOnFirstPage);
         
         this.textBoxes = new TextBoxGroup();
         ARROW_X_LEFT = arrowX;

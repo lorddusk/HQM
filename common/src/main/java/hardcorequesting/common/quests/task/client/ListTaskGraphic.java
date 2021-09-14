@@ -9,7 +9,6 @@ import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,13 +25,13 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected abstract List<Positioned<Part>> positionParts(List<Part> parts);
     
-    protected abstract void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY);
+    protected abstract void drawPart(PoseStack matrices, GuiQuestBook gui, Part part, int id, int x, int y, int mX, int mY);
     
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Player player, Positioned<Part> pos, int id, int mX, int mY) {return null;}
+    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Positioned<Part> pos, int id, int mX, int mY) {return null;}
     
     protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
     
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, Part part, int id) {
         if (mode == EditMode.DELETE) {
             parts.remove(id);
             return true;
@@ -41,43 +40,43 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
         
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
-            drawPart(matrices, gui, player, part, i, pos.getX(), pos.getY(), mX, mY);
+            drawPart(matrices, gui, part, i, pos.getX(), pos.getY(), mX, mY);
         }
         
-        super.draw(matrices, gui, player, mX, mY);
+        super.draw(matrices, gui, mX, mY);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
     
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
-            List<FormattedText> tooltip = getPartTooltip(gui, player, pos, i, mX, mY);
+            List<FormattedText> tooltip = getPartTooltip(gui, pos, i, mX, mY);
             if (tooltip != null) {
                 gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
                 return;
             }
         }
         
-        super.drawTooltip(matrices, gui, player, mX, mY);
+        super.drawTooltip(matrices, gui, mX, mY);
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
             int id = getClickedPart(gui, mX, mY);
             if (id >= 0)
-                handlePartClick(gui, player, gui.getCurrentMode(), parts.getShownElements().get(id), id);
+                handlePartClick(gui, gui.getCurrentMode(), parts.getShownElements().get(id), id);
         }
         
-        super.onClick(gui, player, mX, mY, b);
+        super.onClick(gui, mX, mY, b);
     }
     
     protected final int getClickedPart(GuiQuestBook gui, int mX, int mY) {

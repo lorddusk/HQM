@@ -249,51 +249,51 @@ public class GuiQuestBook extends GuiBase {
     {
         buttons.add(saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return Quest.canQuestsBeEdited() && SaveHelper.isLarge();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 save();
             }
         });
         
         buttons.add(new LargeButton("hqm.questBook.open", 245, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && selectedSet != null && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 isSetOpened = true;
             }
         });
         
         buttons.add(new LargeButton("hqm.questBook.createSet", 185, 50) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && Quest.canQuestsBeEdited() && currentMode == EditMode.CREATE && !isBagPage && !isSetOpened && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 int i = 0;
                 for (QuestSet set : Quest.getQuestSets()) {
                     if (set.getName().startsWith("Unnamed set")) i++;
@@ -305,17 +305,17 @@ public class GuiQuestBook extends GuiBase {
         
         buttons.add(new LargeButton("hqm.questBook.createGroup", 100, 175) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 Group.add(new Group(null));
                 SaveHelper.add(EditType.GROUP_CREATE);
             }
@@ -323,17 +323,17 @@ public class GuiQuestBook extends GuiBase {
         
         buttons.add(new LargeButton("hqm.questBook.createTier", 100, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 GroupTierManager.getInstance().getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
                 SaveHelper.add(EditType.TIER_CREATE);
             }
@@ -341,34 +341,34 @@ public class GuiQuestBook extends GuiBase {
         
         buttons.add(new LargeButton("Reset", 90, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return Screen.hasControlDown() && Screen.hasShiftDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && !isBagPage && !isMainPageOpen && isOpBook && isMenuPageOpen && !isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
-                OPBookHelper.reset(player);
+            public void onClick(GuiBase gui) {
+                OPBookHelper.reset(GuiQuestBook.this.player.getUUID());
             }
         });
         
         buttons.add(new LargeButton("Create New", 180, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && !isBagPage && currentMode == EditMode.CREATE && selectedReputation == null && !isMainPageOpen && !isMenuPageOpen && isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
                 SaveHelper.add(EditType.REPUTATION_ADD);
             }
@@ -376,17 +376,17 @@ public class GuiQuestBook extends GuiBase {
         
         buttons.add(new LargeButton("hqm.questBook.createTier", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return editMenu == null && !isBagPage && currentMode == EditMode.CREATE && selectedReputation != null && !isMainPageOpen && !isMenuPageOpen && isReputationPage;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
                 SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
             }
@@ -478,7 +478,7 @@ public class GuiQuestBook extends GuiBase {
         
         
         for (LargeButton button : buttons) {
-            button.draw(matrices, this, player, x, y);
+            button.draw(matrices, this, x, y);
         }
         
         applyColor(0xFFFFFFFF);
@@ -515,7 +515,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedQuest == null) {
                 selectedSet.draw(matrices, this, x0, y0, x, y);
             } else {
-                questGraphic.drawFull(matrices, this, player, x, y);
+                questGraphic.drawFull(matrices, this, x, y);
             }
             
             if (Quest.canQuestsBeEdited()) {
@@ -540,7 +540,7 @@ public class GuiQuestBook extends GuiBase {
         }
         
         if (currentMode != EditMode.MOVE) {
-            buttons.forEach(button -> button.renderTooltip(matrices, this, player, x, y));
+            buttons.forEach(button -> button.renderTooltip(matrices, this, x, y));
         }
         
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
@@ -620,8 +620,8 @@ public class GuiQuestBook extends GuiBase {
         boolean buttonClicked = false;
         
         for (LargeButton largeButton : buttons) {
-            if (largeButton.isVisible(this, player) && largeButton.isEnabled(this, player) && largeButton.inButtonBounds(this, x, y)) {
-                largeButton.onClick(this, player);
+            if (largeButton.isVisible(this) && largeButton.isEnabled(this) && largeButton.inButtonBounds(this, x, y)) {
+                largeButton.onClick(this);
                 buttonClicked = true;
                 break;
             }
@@ -657,7 +657,7 @@ public class GuiQuestBook extends GuiBase {
                     isMenuPageOpen = true;
                     isReputationPage = false;
                 } else {
-                    Reputation.onClick(this, x, y, player);
+                    Reputation.onClick(this, x, y, player.getUUID());
                 }
             } else if (selectedSet == null || !isSetOpened) {
                 if (button == 1) {
@@ -673,7 +673,7 @@ public class GuiQuestBook extends GuiBase {
                         selectedSet.mouseClicked(this, x, y);
                     }
                 } else {
-                    questGraphic.onClick(this, player, x, y, button);
+                    questGraphic.onClick(this, x, y, button);
                 }
             }
         } else {
@@ -844,7 +844,7 @@ public class GuiQuestBook extends GuiBase {
         }
         
         
-        Reputation.drawAll(matrices, this, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y, x, y, player);
+        Reputation.drawAll(matrices, this, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y, x, y, player.getUUID());
     }
     
     private void drawMainPage(PoseStack matrices) {
@@ -931,9 +931,9 @@ public class GuiQuestBook extends GuiBase {
             isMainPageOpen = true;
         } else {
             if (HQMConfig.getInstance().ENABLE_TEAMS && inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
-                editMenu = new GuiEditMenuTeam(this, player);
+                editMenu = new GuiEditMenuTeam(this, player.getUUID());
             } else if (inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
-                editMenu = new GuiEditMenuDeath(this, player);
+                editMenu = new GuiEditMenuDeath(this, player.getUUID());
             } else if (inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 isMenuPageOpen = false;
             }
@@ -950,7 +950,7 @@ public class GuiQuestBook extends GuiBase {
             }
         } else {
             if (Quest.canQuestsBeEdited() && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                TextMenu.display(this, player, Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
+                TextMenu.display(this, player.getUUID(), Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
             }
         }
     }
@@ -978,7 +978,7 @@ public class GuiQuestBook extends GuiBase {
     public void setCurrentMode(EditMode mode) {
         currentMode = mode;
         if (currentMode == EditMode.COMMAND_CREATE || currentMode == EditMode.COMMAND_CHANGE)
-            setEditMenu(new GuiEditMenuCommandEditor(this, player));
+            setEditMenu(new GuiEditMenuCommandEditor(this, player.getUUID()));
     }
     
     public Player getPlayer() {

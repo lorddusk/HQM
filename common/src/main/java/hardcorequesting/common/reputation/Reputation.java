@@ -78,19 +78,19 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawAll(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final Player player) {
+    public static void drawAll(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final UUID playerId) {
         String info = null;
         
         List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
         
-        reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(player)), Math.abs(reputation1.getValue(player))));
+        reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
         
         int start = gui.reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * gui.reputationDisplayScroll.getScroll()) : 0;
         int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputations.get(i).drawAndGetTooltip(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, player, false, null, null, false, null, null, false);
+            info = reputations.get(i).drawAndGetTooltip(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, playerId, false, null, null, false, null, null, false);
         }
         
         if (info != null) {
@@ -136,7 +136,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void onClick(GuiQuestBook gui, int mX, int mY, Player player) {
+    public static void onClick(GuiQuestBook gui, int mX, int mY, UUID playerId) {
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.reputationMap;
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
@@ -157,7 +157,7 @@ public class Reputation {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        TextMenu.display(gui, player, reputation.getName(), true, reputation::setName);
+                        TextMenu.display(gui, playerId, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
@@ -192,7 +192,7 @@ public class Reputation {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.neutral.getName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    TextMenu.display(gui, player, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
+                    TextMenu.display(gui, playerId, selectedReputation.neutral.getName(), true, selectedReputation.neutral::setName);
                 }
                 return;
             }
@@ -207,9 +207,9 @@ public class Reputation {
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
                         ReputationMarker marker = selectedReputation.markers.get(i);
-                        TextMenu.display(gui, player, marker.getName(), true, marker::setName);
+                        TextMenu.display(gui, playerId, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
-                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, player, selectedReputation.markers.get(i)));
+                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, selectedReputation.markers.get(i)));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask<?> task : quest.getTasks()) {
@@ -263,13 +263,13 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
-        draw(matrices, gui, x, y, mX, mY, player, effects, lower, upper, inverted, active, text, completed);
-        return info != null ? info : getTooltip(gui, x, y, mX, mY, player);
+    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+        draw(matrices, gui, x, y, mX, mY, playerId, effects, lower, upper, inverted, active, text, completed);
+        return info != null ? info : getTooltip(gui, x, y, mX, mY, playerId);
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, Player player, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
         String error = getError();
         
         if (error != null) {
@@ -373,8 +373,8 @@ public class Reputation {
         
         ReputationMarker current = null;
         int value = 0;
-        if (player != null) {
-            value = getValue(player);
+        if (playerId != null) {
+            value = getValue(playerId);
             current = getCurrentMarker(value);
     
     
@@ -424,7 +424,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, Player player) {
+    public String getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId) {
     
         if (getError() != null) {
             return null;
@@ -441,8 +441,8 @@ public class Reputation {
             }
         }
         
-        if (player != null) {
-            int value = getValue(player);
+        if (playerId != null) {
+            int value = getValue(playerId);
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {

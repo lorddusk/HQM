@@ -57,17 +57,17 @@ public final class QuestGraphic extends Graphic {
         for (final TaskType taskType : TaskType.values()) {
             addButton(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
-                public boolean isEnabled(GuiBase gui, Player player) {
+                public boolean isEnabled(GuiBase gui) {
                     return true;
                 }
                 
                 @Override
-                public boolean isVisible(GuiBase gui, Player player) {
+                public boolean isVisible(GuiBase gui) {
                     return Quest.canQuestsBeEdited() && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
                 }
                 
                 @Override
-                public void onClick(GuiBase gui, Player player) {
+                public void onClick(GuiBase gui) {
                     taskType.addTask(quest);
                 }
             });
@@ -91,7 +91,7 @@ public final class QuestGraphic extends Graphic {
         addScrollBar(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks(gui) > VISIBLE_TASKS;
+                return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks() > VISIBLE_TASKS;
             }
         });
     }
@@ -110,8 +110,8 @@ public final class QuestGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        if (!Quest.canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        if (!Quest.canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(playerId)) {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
@@ -121,14 +121,14 @@ public final class QuestGraphic extends Graphic {
         gui.drawString(matrices, getCachedDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
         
         int id = 0;
-        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
+        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
         for (int i = start; i < end; i++) {
             QuestTask<?> task = quest.getTasks().get(i);
-            boolean isVisible = task.isVisible(player);
+            boolean isVisible = task.isVisible(playerId);
             if (isVisible || Quest.canQuestsBeEdited()) {
-                boolean completed = task.isCompleted(player);
-                int yPos = getTaskY(gui, id);
+                boolean completed = task.isCompleted(playerId);
+                int yPos = getTaskY(id);
                 boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
                 gui.drawString(matrices, Translator.plain(task.getDescription()), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
@@ -137,64 +137,64 @@ public final class QuestGraphic extends Graphic {
             }
         }
         
-        super.draw(matrices, gui, player, mX, mY);
+        super.draw(matrices, gui, mX, mY);
         
-        rewardsGraphic.draw(matrices, gui, player, mX, mY);
+        rewardsGraphic.draw(matrices, gui, mX, mY);
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     
-            taskGraphic.draw(matrices, gui, player, mX, mY);
+            taskGraphic.draw(matrices, gui, mX, mY);
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        super.drawTooltip(matrices, gui, player, mX, mY);
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.drawTooltip(matrices, gui, mX, mY);
     
         if (taskGraphic != null) {
-            taskGraphic.drawTooltip(matrices, gui, player, mX, mY);
+            taskGraphic.drawTooltip(matrices, gui, mX, mY);
         }
     
-        rewardsGraphic.drawTooltip(matrices, gui, player, mX, mY);
+        rewardsGraphic.drawTooltip(matrices, gui, mX, mY);
     }
     
-    private int getVisibleTasks(GuiBase gui) {
+    private int getVisibleTasks() {
         if (Quest.canQuestsBeEdited()) {
             return quest.getTasks().size();
         }
         
         int count = 0;
         for (QuestTask<?> task : quest.getTasks()) {
-            if (task.isVisible(((GuiQuestBook) gui).getPlayer())) {
+            if (task.isVisible(playerId)) {
                 count++;
             }
         }
         return count;
     }
     
-    private int getTaskY(GuiQuestBook gui, int id) {
+    private int getTaskY(int id) {
         return TASK_LABEL_START_Y + id * (TEXT_HEIGHT + TASK_MARGIN);
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         if (b == 1) {
             gui.loadMap();
         } else {
             int id = 0;
-            int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
+            int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
             for (int i = start; i < end; i++) {
                 QuestTask<?> task = quest.getTasks().get(i);
-                if (task.isVisible(player) || Quest.canQuestsBeEdited()) {
-                    if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
+                if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
+                    if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
                         if (gui.isOpBook && Screen.hasShiftDown()) {
-                            OPBookHelper.reverseTaskCompletion(task, player);
+                            OPBookHelper.reverseTaskCompletion(task, playerId);
                             return;
                         }
                         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
@@ -202,7 +202,7 @@ public final class QuestGraphic extends Graphic {
                         }
                         if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                             if (gui.getCurrentMode() == EditMode.RENAME) {
-                                TextMenu.display(gui, player, task.getDescription(), true,
+                                TextMenu.display(gui, playerId, task.getDescription(), true,
                                         task::setDescription);
                             } else if (gui.getCurrentMode() == EditMode.DELETE) {
                                 if (i + 1 < quest.getTasks().size()) {
@@ -224,7 +224,7 @@ public final class QuestGraphic extends Graphic {
                                     questTask.updateId();
                                 }
                                 
-                                quest.getQuestData(player).clearTaskData(quest);
+                                quest.getQuestData(playerId).clearTaskData(quest);
                                 SaveHelper.add(EditType.TASK_REMOVE);
                             }
                         } else if (task == selectedTask) {
@@ -240,24 +240,24 @@ public final class QuestGraphic extends Graphic {
                 }
             }
     
-            rewardsGraphic.onClick(gui, player, mX, mY, b);
+            rewardsGraphic.onClick(gui, mX, mY, b);
             
             if (taskGraphic != null) {
-                taskGraphic.onClick(gui, player, mX, mY, b);
+                taskGraphic.onClick(gui, mX, mY, b);
             }
             
-            super.onClick(gui, player, mX, mY, b);
+            super.onClick(gui, mX, mY, b);
             
             if (gui.getCurrentMode() == EditMode.RENAME) {
                 if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    TextMenu.display(gui, player, quest.getName(), true, quest::setName);
+                    TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
                 } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, player, quest.getDescription(), false, description -> {
+                    TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
                         cachedDescription = null;
                         quest.setDescription(description);
                     });
                 } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, player, selectedTask.getLongDescription(), false,
+                    TextMenu.display(gui, playerId, selectedTask.getLongDescription(), false,
                             selectedTask::setLongDescription);
                 }
             }

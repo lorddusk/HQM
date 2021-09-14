@@ -16,12 +16,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class PickMobMenu extends GuiEditMenuExtended {
@@ -42,16 +38,16 @@ public class PickMobMenu extends GuiEditMenuExtended {
     private final List<Entry> rawMobs;
     private final List<Entry> mobs;
     
-    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new PickMobMenu(gui, player, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
     }
     
-    public static void display(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new PickMobMenu(gui, player, initMobId, initAmount, textKey, extraEntries, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, extraEntries, resultConsumer));
     }
     
-    private PickMobMenu(GuiQuestBook gui, Player player, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        super(gui, player, false, 180, 70);
+    private PickMobMenu(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+        super(playerId, false, 180, 70);
         
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;

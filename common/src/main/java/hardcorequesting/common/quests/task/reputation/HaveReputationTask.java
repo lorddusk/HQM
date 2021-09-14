@@ -15,7 +15,7 @@ public class HaveReputationTask extends ReputationTask<TaskData> {
     }
     
     private void checkReputation(Player player) {
-        if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player) && !this.isCompleted(player)) {
+        if (parent.isEnabled(player) && parent.isAvailable(player) && this.isVisible(player.getUUID()) && !this.isCompleted(player)) {
             if (isPlayerInRange(player)) {
                 completeTask(player.getUUID());
                 parent.sendUpdatedDataToTeam(player);

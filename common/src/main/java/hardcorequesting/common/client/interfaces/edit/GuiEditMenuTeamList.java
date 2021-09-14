@@ -2,11 +2,11 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
     
@@ -28,8 +28,8 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private GuiEditMenuTeam parent;
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiQuestBook gui, Player player, GuiEditMenuTeam parent) {
-        super(gui, player);
+    protected GuiEditMenuTeamList(UUID playerId, GuiEditMenuTeam parent) {
+        super(playerId);
         this.parent = parent;
     }
     

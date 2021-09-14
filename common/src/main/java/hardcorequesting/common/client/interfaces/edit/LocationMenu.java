@@ -8,9 +8,11 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class LocationMenu extends GuiEditMenuExtended {
@@ -21,12 +23,12 @@ public class LocationMenu extends GuiEditMenuExtended {
     private int radius;
     private String dimension;
     
-    public static void display(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new LocationMenu(gui, player, visibility, initPos, initRadius, initDimension, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new LocationMenu(gui, playerId, visibility, initPos, initRadius, initDimension, resultConsumer));
     }
     
-    private LocationMenu(GuiQuestBook gui, Player player, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        super(gui, player, true, 180, 30);
+    private LocationMenu(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        super(playerId, true, 180, 30);
     
         this.resultConsumer = resultConsumer;
         this.visibility = visibility;
@@ -109,17 +111,18 @@ public class LocationMenu extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.locationMenu.location", 100, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
+                Player player = Minecraft.getInstance().player;
                 pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
                 dimension = player.level.dimension().location().toString();
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {

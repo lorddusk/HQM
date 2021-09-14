@@ -7,7 +7,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -17,8 +16,8 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     private int triggerTasks;
     private UUID questId;
     
-    public GuiEditMenuTrigger(GuiQuestBook gui, Player player, Quest quest) {
-        super(gui, player, true, 25, 20);
+    public GuiEditMenuTrigger(GuiQuestBook gui, UUID playerId, Quest quest) {
+        super(playerId, true, 25, 20);
         
         this.questId = quest.getQuestId();
         this.type = quest.getTriggerType();

@@ -76,7 +76,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
         Player killer = KillMobsTask.getKiller(source);
-        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
+        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer.getUUID()) && !this.isCompleted(killer) && !killer.equals(entity)) {
             if (entity instanceof Player && isPlayerInRange((Player) entity)) {
                 ReputationKillTaskData killData = getData(killer);
                 if (killData.kills < kills) {

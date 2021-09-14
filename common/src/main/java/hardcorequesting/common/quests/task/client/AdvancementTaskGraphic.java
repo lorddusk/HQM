@@ -10,7 +10,6 @@ import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -26,20 +25,20 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, GetAdvancementTask.Part part, int id, int x, int y) {
-        if (task.advanced(id, player)) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, GetAdvancementTask.Part part, int id, int x, int y) {
+        if (task.advanced(id, playerId)) {
             gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         }
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, GetAdvancementTask.Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, GetAdvancementTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
-            PickAdvancementMenu.display(gui, player, part.getAdvancement(),
+            PickAdvancementMenu.display(gui, playerId, part.getAdvancement(),
                     result -> task.setAdvancement(id, result));
             return true;
         } else {
-            return super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, mode, part, id);
         }
     }
 }

@@ -10,11 +10,11 @@ import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PickAdvancementMenu extends GuiEditMenuExtended {
@@ -32,12 +32,12 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     private List<String> rawAdvancemenNames;
     private List<String> advancementNames;
     
-    public static void display(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new PickAdvancementMenu(gui, player, advancement, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
     }
     
-    private PickAdvancementMenu(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        super(gui, player, false, 180, 70);
+    private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
+        super(playerId, false, 180, 70);
         
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;

@@ -10,8 +10,8 @@ import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -27,8 +27,8 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, VisitLocationTask.Part part, int index, int x, int y) {
-        if (task.visited(index, player)) {
+    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, VisitLocationTask.Part part, int index, int x, int y) {
+        if (task.visited(index, playerId)) {
             gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         } else if (part.getVisibility().doShowCoordinate()) {
             int row = 0;
@@ -37,10 +37,11 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
                 row++;
             }
             
-            if (Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.getDimension())) {
+            Minecraft mc = Minecraft.getInstance();
+            if (Objects.equals(mc.level.dimension().location().toString(), part.getDimension())) {
                 if (part.getRadius() >= 0) {
                     FormattedText str;
-                    int distance = (int) player.distanceToSqr(part.getPosition().getX() + 0.5, part.getPosition().getY() + 0.5, part.getPosition().getZ() + 0.5);
+                    int distance = (int) mc.player.distanceToSqr(part.getPosition().getX() + 0.5, part.getPosition().getY() + 0.5, part.getPosition().getZ() + 0.5);
                     str = Translator.translatable("hqm.locationMenu.mAway", distance);
                     if (part.getVisibility().doShowRadius()) {
                         str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.getRadius()), Translator.plain("]"));
@@ -55,13 +56,13 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, VisitLocationTask.Part part, int id) {
+    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, VisitLocationTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
-            LocationMenu.display(gui, player, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
+            LocationMenu.display(gui, playerId, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
                     result -> task.setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
             return true;
         } else {
-            return super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(gui, mode, part, id);
         }
     }
 }

@@ -44,10 +44,10 @@ public class GroupTier {
                         }
                         break;
                     case NORMAL:
-                        gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer(), groupTier));
+                        gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer().getUUID(), groupTier));
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer(), groupTier.getName(), 110, groupTier::setName);
+                        TextMenu.display(gui, gui.getPlayer().getUUID(), groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {

@@ -49,8 +49,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
         return new Part();
     }
     
-    public boolean advanced(int id, Player player) {
-        return getData(player).getValue(id);
+    public boolean advanced(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     public void setAdvancement(int id, String advancement) {

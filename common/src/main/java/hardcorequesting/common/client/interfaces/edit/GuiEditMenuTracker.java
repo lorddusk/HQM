@@ -6,14 +6,15 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuTracker extends GuiEditMenuExtended {
     
     private TrackerBlockEntity tracker;
     
-    public GuiEditMenuTracker(GuiBase gui, Player player, final TrackerBlockEntity tracker) {
-        super(gui, player, true, 20, 30);
+    public GuiEditMenuTracker(GuiBase gui, UUID playerId, final TrackerBlockEntity tracker) {
+        super(playerId, true, 20, 30);
         
         this.tracker = tracker;
         

@@ -236,7 +236,7 @@ public class QuestSet {
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer(), questSet.getName(), true,
+                        TextMenu.display(gui, gui.getPlayer().getUUID(), questSet.getName(), true,
                                 result -> {
                                     if (!questSet.setName(result)) {
                                         gui.getPlayer().sendMessage(new TranslatableComponent("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)), Util.NIL_UUID);
@@ -268,7 +268,7 @@ public class QuestSet {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
-                TextMenu.display(gui, gui.getPlayer(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
+                TextMenu.display(gui, gui.getPlayer().getUUID(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
             }
         }
     }
@@ -434,7 +434,7 @@ public class QuestSet {
         Player player = gui.getPlayer();
         
         for (ReputationBar bar : getReputationBars()) {
-            bar.draw(matrices, gui, x, y, player);
+            bar.draw(matrices, gui, x, y, player.getUUID());
         }
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
@@ -786,7 +786,7 @@ public class QuestSet {
                     }
                     break;
                 case REP_BAR_CREATE:
-                    gui.setEditMenu(new ReputationBar.EditGui(gui, player, x, y, this.getId()));
+                    gui.setEditMenu(new ReputationBar.EditGui(gui, player.getUUID(), x, y, this.getId()));
                     break;
                 default:
                     break;
@@ -822,7 +822,7 @@ public class QuestSet {
                                 SaveHelper.add(EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                PickItemMenu.display(gui, player, quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
+                                PickItemMenu.display(gui, player.getUUID(), quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                                         result -> {
                                             try {
                                                 quest.setIconStack(result.get());
@@ -843,10 +843,10 @@ public class QuestSet {
                                 }
                                 break;
                             case REPEATABLE:
-                                gui.setEditMenu(new GuiEditMenuRepeat(gui, player, quest));
+                                gui.setEditMenu(new GuiEditMenuRepeat(gui, player.getUUID(), quest));
                                 break;
                             case REQUIRED_PARENTS:
-                                gui.setEditMenu(new GuiEditMenuParentCount(gui, player, quest));
+                                gui.setEditMenu(new GuiEditMenuParentCount(gui, player.getUUID(), quest));
                                 break;
                             case QUEST_SELECTION:
                                 if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
@@ -864,11 +864,11 @@ public class QuestSet {
                                 }
                                 break;
                             case TRIGGER:
-                                gui.setEditMenu(new GuiEditMenuTrigger(gui, player, quest));
+                                gui.setEditMenu(new GuiEditMenuTrigger(gui, player.getUUID(), quest));
                                 break;
                             case NORMAL:
                                 if (gui.isOpBook && Screen.hasShiftDown()) {
-                                    OPBookHelper.reverseQuestCompletion(quest, player);
+                                    OPBookHelper.reverseQuestCompletion(quest, player.getUUID());
                                     break;
                                 } // deliberate drop through
                             default:
@@ -877,7 +877,7 @@ public class QuestSet {
                         }
                     } else {
                         if (gui.isOpBook && Screen.hasShiftDown()) {
-                            OPBookHelper.reverseQuestCompletion(quest, player);
+                            OPBookHelper.reverseQuestCompletion(quest, player.getUUID());
                         } else {
                             gui.showQuest(quest);
                         }

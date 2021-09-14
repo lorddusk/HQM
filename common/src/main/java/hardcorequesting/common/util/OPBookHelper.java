@@ -23,19 +23,19 @@ public final class OPBookHelper {
     private OPBookHelper() {
     }
     
-    public static void reverseQuestCompletion(Quest quest, Player subject) {
+    public static void reverseQuestCompletion(Quest quest, UUID subject) {
         NetworkManager.sendToServer(OpAction.QUEST_COMPLETION.build(quest, null, -1, subject));
     }
     
-    public static void reverseTaskCompletion(QuestTask task, Player subject) {
+    public static void reverseTaskCompletion(QuestTask<?> task, UUID subject) {
         NetworkManager.sendToServer(OpAction.TASK_COMPLETION.build(task.getParent(), task, -1, subject));
     }
     
-    public static void reverseRequirementCompletion(QuestTask task, int requirement, Player subject) {
+    public static void reverseRequirementCompletion(QuestTask<?> task, int requirement, UUID subject) {
         NetworkManager.sendToServer(OpAction.REQUIREMENT_COMPLETION.build(task.getParent(), task, requirement, subject));
     }
     
-    public static void reset(Player player) {
+    public static void reset(UUID player) {
         NetworkManager.sendToServer(OpAction.RESET.build(null, null, -1, player));
     }
     
@@ -100,7 +100,7 @@ public final class OPBookHelper {
         protected Player subject;
         protected QuestTask task;
         
-        private static String toJson(Quest quest, QuestTask task, int requirement, Player subject) {
+        private static String toJson(Quest quest, QuestTask task, int requirement, UUID subject) {
             StringWriter stringWriter = new StringWriter();
             try {
                 JsonWriter writer = new JsonWriter(stringWriter);
@@ -108,7 +108,7 @@ public final class OPBookHelper {
                 if (quest != null)
                     writer.name(QUEST).value(quest.getQuestId().toString());
                 if (subject != null)
-                    writer.name(SUBJECT).value(subject.getUUID().toString());
+                    writer.name(SUBJECT).value(subject.toString());
                 if (task != null)
                     writer.name(TASK).value(task.getId());
                 if (requirement != -1)
@@ -122,7 +122,7 @@ public final class OPBookHelper {
         
         public abstract void process(String data);
         
-        public IMessage build(Quest quest, QuestTask task, int requirement, Player subject) {
+        public IMessage build(Quest quest, QuestTask task, int requirement, UUID subject) {
             return new OpActionMessage(this, toJson(quest, task, requirement, subject));
         }
         

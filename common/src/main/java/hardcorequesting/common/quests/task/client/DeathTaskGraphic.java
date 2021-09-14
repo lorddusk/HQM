@@ -12,7 +12,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -27,24 +26,24 @@ public class DeathTaskGraphic extends TaskGraphic {
     
         addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return Quest.canQuestsBeEdited();
             }
         
             @Override
-            public void onClick(GuiBase gui, Player player) {
-                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
+            public void onClick(GuiBase gui) {
+                IntInputMenu.display(gui, playerId, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         int died = task.getDeaths(playerId);
         FormattedText text = died == task.getDeathsRequired()
                 ? Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeathsRequired())
@@ -52,6 +51,6 @@ public class DeathTaskGraphic extends TaskGraphic {
     
         gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     
-        super.draw(matrices, gui, player, mX, mY);
+        super.draw(matrices, gui, mX, mY);
     }
 }

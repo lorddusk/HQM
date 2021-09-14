@@ -13,7 +13,6 @@ import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -28,33 +27,33 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         
         addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return Quest.canQuestsBeEdited();
             }
         
             @Override
-            public void onClick(GuiBase gui, Player player) {
-                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
+            public void onClick(GuiBase gui) {
+                IntInputMenu.display(gui, playerId, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
     
     }
     
     @Override
-    protected Player getPlayerForRender(Player player) {
-        return null;
+    protected boolean shouldShowPlayer() {
+        return false;
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        super.draw(matrices, gui, player, mX, mY);
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
     
-        int killCount = task.getKills(player.getUUID());
+        int killCount = task.getKills(playerId);
         if (Quest.canQuestsBeEdited()) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.pluralTranslated(task.getKillsRequirement() != 1, "hqm.repKil.kills", killCount, task.getKillsRequirement()), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {

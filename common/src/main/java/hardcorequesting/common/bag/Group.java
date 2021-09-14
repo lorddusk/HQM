@@ -146,7 +146,7 @@ public class Group {
                         gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer(), group.getDisplayName(), true, group::setName);
+                        TextMenu.display(gui, gui.getPlayer().getUUID(), group.getDisplayName(), true, group::setName);
                         break;
                     case DELETE:
                         remove(group.getId());
@@ -329,7 +329,7 @@ public class Group {
                     }
                     
                     final int id = i;
-                    PickItemMenu.display(gui, gui.getPlayer(), stack, PickItemMenu.Type.ITEM, amount,
+                    PickItemMenu.display(gui, gui.getPlayer().getUUID(), stack, PickItemMenu.Type.ITEM, amount,
                             result -> this.setItem(id, result.getWithAmount()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {

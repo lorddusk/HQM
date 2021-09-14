@@ -13,9 +13,9 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSink;
 import net.minecraft.util.StringDecomposer;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class GuiEditMenuCommandEditor extends TextMenu {
     
@@ -25,8 +25,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     private boolean[] edited;
     private String added;
     
-    public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
-        super(gui, player, "", false, -1, null);
+    public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId) {
+        super(gui, playerId, "", false, -1, null);
         this.quest = GuiQuestBook.getShownQuest();
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];

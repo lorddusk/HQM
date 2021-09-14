@@ -71,8 +71,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     }
     
-    public int tamed(int id, Player player) {
-        return getData(player).getValue(id);
+    public int tamed(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     @Override
@@ -132,7 +132,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Override
     public void onAnimalTame(Player tamer, Entity entity) {
-        if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
+        if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer.getUUID()) && !isCompleted(tamer)) {
             TameTaskData data = getData(tamer);
             boolean updated = false;
             for (int i = 0; i < parts.size(); i++) {
@@ -160,7 +160,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
                 for (int i = 0; i < parts.size(); i++) {
                     Part part = parts.get(i);
                     
-                    if (tamed(i, tamer) < part.count) {
+                    if (tamed(i, tamer.getUUID()) < part.count) {
                         done = false;
                         break;
                     }

@@ -2,8 +2,8 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
 import java.util.function.IntConsumer;
 
 public class IntInputMenu extends GuiEditMenuExtended {
@@ -11,12 +11,12 @@ public class IntInputMenu extends GuiEditMenuExtended {
     private final IntConsumer resultConsumer;
     private int amount;
     
-    public static void display(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
-        gui.setEditMenu(new IntInputMenu(gui, player, title, initAmount, resultConsumer));
+    public static void display(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+        gui.setEditMenu(new IntInputMenu(gui, playerId, title, initAmount, resultConsumer));
     }
     
-    public IntInputMenu(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
-        super(gui, player, true, -1, -1);
+    public IntInputMenu(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+        super(playerId, true, -1, -1);
         
         this.resultConsumer = resultConsumer;
         amount = initAmount;

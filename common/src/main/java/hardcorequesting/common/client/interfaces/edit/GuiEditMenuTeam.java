@@ -17,10 +17,10 @@ import hardcorequesting.common.util.Translator;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GuiEditMenuTeam extends GuiEditMenu {
     
@@ -50,56 +50,56 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private TextBoxGroup.TextBox inviteName;
     private PlayerEntry selectedEntry;
     
-    public GuiEditMenuTeam(GuiQuestBook gui, Player player) {
-        super(gui, player);
+    public GuiEditMenuTeam(GuiQuestBook gui, UUID playerId) {
+        super(playerId);
         
         buttons.add(new LargeButton("hqm.party.create", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return teamName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return inviteTeam == null && getTeam().isSingle();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 getTeam().create(teamName.getText());
             }
         });
         
         buttons.add(inviteButton = new LargeButton("hqm.party.invitePlayer", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return inviteName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 getTeam().invite(inviteName.getText());
             }
         });
         
         buttons.add(new LargeButton("hqm.party.accept", 180, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 inviteTeam.accept();
                 inviteTeam = null;
             }
@@ -107,17 +107,17 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decline", 240, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 inviteTeam.decline();
                 inviteTeam = null;
             }
@@ -125,34 +125,34 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decideLater", 180, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return inviteTeam != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 inviteTeam = null;
             }
         });
         
         buttons.add(new LargeButton(null, 250, 50) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return !selectedEntry.isOwner();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return selectedEntry != null && getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 getTeam().kick(selectedEntry.getUUID());
                 selectedEntry = null;
             }
@@ -165,34 +165,34 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.leave", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return Screen.hasShiftDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return !getTeam().isSingle() && !getEntry(getTeam()).isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 getTeam().leave();
             }
         });
         
         buttons.add(new LargeButton("hqm.party.disband", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return !getTeam().isSingle() && selectedEntry != null && selectedEntry.isOwner();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 getTeam().disband();
                 selectedEntry = null;
             }
@@ -201,18 +201,18 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.list", 250, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
-                gui.setEditMenu(new GuiEditMenuTeamList((GuiQuestBook) gui, player, self));
+            public void onClick(GuiBase gui) {
+                gui.setEditMenu(new GuiEditMenuTeamList(playerId, self));
             }
         });
         
@@ -498,11 +498,11 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     private Team getTeam() {
-        return QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+        return QuestingDataManager.getInstance().getQuestingData(playerId).getTeam();
     }
     
     private PlayerEntry getEntry(Team team) {
-        return team.getEntry(this.player.getUUID());
+        return team.getEntry(this.playerId);
     }
     
     private static class TextBoxName extends TextBoxGroup.TextBox {

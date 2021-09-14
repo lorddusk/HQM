@@ -11,10 +11,10 @@ import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     
@@ -26,8 +26,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private ReputationReward selectedReward;
     private List<FormattedText> error;
     
-    public GuiEditMenuReputationReward(GuiBase gui, Player player, List<ReputationReward> rewards) {
-        super(gui, player, true, 185, 25);
+    public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards) {
+        super(playerId, true, 185, 25);
         
         this.rewards = new ArrayList<>();
         if (rewards != null) {
@@ -60,34 +60,34 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.repReward.create", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return isValid();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
             }
         });
         
         buttons.add(new LargeButton("hqm.repReward.delete", 80, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return isValid() && selectedReward != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 GuiEditMenuReputationReward.this.rewards.remove(selectedReward);
                 selectedReward = null;
             }

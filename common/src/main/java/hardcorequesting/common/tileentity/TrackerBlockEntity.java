@@ -50,7 +50,7 @@ public class TrackerBlockEntity extends BlockEntity {
             tracker.radius = radius;
             tracker.type = type;
             GuiBase gui = new GuiWrapperEditMenu();
-            gui.setEditMenu(new GuiEditMenuTracker(gui, player, tracker));
+            gui.setEditMenu(new GuiEditMenuTracker(gui, player.getUUID(), tracker));
             Minecraft.getInstance().setScreen(gui);
         }
     }

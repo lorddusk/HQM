@@ -9,10 +9,10 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public abstract class GuiEditMenu {
@@ -21,35 +21,34 @@ public abstract class GuiEditMenu {
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
     protected List<LargeButton> buttons;
-    protected Player player;
+    protected final UUID playerId;
     protected List<CheckBox> checkboxes;
     private boolean hasButtons;
     
-    protected GuiEditMenu(final GuiBase gui, Player player) {
+    protected GuiEditMenu(UUID playerId) {
         buttons = new ArrayList<>();
-        this.player = player;
-        
         checkboxes = new ArrayList<>();
+        this.playerId = playerId;
     }
     
-    protected GuiEditMenu(final GuiBase gui, Player player, boolean isControlOnFirstPage) {
-        this(gui, player);
+    protected GuiEditMenu(UUID playerId, boolean isControlOnFirstPage) {
+        this(playerId);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
         
         buttons.add(new LargeButton("hqm.edit.ok", xOffset + 40, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 save(gui);
                 close(gui);
             }
@@ -57,17 +56,17 @@ public abstract class GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.edit.cancel", xOffset + 100, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 close(gui);
             }
         });
@@ -75,8 +74,8 @@ public abstract class GuiEditMenu {
     
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
-            if (button.isVisible(gui, null)) {
-                button.draw(matrices, gui, player, mX, mY);
+            if (button.isVisible(gui)) {
+                button.draw(matrices, gui, mX, mY);
             }
         }
         for (CheckBox checkbox : checkboxes) {
@@ -86,8 +85,8 @@ public abstract class GuiEditMenu {
     
     public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
-            if (button.isVisible(gui, null)) {
-                button.renderTooltip(matrices, gui, player, mX, mY);
+            if (button.isVisible(gui)) {
+                button.renderTooltip(matrices, gui, mX, mY);
             }
         }
     }
@@ -100,8 +99,8 @@ public abstract class GuiEditMenu {
         }
         
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui, null) && button.isEnabled(gui, null)) {
-                button.onClick(gui, player);
+            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui) && button.isEnabled(gui)) {
+                button.onClick(gui);
             }
         }
         

@@ -12,9 +12,9 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ReputationBar {
     private String repId;
@@ -71,14 +71,14 @@ public class ReputationBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY, Player player) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY, UUID playerId) {
         Reputation reputation = ReputationManager.getInstance().getReputation(this.repId);
         if (reputation == null) return;
         
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
-        String info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, player, false, null, null, false, null, null, false);
+        String info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
         
         if (info != null) {
             gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
@@ -103,7 +103,7 @@ public class ReputationBar {
                     SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new EditGui(gui, gui.getPlayer(), this));
+                    gui.setEditMenu(new EditGui(gui, gui.getPlayer().getUUID(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
@@ -120,14 +120,14 @@ public class ReputationBar {
         private ReputationBar bar;
         private boolean isNew;
         
-        public EditGui(GuiBase guiBase, Player player, ReputationBar bar) {
-            super(guiBase, player);
+        public EditGui(GuiBase guiBase, UUID playerId, ReputationBar bar) {
+            super(playerId);
             this.bar = bar;
             this.isNew = false;
         }
         
-        public EditGui(GuiBase guiBase, Player player, int x, int y, int selectedSet) {
-            super(guiBase, player);
+        public EditGui(GuiBase guiBase, UUID playerId, int x, int y, int selectedSet) {
+            super(playerId);
             this.bar = new ReputationBar(null, x, y, selectedSet);
             this.isNew = true;
         }

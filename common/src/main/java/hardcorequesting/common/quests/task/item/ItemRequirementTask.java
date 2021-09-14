@@ -20,7 +20,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
@@ -68,12 +67,12 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         parent.setIconIfEmpty(stack);
     }
     
-    public int getProgress(Player player, int id) {
+    public int getProgress(UUID playerId, int id) {
         if (id >= parts.size()) {
             return 0;
         }
         
-        return getData(player).getValue(id);
+        return getData(playerId).getValue(id);
     }
     
     @Environment(EnvType.CLIENT)

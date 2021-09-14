@@ -75,7 +75,7 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     @Override
     public void onLivingDeath(LivingEntity player, DamageSource source) {
         if (player instanceof ServerPlayer) {
-            if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible((Player) player) && !isCompleted((Player) player)) {
+            if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible(player.getUUID()) && !isCompleted((Player) player)) {
                 DeathTaskData deathData = getData((Player) player);
                 if (deathData.getDeaths() < deaths) {
                     deathData.setDeaths(deathData.getDeaths() + 1);

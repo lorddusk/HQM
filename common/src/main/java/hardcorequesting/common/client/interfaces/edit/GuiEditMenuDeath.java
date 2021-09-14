@@ -13,7 +13,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -52,10 +51,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private boolean showBest;
     private ScrollBar scrollBar;
     
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, Player player) {
-        super(guiQuestBook, player);
-        
-        playerId = player.getUUID();
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
+        super(playerId);
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override

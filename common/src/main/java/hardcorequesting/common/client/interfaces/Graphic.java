@@ -6,7 +6,6 @@ import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,31 +19,31 @@ public abstract class Graphic {
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     
-    public final void drawFull(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        draw(matrices, gui, player, mX, mY);
-        drawTooltip(matrices, gui, player, mX, mY);
+    public final void drawFull(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        draw(matrices, gui, mX, mY);
+        drawTooltip(matrices, gui, mX, mY);
     }
     
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         for (LargeButton button : buttons) {
-            button.draw(matrices, gui, player, mX, mY);
+            button.draw(matrices, gui, mX, mY);
         }
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(matrices, gui);
         }
     }
     
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, gui, player, mX, mY);
+            button.renderTooltip(matrices, gui, mX, mY);
         }
     }
     
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui, player) && button.isEnabled(gui, player)) {
-                button.onClick(gui, player);
+            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui) && button.isEnabled(gui)) {
+                button.onClick(gui);
                 break;
             }
         }

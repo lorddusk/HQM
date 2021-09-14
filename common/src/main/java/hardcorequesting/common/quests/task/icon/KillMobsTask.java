@@ -62,8 +62,8 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         part.setCount(amount);
     }
     
-    public int killed(int id, Player player) {
-        return getData(player).getValue(id);
+    public int killed(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     @Override
@@ -126,7 +126,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
         Player killer = getKiller(source);
         
-        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !isCompleted(killer)) {
+        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer.getUUID()) && !isCompleted(killer)) {
             MobTaskData data = getData(killer);
             boolean updated = false;
             for (int i = 0; i < parts.size(); i++) {
@@ -147,7 +147,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
                 for (int i = 0; i < parts.size(); i++) {
                     Part part = parts.get(i);
                     
-                    if (killed(i, killer) < part.count) {
+                    if (killed(i, killer.getUUID()) < part.count) {
                         done = false;
                         break;
                     }

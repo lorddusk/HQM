@@ -14,6 +14,7 @@ import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
@@ -72,31 +73,31 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private boolean clicked;
     private TextBoxGroup.TextBox amountTextBox;
     private TextBoxGroup textBoxes;
-    private int lastClicked;
+    private long lastClicked;
     
     /**
      * Create and display the menu.
      */
-    public static <T> void display(GuiBase gui, Player player, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiBase gui, UUID playerId, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, and include text bar for amounts.
      */
-    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiBase gui, UUID playerId, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, include text bar for amounts, and allow choice of precision.
      */
-    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, precision, true, resultConsumer));
+    public static <T> void display(GuiBase gui, UUID playerId, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiBase gui, Player player, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
-        super(gui, player, true);
+    private PickItemMenu(GuiBase gui, UUID playerId, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
+        super(playerId, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
         this.precisionInput = precisionInput;
@@ -107,7 +108,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         
         searchItems = Collections.emptyList();
         
-        playerItems = type.createPlayerEntries(player);
+        playerItems = type.createPlayerEntries(Minecraft.getInstance().player);
         
         textBoxes = new TextBoxGroup();
         if (amountInput) {
@@ -274,13 +275,14 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 if (element != null) {
                     selected = element;
                     
-                    int lastDiff = player.tickCount - lastClicked;
+                    long tickCount = Minecraft.getInstance().level.getGameTime();
+                    long lastDiff = tickCount - lastClicked;
                     if (0 <= lastDiff && lastDiff < 6 && !type.isEmpty(selected)) {
                         save(gui);
                         close(gui);
                         return true;
                     } else {
-                        lastClicked = player.tickCount;
+                        lastClicked = tickCount;
                     }
                 }
                 break;

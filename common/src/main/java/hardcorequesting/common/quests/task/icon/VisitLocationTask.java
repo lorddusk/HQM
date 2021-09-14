@@ -72,7 +72,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
                         if (part.radius >= 0 && current > target) {
                             all = false;
                         } else {
-                            if (!this.isCompleted(player) && this.isVisible(player) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
+                            if (!this.isCompleted(player) && this.isVisible(player.getUUID()) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
                                 updated = true;
                                 data.complete(i);
                             }
@@ -90,8 +90,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         }
     }
     
-    public boolean visited(int id, Player player) {
-        return getData(player).getValue(id);
+    public boolean visited(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     public void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {

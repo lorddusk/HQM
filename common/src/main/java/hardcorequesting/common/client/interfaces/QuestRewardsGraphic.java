@@ -23,7 +23,6 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -50,21 +49,21 @@ public class QuestRewardsGraphic extends Graphic {
     private static final int REPUTATION_SRC_Y = 82;
     
     private int selectedReward = -1;
-    private int lastClicked;
+    private long lastClicked;
     {
         addButton(new LargeButton("hqm.quest.claim", 100, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(player);
+            public boolean isEnabled(GuiBase gui) {
+                return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(playerId);
             }
     
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return rewards.hasReward(playerId);
             }
     
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<>(quest.getQuestId(), rewards.hasChoiceReward() ? selectedReward : -1)));
             }
         });
@@ -81,27 +80,27 @@ public class QuestRewardsGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         QuestData data = quest.getQuestData(playerId);
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        if (selectedReward != -1 && !rewards.hasReward(data, player.getUUID())) {
+        if (selectedReward != -1 && !rewards.hasReward(data, playerId)) {
             selectedReward = -1;
         }
         
         drawItemRewards(matrices, gui, mX, mY);
         
-        super.draw(matrices, gui, player, mX, mY);
+        super.draw(matrices, gui, mX, mY);
         
         drawReputationIcon(matrices, gui, mX, mY, data);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         
         drawItemRewardTooltips(matrices, gui, mX, mY);
     
-        super.drawTooltip(matrices, gui, player, mX, mY);
+        super.drawTooltip(matrices, gui, mX, mY);
         
         drawRepIconTooltip(matrices, gui, mX, mY);
     }
@@ -197,27 +196,27 @@ public class QuestRewardsGraphic extends Graphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
         NonNullList<ItemStack> choiceRewards = rewards.getReward();
         List<ReputationReward> reputationRewards = rewards.getReputationRewards();
         
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
-            handleRewardClick(gui, player, itemRewards, REWARD_Y, false, mX, mY);
+            handleRewardClick(gui, itemRewards, REWARD_Y, false, mX, mY);
             if (!choiceRewards.isEmpty() || Quest.canQuestsBeEdited()) {
-                handleRewardClick(gui, player, choiceRewards, REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
+                handleRewardClick(gui, choiceRewards, REWARD_Y + REWARD_Y_OFFSET, true, mX, mY);
             }
         } else if (!choiceRewards.isEmpty()) {
-            handleRewardClick(gui, player, choiceRewards, REWARD_Y, true, mX, mY);
+            handleRewardClick(gui, choiceRewards, REWARD_Y, true, mX, mY);
         }
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
             if (isOnReputationIcon(gui, mX, mY)) {
-                gui.setEditMenu(new GuiEditMenuReputationReward(gui, player, reputationRewards));
+                gui.setEditMenu(new GuiEditMenuReputationReward(gui, playerId, reputationRewards));
             }
         }
         
-        super.onClick(gui, player, mX, mY, b);
+        super.onClick(gui, mX, mY, b);
     }
     
     private NonNullList<ItemStack> getEditFriendlyRewards(NonNullList<ItemStack> rewards, int max) {
@@ -262,7 +261,7 @@ public class QuestRewardsGraphic extends Graphic {
         }
     }
     
-    private void handleRewardClick(GuiQuestBook gui, Player player, NonNullList<ItemStack> rawRewards, int y, boolean canSelect, int mX, int mY) {
+    private void handleRewardClick(GuiQuestBook gui, NonNullList<ItemStack> rawRewards, int y, boolean canSelect, int mX, int mY) {
         NonNullList<ItemStack> itemRewards = getEditFriendlyRewards(rawRewards, canSelect ? MAX_SELECT_REWARD_SLOTS : MAX_REWARD_SLOTS);
         
         boolean doubleClick = false;
@@ -270,13 +269,14 @@ public class QuestRewardsGraphic extends Graphic {
         for (int i = 0; i < itemRewards.size(); i++) {
             if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.NORMAL) {
-                    int lastDiff = player.tickCount - lastClicked;
+                    long tickCount = Minecraft.getInstance().level.getGameTime();
+                    long lastDiff = tickCount - lastClicked;
                     if (lastDiff < 0) {
-                        lastClicked = player.tickCount;
+                        lastClicked = tickCount;
                     } else if (lastDiff < 6) {
                         doubleClick = true;
                     } else {
-                        lastClicked = player.tickCount;
+                        lastClicked = tickCount;
                     }
                 }
                 if (canSelect && (!Quest.canQuestsBeEdited() || (gui.getCurrentMode() == EditMode.NORMAL && !doubleClick))) {
@@ -306,7 +306,7 @@ public class QuestRewardsGraphic extends Graphic {
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
-                        PickItemMenu.display(gui, player, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
+                        PickItemMenu.display(gui, playerId, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
                                 result -> rewards.setItemReward(result.getWithAmount(), id, !canSelect));
                     }
                 }

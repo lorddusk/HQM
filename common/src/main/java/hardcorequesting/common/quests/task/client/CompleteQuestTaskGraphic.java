@@ -13,7 +13,6 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +47,13 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, GuiQuestBook gui, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
         if (part.getQuest() != null) {
             gui.drawString(matrices, Translator.plain(part.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            if (task.completed(id, player)) {
+            if (task.completed(id, playerId)) {
                 gui.drawString(matrices, Translator.translatable("hqm.completedMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         } else {
@@ -65,8 +64,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, CompleteQuestTask.Part part, int id) {
-        if (super.handlePartClick(gui, player, mode, part, id)) {
+    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, CompleteQuestTask.Part part, int id) {
+        if (super.handlePartClick(gui, mode, part, id)) {
             return true;
         } else if (Quest.speciallySelectedQuestId != null) {
             parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);

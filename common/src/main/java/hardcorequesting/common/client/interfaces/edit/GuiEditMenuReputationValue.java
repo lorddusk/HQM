@@ -6,15 +6,16 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     
     private ReputationMarker marker;
     private int value;
     
-    public GuiEditMenuReputationValue(GuiBase gui, Player player, ReputationMarker marker) {
-        super(gui, player, true, -1, -1);
+    public GuiEditMenuReputationValue(GuiBase gui, UUID playerId, ReputationMarker marker) {
+        super(playerId, true, -1, -1);
         
         this.marker = marker;
         this.value = marker.getValue();

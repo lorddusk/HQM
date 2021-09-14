@@ -10,10 +10,10 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     
@@ -27,11 +27,11 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
-    private ReputationTask task;
+    private ReputationTask<?> task;
     private int id;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.Part setting) {
-        super(gui, player, true, 25, 25);
+    public GuiEditMenuReputationSetting(UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
+        super(playerId, true, 25, 25);
         
         this.task = task;
         this.id = id;
@@ -92,17 +92,17 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);
             
             
             if (info != null) {

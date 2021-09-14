@@ -12,7 +12,8 @@ import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     
@@ -36,8 +37,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private TextBoxGroup textBoxes;
     private boolean clicked;
     
-    public GuiEditMenuTier(GuiQuestBook gui, Player player, GroupTier original) {
-        super(gui, player, true);
+    public GuiEditMenuTier(GuiQuestBook gui, UUID playerId, GroupTier original) {
+        super(playerId, true);
         this.original = original;
         this.tier = original.copy();
         this.textBoxes = new TextBoxGroup();

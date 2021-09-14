@@ -10,7 +10,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
 
@@ -44,30 +43,30 @@ public abstract class LargeButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isEnabled(GuiBase gui, Player player);
+    public abstract boolean isEnabled(GuiBase gui);
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isVisible(GuiBase gui, Player player);
+    public abstract boolean isVisible(GuiBase gui);
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiBase gui, Player player);
+    public abstract void onClick(GuiBase gui);
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiBase gui, Player player, int mX, int mY) {
-        if (isVisible(gui, player)) {
+    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+        if (isVisible(gui)) {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            boolean enabled = isEnabled(gui, player);
+            boolean enabled = isEnabled(gui);
             gui.drawRect(matrices, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(gui, mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
             gui.drawCenteredString(matrices, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void renderTooltip(PoseStack matrices, GuiBase gui, Player player, int mX, int mY) {
-        if (isVisible(gui, player) && description != null && inButtonBounds(gui, mX, mY)) {
+    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
+        if (isVisible(gui) && description != null && inButtonBounds(gui, mX, mY)) {
             if (lines == null) {
                 lines = gui.getLinesFromText(getDescription(), 1, 200);
             }

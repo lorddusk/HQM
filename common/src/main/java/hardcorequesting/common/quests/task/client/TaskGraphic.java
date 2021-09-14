@@ -8,7 +8,6 @@ import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -25,17 +24,17 @@ public abstract class TaskGraphic extends Graphic {
     protected void addSubmitButton(QuestTask<?> task) {
         addButton(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return !task.isCompleted(playerId);
             }
         
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(task));
             }
         });
@@ -44,17 +43,17 @@ public abstract class TaskGraphic extends Graphic {
     protected void addDetectButton(QuestTask<?> task) {
         addButton(new LargeButton("hqm.quest.manualDetect", 185, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return !task.isCompleted(playerId);
             }
         
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(task));
             }
         });

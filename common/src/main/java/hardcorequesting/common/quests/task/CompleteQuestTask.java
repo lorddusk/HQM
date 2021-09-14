@@ -41,8 +41,8 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
         return new CompleteQuestTaskGraphic(this, parts, playerId);
     }
     
-    public boolean completed(int id, Player player) {
-        return getData(player).getValue(id);
+    public boolean completed(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     @SuppressWarnings("unused")

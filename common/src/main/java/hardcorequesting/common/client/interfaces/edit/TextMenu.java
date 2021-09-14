@@ -12,8 +12,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -30,16 +30,16 @@ public class TextMenu extends GuiEditMenu {
     protected TextBoxLogic text;
     private final boolean isName;
     
-    public static void display(GuiQuestBook gui, Player player, String txt, boolean isName, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new TextMenu(gui, player, txt, isName, -1, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, String txt, boolean isName, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new TextMenu(gui, playerId, txt, isName, -1, resultConsumer));
     }
     
-    public static void display(GuiQuestBook gui, Player player, String txt, int limit, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new TextMenu(gui, player, txt, true, limit, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, String txt, int limit, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new TextMenu(gui, playerId, txt, true, limit, resultConsumer));
     }
     
-    protected TextMenu(GuiQuestBook gui, Player player, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
-        super(gui, player, false);
+    protected TextMenu(GuiQuestBook gui, UUID playerId, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
+        super(playerId, false);
     
         this.resultConsumer = resultConsumer;
         this.limit = limit;
@@ -52,34 +52,34 @@ public class TextMenu extends GuiEditMenu {
         this.isName = isName;
         buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 Minecraft.getInstance().keyboardHandler.setClipboard(text.getText());
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.paste", 245, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
@@ -90,34 +90,34 @@ public class TextMenu extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.textEditor.clear", 185, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 text.setTextAndCursor(gui, "");
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.clearPaste", 245, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
+            public boolean isEnabled(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible(GuiBase gui) {
                 return true;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick(GuiBase gui) {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
