@@ -282,7 +282,7 @@ public class Quest {
         return isVisible(player.getUUID());
     }
     
-    boolean isVisible(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    public boolean isVisible(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isVisible(player.getUUID(), isVisibleCache, isLinkFreeCache);
     }
     
@@ -305,7 +305,7 @@ public class Quest {
         return isEnabled(player.getUUID());
     }
     
-    boolean isEnabled(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    public boolean isEnabled(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isEnabled(player.getUUID(), true, isVisibleCache, isLinkFreeCache);
     }
     
@@ -325,7 +325,7 @@ public class Quest {
         return isLinkFree(player.getUUID(), new HashMap<>());
     }
     
-    boolean isLinkFree(Player player, Map<Quest, Boolean> cache) {
+    public boolean isLinkFree(Player player, Map<Quest, Boolean> cache) {
         return isLinkFree(player.getUUID(), cache);
     }
     

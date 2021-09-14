@@ -10,6 +10,7 @@ import hardcorequesting.common.bag.GroupTierManager;
 import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.KeyboardHandler;
+import hardcorequesting.common.client.QuestSetGraphic;
 import hardcorequesting.common.client.interfaces.edit.*;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -117,6 +118,7 @@ public class GuiQuestBook extends GuiBase {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
+    private QuestSetGraphic questSetGraphic;
     private static Quest selectedQuest;
     private QuestGraphic questGraphic;
     public static Group selectedGroup;
@@ -277,7 +279,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public void onClick(GuiBase gui) {
-                isSetOpened = true;
+                openSet();
             }
         });
         
@@ -398,7 +400,10 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
-        questGraphic = new QuestGraphic(player.getUUID(), selectedQuest);
+        if (isSetOpened)
+            questSetGraphic = new QuestSetGraphic(selectedSet);
+        if (selectedQuest != null)
+            questGraphic = new QuestGraphic(player.getUUID(), selectedQuest);
         
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
@@ -513,7 +518,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (selectedSet == null || !isSetOpened) {
                 QuestSet.drawOverview(matrices, this, setScroll, descriptionScroll, x, y);
             } else if (selectedQuest == null) {
-                selectedSet.draw(matrices, this, x0, y0, x, y);
+                questSetGraphic.draw(matrices, this, x0, y0, x, y);
             } else {
                 questGraphic.drawFull(matrices, this, x, y);
             }
@@ -556,6 +561,7 @@ public class GuiQuestBook extends GuiBase {
     
     public void openSet() {
         isSetOpened = true;
+        questSetGraphic = new QuestSetGraphic(selectedSet);
     }
     
     @Override
@@ -670,7 +676,7 @@ public class GuiQuestBook extends GuiBase {
                     if (button == 1) {
                         isSetOpened = false;
                     } else {
-                        selectedSet.mouseClicked(this, x, y);
+                        questSetGraphic.mouseClicked(this, x, y);
                     }
                 } else {
                     questGraphic.onClick(this, x, y, button);
@@ -1013,6 +1019,7 @@ public class GuiQuestBook extends GuiBase {
     public void showQuest(Quest quest) {
         selectedQuest = quest;
         questGraphic = new QuestGraphic(player.getUUID(), quest);
+        
         questGraphic.onOpen(player);
     }
     
