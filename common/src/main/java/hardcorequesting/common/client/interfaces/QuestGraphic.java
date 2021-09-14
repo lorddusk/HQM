@@ -183,88 +183,84 @@ public final class QuestGraphic extends Graphic {
     
     @Override
     public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        if (b == 1) {
-            gui.loadMap();
-        } else {
-            int id = 0;
-            int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
-            for (int i = start; i < end; i++) {
-                QuestTask<?> task = quest.getTasks().get(i);
-                if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
-                    if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
-                        if (gui.isOpBook && Screen.hasShiftDown()) {
-                            OPBookHelper.reverseTaskCompletion(task, playerId);
-                            return;
-                        }
-                        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-                            gui.setCurrentMode(EditMode.NORMAL);
-                        }
-                        if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
-                            if (gui.getCurrentMode() == EditMode.RENAME) {
-                                TextMenu.display(gui, playerId, task.getDescription(), true,
-                                        task::setDescription);
-                            } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                                if (i + 1 < quest.getTasks().size()) {
-                                    quest.getTasks().get(i + 1).clearRequirements();
-                                    
-                                    if (i > 0) {
-                                        quest.getTasks().get(i + 1).addRequirement(quest.getTasks().get(i - 1));
-                                    }
-                                }
-                                if (selectedTask == task) {
-                                    setSelectedTask(null);
-                                }
-                                
-                                task.onDelete();
-    
-                                quest.getTasks().remove(i);
-                                quest.nextTaskId = 0;
-                                for (QuestTask<?> questTask : quest.getTasks()) {
-                                    questTask.updateId();
-                                }
-                                
-                                quest.getQuestData(playerId).clearTaskData(quest);
-                                SaveHelper.add(EditType.TASK_REMOVE);
-                            }
-                        } else if (task == selectedTask) {
-                            setSelectedTask(null);
-                        } else {
-                            setSelectedTask(task);
-                            taskDescriptionScroll.resetScroll();
-                        }
-                        break;
+        int id = 0;
+        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
+        int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
+        for (int i = start; i < end; i++) {
+            QuestTask<?> task = quest.getTasks().get(i);
+            if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
+                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
+                    if (gui.isOpBook && Screen.hasShiftDown()) {
+                        OPBookHelper.reverseTaskCompletion(task, playerId);
+                        return;
                     }
-                    
-                    id++;
+                    if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
+                        gui.setCurrentMode(EditMode.NORMAL);
+                    }
+                    if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
+                        if (gui.getCurrentMode() == EditMode.RENAME) {
+                            TextMenu.display(gui, playerId, task.getDescription(), true,
+                                    task::setDescription);
+                        } else if (gui.getCurrentMode() == EditMode.DELETE) {
+                            if (i + 1 < quest.getTasks().size()) {
+                                quest.getTasks().get(i + 1).clearRequirements();
+                            
+                                if (i > 0) {
+                                    quest.getTasks().get(i + 1).addRequirement(quest.getTasks().get(i - 1));
+                                }
+                            }
+                            if (selectedTask == task) {
+                                setSelectedTask(null);
+                            }
+                        
+                            task.onDelete();
+                        
+                            quest.getTasks().remove(i);
+                            quest.nextTaskId = 0;
+                            for (QuestTask<?> questTask : quest.getTasks()) {
+                                questTask.updateId();
+                            }
+                        
+                            quest.getQuestData(playerId).clearTaskData(quest);
+                            SaveHelper.add(EditType.TASK_REMOVE);
+                        }
+                    } else if (task == selectedTask) {
+                        setSelectedTask(null);
+                    } else {
+                        setSelectedTask(task);
+                        taskDescriptionScroll.resetScroll();
+                    }
+                    break;
                 }
+            
+                id++;
             }
+        }
     
-            rewardsGraphic.onClick(gui, mX, mY, b);
-            
-            if (taskGraphic != null) {
-                taskGraphic.onClick(gui, mX, mY, b);
+        rewardsGraphic.onClick(gui, mX, mY, b);
+    
+        if (taskGraphic != null) {
+            taskGraphic.onClick(gui, mX, mY, b);
+        }
+    
+        super.onClick(gui, mX, mY, b);
+    
+        if (gui.getCurrentMode() == EditMode.RENAME) {
+            if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
+                TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
+            } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
+                TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
+                    cachedDescription = null;
+                    quest.setDescription(description);
+                });
+            } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
+                TextMenu.display(gui, playerId, selectedTask.getLongDescription(), false,
+                        selectedTask::setLongDescription);
             }
-            
-            super.onClick(gui, mX, mY, b);
-            
-            if (gui.getCurrentMode() == EditMode.RENAME) {
-                if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
-                } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
-                        cachedDescription = null;
-                        quest.setDescription(description);
-                    });
-                } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, playerId, selectedTask.getLongDescription(), false,
-                            selectedTask::setLongDescription);
-                }
-            }
-            
-            if (Quest.canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
-                setSelectedTask(null);
-            }
+        }
+    
+        if (Quest.canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
+            setSelectedTask(null);
         }
     }
     

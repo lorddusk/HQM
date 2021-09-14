@@ -679,7 +679,11 @@ public class GuiQuestBook extends GuiBase {
                         questSetGraphic.onClick(this, x, y, button);
                     }
                 } else {
-                    questGraphic.onClick(this, x, y, button);
+                    if (button == 1) {
+                        loadMap();
+                    } else {
+                        questGraphic.onClick(this, x, y, button);
+                    }
                 }
             }
         } else {
