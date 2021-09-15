@@ -212,7 +212,10 @@ public class QuestRewardsGraphic extends Graphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
             if (isOnReputationIcon(gui, mX, mY)) {
-                gui.setEditMenu(new GuiEditMenuReputationReward(gui, playerId, reputationRewards));
+                gui.setEditMenu(new GuiEditMenuReputationReward(gui, playerId, reputationRewards, newRewards -> {
+                    rewards.setReputationRewards(newRewards.isEmpty() ? null : newRewards);
+                    SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
+                }));
             }
         }
         

@@ -25,9 +25,9 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     private boolean[] edited;
     private String added;
     
-    public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId) {
+    public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, "", false, -1, null);
-        this.quest = GuiQuestBook.getShownQuest();
+        this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];
         this.id = -1;

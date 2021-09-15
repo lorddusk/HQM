@@ -2,19 +2,17 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
-import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     
@@ -22,13 +20,16 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private static final int START_Y = 50;
     private static final int ERROR_Y = 20;
     private static final int OFFSET = 15;
-    private List<ReputationReward> rewards;
+    
+    private final Consumer<List<ReputationReward>> resultConsumer;
+    private final List<ReputationReward> rewards;
     private ReputationReward selectedReward;
     private List<FormattedText> error;
     
-    public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards) {
+    public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
         super(playerId, true, 185, 25);
-        
+        this.resultConsumer = resultConsumer;
+    
         this.rewards = new ArrayList<>();
         if (rewards != null) {
             for (ReputationReward reward : rewards) {
@@ -173,7 +174,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     
     @Override
     public void save(GuiBase gui) {
-        GuiQuestBook.getShownQuest().getRewards().setReputationRewards(rewards.isEmpty() ? null : rewards);
-        SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
+        resultConsumer.accept(rewards);
     }
 }

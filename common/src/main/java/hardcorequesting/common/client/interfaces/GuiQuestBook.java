@@ -988,7 +988,7 @@ public class GuiQuestBook extends GuiBase {
     public void setCurrentMode(EditMode mode) {
         currentMode = mode;
         if (currentMode == EditMode.COMMAND_CREATE || currentMode == EditMode.COMMAND_CHANGE)
-            setEditMenu(new GuiEditMenuCommandEditor(this, player.getUUID()));
+            setEditMenu(new GuiEditMenuCommandEditor(this, player.getUUID(), selectedQuest));
     }
     
     public Player getPlayer() {
@@ -1025,9 +1025,5 @@ public class GuiQuestBook extends GuiBase {
         questGraphic = new QuestGraphic(player.getUUID(), quest);
         
         questGraphic.onOpen(player);
-    }
-    
-    public static Quest getShownQuest() {
-        return selectedQuest;
     }
 }
