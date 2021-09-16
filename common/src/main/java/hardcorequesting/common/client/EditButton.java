@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class EditButton {
     
@@ -27,16 +28,18 @@ public class EditButton {
     private static final int EDIT_BUTTONS_PER_ROW = 2;
     private static final int EDIT_BUTTONS_SRC_PER_ROW = 8;
     
-    private GuiQuestBook guiQuestBook;
-    private int x;
-    private int y;
-    private EditMode mode;
+    private final Runnable onClick;
+    private final GuiQuestBook guiQuestBook;
+    private final int x;
+    private final int y;
+    private final EditMode mode;
     private List<FormattedCharSequence> text;
     
-    public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id) {
+    public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id, Runnable onClick) {
         this.guiQuestBook = guiQuestBook;
         this.mode = mode;
-        
+        this.onClick = onClick;
+    
         int x = id % EDIT_BUTTONS_PER_ROW;
         int y = id / EDIT_BUTTONS_PER_ROW;
         
@@ -44,11 +47,11 @@ public class EditButton {
         this.y = 5 + y * 20;
     }
     
-    public static EditButton[] createButtons(GuiQuestBook gui, EditMode... modes) {
+    public static EditButton[] createButtons(GuiQuestBook gui, Consumer<EditMode> setter, EditMode... modes) {
         EditButton[] ret = new EditButton[modes.length];
         for (int i = 0; i < modes.length; i++) {
             EditMode mode = modes[i];
-            ret[i] = new EditButton(gui, mode, i);
+            ret[i] = new EditButton(gui, mode, i, () -> setter.accept(mode));
         }
         return ret;
     }
@@ -97,9 +100,7 @@ public class EditButton {
     @Environment(EnvType.CLIENT)
     public boolean onClick(int mX, int mY) {
         if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
-            guiQuestBook.setCurrentMode(mode);
-            guiQuestBook.modifyingQuest = null;
-            guiQuestBook.modifyingBar = null;
+            click();
             return true;
         }
         
@@ -107,8 +108,8 @@ public class EditButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean click() {
-        return onClick(x, y);
+    public void click() {
+        guiQuestBook.setCurrentMode(mode);
     }
     
     public boolean matchesMode(EditMode mode) {
