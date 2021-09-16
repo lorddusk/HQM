@@ -152,15 +152,15 @@ public class GuiQuestBook extends GuiBase {
     private LargeButton saveButton;
     private List<LargeButton> buttons = new ArrayList<LargeButton>();
     private EditMode currentMode = EditMode.NORMAL;
-    private EditButton[] groupButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
-    private EditButton[] bagButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
-    private EditButton[] reputationButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
-    private EditButton[] mainButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
-    private EditButton[] menuButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
-    private EditButton[] overviewButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
+    private final EditButton[] groupButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
+    private final EditButton[] bagButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
+    private final EditButton[] reputationButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
+    private final EditButton[] mainButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
+    private final EditButton[] menuButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
+    private final EditButton[] overviewButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
     //endregion
-    private EditButton[] setButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
-    private EditButton[] questButtons = EditButton.createButtons(this, this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
+    private final EditButton[] setButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
+    private final EditButton[] questButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
     
     {
         scrollBars = new ArrayList<>();
@@ -993,26 +993,26 @@ public class GuiQuestBook extends GuiBase {
         return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : selectedSet == null || !isSetOpened ? overviewButtons : selectedQuest == null ? setButtons : questButtons;
     }
     
-    public static void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
+    public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
-                button.draw(matrices, mX, mY);
+                button.draw(this, matrices, mX, mY);
             }
         }
     }
     
-    public static void drawEditButtonTooltip(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
+    public void drawEditButtonTooltip(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
-                button.drawInfo(matrices, mX, mY);
+                button.drawInfo(this, matrices, mX, mY);
             }
         }
     }
     
-    public static void handleEditButtonClick(int mX, int mY, EditButton[] editButtons) {
+    public void handleEditButtonClick(int mX, int mY, EditButton[] editButtons) {
         if (Quest.canQuestsBeEdited()) {
             for (EditButton editButton : editButtons) {
-                if (editButton.onClick(mX, mY)) {
+                if (editButton.onClick(this, mX, mY)) {
                     break;
                 }
             }

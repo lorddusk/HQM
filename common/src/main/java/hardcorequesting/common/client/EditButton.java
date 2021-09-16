@@ -29,14 +29,12 @@ public class EditButton {
     private static final int EDIT_BUTTONS_SRC_PER_ROW = 8;
     
     private final Runnable onClick;
-    private final GuiQuestBook guiQuestBook;
     private final int x;
     private final int y;
     private final EditMode mode;
     private List<FormattedCharSequence> text;
     
-    public EditButton(GuiQuestBook guiQuestBook, EditMode mode, int id, Runnable onClick) {
-        this.guiQuestBook = guiQuestBook;
+    public EditButton(EditMode mode, int id, Runnable onClick) {
         this.mode = mode;
         this.onClick = onClick;
     
@@ -47,28 +45,28 @@ public class EditButton {
         this.y = 5 + y * 20;
     }
     
-    public static EditButton[] createButtons(GuiQuestBook gui, Consumer<EditMode> setter, EditMode... modes) {
+    public static EditButton[] createButtons(Consumer<EditMode> setter, EditMode... modes) {
         EditButton[] ret = new EditButton[modes.length];
         for (int i = 0; i < modes.length; i++) {
             EditMode mode = modes[i];
-            ret[i] = new EditButton(gui, mode, i, () -> setter.accept(mode));
+            ret[i] = new EditButton(mode, i, () -> setter.accept(mode));
         }
         return ret;
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, int mX, int mY) {
-        int srcY = guiQuestBook.getCurrentMode() == mode ? 2 : guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
-        guiQuestBook.drawRect(matrices, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
-        guiQuestBook.drawRect(matrices, x + 2, y + 2,
+    public void draw(GuiQuestBook gui, PoseStack matrices, int mX, int mY) {
+        int srcY = gui.getCurrentMode() == mode ? 2 : gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
+        gui.drawRect(matrices, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        gui.drawRect(matrices, x + 2, y + 2,
                 BUTTON_ICON_SRC_X + (mode.ordinal() % EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SRC_Y + (mode.ordinal() / EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SIZE, BUTTON_ICON_SIZE);
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawInfo(PoseStack matrices, int mX, int mY) {
-        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
+    public void drawInfo(GuiQuestBook gui, PoseStack matrices, int mX, int mY) {
+        if (gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             if (text == null) {
                 List<FormattedText> text = new ArrayList<>();
                 if (KeyboardHandler.keyMap.containsValue(mode)) {
@@ -81,7 +79,7 @@ public class EditButton {
                 } else {
                     text.add(FormattedText.of(mode.getName()));
                 }
-                text.addAll(guiQuestBook.getLinesFromText(Translator.plain("\n" + mode.getDescription()), 1F, 150));
+                text.addAll(gui.getLinesFromText(Translator.plain("\n" + mode.getDescription()), 1F, 150));
                 for (int i = 1; i < text.size(); i++) {
                     ComponentCollector collector = new ComponentCollector();
                     text.get(i).visit((style, string) -> {
@@ -92,14 +90,14 @@ public class EditButton {
                 }
                 this.text = Language.getInstance().getVisualOrder(text);
             }
-            
-            guiQuestBook.renderTooltip(matrices, text, mX + guiQuestBook.getLeft(), mY + guiQuestBook.getTop());
+    
+            gui.renderTooltip(matrices, text, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean onClick(int mX, int mY) {
-        if (guiQuestBook.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
+    public boolean onClick(GuiQuestBook gui, int mX, int mY) {
+        if (gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
             click();
             return true;
         }
@@ -109,7 +107,7 @@ public class EditButton {
     
     @Environment(EnvType.CLIENT)
     public void click() {
-        guiQuestBook.setCurrentMode(mode);
+        onClick.run();
     }
     
     public boolean matchesMode(EditMode mode) {
