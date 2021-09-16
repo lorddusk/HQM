@@ -52,8 +52,8 @@ public class KeyboardHandler {
     
     public static boolean handleEditModeHotkey(int key, EditButton[] buttons) {
         if (Quest.canQuestsBeEdited()) {
-            if (key >= GLFW.GLFW_KEY_1 && key <= GLFW.GLFW_KEY_0) {
-                int i = key - GLFW.GLFW_KEY_1;
+            if (GLFW.GLFW_KEY_0 <= key && key <= GLFW.GLFW_KEY_9) {
+                int i = key == GLFW.GLFW_KEY_0 ? 9 : key - GLFW.GLFW_KEY_1;
                 if (i < buttons.length) {
                     buttons[i].click();
                     return true;
