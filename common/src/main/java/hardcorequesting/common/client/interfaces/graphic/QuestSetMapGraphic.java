@@ -428,7 +428,7 @@ public class QuestSetMapGraphic extends Graphic {
                     }
                     break;
                 case REP_BAR_CREATE:
-                    gui.setEditMenu(new ReputationBar.EditGui(gui, player.getUUID(), mX, mY, set.getId()));
+                    gui.setEditMenu(new ReputationBar.EditGui(player.getUUID(), mX, mY, set.getId()));
                     break;
                 default:
                     break;

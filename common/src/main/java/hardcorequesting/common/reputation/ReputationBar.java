@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
@@ -105,7 +106,7 @@ public class ReputationBar {
                     SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new EditGui(gui, gui.getPlayer().getUUID(), this));
+                    gui.setEditMenu(new EditGui(gui.getPlayer().getUUID(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
@@ -121,14 +122,20 @@ public class ReputationBar {
         
         private final ReputationBar bar;
         private final boolean isNew;
+        private final ScrollBar scrollBar = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return ReputationManager.getInstance().size() > GuiQuestBook.VISIBLE_REPUTATIONS;
+            }
+        };
         
-        public EditGui(GuiBase guiBase, UUID playerId, ReputationBar bar) {
+        public EditGui(UUID playerId, ReputationBar bar) {
             super(playerId);
             this.bar = bar;
             this.isNew = false;
         }
         
-        public EditGui(GuiBase guiBase, UUID playerId, int x, int y, int selectedSet) {
+        public EditGui(UUID playerId, int x, int y, int selectedSet) {
             super(playerId);
             this.bar = new ReputationBar(null, x, y, selectedSet);
             this.isNew = true;
@@ -136,10 +143,9 @@ public class ReputationBar {
         
         @Override
         @Environment(EnvType.CLIENT)
-        public void draw(PoseStack matrices, GuiBase guiB, int mX, int mY) {
+        public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
             ReputationManager reputationManager = ReputationManager.getInstance();
-            GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -153,15 +159,16 @@ public class ReputationBar {
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
+            
+            scrollBar.draw(matrices, gui);
         }
         
         @Environment(EnvType.CLIENT)
-        public void onClick(GuiBase guiB, int mX, int mY, int b) {
-            super.onClick(guiB, mX, mY, b);
+        public void onClick(GuiBase gui, int mX, int mY, int b) {
+            super.onClick(gui, mX, mY, b);
             ReputationManager reputationManager = ReputationManager.getInstance();
             
-            GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -171,12 +178,29 @@ public class ReputationBar {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                     bar.repId = reputationList.get(i).getId();
-                    save(guiB);
-                    close(guiB);
+                    save(gui);
+                    close(gui);
                 }
             }
+            
+            scrollBar.onClick(gui, mX, mY);
         }
-        
+    
+        @Override
+        public void onDrag(GuiBase gui, int mX, int mY) {
+            scrollBar.onDrag(gui, mX, mY);
+        }
+    
+        @Override
+        public void onRelease(GuiBase gui, int mX, int mY) {
+            scrollBar.onRelease(gui, mX, mY);
+        }
+    
+        @Override
+        public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
+            scrollBar.onScroll(gui, mX, mY, scroll);
+        }
+    
         @Override
         public void save(GuiBase gui) {
             if (isNew) {
