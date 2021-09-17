@@ -4,9 +4,12 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetMapGraphic;
+import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public abstract class BookPage {
     
@@ -15,11 +18,29 @@ public abstract class BookPage {
     @Nullable
     public abstract BookPage getParent();
     
+    public static class SetsPage extends BookPage {
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new QuestSetsGraphic(this, gui);
+        }
+    
+        @Override
+        public @Nullable BookPage getParent() {
+            return null;
+        }
+        
+        public BookPage forSet() {
+            return new SetMapPage(this, GuiQuestBook.selectedSet);
+        }
+    }
+    
     public static class SetMapPage extends BookPage {
+        private final SetsPage parent;
         private final QuestSet set;
     
-        public SetMapPage(QuestSet set) {
-            this.set = set;
+        public SetMapPage(SetsPage parent, QuestSet set) {
+            this.parent = parent;
+            this.set = Objects.requireNonNull(set);
         }
     
         @Override
@@ -29,7 +50,7 @@ public abstract class BookPage {
     
         @Override
         public BookPage getParent() {
-            return null;
+            return parent;
         }
         
         public BookPage forQuest(Quest quest) {

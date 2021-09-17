@@ -1,7 +1,10 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.BookPage;
+import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -43,9 +46,12 @@ public class QuestSetsGraphic extends Graphic {
     private static int lastClicked = -1;
     private static QuestSet lastLastQuestSet = null;
     
+    private final BookPage.SetsPage page;
     private final GuiQuestBook gui;
     private final ScrollBar setScroll;
     private final ScrollBar descriptionScroll;
+    private final EditButton[] editButtons;
+    
     {
         addScrollBar(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
             @Override
@@ -74,7 +80,7 @@ public class QuestSetsGraphic extends Graphic {
         
             @Override
             public void onClick(GuiBase gui) {
-                QuestSetsGraphic.this.gui.openSet();
+                QuestSetsGraphic.this.gui.setPage(page.forSet());
             }
         });
     
@@ -101,8 +107,10 @@ public class QuestSetsGraphic extends Graphic {
         });
     }
     
-    public QuestSetsGraphic(GuiQuestBook gui) {
+    public QuestSetsGraphic(BookPage.SetsPage page, GuiQuestBook gui) {
+        this.page = page;
         this.gui = gui;
+        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
     }
     
     public static void loginReset() {
@@ -204,7 +212,15 @@ public class QuestSetsGraphic extends Graphic {
             
             drawQuestInfo(matrices, gui, GuiQuestBook.selectedSet, DESCRIPTION_X, GuiQuestBook.selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
-        
+    
+        gui.drawEditButtons(matrices, mX, mY, editButtons);
+    }
+    
+    @Override
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.drawTooltip(matrices, gui, mX, mY);
+    
+        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     public static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y) {
@@ -299,7 +315,7 @@ public class QuestSetsGraphic extends Graphic {
                         
                         if (lastClicked != -1 && thisClicked < 6) {
                             if (GuiQuestBook.selectedSet == null && lastLastQuestSet != null) GuiQuestBook.selectedSet = lastLastQuestSet;
-                            gui.openSet();
+                            gui.setPage(page.forSet());
                             lastLastQuestSet = null;
                         } else {
                             GuiQuestBook.selectedSet = (questSet == GuiQuestBook.selectedSet) ? null : questSet;
@@ -318,6 +334,12 @@ public class QuestSetsGraphic extends Graphic {
                 TextMenu.display(gui, gui.getPlayer().getUUID(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
             }
         }
+        
+        gui.handleEditButtonClick(mX, mY, editButtons);
     }
     
+    @Override
+    public boolean keyPressed(int keyCode) {
+        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
+    }
 }

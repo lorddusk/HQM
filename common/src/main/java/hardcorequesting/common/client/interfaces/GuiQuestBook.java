@@ -121,7 +121,6 @@ public class GuiQuestBook extends GuiBase {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
-    private static QuestSetsGraphic setsGraphic;
     private static BookPage page;
     private Graphic graphic;
     public static Group selectedGroup;
@@ -156,7 +155,6 @@ public class GuiQuestBook extends GuiBase {
     private final EditButton[] reputationButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
     private final EditButton[] mainButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
     private final EditButton[] menuButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
-    private final EditButton[] overviewButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
     
     {
         scrollBars = new ArrayList<>();
@@ -453,9 +451,7 @@ public class GuiQuestBook extends GuiBase {
                 drawBagPage(matrices, x, y);
             } else if (isReputationPage) {
                 Reputation.drawEditPage(matrices, this, x, y);
-            } else if (graphic == null) {
-                setsGraphic.drawFull(matrices, this, x, y);
-            } else {
+            } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
     
@@ -484,12 +480,6 @@ public class GuiQuestBook extends GuiBase {
             ), x + left, y + top);
         } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
             renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
-        }
-    }
-    
-    public void openSet() {
-        if (selectedSet != null) {
-            setPage(new BookPage.SetMapPage(selectedSet));
         }
     }
     
@@ -593,15 +583,10 @@ public class GuiQuestBook extends GuiBase {
                 } else {
                     Reputation.onClick(this, x, y, player.getUUID());
                 }
-            } else if (graphic == null) {
+            } else if (graphic != null) {
                 if (button == 1) {
                     goBack();
                     return true;
-                }
-                setsGraphic.onClick(this, x, y, button);
-            } else {
-                if (button == 1) {
-                    goBack();
                 } else {
                     graphic.onClick(this, x, y, button);
                 }
@@ -816,10 +801,7 @@ public class GuiQuestBook extends GuiBase {
         } else if (isReputationPage) {
             isMenuPageOpen = true;
             isReputationPage = false;
-        } else if (page == null) {
-            isMenuPageOpen = true;
-            setsGraphic = null;
-        } else {
+        } else if (page != null) {
             setPage(page.getParent());
         }
     }
@@ -853,8 +835,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 editMenu = new GuiEditMenuDeath(this, player.getUUID());
             } else if (inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
-                isMenuPageOpen = false;
-                setsGraphic = new QuestSetsGraphic(this);
+                setPage(new BookPage.SetsPage());
             }
         }
     }
@@ -916,7 +897,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private EditButton[] getButtons() {
-        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : selectedSet == null || graphic == null ? overviewButtons : new EditButton[0];
+        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
@@ -962,6 +943,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void setPage(BookPage page) {
+        isMenuPageOpen = page == null;
         GuiQuestBook.page = page;
         graphic = page == null ? null : page.createGraphic(this);
     }
