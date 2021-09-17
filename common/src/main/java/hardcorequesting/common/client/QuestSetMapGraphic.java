@@ -34,11 +34,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
-public class QuestSetGraphic extends Graphic {
+public class QuestSetMapGraphic extends Graphic {
     private final QuestSet set;
+    private final BookPage.SetMapPage page;
     
-    public QuestSetGraphic(QuestSet set) {
+    private final EditButton[] editButtons;
+    
+    public QuestSetMapGraphic(GuiQuestBook gui, QuestSet set, BookPage.SetMapPage page) {
         this.set = set;
+        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
+        this.page = page;
     }
     
     @Override
@@ -64,7 +69,8 @@ public class QuestSetGraphic extends Graphic {
         gui.setBlitOffset(50);
         
         drawQuestIcons(matrices, gui, mX, mY, player, isVisibleCache, isLinkFreeCache);
-        
+    
+        gui.drawEditButtons(matrices, mX, mY, editButtons);
     }
     
     @Override
@@ -332,6 +338,8 @@ public class QuestSetGraphic extends Graphic {
                 break;
             }
         }
+    
+        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
@@ -499,14 +507,14 @@ public class QuestSetGraphic extends Graphic {
                                     break;
                                 } // deliberate drop through
                             default:
-                                gui.showQuest(quest);
+                                gui.setPage(page.forQuest(quest));
                                 break;
                         }
                     } else {
                         if (gui.isOpBook && Screen.hasShiftDown()) {
                             OPBookHelper.reverseQuestCompletion(quest, player.getUUID());
                         } else {
-                            gui.showQuest(quest);
+                            gui.setPage(page.forQuest(quest));
                         }
                     }
                     break;
@@ -517,5 +525,12 @@ public class QuestSetGraphic extends Graphic {
         if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(set.getReputationBars()))
                 reputationBar.mouseClicked(gui, mX, mY);
+    
+        gui.handleEditButtonClick(mX, mY, editButtons);
+    }
+    
+    @Override
+    public boolean keyPressed(int keyCode) {
+        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
     }
 }

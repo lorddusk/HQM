@@ -3,6 +3,7 @@ package hardcorequesting.common.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -56,6 +57,7 @@ public class EditButton {
     
     @Environment(EnvType.CLIENT)
     public void draw(GuiQuestBook gui, PoseStack matrices, int mX, int mY) {
+        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         int srcY = gui.getCurrentMode() == mode ? 2 : gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
         gui.drawRect(matrices, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
         gui.drawRect(matrices, x + 2, y + 2,
