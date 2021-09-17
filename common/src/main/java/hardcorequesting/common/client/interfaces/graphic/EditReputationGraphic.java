@@ -26,7 +26,7 @@ import java.util.UUID;
 import static hardcorequesting.common.client.interfaces.GuiQuestBook.selectedReputation;
 
 @Environment(EnvType.CLIENT)
-public class EditReputationGraphic {
+public class EditReputationGraphic extends Graphic {
     public static final int REPUTATION_LIST_X = 20;
     public static final int REPUTATION_MARKER_LIST_X = 180;
     public static final int REPUTATION_LIST_Y = 20;
@@ -35,7 +35,10 @@ public class EditReputationGraphic {
     public static final int REPUTATION_OFFSET = 20;
     public static final int FONT_HEIGHT = 9;
     
-    public static void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    @Override
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
+        
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
@@ -71,7 +74,11 @@ public class EditReputationGraphic {
         }
     }
     
-    public static void onClick(GuiQuestBook gui, int mX, int mY, UUID playerId) {
+    @Override
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onClick(gui, mX, mY, b);
+        UUID playerId = gui.getPlayer().getUUID();
+        
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
@@ -171,5 +178,4 @@ public class EditReputationGraphic {
             }
         }
     }
-    
 }

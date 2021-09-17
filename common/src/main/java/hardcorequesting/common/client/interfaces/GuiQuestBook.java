@@ -129,6 +129,7 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isMenuPageOpen = true;
     private static boolean isBagPage;
     private static boolean isReputationPage;
+    private static EditReputationGraphic reputationGraphic;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
@@ -449,7 +450,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (isBagPage) {
                 drawBagPage(matrices, x, y);
             } else if (isReputationPage) {
-                EditReputationGraphic.draw(matrices, this, x, y);
+                reputationGraphic.draw(matrices, this, x, y);
             } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -579,7 +580,7 @@ public class GuiQuestBook extends GuiBase {
                 if (button == 1) {
                     goBack();
                 } else {
-                    EditReputationGraphic.onClick(this, x, y, player.getUUID());
+                    reputationGraphic.onClick(this, x, y, button);
                 }
             } else if (graphic != null) {
                 if (button == 1) {
@@ -882,6 +883,7 @@ public class GuiQuestBook extends GuiBase {
             currentMode = EditMode.NORMAL;
             isReputationPage = true;
             isMenuPageOpen = false;
+            reputationGraphic = new EditReputationGraphic();
         }
     }
     
