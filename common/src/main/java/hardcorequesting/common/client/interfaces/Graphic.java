@@ -52,6 +52,10 @@ public abstract class Graphic {
         }
     }
     
+    public boolean keyPressed(int keyCode) {
+        return false;
+    }
+    
     public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onDrag(gui, mX, mY);

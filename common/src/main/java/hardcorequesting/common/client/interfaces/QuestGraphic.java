@@ -106,6 +106,7 @@ public final class QuestGraphic extends Graphic {
         this.quest = quest;
         this.gui = gui;
         rewardsGraphic = new QuestRewardsGraphic(quest, playerId);
+        this.onOpen(gui.getPlayer());
     }
     
     private List<FormattedText> getCachedDescription(GuiBase gui) {
@@ -276,6 +277,7 @@ public final class QuestGraphic extends Graphic {
         }
     }
     
+    @Override
     public boolean keyPressed(int keyCode) {
         return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
     }
