@@ -15,7 +15,6 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -125,8 +124,6 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
     private static boolean isBagPage;
-    private static boolean isReputationPage;
-    private static EditReputationGraphic reputationGraphic;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
@@ -156,21 +153,21 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && !isBagPage && isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
+                return !isBagPage && isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
             }
         });
         
         scrollBars.add(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
+                return isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
             }
         });
         
         scrollBars.add(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && isBagPage && selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
+                return isBagPage && selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
             }
         });
         
@@ -236,7 +233,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public boolean isVisible(GuiBase gui) {
-                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
+                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen;
             }
             
             @Override
@@ -254,7 +251,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public boolean isVisible(GuiBase gui) {
-                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
+                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen;
             }
             
             @Override
@@ -272,7 +269,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public boolean isVisible(GuiBase gui) {
-                return editMenu == null && !isBagPage && !isMainPageOpen && isOpBook && isMenuPageOpen && !isReputationPage;
+                return editMenu == null && !isBagPage && !isMainPageOpen && isOpBook && isMenuPageOpen;
             }
             
             @Override
@@ -305,7 +302,6 @@ public class GuiQuestBook extends GuiBase {
         page = null;
         isMainPageOpen = true;
         isBagPage = false;
-        isReputationPage = false;
         isMenuPageOpen = true;
         
         selectedGroup = null;
@@ -394,8 +390,6 @@ public class GuiQuestBook extends GuiBase {
                 drawMenuPage(matrices, x, y);
             } else if (isBagPage) {
                 drawBagPage(matrices, x, y);
-            } else if (isReputationPage) {
-                reputationGraphic.draw(matrices, this, x, y);
             } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -488,7 +482,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu = null;
             }
             isBagPage = false;
-            isReputationPage = false;
+            page = null;
             return true;
         }
         
@@ -521,12 +515,6 @@ public class GuiQuestBook extends GuiBase {
                 menuPageMouseClicked(button, x, y);
             } else if (isBagPage) {
                 bagPageMouseClicked(button, x, y);
-            } else if (isReputationPage) {
-                if (button == 1) {
-                    goBack();
-                } else {
-                    reputationGraphic.onClick(this, x, y, button);
-                }
             } else if (graphic != null) {
                 if (button == 1) {
                     goBack();
@@ -742,9 +730,6 @@ public class GuiQuestBook extends GuiBase {
         } else if (isBagPage) {
             isBagPage = false;
             isMenuPageOpen = true;
-        } else if (isReputationPage) {
-            isMenuPageOpen = true;
-            isReputationPage = false;
         } else if (page != null) {
             setPage(page.getParent());
         }
@@ -826,9 +811,7 @@ public class GuiQuestBook extends GuiBase {
             isMenuPageOpen = false;
         } else if (currentMode == EditMode.REPUTATION) {
             currentMode = EditMode.NORMAL;
-            isReputationPage = true;
-            isMenuPageOpen = false;
-            reputationGraphic = new EditReputationGraphic(this);
+            setPage(new BookPage.ReputationPage());
         }
     }
     

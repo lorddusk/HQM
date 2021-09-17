@@ -1,10 +1,7 @@
 package hardcorequesting.common.client;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.Graphic;
-import hardcorequesting.common.client.interfaces.graphic.QuestGraphic;
-import hardcorequesting.common.client.interfaces.graphic.QuestSetMapGraphic;
-import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
+import hardcorequesting.common.client.interfaces.graphic.*;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import org.jetbrains.annotations.Nullable;
@@ -13,20 +10,38 @@ import java.util.Objects;
 
 public abstract class BookPage {
     
+    private final BookPage parent;
+    
+    private BookPage(BookPage parent) {
+        this.parent = parent;
+    }
+    
     public abstract Graphic createGraphic(GuiQuestBook gui);
     
     @Nullable
-    public abstract BookPage getParent();
+    public final BookPage getParent() {
+        return parent;
+    }
     
-    public static class SetsPage extends BookPage {
-        @Override
-        public Graphic createGraphic(GuiQuestBook gui) {
-            return new QuestSetsGraphic(this, gui);
+    public static class ReputationPage extends BookPage {
+        public ReputationPage() {
+            super(null);
         }
     
         @Override
-        public @Nullable BookPage getParent() {
-            return null;
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new EditReputationGraphic(gui);
+        }
+    }
+    
+    public static class SetsPage extends BookPage {
+        public SetsPage() {
+            super(null);
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new QuestSetsGraphic(this, gui);
         }
         
         public BookPage forSet(QuestSet set) {
@@ -35,11 +50,10 @@ public abstract class BookPage {
     }
     
     public static class SetMapPage extends BookPage {
-        private final SetsPage parent;
         private final QuestSet set;
     
         private SetMapPage(SetsPage parent, QuestSet set) {
-            this.parent = parent;
+            super(parent);
             this.set = Objects.requireNonNull(set);
         }
     
@@ -48,33 +62,22 @@ public abstract class BookPage {
             return new QuestSetMapGraphic(gui, set, this);
         }
     
-        @Override
-        public BookPage getParent() {
-            return parent;
-        }
-        
         public BookPage forQuest(Quest quest) {
             return new QuestPage(this, quest);
         }
     }
     
     public static class QuestPage extends BookPage {
-        private final SetMapPage parent;
         private final Quest quest;
     
         private QuestPage(SetMapPage parent, Quest quest) {
-            this.parent = parent;
+            super(parent);
             this.quest = quest;
         }
     
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
             return new QuestGraphic(gui.getPlayer().getUUID(), quest, gui);
-        }
-    
-        @Override
-        public BookPage getParent() {
-            return parent;
         }
     }
 }
