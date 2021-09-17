@@ -5,7 +5,6 @@ import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
-import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
@@ -54,8 +53,6 @@ public class PlayerTracker {
                 tags.remove(HQ_TAG);
             }
         }
-        
-        QuestSet.loginReset();
         
         questingData.spawnBook(player);
     }

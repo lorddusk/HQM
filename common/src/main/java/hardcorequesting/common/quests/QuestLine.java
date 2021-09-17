@@ -7,6 +7,7 @@ import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.SaveHandler;
@@ -118,6 +119,8 @@ public class QuestLine {
     @Environment(EnvType.CLIENT)
     private void resetClient() {
         GuiQuestBook.resetBookPosition();
+        
+        QuestSetsGraphic.loginReset();
     }
     
     public void add(Serializable serializable) {

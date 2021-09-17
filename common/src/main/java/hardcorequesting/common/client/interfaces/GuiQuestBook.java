@@ -16,6 +16,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
+import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -511,7 +512,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (isReputationPage) {
                 Reputation.drawEditPage(matrices, this, x, y);
             } else if (graphic == null) {
-                QuestSet.drawOverview(matrices, this, setScroll, descriptionScroll, x, y);
+                QuestSetsGraphic.drawOverview(matrices, this, setScroll, descriptionScroll, x, y);
             } else {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -655,7 +656,7 @@ public class GuiQuestBook extends GuiBase {
                     isMenuPageOpen = true;
                     return true;
                 }
-                QuestSet.mouseClickedOverview(this, setScroll, x, y);
+                QuestSetsGraphic.mouseClickedOverview(this, setScroll, x, y);
             } else {
                 if (button == 1) {
                     goBack();
@@ -765,8 +766,8 @@ public class GuiQuestBook extends GuiBase {
             drawString(matrices, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
         drawString(matrices, Translator.translatable("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
-        
-        QuestSet.drawQuestInfo(matrices, this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
+    
+        QuestSetsGraphic.drawQuestInfo(matrices, this, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (TEXT_HEIGHT * 1.5F));
         drawString(matrices, Translator.translatable("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         if (manager.isHardcoreActive()) {
