@@ -63,15 +63,11 @@ public class GuiQuestBook extends GuiBase {
     public static final int VISIBLE_REPUTATION_TIERS = 9;
     public static final int VISIBLE_REPUTATIONS = 10;
     public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
-    public static final int LIST_X = 25;
-    public static final int LIST_Y = 20;
     public static final int TEXT_HEIGHT = 9;
     public static final int TEXT_SPACING = 20;
-    public static final int DESCRIPTION_X = 180;
-    public static final int DESCRIPTION_Y = 20;
-    public static final int VISIBLE_DESCRIPTION_LINES = 7;
+    private static final int DESCRIPTION_X = 180;
+    private static final int DESCRIPTION_Y = 20;
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
-    public static final int VISIBLE_SETS = 7;
     public static final int TIERS_X = 180;
     public static final int TIERS_Y = 20;
     public static final int TIERS_SPACING = 25;
@@ -125,6 +121,7 @@ public class GuiQuestBook extends GuiBase {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
     public static QuestSet selectedSet;
+    private static QuestSetsGraphic setsGraphic;
     private static BookPage page;
     private Graphic graphic;
     public static Group selectedGroup;
@@ -143,8 +140,6 @@ public class GuiQuestBook extends GuiBase {
     public QuestSet modifyingQuestSet;
     public Quest modifyingQuest;
     public ReputationBar modifyingBar;
-    private ScrollBar setScroll;
-    private ScrollBar descriptionScroll;
     private ScrollBar mainDescriptionScroll;
     private ScrollBar groupScroll;
     private ScrollBar tierScroll;
@@ -165,20 +160,6 @@ public class GuiQuestBook extends GuiBase {
     
     {
         scrollBars = new ArrayList<>();
-        scrollBars.add(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && !isBagPage && !isMainPageOpen && selectedSet != null && page == null && selectedSet.getDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        
-        scrollBars.add(setScroll = new ScrollBar(160, 18, 186, 171, 69, LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return !isReputationPage && !isBagPage && !isMainPageOpen && page == null && Quest.getQuestSets().size() > VISIBLE_SETS;
-            }
-        });
-        
         scrollBars.add(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
@@ -265,45 +246,6 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public void onClick(GuiBase gui) {
                 save();
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.questBook.open", 245, 190) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && selectedSet != null && !isBagPage && page == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                openSet();
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.questBook.createSet", 185, 50) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && Quest.canQuestsBeEdited() && currentMode == EditMode.CREATE && !isBagPage && page == null && !isMainPageOpen && !isMenuPageOpen && !isReputationPage;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                int i = 0;
-                for (QuestSet set : Quest.getQuestSets()) {
-                    if (set.getName().startsWith("Unnamed set")) i++;
-                }
-                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
-                SaveHelper.add(EditType.SET_CREATE);
             }
         });
         
@@ -512,7 +454,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (isReputationPage) {
                 Reputation.drawEditPage(matrices, this, x, y);
             } else if (graphic == null) {
-                QuestSetsGraphic.drawOverview(matrices, this, setScroll, descriptionScroll, x, y);
+                setsGraphic.drawFull(matrices, this, x, y);
             } else {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -653,10 +595,10 @@ public class GuiQuestBook extends GuiBase {
                 }
             } else if (graphic == null) {
                 if (button == 1) {
-                    isMenuPageOpen = true;
+                    goBack();
                     return true;
                 }
-                QuestSetsGraphic.mouseClickedOverview(this, setScroll, x, y);
+                setsGraphic.onClick(this, x, y, button);
             } else {
                 if (button == 1) {
                     goBack();
@@ -876,6 +818,7 @@ public class GuiQuestBook extends GuiBase {
             isReputationPage = false;
         } else if (page == null) {
             isMenuPageOpen = true;
+            setsGraphic = null;
         } else {
             setPage(page.getParent());
         }
@@ -911,6 +854,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu = new GuiEditMenuDeath(this, player.getUUID());
             } else if (inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, PAGE_WIDTH, (int) (TEXT_HEIGHT * 0.7F), x, y)) {
                 isMenuPageOpen = false;
+                setsGraphic = new QuestSetsGraphic(this);
             }
         }
     }

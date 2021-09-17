@@ -2,9 +2,11 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
@@ -27,31 +29,101 @@ import java.util.HashMap;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class QuestSetsGraphic {
+public class QuestSetsGraphic extends Graphic {
     
+    private static final int LIST_X = 25;
+    private static final int LIST_Y = 20;
+    private static final int DESCRIPTION_X = 180;
+    private static final int DESCRIPTION_Y = 20;
+    private static final int VISIBLE_DESCRIPTION_LINES = 7;
+    private static final int VISIBLE_SETS = 7;
     private static final int LINE_2_X = 10;
     private static final int LINE_2_Y = 12;
     private static final int INFO_Y = 100;
     private static int lastClicked = -1;
     private static QuestSet lastLastQuestSet = null;
     
+    private final GuiQuestBook gui;
+    private final ScrollBar setScroll;
+    private final ScrollBar descriptionScroll;
+    {
+        addScrollBar(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return GuiQuestBook.selectedSet != null && GuiQuestBook.selectedSet.getDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
+            }
+        });
+    
+        addScrollBar(setScroll = new ScrollBar(160, 18, 186, 171, 69, LIST_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return Quest.getQuestSets().size() > VISIBLE_SETS;
+            }
+        });
+    
+        addButton(new LargeButton("hqm.questBook.open", 245, 190) {
+            @Override
+            public boolean isEnabled(GuiBase gui) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return GuiQuestBook.selectedSet != null;
+            }
+        
+            @Override
+            public void onClick(GuiBase gui) {
+                QuestSetsGraphic.this.gui.openSet();
+            }
+        });
+    
+        addButton(new LargeButton("hqm.questBook.createSet", 185, 50) {
+            @Override
+            public boolean isEnabled(GuiBase gui) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return Quest.canQuestsBeEdited() && QuestSetsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
+            }
+        
+            @Override
+            public void onClick(GuiBase gui) {
+                int i = 0;
+                for (QuestSet set : Quest.getQuestSets()) {
+                    if (set.getName().startsWith("Unnamed set")) i++;
+                }
+                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
+                SaveHelper.add(EditType.SET_CREATE);
+            }
+        });
+    }
+    
+    public QuestSetsGraphic(GuiQuestBook gui) {
+        this.gui = gui;
+    }
+    
     public static void loginReset() {
         lastClicked = -1;
         lastLastQuestSet = null;
     }
     
-    @Environment(EnvType.CLIENT)
-    public static void drawOverview(PoseStack matrices, GuiQuestBook gui, ScrollBar setScroll, ScrollBar descriptionScroll, int x, int y) {
+    @Override
+    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.draw(matrices, gui, mX, mY);
+        
         Player player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
-        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
+        for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
             
-            int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
+            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
             
             int total = questSet.getQuests().size();
             
@@ -73,7 +145,7 @@ public class QuestSetsGraphic {
                 if (quest.isCompleted(player) && quest.hasReward(player.getUUID())) unclaimed++;
             }
             boolean selected = questSet == GuiQuestBook.selectedSet;
-            boolean inBounds = gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y);
+            boolean inBounds = gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             
             int color;
             if (gui.modifyingQuestSet == questSet) {
@@ -105,7 +177,7 @@ public class QuestSetsGraphic {
             } else {
                 color = HQMConfig.DISABLED_SET;
             }
-            gui.drawString(matrices, Translator.plain(questSet.getName(i)), GuiQuestBook.LIST_X, setY, color);
+            gui.drawString(matrices, Translator.plain(questSet.getName(i)), LIST_X, setY, color);
             
             FormattedText info;
             if (enabled) {
@@ -115,32 +187,30 @@ public class QuestSetsGraphic {
                     info = Translator.translatable("hqm.questBook.percentageQuests", ((completedCount * 100) / total));
             } else
                 info = Translator.translatable("hqm.questBook.locked");
-            gui.drawString(matrices, info, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
+            gui.drawString(matrices, info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
                 FormattedText toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
-                gui.drawString(matrices, toClaim, GuiQuestBook.LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
+                gui.drawString(matrices, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
         }
         
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (GuiQuestBook.selectedSet != null) {
-                int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - GuiQuestBook.VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-                gui.drawString(matrices, GuiQuestBook.selectedSet.getDescription(gui), startLine, GuiQuestBook.VISIBLE_DESCRIPTION_LINES, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 0.7F, 0x404040);
+                int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
+                gui.drawString(matrices, GuiQuestBook.selectedSet.getDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
             }
             
-            drawQuestInfo(matrices, gui, GuiQuestBook.selectedSet, GuiQuestBook.DESCRIPTION_X, GuiQuestBook.selectedSet == null ? GuiQuestBook.DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
+            drawQuestInfo(matrices, gui, GuiQuestBook.selectedSet, DESCRIPTION_X, GuiQuestBook.selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
         
     }
     
-    @Environment(EnvType.CLIENT)
     public static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y) {
         drawQuestInfo(matrices, gui, set, x, y, new HashMap<>(), new HashMap<>());
     }
     
-    @Environment(EnvType.CLIENT)
     private static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         int completed = 0;
         int reward = 0;
@@ -182,19 +252,18 @@ public class QuestSetsGraphic {
         gui.drawString(matrices, info, x, y, 0.7F, 0x404040);
     }
     
-    @Environment(EnvType.CLIENT)
-    public static void mouseClickedOverview(GuiQuestBook gui, ScrollBar setScroll, int x, int y) {
+    @Override
+    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onClick(gui, mX, mY, b);
+        
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - GuiQuestBook.VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
         
-        HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
-        HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
-        
-        for (int i = start; i < Math.min(start + GuiQuestBook.VISIBLE_SETS, questSets.size()); i++) {
+        for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
             
-            int setY = GuiQuestBook.LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
-            if (gui.inBounds(GuiQuestBook.LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, x, y)) {
+            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
+            if (gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case DELETE:
                         if (!questSet.getQuests().isEmpty()) {
@@ -245,7 +314,7 @@ public class QuestSetsGraphic {
         
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
-            if (gui.inBounds(GuiQuestBook.DESCRIPTION_X, GuiQuestBook.DESCRIPTION_Y, 130, (int) (GuiQuestBook.VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), x, y)) {
+            if (gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
                 TextMenu.display(gui, gui.getPlayer().getUUID(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
             }
         }
