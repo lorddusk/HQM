@@ -43,8 +43,10 @@ public class QuestSetsGraphic extends Graphic {
     private static final int LINE_2_X = 10;
     private static final int LINE_2_Y = 12;
     private static final int INFO_Y = 100;
+    
     private static int lastClicked = -1;
     private static QuestSet lastLastQuestSet = null;
+    private static QuestSet selectedSet;
     
     private final BookPage.SetsPage page;
     private final GuiQuestBook gui;
@@ -56,7 +58,7 @@ public class QuestSetsGraphic extends Graphic {
         addScrollBar(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return GuiQuestBook.selectedSet != null && GuiQuestBook.selectedSet.getDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
+                return selectedSet != null && selectedSet.getDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
     
@@ -75,12 +77,12 @@ public class QuestSetsGraphic extends Graphic {
         
             @Override
             public boolean isVisible(GuiBase gui) {
-                return GuiQuestBook.selectedSet != null;
+                return selectedSet != null;
             }
         
             @Override
             public void onClick(GuiBase gui) {
-                QuestSetsGraphic.this.gui.setPage(page.forSet());
+                QuestSetsGraphic.this.gui.setPage(page.forSet(selectedSet));
             }
         });
     
@@ -116,6 +118,7 @@ public class QuestSetsGraphic extends Graphic {
     public static void loginReset() {
         lastClicked = -1;
         lastLastQuestSet = null;
+        selectedSet = null;
     }
     
     @Override
@@ -152,7 +155,7 @@ public class QuestSetsGraphic extends Graphic {
                 }
                 if (quest.isCompleted(player) && quest.hasReward(player.getUUID())) unclaimed++;
             }
-            boolean selected = questSet == GuiQuestBook.selectedSet;
+            boolean selected = questSet == selectedSet;
             boolean inBounds = gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             
             int color;
@@ -205,12 +208,12 @@ public class QuestSetsGraphic extends Graphic {
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
-            if (GuiQuestBook.selectedSet != null) {
-                int startLine = descriptionScroll.isVisible(gui) ? Math.round((GuiQuestBook.selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-                gui.drawString(matrices, GuiQuestBook.selectedSet.getDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+            if (selectedSet != null) {
+                int startLine = descriptionScroll.isVisible(gui) ? Math.round((selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
+                gui.drawString(matrices, selectedSet.getDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
             }
             
-            drawQuestInfo(matrices, gui, GuiQuestBook.selectedSet, DESCRIPTION_X, GuiQuestBook.selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
+            drawQuestInfo(matrices, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
     
         gui.drawEditButtons(matrices, mX, mY, editButtons);
@@ -314,11 +317,14 @@ public class QuestSetsGraphic extends Graphic {
                         }
                         
                         if (lastClicked != -1 && thisClicked < 6) {
-                            if (GuiQuestBook.selectedSet == null && lastLastQuestSet != null) GuiQuestBook.selectedSet = lastLastQuestSet;
-                            gui.setPage(page.forSet());
-                            lastLastQuestSet = null;
+                            if (selectedSet == null && lastLastQuestSet != null)
+                                selectedSet = lastLastQuestSet;
+                            if (selectedSet != null) {
+                                gui.setPage(page.forSet(selectedSet));
+                                lastLastQuestSet = null;
+                            }
                         } else {
-                            GuiQuestBook.selectedSet = (questSet == GuiQuestBook.selectedSet) ? null : questSet;
+                            selectedSet = (questSet == selectedSet) ? null : questSet;
                             lastClicked = gui.getPlayer().tickCount;
                             lastLastQuestSet = questSet;
                         }
@@ -331,7 +337,7 @@ public class QuestSetsGraphic extends Graphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, gui.getPlayer().getUUID(), GuiQuestBook.selectedSet.getDescription(), false, GuiQuestBook.selectedSet::setDescription);
+                TextMenu.display(gui, gui.getPlayer().getUUID(), selectedSet.getDescription(), false, selectedSet::setDescription);
             }
         }
         

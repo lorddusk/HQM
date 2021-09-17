@@ -120,7 +120,6 @@ public class GuiQuestBook extends GuiBase {
     //endregion
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
-    public static QuestSet selectedSet;
     private static BookPage page;
     private Graphic graphic;
     public static Group selectedGroup;
@@ -356,7 +355,6 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public static void resetBookPosition() {
-        selectedSet = null;
         page = null;
         isMainPageOpen = true;
         isBagPage = false;

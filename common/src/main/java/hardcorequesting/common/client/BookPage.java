@@ -29,8 +29,8 @@ public abstract class BookPage {
             return null;
         }
         
-        public BookPage forSet() {
-            return new SetMapPage(this, GuiQuestBook.selectedSet);
+        public BookPage forSet(QuestSet set) {
+            return new SetMapPage(this, set);
         }
     }
     
@@ -38,7 +38,7 @@ public abstract class BookPage {
         private final SetsPage parent;
         private final QuestSet set;
     
-        public SetMapPage(SetsPage parent, QuestSet set) {
+        private SetMapPage(SetsPage parent, QuestSet set) {
             this.parent = parent;
             this.set = Objects.requireNonNull(set);
         }
@@ -62,7 +62,7 @@ public abstract class BookPage {
         private final SetMapPage parent;
         private final Quest quest;
     
-        public QuestPage(SetMapPage parent, Quest quest) {
+        private QuestPage(SetMapPage parent, Quest quest) {
             this.parent = parent;
             this.quest = quest;
         }
