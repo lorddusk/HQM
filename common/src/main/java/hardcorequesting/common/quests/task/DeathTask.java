@@ -1,12 +1,12 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.graphic.task.DeathTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.DeathTaskData;
-import hardcorequesting.common.quests.task.client.DeathTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;

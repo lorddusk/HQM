@@ -1,7 +1,8 @@
-package hardcorequesting.common.client.interfaces;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import net.fabricmc.api.EnvType;

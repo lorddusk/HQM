@@ -1,8 +1,9 @@
 package hardcorequesting.common.client;
 
-import hardcorequesting.common.client.interfaces.Graphic;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.QuestGraphic;
+import hardcorequesting.common.client.interfaces.graphic.Graphic;
+import hardcorequesting.common.client.interfaces.graphic.QuestGraphic;
+import hardcorequesting.common.client.interfaces.graphic.QuestSetMapGraphic;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import org.jetbrains.annotations.Nullable;

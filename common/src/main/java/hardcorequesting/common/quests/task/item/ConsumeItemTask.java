@@ -1,10 +1,10 @@
 package hardcorequesting.common.quests.task.item;
 
+import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
-import hardcorequesting.common.quests.task.client.ItemTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

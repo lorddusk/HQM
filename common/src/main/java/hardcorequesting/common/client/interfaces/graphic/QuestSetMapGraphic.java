@@ -1,9 +1,16 @@
-package hardcorequesting.common.client;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.*;
+import hardcorequesting.common.client.BookPage;
+import hardcorequesting.common.client.EditButton;
+import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.KeyboardHandler;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuParentCount;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuRepeat;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTrigger;

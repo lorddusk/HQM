@@ -1,11 +1,14 @@
-package hardcorequesting.common.client.interfaces;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.KeyboardHandler;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.event.EventTrigger;
@@ -14,7 +17,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;

@@ -1,8 +1,8 @@
-package hardcorequesting.common.quests.task.client;
+package hardcorequesting.common.client.interfaces.graphic.task;
 
 import hardcorequesting.common.client.ClientChange;
-import hardcorequesting.common.client.interfaces.Graphic;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.QuestTask;

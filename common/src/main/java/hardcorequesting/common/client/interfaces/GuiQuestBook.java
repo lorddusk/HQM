@@ -15,6 +15,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;

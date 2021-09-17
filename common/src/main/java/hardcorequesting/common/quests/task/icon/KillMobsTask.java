@@ -2,13 +2,13 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.graphic.task.KillMobsTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.MobTaskData;
-import hardcorequesting.common.quests.task.client.KillMobsTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;

@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task.client;
+package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;

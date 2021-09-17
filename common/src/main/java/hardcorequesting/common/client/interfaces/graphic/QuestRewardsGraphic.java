@@ -1,10 +1,14 @@
-package hardcorequesting.common.client.interfaces;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
