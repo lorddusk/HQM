@@ -15,6 +15,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -178,14 +179,14 @@ public class GuiQuestBook extends GuiBase {
             }
         });
         
-        scrollBars.add(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, Reputation.REPUTATION_MARKER_LIST_X) {
+        scrollBars.add(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return isReputationPage && !isBagPage && !isMainPageOpen && selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
             }
         });
         
-        scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
+        scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
@@ -448,7 +449,7 @@ public class GuiQuestBook extends GuiBase {
             } else if (isBagPage) {
                 drawBagPage(matrices, x, y);
             } else if (isReputationPage) {
-                Reputation.drawEditPage(matrices, this, x, y);
+                EditReputationGraphic.draw(matrices, this, x, y);
             } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -576,10 +577,9 @@ public class GuiQuestBook extends GuiBase {
                 bagPageMouseClicked(button, x, y);
             } else if (isReputationPage) {
                 if (button == 1) {
-                    isMenuPageOpen = true;
-                    isReputationPage = false;
+                    goBack();
                 } else {
-                    Reputation.onClick(this, x, y, player.getUUID());
+                    EditReputationGraphic.onClick(this, x, y, player.getUUID());
                 }
             } else if (graphic != null) {
                 if (button == 1) {

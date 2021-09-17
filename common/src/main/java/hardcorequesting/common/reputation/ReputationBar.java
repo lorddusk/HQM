@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
+import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class ReputationBar {
+    
     private String repId;
     private int x, y, questSet;
     
@@ -117,8 +119,8 @@ public class ReputationBar {
     @Environment(EnvType.CLIENT)
     public static class EditGui extends GuiEditMenu {
         
-        private ReputationBar bar;
-        private boolean isNew;
+        private final ReputationBar bar;
+        private final boolean isNew;
         
         public EditGui(GuiBase guiBase, UUID playerId, ReputationBar bar) {
             super(playerId);
@@ -141,16 +143,16 @@ public class ReputationBar {
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
-                int x = Reputation.REPUTATION_LIST_X;
-                int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;
+                int x = EditReputationGraphic.REPUTATION_LIST_X;
+                int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
                 String str = reputationList.get(i).getName();
                 
-                boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY);
+                boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
                 boolean selected = reputationList.get(i).equals(reputationManager.getReputation(bar.repId));
                 
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
         }
         
         @Environment(EnvType.CLIENT)
@@ -163,11 +165,11 @@ public class ReputationBar {
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
-                int x = Reputation.REPUTATION_LIST_X;
-                int y = Reputation.REPUTATION_LIST_Y + (i - start) * Reputation.REPUTATION_OFFSET;
+                int x = EditReputationGraphic.REPUTATION_LIST_X;
+                int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
                 String str = reputationList.get(i).getName();
                 
-                if (gui.inBounds(x, y, gui.getStringWidth(str), Reputation.FONT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                     bar.repId = reputationList.get(i).getId();
                     save(guiB);
                     close(guiB);
