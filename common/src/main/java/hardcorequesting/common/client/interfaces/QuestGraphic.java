@@ -1,7 +1,10 @@
 package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.KeyboardHandler;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -46,12 +49,14 @@ public final class QuestGraphic extends Graphic {
     private QuestTask<?> selectedTask;
     private TaskGraphic taskGraphic;
     
+    private final GuiQuestBook gui;
     private final QuestRewardsGraphic rewardsGraphic;
     
     private final ScrollBar descriptionScroll;
     private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
     private List<FormattedText> cachedDescription;
+    private final EditButton[] editButtons = EditButton.createButtons(this::setEditMode, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
     
     {
         for (final TaskType taskType : TaskType.values()) {
@@ -96,9 +101,10 @@ public final class QuestGraphic extends Graphic {
         });
     }
     
-    public QuestGraphic(UUID playerId, Quest quest) {
+    public QuestGraphic(UUID playerId, Quest quest, GuiQuestBook gui) {
         this.playerId = playerId;
         this.quest = quest;
+        this.gui = gui;
         rewardsGraphic = new QuestRewardsGraphic(quest, playerId);
     }
     
@@ -140,6 +146,8 @@ public final class QuestGraphic extends Graphic {
         super.draw(matrices, gui, mX, mY);
         
         rewardsGraphic.draw(matrices, gui, mX, mY);
+    
+        gui.drawEditButtons(matrices, mX, mY, editButtons);
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
@@ -161,6 +169,8 @@ public final class QuestGraphic extends Graphic {
         }
     
         rewardsGraphic.drawTooltip(matrices, gui, mX, mY);
+    
+        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     private int getVisibleTasks() {
@@ -238,6 +248,8 @@ public final class QuestGraphic extends Graphic {
         }
     
         rewardsGraphic.onClick(gui, mX, mY, b);
+        
+        gui.handleEditButtonClick(mX, mY, editButtons);
     
         if (taskGraphic != null) {
             taskGraphic.onClick(gui, mX, mY, b);
@@ -262,6 +274,10 @@ public final class QuestGraphic extends Graphic {
         if (Quest.canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
             setSelectedTask(null);
         }
+    }
+    
+    public boolean keyPressed(int keyCode) {
+        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
     }
     
     @Override
@@ -310,5 +326,11 @@ public final class QuestGraphic extends Graphic {
     private void setSelectedTask(@Nullable QuestTask<?> task) {
         selectedTask = task;
         taskGraphic = task == null ? null : task.createGraphic(playerId);
+    }
+    
+    private void setEditMode(EditMode editMode) {
+        if (editMode == EditMode.COMMAND_CREATE || editMode == EditMode.COMMAND_CHANGE) {
+            gui.setEditMenu(new GuiEditMenuCommandEditor(gui, playerId, quest));
+        } else gui.setCurrentMode(editMode);
     }
 }

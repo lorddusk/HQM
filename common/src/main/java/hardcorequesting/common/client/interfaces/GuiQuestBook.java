@@ -11,7 +11,10 @@ import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.QuestSetGraphic;
-import hardcorequesting.common.client.interfaces.edit.*;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
+import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
+import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -160,7 +163,6 @@ public class GuiQuestBook extends GuiBase {
     private final EditButton[] overviewButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
     //endregion
     private final EditButton[] setButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
-    private final EditButton[] questButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
     
     {
         scrollBars = new ArrayList<>();
@@ -404,7 +406,7 @@ public class GuiQuestBook extends GuiBase {
         if (isSetOpened)
             questSetGraphic = new QuestSetGraphic(selectedSet);
         if (selectedQuest != null)
-            questGraphic = new QuestGraphic(player.getUUID(), selectedQuest);
+            questGraphic = new QuestGraphic(player.getUUID(), selectedQuest, this);
         
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
@@ -582,7 +584,9 @@ public class GuiQuestBook extends GuiBase {
 		} else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
             return true;
-        } else {
+        } else if (questGraphic != null) {
+            return questGraphic.keyPressed(keyCode);
+        } else  {
             return KeyboardHandler.handleEditModeHotkey(keyCode, getButtons());
         }
         return false;
@@ -954,6 +958,7 @@ public class GuiQuestBook extends GuiBase {
     
     public void loadMap() {
         selectedQuest = null;
+        questGraphic = null;
     }
     
     public EditMode getCurrentMode() {
@@ -974,10 +979,6 @@ public class GuiQuestBook extends GuiBase {
             isReputationPage = true;
             isMenuPageOpen = false;
         }
-        if (currentMode == EditMode.COMMAND_CREATE || currentMode == EditMode.COMMAND_CHANGE) {
-            setEditMenu(new GuiEditMenuCommandEditor(this, player.getUUID(), selectedQuest));
-            currentMode = EditMode.NORMAL;
-        }
     }
     
     public Player getPlayer() {
@@ -990,7 +991,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private EditButton[] getButtons() {
-        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : selectedSet == null || !isSetOpened ? overviewButtons : selectedQuest == null ? setButtons : questButtons;
+        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : selectedSet == null || !isSetOpened ? overviewButtons : selectedQuest == null ? setButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
@@ -1037,7 +1038,7 @@ public class GuiQuestBook extends GuiBase {
     
     public void showQuest(Quest quest) {
         selectedQuest = quest;
-        questGraphic = new QuestGraphic(player.getUUID(), quest);
+        questGraphic = new QuestGraphic(player.getUUID(), quest, this);
         
         questGraphic.onOpen(player);
     }
