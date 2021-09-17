@@ -31,7 +31,6 @@ import hardcorequesting.common.quests.*;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
-import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
@@ -61,8 +60,6 @@ public class GuiQuestBook extends GuiBase {
     
     public static final int PAGE_WIDTH = 170;
     //region pixel info for all the things
-    public static final int VISIBLE_REPUTATION_TIERS = 9;
-    public static final int VISIBLE_REPUTATIONS = 10;
     public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
     public static final int TEXT_HEIGHT = 9;
     public static final int TEXT_SPACING = 20;
@@ -134,8 +131,6 @@ public class GuiQuestBook extends GuiBase {
     public final boolean isOpBook;
     private final Player player;
     public ScrollBar reputationDisplayScroll;
-    public ScrollBar reputationScroll;
-    public ScrollBar reputationTierScroll;
     public Group modifyingGroup;
     public QuestSet modifyingQuestSet;
     public Quest modifyingQuest;
@@ -153,7 +148,6 @@ public class GuiQuestBook extends GuiBase {
     private EditMode currentMode = EditMode.NORMAL;
     private final EditButton[] groupButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
     private final EditButton[] bagButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
-    private final EditButton[] reputationButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
     private final EditButton[] mainButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
     private final EditButton[] menuButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
     
@@ -177,20 +171,6 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return !isReputationPage && isBagPage && selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
-            }
-        });
-        
-        scrollBars.add(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && !isMainPageOpen && selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
-            }
-        });
-        
-        scrollBars.add(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return isReputationPage && !isBagPage && (getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
             }
         });
         
@@ -301,41 +281,6 @@ public class GuiQuestBook extends GuiBase {
             }
         });
         
-        buttons.add(new LargeButton("Create New", 180, 20) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && !isBagPage && currentMode == EditMode.CREATE && selectedReputation == null && !isMainPageOpen && !isMenuPageOpen && isReputationPage;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
-                SaveHelper.add(EditType.REPUTATION_ADD);
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.questBook.createTier", 20, 20) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && !isBagPage && currentMode == EditMode.CREATE && selectedReputation != null && !isMainPageOpen && !isMenuPageOpen && isReputationPage;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
-                SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
-            }
-        });
     }
     
     private GuiQuestBook(Player player, boolean isOpBook) {
@@ -883,7 +828,7 @@ public class GuiQuestBook extends GuiBase {
             currentMode = EditMode.NORMAL;
             isReputationPage = true;
             isMenuPageOpen = false;
-            reputationGraphic = new EditReputationGraphic();
+            reputationGraphic = new EditReputationGraphic(this);
         }
     }
     
@@ -897,7 +842,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private EditButton[] getButtons() {
-        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isReputationPage ? reputationButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : new EditButton[0];
+        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {

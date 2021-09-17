@@ -1,10 +1,15 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.KeyboardHandler;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
@@ -27,6 +32,8 @@ import static hardcorequesting.common.client.interfaces.GuiQuestBook.selectedRep
 
 @Environment(EnvType.CLIENT)
 public class EditReputationGraphic extends Graphic {
+    public static final int VISIBLE_REPUTATION_TIERS = 9;
+    public static final int VISIBLE_REPUTATIONS = 10;
     public static final int REPUTATION_LIST_X = 20;
     public static final int REPUTATION_MARKER_LIST_X = 180;
     public static final int REPUTATION_LIST_Y = 20;
@@ -35,6 +42,68 @@ public class EditReputationGraphic extends Graphic {
     public static final int REPUTATION_OFFSET = 20;
     public static final int FONT_HEIGHT = 9;
     
+    private final GuiQuestBook gui;
+    
+    private final ScrollBar reputationScroll;
+    private final ScrollBar reputationTierScroll;
+    private final EditButton[] editButtons;
+    {
+        addScrollBar(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
+            }
+        });
+    
+        addScrollBar(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return (EditReputationGraphic.this.gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
+            }
+        });
+        
+        addButton(new LargeButton("Create New", 180, 20) {
+            @Override
+            public boolean isEnabled(GuiBase gui) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation == null;
+            }
+        
+            @Override
+            public void onClick(GuiBase gui) {
+                ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
+                SaveHelper.add(EditType.REPUTATION_ADD);
+            }
+        });
+    
+        addButton(new LargeButton("hqm.questBook.createTier", 20, 20) {
+            @Override
+            public boolean isEnabled(GuiBase gui) {
+                return true;
+            }
+        
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation != null;
+            }
+        
+            @Override
+            public void onClick(GuiBase gui) {
+                selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
+                SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
+            }
+        });
+    }
+    
+    public EditReputationGraphic(GuiQuestBook gui) {
+        this.gui = gui;
+        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
+    }
+    
     @Override
     public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
@@ -42,8 +111,8 @@ public class EditReputationGraphic extends Graphic {
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
+            int start = reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
@@ -61,8 +130,8 @@ public class EditReputationGraphic extends Graphic {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
-            int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
+            int start = reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
+            int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_MARKER_LIST_X;
                 int y = REPUTATION_MARKER_LIST_Y + (i - start) * REPUTATION_OFFSET;
@@ -72,6 +141,15 @@ public class EditReputationGraphic extends Graphic {
                 gui.drawString(matrices, Translator.plain(str), x, y, hover ? 0xAAAAAA : 0x404040);
             }
         }
+        
+        gui.drawEditButtons(matrices, mX, mY, editButtons);
+    }
+    
+    @Override
+    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+        super.drawTooltip(matrices, gui, mX, mY);
+        
+        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     @Override
@@ -82,8 +160,8 @@ public class EditReputationGraphic extends Graphic {
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationMap.size());
+            int start = reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
+            int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_LIST_X;
@@ -139,8 +217,8 @@ public class EditReputationGraphic extends Graphic {
                 return;
             }
             
-            int start = gui.reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - GuiQuestBook.VISIBLE_REPUTATION_TIERS) * gui.reputationTierScroll.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
+            int start = reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
+            int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_MARKER_LIST_X;
                 int y = REPUTATION_MARKER_LIST_Y + (i - start) * REPUTATION_OFFSET;
@@ -177,5 +255,12 @@ public class EditReputationGraphic extends Graphic {
                 }
             }
         }
+        
+        gui.handleEditButtonClick(mX, mY, editButtons);
+    }
+    
+    @Override
+    public boolean keyPressed(int keyCode) {
+        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
     }
 }

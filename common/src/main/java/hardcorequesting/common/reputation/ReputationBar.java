@@ -125,7 +125,7 @@ public class ReputationBar {
         private final ScrollBar scrollBar = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return ReputationManager.getInstance().size() > GuiQuestBook.VISIBLE_REPUTATIONS;
+                return ReputationManager.getInstance().size() > EditReputationGraphic.VISIBLE_REPUTATIONS;
             }
         };
         
@@ -145,8 +145,8 @@ public class ReputationBar {
         @Environment(EnvType.CLIENT)
         public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
             ReputationManager reputationManager = ReputationManager.getInstance();
-            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
+            int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = EditReputationGraphic.REPUTATION_LIST_X;
@@ -168,8 +168,8 @@ public class ReputationBar {
             super.onClick(gui, mX, mY, b);
             ReputationManager reputationManager = ReputationManager.getInstance();
             
-            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
+            int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
                 int x = EditReputationGraphic.REPUTATION_LIST_X;
