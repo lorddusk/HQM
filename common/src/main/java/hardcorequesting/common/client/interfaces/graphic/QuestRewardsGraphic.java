@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
@@ -54,37 +53,38 @@ public class QuestRewardsGraphic extends Graphic {
     
     private int selectedReward = -1;
     private long lastClicked;
-    {
-        addButton(new LargeButton("hqm.quest.claim", 100, 190) {
+    
+    private final Quest quest;
+    private final QuestRewards rewards;
+    private final UUID playerId;
+    private final GuiQuestBook gui;
+    
+    public QuestRewardsGraphic(Quest quest, UUID playerId, GuiQuestBook gui) {
+        this.quest = quest;
+        this.rewards = quest.getRewards();
+        this.playerId = playerId;
+        this.gui = gui;
+    
+        addButton(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
             @Override
             public boolean isEnabled() {
                 return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(playerId);
             }
-    
+        
             @Override
             public boolean isVisible() {
                 return rewards.hasReward(playerId);
             }
-    
+        
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 NetworkManager.sendToServer(ClientChange.CLAIM_QUEST.build(new Tuple<>(quest.getQuestId(), rewards.hasChoiceReward() ? selectedReward : -1)));
             }
         });
     }
     
-    private final Quest quest;
-    private final QuestRewards rewards;
-    private final UUID playerId;
-    
-    public QuestRewardsGraphic(Quest quest, UUID playerId) {
-        this.quest = quest;
-        this.rewards = quest.getRewards();
-        this.playerId = playerId;
-    }
-    
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         QuestData data = quest.getQuestData(playerId);
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -92,24 +92,24 @@ public class QuestRewardsGraphic extends Graphic {
             selectedReward = -1;
         }
         
-        drawItemRewards(matrices, gui, mX, mY);
+        drawItemRewards(matrices, mX, mY);
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
         
-        drawReputationIcon(matrices, gui, mX, mY, data);
+        drawReputationIcon(matrices, mX, mY, data);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
         
-        drawItemRewardTooltips(matrices, gui, mX, mY);
+        drawItemRewardTooltips(matrices, mX, mY);
     
-        super.drawTooltip(matrices, gui, mX, mY);
+        super.drawTooltip(matrices, mX, mY);
         
-        drawRepIconTooltip(matrices, gui, mX, mY);
+        drawRepIconTooltip(matrices, mX, mY);
     }
     
-    private void drawItemRewards(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    private void drawItemRewards(PoseStack matrices, int mX, int mY) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
         NonNullList<ItemStack> choiceRewards = rewards.getReward();
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
@@ -125,7 +125,7 @@ public class QuestRewardsGraphic extends Graphic {
         }
     }
     
-    private void drawItemRewardTooltips(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    private void drawItemRewardTooltips(PoseStack matrices, int mX, int mY) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
         NonNullList<ItemStack> choiceRewards = rewards.getReward();
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
@@ -138,7 +138,7 @@ public class QuestRewardsGraphic extends Graphic {
         }
     }
     
-    private void drawReputationIcon(PoseStack matrices, GuiQuestBook gui, int mX, int mY, QuestData data) {
+    private void drawReputationIcon(PoseStack matrices, int mX, int mY, QuestData data) {
         List<ReputationReward> reputationRewards = rewards.getReputationRewards();
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -176,7 +176,7 @@ public class QuestRewardsGraphic extends Graphic {
         }
     }
     
-    private void drawRepIconTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    private void drawRepIconTooltip(PoseStack matrices, int mX, int mY) {
         QuestData data = quest.getQuestData(playerId);
         List<ReputationReward> reputationRewards = rewards.getReputationRewards();
         if (reputationRewards != null && isOnReputationIcon(gui, mX, mY)) {
@@ -200,7 +200,7 @@ public class QuestRewardsGraphic extends Graphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
         NonNullList<ItemStack> choiceRewards = rewards.getReward();
         List<ReputationReward> reputationRewards = rewards.getReputationRewards();
@@ -223,7 +223,7 @@ public class QuestRewardsGraphic extends Graphic {
             }
         }
         
-        super.onClick(gui, mX, mY, b);
+        super.onClick(mX, mY, b);
     }
     
     private NonNullList<ItemStack> getEditFriendlyRewards(NonNullList<ItemStack> rewards, int max) {

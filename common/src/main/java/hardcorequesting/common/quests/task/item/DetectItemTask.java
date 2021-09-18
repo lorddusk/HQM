@@ -1,6 +1,7 @@
 package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
@@ -26,8 +27,8 @@ public class DetectItemTask extends ItemRequirementTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return ItemTaskGraphic.createDetectGraphic(this, parts, playerId);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return ItemTaskGraphic.createDetectGraphic(this, parts, playerId, gui);
     }
     
     @Environment(EnvType.CLIENT)

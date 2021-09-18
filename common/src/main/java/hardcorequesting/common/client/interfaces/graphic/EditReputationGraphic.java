@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -43,7 +42,7 @@ public class EditReputationGraphic extends EditableGraphic {
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;
     {
-        addButton(new LargeButton("Create New", 180, 20) {
+        addButton(new LargeButton(gui, "Create New", 180, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -55,13 +54,13 @@ public class EditReputationGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
                 SaveHelper.add(EditType.REPUTATION_ADD);
             }
         });
     
-        addButton(new LargeButton("hqm.questBook.createTier", 20, 20) {
+        addButton(new LargeButton(gui, "hqm.questBook.createTier", 20, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -73,7 +72,7 @@ public class EditReputationGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
                 SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
             }
@@ -98,8 +97,8 @@ public class EditReputationGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
@@ -137,8 +136,8 @@ public class EditReputationGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         UUID playerId = gui.getPlayer().getUUID();
         
         ReputationManager reputationManager = ReputationManager.getInstance();

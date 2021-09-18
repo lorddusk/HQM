@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
@@ -53,7 +52,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     public GuiEditMenuTeam(GuiQuestBook gui, UUID playerId) {
         super(gui, playerId);
         
-        buttons.add(new LargeButton("hqm.party.create", 250, 20) {
+        buttons.add(new LargeButton(gui, "hqm.party.create", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return teamName.getText().length() > 0;
@@ -65,12 +64,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 getTeam().create(teamName.getText());
             }
         });
         
-        buttons.add(inviteButton = new LargeButton("hqm.party.invitePlayer", 250, 20) {
+        buttons.add(inviteButton = new LargeButton(gui, "hqm.party.invitePlayer", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return inviteName.getText().length() > 0;
@@ -82,12 +81,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 getTeam().invite(inviteName.getText());
             }
         });
         
-        buttons.add(new LargeButton("hqm.party.accept", 180, 20) {
+        buttons.add(new LargeButton(gui, "hqm.party.accept", 180, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -99,13 +98,13 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 inviteTeam.accept();
                 inviteTeam = null;
             }
         });
         
-        buttons.add(new LargeButton("hqm.party.decline", 240, 20) {
+        buttons.add(new LargeButton(gui, "hqm.party.decline", 240, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -117,13 +116,13 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 inviteTeam.decline();
                 inviteTeam = null;
             }
         });
         
-        buttons.add(new LargeButton("hqm.party.decideLater", 180, 40) {
+        buttons.add(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -135,12 +134,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 inviteTeam = null;
             }
         });
         
-        buttons.add(new LargeButton(null, 250, 50) {
+        buttons.add(new LargeButton(gui, null, 250, 50) {
             @Override
             public boolean isEnabled() {
                 return !selectedEntry.isOwner();
@@ -152,7 +151,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 getTeam().kick(selectedEntry.getUUID());
                 selectedEntry = null;
             }
@@ -163,7 +162,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton("hqm.party.leave", 250, 160) {
+        buttons.add(new LargeButton(gui, "hqm.party.leave", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown();
@@ -175,12 +174,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 getTeam().leave();
             }
         });
         
-        buttons.add(new LargeButton("hqm.party.disband", 250, 160) {
+        buttons.add(new LargeButton(gui, "hqm.party.disband", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
@@ -192,14 +191,14 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 getTeam().disband();
                 selectedEntry = null;
             }
         });
         
         
-        buttons.add(new LargeButton("hqm.party.list", 250, 190) {
+        buttons.add(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -211,7 +210,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 gui.setEditMenu(new GuiEditMenuTeamList(gui, playerId, self));
             }
         });
@@ -395,7 +394,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         }
         
         if (TeamError.latestError != null) {
-            if (inviteButton.inButtonBounds(gui, mX, mY)) {
+            if (inviteButton.inButtonBounds(mX, mY)) {
                 gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
             } else {
                 TeamError.latestError = null;

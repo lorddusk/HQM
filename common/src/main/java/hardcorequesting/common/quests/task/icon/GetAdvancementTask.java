@@ -2,6 +2,7 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.AdvancementTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
@@ -40,8 +41,8 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return new AdvancementTaskGraphic(this, parts, playerId);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new AdvancementTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

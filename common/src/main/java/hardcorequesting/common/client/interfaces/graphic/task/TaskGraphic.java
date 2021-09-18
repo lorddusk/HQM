@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.graphic.task;
 
 import hardcorequesting.common.client.ClientChange;
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.network.NetworkManager;
@@ -16,13 +16,15 @@ public abstract class TaskGraphic extends Graphic {
     protected static final int START_X = 180;
     protected static final int START_Y = 95;
     protected final UUID playerId;
+    protected final GuiQuestBook gui;
     
-    protected TaskGraphic(UUID playerId) {
+    protected TaskGraphic(UUID playerId, GuiQuestBook gui) {
         this.playerId = playerId;
+        this.gui = gui;
     }
     
     protected void addSubmitButton(QuestTask<?> task) {
-        addButton(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
+        addButton(new LargeButton(gui, "hqm.quest.manualSubmit", 185, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -34,14 +36,14 @@ public abstract class TaskGraphic extends Graphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(task));
             }
         });
     }
     
     protected void addDetectButton(QuestTask<?> task) {
-        addButton(new LargeButton("hqm.quest.manualDetect", 185, 200) {
+        addButton(new LargeButton(gui, "hqm.quest.manualDetect", 185, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -53,7 +55,7 @@ public abstract class TaskGraphic extends Graphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(task));
             }
         });

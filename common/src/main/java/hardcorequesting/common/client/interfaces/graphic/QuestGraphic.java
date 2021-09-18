@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -58,7 +57,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     {
         for (final TaskType taskType : TaskType.values()) {
-            addButton(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
+            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
                 public boolean isEnabled() {
                     return true;
@@ -70,7 +69,7 @@ public final class QuestGraphic extends EditableGraphic {
                 }
                 
                 @Override
-                public void onClick(GuiBase gui) {
+                public void onClick() {
                     taskType.addTask(quest);
                 }
             });
@@ -81,7 +80,7 @@ public final class QuestGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
         this.playerId = playerId;
         this.quest = quest;
-        rewardsGraphic = new QuestRewardsGraphic(quest, playerId);
+        rewardsGraphic = new QuestRewardsGraphic(quest, playerId, gui);
         this.onOpen(gui.getPlayer());
         
         addScrollBar(descriptionScroll = new ScrollBar(gui, 155, 28, 64, 249, 102, START_X) {
@@ -113,7 +112,7 @@ public final class QuestGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         if (!Quest.canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(playerId)) {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
@@ -140,30 +139,30 @@ public final class QuestGraphic extends EditableGraphic {
             }
         }
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
         
-        rewardsGraphic.draw(matrices, gui, mX, mY);
+        rewardsGraphic.draw(matrices, mX, mY);
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
             int taskStartLine = taskDescriptionScroll.isVisible() ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     
-            taskGraphic.draw(matrices, gui, mX, mY);
+            taskGraphic.draw(matrices, mX, mY);
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
         }
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.drawTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
     
         if (taskGraphic != null) {
-            taskGraphic.drawTooltip(matrices, gui, mX, mY);
+            taskGraphic.drawTooltip(matrices, mX, mY);
         }
     
-        rewardsGraphic.drawTooltip(matrices, gui, mX, mY);
+        rewardsGraphic.drawTooltip(matrices, mX, mY);
     }
     
     private int getVisibleTasks() {
@@ -185,7 +184,7 @@ public final class QuestGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         int id = 0;
         int start = taskScroll.isVisible() ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
@@ -240,13 +239,13 @@ public final class QuestGraphic extends EditableGraphic {
             }
         }
     
-        rewardsGraphic.onClick(gui, mX, mY, b);
+        rewardsGraphic.onClick(mX, mY, b);
     
         if (taskGraphic != null) {
-            taskGraphic.onClick(gui, mX, mY, b);
+            taskGraphic.onClick(mX, mY, b);
         }
     
-        super.onClick(gui, mX, mY, b);
+        super.onClick(mX, mY, b);
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
@@ -312,7 +311,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private void setSelectedTask(@Nullable QuestTask<?> task) {
         selectedTask = task;
-        taskGraphic = task == null ? null : task.createGraphic(playerId);
+        taskGraphic = task == null ? null : task.createGraphic(playerId, gui);
     }
     
     @Override

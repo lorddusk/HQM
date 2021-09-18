@@ -21,13 +21,13 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     
     private final VisitLocationTask task;
     
-    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts, UUID playerId) {
-        super(task, parts, playerId);
+    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui);
         this.task = task;
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, VisitLocationTask.Part part, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, VisitLocationTask.Part part, int index, int x, int y) {
         if (task.visited(index, playerId)) {
             gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         } else if (part.getVisibility().doShowCoordinate()) {
@@ -56,13 +56,13 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, VisitLocationTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, VisitLocationTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
             LocationMenu.display(gui, playerId, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
                     result -> task.setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }

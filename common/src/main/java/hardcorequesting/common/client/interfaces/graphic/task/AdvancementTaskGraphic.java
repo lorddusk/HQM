@@ -18,27 +18,27 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     
     private final GetAdvancementTask task;
     
-    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts, UUID playerId) {
-        super(task, parts, playerId);
+    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui);
         this.task = task;
         addDetectButton(task);
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, GetAdvancementTask.Part part, int id, int x, int y) {
+    protected void drawElementText(PoseStack matrices, GetAdvancementTask.Part part, int id, int x, int y) {
         if (task.advanced(id, playerId)) {
             gui.drawString(matrices, Translator.translatable("hqm.advancementMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
         }
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, GetAdvancementTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, GetAdvancementTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
             PickAdvancementMenu.display(gui, playerId, part.getAdvancement(),
                     result -> task.setAdvancement(id, result));
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }

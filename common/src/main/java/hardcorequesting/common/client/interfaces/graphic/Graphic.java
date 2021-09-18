@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -22,15 +21,15 @@ public abstract class Graphic {
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
     
-    public final void drawFull(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        draw(matrices, gui, mX, mY);
-        drawTooltip(matrices, gui, mX, mY);
+    public final void drawFull(PoseStack matrices, int mX, int mY) {
+        draw(matrices, mX, mY);
+        drawTooltip(matrices, mX, mY);
     }
     
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         for (LargeButton button : buttons) {
-            button.draw(matrices, gui, mX, mY);
+            button.draw(matrices, mX, mY);
         }
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(matrices);
@@ -39,16 +38,16 @@ public abstract class Graphic {
         textBoxes.draw(matrices);
     }
     
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
         for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, gui, mX, mY);
+            button.renderTooltip(matrices, mX, mY);
         }
     }
     
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick(gui);
+            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
+                button.onClick();
                 break;
             }
         }

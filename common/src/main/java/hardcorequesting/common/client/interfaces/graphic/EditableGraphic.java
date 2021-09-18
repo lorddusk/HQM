@@ -20,8 +20,8 @@ public class EditableGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
     
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
@@ -31,8 +31,8 @@ public class EditableGraphic extends Graphic {
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.drawTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
     
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
@@ -42,8 +42,8 @@ public class EditableGraphic extends Graphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
-        super.onClick(gui, mX, mY, button);
+    public void onClick(int mX, int mY, int button) {
+        super.onClick(mX, mY, button);
     
         if (Quest.canQuestsBeEdited()) {
             for (EditButton editButton : editButtons) {

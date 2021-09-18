@@ -63,7 +63,7 @@ public class GuiQuestBook extends GuiBase {
     private EditMode currentMode = EditMode.NORMAL;
     
     {
-        saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
+        saveButton = new LargeButton(this, "hqm.questBook.saveAll", 360, 10) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -75,7 +75,7 @@ public class GuiQuestBook extends GuiBase {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 save();
             }
         };
@@ -144,7 +144,7 @@ public class GuiQuestBook extends GuiBase {
             SaveHelper.render(matrices, this, x, y);
         }
         
-        saveButton.draw(matrices, this, x, y);
+        saveButton.draw(matrices, x, y);
         
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(MAP_TEXTURE);
@@ -159,7 +159,7 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu == null) {
     
-            pageGraphic.drawFull(matrices, this, x, y);
+            pageGraphic.drawFull(matrices, x, y);
     
             if (currentMode == EditMode.DELETE) {
                 matrices.pushPose();
@@ -174,7 +174,7 @@ public class GuiQuestBook extends GuiBase {
             editMenu.renderTooltip(matrices, x, y);
         }
     
-        saveButton.renderTooltip(matrices, this, x, y);
+        saveButton.renderTooltip(matrices, x, y);
         
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             renderTooltip(matrices, FormattedText.composite(
@@ -245,8 +245,8 @@ public class GuiQuestBook extends GuiBase {
         
         boolean buttonClicked = false;
     
-        if (saveButton.isVisible() && saveButton.isEnabled() && saveButton.inButtonBounds(this, x, y)) {
-            saveButton.onClick(this);
+        if (saveButton.isVisible() && saveButton.isEnabled() && saveButton.inButtonBounds(x, y)) {
+            saveButton.onClick();
             buttonClicked = true;
         }
         
@@ -261,7 +261,7 @@ public class GuiQuestBook extends GuiBase {
                 goBack();
                 return true;
             } else {
-                pageGraphic.onClick(this, x, y, button);
+                pageGraphic.onClick(x, y, button);
             }
         } else {
             editMenu.onClick(x, y, button);

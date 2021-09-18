@@ -26,14 +26,14 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     
     private final ReputationTask<?> task;
     
-    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId) {
-        super(parts, playerId);
+    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(parts, playerId, gui);
         this.task = task;
         startOffsetY = 0;
     }
     
-    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, int startOffsetY) {
-        super(parts, playerId);
+    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui, int startOffsetY) {
+        super(parts, playerId, gui);
         this.task = task;
         this.startOffsetY = startOffsetY;
     }
@@ -55,7 +55,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
@@ -67,7 +67,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Positioned<ReputationTask.Part> pos, int id, int mX, int mY) {
+    protected List<FormattedText> getPartTooltip(Positioned<ReputationTask.Part> pos, int id, int mX, int mY) {
         ReputationTask.Part part = pos.getElement();
         if (part.getReputation() != null) {
             String text = part.getReputation().getTooltip(gui, pos.getX(), pos.getY(), mX, mY, playerId);
@@ -78,17 +78,17 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<ReputationTask.Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<ReputationTask.Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), Reputation.BAR_WIDTH, 20, mX, mY);
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, ReputationTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, ReputationTask.Part part, int id) {
         if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
             gui.setEditMenu(new GuiEditMenuReputationSetting(gui, playerId, task, id, part));
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }

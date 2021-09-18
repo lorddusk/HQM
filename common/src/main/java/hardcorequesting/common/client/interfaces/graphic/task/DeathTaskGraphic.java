@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
@@ -20,11 +19,11 @@ public class DeathTaskGraphic extends TaskGraphic {
     
     private final DeathTask task;
     
-    public DeathTaskGraphic(DeathTask task, UUID playerId) {
-        super(playerId);
+    public DeathTaskGraphic(DeathTask task, UUID playerId, GuiQuestBook gui) {
+        super(playerId, gui);
         this.task = task;
     
-        addButton(new LargeButton("hqm.quest.requirement", 185, 200) {
+        addButton(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -36,14 +35,14 @@ public class DeathTaskGraphic extends TaskGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 IntInputMenu.display(gui, playerId, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         int died = task.getDeaths(playerId);
         FormattedText text = died == task.getDeathsRequired()
                 ? Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeathsRequired())
@@ -51,6 +50,6 @@ public class DeathTaskGraphic extends TaskGraphic {
     
         gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
     }
 }

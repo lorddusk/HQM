@@ -18,20 +18,20 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected final PartList<Part> parts;
     
-    public ListTaskGraphic(PartList<Part> parts, UUID playerId) {
-        super(playerId);
+    public ListTaskGraphic(PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(playerId, gui);
         this.parts = parts;
     }
     
     protected abstract List<Positioned<Part>> positionParts(List<Part> parts);
     
-    protected abstract void drawPart(PoseStack matrices, GuiQuestBook gui, Part part, int id, int x, int y, int mX, int mY);
+    protected abstract void drawPart(PoseStack matrices, Part part, int id, int x, int y, int mX, int mY);
     
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Positioned<Part> pos, int id, int mX, int mY) {return null;}
+    protected List<FormattedText> getPartTooltip(Positioned<Part> pos, int id, int mX, int mY) {return null;}
     
-    protected abstract boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos);
+    protected abstract boolean isInPartBounds(int mX, int mY, Positioned<Part> pos);
     
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.DELETE) {
             parts.remove(id);
             return true;
@@ -40,49 +40,49 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
         
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
-            drawPart(matrices, gui, part, i, pos.getX(), pos.getY(), mX, mY);
+            drawPart(matrices, part, i, pos.getX(), pos.getY(), mX, mY);
         }
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
     
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
-            List<FormattedText> tooltip = getPartTooltip(gui, pos, i, mX, mY);
+            List<FormattedText> tooltip = getPartTooltip(pos, i, mX, mY);
             if (tooltip != null) {
                 gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
                 return;
             }
         }
         
-        super.drawTooltip(matrices, gui, mX, mY);
+        super.drawTooltip(matrices, mX, mY);
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            int id = getClickedPart(gui, mX, mY);
+            int id = getClickedPart(mX, mY);
             if (id >= 0)
-                handlePartClick(gui, gui.getCurrentMode(), parts.getShownElements().get(id), id);
+                handlePartClick(gui.getCurrentMode(), parts.getShownElements().get(id), id);
         }
         
-        super.onClick(gui, mX, mY, b);
+        super.onClick(mX, mY, b);
     }
     
-    protected final int getClickedPart(GuiQuestBook gui, int mX, int mY) {
+    protected final int getClickedPart(int mX, int mY) {
         List<Positioned<Part>> elements = positionParts(parts.getShownElements());
         for (int i = 0; i < elements.size(); i++) {
-            if (isInPartBounds(gui, mX, mY, elements.get(i))) {
+            if (isInPartBounds(mX, mY, elements.get(i))) {
                 return i;
             }
         }

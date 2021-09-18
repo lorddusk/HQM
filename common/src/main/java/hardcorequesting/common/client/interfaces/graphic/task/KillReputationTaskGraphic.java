@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
@@ -21,11 +20,11 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
     private final KillReputationTask task;
     
-    public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts, UUID playerId) {
-        super(task, parts, playerId, 20);
+    public KillReputationTaskGraphic(KillReputationTask task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui, 20);
         this.task = task;
         
-        addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
+        addButton(new LargeButton(gui, "hqm.quest.requirement", 250, 95) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -37,7 +36,7 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 IntInputMenu.display(gui, playerId, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
@@ -50,8 +49,8 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
     
         int killCount = task.getKills(playerId);
         if (Quest.canQuestsBeEdited()) {

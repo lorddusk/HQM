@@ -19,13 +19,13 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     
     private final TameMobsTask task;
     
-    public TameMobsTaskGraphic(TameMobsTask task, PartList<TameMobsTask.Part> parts, UUID playerId) {
-        super(task, parts, playerId);
+    public TameMobsTaskGraphic(TameMobsTask task, PartList<TameMobsTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui);
         this.task = task;
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, GuiQuestBook gui, TameMobsTask.Part part, int index, int x, int y) {
+    protected void drawElementText(PoseStack matrices, TameMobsTask.Part part, int index, int x, int y) {
         int tamed = task.tamed(index, playerId);
         if (tamed == part.getCount()) {
             gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
@@ -36,13 +36,13 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, TameMobsTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, TameMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
             PickMobMenu.display(gui, playerId, part.getTame() == null ? null : ResourceLocation.tryParse(part.getTame()), part.getCount(), "tameTask",
                     PickMobMenu.EXTRA_TAME_ENTRIES, result -> task.setInfo(id, result.getMobId().toString(), result.getAmount()));
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }

@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.TextBoxLogic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -50,7 +49,7 @@ public class TextMenu extends GuiEditMenu {
         
         this.text = new TextBoxLogic(gui, txt, 140, true);
         this.isName = isName;
-        buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
+        buttons.add(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -62,12 +61,12 @@ public class TextMenu extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 Minecraft.getInstance().keyboardHandler.setClipboard(text.getText());
             }
         });
         
-        buttons.add(new LargeButton("hqm.textEditor.paste", 245, 20) {
+        buttons.add(new LargeButton(gui, "hqm.textEditor.paste", 245, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -79,7 +78,7 @@ public class TextMenu extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
@@ -88,7 +87,7 @@ public class TextMenu extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton("hqm.textEditor.clear", 185, 40) {
+        buttons.add(new LargeButton(gui, "hqm.textEditor.clear", 185, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -100,12 +99,12 @@ public class TextMenu extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 text.setTextAndCursor("");
             }
         });
         
-        buttons.add(new LargeButton("hqm.textEditor.clearPaste", 245, 40) {
+        buttons.add(new LargeButton(gui, "hqm.textEditor.clearPaste", 245, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -117,7 +116,7 @@ public class TextMenu extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");

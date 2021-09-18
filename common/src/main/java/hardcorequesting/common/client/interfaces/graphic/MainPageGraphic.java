@@ -42,8 +42,8 @@ public class MainPageGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
         int startLine = mainDescriptionScroll.isVisible() ? Math.round((Quest.getMainDescription(gui).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
@@ -75,8 +75,8 @@ public class MainPageGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
-        super.onClick(gui, mX, mY, button);
+    public void onClick(int mX, int mY, int button) {
+        super.onClick(mX, mY, button);
         
         if (mX > 0 && mX < GuiQuestBook.PAGE_WIDTH && mY > 205) {
             gui.setPage(BookPage.MenuPage.INSTANCE);

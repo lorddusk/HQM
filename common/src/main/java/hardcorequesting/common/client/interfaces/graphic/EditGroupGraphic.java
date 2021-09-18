@@ -53,8 +53,8 @@ public class EditGroupGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         gui.drawString(matrices, Translator.plain(group.getDisplayName()), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(group.getItems());
@@ -90,8 +90,8 @@ public class EditGroupGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         List<ItemStack> items = new ArrayList<>(group.getItems());
         items.add(ItemStack.EMPTY);

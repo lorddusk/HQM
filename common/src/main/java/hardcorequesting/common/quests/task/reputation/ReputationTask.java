@@ -3,6 +3,7 @@ package hardcorequesting.common.quests.task.reputation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.ReputationTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -39,8 +40,8 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return new ReputationTaskGraphic(this, parts, playerId);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new ReputationTaskGraphic(this, parts, playerId, gui);
     }
     
     @Deprecated

@@ -3,6 +3,7 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.CompleteQuestTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
@@ -37,8 +38,8 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return new CompleteQuestTaskGraphic(this, parts, playerId);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new CompleteQuestTaskGraphic(this, parts, playerId, gui);
     }
     
     public boolean completed(int id, UUID playerId) {

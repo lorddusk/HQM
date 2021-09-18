@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
@@ -48,7 +47,7 @@ public class MenuPageGraphic extends EditableGraphic {
     
     private final ScrollBar reputationDisplayScroll;
     {
-        addButton(new LargeButton("Reset", 90, 190) {
+        addButton(new LargeButton(gui, "Reset", 90, 190) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasControlDown() && Screen.hasShiftDown();
@@ -60,7 +59,7 @@ public class MenuPageGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 OPBookHelper.reset(MenuPageGraphic.this.gui.getPlayer().getUUID());
             }
         });
@@ -77,8 +76,8 @@ public class MenuPageGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         Player player = gui.getPlayer();
         
@@ -158,8 +157,8 @@ public class MenuPageGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
-        super.onClick(gui, mX, mY, button);
+    public void onClick(int mX, int mY, int button) {
+        super.onClick(mX, mY, button);
     
         if (HQMConfig.getInstance().ENABLE_TEAMS && gui.inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
             gui.setEditMenu(new GuiEditMenuTeam(gui, gui.getPlayer().getUUID()));

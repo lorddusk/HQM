@@ -25,21 +25,23 @@ public abstract class LargeButton {
     private int x;
     private int y;
     private List<FormattedText> lines;
+    private final GuiBase gui;
     
-    public LargeButton(String name, int x, int y) {
+    public LargeButton(GuiBase gui, String name, int x, int y) {
         this.name = name;
         this.x = x;
         this.y = y;
+        this.gui = gui;
     }
     
-    public LargeButton(String name, String description, int x, int y) {
-        this(name, x, y);
+    public LargeButton(GuiBase gui, String name, String description, int x, int y) {
+        this(gui, name, x, y);
         this.description = description;
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean inButtonBounds(GuiBase gui, int mX, int mY) {
-        return gui.inBounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, mX, mY);
+    public boolean inButtonBounds(int mX, int mY) {
+        return this.gui.inBounds(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, mX, mY);
     }
     
     @Environment(EnvType.CLIENT)
@@ -49,29 +51,29 @@ public abstract class LargeButton {
     public abstract boolean isVisible();
     
     @Environment(EnvType.CLIENT)
-    public abstract void onClick(GuiBase gui);
+    public abstract void onClick();
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         if (isVisible()) {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             boolean enabled = isEnabled();
-            gui.drawRect(matrices, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(gui, mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
-            gui.drawCenteredString(matrices, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
+            this.gui.drawRect(matrices, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+            this.gui.drawCenteredString(matrices, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        if (isVisible() && description != null && inButtonBounds(gui, mX, mY)) {
+    public void renderTooltip(PoseStack matrices, int mX, int mY) {
+        if (isVisible() && description != null && inButtonBounds(mX, mY)) {
             if (lines == null) {
-                lines = gui.getLinesFromText(getDescription(), 1, 200);
+                lines = this.gui.getLinesFromText(getDescription(), 1, 200);
             }
-            
-            gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + gui.getLeft(), mY + gui.getTop());
+    
+            this.gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + this.gui.getLeft(), mY + this.gui.getTop());
         }
     }
     

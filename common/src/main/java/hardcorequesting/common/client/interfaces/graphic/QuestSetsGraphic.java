@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -52,7 +51,7 @@ public class QuestSetsGraphic extends EditableGraphic {
     private final ScrollBar descriptionScroll;
     
     {
-        addButton(new LargeButton("hqm.questBook.open", 245, 190) {
+        addButton(new LargeButton(gui, "hqm.questBook.open", 245, 190) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -64,12 +63,12 @@ public class QuestSetsGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 QuestSetsGraphic.this.gui.setPage(page.forSet(selectedSet));
             }
         });
     
-        addButton(new LargeButton("hqm.questBook.createSet", 185, 50) {
+        addButton(new LargeButton(gui, "hqm.questBook.createSet", 185, 50) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -81,7 +80,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 int i = 0;
                 for (QuestSet set : Quest.getQuestSets()) {
                     if (set.getName().startsWith("Unnamed set")) i++;
@@ -118,8 +117,8 @@ public class QuestSetsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         Player player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
@@ -259,8 +258,8 @@ public class QuestSetsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         List<QuestSet> questSets = Quest.getQuestSets();
         int start = setScroll.isVisible() ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;

@@ -52,9 +52,9 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
         
         if (gui.isOpBook) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
@@ -69,16 +69,16 @@ public class QuestSetMapGraphic extends EditableGraphic {
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         
-        drawConnectingLines(matrices, gui, player, isVisibleCache, isLinkFreeCache);
+        drawConnectingLines(matrices, player, isVisibleCache, isLinkFreeCache);
         
         gui.setBlitOffset(50);
         
-        drawQuestIcons(matrices, gui, mX, mY, player, isVisibleCache, isLinkFreeCache);
+        drawQuestIcons(matrices, mX, mY, player, isVisibleCache, isLinkFreeCache);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.drawTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         Player player = gui.getPlayer();
     
@@ -343,7 +343,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         }
     }
     
-    private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawConnectingLines(PoseStack matrices, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest child : set.getQuests().values()) {
             if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirements()) {
@@ -374,7 +374,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         }
     }
     
-    private void drawQuestIcons(PoseStack matrices, GuiQuestBook gui, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawQuestIcons(PoseStack matrices, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest quest : set.getQuests().values()) {
             if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
                 
@@ -406,8 +406,8 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         Player player = gui.getPlayer();
         if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.CREATE || gui.getCurrentMode() == EditMode.REP_BAR_CREATE)) {

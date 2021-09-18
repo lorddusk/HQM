@@ -26,12 +26,12 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     
     private final IconLayoutTask<Part, ?> task;
     
-    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId) {
-        super(parts, playerId);
+    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(parts, playerId, gui);
         this.task = task;
     }
     
-    protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Part part, int id, int x, int y);
+    protected abstract void drawElementText(PoseStack matrices, Part part, int id, int x, int y);
     
     @Override
     protected List<Positioned<Part>> positionParts(List<Part> parts) {
@@ -46,17 +46,17 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, Part part, int id, int x, int y, int mX, int mY) {
         int textX = x + X_TEXT_OFFSET, textY = y + Y_TEXT_OFFSET;
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
         gui.drawString(matrices, Translator.plain(part.getName()), textX, textY, 0x404040);
-        drawElementText(matrices, gui, part, id, textX + X_TEXT_INDENT, textY + 9);
+        drawElementText(matrices, part, id, textX + X_TEXT_INDENT, textY + 9);
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
             PickItemMenu.display(gui, playerId, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                     result -> task.setIcon(id, result.get()));
@@ -66,12 +66,12 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
                     result -> task.setName(id, result));
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), ITEM_SIZE, ITEM_SIZE, mX, mY);
     }
 }

@@ -8,7 +8,6 @@ import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
@@ -46,7 +45,7 @@ public class EditBagsGraphic extends EditableGraphic {
     private final ScrollBar tierScroll;
     
     {
-        addButton(new LargeButton("hqm.questBook.createGroup", 100, 175) {
+        addButton(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -58,13 +57,13 @@ public class EditBagsGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 Group.add(new Group(null));
                 SaveHelper.add(EditType.GROUP_CREATE);
             }
         });
     
-        addButton(new LargeButton("hqm.questBook.createTier", 100, 200) {
+        addButton(new LargeButton(gui, "hqm.questBook.createTier", 100, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -76,7 +75,7 @@ public class EditBagsGraphic extends EditableGraphic {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 GroupTierManager.getInstance().getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
                 SaveHelper.add(EditType.TIER_CREATE);
             }
@@ -106,8 +105,8 @@ public class EditBagsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         int start = tierScroll.isVisible() ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
@@ -171,8 +170,8 @@ public class EditBagsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
-        super.onClick(gui, mX, mY, button);
+    public void onClick(int mX, int mY, int button) {
+        super.onClick(mX, mY, button);
         
         //Handle click on groups
         List<Group> groups = new ArrayList<>(Group.getGroups().values());

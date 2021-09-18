@@ -1,6 +1,7 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.DeathTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
@@ -33,8 +34,8 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return new DeathTaskGraphic(this, playerId);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new DeathTaskGraphic(this, playerId, gui);
     }
     
     @Override

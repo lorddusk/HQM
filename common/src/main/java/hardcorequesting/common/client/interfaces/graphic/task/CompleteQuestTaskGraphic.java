@@ -28,8 +28,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     
     private final CompleteQuestTask task;
     
-    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId) {
-        super(parts, playerId);
+    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(parts, playerId, gui);
         this.task = task;
         addDetectButton(task);
     }
@@ -47,7 +47,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
@@ -64,8 +64,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, CompleteQuestTask.Part part, int id) {
-        if (super.handlePartClick(gui, mode, part, id)) {
+    protected boolean handlePartClick(EditMode mode, CompleteQuestTask.Part part, int id) {
+        if (super.handlePartClick(mode, part, id)) {
             return true;
         } else if (Quest.speciallySelectedQuestId != null) {
             parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
@@ -76,7 +76,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<CompleteQuestTask.Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<CompleteQuestTask.Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), ITEM_SIZE, ITEM_SIZE, mX, mY);
     }
 }

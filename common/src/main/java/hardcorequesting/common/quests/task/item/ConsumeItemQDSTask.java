@@ -1,5 +1,6 @@
 package hardcorequesting.common.quests.task.item;
 
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.quests.Quest;
@@ -16,7 +17,7 @@ public class ConsumeItemQDSTask extends ConsumeItemTask {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public TaskGraphic createGraphic(UUID playerId) {
-        return ItemTaskGraphic.createConsumeGraphic(this, parts, playerId, false);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return ItemTaskGraphic.createConsumeGraphic(this, parts, playerId, gui, false);
     }
 }

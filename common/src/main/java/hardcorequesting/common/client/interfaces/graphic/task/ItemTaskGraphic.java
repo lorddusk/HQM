@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
@@ -45,23 +44,23 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
     private final ItemRequirementTask task;
     
-    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId) {
-        super(parts, playerId);
+    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(parts, playerId, gui);
         this.task = task;
     }
     
-    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId);
+    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId, gui);
         graphic.addDetectButton(task);
         return graphic;
     }
     
-    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, boolean hasSubmitButton) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId);
+    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui, boolean hasSubmitButton) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId, gui);
         if (hasSubmitButton)
             graphic.addSubmitButton(task);
     
-        graphic.addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
+        graphic.addButton(new LargeButton(gui, "hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled() {
                 QuestingData data = QuestingDataManager.getInstance().getQuestingData(playerId);
@@ -77,7 +76,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             }
         
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = task.getParent().getQuestId();
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = task.getId();
@@ -110,7 +109,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, GuiQuestBook gui, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, ItemRequirementTask.Part part, int id, int x, int y, int mX, int mY) {
         part.stack.ifLeft(itemStack -> gui.drawItemStack(matrices, part.getPermutatedItem(), x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
     
@@ -124,9 +123,9 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Positioned<ItemRequirementTask.Part> pos, int id, int mX, int mY) {
+    protected List<FormattedText> getPartTooltip(Positioned<ItemRequirementTask.Part> pos, int id, int mX, int mY) {
         ItemRequirementTask.Part part = pos.getElement();
-        if (isInPartBounds(gui, mX, mY, pos)) {
+        if (isInPartBounds(mX, mY, pos)) {
             List<FormattedText> str = new ArrayList<>();
             part.stack.ifRight(fluidStack -> {
                 List<Component> list = new ArrayList<>();
@@ -156,19 +155,19 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<ItemRequirementTask.Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<ItemRequirementTask.Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), SIZE, SIZE, mX, mY);
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         if (gui.isOpBook && Screen.hasShiftDown()) {
-            int id = getClickedPart(gui, mX, mY);
+            int id = getClickedPart(mX, mY);
             if (id >= 0) {
                 OPBookHelper.reverseRequirementCompletion(task, id, playerId);
             }
         } else if (Quest.canQuestsBeEdited()) {
-            super.onClick(gui, mX, mY, b);
+            super.onClick(mX, mY, b);
         } else {
             /* TODO REI
             if (Loader.isModLoaded("jei")) {
@@ -183,7 +182,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, ItemRequirementTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, ItemRequirementTask.Part part, int id) {
         boolean doubleClick = false;
         long tickCount = Minecraft.getInstance().level.getGameTime();
         long lastDiff = tickCount - lastClicked;
@@ -203,7 +202,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             }
             return true;
         } else {
-            return super.handlePartClick(gui, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }

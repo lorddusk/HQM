@@ -39,7 +39,7 @@ public abstract class GuiEditMenu {
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
         
-        buttons.add(new LargeButton("hqm.edit.ok", xOffset + 40, 200) {
+        buttons.add(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -51,13 +51,13 @@ public abstract class GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 save();
                 close();
             }
         });
         
-        buttons.add(new LargeButton("hqm.edit.cancel", xOffset + 100, 200) {
+        buttons.add(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -69,7 +69,7 @@ public abstract class GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 close();
             }
         });
@@ -78,7 +78,7 @@ public abstract class GuiEditMenu {
     public void draw(PoseStack matrices, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible()) {
-                button.draw(matrices, gui, mX, mY);
+                button.draw(matrices, mX, mY);
             }
         }
         for (CheckBox checkbox : checkboxes) {
@@ -91,7 +91,7 @@ public abstract class GuiEditMenu {
     public void renderTooltip(PoseStack matrices, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible()) {
-                button.renderTooltip(matrices, gui, mX, mY);
+                button.renderTooltip(matrices, mX, mY);
             }
         }
     }
@@ -104,8 +104,8 @@ public abstract class GuiEditMenu {
         }
         
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick(gui);
+            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
+                button.onClick();
             }
         }
         

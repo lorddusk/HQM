@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -111,7 +110,7 @@ public class LocationMenu extends GuiEditMenu {
         });
         
         
-        buttons.add(new LargeButton("hqm.locationMenu.location", 100, 20) {
+        buttons.add(new LargeButton(gui, "hqm.locationMenu.location", 100, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -123,7 +122,7 @@ public class LocationMenu extends GuiEditMenu {
             }
             
             @Override
-            public void onClick(GuiBase gui) {
+            public void onClick() {
                 Player player = Minecraft.getInstance().player;
                 pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
                 dimension = player.level.dimension().location().toString();
