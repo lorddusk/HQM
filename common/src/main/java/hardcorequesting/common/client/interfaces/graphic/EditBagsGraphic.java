@@ -48,14 +48,14 @@ public class EditBagsGraphic extends Graphic {
         addScrollBar(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return GuiQuestBook.selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
+                return Group.getGroups().size() > VISIBLE_GROUPS;
             }
         });
     
         addScrollBar(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return GuiQuestBook.selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
+                return GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
             }
         });
     
@@ -67,7 +67,7 @@ public class EditBagsGraphic extends Graphic {
         
             @Override
             public boolean isVisible(GuiBase gui) {
-                return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE && GuiQuestBook.selectedGroup == null;
+                return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
             }
         
             @Override
@@ -85,7 +85,7 @@ public class EditBagsGraphic extends Graphic {
         
             @Override
             public boolean isVisible(GuiBase gui) {
-                return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE && GuiQuestBook.selectedGroup == null;
+                return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
             }
         
             @Override
@@ -183,7 +183,7 @@ public class EditBagsGraphic extends Graphic {
                         gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
                         break;
                     case NORMAL:
-                        GuiQuestBook.selectedGroup = group;
+                        gui.setGroup(group);
                         gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
                         break;
                     case RENAME:

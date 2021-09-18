@@ -14,6 +14,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.EditBagsGraphic;
+import hardcorequesting.common.client.interfaces.graphic.EditGroupGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -104,7 +105,8 @@ public class GuiQuestBook extends GuiBase {
     //these are static to keep the same page loaded when the book is reopened
     private static BookPage page;
     private Graphic graphic;
-    public static Group selectedGroup;
+    private static Group selectedGroup;
+    private EditGroupGraphic groupGraphic;
     public static Reputation selectedReputation;
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
@@ -546,7 +548,7 @@ public class GuiQuestBook extends GuiBase {
     
     private void drawBagPage(PoseStack matrices, int x, int y) {
         if (selectedGroup != null) {
-            selectedGroup.draw(matrices, this, x, y);
+            groupGraphic.drawFull(matrices, this, x, y);
             textBoxes.draw(matrices, this);
             
         } else {
@@ -674,9 +676,9 @@ public class GuiQuestBook extends GuiBase {
     private void bagPageMouseClicked(int button, int x, int y) {
         if (selectedGroup != null) {
             if (button == 1) {
-                selectedGroup = null;
+                setGroup(null);
             } else {
-                selectedGroup.mouseClicked(this, x, y);
+                groupGraphic.onClick(this, x, y, button);
                 textBoxes.onClick(this, x, y);
             }
         } else {
@@ -802,6 +804,11 @@ public class GuiQuestBook extends GuiBase {
     
     private boolean shouldDisplayAndIsInArrowBounds(boolean isMenuArrow, int mX, int mY) {
         return shouldDisplayControlArrow(isMenuArrow) && inArrowBounds(isMenuArrow, mX, mY);
+    }
+    
+    public void setGroup(Group group) {
+        selectedGroup = group;
+        groupGraphic = group == null ? null : new EditGroupGraphic(group);
     }
     
     public void setPage(BookPage page) {
