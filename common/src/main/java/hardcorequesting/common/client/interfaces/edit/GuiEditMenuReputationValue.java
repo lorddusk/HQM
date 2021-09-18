@@ -15,7 +15,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     private int value;
     
     public GuiEditMenuReputationValue(GuiBase gui, UUID playerId, ReputationMarker marker) {
-        super(gui, playerId, true, -1, -1);
+        super(gui, playerId, true);
         
         this.marker = marker;
         this.value = marker.getValue();
@@ -36,21 +36,6 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
                 value = number;
             }
         });
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return null;
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
     }
     
     @Override

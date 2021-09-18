@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.reward.ReputationReward;
@@ -25,9 +26,10 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private final List<ReputationReward> rewards;
     private ReputationReward selectedReward;
     private List<FormattedText> error;
+    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
-        super(gui, playerId, true, 185, 25);
+        super(gui, playerId, true);
         this.resultConsumer = resultConsumer;
     
         this.rewards = new ArrayList<>();
@@ -93,6 +95,44 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
                 selectedReward = null;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 185, 25) {
+    
+            @Override
+            protected boolean isArrowVisible() {
+                return isValid() && selectedReward != null;
+            }
+    
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (selectedReward != null && selectedReward.getReward() != null) {
+                    ReputationManager reputationManager = ReputationManager.getInstance();
+                    for (int i = 0; i < reputationManager.getReputationList().size(); i++) {
+                        if (reputationManager.getReputationList().get(i).equals(selectedReward.getReward())) {
+                            int id = i + (left ? -1 : 1);
+                            if (id < 0) {
+                                id = reputationManager.getReputationList().size() - 1;
+                            } else if (id >= reputationManager.getReputationList().size()) {
+                                id = 0;
+                            }
+                            selectedReward.setReward(reputationManager.getReputationList().get(id));
+                            break;
+                        }
+                    }
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return selectedReward.getReward().getName();
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return null;
+            }
+    
+        };
     }
     
     @Override
@@ -113,6 +153,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             
             gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);
         }
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
@@ -132,40 +174,15 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
                 }
             }
         }
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected boolean isArrowVisible() {
-        return isValid() && selectedReward != null;
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        if (selectedReward != null && selectedReward.getReward() != null) {
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            for (int i = 0; i < reputationManager.getReputationList().size(); i++) {
-                if (reputationManager.getReputationList().get(i).equals(selectedReward.getReward())) {
-                    int id = i + (left ? -1 : 1);
-                    if (id < 0) {
-                        id = reputationManager.getReputationList().size() - 1;
-                    } else if (id >= reputationManager.getReputationList().size()) {
-                        id = 0;
-                    }
-                    selectedReward.setReward(reputationManager.getReputationList().get(id));
-                    break;
-                }
-            }
-        }
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return selectedReward.getReward().getName();
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     private boolean isValid() {

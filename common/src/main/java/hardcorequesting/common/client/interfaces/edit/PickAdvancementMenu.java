@@ -6,6 +6,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
@@ -31,13 +32,14 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     
     private List<String> rawAdvancemenNames;
     private List<String> advancementNames;
+    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
         gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
     }
     
     private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
-        super(gui, playerId, false, 180, 70);
+        super(gui, playerId, false);
         
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
@@ -56,6 +58,22 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
                 updateAdvancements(getText());
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+            @Override
+            protected void onArrowClick(boolean left) {
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return "Exact Advancement";
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return "Completing the exact advancement is required.";
+            }
+        };
         
         rawAdvancemenNames = new ArrayList<>();
         advancementNames = new ArrayList<>();
@@ -91,6 +109,8 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         scrollBar.draw(matrices, gui);
+    
+        selectionHelper.render(matrices, mX, mY);
         
         int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
@@ -114,6 +134,8 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
         
         scrollBar.onClick(gui, mX, mY);
         
+        selectionHelper.onClick(mX, mY);
+        
         int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
@@ -134,20 +156,8 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
         super.onRelease(mX, mY);
         
         scrollBar.onRelease(gui, mX, mY);
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return "Exact Advancement";
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return "Completing the exact advancement is required.";
+        
+        selectionHelper.onRelease();
     }
     
     @Override

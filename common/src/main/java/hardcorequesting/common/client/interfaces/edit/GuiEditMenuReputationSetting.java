@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -29,9 +30,10 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private boolean inverted;
     private ReputationTask<?> task;
     private int id;
+    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuReputationSetting(GuiBase gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
-        super(gui, playerId, true, 25, 25);
+        super(gui, playerId, true);
         
         this.task = task;
         this.id = id;
@@ -79,6 +81,42 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
                 inverted = val;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 25, 25) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (reputation != null) {
+                    ReputationManager reputationManager = ReputationManager.getInstance();
+                    reputationId += left ? -1 : 1;
+                    if (reputationId < 0) {
+                        reputationId = reputationManager.getReputations().size() - 1;
+                    } else if (reputationId >= reputationManager.getReputations().size()) {
+                        reputationId = 0;
+                    }
+                    lower = null;
+                    upper = null;
+                    reputation = reputationManager.getReputationList().get(reputationId);
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                if (ReputationManager.getInstance().getReputations().isEmpty()) {
+                    return I18n.get("hqm.repSetting.invalid");
+                } else {
+                    return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
+                }
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                if (ReputationManager.getInstance().getReputations().isEmpty()) {
+                    return I18n.get("hqm.repReward.noValidReps");
+                } else {
+                    return null;
+                }
+            }
+        };
     }
     
     @Override
@@ -109,6 +147,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
                 gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
             }
         }
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
@@ -134,40 +174,15 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
                 }
             }
         }
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        if (reputation != null) {
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            reputationId += left ? -1 : 1;
-            if (reputationId < 0) {
-                reputationId = reputationManager.getReputations().size() - 1;
-            } else if (reputationId >= reputationManager.getReputations().size()) {
-                reputationId = 0;
-            }
-            lower = null;
-            upper = null;
-            reputation = reputationManager.getReputationList().get(reputationId);
-        }
-    }
-    
-    @Override
-    protected String getArrowText() {
-        if (ReputationManager.getInstance().getReputations().isEmpty()) {
-            return I18n.get("hqm.repSetting.invalid");
-        } else {
-            return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
-        }
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        if (ReputationManager.getInstance().getReputations().isEmpty()) {
-            return I18n.get("hqm.repReward.noValidReps");
-        } else {
-            return null;
-        }
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     @Override

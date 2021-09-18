@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -22,16 +23,17 @@ public class LocationMenu extends GuiEditMenuExtended {
     private BlockPos.MutableBlockPos pos;
     private int radius;
     private String dimension;
+    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         gui.setEditMenu(new LocationMenu(gui, playerId, visibility, initPos, initRadius, initDimension, resultConsumer));
     }
     
-    private LocationMenu(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        super(gui, playerId, true, 180, 30);
+    private LocationMenu(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibilityIn, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        super(gui, playerId, true);
     
         this.resultConsumer = resultConsumer;
-        this.visibility = visibility;
+        this.visibility = visibilityIn;
         this.pos = new BlockPos.MutableBlockPos(initPos.getX(), initPos.getY(), initPos.getZ());
         this.radius = initRadius;
         this.dimension = initDimension;
@@ -133,25 +135,48 @@ public class LocationMenu extends GuiEditMenuExtended {
                 }
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 180, 30) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (left) {
+                    visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + VisitLocationTask.Visibility.values().length - 1) % VisitLocationTask.Visibility.values().length];
+                } else {
+                    visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + 1) % VisitLocationTask.Visibility.values().length];
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return visibility.getName();
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return visibility.getDescription();
+            }
+        };
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        if (left) {
-            visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + VisitLocationTask.Visibility.values().length - 1) % VisitLocationTask.Visibility.values().length];
-        } else {
-            visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + 1) % VisitLocationTask.Visibility.values().length];
-        }
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
-    protected String getArrowText() {
-        return visibility.getName();
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected String getArrowDescription() {
-        return visibility.getDescription();
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     @Override

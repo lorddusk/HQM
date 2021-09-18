@@ -16,7 +16,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
     }
     
     public IntInputMenu(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
-        super(gui, playerId, true, -1, -1);
+        super(gui, playerId, true);
         
         this.resultConsumer = resultConsumer;
         amount = initAmount;
@@ -37,20 +37,5 @@ public class IntInputMenu extends GuiEditMenuExtended {
     @Override
     public void save() {
         resultConsumer.accept(amount);
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return null;
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
     }
 }

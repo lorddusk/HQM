@@ -1,6 +1,8 @@
 package hardcorequesting.common.client.interfaces.edit;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.EditType;
@@ -14,9 +16,10 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
     private boolean showModifiedParentRequirement;
     private int parentRequirementCount;
     private Quest quest;
+    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuParentCount(GuiBase gui, UUID playerId, Quest quest) {
-        super(gui, playerId, true, 25, 20);
+        super(gui, playerId, true);
         
         this.quest = quest;
         this.parentRequirementCount = quest._getParentRequirementCount();
@@ -39,21 +42,45 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
                 return showModifiedParentRequirement;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui,  25, 20) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                showModifiedParentRequirement = !showModifiedParentRequirement;
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
+            }
+    
+        };
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        showModifiedParentRequirement = !showModifiedParentRequirement;
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
-    protected String getArrowText() {
-        return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected String getArrowDescription() {
-        return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     @Override

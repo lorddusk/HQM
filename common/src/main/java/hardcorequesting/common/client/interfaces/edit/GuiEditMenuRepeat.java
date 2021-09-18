@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.RepeatInfo;
@@ -18,9 +19,10 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     private RepeatType type;
     private int days;
     private int hours;
+    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuRepeat(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(gui, playerId, true, 25, 20);
+        super(gui, playerId, true);
         this.quest = quest;
         this.type = quest.getRepeatInfo().getType();
         days = quest.getRepeatInfo().getDays();
@@ -56,31 +58,54 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
                 hours = number;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 25, 20) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (left) {
+                    type = RepeatType.values()[(type.ordinal() + RepeatType.values().length - 1) % RepeatType.values().length];
+                } else {
+                    type = RepeatType.values()[(type.ordinal() + 1) % RepeatType.values().length];
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return type.getName();
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return type.getDescription();
+            }
+        };
+    }
+    
+    @Override
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
+        
+        selectionHelper.render(matrices, mX, mY);
+    }
+    
+    @Override
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
+        
+        selectionHelper.onClick(mX, mY);
+    }
+    
+    @Override
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     @Override
     public void save() {
         quest.setRepeatInfo(new RepeatInfo(type, days, hours));
         SaveHelper.add(EditType.REPEATABILITY_CHANGED);
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        if (left) {
-            type = RepeatType.values()[(type.ordinal() + RepeatType.values().length - 1) % RepeatType.values().length];
-        } else {
-            type = RepeatType.values()[(type.ordinal() + 1) % RepeatType.values().length];
-        }
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return type.getName();
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return type.getDescription();
     }
     
     private abstract class TextBoxHidden extends NumberTextBox {

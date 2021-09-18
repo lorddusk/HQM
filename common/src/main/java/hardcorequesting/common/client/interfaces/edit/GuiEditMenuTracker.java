@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
@@ -12,9 +13,10 @@ import java.util.UUID;
 public class GuiEditMenuTracker extends GuiEditMenuExtended {
     
     private TrackerBlockEntity tracker;
+    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuTracker(GuiBase gui, UUID playerId, final TrackerBlockEntity tracker) {
-        super(gui, playerId, true, 20, 30);
+        super(gui, playerId, true);
         
         this.tracker = tracker;
         
@@ -36,6 +38,27 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
                 tracker.setRadius(number);
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 20, 30) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (left) {
+                    tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + TrackerType.values().length - 1) % TrackerType.values().length]);
+                } else {
+                    tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + 1) % TrackerType.values().length]);
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return tracker.getTrackerType().getName();
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return tracker.getTrackerType().getDescription();
+            }
+        };
     }
     
     @Override
@@ -43,25 +66,22 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
         super.draw(matrices, mX, mY);
         
         gui.drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        if (left) {
-            tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + TrackerType.values().length - 1) % TrackerType.values().length]);
-        } else {
-            tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + 1) % TrackerType.values().length]);
-        }
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected String getArrowText() {
-        return tracker.getTrackerType().getName();
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return tracker.getTrackerType().getDescription();
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
+        
+        selectionHelper.onRelease();
     }
     
     @Override

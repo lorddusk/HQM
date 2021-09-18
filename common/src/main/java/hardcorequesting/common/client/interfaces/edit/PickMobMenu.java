@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -37,6 +38,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
     private final ScrollBar scrollBar;
     private final List<Entry> rawMobs;
     private final List<Entry> mobs;
+    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
         gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
@@ -47,7 +49,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     private PickMobMenu(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        super(gui, playerId, false, 180, 70);
+        super(gui, playerId, false);
         
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;
@@ -79,6 +81,29 @@ public class PickMobMenu extends GuiEditMenuExtended {
                 updateMobs(getText());
             }
         });
+    
+        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+            @Override
+            protected boolean isArrowVisible() {
+                return false;   //There is currently no precision for mobs. Change this if precision is ever added back
+            }
+        
+            @Override
+            protected void onArrowClick(boolean left) {
+//              mob.setExact(!mob.isExact());
+            }
+        
+            @Override
+            protected String getArrowText() {
+                return I18n.get("hqm." + textKey + "." + "type" + "Match.title");
+            }
+        
+            @Override
+            protected String getArrowDescription() {
+                return I18n.get("hqm." + textKey + "." + "type" + "Match.desc");
+            }
+        
+        };
         
         rawMobs = new ArrayList<>();
         mobs = new ArrayList<>();
@@ -121,6 +146,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         scrollBar.draw(matrices, gui);
         
+        selectionHelper.render(matrices, mX, mY);
+        
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
@@ -143,6 +170,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
         
         scrollBar.onClick(gui, mX, mY);
         
+        selectionHelper.onClick(mX, mY);
+        
         int start = scrollBar.isVisible(gui) ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
@@ -162,26 +191,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
         super.onRelease(mX, mY);
         
         scrollBar.onRelease(gui, mX, mY);
-    }
-    
-    @Override
-    protected boolean isArrowVisible() {
-        return false;   //There is currently no precision for mobs. Change this if precision is ever added back
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-//        mob.setExact(!mob.isExact());
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return I18n.get("hqm." + textKey + "." + "type" + "Match.title");
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return I18n.get("hqm." + textKey + "." + "type" + "Match.desc");
+        
+        selectionHelper.onRelease();
     }
     
     @Override
