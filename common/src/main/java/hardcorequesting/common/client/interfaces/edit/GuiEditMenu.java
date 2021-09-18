@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,19 +18,19 @@ import java.util.UUID;
 @Environment(EnvType.CLIENT)
 public abstract class GuiEditMenu {
     
+    protected static final int BOX_OFFSET = 30;
     private static final int CHECK_BOX_SRC_X = 192;
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
-    protected List<LargeButton> buttons;
-    protected final UUID playerId;
-    protected List<CheckBox> checkboxes;
+    protected final List<LargeButton> buttons = new ArrayList<>();
+    protected final List<CheckBox> checkboxes = new ArrayList<>();
+    protected final TextBoxGroup textBoxes = new TextBoxGroup();
     private boolean hasButtons;
     protected final GuiBase gui;
+    protected final UUID playerId;
     
     protected GuiEditMenu(GuiBase gui, UUID playerId) {
         this.gui = gui;
-        buttons = new ArrayList<>();
-        checkboxes = new ArrayList<>();
         this.playerId = playerId;
     }
     
@@ -83,6 +84,8 @@ public abstract class GuiEditMenu {
         for (CheckBox checkbox : checkboxes) {
             checkbox.draw(matrices, gui, mX, mY);
         }
+    
+        textBoxes.draw(matrices);
     }
     
     public void renderTooltip(PoseStack matrices, int mX, int mY) {
@@ -109,7 +112,8 @@ public abstract class GuiEditMenu {
         for (CheckBox checkbox : checkboxes) {
             checkbox.onClick(gui, mX, mY);
         }
-        
+    
+        textBoxes.onClick(mX, mY);
     }
     
     public void close() {
@@ -117,7 +121,10 @@ public abstract class GuiEditMenu {
     }
     
     public void onKeyStroke(char c, int k) {
-        
+        if (k == -1)
+            textBoxes.onCharTyped(c);
+        else
+            textBoxes.onKeyStroke(k);
     }
     
     public void onDrag(int mX, int mY) {

@@ -6,7 +6,7 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import java.util.UUID;
 import java.util.function.IntConsumer;
 
-public class IntInputMenu extends GuiEditMenuExtended {
+public class IntInputMenu extends GuiEditMenu {
     
     private final IntConsumer resultConsumer;
     private int amount;
@@ -17,7 +17,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
     
     public IntInputMenu(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
         super(gui, playerId, true);
-        
+    
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         

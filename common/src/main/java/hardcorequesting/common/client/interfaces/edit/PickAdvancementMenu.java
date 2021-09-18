@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class PickAdvancementMenu extends GuiEditMenuExtended {
+public class PickAdvancementMenu extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 20;
@@ -40,7 +40,7 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     
     private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
         super(gui, playerId, false);
-        
+    
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
         

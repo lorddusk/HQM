@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
+public class GuiEditMenuReputationReward extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 50;

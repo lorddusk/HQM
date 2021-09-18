@@ -13,7 +13,7 @@ import hardcorequesting.common.util.Translator;
 
 import java.util.UUID;
 
-public class GuiEditMenuRepeat extends GuiEditMenuExtended {
+public class GuiEditMenuRepeat extends GuiEditMenu {
     
     private Quest quest;
     private RepeatType type;

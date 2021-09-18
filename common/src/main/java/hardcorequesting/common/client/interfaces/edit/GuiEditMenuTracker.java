@@ -10,14 +10,14 @@ import hardcorequesting.common.util.Translator;
 
 import java.util.UUID;
 
-public class GuiEditMenuTracker extends GuiEditMenuExtended {
+public class GuiEditMenuTracker extends GuiEditMenu {
     
     private TrackerBlockEntity tracker;
     private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuTracker(GuiBase gui, UUID playerId, final TrackerBlockEntity tracker) {
         super(gui, playerId, true);
-        
+    
         this.tracker = tracker;
         
         textBoxes.add(new NumberTextBox(gui, 20, 130, "hqm.menuTracker.radius.title") {

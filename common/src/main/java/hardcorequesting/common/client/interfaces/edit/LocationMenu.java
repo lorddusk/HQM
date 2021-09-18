@@ -16,7 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class LocationMenu extends GuiEditMenuExtended {
+public class LocationMenu extends GuiEditMenu {
     
     private final Consumer<Result> resultConsumer;
     private VisitLocationTask.Visibility visibility;

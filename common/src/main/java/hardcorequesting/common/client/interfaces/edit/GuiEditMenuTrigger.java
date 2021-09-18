@@ -11,7 +11,7 @@ import hardcorequesting.common.util.SaveHelper;
 
 import java.util.UUID;
 
-public class GuiEditMenuTrigger extends GuiEditMenuExtended {
+public class GuiEditMenuTrigger extends GuiEditMenu {
     
     private TriggerType type;
     private int triggerTasks;
@@ -20,7 +20,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     
     public GuiEditMenuTrigger(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, true);
-        
+    
         this.questId = quest.getQuestId();
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();

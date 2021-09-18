@@ -11,7 +11,7 @@ import net.minecraft.client.resources.language.I18n;
 
 import java.util.UUID;
 
-public class GuiEditMenuParentCount extends GuiEditMenuExtended {
+public class GuiEditMenuParentCount extends GuiEditMenu {
     
     private boolean showModifiedParentRequirement;
     private int parentRequirementCount;
@@ -20,7 +20,7 @@ public class GuiEditMenuParentCount extends GuiEditMenuExtended {
     
     public GuiEditMenuParentCount(GuiBase gui, UUID playerId, Quest quest) {
         super(gui, playerId, true);
-        
+    
         this.quest = quest;
         this.parentRequirementCount = quest._getParentRequirementCount();
         this.showModifiedParentRequirement = quest.getUseModifiedParentRequirement();

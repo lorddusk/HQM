@@ -21,7 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class PickMobMenu extends GuiEditMenuExtended {
+public class PickMobMenu extends GuiEditMenu {
     //TODO add support for entity tags to replace functionality of this special case
     public static final List<Entry> EXTRA_TAME_ENTRIES = ImmutableList.of(new Entry(TameMobsTask.ABSTRACT_HORSE, Translator.plain("Any Horse-like Entity")));
     
@@ -50,7 +50,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
     
     private PickMobMenu(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
         super(gui, playerId, false);
-        
+    
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;
         this.amount = initAmount;

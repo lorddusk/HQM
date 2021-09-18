@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
+public class GuiEditMenuReputationSetting extends GuiEditMenu {
     
     private static final int BARS_X = 20;
     private static final int LOWER_Y = 50;
@@ -34,7 +34,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     
     public GuiEditMenuReputationSetting(GuiBase gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
         super(gui, playerId, true);
-        
+    
         this.task = task;
         this.id = id;
         ReputationManager reputationManager = ReputationManager.getInstance();

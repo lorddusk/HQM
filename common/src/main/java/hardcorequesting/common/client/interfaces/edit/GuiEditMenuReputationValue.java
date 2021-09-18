@@ -9,14 +9,14 @@ import hardcorequesting.common.util.SaveHelper;
 
 import java.util.UUID;
 
-public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
+public class GuiEditMenuReputationValue extends GuiEditMenu {
     
     private ReputationMarker marker;
     private int value;
     
     public GuiEditMenuReputationValue(GuiBase gui, UUID playerId, ReputationMarker marker) {
         super(gui, playerId, true);
-        
+    
         this.marker = marker;
         this.value = marker.getValue();
         
