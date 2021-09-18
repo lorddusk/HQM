@@ -51,7 +51,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private PlayerEntry selectedEntry;
     
     public GuiEditMenuTeam(GuiQuestBook gui, UUID playerId) {
-        super(playerId);
+        super(gui, playerId);
         
         buttons.add(new LargeButton("hqm.party.create", 250, 20) {
             @Override
@@ -212,7 +212,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             
             @Override
             public void onClick(GuiBase gui) {
-                gui.setEditMenu(new GuiEditMenuTeamList(playerId, self));
+                gui.setEditMenu(new GuiEditMenuTeamList(gui, playerId, self));
             }
         });
         
@@ -249,7 +249,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         Team team = getTeam();
         PlayerEntry entry = getEntry(team);
         
@@ -274,7 +274,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             Team.reloadedInvites = false;
         }
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
         
         textBoxes.draw(matrices);
         
@@ -377,8 +377,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void renderTooltip(PoseStack matrices, int mX, int mY) {
+        super.renderTooltip(matrices, mX, mY);
         
         Team team = getTeam();
         PlayerEntry entry = getEntry(team);
@@ -404,8 +404,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         
         Team team = getTeam();
@@ -450,8 +450,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
+    public void onKeyStroke(char c, int k) {
+        super.onKeyStroke(c, k);
         if (k == -1)
             textBoxes.onCharTyped(c);
         else
@@ -459,8 +459,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void onDrag(GuiBase gui, int mX, int mY) {
-        super.onDrag(gui, mX, mY);
+    public void onDrag(int mX, int mY) {
+        super.onDrag(mX, mY);
         
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onDrag(gui, mX, mY);
@@ -468,8 +468,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
         
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onRelease(gui, mX, mY);
@@ -477,8 +477,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
-        super.onScroll(gui, mX, mY, scroll);
+    public void onScroll(double mX, double mY, double scroll) {
+        super.onScroll(mX, mY, scroll);
         
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onScroll(gui, mX, mY, scroll);
@@ -486,7 +486,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         
     }
     

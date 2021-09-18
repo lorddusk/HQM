@@ -56,8 +56,8 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = mY0 - top;
         
         if (editMenu != null) {
-            editMenu.draw(matrices, this, mX, mY);
-            editMenu.renderTooltip(matrices, this, mX, mY);
+            editMenu.draw(matrices, mX, mY);
+            editMenu.renderTooltip(matrices, mX, mY);
         }
     }
     
@@ -68,7 +68,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         }
         
         if (editMenu != null) {
-            editMenu.onKeyStroke(this, c, -1);
+            editMenu.onKeyStroke(c, -1);
             return true;
         }
         return false;
@@ -81,7 +81,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         }
         
         if (editMenu != null) {
-            editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+            editMenu.onKeyStroke(Character.MIN_VALUE, keyCode);
         }
         return false;
     }
@@ -92,7 +92,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = (int) (mY0 - top);
         
         if (editMenu != null) {
-            editMenu.onClick(this, mX, mY, b);
+            editMenu.onClick(mX, mY, b);
             return true;
         }
         return false;
@@ -104,7 +104,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = (int) (mY0 - top);
         
         if (editMenu != null) {
-            editMenu.onRelease(this, mX, mY);
+            editMenu.onRelease(mX, mY);
             return true;
         }
         return false;
@@ -116,7 +116,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = (int) (mouseY - top);
         
         if (editMenu != null) {
-            editMenu.onDrag(this, mX, mY);
+            editMenu.onDrag(mX, mY);
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
@@ -127,7 +127,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         if (super.mouseScrolled(d, e, amount)) {
             return true;
         }
-        editMenu.onScroll(this, d, e, amount);
+        editMenu.onScroll(d, e, amount);
         return true;
     }
     

@@ -38,7 +38,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private boolean clicked;
     
     public GuiEditMenuTier(GuiQuestBook gui, UUID playerId, GroupTier original) {
-        super(playerId, true);
+        super(gui, playerId, true);
         this.original = original;
         this.tier = original.copy();
         this.textBoxes = new TextBoxGroup();
@@ -72,8 +72,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         gui.drawString(matrices, Translator.plain(tier.getName()), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
         
@@ -99,8 +99,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (inArrowBounds(gui, mX, mY, true)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
@@ -114,8 +114,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
+    public void onKeyStroke(char c, int k) {
+        super.onKeyStroke(c, k);
     
         if (k == -1)
             textBoxes.onCharTyped(c);
@@ -124,13 +124,13 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
         clicked = false;
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         original.load(tier);
         SaveHelper.add(EditType.TIER_CHANGE);
     }

@@ -24,15 +24,17 @@ public abstract class GuiEditMenu {
     protected final UUID playerId;
     protected List<CheckBox> checkboxes;
     private boolean hasButtons;
+    protected final GuiBase gui;
     
-    protected GuiEditMenu(UUID playerId) {
+    protected GuiEditMenu(GuiBase gui, UUID playerId) {
+        this.gui = gui;
         buttons = new ArrayList<>();
         checkboxes = new ArrayList<>();
         this.playerId = playerId;
     }
     
-    protected GuiEditMenu(UUID playerId, boolean isControlOnFirstPage) {
-        this(playerId);
+    protected GuiEditMenu(GuiBase gui, UUID playerId, boolean isControlOnFirstPage) {
+        this(gui, playerId);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
         
@@ -49,8 +51,8 @@ public abstract class GuiEditMenu {
             
             @Override
             public void onClick(GuiBase gui) {
-                save(gui);
-                close(gui);
+                save();
+                close();
             }
         });
         
@@ -67,12 +69,12 @@ public abstract class GuiEditMenu {
             
             @Override
             public void onClick(GuiBase gui) {
-                close(gui);
+                close();
             }
         });
     }
     
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible()) {
                 button.draw(matrices, gui, mX, mY);
@@ -83,7 +85,7 @@ public abstract class GuiEditMenu {
         }
     }
     
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void renderTooltip(PoseStack matrices, int mX, int mY) {
         for (LargeButton button : buttons) {
             if (button.isVisible()) {
                 button.renderTooltip(matrices, gui, mX, mY);
@@ -91,10 +93,10 @@ public abstract class GuiEditMenu {
         }
     }
     
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
+    public void onClick(int mX, int mY, int b) {
         if (!hasButtons && b == 1) {
-            save(gui);
-            close(gui);
+            save();
+            close();
             return;
         }
         
@@ -110,27 +112,27 @@ public abstract class GuiEditMenu {
         
     }
     
-    public void close(GuiBase gui) {
+    public void close() {
         gui.setEditMenu(null);
     }
     
-    public void onKeyStroke(GuiBase gui, char c, int k) {
+    public void onKeyStroke(char c, int k) {
         
     }
     
-    public void onDrag(GuiBase gui, int mX, int mY) {
+    public void onDrag(int mX, int mY) {
         
     }
     
-    public void onRelease(GuiBase gui, int mX, int mY) {
+    public void onRelease(int mX, int mY) {
         
     }
     
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
+    public void onScroll(double mX, double mY, double scroll) {
         
     }
     
-    public abstract void save(GuiBase gui);
+    public abstract void save();
     
     public boolean doesRequiredDoublePage() {
         return true;
@@ -140,7 +142,7 @@ public abstract class GuiEditMenu {
         return hasButtons;
     }
     
-    public abstract class CheckBox {
+    public abstract static class CheckBox {
         
         private int x;
         private int y;

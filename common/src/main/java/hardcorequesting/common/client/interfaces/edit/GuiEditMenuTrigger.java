@@ -1,6 +1,5 @@
 package hardcorequesting.common.client.interfaces.edit;
 
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
@@ -17,7 +16,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     private UUID questId;
     
     public GuiEditMenuTrigger(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(playerId, true, 25, 20);
+        super(gui, playerId, true, 25, 20);
         
         this.questId = quest.getQuestId();
         this.type = quest.getTriggerType();
@@ -61,7 +60,7 @@ public class GuiEditMenuTrigger extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         Quest quest = Quest.getQuest(questId);
         if (quest != null) {
             quest.setTriggerType(type);

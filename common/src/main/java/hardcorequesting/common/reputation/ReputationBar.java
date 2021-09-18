@@ -106,7 +106,7 @@ public class ReputationBar {
                     SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new EditGui(gui.getPlayer().getUUID(), this));
+                    gui.setEditMenu(new EditGui(gui, gui.getPlayer().getUUID(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
@@ -129,21 +129,21 @@ public class ReputationBar {
             }
         };
         
-        public EditGui(UUID playerId, ReputationBar bar) {
-            super(playerId);
+        public EditGui(GuiBase gui, UUID playerId, ReputationBar bar) {
+            super(gui, playerId);
             this.bar = bar;
             this.isNew = false;
         }
         
-        public EditGui(UUID playerId, int x, int y, int selectedSet) {
-            super(playerId);
+        public EditGui(GuiBase gui, UUID playerId, int x, int y, int selectedSet) {
+            super(gui, playerId);
             this.bar = new ReputationBar(null, x, y, selectedSet);
             this.isNew = true;
         }
         
         @Override
         @Environment(EnvType.CLIENT)
-        public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+        public void draw(PoseStack matrices, int mX, int mY) {
             ReputationManager reputationManager = ReputationManager.getInstance();
             int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
@@ -164,8 +164,8 @@ public class ReputationBar {
         }
         
         @Environment(EnvType.CLIENT)
-        public void onClick(GuiBase gui, int mX, int mY, int b) {
-            super.onClick(gui, mX, mY, b);
+        public void onClick(int mX, int mY, int b) {
+            super.onClick(mX, mY, b);
             ReputationManager reputationManager = ReputationManager.getInstance();
             
             int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
@@ -178,8 +178,8 @@ public class ReputationBar {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                     bar.repId = reputationList.get(i).getId();
-                    save(gui);
-                    close(gui);
+                    save();
+                    close();
                 }
             }
             
@@ -187,22 +187,22 @@ public class ReputationBar {
         }
     
         @Override
-        public void onDrag(GuiBase gui, int mX, int mY) {
+        public void onDrag(int mX, int mY) {
             scrollBar.onDrag(gui, mX, mY);
         }
     
         @Override
-        public void onRelease(GuiBase gui, int mX, int mY) {
+        public void onRelease(int mX, int mY) {
             scrollBar.onRelease(gui, mX, mY);
         }
     
         @Override
-        public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
+        public void onScroll(double mX, double mY, double scroll) {
             scrollBar.onScroll(gui, mX, mY, scroll);
         }
     
         @Override
-        public void save(GuiBase gui) {
+        public void save() {
             if (isNew) {
                 Quest.getQuestSets().get(bar.questSet).addRepBar(bar);
                 SaveHelper.add(EditType.REPUTATION_BAR_ADD);

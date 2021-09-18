@@ -85,7 +85,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     @Override
     protected boolean handlePartClick(GuiQuestBook gui, EditMode mode, ReputationTask.Part part, int id) {
         if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-            gui.setEditMenu(new GuiEditMenuReputationSetting(playerId, task, id, part));
+            gui.setEditMenu(new GuiEditMenuReputationSetting(gui, playerId, task, id, part));
             return true;
         } else {
             return super.handlePartClick(gui, mode, part, id);

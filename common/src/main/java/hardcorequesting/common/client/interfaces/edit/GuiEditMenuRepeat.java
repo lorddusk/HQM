@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
@@ -21,7 +20,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     private int hours;
     
     public GuiEditMenuRepeat(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(playerId, true, 25, 20);
+        super(gui, playerId, true, 25, 20);
         this.quest = quest;
         this.type = quest.getRepeatInfo().getType();
         days = quest.getRepeatInfo().getDays();
@@ -60,7 +59,7 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         quest.setRepeatInfo(new RepeatInfo(type, days, hours));
         SaveHelper.add(EditType.REPEATABILITY_CHANGED);
     }

@@ -28,7 +28,7 @@ public class LocationMenu extends GuiEditMenuExtended {
     }
     
     private LocationMenu(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        super(playerId, true, 180, 30);
+        super(gui, playerId, true, 180, 30);
     
         this.resultConsumer = resultConsumer;
         this.visibility = visibility;
@@ -155,7 +155,7 @@ public class LocationMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(new Result(visibility, pos.immutable(), radius, dimension));
     }
     

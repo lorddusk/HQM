@@ -52,7 +52,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private ScrollBar scrollBar;
     
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
-        super(playerId);
+        super(guiQuestBook, playerId);
         
         scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
@@ -63,8 +63,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         scrollBar.draw(matrices, gui);
         
@@ -123,8 +123,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void renderTooltip(PoseStack matrices, int mX, int mY) {
+        super.renderTooltip(matrices, mX, mY);
         
         DeathStat stats = getDeathStat();
         if (stats != null) {
@@ -143,8 +143,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         scrollBar.onClick(gui, mX, mY);
         
@@ -176,22 +176,22 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void onDrag(GuiBase gui, int mX, int mY) {
+    public void onDrag(int mX, int mY) {
         scrollBar.onDrag(gui, mX, mY);
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
+    public void onRelease(int mX, int mY) {
         scrollBar.onRelease(gui, mX, mY);
     }
     
     @Override
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
+    public void onScroll(double mX, double mY, double scroll) {
         scrollBar.onScroll(gui, mX, mY, scroll);
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         
     }
     

@@ -39,7 +39,7 @@ public class TextMenu extends GuiEditMenu {
     }
     
     protected TextMenu(GuiQuestBook gui, UUID playerId, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
-        super(playerId, false);
+        super(gui, playerId, false);
     
         this.resultConsumer = resultConsumer;
         this.limit = limit;
@@ -128,16 +128,16 @@ public class TextMenu extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         int page = text.getCursorLine() / LINES_PER_PAGE;
         gui.drawString(matrices, text.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
         gui.drawCursor(matrices, START_X + text.getCursorPositionX() - 1, START_Y + text.getCursorPositionY() - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
+    public void onKeyStroke(char c, int k) {
+        super.onKeyStroke(c, k);
         if (k == -1)
             text.onCharTyped(c);
         else
@@ -145,7 +145,7 @@ public class TextMenu extends GuiEditMenu {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         String str = text.getText();
         if (str == null || str.isEmpty()) {
             str = I18n.get("hqm.textEditor.unnamed");

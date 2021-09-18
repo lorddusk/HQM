@@ -30,8 +30,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private ReputationTask<?> task;
     private int id;
     
-    public GuiEditMenuReputationSetting(UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
-        super(playerId, true, 25, 25);
+    public GuiEditMenuReputationSetting(GuiBase gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
+        super(gui, playerId, true, 25, 25);
         
         this.task = task;
         this.id = id;
@@ -82,8 +82,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         if (reputation != null) {
             
@@ -112,8 +112,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (reputation != null) {
             ReputationMarker marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
@@ -171,7 +171,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         if (reputation != null) {
             task.setSetting(id, new ReputationTask.Part(reputation, lower, upper, inverted));
         }

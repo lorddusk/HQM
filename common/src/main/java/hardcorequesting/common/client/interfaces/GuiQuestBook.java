@@ -170,8 +170,8 @@ public class GuiQuestBook extends GuiBase {
             }
     
         } else {
-            editMenu.draw(matrices, this, x, y);
-            editMenu.renderTooltip(matrices, this, x, y);
+            editMenu.draw(matrices, x, y);
+            editMenu.renderTooltip(matrices, x, y);
         }
     
         saveButton.renderTooltip(matrices, this, x, y);
@@ -193,7 +193,7 @@ public class GuiQuestBook extends GuiBase {
             return true;
         }
         if (editMenu != null) {
-            editMenu.onKeyStroke(this, c, -1);
+            editMenu.onKeyStroke(c, -1);
         } else {
             return pageGraphic.charTyped(this, c);
         }
@@ -207,7 +207,7 @@ public class GuiQuestBook extends GuiBase {
         }
         
         if (editMenu != null) {
-            editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+            editMenu.onKeyStroke(Character.MIN_VALUE, keyCode);
         } else if (pageGraphic.keyPressed(this, keyCode)) {
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
@@ -229,14 +229,14 @@ public class GuiQuestBook extends GuiBase {
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             button = 1;
             if (editMenu != null) {
-                editMenu.save(this);
-                editMenu.close(this);
+                editMenu.save();
+                editMenu.close();
                 return true;
             }
         } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
             if (editMenu != null) {
-                editMenu.save(this);
-                editMenu.close(this);
+                editMenu.save();
+                editMenu.close();
                 editMenu = null;
             }
             setPage(BookPage.MenuPage.INSTANCE);
@@ -264,7 +264,7 @@ public class GuiQuestBook extends GuiBase {
                 pageGraphic.onClick(this, x, y, button);
             }
         } else {
-            editMenu.onClick(this, x, y, button);
+            editMenu.onClick(x, y, button);
         }
         return true;
     }
@@ -283,7 +283,7 @@ public class GuiQuestBook extends GuiBase {
             modifyingBar = null;
         }
         if (editMenu != null) {
-            editMenu.onRelease(this, x, y);
+            editMenu.onRelease(x, y);
         } else {
             pageGraphic.onRelease(this, x, y, button);
         }
@@ -300,7 +300,7 @@ public class GuiQuestBook extends GuiBase {
         
         updatePosition(x, y);
         if (editMenu != null) {
-            editMenu.onDrag(this, x, y);
+            editMenu.onDrag(x, y);
         } else {
             pageGraphic.onDrag(this, x, y, button);
         }
@@ -310,7 +310,7 @@ public class GuiQuestBook extends GuiBase {
     @Override
     public boolean mouseScrolled(double x, double y, double scroll) {
         if (editMenu != null) {
-            editMenu.onScroll(this, x, y, scroll);
+            editMenu.onScroll(x, y, scroll);
         } else {
             pageGraphic.onScroll(this, x, y, scroll);
         }

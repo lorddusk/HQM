@@ -16,7 +16,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
     }
     
     public IntInputMenu(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
-        super(playerId, true, -1, -1);
+        super(gui, playerId, true, -1, -1);
         
         this.resultConsumer = resultConsumer;
         amount = initAmount;
@@ -35,7 +35,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(amount);
     }
     

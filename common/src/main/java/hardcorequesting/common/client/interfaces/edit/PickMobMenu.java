@@ -47,7 +47,7 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     private PickMobMenu(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        super(playerId, false, 180, 70);
+        super(gui, playerId, false, 180, 70);
         
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;
@@ -114,8 +114,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -138,8 +138,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         scrollBar.onClick(gui, mX, mY);
         
@@ -158,8 +158,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
         
         scrollBar.onRelease(gui, mX, mY);
     }
@@ -185,19 +185,19 @@ public class PickMobMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onDrag(GuiBase gui, int mX, int mY) {
-        super.onDrag(gui, mX, mY);
+    public void onDrag(int mX, int mY) {
+        super.onDrag(mX, mY);
         scrollBar.onDrag(gui, mX, mY);
     }
     
     @Override
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
-        super.onScroll(gui, mX, mY, scroll);
+    public void onScroll(double mX, double mY, double scroll) {
+        super.onScroll(mX, mY, scroll);
         scrollBar.onScroll(gui, mX, mY, scroll);
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(new Result(mob.id, Math.max(1, amount)));
     }
     

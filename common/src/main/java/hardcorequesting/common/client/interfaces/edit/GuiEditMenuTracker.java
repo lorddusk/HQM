@@ -14,7 +14,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     private TrackerBlockEntity tracker;
     
     public GuiEditMenuTracker(GuiBase gui, UUID playerId, final TrackerBlockEntity tracker) {
-        super(playerId, true, 20, 30);
+        super(gui, playerId, true, 20, 30);
         
         this.tracker = tracker;
         
@@ -39,8 +39,8 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         gui.drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     }
@@ -65,7 +65,7 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         tracker.sendToServer();
     }
     

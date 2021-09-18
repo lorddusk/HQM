@@ -15,7 +15,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     private int value;
     
     public GuiEditMenuReputationValue(GuiBase gui, UUID playerId, ReputationMarker marker) {
-        super(playerId, true, -1, -1);
+        super(gui, playerId, true, -1, -1);
         
         this.marker = marker;
         this.value = marker.getValue();
@@ -54,7 +54,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         marker.setValue(value);
         EditReputationGraphic.selectedReputation.sort();
         SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);

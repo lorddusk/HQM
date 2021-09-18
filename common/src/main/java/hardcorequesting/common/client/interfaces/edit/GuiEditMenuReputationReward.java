@@ -27,7 +27,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     private List<FormattedText> error;
     
     public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
-        super(playerId, true, 185, 25);
+        super(gui, playerId, true, 185, 25);
         this.resultConsumer = resultConsumer;
     
         this.rewards = new ArrayList<>();
@@ -96,8 +96,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
@@ -116,8 +116,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
@@ -173,7 +173,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(rewards);
     }
 }

@@ -24,8 +24,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     protected TextBoxGroup textBoxes;
     private boolean clicked;
     
-    protected GuiEditMenuExtended(UUID playerId, boolean isControlOnFirstPage, int arrowX, int arrowY) {
-        super(playerId, isControlOnFirstPage);
+    protected GuiEditMenuExtended(GuiBase gui, UUID playerId, boolean isControlOnFirstPage, int arrowX, int arrowY) {
+        super(gui, playerId, isControlOnFirstPage);
         
         this.textBoxes = new TextBoxGroup();
         ARROW_X_LEFT = arrowX;
@@ -35,8 +35,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -57,8 +57,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (isArrowVisible()) {
             if (inArrowBounds(gui, mX, mY, true)) {
@@ -74,8 +74,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
+    public void onKeyStroke(char c, int k) {
+        super.onKeyStroke(c, k);
     
         if (k == -1)
             textBoxes.onCharTyped(c);
@@ -84,8 +84,8 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY) {
+        super.onRelease(mX, mY);
         
         clicked = false;
     }

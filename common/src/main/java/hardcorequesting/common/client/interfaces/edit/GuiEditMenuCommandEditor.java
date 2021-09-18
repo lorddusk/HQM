@@ -40,8 +40,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
@@ -58,7 +58,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         if (this.id < 0) this.added = this.text.getText();
         else if (this.commands != null) {
             if (!this.commands[this.id].equals(this.text.getText())) {
@@ -87,8 +87,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void renderTooltip(PoseStack matrices, int mX, int mY) {
+        super.renderTooltip(matrices, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
@@ -107,8 +107,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
