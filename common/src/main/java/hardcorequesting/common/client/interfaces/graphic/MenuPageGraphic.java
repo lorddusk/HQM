@@ -45,6 +45,7 @@ public class MenuPageGraphic extends EditableGraphic {
     private static final int INFO_REPUTATION_OFFSET_X = 5;
     private static final int INFO_REPUTATION_OFFSET_Y = 12;
     
+    private final BookPage.MenuPage page;
     private final ScrollBar reputationDisplayScroll;
     {
         addScrollBar(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
@@ -72,8 +73,9 @@ public class MenuPageGraphic extends EditableGraphic {
         });
     }
     
-    public MenuPageGraphic(GuiQuestBook gui) {
+    public MenuPageGraphic(BookPage.MenuPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
+        this.page = page;
     }
     
     @Override
@@ -166,16 +168,16 @@ public class MenuPageGraphic extends EditableGraphic {
         } else if (gui.inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
             gui.setEditMenu(new GuiEditMenuDeath(gui, gui.getPlayer().getUUID()));
         } else if (gui.inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-            gui.setPage(new BookPage.SetsPage());
+            gui.setPage(page.questSets);
         }
     }
     
     @Override
     protected void setEditMode(EditMode mode) {
         if (mode == EditMode.BAG) {
-            gui.setPage(new BookPage.BagsPage());
+            gui.setPage(page.bags);
         } else if (mode == EditMode.REPUTATION) {
-            gui.setPage(new BookPage.ReputationPage());
+            gui.setPage(page.reputations);
         } else super.setEditMode(mode);
     }
 }

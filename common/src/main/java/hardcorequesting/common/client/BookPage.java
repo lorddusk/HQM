@@ -24,21 +24,35 @@ public abstract class BookPage {
         return parent;
     }
     
-    public static class ReputationPage extends BookPage {
-        public ReputationPage() {
+    public boolean hasGoToMenuButton() {
+        return true;
+    }
+    
+    
+    public static class MenuPage extends BookPage {
+        public static final BookPage INSTANCE = new MenuPage();
+        public final BookPage questSets = new SetsPage(this);
+        public final BookPage reputations = new ReputationPage(this);
+        public final BookPage bags = new BagsPage(this);
+        
+        private MenuPage() {
             super(null);
         }
     
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
-            return new EditReputationGraphic(gui);
+            return new MenuPageGraphic(this, gui);
+        }
+    
+        @Override
+        public boolean hasGoToMenuButton() {
+            return false;
         }
     }
     
     public static class SetsPage extends BookPage {
-        
-        public SetsPage() {
-            super(null);
+        private SetsPage(MenuPage parent) {
+            super(parent);
         }
     
         @Override
@@ -83,10 +97,20 @@ public abstract class BookPage {
         }
     }
     
-    public static class BagsPage extends BookPage {
+    public static class ReputationPage extends BookPage {
+        private ReputationPage(MenuPage parent) {
+            super(parent);
+        }
+        
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new EditReputationGraphic(gui);
+        }
+    }
     
-        public BagsPage() {
-            super(null);
+    public static class BagsPage extends BookPage {
+        private BagsPage(MenuPage parent) {
+            super(parent);
         }
     
         @Override
