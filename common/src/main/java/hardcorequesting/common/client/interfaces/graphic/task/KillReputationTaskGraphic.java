@@ -27,12 +27,12 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         
         addButton(new LargeButton("hqm.quest.requirement", 250, 95) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return Quest.canQuestsBeEdited();
             }
         

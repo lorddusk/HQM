@@ -53,7 +53,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
                 }
                 
                 @Override
-                public void textChanged(GuiBase gui) {
+                public void textChanged() {
                     try {
                         int number;
                         if (getText().equals("")) {
@@ -95,7 +95,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
         drawArrow(matrices, gui, mX, mY, false);
         gui.drawCenteredString(matrices, Translator.plain(tier.getColor().getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         
-        textBoxes.draw(matrices, gui);
+        textBoxes.draw(matrices);
     }
     
     @Override
@@ -110,7 +110,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             clicked = true;
         }
         
-        textBoxes.onClick(gui, mX, mY);
+        textBoxes.onClick(mX, mY);
     }
     
     @Override
@@ -118,9 +118,9 @@ public class GuiEditMenuTier extends GuiEditMenu {
         super.onKeyStroke(gui, c, k);
     
         if (k == -1)
-            textBoxes.onCharTyped(gui, c);
+            textBoxes.onCharTyped(c);
         else
-            textBoxes.onKeyStroke(gui, k);
+            textBoxes.onKeyStroke(k);
     }
     
     @Override

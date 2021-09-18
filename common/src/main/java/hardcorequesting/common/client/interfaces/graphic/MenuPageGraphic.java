@@ -57,12 +57,12 @@ public class MenuPageGraphic extends EditableGraphic {
     
         addButton(new LargeButton("Reset", 90, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return Screen.hasControlDown() && Screen.hasShiftDown();
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return MenuPageGraphic.this.gui.isOpBook;
             }
         

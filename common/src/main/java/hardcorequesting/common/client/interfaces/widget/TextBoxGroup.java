@@ -22,11 +22,7 @@ public class TextBoxGroup {
     private static final int TEXT_BOX_SRC_Y = 77;
     
     private TextBox selectedTextBox;
-    private List<TextBox> textBoxes;
-    
-    public TextBoxGroup() {
-        textBoxes = new ArrayList<>();
-    }
+    private final List<TextBox> textBoxes = new ArrayList<>();
     
     public void add(TextBox textBox) {
         textBoxes.add(textBox);
@@ -37,18 +33,18 @@ public class TextBoxGroup {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiBase gui) {
+    public void draw(PoseStack matrices) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible()) {
-                textBox.draw(matrices, gui, selectedTextBox == textBox);
+                textBox.draw(matrices, selectedTextBox == textBox);
             }
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void onClick(GuiBase gui, int mX, int mY) {
+    public void onClick(int mX, int mY) {
         for (TextBox textBox : textBoxes) {
-            if (textBox.isVisible() && gui.inBounds(textBox.x, textBox.y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mX, mY)) {
+            if (textBox.isVisible() && textBox.inBounds(mX, mY)) {
                 if (selectedTextBox == textBox) {
                     selectedTextBox = null;
                 } else {
@@ -60,17 +56,17 @@ public class TextBoxGroup {
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean onKeyStroke(GuiBase gui, int k) {
+    public boolean onKeyStroke(int k) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
-            return selectedTextBox.onKeyStroke(gui, k);
+            return selectedTextBox.onKeyStroke(k);
         }
         return false;
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean onCharTyped(GuiBase gui, char c) {
+    public boolean onCharTyped(char c) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
-            return selectedTextBox.onCharTyped(gui, c);
+            return selectedTextBox.onCharTyped(c);
         }
         return false;
     }
@@ -94,15 +90,15 @@ public class TextBoxGroup {
         }
         
         @Environment(EnvType.CLIENT)
-        protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
+        protected void draw(PoseStack matrices, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Vec2 mouse = Points.ofMouse();
-            gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mouse.x - gui.getLeft(), mouse.y - gui.getTop()) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
-            gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
+            this.gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mouse.x - this.gui.getLeft(), mouse.y - this.gui.getTop()) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
+            this.gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
             if (selected) {
-                gui.drawCursor(matrices, x + getCursorPositionX(gui) + 2, y + getCursorPositionY(gui), 10, 1F, 0xFF909090);
+                this.gui.drawCursor(matrices, x + getCursorPositionX() + 2, y + getCursorPositionY(), 10, 1F, 0xFF909090);
             }
         }
         
@@ -112,50 +108,55 @@ public class TextBoxGroup {
         
         @Environment(EnvType.CLIENT)
         @Override
-        public void textChanged(GuiBase gui) {
-            super.textChanged(gui);
+        public void textChanged() {
+            super.textChanged();
             if (scrollable) {
-                updateVisible(gui);
+                updateVisible();
             }
         }
         
         @Environment(EnvType.CLIENT)
         @Override
-        public void recalculateCursor(GuiBase gui) {
+        public void recalculateCursor() {
             if (scrollable) {
                 if (updatedCursor) {
-                    updateVisible(gui);
-                    cursorPositionX = (int) (getMult() * gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
+                    updateVisible();
+                    cursorPositionX = (int) (getMult() * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
                     updatedCursor = false;
                 }
             } else {
-                super.recalculateCursor(gui);
+                super.recalculateCursor();
             }
         }
         
         @Environment(EnvType.CLIENT)
-        private void updateVisible(GuiBase gui) {
+        private void updateVisible() {
             if (cursor < start) {
                 start = cursor;
             }
             
             while (start < cursor) {
                 String text = getText().substring(start, cursor);
-                if (gui.getStringWidth(text) * getMult() > WIDTH) {
+                if (this.gui.getStringWidth(text) * getMult() > WIDTH) {
                     start++;
                 } else {
                     break;
                 }
             }
             visibleText = getText().substring(start);
-            while (gui.getStringWidth(visibleText) * getMult() > WIDTH) {
+            while (this.gui.getStringWidth(visibleText) * getMult() > WIDTH) {
                 visibleText = visibleText.substring(0, visibleText.length() - 2);
             }
         }
         
         @Environment(EnvType.CLIENT)
-        public void reloadText(GuiBase gui) {
+        public void reloadText() {
             
+        }
+    
+        @Environment(EnvType.CLIENT)
+        public boolean inBounds(double mX, double mY) {
+            return gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mX, mY);
         }
     }
 }

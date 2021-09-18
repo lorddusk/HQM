@@ -43,22 +43,22 @@ public abstract class LargeButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isEnabled(GuiBase gui);
+    public abstract boolean isEnabled();
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isVisible(GuiBase gui);
+    public abstract boolean isVisible();
     
     @Environment(EnvType.CLIENT)
     public abstract void onClick(GuiBase gui);
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        if (isVisible(gui)) {
+        if (isVisible()) {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            boolean enabled = isEnabled(gui);
+            boolean enabled = isEnabled();
             gui.drawRect(matrices, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(gui, mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
             gui.drawCenteredString(matrices, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
         }
@@ -66,7 +66,7 @@ public abstract class LargeButton {
     
     @Environment(EnvType.CLIENT)
     public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        if (isVisible(gui) && description != null && inButtonBounds(gui, mX, mY)) {
+        if (isVisible() && description != null && inButtonBounds(gui, mX, mY)) {
             if (lines == null) {
                 lines = gui.getLinesFromText(getDescription(), 1, 200);
             }

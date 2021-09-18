@@ -59,12 +59,12 @@ public class EditReputationGraphic extends EditableGraphic {
         
         addButton(new LargeButton("Create New", 180, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation == null;
             }
         
@@ -77,12 +77,12 @@ public class EditReputationGraphic extends EditableGraphic {
     
         addButton(new LargeButton("hqm.questBook.createTier", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation != null;
             }
         

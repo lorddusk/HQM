@@ -52,12 +52,12 @@ public class TextMenu extends GuiEditMenu {
         this.isName = isName;
         buttons.add(new LargeButton("hqm.textEditor.copyAll", 185, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -69,12 +69,12 @@ public class TextMenu extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.textEditor.paste", 245, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -84,35 +84,35 @@ public class TextMenu extends GuiEditMenu {
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
                 }
-                text.addText(gui, clip);
+                text.addText(clip);
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.clear", 185, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
             @Override
             public void onClick(GuiBase gui) {
-                text.setTextAndCursor(gui, "");
+                text.setTextAndCursor("");
             }
         });
         
         buttons.add(new LargeButton("hqm.textEditor.clearPaste", 245, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -122,7 +122,7 @@ public class TextMenu extends GuiEditMenu {
                 if (!clip.isEmpty()) {
                     clip = clip.replace("\n", "\\n");
                 }
-                text.setTextAndCursor(gui, clip);
+                text.setTextAndCursor(clip);
             }
         });
     }
@@ -130,18 +130,18 @@ public class TextMenu extends GuiEditMenu {
     @Override
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
-        int page = text.getCursorLine(gui) / LINES_PER_PAGE;
+        int page = text.getCursorLine() / LINES_PER_PAGE;
         gui.drawString(matrices, text.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
-        gui.drawCursor(matrices, START_X + text.getCursorPositionX(gui) - 1, START_Y + text.getCursorPositionY(gui) - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
+        gui.drawCursor(matrices, START_X + text.getCursorPositionX() - 1, START_Y + text.getCursorPositionY() - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     
     @Override
     public void onKeyStroke(GuiBase gui, char c, int k) {
         super.onKeyStroke(gui, c, k);
         if (k == -1)
-            text.onCharTyped(gui, c);
+            text.onCharTyped(c);
         else
-            text.onKeyStroke(gui, k);
+            text.onKeyStroke(k);
     }
     
     @Override

@@ -75,19 +75,19 @@ public class LocationMenu extends GuiEditMenuExtended {
         TextBoxGroup.TextBox locationBox;
         textBoxes.add(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
             @Override
-            public void textChanged(GuiBase gui) {
-                super.textChanged(gui);
+            public void textChanged() {
+                super.textChanged();
                 dimension = getText();
             }
             
             @Override
-            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
-                super.draw(matrices, gui, selected);
+            protected void draw(PoseStack matrices, boolean selected) {
+                super.draw(matrices, selected);
                 
-                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
+                this.gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
             }
         });
-        locationBox.recalculateCursor(gui);
+        locationBox.recalculateCursor();
         
         textBoxes.add(new TextBoxNumberNegative(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius") {
             @Override
@@ -101,22 +101,22 @@ public class LocationMenu extends GuiEditMenuExtended {
             }
             
             @Override
-            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
-                super.draw(matrices, gui, selected);
-                
-                gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+            protected void draw(PoseStack matrices, boolean selected) {
+                super.draw(matrices, selected);
+    
+                this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
         });
         
         
         buttons.add(new LargeButton("hqm.locationMenu.location", 100, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -127,9 +127,9 @@ public class LocationMenu extends GuiEditMenuExtended {
                 dimension = player.level.dimension().location().toString();
                 for (TextBoxGroup.TextBox textBox : textBoxes.getTextBoxes()) {
                     if (textBox instanceof NumberTextBox)
-                        textBox.reloadText(gui);
+                        textBox.reloadText();
                     else
-                        textBox.recalculateCursor(gui);
+                        textBox.recalculateCursor();
                 }
             }
         });

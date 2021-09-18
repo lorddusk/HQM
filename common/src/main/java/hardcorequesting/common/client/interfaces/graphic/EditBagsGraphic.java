@@ -62,12 +62,12 @@ public class EditBagsGraphic extends EditableGraphic {
     
         addButton(new LargeButton("hqm.questBook.createGroup", 100, 175) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
             }
         
@@ -80,12 +80,12 @@ public class EditBagsGraphic extends EditableGraphic {
     
         addButton(new LargeButton("hqm.questBook.createTier", 100, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
             }
         

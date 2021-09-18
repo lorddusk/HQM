@@ -74,8 +74,8 @@ public class PickMobMenu extends GuiEditMenuExtended {
         
         textBoxes.add(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
             @Override
-            public void textChanged(GuiBase gui) {
-                super.textChanged(gui);
+            public void textChanged() {
+                super.textChanged();
                 updateMobs(getText());
             }
         });

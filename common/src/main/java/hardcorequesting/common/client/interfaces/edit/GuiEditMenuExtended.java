@@ -53,7 +53,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
             }
         }
         
-        textBoxes.draw(matrices, gui);
+        textBoxes.draw(matrices);
     }
     
     @Override
@@ -70,7 +70,7 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
             }
         }
         
-        textBoxes.onClick(gui, mX, mY);
+        textBoxes.onClick(mX, mY);
     }
     
     @Override
@@ -78,9 +78,9 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
         super.onKeyStroke(gui, c, k);
     
         if (k == -1)
-            textBoxes.onCharTyped(gui, c);
+            textBoxes.onCharTyped(c);
         else
-            textBoxes.onKeyStroke(gui, k);
+            textBoxes.onKeyStroke(k);
     }
     
     @Override

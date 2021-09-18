@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -37,7 +36,7 @@ public class EditGroupGraphic extends EditableGraphic {
             }
         
             @Override
-            public void textChanged(GuiBase gui) {
+            public void textChanged() {
                 try {
                     int number;
                     if (getText().equals("")) {

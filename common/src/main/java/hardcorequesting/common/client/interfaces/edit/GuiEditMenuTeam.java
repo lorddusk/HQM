@@ -55,12 +55,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.create", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return teamName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return inviteTeam == null && getTeam().isSingle();
             }
             
@@ -72,12 +72,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(inviteButton = new LargeButton("hqm.party.invitePlayer", 250, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return inviteName.getText().length() > 0;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
             }
             
@@ -89,12 +89,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.accept", 180, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return inviteTeam != null;
             }
             
@@ -107,12 +107,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decline", 240, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return inviteTeam != null;
             }
             
@@ -125,12 +125,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.decideLater", 180, 40) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return inviteTeam != null;
             }
             
@@ -142,12 +142,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton(null, 250, 50) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return !selectedEntry.isOwner();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return selectedEntry != null && getEntry(getTeam()).isOwner();
             }
             
@@ -165,12 +165,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.leave", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return Screen.hasShiftDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return !getTeam().isSingle() && !getEntry(getTeam()).isOwner();
             }
             
@@ -182,12 +182,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.disband", 250, 160) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return !getTeam().isSingle() && selectedEntry != null && selectedEntry.isOwner();
             }
             
@@ -201,12 +201,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.party.list", 250, 190) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -276,7 +276,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         super.draw(matrices, gui, mX, mY);
         
-        textBoxes.draw(matrices, gui);
+        textBoxes.draw(matrices);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
@@ -443,7 +443,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         }
         
         
-        textBoxes.onClick(gui, mX, mY);
+        textBoxes.onClick(mX, mY);
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onClick(gui, mX, mY);
         }
@@ -453,9 +453,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     public void onKeyStroke(GuiBase gui, char c, int k) {
         super.onKeyStroke(gui, c, k);
         if (k == -1)
-            textBoxes.onCharTyped(gui, c);
+            textBoxes.onCharTyped(c);
         else
-            textBoxes.onKeyStroke(gui, k);
+            textBoxes.onKeyStroke(k);
     }
     
     @Override

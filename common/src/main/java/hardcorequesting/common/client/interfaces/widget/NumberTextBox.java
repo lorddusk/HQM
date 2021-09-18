@@ -13,7 +13,7 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
     public NumberTextBox(GuiBase gui, int x, int y, String title) {
         super(gui, "", x, y, false);
         loaded = true;
-        reloadText(gui);
+        reloadText();
         this.title = title;
     }
     
@@ -27,14 +27,14 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
     }
     
     @Override
-    protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
-        super.draw(matrices, gui, selected);
+    protected void draw(PoseStack matrices, boolean selected) {
+        super.draw(matrices, selected);
         
-        gui.drawString(matrices, Translator.translatable(title), x, y + TEXT_OFFSET, 0x404040);
+        this.gui.drawString(matrices, Translator.translatable(title), x, y + TEXT_OFFSET, 0x404040);
     }
     
     @Override
-    public void textChanged(GuiBase gui) {
+    public void textChanged() {
         if (loaded) {
             try {
                 int number;
@@ -50,8 +50,8 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
     }
     
     @Override
-    public void reloadText(GuiBase gui) {
-        setTextAndCursor(gui, isVisible() ? String.valueOf(getValue()) : "0");
+    public void reloadText() {
+        setTextAndCursor(isVisible() ? String.valueOf(getValue()) : "0");
     }
     
     protected abstract int getValue();

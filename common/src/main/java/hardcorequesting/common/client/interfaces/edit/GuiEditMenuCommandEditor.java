@@ -34,7 +34,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
             if (this.commands.length > 0) {
                 this.id = this.commands.length - 1;
-                this.text.setTextAndCursor(gui, this.commands[this.id]);
+                this.text.setTextAndCursor(this.commands[this.id]);
             }
         }
     }
@@ -122,7 +122,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
                         }
                     }
                     this.id = i;
-                    this.text.setTextAndCursor(gui, this.commands[this.id]);
+                    this.text.setTextAndCursor(this.commands[this.id]);
                 }
             }
         }
@@ -130,7 +130,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
             if (this.id == -1) return;
             if (this.commands != null) this.commands[this.id] = this.text.getText();
             this.id = -1;
-            this.text.setTextAndCursor(gui, this.added);
+            this.text.setTextAndCursor(this.added);
         }
     }
     

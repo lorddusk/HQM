@@ -63,7 +63,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
         graphic.addButton(new LargeButton("hqm.quest.selectTask", 250, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 QuestingData data = QuestingDataManager.getInstance().getQuestingData(playerId);
                 if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(task.getParent().getQuestId())) {
                     return data.selectedTask != task.getId();
@@ -72,7 +72,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             }
         
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return !task.isCompleted(playerId);
             }
         

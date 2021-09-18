@@ -119,7 +119,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 }
                 
                 @Override
-                public void textChanged(GuiBase gui) {
+                public void textChanged() {
                     try {
                         int number;
                         if (getText().equals("")) {
@@ -142,7 +142,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         }
         textBoxes.add(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override
-            public void textChanged(GuiBase gui) {
+            public void textChanged() {
                 startSearch(getText());
             }
         });
@@ -176,7 +176,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
         drawList(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
-        textBoxes.draw(matrices, gui);
+        textBoxes.draw(matrices);
         
         if (usePrecision()) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -204,7 +204,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         if (clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY)) return;
         if (clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY)) return;
         
-        textBoxes.onClick(gui, mX, mY);
+        textBoxes.onClick(mX, mY);
         
         if (usePrecision()) {
             if (inArrowBounds(gui, mX, mY, true)) {
@@ -224,9 +224,9 @@ public class PickItemMenu<T> extends GuiEditMenu {
         super.onKeyStroke(gui, c, k);
     
         if (k == -1)
-            textBoxes.onCharTyped(gui, c);
+            textBoxes.onCharTyped(c);
         else
-            textBoxes.onKeyStroke(gui, k);
+            textBoxes.onKeyStroke(k);
     }
     
     @Override

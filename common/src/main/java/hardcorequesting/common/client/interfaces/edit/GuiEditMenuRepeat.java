@@ -41,10 +41,10 @@ public class GuiEditMenuRepeat extends GuiEditMenuExtended {
         
         textBoxes.add(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours") {
             @Override
-            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
-                super.draw(matrices, gui, selected);
-                
-                gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+            protected void draw(PoseStack matrices, boolean selected) {
+                super.draw(matrices, selected);
+    
+                this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
             
             @Override

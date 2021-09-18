@@ -61,12 +61,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.repReward.create", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return isValid();
             }
             
@@ -78,12 +78,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
         
         buttons.add(new LargeButton("hqm.repReward.delete", 80, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return isValid() && selectedReward != null;
             }
             
@@ -126,7 +126,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
                         selectedReward = null;
                     } else {
                         selectedReward = rewards.get(i);
-                        textBoxes.getTextBoxes().get(0).reloadText(gui);
+                        textBoxes.getTextBoxes().get(0).reloadText();
                     }
                     break;
                 }

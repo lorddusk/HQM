@@ -38,12 +38,12 @@ public abstract class GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.edit.ok", xOffset + 40, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -56,12 +56,12 @@ public abstract class GuiEditMenu {
         
         buttons.add(new LargeButton("hqm.edit.cancel", xOffset + 100, 200) {
             @Override
-            public boolean isEnabled(GuiBase gui) {
+            public boolean isEnabled() {
                 return true;
             }
             
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return true;
             }
             
@@ -74,7 +74,7 @@ public abstract class GuiEditMenu {
     
     public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
-            if (button.isVisible(gui)) {
+            if (button.isVisible()) {
                 button.draw(matrices, gui, mX, mY);
             }
         }
@@ -85,7 +85,7 @@ public abstract class GuiEditMenu {
     
     public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
         for (LargeButton button : buttons) {
-            if (button.isVisible(gui)) {
+            if (button.isVisible()) {
                 button.renderTooltip(matrices, gui, mX, mY);
             }
         }
@@ -99,7 +99,7 @@ public abstract class GuiEditMenu {
         }
         
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui) && button.isEnabled(gui)) {
+            if (button.inButtonBounds(gui, mX, mY) && button.isVisible() && button.isEnabled()) {
                 button.onClick(gui);
             }
         }

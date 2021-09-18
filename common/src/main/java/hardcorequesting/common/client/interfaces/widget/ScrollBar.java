@@ -16,12 +16,12 @@ public class ScrollBar {
     private static final int SCROLL_BAR_SRC_X = 250;
     private static final int SCROLL_BAR_SRC_Y = 167;
     
-    private int x;
-    private int y;
-    private int h;
-    private int u;
-    private int v;
-    private int left;
+    private final int x;
+    private final int y;
+    private final int h;
+    private final int u;
+    private final int v;
+    private final int left;
     
     private int scroll;
     private boolean isScrolling;

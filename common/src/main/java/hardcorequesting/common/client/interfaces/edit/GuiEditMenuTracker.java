@@ -20,10 +20,10 @@ public class GuiEditMenuTracker extends GuiEditMenuExtended {
         
         textBoxes.add(new NumberTextBox(gui, 20, 130, "hqm.menuTracker.radius.title") {
             @Override
-            protected void draw(PoseStack matrices, GuiBase gui, boolean selected) {
-                super.draw(matrices, gui, selected);
-                
-                gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+            protected void draw(PoseStack matrices, boolean selected) {
+                super.draw(matrices, selected);
+    
+                this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
             
             @Override

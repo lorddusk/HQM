@@ -36,7 +36,7 @@ public abstract class Graphic {
             scrollBar.draw(matrices, gui);
         }
         
-        textBoxes.draw(matrices, gui);
+        textBoxes.draw(matrices);
     }
     
     public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
@@ -47,7 +47,7 @@ public abstract class Graphic {
     
     public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui) && button.isEnabled(gui)) {
+            if (button.inButtonBounds(gui, mX, mY) && button.isVisible() && button.isEnabled()) {
                 button.onClick(gui);
                 break;
             }
@@ -56,15 +56,15 @@ public abstract class Graphic {
             scrollBar.onClick(gui, mX, mY);
         }
         
-        textBoxes.onClick(gui, mX, mY);
+        textBoxes.onClick(mX, mY);
     }
     
     public boolean keyPressed(GuiQuestBook gui, int keyCode) {
-        return textBoxes.onKeyStroke(gui, keyCode);
+        return textBoxes.onKeyStroke(keyCode);
     }
     
     public boolean charTyped(GuiQuestBook gui, char c) {
-        return textBoxes.onCharTyped(gui, c);
+        return textBoxes.onCharTyped(c);
     }
     
     public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
