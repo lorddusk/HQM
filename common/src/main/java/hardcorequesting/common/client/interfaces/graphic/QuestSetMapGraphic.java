@@ -4,9 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
-import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -41,15 +39,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
-public class QuestSetMapGraphic extends Graphic {
+public class QuestSetMapGraphic extends EditableGraphic {
     private final QuestSet set;
     private final BookPage.SetMapPage page;
     
-    private final EditButton[] editButtons;
-    
     public QuestSetMapGraphic(GuiQuestBook gui, QuestSet set, BookPage.SetMapPage page) {
+        super(gui, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
         this.set = set;
-        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
         this.page = page;
     }
     
@@ -76,8 +72,6 @@ public class QuestSetMapGraphic extends Graphic {
         gui.setBlitOffset(50);
         
         drawQuestIcons(matrices, gui, mX, mY, player, isVisibleCache, isLinkFreeCache);
-    
-        gui.drawEditButtons(matrices, mX, mY, editButtons);
     }
     
     @Override
@@ -345,8 +339,6 @@ public class QuestSetMapGraphic extends Graphic {
                 break;
             }
         }
-    
-        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     private void drawConnectingLines(PoseStack matrices, GuiQuestBook gui, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
@@ -532,13 +524,5 @@ public class QuestSetMapGraphic extends Graphic {
         if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(set.getReputationBars()))
                 reputationBar.mouseClicked(gui, mX, mY);
-    
-        gui.handleEditButtonClick(mX, mY, editButtons);
-    }
-    
-    @Override
-    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
-        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
-                || super.keyPressed(gui, keyCode);
     }
 }

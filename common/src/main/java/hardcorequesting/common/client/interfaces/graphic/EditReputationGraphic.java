@@ -1,9 +1,7 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
@@ -31,7 +29,7 @@ import java.util.UUID;
 import static hardcorequesting.common.client.interfaces.GuiQuestBook.selectedReputation;
 
 @Environment(EnvType.CLIENT)
-public class EditReputationGraphic extends Graphic {
+public class EditReputationGraphic extends EditableGraphic {
     public static final int VISIBLE_REPUTATION_TIERS = 9;
     public static final int VISIBLE_REPUTATIONS = 10;
     public static final int REPUTATION_LIST_X = 20;
@@ -42,11 +40,8 @@ public class EditReputationGraphic extends Graphic {
     public static final int REPUTATION_OFFSET = 20;
     public static final int FONT_HEIGHT = 9;
     
-    private final GuiQuestBook gui;
-    
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;
-    private final EditButton[] editButtons;
     {
         addScrollBar(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
             @Override
@@ -100,8 +95,7 @@ public class EditReputationGraphic extends Graphic {
     }
     
     public EditReputationGraphic(GuiQuestBook gui) {
-        this.gui = gui;
-        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
+        super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
     }
     
     @Override
@@ -141,15 +135,6 @@ public class EditReputationGraphic extends Graphic {
                 gui.drawString(matrices, Translator.plain(str), x, y, hover ? 0xAAAAAA : 0x404040);
             }
         }
-        
-        gui.drawEditButtons(matrices, mX, mY, editButtons);
-    }
-    
-    @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.drawTooltip(matrices, gui, mX, mY);
-        
-        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     @Override
@@ -255,13 +240,5 @@ public class EditReputationGraphic extends Graphic {
                 }
             }
         }
-        
-        gui.handleEditButtonClick(mX, mY, editButtons);
-    }
-    
-    @Override
-    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
-        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
-                || super.keyPressed(gui, keyCode);
     }
 }

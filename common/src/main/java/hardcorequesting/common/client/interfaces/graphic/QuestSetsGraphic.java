@@ -2,9 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
-import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -32,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class QuestSetsGraphic extends Graphic {
+public class QuestSetsGraphic extends EditableGraphic {
     
     private static final int LIST_X = 25;
     private static final int LIST_Y = 20;
@@ -49,10 +47,8 @@ public class QuestSetsGraphic extends Graphic {
     private static QuestSet selectedSet;
     
     private final BookPage.SetsPage page;
-    private final GuiQuestBook gui;
     private final ScrollBar setScroll;
     private final ScrollBar descriptionScroll;
-    private final EditButton[] editButtons;
     
     {
         addScrollBar(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
@@ -110,9 +106,8 @@ public class QuestSetsGraphic extends Graphic {
     }
     
     public QuestSetsGraphic(BookPage.SetsPage page, GuiQuestBook gui) {
+        super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
         this.page = page;
-        this.gui = gui;
-        editButtons = EditButton.createButtons(gui::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
     }
     
     public static void loginReset() {
@@ -215,15 +210,6 @@ public class QuestSetsGraphic extends Graphic {
             
             drawQuestInfo(matrices, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
-    
-        gui.drawEditButtons(matrices, mX, mY, editButtons);
-    }
-    
-    @Override
-    public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
-        super.drawTooltip(matrices, gui, mX, mY);
-    
-        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
     }
     
     public static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y) {
@@ -334,19 +320,10 @@ public class QuestSetsGraphic extends Graphic {
             }
         }
         
-        
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
                 TextMenu.display(gui, gui.getPlayer().getUUID(), selectedSet.getDescription(), false, selectedSet::setDescription);
             }
         }
-        
-        gui.handleEditButtonClick(mX, mY, editButtons);
-    }
-    
-    @Override
-    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
-        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
-                || super.keyPressed(gui, keyCode);
     }
 }
