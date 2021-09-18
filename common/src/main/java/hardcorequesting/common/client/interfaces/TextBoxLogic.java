@@ -7,6 +7,7 @@ import net.minecraft.SharedConstants;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
@@ -28,11 +29,7 @@ public class TextBoxLogic {
     public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine) {
         this.width = width;
         this.multiLine = multiLine;
-        if (text == null) {
-            this.text = "";
-        } else {
-            this.text = text;
-        }
+        this.text = Objects.requireNonNullElse(text, "");
         textChanged(gui);
         resetCursor();
     }

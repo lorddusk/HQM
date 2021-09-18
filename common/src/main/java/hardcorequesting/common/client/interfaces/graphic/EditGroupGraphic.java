@@ -3,8 +3,10 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -19,8 +21,30 @@ import java.util.List;
 public class EditGroupGraphic extends Graphic {
     private final Group group;
     
-    public EditGroupGraphic(Group group) {
+    public EditGroupGraphic(GuiQuestBook gui, Group group) {
         this.group = group;
+    
+        addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(group.getLimit()), 180, 30, false) {
+            @Override
+            protected boolean isCharacterValid(char c, String rest) {
+                return rest.length() < 3 && Character.isDigit(c);
+            }
+        
+            @Override
+            public void textChanged(GuiBase gui) {
+                try {
+                    int number;
+                    if (getText().equals("")) {
+                        number = 1;
+                    } else {
+                        number = Integer.parseInt(getText());
+                    }
+                
+                    group.setLimit(number);
+                } catch (Exception ignored) {
+                }
+            }
+        });
     }
     
     @Override

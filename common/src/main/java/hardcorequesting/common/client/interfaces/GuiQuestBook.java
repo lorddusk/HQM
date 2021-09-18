@@ -19,7 +19,6 @@ import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
@@ -122,8 +121,6 @@ public class GuiQuestBook extends GuiBase {
     public ReputationBar modifyingBar;
     private ScrollBar mainDescriptionScroll;
     private List<ScrollBar> scrollBars;
-    private TextBoxGroup.TextBox textBoxGroupAmount;
-    private TextBoxGroup textBoxes;
     private int tick;
     private GuiEditMenu editMenu;
     private LargeButton saveButton;
@@ -147,34 +144,6 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return isMenuPageOpen && !isMainPageOpen && ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
-            }
-        });
-    }
-    
-    {
-        textBoxes = new TextBoxGroup();
-        textBoxes.add(textBoxGroupAmount = new TextBoxGroup.TextBox(this, "0", 180, 30, false) {
-            @Override
-            protected boolean isCharacterValid(char c, String rest) {
-                return rest.length() < 3 && Character.isDigit(c);
-            }
-            
-            @Override
-            public void textChanged(GuiBase gui) {
-                try {
-                    int number;
-                    if (getText().equals("")) {
-                        number = 1;
-                    } else {
-                        number = Integer.parseInt(getText());
-                    }
-                    
-                    if (selectedGroup != null) {
-                        selectedGroup.setLimit(number);
-                    }
-                } catch (Exception ignored) {
-                }
-                
             }
         });
     }
@@ -246,10 +215,6 @@ public class GuiQuestBook extends GuiBase {
         selectedReputation = null;
     }
     
-    public static Group getSelectedGroup() {
-        return selectedGroup;
-    }
-    
     public static void displayGui(Player player, boolean isOpBook) {
         if (player != null) {
             Minecraft mc = Minecraft.getInstance();
@@ -261,10 +226,6 @@ public class GuiQuestBook extends GuiBase {
     
     public static void setSelectedStack(ItemStack stack) {
         selectedStack = stack;
-    }
-    
-    public TextBoxGroup.TextBox getTextBoxGroupAmount() {
-        return textBoxGroupAmount;
     }
     
     public int getTick() {
@@ -368,7 +329,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onKeyStroke(this, c, -1);
         } else if (isBagPage && selectedGroup != null) {
-            textBoxes.onCharTyped(this, c);
+            groupGraphic.charTyped(this, c);
         } else if (graphic != null) {
             return graphic.charTyped(this, c);
         } else {
@@ -386,7 +347,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
         } else if (isBagPage && selectedGroup != null) {
-			textBoxes.onKeyStroke(this, keyCode);
+			groupGraphic.keyPressed(this, keyCode);
 		} else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
             return true;
@@ -551,7 +512,6 @@ public class GuiQuestBook extends GuiBase {
     private void drawBagPage(PoseStack matrices, int x, int y) {
         if (selectedGroup != null) {
             groupGraphic.drawFull(matrices, this, x, y);
-            textBoxes.draw(matrices, this);
             
         } else {
             bagGraphic.drawFull(matrices, this, x, y);
@@ -681,7 +641,6 @@ public class GuiQuestBook extends GuiBase {
                 setGroup(null);
             } else {
                 groupGraphic.onClick(this, x, y, button);
-                textBoxes.onClick(this, x, y);
             }
         } else {
             if (button == 1) {
@@ -810,7 +769,7 @@ public class GuiQuestBook extends GuiBase {
     
     public void setGroup(Group group) {
         selectedGroup = group;
-        groupGraphic = group == null ? null : new EditGroupGraphic(group);
+        groupGraphic = group == null ? null : new EditGroupGraphic(this, group);
     }
     
     public void setPage(BookPage page) {

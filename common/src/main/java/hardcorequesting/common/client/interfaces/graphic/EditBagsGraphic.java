@@ -184,7 +184,6 @@ public class EditBagsGraphic extends Graphic {
                         break;
                     case NORMAL:
                         gui.setGroup(group);
-                        gui.getTextBoxGroupAmount().setTextAndCursor(gui, String.valueOf(GuiQuestBook.getSelectedGroup().getLimit()));
                         break;
                     case RENAME:
                         TextMenu.display(gui, gui.getPlayer().getUUID(), group.getDisplayName(), true, group::setName);
