@@ -83,11 +83,27 @@ public abstract class BookPage {
         }
     }
     
+    public static class BagsPage extends BookPage {
+    
+        public BagsPage() {
+            super(null);
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new EditBagsGraphic(this, gui);
+        }
+        
+        public BookPage forGroup(Group group) {
+            return new GroupPage(this, group);
+        }
+    }
+    
     public static class GroupPage extends BookPage {
         private final Group group;
-        
-        public GroupPage(Group group) {
-            super(null);
+    
+        private GroupPage(BagsPage parent, Group group) {
+            super(parent);
             this.group = group;
         }
     

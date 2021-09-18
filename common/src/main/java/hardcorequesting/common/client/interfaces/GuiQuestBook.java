@@ -13,7 +13,6 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.client.interfaces.graphic.EditBagsGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -106,8 +105,6 @@ public class GuiQuestBook extends GuiBase {
     public static Reputation selectedReputation;
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
-    private static boolean isBagPage;
-    private EditBagsGraphic bagGraphic;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
@@ -131,7 +128,7 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return !isBagPage && isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
+                return isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
             }
         });
         
@@ -169,7 +166,7 @@ public class GuiQuestBook extends GuiBase {
             
             @Override
             public boolean isVisible(GuiBase gui) {
-                return editMenu == null && !isBagPage && !isMainPageOpen && isOpBook && isMenuPageOpen;
+                return editMenu == null && !isMainPageOpen && isOpBook && isMenuPageOpen;
             }
             
             @Override
@@ -185,8 +182,6 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
-        if (isBagPage)
-            bagGraphic = new EditBagsGraphic(this);
         if (page != null)
             graphic = page.createGraphic(this);
         
@@ -203,7 +198,6 @@ public class GuiQuestBook extends GuiBase {
     public static void resetBookPosition() {
         page = null;
         isMainPageOpen = true;
-        isBagPage = false;
         isMenuPageOpen = true;
         
         selectedReputation = null;
@@ -281,8 +275,6 @@ public class GuiQuestBook extends GuiBase {
                 drawMainPage(matrices);
             } else if (isMenuPageOpen) {
                 drawMenuPage(matrices, x, y);
-            } else if (isBagPage && page == null) {
-                bagGraphic.drawFull(matrices, this, x, y);
             } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -372,8 +364,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu.close(this);
                 editMenu = null;
             }
-            isBagPage = false;
-            page = null;
+            setPage(null);
             return true;
         }
         
@@ -404,12 +395,6 @@ public class GuiQuestBook extends GuiBase {
                 mainPageMouseClicked(x, y);
             } else if (isMenuPageOpen) {
                 menuPageMouseClicked(button, x, y);
-            } else if (isBagPage && page == null) {
-                if (button == 1) {
-                    goBack();
-                } else {
-                    bagGraphic.onClick(this, x, y, button);
-                }
             } else if (graphic != null) {
                 if (button == 1) {
                     goBack();
@@ -612,9 +597,6 @@ public class GuiQuestBook extends GuiBase {
     public void goBack() {
         if (isMenuPageOpen) {
             isMainPageOpen = true;
-        } else if (isBagPage) {
-            isBagPage = false;
-            isMenuPageOpen = true;
         } else if (page != null) {
             setPage(page.getParent());
         }
@@ -671,12 +653,8 @@ public class GuiQuestBook extends GuiBase {
         modifyingBar = null;
         
         if (currentMode == EditMode.BAG) {
-            currentMode = EditMode.NORMAL;
-            isBagPage = true;
-            bagGraphic = new EditBagsGraphic(this);
-            isMenuPageOpen = false;
+            setPage(new BookPage.BagsPage());
         } else if (currentMode == EditMode.REPUTATION) {
-            currentMode = EditMode.NORMAL;
             setPage(new BookPage.ReputationPage());
         }
     }

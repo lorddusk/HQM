@@ -41,6 +41,7 @@ public class EditBagsGraphic extends EditableGraphic {
     public static final int GROUPS_SECOND_LINE_Y = 12;
     public static final int VISIBLE_GROUPS = 8;
     
+    private final BookPage.BagsPage page;
     private final ScrollBar groupScroll;
     private final ScrollBar tierScroll;
     
@@ -97,8 +98,9 @@ public class EditBagsGraphic extends EditableGraphic {
     
     }
     
-    public EditBagsGraphic(GuiQuestBook gui) {
+    public EditBagsGraphic(BookPage.BagsPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
+        this.page = page;
     }
     
     @Override
@@ -183,7 +185,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
                         break;
                     case NORMAL:
-                        gui.setPage(new BookPage.GroupPage(group));
+                        gui.setPage(page.forGroup(group));
                         break;
                     case RENAME:
                         TextMenu.display(gui, gui.getPlayer().getUUID(), group.getDisplayName(), true, group::setName);
