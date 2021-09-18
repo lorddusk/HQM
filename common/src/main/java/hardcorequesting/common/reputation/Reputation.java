@@ -67,7 +67,7 @@ public class Reputation {
         
         reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
         
-        int start = scrollBar.isVisible(gui) ? Math.round((reputations.size() - maxVisibleBars) * scrollBar.getScroll()) : 0;
+        int start = scrollBar.isVisible() ? Math.round((reputations.size() - maxVisibleBars) * scrollBar.getScroll()) : 0;
         int end = Math.min(start + maxVisibleBars, reputations.size());
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);

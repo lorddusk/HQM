@@ -33,7 +33,7 @@ public abstract class Graphic {
             button.draw(matrices, gui, mX, mY);
         }
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices, gui);
+            scrollBar.draw(matrices);
         }
         
         textBoxes.draw(matrices);
@@ -53,35 +53,35 @@ public abstract class Graphic {
             }
         }
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onClick(gui, mX, mY);
+            scrollBar.onClick(mX, mY);
         }
         
         textBoxes.onClick(mX, mY);
     }
     
-    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
+    public boolean keyPressed(int keyCode) {
         return textBoxes.onKeyStroke(keyCode);
     }
     
-    public boolean charTyped(GuiQuestBook gui, char c) {
+    public boolean charTyped(char c) {
         return textBoxes.onCharTyped(c);
     }
     
-    public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onDrag(int mX, int mY, int b) {
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(gui, mX, mY);
+            scrollBar.onDrag(mX, mY);
         }
     }
     
-    public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
+    public void onRelease(int mX, int mY, int b) {
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(gui, mX, mY);
+            scrollBar.onRelease(mX, mY);
         }
     }
     
-    public void onScroll(GuiQuestBook gui, double x, double y, double scroll) {
+    public void onScroll(double x, double y, double scroll) {
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onScroll(gui, x, y, scroll);
+            scrollBar.onScroll(x, y, scroll);
         }
     }
     

@@ -122,30 +122,33 @@ public class ReputationBar {
         
         private final ReputationBar bar;
         private final boolean isNew;
-        private final ScrollBar scrollBar = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return ReputationManager.getInstance().size() > EditReputationGraphic.VISIBLE_REPUTATIONS;
-            }
-        };
+        private final ScrollBar scrollBar;
         
         public EditGui(GuiBase gui, UUID playerId, ReputationBar bar) {
-            super(gui, playerId);
-            this.bar = bar;
-            this.isNew = false;
+            this(gui, playerId, bar, false);
         }
         
         public EditGui(GuiBase gui, UUID playerId, int x, int y, int selectedSet) {
+            this(gui, playerId, new ReputationBar(null, x, y, selectedSet), true);
+        }
+        
+        private EditGui(GuiBase gui, UUID playerId, ReputationBar bar, boolean isNew) {
             super(gui, playerId);
-            this.bar = new ReputationBar(null, x, y, selectedSet);
-            this.isNew = true;
+            this.bar = bar;
+            this.isNew = isNew;
+            scrollBar = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+                @Override
+                public boolean isVisible() {
+                    return ReputationManager.getInstance().size() > EditReputationGraphic.VISIBLE_REPUTATIONS;
+                }
+            };
         }
         
         @Override
         @Environment(EnvType.CLIENT)
         public void draw(PoseStack matrices, int mX, int mY) {
             ReputationManager reputationManager = ReputationManager.getInstance();
-            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
+            int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -160,7 +163,7 @@ public class ReputationBar {
             }
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
             
-            scrollBar.draw(matrices, gui);
+            scrollBar.draw(matrices);
         }
         
         @Environment(EnvType.CLIENT)
@@ -168,7 +171,7 @@ public class ReputationBar {
             super.onClick(mX, mY, b);
             ReputationManager reputationManager = ReputationManager.getInstance();
             
-            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
+            int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -183,22 +186,22 @@ public class ReputationBar {
                 }
             }
             
-            scrollBar.onClick(gui, mX, mY);
+            scrollBar.onClick(mX, mY);
         }
     
         @Override
         public void onDrag(int mX, int mY) {
-            scrollBar.onDrag(gui, mX, mY);
+            scrollBar.onDrag(mX, mY);
         }
     
         @Override
         public void onRelease(int mX, int mY) {
-            scrollBar.onRelease(gui, mX, mY);
+            scrollBar.onRelease(mX, mY);
         }
     
         @Override
         public void onScroll(double mX, double mY, double scroll) {
-            scrollBar.onScroll(gui, mX, mY, scroll);
+            scrollBar.onScroll(mX, mY, scroll);
         }
     
         @Override

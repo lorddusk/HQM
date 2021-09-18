@@ -43,20 +43,6 @@ public class EditReputationGraphic extends EditableGraphic {
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;
     {
-        addScrollBar(reputationTierScroll = new ScrollBar(312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
-            }
-        });
-    
-        addScrollBar(reputationScroll = new ScrollBar(160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return (EditReputationGraphic.this.gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
-            }
-        });
-        
         addButton(new LargeButton("Create New", 180, 20) {
             @Override
             public boolean isEnabled() {
@@ -96,6 +82,19 @@ public class EditReputationGraphic extends EditableGraphic {
     
     public EditReputationGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
+        addScrollBar(reputationTierScroll = new ScrollBar(gui, 312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
+            @Override
+            public boolean isVisible() {
+                return selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
+            }
+        });
+    
+        addScrollBar(reputationScroll = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+            @Override
+            public boolean isVisible() {
+                return (EditReputationGraphic.this.gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;
+            }
+        });
     }
     
     @Override
@@ -105,7 +104,7 @@ public class EditReputationGraphic extends EditableGraphic {
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
+            int start = reputationScroll.isVisible() ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -124,7 +123,7 @@ public class EditReputationGraphic extends EditableGraphic {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
             
-            int start = reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
+            int start = reputationTierScroll.isVisible() ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_MARKER_LIST_X;
@@ -145,7 +144,7 @@ public class EditReputationGraphic extends EditableGraphic {
         ReputationManager reputationManager = ReputationManager.getInstance();
         Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = reputationScroll.isVisible(gui) ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
+            int start = reputationScroll.isVisible() ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -202,7 +201,7 @@ public class EditReputationGraphic extends EditableGraphic {
                 return;
             }
             
-            int start = reputationTierScroll.isVisible(gui) ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
+            int start = reputationTierScroll.isVisible() ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
             int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
             for (int i = start; i < end; i++) {
                 int x = REPUTATION_MARKER_LIST_X;

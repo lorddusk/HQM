@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -54,9 +53,9 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
         super(guiQuestBook, playerId);
         
-        scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
+        scrollBar = new ScrollBar(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return DeathStatsManager.getInstance().getDeathStats().length > VISIBLE_PLAYERS;
             }
         };
@@ -66,10 +65,10 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        scrollBar.draw(matrices, gui);
+        scrollBar.draw(matrices);
         
         DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-        int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
+        int start = scrollBar.isVisible() ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
         int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
         for (int i = start; i < end; i++) {
             DeathStat stats = deathStats[i];
@@ -146,7 +145,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        scrollBar.onClick(gui, mX, mY);
+        scrollBar.onClick(mX, mY);
         
         if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translatable(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
@@ -159,7 +158,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         } else {
             showBest = showTotal = false;
             DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-            int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
+            int start = scrollBar.isVisible() ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
             int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
             for (int i = start; i < end; i++) {
                 DeathStat stats = deathStats[i];
@@ -177,17 +176,17 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     
     @Override
     public void onDrag(int mX, int mY) {
-        scrollBar.onDrag(gui, mX, mY);
+        scrollBar.onDrag(mX, mY);
     }
     
     @Override
     public void onRelease(int mX, int mY) {
-        scrollBar.onRelease(gui, mX, mY);
+        scrollBar.onRelease(mX, mY);
     }
     
     @Override
     public void onScroll(double mX, double mY, double scroll) {
-        scrollBar.onScroll(gui, mX, mY, scroll);
+        scrollBar.onScroll(mX, mY, scroll);
     }
     
     @Override

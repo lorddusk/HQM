@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -31,17 +30,15 @@ public class MainPageGraphic extends EditableGraphic {
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
     
     private final ScrollBar mainDescriptionScroll;
-    {
-        addScrollBar(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
-            }
-        });
-    }
     
     public MainPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME);
+        addScrollBar(mainDescriptionScroll = new ScrollBar(gui, 312, 18, 186, 171, 69, DESCRIPTION_X) {
+            @Override
+            public boolean isVisible() {
+                return Quest.getMainDescription(MainPageGraphic.this.gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
+            }
+        });
     }
     
     @Override
@@ -49,7 +46,7 @@ public class MainPageGraphic extends EditableGraphic {
         super.draw(matrices, gui, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
-        int startLine = mainDescriptionScroll.isVisible(gui) ? Math.round((Quest.getMainDescription(gui).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
+        int startLine = mainDescriptionScroll.isVisible() ? Math.round((Quest.getMainDescription(gui).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
         gui.drawString(matrices, Quest.getMainDescription(gui), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {

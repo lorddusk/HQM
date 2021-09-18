@@ -48,13 +48,6 @@ public class MenuPageGraphic extends EditableGraphic {
     
     private final ScrollBar reputationDisplayScroll;
     {
-        addScrollBar(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
-            }
-        });
-    
         addButton(new LargeButton("Reset", 90, 190) {
             @Override
             public boolean isEnabled() {
@@ -75,6 +68,12 @@ public class MenuPageGraphic extends EditableGraphic {
     
     public MenuPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
+        addScrollBar(reputationDisplayScroll = new ScrollBar(gui, 160, 125, 87, 164, 69, INFO_LEFT_X) {
+            @Override
+            public boolean isVisible() {
+                return ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
+            }
+        });
     }
     
     @Override

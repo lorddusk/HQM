@@ -52,20 +52,6 @@ public class QuestSetsGraphic extends EditableGraphic {
     private final ScrollBar descriptionScroll;
     
     {
-        addScrollBar(descriptionScroll = new ScrollBar(312, 18, 64, 249, 102, DESCRIPTION_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return selectedSet != null && selectedSet.getDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-    
-        addScrollBar(setScroll = new ScrollBar(160, 18, 186, 171, 69, LIST_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return Quest.getQuestSets().size() > VISIBLE_SETS;
-            }
-        });
-    
         addButton(new LargeButton("hqm.questBook.open", 245, 190) {
             @Override
             public boolean isEnabled() {
@@ -109,6 +95,20 @@ public class QuestSetsGraphic extends EditableGraphic {
     public QuestSetsGraphic(BookPage.SetsPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
         this.page = page;
+        
+        addScrollBar(descriptionScroll = new ScrollBar(gui, 312, 18, 64, 249, 102, DESCRIPTION_X) {
+            @Override
+            public boolean isVisible() {
+                return selectedSet != null && selectedSet.getDescription(QuestSetsGraphic.this.gui).size() > VISIBLE_DESCRIPTION_LINES;
+            }
+        });
+    
+        addScrollBar(setScroll = new ScrollBar(gui, 160, 18, 186, 171, 69, LIST_X) {
+            @Override
+            public boolean isVisible() {
+                return Quest.getQuestSets().size() > VISIBLE_SETS;
+            }
+        });
     }
     
     public static void loginReset() {
@@ -123,7 +123,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         
         Player player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        int start = setScroll.isVisible() ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
@@ -205,7 +205,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (selectedSet != null) {
-                int startLine = descriptionScroll.isVisible(gui) ? Math.round((selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
+                int startLine = descriptionScroll.isVisible() ? Math.round((selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
                 gui.drawString(matrices, selectedSet.getDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
             }
             
@@ -263,7 +263,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         super.onClick(gui, mX, mY, b);
         
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible(gui) ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
+        int start = setScroll.isVisible() ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
         
         for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);

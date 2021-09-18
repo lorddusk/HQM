@@ -46,20 +46,6 @@ public class EditBagsGraphic extends EditableGraphic {
     private final ScrollBar tierScroll;
     
     {
-        addScrollBar(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return Group.getGroups().size() > VISIBLE_GROUPS;
-            }
-        });
-    
-        addScrollBar(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
-            }
-        });
-    
         addButton(new LargeButton("hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isEnabled() {
@@ -103,6 +89,20 @@ public class EditBagsGraphic extends EditableGraphic {
     public EditBagsGraphic(BookPage.BagsPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
         this.page = page;
+    
+        addScrollBar(groupScroll = new ScrollBar(gui, 160, 18, 186, 171, 69, GROUPS_X) {
+            @Override
+            public boolean isVisible() {
+                return Group.getGroups().size() > VISIBLE_GROUPS;
+            }
+        });
+    
+        addScrollBar(tierScroll = new ScrollBar(gui, 312, 18, 186, 171, 69, TIERS_X) {
+            @Override
+            public boolean isVisible() {
+                return GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
+            }
+        });
     }
     
     @Override
@@ -110,7 +110,7 @@ public class EditBagsGraphic extends EditableGraphic {
         super.draw(matrices, gui, mX, mY);
         
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
-        int start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
+        int start = tierScroll.isVisible() ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + VISIBLE_TIERS, tiers.size()); i++) {
             GroupTier groupTier = tiers.get(i);
             
@@ -138,7 +138,7 @@ public class EditBagsGraphic extends EditableGraphic {
         }
         
         List<Group> groups = new ArrayList<>(Group.getGroups().values());
-        start = groupScroll.isVisible(gui) ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
+        start = groupScroll.isVisible() ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
             
@@ -176,7 +176,7 @@ public class EditBagsGraphic extends EditableGraphic {
         
         //Handle click on groups
         List<Group> groups = new ArrayList<>(Group.getGroups().values());
-        int start = groupScroll.isVisible(gui) ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
+        int start = groupScroll.isVisible() ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + VISIBLE_GROUPS, groups.size()); i++) {
             Group group = groups.get(i);
             
@@ -205,7 +205,7 @@ public class EditBagsGraphic extends EditableGraphic {
     
         //Handle click on tiers
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
-        start = tierScroll.isVisible(gui) ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
+        start = tierScroll.isVisible() ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
         for (int i = start; i < Math.min(start + VISIBLE_TIERS, tiers.size()); i++) {
             GroupTier groupTier = tiers.get(i);
         

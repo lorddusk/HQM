@@ -55,9 +55,9 @@ public class EditableGraphic extends Graphic {
     }
     
     @Override
-    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
+    public boolean keyPressed(int keyCode) {
         return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
-                || super.keyPressed(gui, keyCode);
+                || super.keyPressed(keyCode);
     }
     
     protected void setEditMode(EditMode mode) {

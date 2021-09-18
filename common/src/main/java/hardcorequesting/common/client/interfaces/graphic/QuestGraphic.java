@@ -77,37 +77,35 @@ public final class QuestGraphic extends EditableGraphic {
         }
     }
     
-    {
-        addScrollBar(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return getCachedDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        addScrollBar(taskDescriptionScroll = new ScrollBar(312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return selectedTask != null && selectedTask.getCachedLongDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        
-        addScrollBar(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks() > VISIBLE_TASKS;
-            }
-        });
-    }
-    
     public QuestGraphic(UUID playerId, Quest quest, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
         this.playerId = playerId;
         this.quest = quest;
         rewardsGraphic = new QuestRewardsGraphic(quest, playerId);
         this.onOpen(gui.getPlayer());
+        
+        addScrollBar(descriptionScroll = new ScrollBar(gui, 155, 28, 64, 249, 102, START_X) {
+            @Override
+            public boolean isVisible() {
+                return getCachedDescription().size() > VISIBLE_DESCRIPTION_LINES;
+            }
+        });
+        addScrollBar(taskDescriptionScroll = new ScrollBar(gui, 312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
+            @Override
+            public boolean isVisible() {
+                return selectedTask != null && selectedTask.getCachedLongDescription(QuestGraphic.this.gui).size() > VISIBLE_DESCRIPTION_LINES;
+            }
+        });
+    
+        addScrollBar(taskScroll = new ScrollBar(gui, 155, 100, 29, 242, 102, START_X) {
+            @Override
+            public boolean isVisible() {
+                return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks() > VISIBLE_TASKS;
+            }
+        });
     }
     
-    private List<FormattedText> getCachedDescription(GuiBase gui) {
+    private List<FormattedText> getCachedDescription() {
         if (cachedDescription == null) {
             cachedDescription = gui.getLinesFromText(Translator.plain(quest.getDescription()), 0.7F, 130);
         }
@@ -122,11 +120,11 @@ public final class QuestGraphic extends EditableGraphic {
         
         gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
         
-        int startLine = descriptionScroll.isVisible(gui) ? Math.round((getCachedDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-        gui.drawString(matrices, getCachedDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
+        int startLine = descriptionScroll.isVisible() ? Math.round((getCachedDescription().size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
+        gui.drawString(matrices, getCachedDescription(), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
         
         int id = 0;
-        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
+        int start = taskScroll.isVisible() ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
         for (int i = start; i < end; i++) {
             QuestTask<?> task = quest.getTasks().get(i);
@@ -148,7 +146,7 @@ public final class QuestGraphic extends EditableGraphic {
         
         if (selectedTask != null) {
             List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
-            int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
+            int taskStartLine = taskDescriptionScroll.isVisible() ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
             gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     
             taskGraphic.draw(matrices, gui, mX, mY);
@@ -189,7 +187,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
         int id = 0;
-        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
+        int start = taskScroll.isVisible() ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
         int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
         for (int i = start; i < end; i++) {
             QuestTask<?> task = quest.getTasks().get(i);
@@ -270,24 +268,24 @@ public final class QuestGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onDrag(gui, mX, mY, b);
+    public void onDrag(int mX, int mY, int b) {
+        super.onDrag(mX, mY, b);
         if (taskGraphic != null)
-            taskGraphic.onDrag(gui, mX, mY, b);
+            taskGraphic.onDrag(mX, mY, b);
     }
     
     @Override
-    public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onRelease(gui, mX, mY, b);
+    public void onRelease(int mX, int mY, int b) {
+        super.onRelease(mX, mY, b);
         if (taskGraphic != null)
-            taskGraphic.onRelease(gui, mX, mY, b);
+            taskGraphic.onRelease(mX, mY, b);
     }
     
     @Override
-    public void onScroll(GuiQuestBook gui, double x, double y, double scroll) {
-        super.onScroll(gui, x, y, scroll);
+    public void onScroll(double x, double y, double scroll) {
+        super.onScroll(x, y, scroll);
         if (taskGraphic != null)
-            taskGraphic.onScroll(gui, x, y, scroll);
+            taskGraphic.onScroll(x, y, scroll);
     }
     
     public void onOpen(Player player) {

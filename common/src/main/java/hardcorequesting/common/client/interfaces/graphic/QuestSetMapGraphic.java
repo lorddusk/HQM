@@ -529,16 +529,16 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     @Override
-    public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onRelease(gui, mX, mY, b);
+    public void onRelease(int mX, int mY, int b) {
+        super.onRelease(mX, mY, b);
         draggedQuest = null;
     }
     
     @Override
-    public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onDrag(gui, mX, mY, b);
+    public void onDrag(int mX, int mY, int b) {
+        super.onDrag(mX, mY, b);
     
-        if (draggedQuest != null && Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.MOVE) {
+        if (draggedQuest != null && Quest.canQuestsBeEdited() && this.gui.getCurrentMode() == EditMode.MOVE) {
             draggedQuest.setGuiCenterX(mX);
             draggedQuest.setGuiCenterY(mY);
         }

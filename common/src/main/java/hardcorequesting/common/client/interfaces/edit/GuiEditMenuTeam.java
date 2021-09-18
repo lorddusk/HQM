@@ -233,16 +233,16 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         });
         
         scrollBars = new ArrayList<>();
-        scrollBars.add(inviteScroll = new ScrollBar(155, 22, 186, 171, 69, PLAYER_X) {
+        scrollBars.add(inviteScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return inviteTeam == null && getTeam().isSingle() && getTeam().getInvites() != null && getTeam().getInvites().size() > VISIBLE_INVITES;
             }
         });
         
-        scrollBars.add(memberScroll = new ScrollBar(155, 22, 186, 171, 69, PLAYER_X) {
+        scrollBars.add(memberScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return (inviteTeam != null && inviteTeam.getPlayers().size() > VISIBLE_MEMBERS) || (!getTeam().isSingle() && getTeam().getPlayers().size() > VISIBLE_MEMBERS);
             }
         });
@@ -282,7 +282,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices, gui);
+            scrollBar.draw(matrices);
         }
         
         if (team.isSingle() && inviteTeam == null) {
@@ -290,7 +290,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             if (inviteCount > 0) {
                 gui.drawString(matrices, Translator.translatable("hqm.party.invites"), TITLE_X, TITLE_Y, 0x404040);
                 List<Team> invites = team.getInvites();
-                int start = inviteScroll.isVisible(gui) ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
+                int start = inviteScroll.isVisible() ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
                 int end = Math.min(invites.size(), start + VISIBLE_INVITES);
                 for (int i = start; i < end; i++) {
                     Team invite = invites.get(i);
@@ -307,7 +307,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             gui.drawString(matrices, Translator.plain(title), TITLE_X, TITLE_Y, 0x404040);
             List<PlayerEntry> players = (inviteTeam == null ? team : inviteTeam).getPlayers();
             int y = 0;
-            int start = memberScroll.isVisible(gui) ? Math.round(((isOwner ? players.size() : (inviteTeam == null ? team : inviteTeam).getPlayerCount()) - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
+            int start = memberScroll.isVisible() ? Math.round(((isOwner ? players.size() : (inviteTeam == null ? team : inviteTeam).getPlayerCount()) - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
             
             for (PlayerEntry player : players) {
                 String str = player.getDisplayName();
@@ -412,7 +412,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         if (team.isSingle() && inviteTeam == null) {
             List<Team> invites = team.getInvites();
             if (invites != null) {
-                int start = inviteScroll.isVisible(gui) ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
+                int start = inviteScroll.isVisible() ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
                 int end = Math.min(invites.size(), start + VISIBLE_INVITES);
                 for (int i = start; i < end; i++) {
                     Team invite = invites.get(i);
@@ -423,7 +423,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 }
             }
         } else if (!team.isSingle() && getEntry(team).isOwner()) {
-            int start = memberScroll.isVisible(gui) ? Math.round((team.getPlayers().size() - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
+            int start = memberScroll.isVisible() ? Math.round((team.getPlayers().size() - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
             int end = Math.min(team.getPlayers().size(), start + VISIBLE_MEMBERS);
             for (int i = start; i < end; i++) {
                 PlayerEntry entry = team.getPlayers().get(i);
@@ -445,7 +445,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         textBoxes.onClick(mX, mY);
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onClick(gui, mX, mY);
+            scrollBar.onClick(mX, mY);
         }
     }
     
@@ -463,7 +463,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         super.onDrag(mX, mY);
         
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(gui, mX, mY);
+            scrollBar.onDrag(mX, mY);
         }
     }
     
@@ -472,7 +472,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         super.onRelease(mX, mY);
         
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(gui, mX, mY);
+            scrollBar.onRelease(mX, mY);
         }
     }
     
@@ -481,7 +481,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         super.onScroll(mX, mY, scroll);
         
         for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onScroll(gui, mX, mY, scroll);
+            scrollBar.onScroll(mX, mY, scroll);
         }
     }
     

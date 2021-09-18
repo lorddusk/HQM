@@ -25,8 +25,10 @@ public class ScrollBar {
     
     private int scroll;
     private boolean isScrolling;
+    private final GuiBase gui;
     
-    public ScrollBar(int x, int y, int h, int u, int v, int left) {
+    public ScrollBar(GuiBase gui, int x, int y, int h, int u, int v, int left) {
+        this.gui = gui;
         this.x = x;
         this.y = y;
         this.h = h;
@@ -36,7 +38,7 @@ public class ScrollBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean isVisible(GuiBase gui) {
+    public boolean isVisible() {
         return true;
     }
     
@@ -45,32 +47,32 @@ public class ScrollBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiBase gui) {
-        if (isVisible(gui)) {
+    public void draw(PoseStack matrices) {
+        if (isVisible()) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
-            gui.drawRect(matrices, x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
+            this.gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
+            this.gui.drawRect(matrices, x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void onClick(GuiBase gui, int mX, int mY) {
-        if (isVisible(gui) && gui.inBounds(x, y, SCROLL_WIDTH, h, mX, mY)) {
+    public void onClick(int mX, int mY) {
+        if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, h, mX, mY)) {
             isScrolling = true;
             updateScroll(mY);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void onDrag(GuiBase gui, int mX, int mY) {
-        if (isVisible(gui)) {
+    public void onDrag(int mX, int mY) {
+        if (isVisible()) {
             updateScroll(mY);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        if (isVisible(gui)) {
+    public void onRelease(int mX, int mY) {
+        if (isVisible()) {
             updateScroll(mY);
             isScrolling = false;
         }
@@ -110,8 +112,8 @@ public class ScrollBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
-        if (isVisible(gui) && gui.inBounds(left, y, x + SCROLL_WIDTH - left, h, mX, mY)) {
+    public void onScroll(double mX, double mY, double scroll) {
+        if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, h, mX, mY)) {
             setScroll((int) (this.scroll - scroll / 20));
         }
     }

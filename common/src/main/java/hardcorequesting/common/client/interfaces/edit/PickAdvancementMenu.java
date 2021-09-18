@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
@@ -44,9 +43,9 @@ public class PickAdvancementMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
         
-        scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
+        scrollBar = new ScrollBar(gui, 160, 18, 186, 171, 69, START_X) {
             @Override
-            public boolean isVisible(GuiBase gui) {
+            public boolean isVisible() {
                 return advancementNames.size() > VISIBLE_MOBS;
             }
         };
@@ -108,11 +107,11 @@ public class PickAdvancementMenu extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        scrollBar.draw(matrices, gui);
+        scrollBar.draw(matrices);
     
         selectionHelper.render(matrices, mX, mY);
         
-        int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
+        int start = scrollBar.isVisible() ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
             boolean selected = advancementNames.get(i).equals(advancement);
@@ -132,11 +131,11 @@ public class PickAdvancementMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        scrollBar.onClick(gui, mX, mY);
+        scrollBar.onClick(mX, mY);
         
         selectionHelper.onClick(mX, mY);
         
-        int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
+        int start = scrollBar.isVisible() ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
         int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
         for (int i = start; i < end; i++) {
             if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
@@ -155,7 +154,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
     public void onRelease(int mX, int mY) {
         super.onRelease(mX, mY);
         
-        scrollBar.onRelease(gui, mX, mY);
+        scrollBar.onRelease(mX, mY);
         
         selectionHelper.onRelease();
     }
@@ -163,13 +162,13 @@ public class PickAdvancementMenu extends GuiEditMenu {
     @Override
     public void onDrag(int mX, int mY) {
         super.onDrag(mX, mY);
-        scrollBar.onDrag(gui, mX, mY);
+        scrollBar.onDrag(mX, mY);
     }
     
     @Override
     public void onScroll(double mX, double mY, double scroll) {
         super.onScroll(mX, mY, scroll);
-        scrollBar.onScroll(gui, mX, mY, scroll);
+        scrollBar.onScroll(mX, mY, scroll);
     }
     
     @Override
