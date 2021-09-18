@@ -126,8 +126,6 @@ public class GuiQuestBook extends GuiBase {
     private LargeButton saveButton;
     private List<LargeButton> buttons = new ArrayList<>();
     private EditMode currentMode = EditMode.NORMAL;
-    private final EditButton[] groupButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
-    private final EditButton[] bagButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
     private final EditButton[] mainButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
     private final EditButton[] menuButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
     
@@ -722,7 +720,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private EditButton[] getButtons() {
-        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : isBagPage ? selectedGroup != null ? groupButtons : bagButtons : new EditButton[0];
+        return isMainPageOpen ? mainButtons : isMenuPageOpen ? menuButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {

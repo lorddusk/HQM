@@ -18,10 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class EditGroupGraphic extends Graphic {
+public class EditGroupGraphic extends EditableGraphic {
     private final Group group;
     
     public EditGroupGraphic(GuiQuestBook gui, Group group) {
+        super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
         this.group = group;
     
         addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(group.getLimit()), 180, 30, false) {

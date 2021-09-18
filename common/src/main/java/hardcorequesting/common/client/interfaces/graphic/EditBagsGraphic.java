@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class EditBagsGraphic extends Graphic {
+public class EditBagsGraphic extends EditableGraphic {
     public static final int TIERS_X = 180;
     public static final int TIERS_Y = 20;
     public static final int TIERS_SPACING = 25;
@@ -40,7 +40,6 @@ public class EditBagsGraphic extends Graphic {
     public static final int GROUPS_SECOND_LINE_Y = 12;
     public static final int VISIBLE_GROUPS = 8;
     
-    private final GuiQuestBook gui;
     private final ScrollBar groupScroll;
     private final ScrollBar tierScroll;
     
@@ -98,7 +97,7 @@ public class EditBagsGraphic extends Graphic {
     }
     
     public EditBagsGraphic(GuiQuestBook gui) {
-        this.gui = gui;
+        super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
     }
     
     @Override
