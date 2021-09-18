@@ -4,6 +4,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -157,20 +158,20 @@ public class TextBoxLogic {
     
     @Environment(EnvType.CLIENT)
     public void onKeyStroke(GuiBase gui, char c, int k) {
-        if (k == 263) {
+        if (k == GLFW.GLFW_KEY_LEFT) {
             moveCursor(gui, -1);
-        } else if (k == 262) {
+        } else if (k == GLFW.GLFW_KEY_RIGHT) {
             moveCursor(gui, 1);
-        } else if (k == 259) {
+        } else if (k == GLFW.GLFW_KEY_BACKSPACE) {
             deleteText(gui, -1);
-        } else if (k == 261) {
+        } else if (k == GLFW.GLFW_KEY_DELETE) {
             deleteText(gui, 1);
-        } else if (k == 335 || k == 257) { // enter
+        } else if (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER) {
             addText(gui, "\\n");
-        } else if (k == 268) { // home key
+        } else if (k == GLFW.GLFW_KEY_HOME) {
             cursor = 0;
             updateCursor();
-        } else if (k == 269) {
+        } else if (k == GLFW.GLFW_KEY_END) {
             cursor = text.length();
             updateCursor();
         } else if (isCharacterValid(c, getText())) {
