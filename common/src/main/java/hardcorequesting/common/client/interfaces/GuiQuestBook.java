@@ -5,8 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.Group;
-import hardcorequesting.common.bag.GroupTier;
-import hardcorequesting.common.bag.GroupTierManager;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
@@ -15,7 +13,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.client.interfaces.graphic.EditBagGraphic;
+import hardcorequesting.common.client.interfaces.graphic.EditBagsGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -33,7 +31,6 @@ import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
-import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -66,19 +63,6 @@ public class GuiQuestBook extends GuiBase {
     private static final int DESCRIPTION_X = 180;
     private static final int DESCRIPTION_Y = 20;
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
-    public static final int TIERS_X = 180;
-    public static final int TIERS_Y = 20;
-    public static final int TIERS_SPACING = 25;
-    public static final int TIERS_SECOND_LINE_X = -5;
-    public static final int TIERS_SECOND_LINE_Y = 12;
-    public static final int WEIGHT_SPACING = 25;
-    public static final int VISIBLE_TIERS = 8;
-    public static final int GROUPS_X = 20;
-    public static final int GROUPS_Y = 20;
-    public static final int GROUPS_SPACING = 25;
-    public static final int GROUPS_SECOND_LINE_X = 5;
-    public static final int GROUPS_SECOND_LINE_Y = 12;
-    public static final int VISIBLE_GROUPS = 8;
     public static final int GROUP_ITEMS_X = 20;
     public static final int GROUP_ITEMS_Y = 40;
     public static final int GROUP_ITEMS_SPACING = 20;
@@ -125,6 +109,7 @@ public class GuiQuestBook extends GuiBase {
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
     private static boolean isBagPage;
+    private EditBagsGraphic bagGraphic;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
@@ -134,15 +119,13 @@ public class GuiQuestBook extends GuiBase {
     public Quest modifyingQuest;
     public ReputationBar modifyingBar;
     private ScrollBar mainDescriptionScroll;
-    private ScrollBar groupScroll;
-    private ScrollBar tierScroll;
     private List<ScrollBar> scrollBars;
     private TextBoxGroup.TextBox textBoxGroupAmount;
     private TextBoxGroup textBoxes;
     private int tick;
     private GuiEditMenu editMenu;
     private LargeButton saveButton;
-    private List<LargeButton> buttons = new ArrayList<LargeButton>();
+    private List<LargeButton> buttons = new ArrayList<>();
     private EditMode currentMode = EditMode.NORMAL;
     private final EditButton[] groupButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
     private final EditButton[] bagButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
@@ -155,20 +138,6 @@ public class GuiQuestBook extends GuiBase {
             @Override
             public boolean isVisible(GuiBase gui) {
                 return !isBagPage && isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
-            }
-        });
-        
-        scrollBars.add(groupScroll = new ScrollBar(160, 18, 186, 171, 69, GROUPS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return isBagPage && selectedGroup == null && Group.getGroups().size() > VISIBLE_GROUPS;
-            }
-        });
-        
-        scrollBars.add(tierScroll = new ScrollBar(312, 18, 186, 171, 69, TIERS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return isBagPage && selectedGroup == null && GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
             }
         });
         
@@ -226,42 +195,6 @@ public class GuiQuestBook extends GuiBase {
             }
         });
         
-        buttons.add(new LargeButton("hqm.questBook.createGroup", 100, 175) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                Group.add(new Group(null));
-                SaveHelper.add(EditType.GROUP_CREATE);
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.questBook.createTier", 100, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return editMenu == null && isBagPage && currentMode == EditMode.CREATE && selectedGroup == null && !isMainPageOpen && !isMenuPageOpen;
-            }
-            
-            @Override
-            public void onClick(GuiBase gui) {
-                GroupTierManager.getInstance().getTiers().add(new GroupTier("New Tier", GuiColor.BLACK, 0, 0, 0, 0, 0));
-                SaveHelper.add(EditType.TIER_CREATE);
-            }
-        });
-        
         buttons.add(new LargeButton("Reset", 90, 190) {
             @Override
             public boolean isEnabled(GuiBase gui) {
@@ -286,6 +219,8 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
+        if (isBagPage)
+            bagGraphic = new EditBagsGraphic(this);
         if (page != null)
             graphic = page.createGraphic(this);
         
@@ -615,7 +550,7 @@ public class GuiQuestBook extends GuiBase {
             textBoxes.draw(matrices, this);
             
         } else {
-            EditBagGraphic.draw(matrices, this, tierScroll, groupScroll, x, y);
+            bagGraphic.drawFull(matrices, this, x, y);
         }
     }
     
@@ -748,7 +683,7 @@ public class GuiQuestBook extends GuiBase {
             if (button == 1) {
                 goBack();
             } else {
-                EditBagGraphic.onClick(this, tierScroll, groupScroll, x, y);
+                bagGraphic.onClick(this, x, y, button);
             }
         }
     }
@@ -806,6 +741,7 @@ public class GuiQuestBook extends GuiBase {
         if (currentMode == EditMode.BAG) {
             currentMode = EditMode.NORMAL;
             isBagPage = true;
+            bagGraphic = new EditBagsGraphic(this);
             isMenuPageOpen = false;
         } else if (currentMode == EditMode.REPUTATION) {
             currentMode = EditMode.NORMAL;
