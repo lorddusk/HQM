@@ -72,9 +72,8 @@ public class GuiQuestBook extends GuiBase {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //these are static to keep the same page loaded when the book is reopened
     private static BookPage page;
-    private Graphic graphic;
+    private Graphic pageGraphic;
     public static Reputation selectedReputation;
-    private static boolean isMainPageOpen = true;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
@@ -96,7 +95,7 @@ public class GuiQuestBook extends GuiBase {
         scrollBars.add(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return isMainPageOpen && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
+                return page == null && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
             }
         });
     }
@@ -126,7 +125,7 @@ public class GuiQuestBook extends GuiBase {
         this.isOpBook = isOpBook;
         
         if (page != null)
-            graphic = page.createGraphic(this);
+            pageGraphic = page.createGraphic(this);
         
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
@@ -140,7 +139,6 @@ public class GuiQuestBook extends GuiBase {
     
     public static void resetBookPosition() {
         page = null;
-        isMainPageOpen = true;
         
         selectedReputation = null;
     }
@@ -213,10 +211,10 @@ public class GuiQuestBook extends GuiBase {
                 scrollBar.draw(matrices, this);
             }
             
-            if (isMainPageOpen) {
+            if (pageGraphic == null) {
                 drawMainPage(matrices);
-            } else if (graphic != null) {
-                graphic.drawFull(matrices, this, x, y);
+            } else {
+                pageGraphic.drawFull(matrices, this, x, y);
             }
     
             drawEditButtonTooltip(matrices, x, y, getButtons());
@@ -254,8 +252,8 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onKeyStroke(this, c, -1);
-        } else if (graphic != null) {
-            return graphic.charTyped(this, c);
+        } else if (pageGraphic != null) {
+            return pageGraphic.charTyped(this, c);
         } else {
             return false;
         }
@@ -270,7 +268,7 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
-        } else if (graphic != null && graphic.keyPressed(this, keyCode)) {
+        } else if (pageGraphic != null && pageGraphic.keyPressed(this, keyCode)) {
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
@@ -330,14 +328,14 @@ public class GuiQuestBook extends GuiBase {
                 scrollBar.onClick(this, x, y);
             }
             
-            if (isMainPageOpen) {
+            if (pageGraphic == null) {
                 mainPageMouseClicked(x, y);
-            } else if (graphic != null) {
+            } else {
                 if (button == 1) {
                     goBack();
                     return true;
                 } else {
-                    graphic.onClick(this, x, y, button);
+                    pageGraphic.onClick(this, x, y, button);
                 }
             }
         } else {
@@ -362,8 +360,8 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
-        } else if (graphic != null) {
-            graphic.onRelease(this, x, y, button);
+        } else if (pageGraphic != null) {
+            pageGraphic.onRelease(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onRelease(this, x, y);
@@ -383,8 +381,8 @@ public class GuiQuestBook extends GuiBase {
         updatePosition(x, y);
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
-        } else if (graphic != null) {
-            graphic.onDrag(this, x, y, button);
+        } else if (pageGraphic != null) {
+            pageGraphic.onDrag(this, x, y, button);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onDrag(this, x, y);
@@ -397,8 +395,8 @@ public class GuiQuestBook extends GuiBase {
     public boolean mouseScrolled(double x, double y, double scroll) {
         if (editMenu != null) {
             editMenu.onScroll(this, x, y, scroll);
-        } else if (graphic != null) {
-            graphic.onScroll(this, x, y, scroll);
+        } else if (pageGraphic != null) {
+            pageGraphic.onScroll(this, x, y, scroll);
         } else {
             for (ScrollBar scrollBar : scrollBars) {
                 scrollBar.onScroll(this, x, y, scroll);
@@ -463,7 +461,7 @@ public class GuiQuestBook extends GuiBase {
     
     private void mainPageMouseClicked(int x, int y) {
         if (x > 0 && x < PAGE_WIDTH && y > 205) {
-            isMainPageOpen = false;
+            setPage(BookPage.MenuPage.INSTANCE);
             SoundHandler.stopLoreMusic();
         } else if (x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
             if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
@@ -508,7 +506,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private EditButton[] getButtons() {
-        return isMainPageOpen ? mainButtons : new EditButton[0];
+        return page == null ? mainButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
@@ -538,9 +536,9 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private boolean shouldDisplayControlArrow(boolean isMenuArrow) {
-        return !isMainPageOpen && (
-                (editMenu == null && (!isMenuArrow || page != null && page.hasGoToMenuButton()))
-                        || (editMenu != null && !editMenu.hasButtons()));
+        return page != null && (
+                editMenu == null && (!isMenuArrow || page.hasGoToMenuButton())
+                        || editMenu != null && !editMenu.hasButtons());
     }
     
     private boolean inArrowBounds(boolean isMenuArrow, int mX, int mY) {
@@ -556,8 +554,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void setPage(BookPage page) {
-        isMainPageOpen = page == null;
         GuiQuestBook.page = page;
-        graphic = page == null ? null : page.createGraphic(this);
+        pageGraphic = page == null ? null : page.createGraphic(this);
     }
 }
