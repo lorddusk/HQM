@@ -15,6 +15,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.graphic.EditBagGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -614,7 +615,7 @@ public class GuiQuestBook extends GuiBase {
             textBoxes.draw(matrices, this);
             
         } else {
-            Group.drawOverview(matrices, this, tierScroll, groupScroll, x, y);
+            EditBagGraphic.draw(matrices, this, tierScroll, groupScroll, x, y);
         }
     }
     
@@ -745,14 +746,11 @@ public class GuiQuestBook extends GuiBase {
             }
         } else {
             if (button == 1) {
-                isBagPage = false;
-                isMenuPageOpen = true;
+                goBack();
             } else {
-                Group.mouseClickedOverview(this, groupScroll, x, y);
-                GroupTier.mouseClickedOverview(this, tierScroll, x, y);
+                EditBagGraphic.onClick(this, tierScroll, groupScroll, x, y);
             }
         }
-        
     }
     
     private void menuPageMouseClicked(int button, int x, int y) {
