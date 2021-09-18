@@ -127,7 +127,6 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     protected List<FormattedText> getPartTooltip(GuiQuestBook gui, Positioned<ItemRequirementTask.Part> pos, int id, int mX, int mY) {
         ItemRequirementTask.Part part = pos.getElement();
         if (isInPartBounds(gui, mX, mY, pos)) {
-            GuiQuestBook.setSelectedStack(part.getStack());
             List<FormattedText> str = new ArrayList<>();
             part.stack.ifRight(fluidStack -> {
                 List<Component> list = new ArrayList<>();

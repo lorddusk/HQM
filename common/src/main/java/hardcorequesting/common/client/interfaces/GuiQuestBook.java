@@ -23,7 +23,6 @@ import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -63,7 +62,6 @@ public class GuiQuestBook extends GuiBase {
     @NotNull
     private Graphic pageGraphic;
     public static Reputation selectedReputation;
-    private static ItemStack selectedStack;
     public final boolean isOpBook;
     private final Player player;
     public Group modifyingGroup;
@@ -126,10 +124,6 @@ public class GuiQuestBook extends GuiBase {
         }
     }
     
-    public static void setSelectedStack(ItemStack stack) {
-        selectedStack = stack;
-    }
-    
     public int getTick() {
         return tick;
     }
@@ -142,8 +136,7 @@ public class GuiQuestBook extends GuiBase {
     @Override
     public void render(PoseStack matrices, int x0, int y0, float f) {
         setBlitOffset(0);
-        
-        selectedStack = null;
+    
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
         

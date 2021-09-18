@@ -253,7 +253,6 @@ public class QuestRewardsGraphic extends Graphic {
             for (int i = 0; i < rewards.size(); i++) {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (!rewards.get(i).isEmpty()) {
-                        GuiQuestBook.setSelectedStack(rewards.get(i));
                         List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                         List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
