@@ -56,8 +56,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = mY0 - top;
         
         if (editMenu != null) {
-            editMenu.draw(matrices, mX, mY);
-            editMenu.renderTooltip(matrices, mX, mY);
+            editMenu.drawFull(matrices, mX, mY);
         }
     }
     
@@ -68,7 +67,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         }
         
         if (editMenu != null) {
-            editMenu.onKeyStroke(c, -1);
+            editMenu.charTyped(c);
             return true;
         }
         return false;
@@ -81,7 +80,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         }
         
         if (editMenu != null) {
-            editMenu.onKeyStroke(Character.MIN_VALUE, keyCode);
+            editMenu.keyPressed(keyCode);
         }
         return false;
     }
@@ -104,7 +103,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = (int) (mY0 - top);
         
         if (editMenu != null) {
-            editMenu.onRelease(mX, mY);
+            editMenu.onRelease(mX, mY, b);
             return true;
         }
         return false;
@@ -116,7 +115,7 @@ public class GuiWrapperEditMenu extends GuiBase {
         int mY = (int) (mouseY - top);
         
         if (editMenu != null) {
-            editMenu.onDrag(mX, mY);
+            editMenu.onDrag(mX, mY, button);
             return true;
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);

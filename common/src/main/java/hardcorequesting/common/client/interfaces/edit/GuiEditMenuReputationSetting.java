@@ -179,8 +179,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
     }

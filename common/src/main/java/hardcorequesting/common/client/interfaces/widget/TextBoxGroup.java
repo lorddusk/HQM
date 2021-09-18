@@ -151,7 +151,7 @@ public class TextBoxGroup {
         
         @Environment(EnvType.CLIENT)
         public void reloadText() {
-            
+            recalculateCursor();
         }
     
         @Environment(EnvType.CLIENT)

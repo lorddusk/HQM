@@ -20,7 +20,7 @@ public class GuiEditMenuTracker extends GuiEditMenu {
     
         this.tracker = tracker;
         
-        textBoxes.add(new NumberTextBox(gui, 20, 130, "hqm.menuTracker.radius.title") {
+        addTextBox(new NumberTextBox(gui, 20, 130, "hqm.menuTracker.radius.title") {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
@@ -78,8 +78,8 @@ public class GuiEditMenuTracker extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
     }

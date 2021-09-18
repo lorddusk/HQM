@@ -20,7 +20,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenu {
         this.marker = marker;
         this.value = marker.getValue();
         
-        textBoxes.add(new NumberTextBox(gui, 25, 30, "hqm.repValue.tierValue") {
+        addTextBox(new NumberTextBox(gui, 25, 30, "hqm.repValue.tierValue") {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;

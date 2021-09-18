@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,15 +16,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
-public abstract class GuiEditMenu {
+public abstract class GuiEditMenu extends Graphic {
     
     protected static final int BOX_OFFSET = 30;
     private static final int CHECK_BOX_SRC_X = 192;
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
-    protected final List<LargeButton> buttons = new ArrayList<>();
     protected final List<CheckBox> checkboxes = new ArrayList<>();
-    protected final TextBoxGroup textBoxes = new TextBoxGroup();
     private boolean hasButtons;
     protected final GuiBase gui;
     protected final UUID playerId;
@@ -39,7 +37,7 @@ public abstract class GuiEditMenu {
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
         
-        buttons.add(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
+        addButton(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -57,7 +55,7 @@ public abstract class GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
+        addButton(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -76,23 +74,10 @@ public abstract class GuiEditMenu {
     }
     
     public void draw(PoseStack matrices, int mX, int mY) {
-        for (LargeButton button : buttons) {
-            if (button.isVisible()) {
-                button.draw(matrices, mX, mY);
-            }
-        }
+        super.draw(matrices, mX, mY);
+        
         for (CheckBox checkbox : checkboxes) {
             checkbox.draw(matrices, gui, mX, mY);
-        }
-    
-        textBoxes.draw(matrices);
-    }
-    
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        for (LargeButton button : buttons) {
-            if (button.isVisible()) {
-                button.renderTooltip(matrices, mX, mY);
-            }
         }
     }
     
@@ -103,40 +88,15 @@ public abstract class GuiEditMenu {
             return;
         }
         
-        for (LargeButton button : buttons) {
-            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick();
-            }
-        }
+        super.onClick(mX, mY, b);
         
         for (CheckBox checkbox : checkboxes) {
             checkbox.onClick(gui, mX, mY);
         }
-    
-        textBoxes.onClick(mX, mY);
     }
     
     public void close() {
         gui.setEditMenu(null);
-    }
-    
-    public void onKeyStroke(char c, int k) {
-        if (k == -1)
-            textBoxes.onCharTyped(c);
-        else
-            textBoxes.onKeyStroke(k);
-    }
-    
-    public void onDrag(int mX, int mY) {
-        
-    }
-    
-    public void onRelease(int mX, int mY) {
-        
-    }
-    
-    public void onScroll(double mX, double mY, double scroll) {
-        
     }
     
     public abstract void save();

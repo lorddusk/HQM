@@ -49,7 +49,7 @@ public class TextMenu extends GuiEditMenu {
         
         this.text = new TextBoxLogic(gui, txt, 140, true);
         this.isName = isName;
-        buttons.add(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
+        addButton(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -66,7 +66,7 @@ public class TextMenu extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.textEditor.paste", 245, 20) {
+        addButton(new LargeButton(gui, "hqm.textEditor.paste", 245, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -87,7 +87,7 @@ public class TextMenu extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.textEditor.clear", 185, 40) {
+        addButton(new LargeButton(gui, "hqm.textEditor.clear", 185, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -104,7 +104,7 @@ public class TextMenu extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.textEditor.clearPaste", 245, 40) {
+        addButton(new LargeButton(gui, "hqm.textEditor.clearPaste", 245, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -135,12 +135,13 @@ public class TextMenu extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(char c, int k) {
-        super.onKeyStroke(c, k);
-        if (k == -1)
-            text.onCharTyped(c);
-        else
-            text.onKeyStroke(k);
+    public boolean keyPressed(int keyCode) {
+        return text.onKeyStroke(keyCode) || super.keyPressed(keyCode);
+    }
+    
+    @Override
+    public boolean charTyped(char c) {
+        return text.onCharTyped(c) || super.charTyped(c);
     }
     
     @Override

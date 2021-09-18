@@ -95,4 +95,8 @@ public abstract class Graphic {
     protected void addTextBox(TextBoxGroup.TextBox box) {
         textBoxes.add(box);
     }
+    
+    protected void reloadTextBoxes() {
+        textBoxes.getTextBoxes().forEach(TextBoxGroup.TextBox::reloadText);
+    }
 }

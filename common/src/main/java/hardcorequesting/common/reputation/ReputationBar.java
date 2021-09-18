@@ -136,12 +136,12 @@ public class ReputationBar {
             super(gui, playerId);
             this.bar = bar;
             this.isNew = isNew;
-            scrollBar = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+            addScrollBar(scrollBar = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
                 @Override
                 public boolean isVisible() {
                     return ReputationManager.getInstance().size() > EditReputationGraphic.VISIBLE_REPUTATIONS;
                 }
-            };
+            });
         }
         
         @Override
@@ -162,8 +162,6 @@ public class ReputationBar {
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
-            
-            scrollBar.draw(matrices);
         }
         
         @Environment(EnvType.CLIENT)
@@ -185,25 +183,8 @@ public class ReputationBar {
                     close();
                 }
             }
-            
-            scrollBar.onClick(mX, mY);
         }
-    
-        @Override
-        public void onDrag(int mX, int mY) {
-            scrollBar.onDrag(mX, mY);
-        }
-    
-        @Override
-        public void onRelease(int mX, int mY) {
-            scrollBar.onRelease(mX, mY);
-        }
-    
-        @Override
-        public void onScroll(double mX, double mY, double scroll) {
-            scrollBar.onScroll(mX, mY, scroll);
-        }
-    
+        
         @Override
         public void save() {
             if (isNew) {

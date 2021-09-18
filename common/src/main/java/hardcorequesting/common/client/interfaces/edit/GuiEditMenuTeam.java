@@ -17,7 +17,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,10 +40,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     private GuiEditMenuTeam self = this;
     private ScrollBar memberScroll;
     private ScrollBar inviteScroll;
-    private List<ScrollBar> scrollBars;
     private LargeButton inviteButton;
     private Team inviteTeam;
-    private TextBoxGroup textBoxes;
     private TextBoxGroup.TextBox teamName;
     private TextBoxGroup.TextBox inviteName;
     private PlayerEntry selectedEntry;
@@ -52,7 +49,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     public GuiEditMenuTeam(GuiQuestBook gui, UUID playerId) {
         super(gui, playerId);
         
-        buttons.add(new LargeButton(gui, "hqm.party.create", 250, 20) {
+        addButton(new LargeButton(gui, "hqm.party.create", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return teamName.getText().length() > 0;
@@ -69,7 +66,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(inviteButton = new LargeButton(gui, "hqm.party.invitePlayer", 250, 20) {
+        addButton(inviteButton = new LargeButton(gui, "hqm.party.invitePlayer", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return inviteName.getText().length() > 0;
@@ -86,7 +83,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.party.accept", 180, 20) {
+        addButton(new LargeButton(gui, "hqm.party.accept", 180, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -104,7 +101,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.party.decline", 240, 20) {
+        addButton(new LargeButton(gui, "hqm.party.decline", 240, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -122,7 +119,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
+        addButton(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -139,7 +136,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, null, 250, 50) {
+        addButton(new LargeButton(gui, null, 250, 50) {
             @Override
             public boolean isEnabled() {
                 return !selectedEntry.isOwner();
@@ -162,7 +159,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.party.leave", 250, 160) {
+        addButton(new LargeButton(gui, "hqm.party.leave", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown();
@@ -179,7 +176,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.party.disband", 250, 160) {
+        addButton(new LargeButton(gui, "hqm.party.disband", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
@@ -197,8 +194,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        
-        buttons.add(new LargeButton(gui, "hqm.party.list", 250, 190) {
+        addButton(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -215,8 +211,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        textBoxes = new TextBoxGroup();
-        textBoxes.add(teamName = new TextBoxName(gui, "", 180, 26) {
+        addTextBox(teamName = new TextBoxName(gui, "", 180, 26) {
             @Override
             protected boolean isVisible() {
                 return getTeam().isSingle() && inviteTeam == null;
@@ -224,22 +219,21 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         });
         teamName.setWidth((int) ((GuiQuestBook.PAGE_WIDTH - TITLE_X - 10) * 0.7F));
         
-        textBoxes.add(inviteName = new TextBoxName(gui, "", 180, 26) {
+        addTextBox(inviteName = new TextBoxName(gui, "", 180, 26) {
             @Override
             protected boolean isVisible() {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
             }
         });
         
-        scrollBars = new ArrayList<>();
-        scrollBars.add(inviteScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
+        addScrollBar(inviteScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
             @Override
             public boolean isVisible() {
                 return inviteTeam == null && getTeam().isSingle() && getTeam().getInvites() != null && getTeam().getInvites().size() > VISIBLE_INVITES;
             }
         });
         
-        scrollBars.add(memberScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
+        addScrollBar(memberScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
             @Override
             public boolean isVisible() {
                 return (inviteTeam != null && inviteTeam.getPlayers().size() > VISIBLE_MEMBERS) || (!getTeam().isSingle() && getTeam().getPlayers().size() > VISIBLE_MEMBERS);
@@ -275,14 +269,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         super.draw(matrices, mX, mY);
         
-        textBoxes.draw(matrices);
-        
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices);
-        }
         
         if (team.isSingle() && inviteTeam == null) {
             int inviteCount = team.getInvites() == null ? 0 : team.getInvites().size();
@@ -376,8 +365,8 @@ public class GuiEditMenuTeam extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        super.renderTooltip(matrices, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         Team team = getTeam();
         PlayerEntry entry = getEntry(team);
@@ -439,48 +428,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
                 team.nextRewardSetting();
             }
-        }
-        
-        
-        textBoxes.onClick(mX, mY);
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onClick(mX, mY);
-        }
-    }
-    
-    @Override
-    public void onKeyStroke(char c, int k) {
-        super.onKeyStroke(c, k);
-        if (k == -1)
-            textBoxes.onCharTyped(c);
-        else
-            textBoxes.onKeyStroke(k);
-    }
-    
-    @Override
-    public void onDrag(int mX, int mY) {
-        super.onDrag(mX, mY);
-        
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(mX, mY);
-        }
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
-        
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(mX, mY);
-        }
-    }
-    
-    @Override
-    public void onScroll(double mX, double mY, double scroll) {
-        super.onScroll(mX, mY, scroll);
-        
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onScroll(mX, mY, scroll);
         }
     }
     

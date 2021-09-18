@@ -87,8 +87,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        super.renderTooltip(matrices, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {

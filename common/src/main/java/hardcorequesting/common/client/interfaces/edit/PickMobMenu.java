@@ -54,14 +54,14 @@ public class PickMobMenu extends GuiEditMenu {
         this.textKey = textKey;
         this.amount = initAmount;
         
-        scrollBar = new ScrollBar(gui, 160, 18, 186, 171, 69, START_X) {
+        addScrollBar(scrollBar = new ScrollBar(gui, 160, 18, 186, 171, 69, START_X) {
             @Override
             public boolean isVisible() {
                 return mobs.size() > VISIBLE_MOBS;
             }
-        };
+        });
         
-        textBoxes.add(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {
+        addTextBox(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {
             @Override
             protected int getValue() {
                 return amount;
@@ -73,7 +73,7 @@ public class PickMobMenu extends GuiEditMenu {
             }
         });
         
-        textBoxes.add(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();
@@ -143,7 +143,6 @@ public class PickMobMenu extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        scrollBar.draw(matrices);
         
         selectionHelper.render(matrices, mX, mY);
         
@@ -167,8 +166,6 @@ public class PickMobMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        scrollBar.onClick(mX, mY);
-        
         selectionHelper.onClick(mX, mY);
         
         int start = scrollBar.isVisible() ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
@@ -186,18 +183,10 @@ public class PickMobMenu extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
-        
-        scrollBar.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
-    }
-    
-    @Override
-    public void onDrag(int mX, int mY) {
-        super.onDrag(mX, mY);
-        scrollBar.onDrag(mX, mY);
     }
     
     @Override

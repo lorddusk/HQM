@@ -28,7 +28,7 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
         days = quest.getRepeatInfo().getDays();
         hours = quest.getRepeatInfo().getHours();
         
-        textBoxes.add(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days") {
+        addTextBox(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days") {
             @Override
             protected int getValue() {
                 return days;
@@ -40,7 +40,7 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
             }
         });
         
-        textBoxes.add(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours") {
+        addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours") {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
@@ -96,8 +96,8 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
     }

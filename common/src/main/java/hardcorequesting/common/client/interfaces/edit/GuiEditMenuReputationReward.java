@@ -26,6 +26,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private final List<ReputationReward> rewards;
     private ReputationReward selectedReward;
     private List<FormattedText> error;
+    private final NumberTextBox valueTextBox;
     private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
@@ -39,7 +40,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         }
         
-        textBoxes.add(new NumberTextBox(gui, 185, 55, "hqm.repReward.value") {
+        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value") {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;
@@ -61,7 +62,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.repReward.create", 20, 20) {
+        addButton(new LargeButton(gui, "hqm.repReward.create", 20, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -78,7 +79,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         });
         
-        buttons.add(new LargeButton(gui, "hqm.repReward.delete", 80, 20) {
+        addButton(new LargeButton(gui, "hqm.repReward.delete", 80, 20) {
             @Override
             public boolean isEnabled() {
                 return true;
@@ -168,7 +169,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
                         selectedReward = null;
                     } else {
                         selectedReward = rewards.get(i);
-                        textBoxes.getTextBoxes().get(0).reloadText();
+                        valueTextBox.reloadText();
                     }
                     break;
                 }
@@ -179,8 +180,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
     }

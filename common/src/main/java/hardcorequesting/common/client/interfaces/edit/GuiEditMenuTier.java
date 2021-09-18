@@ -34,19 +34,17 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private static final int TIERS_WEIGHTS_TEXT_Y = 65;
     private GroupTier tier;
     private GroupTier original;
-    private TextBoxGroup textBoxes;
     private boolean clicked;
     
     public GuiEditMenuTier(GuiQuestBook gui, UUID playerId, GroupTier original) {
         super(gui, playerId, true);
         this.original = original;
         this.tier = original.copy();
-        this.textBoxes = new TextBoxGroup();
         
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             final int id = i;
-            textBoxes.add(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
+            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
                 @Override
                 protected boolean isCharacterValid(char c, String rest) {
                     return rest.length() < 6 && Character.isDigit(c);
@@ -94,8 +92,6 @@ public class GuiEditMenuTier extends GuiEditMenu {
         drawArrow(matrices, gui, mX, mY, true);
         drawArrow(matrices, gui, mX, mY, false);
         gui.drawCenteredString(matrices, Translator.plain(tier.getColor().getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
-        
-        textBoxes.draw(matrices);
     }
     
     @Override
@@ -109,23 +105,11 @@ public class GuiEditMenuTier extends GuiEditMenu {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
             clicked = true;
         }
-        
-        textBoxes.onClick(mX, mY);
     }
     
     @Override
-    public void onKeyStroke(char c, int k) {
-        super.onKeyStroke(c, k);
-    
-        if (k == -1)
-            textBoxes.onCharTyped(c);
-        else
-            textBoxes.onKeyStroke(k);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         clicked = false;
     }
     

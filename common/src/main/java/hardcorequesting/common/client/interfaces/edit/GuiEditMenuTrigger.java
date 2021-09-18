@@ -25,7 +25,7 @@ public class GuiEditMenuTrigger extends GuiEditMenu {
         this.type = quest.getTriggerType();
         this.triggerTasks = quest.getTriggerTasks();
         
-        textBoxes.add(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount") {
+        addTextBox(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount") {
             @Override
             protected int getValue() {
                 return triggerTasks;
@@ -80,8 +80,8 @@ public class GuiEditMenuTrigger extends GuiEditMenu {
     }
     
     @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
         selectionHelper.onRelease();
     }

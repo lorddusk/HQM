@@ -72,7 +72,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private ItemPrecision precision;
     private boolean clicked;
     private TextBoxGroup.TextBox amountTextBox;
-    private TextBoxGroup textBoxes;
     private long lastClicked;
     
     /**
@@ -110,9 +109,8 @@ public class PickItemMenu<T> extends GuiEditMenu {
         
         playerItems = type.createPlayerEntries(Minecraft.getInstance().player);
         
-        textBoxes = new TextBoxGroup();
         if (amountInput) {
-            textBoxes.add(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
+            addTextBox(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
                 protected boolean isCharacterValid(char c, String rest) {
                     return Character.isDigit(c);
@@ -140,7 +138,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 }
             });
         }
-        textBoxes.add(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
+        addTextBox(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override
             public void textChanged() {
                 startSearch(getText());
@@ -176,8 +174,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
         gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
         drawList(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
-        textBoxes.draw(matrices);
-        
         if (usePrecision()) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             
@@ -190,8 +186,8 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        super.renderTooltip(matrices, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         drawListMouseOver(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         drawListMouseOver(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
@@ -203,8 +199,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
         
         if (clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY)) return;
         if (clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY)) return;
-        
-        textBoxes.onClick(mX, mY);
         
         if (usePrecision()) {
             if (inArrowBounds(gui, mX, mY, true)) {
@@ -220,18 +214,8 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(char c, int k) {
-        super.onKeyStroke(c, k);
-    
-        if (k == -1)
-            textBoxes.onCharTyped(c);
-        else
-            textBoxes.onKeyStroke(k);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY) {
-        super.onRelease(mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         clicked = false;
     }
     

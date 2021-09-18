@@ -53,19 +53,17 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
         super(guiQuestBook, playerId);
         
-        scrollBar = new ScrollBar(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X) {
+        addScrollBar(scrollBar = new ScrollBar(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
             public boolean isVisible() {
                 return DeathStatsManager.getInstance().getDeathStats().length > VISIBLE_PLAYERS;
             }
-        };
+        });
     }
     
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
-        
-        scrollBar.draw(matrices);
         
         DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
         int start = scrollBar.isVisible() ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
@@ -122,8 +120,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        super.renderTooltip(matrices, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         DeathStat stats = getDeathStat();
         if (stats != null) {
@@ -144,8 +142,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     @Override
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
-        
-        scrollBar.onClick(mX, mY);
         
         if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translatable(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
@@ -172,21 +168,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 }
             }
         }
-    }
-    
-    @Override
-    public void onDrag(int mX, int mY) {
-        scrollBar.onDrag(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY) {
-        scrollBar.onRelease(mX, mY);
-    }
-    
-    @Override
-    public void onScroll(double mX, double mY, double scroll) {
-        scrollBar.onScroll(mX, mY, scroll);
     }
     
     @Override

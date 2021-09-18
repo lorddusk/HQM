@@ -21,7 +21,7 @@ public class IntInputMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        textBoxes.add(new NumberTextBox(gui, 25, 30, title) {
+        addTextBox(new NumberTextBox(gui, 25, 30, title) {
             @Override
             protected int getValue() {
                 return amount;
