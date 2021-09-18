@@ -19,6 +19,11 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class EditGroupGraphic extends EditableGraphic {
+    private static final int GROUP_ITEMS_X = 20;
+    private static final int GROUP_ITEMS_Y = 40;
+    private static final int GROUP_ITEMS_SPACING = 20;
+    private static final int ITEMS_PER_LINE = 7;
+    
     private final Group group;
     
     public EditGroupGraphic(GuiQuestBook gui, Group group) {
@@ -58,8 +63,8 @@ public class EditGroupGraphic extends EditableGraphic {
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
             
-            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
-            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+            int xPos = (i % ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_X;
+            int yPos = (i / ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_Y;
             
             gui.drawItemStack(matrices, stack, xPos, yPos, mX, mY, false);
         }
@@ -67,8 +72,8 @@ public class EditGroupGraphic extends EditableGraphic {
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
             
-            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
-            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+            int xPos = (i % ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_X;
+            int yPos = (i / ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_Y;
             
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, mX, mY)) {
                 if (!stack.isEmpty()) {
@@ -92,8 +97,8 @@ public class EditGroupGraphic extends EditableGraphic {
         List<ItemStack> items = new ArrayList<>(group.getItems());
         items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {
-            int xPos = (i % GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_X;
-            int yPos = (i / GuiQuestBook.ITEMS_PER_LINE) * GuiQuestBook.GROUP_ITEMS_SPACING + GuiQuestBook.GROUP_ITEMS_Y;
+            int xPos = (i % ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_X;
+            int yPos = (i / ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_Y;
             
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.ITEM) {

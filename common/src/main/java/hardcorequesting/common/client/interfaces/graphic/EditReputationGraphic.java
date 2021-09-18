@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static hardcorequesting.common.client.interfaces.GuiQuestBook.selectedReputation;
-
 @Environment(EnvType.CLIENT)
 public class EditReputationGraphic extends EditableGraphic {
     public static final int VISIBLE_REPUTATION_TIERS = 9;
@@ -39,6 +37,8 @@ public class EditReputationGraphic extends EditableGraphic {
     public static final int REPUTATION_NEUTRAL_Y = 20;
     public static final int REPUTATION_OFFSET = 20;
     public static final int FONT_HEIGHT = 9;
+    
+    public static Reputation selectedReputation;
     
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;

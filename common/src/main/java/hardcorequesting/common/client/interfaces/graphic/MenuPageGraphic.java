@@ -27,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class MenuPageGraphic extends EditableGraphic {
+    private static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
     private static final int INFO_RIGHT_X = 180;
     private static final int INFO_LIVES_Y = 20;
     private static final int INFO_DEATHS_Y = 55;
@@ -50,7 +51,7 @@ public class MenuPageGraphic extends EditableGraphic {
         addScrollBar(reputationDisplayScroll = new ScrollBar(160, 125, 87, 164, 69, INFO_LEFT_X) {
             @Override
             public boolean isVisible(GuiBase gui) {
-                return ReputationManager.getInstance().size() > GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS;
+                return ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
             }
         });
     
@@ -154,7 +155,7 @@ public class MenuPageGraphic extends EditableGraphic {
         }
         
         
-        Reputation.drawAll(matrices, gui, reputationDisplayScroll, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y, mX, mY, player.getUUID());
+        Reputation.drawAll(matrices, gui, reputationDisplayScroll, VISIBLE_DISPLAY_REPUTATIONS, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y, mX, mY, player.getUUID());
     }
     
     @Override

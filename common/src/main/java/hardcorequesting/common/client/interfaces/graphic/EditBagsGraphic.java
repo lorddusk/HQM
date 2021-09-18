@@ -98,6 +98,8 @@ public class EditBagsGraphic extends EditableGraphic {
     
     }
     
+    private Group selectedGroup;
+    
     public EditBagsGraphic(BookPage.BagsPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
         this.page = page;
@@ -144,7 +146,7 @@ public class EditBagsGraphic extends EditableGraphic {
             int yPos = GROUPS_Y + GROUPS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             int color = group.getTier().getColor().getHexColor();
-            boolean selected = group == gui.modifyingGroup;
+            boolean selected = group == selectedGroup;
             if (inBounds || selected) {
                 color &= 0xFFFFFF;
                 RenderSystem.enableBlend();
@@ -182,7 +184,7 @@ public class EditBagsGraphic extends EditableGraphic {
             if (gui.inBounds(GROUPS_X, posY, gui.getStringWidth(group.getDisplayName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
-                        gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
+                        selectedGroup = (group == selectedGroup ? null : group);
                         break;
                     case NORMAL:
                         gui.setPage(page.forGroup(group));
@@ -211,8 +213,8 @@ public class EditBagsGraphic extends EditableGraphic {
             if (gui.inBounds(TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
-                        if (gui.modifyingGroup != null) {
-                            gui.modifyingGroup.setTier(groupTier);
+                        if (selectedGroup != null) {
+                            selectedGroup.setTier(groupTier);
                             SaveHelper.add(EditType.GROUP_CHANGE);
                         }
                         break;
@@ -239,5 +241,12 @@ public class EditBagsGraphic extends EditableGraphic {
                 break;
             }
         }
+    }
+    
+    @Override
+    protected void setEditMode(EditMode mode) {
+        if (mode != EditMode.TIER)
+            selectedGroup = null;
+        super.setEditMode(mode);
     }
 }

@@ -32,6 +32,7 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class QuestSetsGraphic extends EditableGraphic {
     
+    private static final int TEXT_SPACING = 20;
     private static final int LIST_X = 25;
     private static final int LIST_Y = 20;
     private static final int DESCRIPTION_X = 180;
@@ -129,7 +130,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
             
-            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
+            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING);
             
             int total = questSet.getQuests().size();
             
@@ -267,7 +268,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
             QuestSet questSet = questSets.get(i);
             
-            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + GuiQuestBook.TEXT_SPACING);
+            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING);
             if (gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case DELETE:

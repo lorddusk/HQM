@@ -43,6 +43,8 @@ public class QuestSetMapGraphic extends EditableGraphic {
     private final QuestSet set;
     private final BookPage.SetMapPage page;
     
+    private Quest draggedQuest, selectedQuest;
+    
     public QuestSetMapGraphic(GuiQuestBook gui, QuestSet set, BookPage.SetMapPage page) {
         super(gui, EditMode.NORMAL, EditMode.MOVE, EditMode.CREATE, EditMode.REQUIREMENT, EditMode.SIZE, EditMode.ITEM, EditMode.REPEATABLE, EditMode.TRIGGER, EditMode.REQUIRED_PARENTS, EditMode.QUEST_SELECTION, EditMode.QUEST_OPTION, EditMode.SWAP, EditMode.REP_BAR_CREATE, EditMode.REP_BAR_CHANGE, EditMode.DELETE);
         this.set = set;
@@ -380,7 +382,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 
                 int color;
-                if (quest == gui.modifyingQuest) color = 0xffbbffbb;
+                if (quest == draggedQuest || quest == selectedQuest) color = 0xffbbffbb;
                 else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = 0xfff8bbff;
                 else color = quest.getColorFilter(player, gui.getTick());
                 
@@ -433,18 +435,18 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     if (Quest.canQuestsBeEdited()) {
                         switch (gui.getCurrentMode()) {
                             case MOVE:
-                                gui.modifyingQuest = quest;
+                                draggedQuest = quest;
                                 SaveHelper.add(EditType.QUEST_MOVE);
                                 break;
                             case REQUIREMENT:
-                                if (gui.modifyingQuest == quest) {
+                                if (selectedQuest == quest) {
                                     if (Screen.hasShiftDown())
-                                        gui.modifyingQuest.clearRequirements();
-                                    gui.modifyingQuest = null;
-                                } else if (gui.modifyingQuest == null) {
-                                    gui.modifyingQuest = quest;
+                                        selectedQuest.clearRequirements();
+                                    selectedQuest = null;
+                                } else if (selectedQuest == null) {
+                                    selectedQuest = quest;
                                 } else {
-                                    gui.modifyingQuest.addRequirement(quest.getQuestId());
+                                    selectedQuest.addRequirement(quest.getQuestId());
                                 }
                                 break;
                             case SIZE:
@@ -487,14 +489,14 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 else Quest.speciallySelectedQuestId = quest.getQuestId();
                                 break;
                             case QUEST_OPTION:
-                                if (gui.modifyingQuest == quest) {
+                                if (selectedQuest == quest) {
                                     if (Screen.hasShiftDown())
-                                        gui.modifyingQuest.clearOptionLinks();
-                                    gui.modifyingQuest = null;
-                                } else if (gui.modifyingQuest == null) {
-                                    gui.modifyingQuest = quest;
+                                        selectedQuest.clearOptionLinks();
+                                    selectedQuest = null;
+                                } else if (selectedQuest == null) {
+                                    selectedQuest = quest;
                                 } else {
-                                    gui.modifyingQuest.addOptionLink(quest.getQuestId());
+                                    selectedQuest.addOptionLink(quest.getQuestId());
                                 }
                                 break;
                             case TRIGGER:
@@ -524,5 +526,28 @@ public class QuestSetMapGraphic extends EditableGraphic {
         if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(set.getReputationBars()))
                 reputationBar.mouseClicked(gui, mX, mY);
+    }
+    
+    @Override
+    public void onRelease(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onRelease(gui, mX, mY, b);
+        draggedQuest = null;
+    }
+    
+    @Override
+    public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
+        super.onDrag(gui, mX, mY, b);
+    
+        if (draggedQuest != null && Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.MOVE) {
+            draggedQuest.setGuiCenterX(mX);
+            draggedQuest.setGuiCenterY(mY);
+        }
+    }
+    
+    @Override
+    protected void setEditMode(EditMode mode) {
+        draggedQuest = null;
+        selectedQuest = null;
+        super.setEditMode(mode);
     }
 }

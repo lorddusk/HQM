@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
@@ -56,7 +56,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     @Override
     public void save(GuiBase gui) {
         marker.setValue(value);
-        GuiQuestBook.selectedReputation.sort();
+        EditReputationGraphic.selectedReputation.sort();
         SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);
     }
 }

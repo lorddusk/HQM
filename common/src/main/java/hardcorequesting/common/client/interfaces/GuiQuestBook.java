@@ -1,18 +1,17 @@
 package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
+import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.CloseBookMessage;
 import hardcorequesting.common.quests.*;
-import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -33,13 +32,7 @@ public class GuiQuestBook extends GuiBase {
     
     public static final int PAGE_WIDTH = 170;
     //region pixel info for all the things
-    public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
     public static final int TEXT_HEIGHT = 9;
-    public static final int TEXT_SPACING = 20;
-    public static final int GROUP_ITEMS_X = 20;
-    public static final int GROUP_ITEMS_Y = 40;
-    public static final int GROUP_ITEMS_SPACING = 20;
-    public static final int ITEMS_PER_LINE = 7;
     public static final int TEXTURE_WIDTH = 170 * 2;
     public static final int TEXTURE_HEIGHT = 234;
     private static final int BACK_ARROW_X = 9;
@@ -61,12 +54,9 @@ public class GuiQuestBook extends GuiBase {
     private static BookPage page = BookPage.MainPage.INSTANCE;
     @NotNull
     private Graphic pageGraphic;
-    public static Reputation selectedReputation;
     public final boolean isOpBook;
     private final Player player;
-    public Group modifyingGroup;
     public QuestSet modifyingQuestSet;
-    public Quest modifyingQuest;
     public ReputationBar modifyingBar;
     private int tick;
     private GuiEditMenu editMenu;
@@ -112,7 +102,7 @@ public class GuiQuestBook extends GuiBase {
     public static void resetBookPosition() {
         page = BookPage.MainPage.INSTANCE;
         
-        selectedReputation = null;
+        EditReputationGraphic.selectedReputation = null;
     }
     
     public static void displayGui(Player player, boolean isOpBook) {
@@ -291,7 +281,6 @@ public class GuiQuestBook extends GuiBase {
         
         updatePosition(x, y);
         if (currentMode == EditMode.MOVE) {
-            modifyingQuest = null;
             modifyingBar = null;
         }
         if (editMenu != null) {
@@ -355,10 +344,6 @@ public class GuiQuestBook extends GuiBase {
     
     private void updatePosition(int x, int y) {
         if (Quest.canQuestsBeEdited() && currentMode == EditMode.MOVE) {
-            if (modifyingQuest != null) {
-                modifyingQuest.setGuiCenterX(x);
-                modifyingQuest.setGuiCenterY(y);
-            }
             if (modifyingBar != null) {
                 modifyingBar.moveTo(x, y);
             }
@@ -371,7 +356,6 @@ public class GuiQuestBook extends GuiBase {
     
     public void setCurrentMode(EditMode mode) {
         currentMode = mode;
-        modifyingQuest = null;
         modifyingBar = null;
     }
     

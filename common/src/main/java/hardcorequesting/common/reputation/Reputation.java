@@ -60,15 +60,15 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawAll(PoseStack matrices, GuiQuestBook gui, ScrollBar reputationDisplayScroll, int x, int y, int mX, int mY, final UUID playerId) {
+    public static void drawAll(PoseStack matrices, GuiQuestBook gui, ScrollBar scrollBar, int maxVisibleBars, int x, int y, int mX, int mY, final UUID playerId) {
         String info = null;
         
         List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
         
         reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
         
-        int start = reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * reputationDisplayScroll.getScroll()) : 0;
-        int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
+        int start = scrollBar.isVisible(gui) ? Math.round((reputations.size() - maxVisibleBars) * scrollBar.getScroll()) : 0;
+        int end = Math.min(start + maxVisibleBars, reputations.size());
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
