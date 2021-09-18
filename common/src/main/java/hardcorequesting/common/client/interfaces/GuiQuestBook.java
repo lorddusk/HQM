@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
-import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
@@ -366,32 +365,6 @@ public class GuiQuestBook extends GuiBase {
     public void save() {
         QuestLine.getActiveQuestLine().saveAll();
         SaveHelper.onSave();
-    }
-    
-    public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
-        if (Quest.canQuestsBeEdited()) {
-            for (EditButton button : editButtons) {
-                button.draw(this, matrices, mX, mY);
-            }
-        }
-    }
-    
-    public void drawEditButtonTooltip(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
-        if (Quest.canQuestsBeEdited()) {
-            for (EditButton button : editButtons) {
-                button.drawInfo(this, matrices, mX, mY);
-            }
-        }
-    }
-    
-    public void handleEditButtonClick(int mX, int mY, EditButton[] editButtons) {
-        if (Quest.canQuestsBeEdited()) {
-            for (EditButton editButton : editButtons) {
-                if (editButton.onClick(this, mX, mY)) {
-                    break;
-                }
-            }
-        }
     }
     
     private boolean shouldDisplayControlArrow(boolean isMenuArrow) {

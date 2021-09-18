@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -22,21 +23,35 @@ public class EditableGraphic extends Graphic {
     public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         super.draw(matrices, gui, mX, mY);
     
-        gui.drawEditButtons(matrices, mX, mY, editButtons);
+        if (Quest.canQuestsBeEdited()) {
+            for (EditButton button : editButtons) {
+                button.draw(gui, matrices, mX, mY);
+            }
+        }
     }
     
     @Override
     public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         super.drawTooltip(matrices, gui, mX, mY);
     
-        gui.drawEditButtonTooltip(matrices, mX, mY, editButtons);
+        if (Quest.canQuestsBeEdited()) {
+            for (EditButton button : editButtons) {
+                button.drawInfo(gui, matrices, mX, mY);
+            }
+        }
     }
     
     @Override
     public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
         super.onClick(gui, mX, mY, button);
     
-        gui.handleEditButtonClick(mX, mY, editButtons);
+        if (Quest.canQuestsBeEdited()) {
+            for (EditButton editButton : editButtons) {
+                if (editButton.onClick(gui, mX, mY)) {
+                    break;
+                }
+            }
+        }
     }
     
     @Override
