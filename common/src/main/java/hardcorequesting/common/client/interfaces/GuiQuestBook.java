@@ -369,6 +369,8 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onKeyStroke(this, c, -1);
         } else if (isBagPage && selectedGroup != null) {
             textBoxes.onCharTyped(this, c);
+        } else if (graphic != null) {
+            return graphic.charTyped(this, c);
         } else {
             return false;
         }
@@ -389,7 +391,7 @@ public class GuiQuestBook extends GuiBase {
             goBack();
             return true;
         } else if (graphic != null) {
-            return graphic.keyPressed(keyCode);
+            return graphic.keyPressed(this, keyCode);
         } else  {
             return KeyboardHandler.handleEditModeHotkey(keyCode, getButtons());
         }

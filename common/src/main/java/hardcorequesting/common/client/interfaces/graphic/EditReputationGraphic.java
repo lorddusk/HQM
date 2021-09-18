@@ -260,7 +260,8 @@ public class EditReputationGraphic extends Graphic {
     }
     
     @Override
-    public boolean keyPressed(int keyCode) {
-        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
+    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
+        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
+                || super.keyPressed(gui, keyCode);
     }
 }

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -19,6 +20,7 @@ public abstract class Graphic {
     
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
+    private final TextBoxGroup textBoxes = new TextBoxGroup();
     
     public final void drawFull(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
         draw(matrices, gui, mX, mY);
@@ -33,6 +35,8 @@ public abstract class Graphic {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(matrices, gui);
         }
+        
+        textBoxes.draw(matrices, gui);
     }
     
     public void drawTooltip(PoseStack matrices, GuiQuestBook gui, int mX, int mY) {
@@ -51,10 +55,16 @@ public abstract class Graphic {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onClick(gui, mX, mY);
         }
+        
+        textBoxes.onClick(gui, mX, mY);
     }
     
-    public boolean keyPressed(int keyCode) {
-        return false;
+    public boolean keyPressed(GuiQuestBook gui, int keyCode) {
+        return textBoxes.onKeyStroke(gui, keyCode);
+    }
+    
+    public boolean charTyped(GuiQuestBook gui, char c) {
+        return textBoxes.onCharTyped(gui, c);
     }
     
     public void onDrag(GuiQuestBook gui, int mX, int mY, int b) {
@@ -81,5 +91,9 @@ public abstract class Graphic {
     
     protected void addScrollBar(ScrollBar scrollBar) {
         scrollBars.add(scrollBar);
+    }
+    
+    protected void addTextBox(TextBoxGroup.TextBox box) {
+        textBoxes.add(box);
     }
 }
