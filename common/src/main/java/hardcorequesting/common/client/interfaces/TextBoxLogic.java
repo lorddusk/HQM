@@ -157,26 +157,41 @@ public class TextBoxLogic {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onKeyStroke(GuiBase gui, char c, int k) {
+    public boolean onKeyStroke(GuiBase gui, int k) {
         if (k == GLFW.GLFW_KEY_LEFT) {
             moveCursor(gui, -1);
+            return true;
         } else if (k == GLFW.GLFW_KEY_RIGHT) {
             moveCursor(gui, 1);
+            return true;
         } else if (k == GLFW.GLFW_KEY_BACKSPACE) {
             deleteText(gui, -1);
+            return true;
         } else if (k == GLFW.GLFW_KEY_DELETE) {
             deleteText(gui, 1);
+            return true;
         } else if (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER) {
             addText(gui, "\\n");
+            return true;
         } else if (k == GLFW.GLFW_KEY_HOME) {
             cursor = 0;
             updateCursor();
+            return true;
         } else if (k == GLFW.GLFW_KEY_END) {
             cursor = text.length();
             updateCursor();
-        } else if (isCharacterValid(c, getText())) {
-            addText(gui, Character.toString(c));
+            return true;
         }
+        return false;
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public boolean onCharTyped(GuiBase gui, char c) {
+        if (isCharacterValid(c, getText())) {
+            addText(gui, Character.toString(c));
+            return true;
+        }
+        return false;
     }
     
     public void setCursor(int cursor) {

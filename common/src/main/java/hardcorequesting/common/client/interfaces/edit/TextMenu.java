@@ -138,7 +138,10 @@ public class TextMenu extends GuiEditMenu {
     @Override
     public void onKeyStroke(GuiBase gui, char c, int k) {
         super.onKeyStroke(gui, c, k);
-        text.onKeyStroke(gui, c, k);
+        if (k == -1)
+            text.onCharTyped(gui, c);
+        else
+            text.onKeyStroke(gui, k);
     }
     
     @Override

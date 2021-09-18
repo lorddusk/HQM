@@ -60,10 +60,19 @@ public class TextBoxGroup {
     }
     
     @Environment(EnvType.CLIENT)
-    public void onKeyStroke(GuiBase gui, char c, int k) {
+    public boolean onKeyStroke(GuiBase gui, int k) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
-            selectedTextBox.onKeyStroke(gui, c, k);
+            return selectedTextBox.onKeyStroke(gui, k);
         }
+        return false;
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public boolean onCharTyped(GuiBase gui, char c) {
+        if (selectedTextBox != null && selectedTextBox.isVisible()) {
+            return selectedTextBox.onCharTyped(gui, c);
+        }
+        return false;
     }
     
     public static class TextBox extends TextBoxLogic {

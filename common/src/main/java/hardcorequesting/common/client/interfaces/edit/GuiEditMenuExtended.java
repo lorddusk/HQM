@@ -76,8 +76,11 @@ public abstract class GuiEditMenuExtended extends GuiEditMenu {
     @Override
     public void onKeyStroke(GuiBase gui, char c, int k) {
         super.onKeyStroke(gui, c, k);
-        
-        textBoxes.onKeyStroke(gui, c, k);
+    
+        if (k == -1)
+            textBoxes.onCharTyped(gui, c);
+        else
+            textBoxes.onKeyStroke(gui, k);
     }
     
     @Override

@@ -368,7 +368,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onKeyStroke(this, c, -1);
         } else if (isBagPage && selectedGroup != null) {
-            textBoxes.onKeyStroke(this, c, -1);
+            textBoxes.onCharTyped(this, c);
         } else {
             return false;
         }
@@ -384,7 +384,7 @@ public class GuiQuestBook extends GuiBase {
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
         } else if (isBagPage && selectedGroup != null) {
-			textBoxes.onKeyStroke(this, Character.MIN_VALUE, keyCode);
+			textBoxes.onKeyStroke(this, keyCode);
 		} else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
             return true;
