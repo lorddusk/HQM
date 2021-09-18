@@ -1,18 +1,14 @@
 package hardcorequesting.common.client.interfaces;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
+import hardcorequesting.common.client.interfaces.graphic.MainPageGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.CloseBookMessage;
@@ -25,18 +21,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class GuiQuestBook extends GuiBase {
@@ -46,16 +35,12 @@ public class GuiQuestBook extends GuiBase {
     public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
     public static final int TEXT_HEIGHT = 9;
     public static final int TEXT_SPACING = 20;
-    private static final int DESCRIPTION_X = 180;
-    private static final int DESCRIPTION_Y = 20;
-    public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
     public static final int GROUP_ITEMS_X = 20;
     public static final int GROUP_ITEMS_Y = 40;
     public static final int GROUP_ITEMS_SPACING = 20;
     public static final int ITEMS_PER_LINE = 7;
-    private static final String FRONT_KEY = "hqm_front_texture";
-    private static final int TEXTURE_WIDTH = 170 * 2;
-    private static final int TEXTURE_HEIGHT = 234;
+    public static final int TEXTURE_WIDTH = 170 * 2;
+    public static final int TEXTURE_HEIGHT = 234;
     private static final int BACK_ARROW_X = 9;
     private static final int BACK_ARROW_Y = 219;
     private static final int BACK_ARROW_SRC_X = 0;
@@ -73,6 +58,7 @@ public class GuiQuestBook extends GuiBase {
     //these are static to keep the same page loaded when the book is reopened
     private static BookPage page;
     private Graphic pageGraphic;
+    private final MainPageGraphic mainPageGraphic = new MainPageGraphic(this);
     public static Reputation selectedReputation;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
@@ -81,27 +67,13 @@ public class GuiQuestBook extends GuiBase {
     public QuestSet modifyingQuestSet;
     public Quest modifyingQuest;
     public ReputationBar modifyingBar;
-    private ScrollBar mainDescriptionScroll;
-    private List<ScrollBar> scrollBars;
     private int tick;
     private GuiEditMenu editMenu;
-    private LargeButton saveButton;
-    private List<LargeButton> buttons = new ArrayList<>();
+    private final LargeButton saveButton;
     private EditMode currentMode = EditMode.NORMAL;
-    private final EditButton[] mainButtons = EditButton.createButtons(this::setCurrentMode, EditMode.NORMAL, EditMode.RENAME);
     
     {
-        scrollBars = new ArrayList<>();
-        scrollBars.add(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return page == null && Quest.getMainDescription(gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
-            }
-        });
-    }
-    
-    {
-        buttons.add(saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
+        saveButton = new LargeButton("hqm.questBook.saveAll", 360, 10) {
             @Override
             public boolean isEnabled(GuiBase gui) {
                 return true;
@@ -116,7 +88,7 @@ public class GuiQuestBook extends GuiBase {
             public void onClick(GuiBase gui) {
                 save();
             }
-        });
+        };
     }
     
     private GuiQuestBook(Player player, boolean isOpBook) {
@@ -188,10 +160,7 @@ public class GuiQuestBook extends GuiBase {
             SaveHelper.render(matrices, this, x, y);
         }
         
-        
-        for (LargeButton button : buttons) {
-            button.draw(matrices, this, x, y);
-        }
+        saveButton.draw(matrices, this, x, y);
         
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(MAP_TEXTURE);
@@ -205,19 +174,13 @@ public class GuiQuestBook extends GuiBase {
         }
         
         if (editMenu == null) {
-            drawEditButtons(matrices, x, y, getButtons());
-            
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.draw(matrices, this);
-            }
             
             if (pageGraphic == null) {
-                drawMainPage(matrices);
+                mainPageGraphic.drawFull(matrices, this, x, y);
             } else {
                 pageGraphic.drawFull(matrices, this, x, y);
             }
     
-            drawEditButtonTooltip(matrices, x, y, getButtons());
     
             if (currentMode == EditMode.DELETE) {
                 matrices.pushPose();
@@ -232,7 +195,7 @@ public class GuiQuestBook extends GuiBase {
             editMenu.renderTooltip(matrices, this, x, y);
         }
     
-        buttons.forEach(button -> button.renderTooltip(matrices, this, x, y));
+        saveButton.renderTooltip(matrices, this, x, y);
         
         if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
             renderTooltip(matrices, FormattedText.composite(
@@ -273,8 +236,6 @@ public class GuiQuestBook extends GuiBase {
         } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
             return true;
-        } else {
-            return KeyboardHandler.handleEditModeHotkey(keyCode, getButtons());
         }
         return false;
     }
@@ -306,13 +267,10 @@ public class GuiQuestBook extends GuiBase {
         }
         
         boolean buttonClicked = false;
-        
-        for (LargeButton largeButton : buttons) {
-            if (largeButton.isVisible(this) && largeButton.isEnabled(this) && largeButton.inButtonBounds(this, x, y)) {
-                largeButton.onClick(this);
-                buttonClicked = true;
-                break;
-            }
+    
+        if (saveButton.isVisible(this) && saveButton.isEnabled(this) && saveButton.inButtonBounds(this, x, y)) {
+            saveButton.onClick(this);
+            buttonClicked = true;
         }
         
         if (Quest.canQuestsBeEdited()) {
@@ -322,14 +280,8 @@ public class GuiQuestBook extends GuiBase {
         if (buttonClicked) return true;
         
         if (editMenu == null) {
-            handleEditButtonClick(x, y, getButtons());
-            
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onClick(this, x, y);
-            }
-            
             if (pageGraphic == null) {
-                mainPageMouseClicked(x, y);
+                mainPageGraphic.onClick(this, x, y, button);
             } else {
                 if (button == 1) {
                     goBack();
@@ -362,10 +314,6 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onRelease(this, x, y);
         } else if (pageGraphic != null) {
             pageGraphic.onRelease(this, x, y, button);
-        } else {
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onRelease(this, x, y);
-            }
         }
         return true;
     }
@@ -383,10 +331,6 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onDrag(this, x, y);
         } else if (pageGraphic != null) {
             pageGraphic.onDrag(this, x, y, button);
-        } else {
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onDrag(this, x, y);
-            }
         }
         return true;
     }
@@ -397,10 +341,6 @@ public class GuiQuestBook extends GuiBase {
             editMenu.onScroll(this, x, y, scroll);
         } else if (pageGraphic != null) {
             pageGraphic.onScroll(this, x, y, scroll);
-        } else {
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onScroll(this, x, y, scroll);
-            }
         }
         return true;
     }
@@ -423,54 +363,9 @@ public class GuiQuestBook extends GuiBase {
         return false;
     }
     
-    private void drawMainPage(PoseStack matrices) {
-        QuestLine questLine = QuestLine.getActiveQuestLine();
-        int startLine = mainDescriptionScroll.isVisible(this) ? Math.round((Quest.getMainDescription(this).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
-        drawString(matrices, Quest.getMainDescription(this), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
-        drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, PAGE_WIDTH, TEXTURE_HEIGHT - 195, 0x707070);
-        if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-            drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), PAGE_WIDTH, 195, 0.7F, PAGE_WIDTH - 10, TEXTURE_HEIGHT - 195, 0x707070);
-        }
-        if (questLine.front == null) {
-            File file = new File(HardcoreQuestingCore.configDir.toFile(), "front.png");
-            if (file.exists()) {
-                try {
-                    NativeImage img = NativeImage.read(new FileInputStream(file));
-                    DynamicTexture dm = new DynamicTexture(img);
-                    questLine.front = Minecraft.getInstance().getTextureManager().register(FRONT_KEY, dm);
-                } catch (IOException ignored) {
-                    questLine.front = ResourceHelper.getResource("front");
-                }
-            } else {
-                questLine.front = ResourceHelper.getResource("front");
-            }
-        }
-        
-        if (questLine.front != null) {
-            ResourceHelper.bindResource(questLine.front);
-            applyColor(0xFFFFFFFF);
-            drawRect(matrices, 20, 20, 0, 0, 140, 180);
-        }
-    }
-    
     public void goBack() {
         if (page != null) {
             setPage(page.getParent());
-        }
-    }
-    
-    private void mainPageMouseClicked(int x, int y) {
-        if (x > 0 && x < PAGE_WIDTH && y > 205) {
-            setPage(BookPage.MenuPage.INSTANCE);
-            SoundHandler.stopLoreMusic();
-        } else if (x > PAGE_WIDTH && x < TEXTURE_WIDTH && y > 205) {
-            if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-                SoundHandler.playLoreMusic();
-            }
-        } else {
-            if (Quest.canQuestsBeEdited() && currentMode == EditMode.RENAME && inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7F), x, y)) {
-                TextMenu.display(this, player.getUUID(), Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
-            }
         }
     }
     
@@ -503,10 +398,6 @@ public class GuiQuestBook extends GuiBase {
     public void save() {
         QuestLine.getActiveQuestLine().saveAll();
         SaveHelper.onSave();
-    }
-    
-    private EditButton[] getButtons() {
-        return page == null ? mainButtons : new EditButton[0];
     }
     
     public void drawEditButtons(PoseStack matrices, int mX, int mY, EditButton[] editButtons) {
