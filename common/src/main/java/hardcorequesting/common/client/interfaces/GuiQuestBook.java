@@ -7,7 +7,6 @@ import hardcorequesting.common.client.EditButton;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
-import hardcorequesting.common.client.interfaces.graphic.MainPageGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.network.NetworkManager;
@@ -25,7 +24,10 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
 public class GuiQuestBook extends GuiBase {
@@ -55,10 +57,11 @@ public class GuiQuestBook extends GuiBase {
     private static final int MENU_ARROW_HEIGHT = 9;
     //endregion
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
-    //these are static to keep the same page loaded when the book is reopened
-    private static BookPage page;
+    //the page is static to keep the same page loaded when the book is reopened
+    @NotNull
+    private static BookPage page = BookPage.MainPage.INSTANCE;
+    @NotNull
     private Graphic pageGraphic;
-    private final MainPageGraphic mainPageGraphic = new MainPageGraphic(this);
     public static Reputation selectedReputation;
     private static ItemStack selectedStack;
     public final boolean isOpBook;
@@ -96,8 +99,7 @@ public class GuiQuestBook extends GuiBase {
         this.player = player;
         this.isOpBook = isOpBook;
         
-        if (page != null)
-            pageGraphic = page.createGraphic(this);
+        pageGraphic = page.createGraphic(this);
         
         if (Quest.canQuestsBeEdited()) {
             Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
@@ -110,7 +112,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public static void resetBookPosition() {
-        page = null;
+        page = BookPage.MainPage.INSTANCE;
         
         selectedReputation = null;
     }
@@ -174,13 +176,8 @@ public class GuiQuestBook extends GuiBase {
         }
         
         if (editMenu == null) {
-            
-            if (pageGraphic == null) {
-                mainPageGraphic.drawFull(matrices, this, x, y);
-            } else {
-                pageGraphic.drawFull(matrices, this, x, y);
-            }
     
+            pageGraphic.drawFull(matrices, this, x, y);
     
             if (currentMode == EditMode.DELETE) {
                 matrices.pushPose();
@@ -215,10 +212,8 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onKeyStroke(this, c, -1);
-        } else if (pageGraphic != null) {
-            return pageGraphic.charTyped(this, c);
         } else {
-            return false;
+            return pageGraphic.charTyped(this, c);
         }
         return true;
     }
@@ -231,7 +226,7 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
-        } else if (pageGraphic != null && pageGraphic.keyPressed(this, keyCode)) {
+        } else if (pageGraphic.keyPressed(this, keyCode)) {
             return true;
         } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
@@ -262,7 +257,7 @@ public class GuiQuestBook extends GuiBase {
                 editMenu.close(this);
                 editMenu = null;
             }
-            setPage(null);
+            setPage(BookPage.MenuPage.INSTANCE);
             return true;
         }
         
@@ -280,15 +275,11 @@ public class GuiQuestBook extends GuiBase {
         if (buttonClicked) return true;
         
         if (editMenu == null) {
-            if (pageGraphic == null) {
-                mainPageGraphic.onClick(this, x, y, button);
+            if (button == 1) {
+                goBack();
+                return true;
             } else {
-                if (button == 1) {
-                    goBack();
-                    return true;
-                } else {
-                    pageGraphic.onClick(this, x, y, button);
-                }
+                pageGraphic.onClick(this, x, y, button);
             }
         } else {
             editMenu.onClick(this, x, y, button);
@@ -312,7 +303,7 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onRelease(this, x, y);
-        } else if (pageGraphic != null) {
+        } else {
             pageGraphic.onRelease(this, x, y, button);
         }
         return true;
@@ -329,7 +320,7 @@ public class GuiQuestBook extends GuiBase {
         updatePosition(x, y);
         if (editMenu != null) {
             editMenu.onDrag(this, x, y);
-        } else if (pageGraphic != null) {
+        } else {
             pageGraphic.onDrag(this, x, y, button);
         }
         return true;
@@ -339,7 +330,7 @@ public class GuiQuestBook extends GuiBase {
     public boolean mouseScrolled(double x, double y, double scroll) {
         if (editMenu != null) {
             editMenu.onScroll(this, x, y, scroll);
-        } else if (pageGraphic != null) {
+        } else {
             pageGraphic.onScroll(this, x, y, scroll);
         }
         return true;
@@ -364,7 +355,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void goBack() {
-        if (page != null) {
+        if (page.canGoBack()) {
             setPage(page.getParent());
         }
     }
@@ -427,7 +418,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private boolean shouldDisplayControlArrow(boolean isMenuArrow) {
-        return page != null && (
+        return page.canGoBack() && (
                 editMenu == null && (!isMenuArrow || page.hasGoToMenuButton())
                         || editMenu != null && !editMenu.hasButtons());
     }
@@ -445,7 +436,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void setPage(BookPage page) {
-        GuiQuestBook.page = page;
-        pageGraphic = page == null ? null : page.createGraphic(this);
+        GuiQuestBook.page = Objects.requireNonNull(page);
+        pageGraphic = page.createGraphic(this);
     }
 }

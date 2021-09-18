@@ -29,6 +29,7 @@ public class MainPageGraphic extends EditableGraphic {
     private static final int DESCRIPTION_X = 180;
     private static final int DESCRIPTION_Y = 20;
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
+    
     private final ScrollBar mainDescriptionScroll;
     {
         addScrollBar(mainDescriptionScroll = new ScrollBar(312, 18, 186, 171, 69, DESCRIPTION_X) {

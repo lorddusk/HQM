@@ -5,7 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.*;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -19,9 +19,13 @@ public abstract class BookPage {
     
     public abstract Graphic createGraphic(GuiQuestBook gui);
     
-    @Nullable
+    @NotNull
     public final BookPage getParent() {
-        return parent;
+        return Objects.requireNonNull(parent);
+    }
+    
+    public boolean canGoBack() {
+        return parent != null;
     }
     
     public boolean hasGoToMenuButton() {
@@ -29,19 +33,34 @@ public abstract class BookPage {
     }
     
     
-    public static class MenuPage extends BookPage {
-        public static final BookPage INSTANCE = new MenuPage();
-        public final BookPage questSets = new SetsPage(this);
-        public final BookPage reputations = new ReputationPage(this);
-        public final BookPage bags = new BagsPage(this);
-        
-        private MenuPage() {
+    public static class MainPage extends BookPage {
+        public static final MainPage INSTANCE = new MainPage();
+    
+        private MainPage() {
             super(null);
         }
     
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
-            return new MenuPageGraphic(this, gui);
+            return new MainPageGraphic(gui);
+        }
+    
+        @Override
+        public boolean hasGoToMenuButton() {
+            return false;
+        }
+    }
+    
+    public static class MenuPage extends BookPage {
+        public static final MenuPage INSTANCE = new MenuPage(MainPage.INSTANCE);
+        
+        private MenuPage(MainPage parent) {
+            super(parent);
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new MenuPageGraphic(gui);
         }
     
         @Override
@@ -51,6 +70,8 @@ public abstract class BookPage {
     }
     
     public static class SetsPage extends BookPage {
+        public static final SetsPage INSTANCE = new SetsPage(MenuPage.INSTANCE);
+        
         private SetsPage(MenuPage parent) {
             super(parent);
         }
@@ -98,6 +119,8 @@ public abstract class BookPage {
     }
     
     public static class ReputationPage extends BookPage {
+        public static final ReputationPage INSTANCE = new ReputationPage(MenuPage.INSTANCE);
+        
         private ReputationPage(MenuPage parent) {
             super(parent);
         }
@@ -109,6 +132,8 @@ public abstract class BookPage {
     }
     
     public static class BagsPage extends BookPage {
+        public static final BagsPage INSTANCE = new BagsPage(MenuPage.INSTANCE);
+        
         private BagsPage(MenuPage parent) {
             super(parent);
         }
