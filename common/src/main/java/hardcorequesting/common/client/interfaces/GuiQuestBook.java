@@ -14,7 +14,6 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.EditBagsGraphic;
-import hardcorequesting.common.client.interfaces.graphic.EditGroupGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -104,8 +103,6 @@ public class GuiQuestBook extends GuiBase {
     //these are static to keep the same page loaded when the book is reopened
     private static BookPage page;
     private Graphic graphic;
-    private static Group selectedGroup;
-    private EditGroupGraphic groupGraphic;
     public static Reputation selectedReputation;
     private static boolean isMainPageOpen = true;
     private static boolean isMenuPageOpen = true;
@@ -209,7 +206,6 @@ public class GuiQuestBook extends GuiBase {
         isBagPage = false;
         isMenuPageOpen = true;
         
-        selectedGroup = null;
         selectedReputation = null;
     }
     
@@ -285,8 +281,8 @@ public class GuiQuestBook extends GuiBase {
                 drawMainPage(matrices);
             } else if (isMenuPageOpen) {
                 drawMenuPage(matrices, x, y);
-            } else if (isBagPage) {
-                drawBagPage(matrices, x, y);
+            } else if (isBagPage && page == null) {
+                bagGraphic.drawFull(matrices, this, x, y);
             } else if (graphic != null) {
                 graphic.drawFull(matrices, this, x, y);
             }
@@ -326,8 +322,6 @@ public class GuiQuestBook extends GuiBase {
         }
         if (editMenu != null) {
             editMenu.onKeyStroke(this, c, -1);
-        } else if (isBagPage && selectedGroup != null) {
-            groupGraphic.charTyped(this, c);
         } else if (graphic != null) {
             return graphic.charTyped(this, c);
         } else {
@@ -344,14 +338,12 @@ public class GuiQuestBook extends GuiBase {
         
         if (editMenu != null) {
             editMenu.onKeyStroke(this, Character.MIN_VALUE, keyCode);
-        } else if (isBagPage && selectedGroup != null) {
-			groupGraphic.keyPressed(this, keyCode);
-		} else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+        } else if (graphic != null && graphic.keyPressed(this, keyCode)) {
+            return true;
+        } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
             goBack();
             return true;
-        } else if (graphic != null) {
-            return graphic.keyPressed(this, keyCode);
-        } else  {
+        } else {
             return KeyboardHandler.handleEditModeHotkey(keyCode, getButtons());
         }
         return false;
@@ -412,8 +404,12 @@ public class GuiQuestBook extends GuiBase {
                 mainPageMouseClicked(x, y);
             } else if (isMenuPageOpen) {
                 menuPageMouseClicked(button, x, y);
-            } else if (isBagPage) {
-                bagPageMouseClicked(button, x, y);
+            } else if (isBagPage && page == null) {
+                if (button == 1) {
+                    goBack();
+                } else {
+                    bagGraphic.onClick(this, x, y, button);
+                }
             } else if (graphic != null) {
                 if (button == 1) {
                     goBack();
@@ -505,15 +501,6 @@ public class GuiQuestBook extends GuiBase {
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-    
-    private void drawBagPage(PoseStack matrices, int x, int y) {
-        if (selectedGroup != null) {
-            groupGraphic.drawFull(matrices, this, x, y);
-            
-        } else {
-            bagGraphic.drawFull(matrices, this, x, y);
-        }
     }
     
     private void drawMenuPage(PoseStack matrices, int x, int y) {
@@ -633,22 +620,6 @@ public class GuiQuestBook extends GuiBase {
         }
     }
     
-    private void bagPageMouseClicked(int button, int x, int y) {
-        if (selectedGroup != null) {
-            if (button == 1) {
-                setGroup(null);
-            } else {
-                groupGraphic.onClick(this, x, y, button);
-            }
-        } else {
-            if (button == 1) {
-                goBack();
-            } else {
-                bagGraphic.onClick(this, x, y, button);
-            }
-        }
-    }
-    
     private void menuPageMouseClicked(int button, int x, int y) {
         if (button == 1) {
             isMainPageOpen = true;
@@ -763,11 +734,6 @@ public class GuiQuestBook extends GuiBase {
     
     private boolean shouldDisplayAndIsInArrowBounds(boolean isMenuArrow, int mX, int mY) {
         return shouldDisplayControlArrow(isMenuArrow) && inArrowBounds(isMenuArrow, mX, mY);
-    }
-    
-    public void setGroup(Group group) {
-        selectedGroup = group;
-        groupGraphic = group == null ? null : new EditGroupGraphic(this, group);
     }
     
     public void setPage(BookPage page) {

@@ -1,5 +1,6 @@
 package hardcorequesting.common.client;
 
+import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.*;
 import hardcorequesting.common.quests.Quest;
@@ -35,6 +36,7 @@ public abstract class BookPage {
     }
     
     public static class SetsPage extends BookPage {
+        
         public SetsPage() {
             super(null);
         }
@@ -78,6 +80,20 @@ public abstract class BookPage {
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
             return new QuestGraphic(gui.getPlayer().getUUID(), quest, gui);
+        }
+    }
+    
+    public static class GroupPage extends BookPage {
+        private final Group group;
+        
+        public GroupPage(Group group) {
+            super(null);
+            this.group = group;
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new EditGroupGraphic(gui, group);
         }
     }
 }

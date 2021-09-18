@@ -6,6 +6,7 @@ import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
+import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
@@ -182,7 +183,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         gui.modifyingGroup = (group == gui.modifyingGroup ? null : group);
                         break;
                     case NORMAL:
-                        gui.setGroup(group);
+                        gui.setPage(new BookPage.GroupPage(group));
                         break;
                     case RENAME:
                         TextMenu.display(gui, gui.getPlayer().getUUID(), group.getDisplayName(), true, group::setName);
