@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -59,14 +60,14 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void drawAll(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, final UUID playerId) {
+    public static void drawAll(PoseStack matrices, GuiQuestBook gui, ScrollBar reputationDisplayScroll, int x, int y, int mX, int mY, final UUID playerId) {
         String info = null;
         
         List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
         
         reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
         
-        int start = gui.reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * gui.reputationDisplayScroll.getScroll()) : 0;
+        int start = reputationDisplayScroll.isVisible(gui) ? Math.round((reputations.size() - GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS) * reputationDisplayScroll.getScroll()) : 0;
         int end = Math.min(start + GuiQuestBook.VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
         for (int i = start; i < end; i++) {
             gui.applyColor(0xFFFFFFFF);

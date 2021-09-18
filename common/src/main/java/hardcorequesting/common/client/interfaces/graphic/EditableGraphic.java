@@ -33,8 +33,8 @@ public class EditableGraphic extends Graphic {
     }
     
     @Override
-    public void onClick(GuiQuestBook gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(GuiQuestBook gui, int mX, int mY, int button) {
+        super.onClick(gui, mX, mY, button);
     
         gui.handleEditButtonClick(mX, mY, editButtons);
     }
