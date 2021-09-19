@@ -65,11 +65,6 @@ public class GuiQuestBook extends GuiBase {
     {
         saveButton = new LargeButton(this, "hqm.questBook.saveAll", 360, 10) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited() && SaveHelper.isLarge();
             }

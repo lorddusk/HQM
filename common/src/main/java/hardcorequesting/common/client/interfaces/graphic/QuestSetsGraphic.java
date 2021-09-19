@@ -53,11 +53,6 @@ public class QuestSetsGraphic extends EditableGraphic {
     {
         addButton(new LargeButton(gui, "hqm.questBook.open", 245, 190) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
-            @Override
             public boolean isVisible() {
                 return selectedSet != null;
             }
@@ -69,11 +64,6 @@ public class QuestSetsGraphic extends EditableGraphic {
         });
     
         addButton(new LargeButton(gui, "hqm.questBook.createSet", 185, 50) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
             @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited() && QuestSetsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;

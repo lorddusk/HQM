@@ -77,16 +77,6 @@ public class EditTrackerScreen extends GuiBase {
         
         buttons.add(new LargeButton(this, "hqm.edit.ok", 40, 200) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-        
-            @Override
             public void onClick() {
                 tracker.sendToServer();
                 onClose();

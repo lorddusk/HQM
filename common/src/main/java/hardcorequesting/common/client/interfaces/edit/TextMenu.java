@@ -51,32 +51,12 @@ public class TextMenu extends GuiEditMenu {
         this.isName = isName;
         addButton(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
-            @Override
             public void onClick() {
                 Minecraft.getInstance().keyboardHandler.setClipboard(text.getText());
             }
         });
         
         addButton(new LargeButton(gui, "hqm.textEditor.paste", 245, 20) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
             @Override
             public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
@@ -89,32 +69,12 @@ public class TextMenu extends GuiEditMenu {
         
         addButton(new LargeButton(gui, "hqm.textEditor.clear", 185, 40) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
-            @Override
             public void onClick() {
                 text.setTextAndCursor("");
             }
         });
         
         addButton(new LargeButton(gui, "hqm.textEditor.clearPaste", 245, 40) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
             @Override
             public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();

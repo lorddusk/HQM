@@ -25,11 +25,6 @@ public class DeathTaskGraphic extends TaskGraphic {
     
         addButton(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
-            @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited();
             }

@@ -26,11 +26,6 @@ public abstract class TaskGraphic extends Graphic {
     protected void addSubmitButton(QuestTask<?> task) {
         addButton(new LargeButton(gui, "hqm.quest.manualSubmit", 185, 200) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
-            @Override
             public boolean isVisible() {
                 return !task.isCompleted(playerId);
             }
@@ -44,11 +39,6 @@ public abstract class TaskGraphic extends Graphic {
     
     protected void addDetectButton(QuestTask<?> task) {
         addButton(new LargeButton(gui, "hqm.quest.manualDetect", 185, 200) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        
             @Override
             public boolean isVisible() {
                 return !task.isCompleted(playerId);

@@ -59,11 +59,6 @@ public final class QuestGraphic extends EditableGraphic {
         for (final TaskType taskType : TaskType.values()) {
             addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
                 @Override
-                public boolean isEnabled() {
-                    return true;
-                }
-                
-                @Override
                 public boolean isVisible() {
                     return Quest.canQuestsBeEdited() && selectedTask == null && QuestGraphic.this.gui.getCurrentMode() == EditMode.TASK;
                 }

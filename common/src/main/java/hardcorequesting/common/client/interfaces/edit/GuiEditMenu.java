@@ -39,16 +39,6 @@ public abstract class GuiEditMenu extends Graphic {
         
         addButton(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
-            @Override
             public void onClick() {
                 save();
                 close();
@@ -56,16 +46,6 @@ public abstract class GuiEditMenu extends Graphic {
         });
         
         addButton(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
             @Override
             public void onClick() {
                 close();

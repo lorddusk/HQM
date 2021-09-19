@@ -45,10 +45,14 @@ public abstract class LargeButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isEnabled();
+    public boolean isEnabled() {
+        return true;
+    }
     
     @Environment(EnvType.CLIENT)
-    public abstract boolean isVisible();
+    public boolean isVisible() {
+        return true;
+    }
     
     @Environment(EnvType.CLIENT)
     public abstract void onClick();

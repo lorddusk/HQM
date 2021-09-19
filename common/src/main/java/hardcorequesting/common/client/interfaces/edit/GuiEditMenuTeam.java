@@ -85,11 +85,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         addButton(new LargeButton(gui, "hqm.party.accept", 180, 20) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
             public boolean isVisible() {
                 return inviteTeam != null;
             }
@@ -103,11 +98,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         
         addButton(new LargeButton(gui, "hqm.party.decline", 240, 20) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
             public boolean isVisible() {
                 return inviteTeam != null;
             }
@@ -120,11 +110,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         });
         
         addButton(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
             @Override
             public boolean isVisible() {
                 return inviteTeam != null;
@@ -195,16 +180,6 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         });
         
         addButton(new LargeButton(gui, "hqm.party.list", 250, 190) {
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
             @Override
             public void onClick() {
                 gui.setEditMenu(new GuiEditMenuTeamList(gui, playerId, self));

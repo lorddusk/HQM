@@ -112,16 +112,6 @@ public class LocationMenu extends GuiEditMenu {
         
         addButton(new LargeButton(gui, "hqm.locationMenu.location", 100, 20) {
             @Override
-            public boolean isEnabled() {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible() {
-                return true;
-            }
-            
-            @Override
             public void onClick() {
                 Player player = Minecraft.getInstance().player;
                 pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
