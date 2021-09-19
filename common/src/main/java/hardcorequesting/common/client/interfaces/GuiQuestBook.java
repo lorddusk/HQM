@@ -117,7 +117,6 @@ public class GuiQuestBook extends GuiBase {
         return tick;
     }
     
-    @Override
     public void setEditMenu(GuiEditMenu editMenu) {
         this.editMenu = editMenu;
     }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -37,9 +36,6 @@ public class GuiBase extends Screen {
     
     protected GuiBase(Component title) {
         super(title);
-    }
-    
-    public void setEditMenu(GuiEditMenu menu) {
     }
     
     public void drawRect(PoseStack matrices, int x, int y, int u, int v, int w, int h) {

@@ -1,6 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 
 import java.util.UUID;
@@ -11,11 +11,11 @@ public class IntInputMenu extends GuiEditMenu {
     private final IntConsumer resultConsumer;
     private int amount;
     
-    public static void display(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+    public static void display(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
         gui.setEditMenu(new IntInputMenu(gui, playerId, title, initAmount, resultConsumer));
     }
     
-    public IntInputMenu(GuiBase gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+    public IntInputMenu(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
         super(gui, playerId, true);
     
         this.resultConsumer = resultConsumer;

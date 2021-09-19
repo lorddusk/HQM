@@ -77,25 +77,25 @@ public class PickItemMenu<T> extends GuiEditMenu {
     /**
      * Create and display the menu.
      */
-    public static <T> void display(GuiBase gui, UUID playerId, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, playerId, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, and include text bar for amounts.
      */
-    public static <T> void display(GuiBase gui, UUID playerId, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, include text bar for amounts, and allow choice of precision.
      */
-    public static <T> void display(GuiBase gui, UUID playerId, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
         gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiBase gui, UUID playerId, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
+    private PickItemMenu(GuiQuestBook gui, UUID playerId, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
         super(gui, playerId, true);
         this.resultConsumer = resultConsumer;
         this.type = type;

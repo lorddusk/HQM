@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
@@ -28,7 +28,7 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private GuiEditMenuTeam parent;
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiBase gui, UUID playerId, GuiEditMenuTeam parent) {
+    protected GuiEditMenuTeamList(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
         super(gui, playerId);
         this.parent = parent;
     }

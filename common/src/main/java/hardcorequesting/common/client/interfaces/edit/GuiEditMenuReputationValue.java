@@ -1,6 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.reputation.ReputationMarker;
@@ -14,7 +14,7 @@ public class GuiEditMenuReputationValue extends GuiEditMenu {
     private ReputationMarker marker;
     private int value;
     
-    public GuiEditMenuReputationValue(GuiBase gui, UUID playerId, ReputationMarker marker) {
+    public GuiEditMenuReputationValue(GuiQuestBook gui, UUID playerId, ReputationMarker marker) {
         super(gui, playerId, true);
     
         this.marker = marker;

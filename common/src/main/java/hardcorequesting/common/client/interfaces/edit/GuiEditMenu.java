@@ -18,21 +18,21 @@ import java.util.UUID;
 @Environment(EnvType.CLIENT)
 public abstract class GuiEditMenu extends Graphic {
     
-    protected static final int BOX_OFFSET = 30;
+    public static final int BOX_OFFSET = 30;
     private static final int CHECK_BOX_SRC_X = 192;
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
     protected final List<CheckBox> checkboxes = new ArrayList<>();
     private boolean hasButtons;
-    protected final GuiBase gui;
+    protected final GuiQuestBook gui;
     protected final UUID playerId;
     
-    protected GuiEditMenu(GuiBase gui, UUID playerId) {
+    protected GuiEditMenu(GuiQuestBook gui, UUID playerId) {
         this.gui = gui;
         this.playerId = playerId;
     }
     
-    protected GuiEditMenu(GuiBase gui, UUID playerId, boolean isControlOnFirstPage) {
+    protected GuiEditMenu(GuiQuestBook gui, UUID playerId, boolean isControlOnFirstPage) {
         this(gui, playerId);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;

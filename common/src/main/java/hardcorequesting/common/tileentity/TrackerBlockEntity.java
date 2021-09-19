@@ -2,10 +2,9 @@ package hardcorequesting.common.tileentity;
 
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.client.ClientChange;
+import hardcorequesting.common.client.interfaces.EditTrackerScreen;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiType;
-import hardcorequesting.common.client.interfaces.GuiWrapperEditMenu;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTracker;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
@@ -49,8 +48,7 @@ public class TrackerBlockEntity extends BlockEntity {
             tracker.quest = null;
             tracker.radius = radius;
             tracker.type = type;
-            GuiBase gui = new GuiWrapperEditMenu();
-            gui.setEditMenu(new GuiEditMenuTracker(gui, player.getUUID(), tracker));
+            GuiBase gui = new EditTrackerScreen(tracker);
             Minecraft.getInstance().setScreen(gui);
         }
     }

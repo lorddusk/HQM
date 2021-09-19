@@ -1,7 +1,6 @@
 package hardcorequesting.common.reputation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
@@ -124,15 +123,15 @@ public class ReputationBar {
         private final boolean isNew;
         private final ScrollBar scrollBar;
         
-        public EditGui(GuiBase gui, UUID playerId, ReputationBar bar) {
+        public EditGui(GuiQuestBook gui, UUID playerId, ReputationBar bar) {
             this(gui, playerId, bar, false);
         }
         
-        public EditGui(GuiBase gui, UUID playerId, int x, int y, int selectedSet) {
+        public EditGui(GuiQuestBook gui, UUID playerId, int x, int y, int selectedSet) {
             this(gui, playerId, new ReputationBar(null, x, y, selectedSet), true);
         }
         
-        private EditGui(GuiBase gui, UUID playerId, ReputationBar bar, boolean isNew) {
+        private EditGui(GuiQuestBook gui, UUID playerId, ReputationBar bar, boolean isNew) {
             super(gui, playerId);
             this.bar = bar;
             this.isNew = isNew;

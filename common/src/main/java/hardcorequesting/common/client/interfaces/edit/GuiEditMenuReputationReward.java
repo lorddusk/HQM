@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
@@ -29,7 +29,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private final NumberTextBox valueTextBox;
     private final ArrowSelectionHelper selectionHelper;
     
-    public GuiEditMenuReputationReward(GuiBase gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+    public GuiEditMenuReputationReward(GuiQuestBook gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
         super(gui, playerId, true);
         this.resultConsumer = resultConsumer;
     

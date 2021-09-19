@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
@@ -18,7 +18,7 @@ public class GuiEditMenuParentCount extends GuiEditMenu {
     private Quest quest;
     private final ArrowSelectionHelper selectionHelper;
     
-    public GuiEditMenuParentCount(GuiBase gui, UUID playerId, Quest quest) {
+    public GuiEditMenuParentCount(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, true);
     
         this.quest = quest;
