@@ -419,7 +419,10 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                     break;
                 case REP_BAR_CREATE:
-                    gui.setEditMenu(new EditRepBarMenu(gui, player.getUUID(), mX, mY, set.getId()));
+                    PickReputationMenu.display(gui, reputation -> {
+                        set.addRepBar(new ReputationBar(reputation, mX, mY));
+                        SaveHelper.add(EditType.REPUTATION_BAR_ADD);
+                    });
                     break;
                 default:
                     break;
@@ -522,7 +525,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         
         if (Quest.canQuestsBeEdited())
             for (ReputationBar reputationBar : new ArrayList<>(set.getReputationBars()))
-                reputationBar.mouseClicked(gui, mX, mY);
+                reputationBar.mouseClicked(gui, set, mX, mY);
     }
     
     @Override

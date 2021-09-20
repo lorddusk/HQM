@@ -141,7 +141,6 @@ public class QuestSet {
     
     public void addRepBar(ReputationBar repBar) {
         if (repBar == null) return;
-        repBar.setQuestSet(this.id);
         reputationBars.add(repBar);
     }
     
@@ -175,7 +174,5 @@ public class QuestSet {
     
     public void decreaseId() {
         id--;
-        for (ReputationBar reputationBar : reputationBars)
-            reputationBar.setQuestSet(this.id);
     }
 }

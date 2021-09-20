@@ -3,8 +3,7 @@ package hardcorequesting.common.reputation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.EditRepBarMenu;
-import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.client.interfaces.edit.PickReputationMenu;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -17,17 +16,16 @@ import java.util.UUID;
 public class ReputationBar {
     
     private String repId;
-    private int x, y, questSet;
+    private int x, y;
     
-    public ReputationBar(Reputation reputation, int x, int y, QuestSet questSet) {
-        this(reputation.getId(), x, y, questSet.getId());
+    public ReputationBar(Reputation reputation, int x, int y) {
+        this(reputation.getId(), x, y);
     }
     
-    public ReputationBar(String repId, int x, int y, int questSet) {
+    public ReputationBar(String repId, int x, int y) {
         this.repId = repId;
         this.x = x;
         this.y = y;
-        this.questSet = questSet;
     }
     
     public void moveTo(int x, int y) {
@@ -47,20 +45,16 @@ public class ReputationBar {
         return repId;
     }
     
+    public Reputation getReputation() {
+        return ReputationManager.getInstance().getReputation(repId);
+    }
+    
     public void setReputation(Reputation reputation) {
         repId = reputation.getId();
     }
     
-    public QuestSet getQuestSet() {
-        return Quest.getQuestSets().get(this.questSet);
-    }
-    
-    public void setQuestSet(int id) {
-        this.questSet = id;
-    }
-    
     public boolean isValid() {
-        return Quest.getQuestSets().size() > this.questSet && getQuestSet() != null && ReputationManager.getInstance().getReputation(this.repId) != null;
+        return ReputationManager.getInstance().getReputation(this.repId) != null;
     }
     
     public boolean sameLocation(ReputationBar reputationBar) {
@@ -92,7 +86,7 @@ public class ReputationBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void mouseClicked(GuiQuestBook gui, int x, int y) {
+    public void mouseClicked(GuiQuestBook gui, QuestSet set, int x, int y) {
         if (this.inBounds(x, y)) {
             switch (gui.getCurrentMode()) {
                 case MOVE:
@@ -100,10 +94,13 @@ public class ReputationBar {
                     SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new EditRepBarMenu(gui, gui.getPlayer().getUUID(), this));
+                    PickReputationMenu.display(gui, getReputation(), reputation -> {
+                        this.setReputation(reputation);
+                        SaveHelper.add(EditType.REPUTATION_BAR_CHANGE);
+                    });
                     break;
                 case DELETE:
-                    this.getQuestSet().removeRepBar(this);
+                    set.removeRepBar(this);
                     SaveHelper.add(EditType.REPUTATION_BAR_REMOVE);
                 default:
                     break;
