@@ -3,9 +3,7 @@ package hardcorequesting.common.reputation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
-import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.edit.EditRepBarMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
@@ -14,7 +12,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ReputationBar {
@@ -49,12 +46,10 @@ public class ReputationBar {
     public String getRepId() {
         return repId;
     }
-
-    /*
-    public int save() {
-        //T ODO
-        return -1;
-    }*/
+    
+    public void setReputation(Reputation reputation) {
+        repId = reputation.getId();
+    }
     
     public QuestSet getQuestSet() {
         return Quest.getQuestSets().get(this.questSet);
@@ -105,92 +100,13 @@ public class ReputationBar {
                     SaveHelper.add(EditType.REPUTATION_BAR_MOVE);
                     break;
                 case REP_BAR_CHANGE:
-                    gui.setEditMenu(new EditGui(gui, gui.getPlayer().getUUID(), this));
+                    gui.setEditMenu(new EditRepBarMenu(gui, gui.getPlayer().getUUID(), this));
                     break;
                 case DELETE:
                     this.getQuestSet().removeRepBar(this);
                     SaveHelper.add(EditType.REPUTATION_BAR_REMOVE);
                 default:
                     break;
-            }
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public static class EditGui extends GuiEditMenu {
-        
-        private final ReputationBar bar;
-        private final boolean isNew;
-        private final ScrollBar scrollBar;
-        
-        public EditGui(GuiQuestBook gui, UUID playerId, ReputationBar bar) {
-            this(gui, playerId, bar, false);
-        }
-        
-        public EditGui(GuiQuestBook gui, UUID playerId, int x, int y, int selectedSet) {
-            this(gui, playerId, new ReputationBar(null, x, y, selectedSet), true);
-        }
-        
-        private EditGui(GuiQuestBook gui, UUID playerId, ReputationBar bar, boolean isNew) {
-            super(gui, playerId);
-            this.bar = bar;
-            this.isNew = isNew;
-            addScrollBar(scrollBar = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
-                @Override
-                public boolean isVisible() {
-                    return ReputationManager.getInstance().size() > EditReputationGraphic.VISIBLE_REPUTATIONS;
-                }
-            });
-        }
-        
-        @Override
-        @Environment(EnvType.CLIENT)
-        public void draw(PoseStack matrices, int mX, int mY) {
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
-            List<Reputation> reputationList = reputationManager.getReputationList();
-            for (int i = start; i < end; i++) {
-                int x = EditReputationGraphic.REPUTATION_LIST_X;
-                int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
-                String str = reputationList.get(i).getName();
-                
-                boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
-                boolean selected = reputationList.get(i).equals(reputationManager.getReputation(bar.repId));
-                
-                gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
-            }
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
-        }
-        
-        @Environment(EnvType.CLIENT)
-        public void onClick(int mX, int mY, int b) {
-            super.onClick(mX, mY, b);
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            
-            int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
-            List<Reputation> reputationList = reputationManager.getReputationList();
-            for (int i = start; i < end; i++) {
-                int x = EditReputationGraphic.REPUTATION_LIST_X;
-                int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
-                String str = reputationList.get(i).getName();
-                
-                if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
-                    bar.repId = reputationList.get(i).getId();
-                    save();
-                    close();
-                }
-            }
-        }
-        
-        @Override
-        public void save() {
-            if (isNew) {
-                Quest.getQuestSets().get(bar.questSet).addRepBar(bar);
-                SaveHelper.add(EditType.REPUTATION_BAR_ADD);
-            } else {
-                SaveHelper.add(EditType.REPUTATION_BAR_CHANGE);
             }
         }
     }

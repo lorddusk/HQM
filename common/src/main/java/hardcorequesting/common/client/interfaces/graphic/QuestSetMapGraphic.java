@@ -9,10 +9,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuParentCount;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuRepeat;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTrigger;
-import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.edit.*;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.task.QuestTask;
@@ -422,7 +419,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                     break;
                 case REP_BAR_CREATE:
-                    gui.setEditMenu(new ReputationBar.EditGui(gui, player.getUUID(), mX, mY, set.getId()));
+                    gui.setEditMenu(new EditRepBarMenu(gui, player.getUUID(), mX, mY, set.getId()));
                     break;
                 default:
                     break;
