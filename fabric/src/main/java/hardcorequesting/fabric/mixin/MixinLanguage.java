@@ -25,7 +25,7 @@ public class MixinLanguage {
     @Shadow @Final private static Logger LOGGER;
     
     @Inject(method = "loadDefault",
-            at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableMap$Builder;build()Lcom/google/common/collect/ImmutableMap;"),
+            at = @At(value = "INVOKE", remap = false, target = "Lcom/google/common/collect/ImmutableMap$Builder;build()Lcom/google/common/collect/ImmutableMap;"),
             locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private static void loadDefault(CallbackInfoReturnable<Language> cir, ImmutableMap.Builder<String, String> builder, BiConsumer<String, String> biConsumer) {
         String s = HardcoreQuestingCore.ID;
