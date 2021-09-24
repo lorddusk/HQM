@@ -15,7 +15,7 @@ dependencies {
     forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${project.forge_version}"
 
     compileOnly("org.jetbrains:annotations:19.0.0")
-    forgeDependencies(implementation("blue.endless:jankson:1.2.0"))
+    forgeDependencies(implementation("blue.endless:jankson:1.2.1"))
     shadowCommon("blue.endless:jankson:1.2.0")
 
     implementation(project(path: ":common", configuration: "dev")) {
