@@ -12,6 +12,10 @@ import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.BlockEvent;
+import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.FluidStack;
@@ -20,8 +24,6 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
-import me.shedaniel.cloth.api.common.events.v1.*;
-import me.shedaniel.cloth.api.utils.v1.GameInstanceUtils;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -29,6 +31,7 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -102,7 +105,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public MinecraftServer getServer() {
-        return GameInstanceUtils.getServer();
+        return GameInstance.getServer();
     }
     
     @Override
@@ -122,17 +125,17 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> consumer) {
-        WorldLoadCallback.EVENT.register(consumer::accept);
+        ServerWorldEvents.LOAD.register((server, world) -> consumer.accept(world.dimension(), world));
     }
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        WorldSaveCallback.EVENT.register((world, listener, flush) -> consumer.accept(world));
+        ServerWorldEvents.UNLOAD.register((server, world) -> consumer.accept(world));
     }
     
     @Override
     public void registerOnPlayerJoin(Consumer<ServerPlayer> consumer) {
-        PlayerJoinCallback.EVENT.register((connection, playerEntity) -> consumer.accept(playerEntity));
+        PlayerEvent.PLAYER_JOIN.register(consumer::accept);
     }
     
     @Override
@@ -165,9 +168,10 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnBlockPlace(BlockPlaced consumer) {
-        BlockPlaceCallback.EVENT.register((world, pos, state, placer, itemStack) -> {
-            consumer.onBlockPlaced(world, pos, state, placer);
-            return InteractionResult.PASS;
+        BlockEvent.PLACE.register((level, pos, state, placer) -> {
+            if (placer instanceof LivingEntity entity)
+                consumer.onBlockPlaced(level, pos, state, entity);
+            return EventResult.pass();
         });
     }
     
@@ -181,12 +185,15 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnBlockBreak(BlockBroken consumer) {
-        BlockBreakCallback.EVENT.register(consumer::onBlockBroken);
+        BlockEvent.BREAK.register((level, pos, state, player, xp) -> {
+            consumer.onBlockBroken(level, pos, state, player);
+            return EventResult.pass();
+        });
     }
     
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> consumer) {
-        ItemPickupCallback.EVENT.register(consumer::accept);
+        PlayerEvent.PICKUP_ITEM_POST.register((player, entity, stack) -> consumer.accept(player, stack));
     }
     
     @Override

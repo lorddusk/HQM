@@ -44,9 +44,6 @@ dependencies {
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
     depend("blue.endless:jankson:1.2.1")
-    modImplementation("me.shedaniel.cloth.api:cloth-api:${project.cloth}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
 
     implementation(project(path: ":common", configuration: "dev")) {
         transitive = false
