@@ -21,7 +21,7 @@ public abstract class BookPage {
     
     @NotNull
     public final BookPage getParent() {
-        return Objects.requireNonNull(parent);
+        return Objects.requireNonNull(parent, "This page does not have a parent!");
     }
     
     public boolean canGoBack() {
