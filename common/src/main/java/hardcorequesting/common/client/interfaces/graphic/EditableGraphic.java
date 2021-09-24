@@ -56,8 +56,8 @@ public class EditableGraphic extends Graphic {
     
     @Override
     public boolean keyPressed(int keyCode) {
-        return KeyboardHandler.handleEditModeHotkey(keyCode, editButtons)
-                || super.keyPressed(keyCode);
+        return super.keyPressed(keyCode)
+                || KeyboardHandler.handleEditModeHotkey(keyCode, editButtons);
     }
     
     protected void setEditMode(EditMode mode) {

@@ -264,6 +264,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     public void onDrag(int mX, int mY, int b) {
         super.onDrag(mX, mY, b);
+        rewardsGraphic.onDrag(mX, mY, b);
         if (taskGraphic != null)
             taskGraphic.onDrag(mX, mY, b);
     }
@@ -271,15 +272,31 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     public void onRelease(int mX, int mY, int b) {
         super.onRelease(mX, mY, b);
+        rewardsGraphic.onRelease(mX, mY, b);
         if (taskGraphic != null)
             taskGraphic.onRelease(mX, mY, b);
     }
     
     @Override
-    public void onScroll(double x, double y, double scroll) {
-        super.onScroll(x, y, scroll);
+    public void onScroll(double mX, double mY, double scroll) {
+        super.onScroll(mX, mY, scroll);
+        rewardsGraphic.onScroll(mX, mY, scroll);
         if (taskGraphic != null)
-            taskGraphic.onScroll(x, y, scroll);
+            taskGraphic.onScroll(mX, mY, scroll);
+    }
+    
+    @Override
+    public boolean keyPressed(int keyCode) {
+        return super.keyPressed(keyCode)
+                || rewardsGraphic.keyPressed(keyCode)
+                || (taskGraphic != null && taskGraphic.keyPressed(keyCode));
+    }
+    
+    @Override
+    public boolean charTyped(char c) {
+        return super.charTyped(c)
+                || rewardsGraphic.charTyped(c)
+                || (taskGraphic != null && taskGraphic.charTyped(c));
     }
     
     public void onOpen(Player player) {
