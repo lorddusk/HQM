@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.TextBoxLogic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class TextMenu extends GuiEditMenu {
     
-    private static final int TEXT_HEIGHT = 9;
     private static final int START_X = 20;
     private static final int START_Y = 20;
     private static final int LINES_PER_PAGE = 21;
@@ -91,7 +91,7 @@ public class TextMenu extends GuiEditMenu {
         super.draw(matrices, mX, mY);
         int page = text.getCursorLine() / LINES_PER_PAGE;
         gui.drawString(matrices, text.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
-        gui.drawCursor(matrices, START_X + text.getCursorPositionX() - 1, START_Y + text.getCursorPositionY() - 3 - page * LINES_PER_PAGE * TEXT_HEIGHT, 10, 1F, 0xFF909090);
+        gui.drawCursor(matrices, START_X + text.getCursorPositionX() - 1, START_Y + text.getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, 1F, 0xFF909090);
     }
     
     @Override

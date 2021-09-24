@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
@@ -38,14 +39,13 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     private static final int MAX_X = 300;
     private static final int OFFSET = 20;
     private static final int SIZE = 18;
-    private static final int TEXT_HEIGHT = 9;
     
     private long lastClicked;
     
     private final ItemRequirementTask task;
     
     public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(parts, playerId, gui);
+        super(task, parts, playerId, gui);
         this.task = task;
     }
     
@@ -118,7 +118,10 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
         matrices.translate(0, 0, 200);// magic z value to write over stack render
         float textSize = 0.8F;
         boolean hasCountLine = part.stack.left().map(itemStack -> itemStack.getCount() > 1).orElse(false);
-        gui.drawStringWithShadow(matrices, progressText, (int) (x + SIZE - gui.getStringWidth(progressText) * textSize), (int) (y + SIZE - (hasCountLine ? TEXT_HEIGHT : 0) - TEXT_HEIGHT * textSize + 2), textSize, task.getProgress(playerId, id) == part.required ? 0x308030 : 0xFFFFFF);
+        gui.drawStringWithShadow(matrices, progressText,
+                (int) (x + SIZE - gui.getStringWidth(progressText) * textSize),
+                (int) (y + SIZE - (hasCountLine ? GuiBase.TEXT_HEIGHT : 0) - GuiBase.TEXT_HEIGHT * textSize + 2),
+                textSize, task.getProgress(playerId, id) == part.required ? 0x308030 : 0xFFFFFF);
         matrices.popPose();
     }
     

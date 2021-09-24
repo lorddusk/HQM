@@ -27,13 +27,11 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     private final ReputationTask<?> task;
     
     public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(parts, playerId, gui);
-        this.task = task;
-        startOffsetY = 0;
+        this(task, parts, playerId, gui, 0);
     }
     
     protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui, int startOffsetY) {
-        super(parts, playerId, gui);
+        super(task, parts, playerId, gui);
         this.task = task;
         this.startOffsetY = startOffsetY;
     }

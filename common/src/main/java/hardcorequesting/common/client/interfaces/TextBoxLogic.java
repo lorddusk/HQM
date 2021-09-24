@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class TextBoxLogic {
     
-    private static final int TEXT_HEIGHT = 9;
-    
     protected final GuiBase gui;
     protected int cursor;
     protected int cursorPositionX;
@@ -135,7 +133,7 @@ public class TextBoxLogic {
                 for (int i = 0; i < lines.size(); i++) {
                     if (tmpCursor <= lines.get(i).length()) {
                         cursorPositionX = (int) (mult * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                        cursorPositionY = (int) (TEXT_HEIGHT * i * mult);
+                        cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * mult);
                         cursorLine = i;
                         break;
                     } else {

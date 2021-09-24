@@ -20,7 +20,7 @@ public class DeathTaskGraphic extends TaskGraphic {
     private final DeathTask task;
     
     public DeathTaskGraphic(DeathTask task, UUID playerId, GuiQuestBook gui) {
-        super(playerId, gui);
+        super(playerId, gui, task);
         this.task = task;
     
         addButton(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {

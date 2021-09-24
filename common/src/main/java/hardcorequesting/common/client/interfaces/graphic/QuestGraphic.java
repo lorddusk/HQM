@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
@@ -35,13 +36,10 @@ public final class QuestGraphic extends EditableGraphic {
     private static final int VISIBLE_TASKS = 3;
     //region pixelinfo
     public static final int START_X = 20;
-    private static final int TEXT_HEIGHT = 9;
     private static final int TASK_LABEL_START_Y = 100;
     private static final int TASK_MARGIN = 2;
     private static final int TITLE_START_Y = 15;
     private static final int DESCRIPTION_START_Y = 30;
-    private static final int TASK_DESCRIPTION_X = 180;
-    private static final int TASK_DESCRIPTION_Y = 20;
     
     private final UUID playerId;
     private final Quest quest;
@@ -51,7 +49,6 @@ public final class QuestGraphic extends EditableGraphic {
     private final QuestRewardsGraphic rewardsGraphic;
     
     private final ScrollBar descriptionScroll;
-    private final ScrollBar taskDescriptionScroll;
     private final ScrollBar taskScroll;
     private List<FormattedText> cachedDescription;
     
@@ -82,12 +79,6 @@ public final class QuestGraphic extends EditableGraphic {
             @Override
             public boolean isVisible() {
                 return getCachedDescription().size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        addScrollBar(taskDescriptionScroll = new ScrollBar(gui, 312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
-            @Override
-            public boolean isVisible() {
-                return selectedTask != null && selectedTask.getCachedLongDescription(QuestGraphic.this.gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
     
@@ -126,7 +117,7 @@ public final class QuestGraphic extends EditableGraphic {
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(playerId);
                 int yPos = getTaskY(id);
-                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY);
+                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
                 gui.drawString(matrices, Translator.plain(task.getDescription()), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
@@ -138,11 +129,7 @@ public final class QuestGraphic extends EditableGraphic {
         
         rewardsGraphic.draw(matrices, mX, mY);
         
-        if (selectedTask != null) {
-            List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
-            int taskStartLine = taskDescriptionScroll.isVisible() ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
-            gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
-    
+        if (taskGraphic != null) {
             taskGraphic.draw(matrices, mX, mY);
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
@@ -175,7 +162,7 @@ public final class QuestGraphic extends EditableGraphic {
     }
     
     private int getTaskY(int id) {
-        return TASK_LABEL_START_Y + id * (TEXT_HEIGHT + TASK_MARGIN);
+        return TASK_LABEL_START_Y + id * (GuiBase.TEXT_HEIGHT + TASK_MARGIN);
     }
     
     @Override
@@ -186,7 +173,7 @@ public final class QuestGraphic extends EditableGraphic {
         for (int i = start; i < end; i++) {
             QuestTask<?> task = quest.getTasks().get(i);
             if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
-                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY)) {
                     if (gui.isOpBook && Screen.hasShiftDown()) {
                         OPBookHelper.reverseTaskCompletion(task, playerId);
                         return;
@@ -225,7 +212,6 @@ public final class QuestGraphic extends EditableGraphic {
                         setSelectedTask(null);
                     } else {
                         setSelectedTask(task);
-                        taskDescriptionScroll.resetScroll();
                     }
                     break;
                 }
@@ -243,16 +229,13 @@ public final class QuestGraphic extends EditableGraphic {
         super.onClick(mX, mY, b);
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
-            if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
+            if (gui.inBounds(START_X, TITLE_START_Y, 140, GuiBase.TEXT_HEIGHT, mX, mY)) {
                 TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
-            } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
+            } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
                 TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
                     cachedDescription = null;
                     quest.setDescription(description);
                 });
-            } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                TextMenu.display(gui, playerId, selectedTask.getLongDescription(), false,
-                        selectedTask::setLongDescription);
             }
         }
     

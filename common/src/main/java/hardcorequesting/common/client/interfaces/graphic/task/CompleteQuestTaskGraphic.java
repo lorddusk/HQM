@@ -29,7 +29,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     private final CompleteQuestTask task;
     
     public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(parts, playerId, gui);
+        super(task, parts, playerId, gui);
         this.task = task;
         addDetectButton(task);
     }

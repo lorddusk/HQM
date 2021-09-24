@@ -31,7 +31,6 @@ public class GuiQuestBook extends GuiBase {
     
     public static final int PAGE_WIDTH = 170;
     //region pixel info for all the things
-    public static final int TEXT_HEIGHT = 9;
     public static final int TEXTURE_WIDTH = 170 * 2;
     public static final int TEXTURE_HEIGHT = 234;
     private static final int BACK_ARROW_X = 9;

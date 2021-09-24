@@ -29,6 +29,7 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class GuiBase extends Screen {
     public static final ResourceLocation MAP_TEXTURE = ResourceHelper.getResource("questmap");
+    public static final int TEXT_HEIGHT = 9;
     public static final int ITEM_SIZE = 18;
     protected static final int ITEM_SRC_Y = 235;
     protected static ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

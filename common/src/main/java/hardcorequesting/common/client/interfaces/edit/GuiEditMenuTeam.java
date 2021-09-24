@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
@@ -22,7 +23,6 @@ import java.util.UUID;
 
 public class GuiEditMenuTeam extends GuiEditMenu {
     
-    private static final int TEXT_HEIGHT = 9;
     private static final int TITLE_X = 20;
     private static final int TITLE_Y = 20;
     private static final int PLAYER_X = 25;
@@ -290,7 +290,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                     if (isOwner) {
                         if (player.equals(selectedEntry)) {
                             color = 0xD0D0D0;
-                        } else if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), (int) (gui.getStringWidth(player.getDisplayName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
+                        } else if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (y - start), (int) (gui.getStringWidth(player.getDisplayName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
                             color = 0x808080;
                         }
                     }
@@ -379,7 +379,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 int end = Math.min(invites.size(), start + VISIBLE_INVITES);
                 for (int i = start; i < end; i++) {
                     Team invite = invites.get(i);
-                    if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * i, (int) (gui.getStringWidth(invite.getName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
+                    if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * i, (int) (gui.getStringWidth(invite.getName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
                         inviteTeam = invite;
                         break;
                     }
@@ -390,7 +390,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int end = Math.min(team.getPlayers().size(), start + VISIBLE_MEMBERS);
             for (int i = start; i < end; i++) {
                 PlayerEntry entry = team.getPlayers().get(i);
-                if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), (int) (gui.getStringWidth(entry.getDisplayName()) * 0.7F), (int) (TEXT_HEIGHT * 0.7F), mX, mY)) {
+                if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), (int) (gui.getStringWidth(entry.getDisplayName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
                     selectedEntry = selectedEntry == entry ? null : entry;
                     break;
                 }

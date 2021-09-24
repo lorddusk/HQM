@@ -27,7 +27,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     private final IconLayoutTask<Part, ?> task;
     
     public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(parts, playerId, gui);
+        super(task, parts, playerId, gui);
         this.task = task;
     }
     

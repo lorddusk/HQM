@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.PartList;
+import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,8 +19,8 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected final PartList<Part> parts;
     
-    public ListTaskGraphic(PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(playerId, gui);
+    public ListTaskGraphic(QuestTask<?> task, PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(playerId, gui, task);
         this.parts = parts;
     }
     
