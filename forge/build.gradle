@@ -11,10 +11,6 @@ architectury {
     forge()
 }
 
-loom {
-    useFabricMixin = true
-}
-
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${project.forge_version}"
 
@@ -22,10 +18,10 @@ dependencies {
     forgeDependencies(implementation("blue.endless:jankson:1.2.0"))
     shadowCommon("blue.endless:jankson:1.2.0")
 
-    implementation(project(path: ":common")) {
+    implementation(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
-    developmentForge(project(path: ":common")) {
+    developmentForge(project(path: ":common", configuration: "dev")) {
         transitive = false
     }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
@@ -57,10 +53,6 @@ remapJar {
 
 jar {
     classifier "dev"
-}
-
-java {
-    withSourcesJar()
 }
 
 sourcesJar {
