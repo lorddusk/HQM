@@ -29,6 +29,9 @@ architectury {
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
     modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+    modApi "dev.architectury:architectury-fabric:${project.architectury_version}"
+
     modApi("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
