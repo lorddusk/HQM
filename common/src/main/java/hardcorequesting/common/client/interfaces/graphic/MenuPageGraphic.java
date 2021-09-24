@@ -6,6 +6,7 @@ import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -24,6 +25,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
+import java.util.UUID;
 
 public class MenuPageGraphic extends EditableGraphic {
     private static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
@@ -44,6 +48,7 @@ public class MenuPageGraphic extends EditableGraphic {
     private static final int QUEST_CLICK_TEXT_Y = 67;
     private static final int INFO_REPUTATION_OFFSET_X = 5;
     private static final int INFO_REPUTATION_OFFSET_Y = 12;
+    private static final int REPUTATION_OFFSET_Y = 24;
     
     private final ScrollBar reputationDisplayScroll;
     {
@@ -152,9 +157,31 @@ public class MenuPageGraphic extends EditableGraphic {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
         }
         
-        
-        Reputation.drawAll(matrices, gui, reputationDisplayScroll, VISIBLE_DISPLAY_REPUTATIONS, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y, mX, mY, player.getUUID());
+        drawReputations(matrices, gui, mX, mY, player.getUUID());
     }
+    
+    private void drawReputations(PoseStack matrices, GuiQuestBook gui, int mX, int mY, final UUID playerId) {
+        String info = null;
+        
+        List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
+        
+        reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
+        
+        int start = reputationDisplayScroll.isVisible() ? Math.round((reputations.size() - VISIBLE_DISPLAY_REPUTATIONS) * reputationDisplayScroll.getScroll()) : 0;
+        int end = Math.min(start + VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
+        for (int i = start; i < end; i++) {
+            gui.applyColor(0xFFFFFFFF);
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            info = reputations.get(i).drawAndGetTooltip(matrices, gui, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X,
+                    INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y + (i - start) * REPUTATION_OFFSET_Y,
+                    mX, mY, info, playerId, false, null, null, false, null, null, false);
+        }
+        
+        if (info != null) {
+            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
+        }
+    }
+    
     
     @Override
     public void onClick(int mX, int mY, int button) {

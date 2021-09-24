@@ -3,8 +3,6 @@ package hardcorequesting.common.reputation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -22,7 +20,6 @@ public class Reputation {
     public static final int BAR_HEIGHT = 3;
     public static final int BAR_X = 0;
     public static final int BAR_Y = 5;
-    private static final int OFFSET_Y = 24;
     private static final int ARROW_SRC_POINTER_X = 0;
     private static final int ARROW_SRC_MARKER_X = 10;
     private static final int ARROW_SRC_NEUTRAL_X = 20;
@@ -57,27 +54,6 @@ public class Reputation {
         this.name = name;
         this.neutral = new ReputationMarker(neutralName, 0, true);
         this.markers = new ArrayList<>();
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public static void drawAll(PoseStack matrices, GuiQuestBook gui, ScrollBar scrollBar, int maxVisibleBars, int x, int y, int mX, int mY, final UUID playerId) {
-        String info = null;
-        
-        List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
-        
-        reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
-        
-        int start = scrollBar.isVisible() ? Math.round((reputations.size() - maxVisibleBars) * scrollBar.getScroll()) : 0;
-        int end = Math.min(start + maxVisibleBars, reputations.size());
-        for (int i = start; i < end; i++) {
-            gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputations.get(i).drawAndGetTooltip(matrices, gui, x, y + (i - start) * OFFSET_Y, mX, mY, info, playerId, false, null, null, false, null, null, false);
-        }
-        
-        if (info != null) {
-            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
-        }
     }
     
     public String getId() {
