@@ -31,6 +31,12 @@
   "accessWidener": "hqm.accesswidener",
   "depends": {
     "fabricloader": ">=0.8.2",
-    "fabric": "*"
+    "fabric": ">=0.36.1",
+    "minecraft": "1.16.x",
+    "cloth-api": ">=1.5.50",
+    "libblockattributes_core": ">=0.8.8",
+    "libblockattributes_fluids": ">=0.8.8",
+    "cardinal-components-base": ">=2.8.3",
+    "cardinal-components-entity": ">=2.8.3"
   }
 }
