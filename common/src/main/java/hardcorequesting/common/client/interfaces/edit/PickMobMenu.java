@@ -186,12 +186,6 @@ public class PickMobMenu extends GuiEditMenu {
     }
     
     @Override
-    public void onScroll(double mX, double mY, double scroll) {
-        super.onScroll(mX, mY, scroll);
-        scrollBar.onScroll(mX, mY, scroll);
-    }
-    
-    @Override
     public void save() {
         resultConsumer.accept(new Result(mob.id, Math.max(1, amount)));
     }

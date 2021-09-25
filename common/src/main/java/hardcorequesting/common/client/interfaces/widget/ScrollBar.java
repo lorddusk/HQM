@@ -25,7 +25,7 @@ public class ScrollBar {
     private final int v;
     private final int left;
     
-    private int scroll;
+    private double scroll;
     private boolean isScrolling;
     private final GuiBase gui;
     
@@ -53,7 +53,7 @@ public class ScrollBar {
         if (isVisible()) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             this.gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
-            this.gui.drawRect(matrices, x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
+            this.gui.drawRect(matrices, x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
     
@@ -87,10 +87,6 @@ public class ScrollBar {
         }
     }
     
-    public int getRawScroll() {
-        return scroll;
-    }
-    
     public float getScroll() {
         return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
     }
@@ -102,8 +98,8 @@ public class ScrollBar {
     }
     
     @Environment(EnvType.CLIENT)
-    private void setScroll(int newScroll) {
-        int old = scroll;
+    private void setScroll(double newScroll) {
+        double old = scroll;
         scroll = newScroll;
         if (scroll < 0) {
             scroll = 0;
@@ -122,7 +118,7 @@ public class ScrollBar {
     @Environment(EnvType.CLIENT)
     public void onScroll(double mX, double mY, double scroll) {
         if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, h, mX, mY)) {
-            setScroll((int) (this.scroll - scroll / 20));
+            setScroll(this.scroll - scroll);
         }
     }
 }
