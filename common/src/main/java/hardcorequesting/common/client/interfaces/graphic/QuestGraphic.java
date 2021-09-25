@@ -165,10 +165,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     public void onClick(int mX, int mY, int b) {
         int id = 0;
-        int start = taskScroll.isVisible() ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
-        int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
-        for (int i = start; i < end; i++) {
-            QuestTask<?> task = quest.getTasks().get(i);
+        for (QuestTask<?> task : taskScroll.getVisibleEntries(quest.getTasks(), VISIBLE_TASKS)) {
             if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
                 if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY)) {
                     if (gui.isOpBook && Screen.hasShiftDown()) {

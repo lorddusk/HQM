@@ -67,16 +67,15 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         super.draw(matrices, mX, mY);
         
         List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
-        int start = scrollBar.isVisible() ? Math.round((deathStats.size() - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(deathStats.size(), start + VISIBLE_PLAYERS);
-        for (int i = start; i < end; i++) {
-            DeathStat stats = deathStats.get(i);
+        int statY = PLAYERS_Y;
+        for (DeathStat stats : scrollBar.getVisibleEntries(deathStats, VISIBLE_PLAYERS)) {
             
             boolean selected = stats.getUuid().equals(playerId);
-            boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
-            gui.drawString(matrices, Translator.plain((i + 1) + ". " + stats.getName()), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
+            boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
+            gui.drawString(matrices, Translator.plain((deathStats.indexOf(stats) + 1) + ". " + stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
-            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
+            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
+            statY += PLAYERS_SPACING;
         }
         
         gui.drawString(matrices, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
@@ -155,18 +154,17 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         } else {
             showBest = showTotal = false;
             List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
-            int start = scrollBar.isVisible() ? Math.round((deathStats.size() - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(deathStats.size(), start + VISIBLE_PLAYERS);
-            for (int i = start; i < end; i++) {
-                DeathStat stats = deathStats.get(i);
+            int statY = PLAYERS_Y;
+            for (DeathStat stats : scrollBar.getVisibleEntries(deathStats, VISIBLE_PLAYERS)) {
                 
-                if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
+                if (gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {
                         playerId = null;
                     } else {
                         playerId = stats.getUuid();
                     }
                 }
+                statY += PLAYERS_SPACING;
             }
         }
     }
