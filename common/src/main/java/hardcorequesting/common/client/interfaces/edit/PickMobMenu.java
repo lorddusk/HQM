@@ -146,13 +146,13 @@ public class PickMobMenu extends GuiEditMenu {
         
         selectionHelper.render(matrices, mX, mY);
         
-        int start = scrollBar.isVisible() ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            boolean selected = mobs.get(i).equals(mob);
-            boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
+        int mobY = START_Y;
+        for (Entry entry : scrollBar.getVisibleEntries(mobs, VISIBLE_MOBS)) {
+            boolean selected = entry.equals(mob);
+            boolean inBounds = gui.inBounds(START_X, mobY, 130, 6, mX, mY);
             
-            gui.drawString(matrices, mobs.get(i).description, START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, entry.description, START_X, mobY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            mobY += OFFSET_Y;
         }
         
         gui.drawString(matrices, Translator.translatable("hqm." + textKey + ".search"), 180, 20, 0x404040);
@@ -168,17 +168,17 @@ public class PickMobMenu extends GuiEditMenu {
         
         selectionHelper.onClick(mX, mY);
         
-        int start = scrollBar.isVisible() ? Math.round((mobs.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(mobs.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
-                if (mobs.get(i).equals(mob)) {
+        int mobY = START_Y;
+        for (Entry entry : scrollBar.getVisibleEntries(mobs, VISIBLE_MOBS)) {
+            if (gui.inBounds(START_X, mobY, 130, 6, mX, mY)) {
+                if (entry.equals(mob)) {
                     mob = null;
                 } else {
-                    mob = mobs.get(i);
+                    mob = entry;
                 }
                 break;
             }
+            mobY += OFFSET_Y;
         }
     }
     

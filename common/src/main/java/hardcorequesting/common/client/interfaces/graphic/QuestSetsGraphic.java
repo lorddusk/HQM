@@ -112,15 +112,14 @@ public class QuestSetsGraphic extends EditableGraphic {
         
         Player player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible() ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
-        for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
-            QuestSet questSet = questSets.get(i);
+        
+        int setY = LIST_Y;
+        for (QuestSet questSet : setScroll.getVisibleEntries(questSets, VISIBLE_SETS)) {
             
-            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING);
-            
+            String name = questSet.getName(questSets.indexOf(questSet));
             int total = questSet.getQuests().size();
             
             boolean enabled = questSet.isEnabled(player, isVisibleCache, isLinkFreeCache);
@@ -141,7 +140,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                 if (quest.isCompleted(player) && quest.hasReward(player.getUUID())) unclaimed++;
             }
             boolean selected = questSet == selectedSet;
-            boolean inBounds = gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY);
+            boolean inBounds = gui.inBounds(LIST_X, setY, gui.getStringWidth(name), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             
             int color;
             if (gui.modifyingQuestSet == questSet) {
@@ -173,7 +172,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             } else {
                 color = HQMConfig.DISABLED_SET;
             }
-            gui.drawString(matrices, Translator.plain(questSet.getName(i)), LIST_X, setY, color);
+            gui.drawString(matrices, Translator.plain(name), LIST_X, setY, color);
             
             FormattedText info;
             if (enabled) {
@@ -188,14 +187,15 @@ public class QuestSetsGraphic extends EditableGraphic {
                 FormattedText toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
                 gui.drawString(matrices, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
+            setY += GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING;
         }
         
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (selectedSet != null) {
-                int startLine = descriptionScroll.isVisible() ? Math.round((selectedSet.getDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-                gui.drawString(matrices, selectedSet.getDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+                List<FormattedText> description = descriptionScroll.getVisibleEntries(selectedSet.getDescription(gui), VISIBLE_DESCRIPTION_LINES);
+                gui.drawString(matrices, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
             }
             
             drawQuestInfo(matrices, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
@@ -252,13 +252,11 @@ public class QuestSetsGraphic extends EditableGraphic {
         super.onClick(mX, mY, b);
         
         List<QuestSet> questSets = Quest.getQuestSets();
-        int start = setScroll.isVisible() ? Math.round((Quest.getQuestSets().size() - VISIBLE_SETS) * setScroll.getScroll()) : 0;
-        
-        for (int i = start; i < Math.min(start + VISIBLE_SETS, questSets.size()); i++) {
-            QuestSet questSet = questSets.get(i);
+    
+        int setY = LIST_Y;
+        for (QuestSet questSet : setScroll.getVisibleEntries(questSets, VISIBLE_SETS)) {
             
-            int setY = LIST_Y + (i - start) * (GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING);
-            if (gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(i)), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
+            if (gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(questSets.indexOf(questSet))), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case DELETE:
                         if (!questSet.getQuests().isEmpty()) {
@@ -308,6 +306,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                 }
                 break;
             }
+            setY += GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING;
         }
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {

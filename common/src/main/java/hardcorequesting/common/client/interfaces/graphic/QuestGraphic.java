@@ -105,14 +105,11 @@ public final class QuestGraphic extends EditableGraphic {
         
         gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
         
-        int startLine = descriptionScroll.isVisible() ? Math.round((getCachedDescription().size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-        gui.drawString(matrices, getCachedDescription(), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
+        List<FormattedText> description = descriptionScroll.getVisibleEntries(getCachedDescription(), VISIBLE_DESCRIPTION_LINES);
+        gui.drawString(matrices, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
         
         int id = 0;
-        int start = taskScroll.isVisible() ? Math.round((getVisibleTasks() - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
-        int end = Math.min(start + VISIBLE_TASKS, quest.getTasks().size());
-        for (int i = start; i < end; i++) {
-            QuestTask<?> task = quest.getTasks().get(i);
+        for (QuestTask<?> task : taskScroll.getVisibleEntries(quest.getTasks(), VISIBLE_TASKS)) {
             boolean isVisible = task.isVisible(playerId);
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(playerId);

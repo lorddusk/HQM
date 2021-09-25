@@ -252,12 +252,11 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int inviteCount = team.getInvites() == null ? 0 : team.getInvites().size();
             if (inviteCount > 0) {
                 gui.drawString(matrices, Translator.translatable("hqm.party.invites"), TITLE_X, TITLE_Y, 0x404040);
-                List<Team> invites = team.getInvites();
-                int start = inviteScroll.isVisible() ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
-                int end = Math.min(invites.size(), start + VISIBLE_INVITES);
-                for (int i = start; i < end; i++) {
-                    Team invite = invites.get(i);
-                    gui.drawString(matrices, Translator.plain(invite.getName()), PLAYER_X, PLAYER_Y + PLAYER_SPACING * (i - start), 0x404040);
+                
+                int inviteY = PLAYER_Y;
+                for (Team invite : inviteScroll.getVisibleEntries(team.getInvites(), VISIBLE_INVITES)) {
+                    gui.drawString(matrices, Translator.plain(invite.getName()), PLAYER_X, inviteY, 0x404040);
+                    inviteY += PLAYER_SPACING;
                 }
             } else {
                 gui.drawString(matrices, Translator.translatable("hqm.party.noInvites"), TITLE_X, TITLE_Y, 0x404040);
@@ -269,9 +268,9 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             String title = (inviteTeam == null ? team : inviteTeam).getName();
             gui.drawString(matrices, Translator.plain(title), TITLE_X, TITLE_Y, 0x404040);
             List<PlayerEntry> players = (inviteTeam == null ? team : inviteTeam).getPlayers();
+            
             int y = 0;
             int start = memberScroll.isVisible() ? Math.round(((isOwner ? players.size() : (inviteTeam == null ? team : inviteTeam).getPlayerCount()) - VISIBLE_MEMBERS) * memberScroll.getScroll()) : 0;
-            
             for (PlayerEntry player : players) {
                 String str = player.getDisplayName();
                 
@@ -375,14 +374,13 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         if (team.isSingle() && inviteTeam == null) {
             List<Team> invites = team.getInvites();
             if (invites != null) {
-                int start = inviteScroll.isVisible() ? Math.round((team.getInvites().size() - VISIBLE_INVITES) * inviteScroll.getScroll()) : 0;
-                int end = Math.min(invites.size(), start + VISIBLE_INVITES);
-                for (int i = start; i < end; i++) {
-                    Team invite = invites.get(i);
-                    if (gui.inBounds(PLAYER_X, PLAYER_Y + PLAYER_SPACING * i, (int) (gui.getStringWidth(invite.getName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
+                int inviteY = PLAYER_Y;
+                for (Team invite : inviteScroll.getVisibleEntries(invites, VISIBLE_INVITES)) {
+                    if (gui.inBounds(PLAYER_X, inviteY, (int) (gui.getStringWidth(invite.getName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
                         inviteTeam = invite;
                         break;
                     }
+                    inviteY += PLAYER_SPACING;
                 }
             }
         } else if (!team.isSingle() && getEntry(team).isOwner()) {

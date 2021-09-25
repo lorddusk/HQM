@@ -22,7 +22,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
@@ -89,38 +88,37 @@ public class EditReputationGraphic extends EditableGraphic {
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
-        
-        ReputationManager reputationManager = ReputationManager.getInstance();
-        Map<String, Reputation> reputationMap = reputationManager.getReputations();
+    
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = reputationScroll.isVisible() ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
-            List<Reputation> reputationList = reputationManager.getReputationList();
-            for (int i = start; i < end; i++) {
-                int x = REPUTATION_LIST_X;
-                int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
-                String str = reputationList.get(i).getName();
+            int x = REPUTATION_LIST_X;
+            int y = REPUTATION_LIST_Y;
+            List<Reputation> reputationList = ReputationManager.getInstance().getReputationList();
+            for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
+                String str = reputation.getName();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
-                boolean selected = reputationList.get(i).equals(selectedReputation);
+                boolean selected = reputation.equals(selectedReputation);
                 
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                
+                y += REPUTATION_OFFSET;
             }
         }
         
         if (selectedReputation != null) {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
+    
+            int x = REPUTATION_MARKER_LIST_X;
+            int y = REPUTATION_MARKER_LIST_Y;
             
-            int start = reputationTierScroll.isVisible() ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
-            for (int i = start; i < end; i++) {
-                int x = REPUTATION_MARKER_LIST_X;
-                int y = REPUTATION_MARKER_LIST_Y + (i - start) * REPUTATION_OFFSET;
-                String str = selectedReputation.getMarker(i).getTitle();
+            for (ReputationMarker marker : reputationTierScroll.getVisibleEntries(selectedReputation.getMarkers(), VISIBLE_REPUTATION_TIERS)) {
+                String str = marker.getTitle();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
                 gui.drawString(matrices, Translator.plain(str), x, y, hover ? 0xAAAAAA : 0x404040);
+                
+                y += REPUTATION_OFFSET;
             }
         }
     }
@@ -131,15 +129,12 @@ public class EditReputationGraphic extends EditableGraphic {
         UUID playerId = gui.getPlayer().getUUID();
         
         ReputationManager reputationManager = ReputationManager.getInstance();
-        Map<String, Reputation> reputationMap = reputationManager.getReputations();
         if (gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) {
-            int start = reputationScroll.isVisible() ? Math.round((reputationMap.size() - VISIBLE_REPUTATIONS) * reputationScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_REPUTATIONS, reputationMap.size());
+            int x = REPUTATION_LIST_X;
+            int y = REPUTATION_LIST_Y;
+            
             List<Reputation> reputationList = reputationManager.getReputationList();
-            for (int i = start; i < end; i++) {
-                int x = REPUTATION_LIST_X;
-                int y = REPUTATION_LIST_Y + (i - start) * REPUTATION_OFFSET;
-                Reputation reputation = reputationList.get(i);
+            for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
                 String str = reputation.getName();
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
@@ -172,12 +167,13 @@ public class EditReputationGraphic extends EditableGraphic {
                             
                         }
                         
-                        reputationMap.remove(reputation.getId());
+                        reputationManager.getReputations().remove(reputation.getId());
                         SaveHelper.add(EditType.REPUTATION_REMOVE);
                     }
                     return;
                 }
                 
+                y += REPUTATION_OFFSET;
             }
         }
         
@@ -189,30 +185,27 @@ public class EditReputationGraphic extends EditableGraphic {
                 }
                 return;
             }
-            
-            int start = reputationTierScroll.isVisible() ? Math.round((selectedReputation.getMarkerCount() - VISIBLE_REPUTATION_TIERS) * reputationTierScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_REPUTATION_TIERS, selectedReputation.getMarkerCount());
-            for (int i = start; i < end; i++) {
-                int x = REPUTATION_MARKER_LIST_X;
-                int y = REPUTATION_MARKER_LIST_Y + (i - start) * REPUTATION_OFFSET;
-                String str = selectedReputation.getMarker(i).getTitle();
+    
+            int x = REPUTATION_MARKER_LIST_X;
+            int y = REPUTATION_MARKER_LIST_Y;
+            for (ReputationMarker marker : reputationTierScroll.getVisibleEntries(selectedReputation.getMarkers(), VISIBLE_REPUTATION_TIERS)) {
+                String str = marker.getTitle();
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        ReputationMarker marker = selectedReputation.getMarker(i);
                         TextMenu.display(gui, playerId, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
-                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, selectedReputation.getMarker(i)));
+                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, marker));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         for (Quest quest : Quest.getQuests().values()) {
                             for (QuestTask<?> task : quest.getTasks()) {
                                 if (task instanceof ReputationTask<?>) {
                                     ReputationTask<?> reputationTask = (ReputationTask<?>) task;
                                     for (ReputationTask.Part setting : reputationTask.getSettings()) {
-                                        if (selectedReputation.getMarker(i).equals(setting.getLower())) {
+                                        if (marker.equals(setting.getLower())) {
                                             setting.setLower(null);
                                         }
-                                        if (selectedReputation.getMarker(i).equals(setting.getUpper())) {
+                                        if (marker.equals(setting.getUpper())) {
                                             setting.setUpper(null);
                                         }
                                     }
@@ -220,12 +213,13 @@ public class EditReputationGraphic extends EditableGraphic {
                             }
                         }
                         
-                        selectedReputation.remove(i);
+                        selectedReputation.remove(marker);
                         SaveHelper.add(EditType.REPUTATION_MARKER_REMOVE);
                     }
                     
                     return;
                 }
+                y += REPUTATION_OFFSET;
             }
         }
     }

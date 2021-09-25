@@ -29,8 +29,8 @@ public class PickAdvancementMenu extends GuiEditMenu {
     
     private final ScrollBar scrollBar;
     
-    private List<String> rawAdvancemenNames;
-    private List<String> advancementNames;
+    private final List<String> rawAdvancemenNames;
+    private final List<String> advancementNames;
     private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
@@ -110,13 +110,13 @@ public class PickAdvancementMenu extends GuiEditMenu {
     
         selectionHelper.render(matrices, mX, mY);
         
-        int start = scrollBar.isVisible() ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            boolean selected = advancementNames.get(i).equals(advancement);
-            boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
+        int nameY = START_Y;
+        for (String name : scrollBar.getVisibleEntries(advancementNames, VISIBLE_MOBS)) {
+            boolean selected = name.equals(advancement);
+            boolean inBounds = gui.inBounds(START_X, nameY, 130, 6, mX, mY);
             
-            gui.drawString(matrices, Translator.plain(advancementNames.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            nameY += OFFSET_Y;
         }
         
         gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
@@ -132,18 +132,18 @@ public class PickAdvancementMenu extends GuiEditMenu {
         
         selectionHelper.onClick(mX, mY);
         
-        int start = scrollBar.isVisible() ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
+        int nameY = START_Y;
+        for (String name : scrollBar.getVisibleEntries(advancementNames, VISIBLE_MOBS)) {
+            if (gui.inBounds(START_X, nameY, 130, 6, mX, mY)) {
                 
-                if (advancementNames.get(i).equals(advancement)) {
+                if (name.equals(advancement)) {
                     advancement = null;
                 } else {
-                    advancement = advancementNames.get(i);
+                    advancement = name;
                 }
                 break;
             }
+            nameY += OFFSET_Y;
         }
     }
     

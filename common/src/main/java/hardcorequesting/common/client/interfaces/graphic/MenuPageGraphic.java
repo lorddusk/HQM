@@ -167,14 +167,14 @@ public class MenuPageGraphic extends EditableGraphic {
         
         reputations.sort((reputation1, reputation2) -> Integer.compare(Math.abs(reputation2.getValue(playerId)), Math.abs(reputation1.getValue(playerId))));
         
-        int start = reputationDisplayScroll.isVisible() ? Math.round((reputations.size() - VISIBLE_DISPLAY_REPUTATIONS) * reputationDisplayScroll.getScroll()) : 0;
-        int end = Math.min(start + VISIBLE_DISPLAY_REPUTATIONS, reputations.size());
-        for (int i = start; i < end; i++) {
+        int repY = INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y;
+        
+        for (Reputation reputation : reputationDisplayScroll.getVisibleEntries(reputations, VISIBLE_DISPLAY_REPUTATIONS)) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputations.get(i).drawAndGetTooltip(matrices, gui, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X,
-                    INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y + (i - start) * REPUTATION_OFFSET_Y,
+            info = reputation.drawAndGetTooltip(matrices, gui, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, repY,
                     mX, mY, info, playerId, false, null, null, false, null, null, false);
+            repY += REPUTATION_OFFSET_Y;
         }
         
         if (info != null) {

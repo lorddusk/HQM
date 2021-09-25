@@ -99,12 +99,10 @@ public class EditBagsGraphic extends EditableGraphic {
         super.draw(matrices, mX, mY);
         
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
-        int start = tierScroll.isVisible() ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
-        for (int i = start; i < Math.min(start + VISIBLE_TIERS, tiers.size()); i++) {
-            GroupTier groupTier = tiers.get(i);
+        int yPos = TIERS_Y;
+        for (GroupTier groupTier : tierScroll.getVisibleEntries(tiers, VISIBLE_TIERS)) {
             
             String str = groupTier.getName();
-            int yPos = TIERS_Y + TIERS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(TIERS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             int color = groupTier.getColor().getHexColor();
             if (inBounds) {
@@ -124,15 +122,14 @@ public class EditBagsGraphic extends EditableGraphic {
                         yPos + TIERS_SECOND_LINE_Y, 0.7F,
                         WEIGHT_SPACING, 0, 0x404040);
             }
+            yPos += TIERS_SPACING;
         }
         
         List<Group> groups = new ArrayList<>(Group.getGroups().values());
-        start = groupScroll.isVisible() ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
-        for (int i = start; i < Math.min(start + VISIBLE_GROUPS, groups.size()); i++) {
-            Group group = groups.get(i);
+        yPos = GROUPS_Y;
+        for (Group group : groupScroll.getVisibleEntries(groups, VISIBLE_GROUPS)) {
             
             FormattedText str = Translator.plain(group.getDisplayName());
-            int yPos = GROUPS_Y + GROUPS_SPACING * (i - start);
             boolean inBounds = gui.inBounds(GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             int color = group.getTier().getColor().getHexColor();
             boolean selected = group == selectedGroup;
@@ -156,6 +153,7 @@ public class EditBagsGraphic extends EditableGraphic {
                     GROUPS_X + GROUPS_SECOND_LINE_X,
                     yPos + GROUPS_SECOND_LINE_Y,
                     0.7F, 0x404040);
+            yPos += GROUPS_SPACING;
         }
     }
     
@@ -165,11 +163,9 @@ public class EditBagsGraphic extends EditableGraphic {
         
         //Handle click on groups
         List<Group> groups = new ArrayList<>(Group.getGroups().values());
-        int start = groupScroll.isVisible() ? Math.round((groups.size() - VISIBLE_GROUPS) * groupScroll.getScroll()) : 0;
-        for (int i = start; i < Math.min(start + VISIBLE_GROUPS, groups.size()); i++) {
-            Group group = groups.get(i);
+        int posY = GROUPS_Y;
+        for (Group group : groupScroll.getVisibleEntries(groups, VISIBLE_GROUPS)) {
             
-            int posY = GROUPS_Y + GROUPS_SPACING * (i - start);
             if (gui.inBounds(GROUPS_X, posY, gui.getStringWidth(group.getDisplayName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
@@ -190,15 +186,14 @@ public class EditBagsGraphic extends EditableGraphic {
                 }
                 break;
             }
+            posY += GROUPS_SPACING;
         }
     
         //Handle click on tiers
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
-        start = tierScroll.isVisible() ? Math.round((tiers.size() - VISIBLE_TIERS) * tierScroll.getScroll()) : 0;
-        for (int i = start; i < Math.min(start + VISIBLE_TIERS, tiers.size()); i++) {
-            GroupTier groupTier = tiers.get(i);
-        
-            int posY = TIERS_Y + TIERS_SPACING * (i - start);
+        posY = TIERS_Y;
+        for (GroupTier groupTier : tierScroll.getVisibleEntries(tiers, VISIBLE_TIERS)) {
+            
             if (gui.inBounds(TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
                     case TIER:
@@ -215,12 +210,15 @@ public class EditBagsGraphic extends EditableGraphic {
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {
+                            GroupTier replacementTier = tiers.get(0);
+                            if (replacementTier == groupTier)
+                                replacementTier = tiers.get(1);
                             for (Group group : Group.getGroups().values()) {
                                 if (group.getTier() == groupTier) {
-                                    group.setTier(i == 0 ? tiers.get(1) : tiers.get(0));
+                                    group.setTier(replacementTier);
                                 }
                             }
-                            tiers.remove(i);
+                            tiers.remove(groupTier);
                             SaveHelper.add(EditType.TIER_REMOVE);
                         }
                         break;
@@ -229,6 +227,7 @@ public class EditBagsGraphic extends EditableGraphic {
                 }
                 break;
             }
+            posY += TIERS_SPACING;
         }
     }
     

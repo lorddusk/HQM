@@ -8,6 +8,8 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import java.util.List;
+
 public class ScrollBar {
     
     private static final int SCROLL_WIDTH = 7;
@@ -91,6 +93,12 @@ public class ScrollBar {
     
     public float getScroll() {
         return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
+    }
+    
+    public <T> List<T> getVisibleEntries(List<T> list, int visibleEntries) {
+        int start = this.isVisible() ? Math.round((list.size() - visibleEntries) * this.getScroll()) : 0;
+        int end = Math.min(list.size(), start + visibleEntries);
+        return list.subList(start, end);
     }
     
     @Environment(EnvType.CLIENT)

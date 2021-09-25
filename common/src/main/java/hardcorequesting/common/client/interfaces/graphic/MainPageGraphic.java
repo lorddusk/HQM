@@ -17,10 +17,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.network.chat.FormattedText;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MainPageGraphic extends EditableGraphic {
@@ -46,8 +48,8 @@ public class MainPageGraphic extends EditableGraphic {
         super.draw(matrices, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
-        int startLine = mainDescriptionScroll.isVisible() ? Math.round((Quest.getMainDescription(gui).size() - VISIBLE_MAIN_DESCRIPTION_LINES) * mainDescriptionScroll.getScroll()) : 0;
-        gui.drawString(matrices, Quest.getMainDescription(gui), startLine, VISIBLE_MAIN_DESCRIPTION_LINES, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+        List<FormattedText> description = mainDescriptionScroll.getVisibleEntries(Quest.getMainDescription(gui), VISIBLE_MAIN_DESCRIPTION_LINES);
+        gui.drawString(matrices, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
             gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);

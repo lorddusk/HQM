@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 public class PickReputationMenu extends GuiEditMenu {
     
     private final Consumer<Reputation> resultConsumer;
-    private Reputation reputation;
+    private Reputation selectedReputation;
     private final ScrollBar scrollBar;
     
     public static void display(GuiQuestBook gui, Consumer<Reputation> resultConsumer) {
@@ -32,7 +32,7 @@ public class PickReputationMenu extends GuiEditMenu {
     private PickReputationMenu(GuiQuestBook gui, UUID playerId, Reputation reputation, Consumer<Reputation> resultConsumer) {
         super(gui, playerId);
         this.resultConsumer = resultConsumer;
-        this.reputation = reputation;
+        this.selectedReputation = reputation;
         addScrollBar(scrollBar = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible() {
@@ -43,19 +43,20 @@ public class PickReputationMenu extends GuiEditMenu {
     
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
-        ReputationManager reputationManager = ReputationManager.getInstance();
-        int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
-        List<Reputation> reputationList = reputationManager.getReputationList();
-        for (int i = start; i < end; i++) {
-            int x = EditReputationGraphic.REPUTATION_LIST_X;
-            int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
-            String str = reputationList.get(i).getName();
+        int x = EditReputationGraphic.REPUTATION_LIST_X;
+        int y = EditReputationGraphic.REPUTATION_LIST_Y;
+        
+        List<Reputation> reputationList = ReputationManager.getInstance().getReputationList();
+        
+        for (Reputation reputation : scrollBar.getVisibleEntries(reputationList, EditReputationGraphic.VISIBLE_REPUTATIONS)) {
+            String str = reputation.getName();
             
             boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
-            boolean selected = reputationList.get(i).equals(reputation);
+            boolean selected = reputation.equals(selectedReputation);
             
             gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+            
+            y += EditReputationGraphic.REPUTATION_OFFSET;
         }
         gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
     }
@@ -63,26 +64,25 @@ public class PickReputationMenu extends GuiEditMenu {
     @Override
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
-        ReputationManager reputationManager = ReputationManager.getInstance();
+    
+        int x = EditReputationGraphic.REPUTATION_LIST_X;
+        int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
-        int start = scrollBar.isVisible() ? Math.round((reputationManager.size() - EditReputationGraphic.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(start + EditReputationGraphic.VISIBLE_REPUTATIONS, reputationManager.size());
-        List<Reputation> reputationList = reputationManager.getReputationList();
-        for (int i = start; i < end; i++) {
-            int x = EditReputationGraphic.REPUTATION_LIST_X;
-            int y = EditReputationGraphic.REPUTATION_LIST_Y + (i - start) * EditReputationGraphic.REPUTATION_OFFSET;
-            String str = reputationList.get(i).getName();
+        List<Reputation> reputationList = ReputationManager.getInstance().getReputationList();
+        for (Reputation reputation : scrollBar.getVisibleEntries(reputationList, EditReputationGraphic.VISIBLE_REPUTATIONS)) {
+            String str = reputation.getName();
             
             if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
-                reputation = reputationList.get(i);
+                selectedReputation = reputation;
                 save();
                 close();
             }
+            y += EditReputationGraphic.REPUTATION_OFFSET;
         }
     }
     
     @Override
     public void save() {
-        resultConsumer.accept(reputation);
+        resultConsumer.accept(selectedReputation);
     }
 }

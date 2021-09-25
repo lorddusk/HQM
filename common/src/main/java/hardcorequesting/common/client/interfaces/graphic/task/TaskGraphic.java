@@ -77,9 +77,8 @@ public abstract class TaskGraphic extends Graphic {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        List<FormattedText> description = task.getCachedLongDescription(gui);
-        int taskStartLine = taskDescriptionScroll.isVisible() ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
-        gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
+        List<FormattedText> description = taskDescriptionScroll.getVisibleEntries(task.getCachedLongDescription(gui), VISIBLE_DESCRIPTION_LINES);
+        gui.drawString(matrices, description, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     }
     
     @Override

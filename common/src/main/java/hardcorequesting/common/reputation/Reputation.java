@@ -405,8 +405,8 @@ public class Reputation {
         sort();
     }
     
-    public void remove(int index) {
-        markers.remove(index);
+    public void remove(ReputationMarker marker) {
+        markers.remove(marker);
         sort();
     }
     
@@ -426,5 +426,7 @@ public class Reputation {
         return markers.size();
     }
     
-    
+    public List<ReputationMarker> getMarkers() {
+        return Collections.unmodifiableList(markers);
+    }
 }
