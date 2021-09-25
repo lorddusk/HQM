@@ -12,30 +12,30 @@ import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 
-import java.lang.reflect.Constructor;
-
 public enum TaskType {
-    CONSUME(ConsumeItemTask.class, "consume"),
-    CRAFT(CraftingTask.class, "craft"),
-    LOCATION(VisitLocationTask.class, "location"),
-    CONSUME_QDS(ConsumeItemQDSTask.class, "consumeQDS"),
-    DETECT(DetectItemTask.class, "detect"),
-    KILL(KillMobsTask.class, "kill"),
-    TAME(TameMobsTask.class, "tame"),
-    DEATH(DeathTask.class, "death"),
-    REPUTATION(HaveReputationTask.class, "reputation"),
-    REPUTATION_KILL(KillReputationTask.class, "reputationKill"),
-    ADVANCEMENT(GetAdvancementTask.class, "advancement"),
-    COMPLETION(CompleteQuestTask.class, "completion"),
-    BLOCK_BREAK(BreakBlockTask.class, "break"),
-    BLOCK_PLACE(PlaceBlockTask.class, "place");
+    CONSUME(ConsumeItemTask.class, "consume", ConsumeItemTask::new),
+    CRAFT(CraftingTask.class, "craft", CraftingTask::new),
+    LOCATION(VisitLocationTask.class, "location", VisitLocationTask::new),
+    CONSUME_QDS(ConsumeItemQDSTask.class, "consumeQDS", ConsumeItemQDSTask::new),
+    DETECT(DetectItemTask.class, "detect", DetectItemTask::new),
+    KILL(KillMobsTask.class, "kill", KillMobsTask::new),
+    TAME(TameMobsTask.class, "tame", TameMobsTask::new),
+    DEATH(DeathTask.class, "death", DeathTask::new),
+    REPUTATION(HaveReputationTask.class, "reputation", HaveReputationTask::new),
+    REPUTATION_KILL(KillReputationTask.class, "reputationKill", KillReputationTask::new),
+    ADVANCEMENT(GetAdvancementTask.class, "advancement", GetAdvancementTask::new),
+    COMPLETION(CompleteQuestTask.class, "completion", CompleteQuestTask::new),
+    BLOCK_BREAK(BreakBlockTask.class, "break", BreakBlockTask::new),
+    BLOCK_PLACE(PlaceBlockTask.class, "place", PlaceBlockTask::new);
     
     private final Class<? extends QuestTask<?>> clazz;
     private final String id;
+    private final TaskConstructor<?> constructor;
     
-    TaskType(Class<? extends QuestTask<?>> clazz, String id) {
+    <T extends QuestTask<?>> TaskType(Class<T> clazz, String id, TaskConstructor<T> constructor) {
         this.clazz = clazz;
         this.id = id;
+        this.constructor = constructor;
     }
     
     public static TaskType getType(Class<?> clazz) {
@@ -46,17 +46,11 @@ public enum TaskType {
     }
     
     public QuestTask<?> addTask(Quest quest) {
-        try {
-            Constructor<? extends QuestTask<?>> ex = clazz.getConstructor(Quest.class, String.class, String.class);
-            QuestTask<?> task = ex.newInstance(quest, getName(), getDescription());
-            task.updateId(quest.getTasks().size());
-            quest.getTasks().add(task);
-            SaveHelper.add(EditType.TASK_CREATE);
-            return task;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        QuestTask<?> task = constructor.create(quest, getName(), getDescription());
+        task.updateId(quest.getTasks().size());
+        quest.getTasks().add(task);
+        SaveHelper.add(EditType.TASK_CREATE);
+        return task;
     }
     
     public String getLangKeyDescription() {
@@ -73,5 +67,9 @@ public enum TaskType {
     
     public String getName() {
         return Translator.get(getLangKeyName());
+    }
+    
+    public interface TaskConstructor<T extends QuestTask<?>> {
+        T create(Quest quest, String name, String description);
     }
 }
