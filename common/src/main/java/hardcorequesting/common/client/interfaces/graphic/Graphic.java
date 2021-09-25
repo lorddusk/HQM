@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Abstract class that represents a screen section.
+ * An abstract class that represents a screen section.
+ * Defines a series of gui functions, and provides some basic widget-managing support.
  */
 @Environment(EnvType.CLIENT)
 public abstract class Graphic {

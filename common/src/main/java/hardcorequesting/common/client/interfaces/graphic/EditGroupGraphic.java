@@ -16,6 +16,9 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A graphic element for displaying the page for editing a specific reward group.
+ */
 @Environment(EnvType.CLIENT)
 public class EditGroupGraphic extends EditableGraphic {
     private static final int GROUP_ITEMS_X = 20;

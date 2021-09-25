@@ -30,6 +30,10 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A graphic element for displaying the primary menu in the quest book.
+ * It shows some general info such as hearts, reputation bars, and can lead to various other menus.
+ */
 public class MenuPageGraphic extends EditableGraphic {
     private static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
     private static final int INFO_RIGHT_X = 180;

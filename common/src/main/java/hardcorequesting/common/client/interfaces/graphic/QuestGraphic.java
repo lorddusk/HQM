@@ -30,6 +30,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A graphic element for displaying the menu for a quest.
+ */
 @Environment(EnvType.CLIENT)
 public final class QuestGraphic extends EditableGraphic {
     

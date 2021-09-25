@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * A graphic element for displaying the list of quest sets.
+ * From here, the quest map of a quest set can be opened.
+ */
 @Environment(EnvType.CLIENT)
 public class QuestSetsGraphic extends EditableGraphic {
     

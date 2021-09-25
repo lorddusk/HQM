@@ -24,6 +24,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * A graphic element for displaying the main page of the quest book,
+ * which contains an initial description and the quest line logo.
+ */
 @Environment(EnvType.CLIENT)
 public class MainPageGraphic extends EditableGraphic {
     private static final String FRONT_KEY = "hqm_front_texture";

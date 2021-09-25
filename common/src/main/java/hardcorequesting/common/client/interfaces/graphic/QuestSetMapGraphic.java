@@ -35,6 +35,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A graphic element for displaying the quest map for a specific quest set.
+ * From here, menus for individual quests can be opened.
+ */
 @Environment(EnvType.CLIENT)
 public class QuestSetMapGraphic extends EditableGraphic {
     private final QuestSet set;

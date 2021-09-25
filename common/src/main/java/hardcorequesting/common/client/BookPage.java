@@ -9,6 +9,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * A page is associated with a menu in the quest book screen.
+ * Unlike Graphic instances that is thrown away with the screen,
+ * the page is kept to track which menu is considered open.
+ * A page is responsible for creating the associated graphic,
+ * and to point to its parent page.
+ * @author kirderf1
+ */
 public abstract class BookPage {
     
     private final BookPage parent;
@@ -32,7 +40,9 @@ public abstract class BookPage {
         return true;
     }
     
-    
+    /**
+     * This is the first page, and is shown when first opening the quest book.
+     */
     public static class MainPage extends BookPage {
         public static final MainPage INSTANCE = new MainPage();
     

@@ -20,6 +20,10 @@ import net.minecraft.network.chat.FormattedText;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A graphic element for displaying the page for editing reputations.
+ * This page should only be accessed when editing quest line data.
+ */
 @Environment(EnvType.CLIENT)
 public class EditReputationGraphic extends EditableGraphic {
     public static final int VISIBLE_REPUTATION_TIERS = 9;

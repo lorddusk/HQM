@@ -14,6 +14,9 @@ import net.fabricmc.api.Environment;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * An edit menu for picking a reputation bar.
+ */
 @Environment(EnvType.CLIENT)
 public class PickReputationMenu extends GuiEditMenu {
     

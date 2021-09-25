@@ -18,6 +18,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A screen for editing information in the quest tracker block. Should only be accessible when editing quest line data.
+ */
 @Environment(EnvType.CLIENT)
 public class EditTrackerScreen extends GuiBase {
     

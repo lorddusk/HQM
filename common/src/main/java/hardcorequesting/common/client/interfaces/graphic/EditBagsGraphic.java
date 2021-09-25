@@ -25,6 +25,10 @@ import net.minecraft.network.chat.FormattedText;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A graphic element for displaying the main page for editing reward bag info.
+ * From here, a page for editing a specific group can be shown.
+ */
 @Environment(EnvType.CLIENT)
 public class EditBagsGraphic extends EditableGraphic {
     public static final int TIERS_X = 180;

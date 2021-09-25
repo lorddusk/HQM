@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A subsection of {@link QuestGraphic} which handles info related to {@link QuestRewards}.
+ */
 @Environment(EnvType.CLIENT)
 public class QuestRewardsGraphic extends Graphic {
     

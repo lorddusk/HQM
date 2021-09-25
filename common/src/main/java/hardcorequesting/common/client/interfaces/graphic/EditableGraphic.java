@@ -9,8 +9,12 @@ import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * A graphic which has a set of edit mode buttons to the left of the gui when editing quest line data.
+ * Is intended to be used specifically by graphics associated with a {@link hardcorequesting.common.client.BookPage}.
+ */
 @Environment(EnvType.CLIENT)
-public class EditableGraphic extends Graphic {
+public abstract class EditableGraphic extends Graphic {
     protected final GuiQuestBook gui;
     private final EditButton[] editButtons;
     
