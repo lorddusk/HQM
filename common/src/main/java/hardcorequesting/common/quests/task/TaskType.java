@@ -46,13 +46,10 @@ public enum TaskType {
     }
     
     public QuestTask<?> addTask(Quest quest) {
-        QuestTask<?> prev = quest.getTasks().size() > 0 ? quest.getTasks().get(quest.getTasks().size() - 1) : null;
         try {
             Constructor<? extends QuestTask<?>> ex = clazz.getConstructor(Quest.class, String.class, String.class);
             QuestTask<?> task = ex.newInstance(quest, getName(), getDescription());
-            if (prev != null) {
-                task.addRequirement(prev);
-            }
+            task.updateId(quest.getTasks().size());
             quest.getTasks().add(task);
             SaveHelper.add(EditType.TASK_CREATE);
             return task;

@@ -37,8 +37,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +45,6 @@ public abstract class QuestTask<Data extends TaskData> {
     private final Class<Data> dataType;
     public String description;
     protected Quest parent;
-    private final List<QuestTask<?>> requirements;
     private String longDescription;
     private int id;
     private List<FormattedText> cachedDescription;
@@ -55,10 +52,8 @@ public abstract class QuestTask<Data extends TaskData> {
     public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
         this.dataType = dataType;
         this.parent = parent;
-        this.requirements = new ArrayList<>();
         this.description = description;
         this.longDescription = longDescription;
-        updateId();
     }
     
     public static void completeQuest(Quest quest, UUID uuid) {
@@ -108,8 +103,8 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract void read(JsonObject object);
     
-    public void updateId() {
-        this.id = parent.nextTaskId++;
+    public void updateId(int id) {
+        this.id = id;
     }
     
     public boolean isCompleted(Player player) {
@@ -121,13 +116,11 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public boolean isVisible(UUID playerId) {
-        Iterator<QuestTask<?>> itr = this.requirements.iterator();
-        QuestTask<?> requirement;
-        do {
-            if (!itr.hasNext()) return true;
-            requirement = itr.next();
-        } while (requirement.isCompleted(playerId) && requirement.isVisible(playerId));
-        return false;
+        if (id > 0) {
+            QuestTask<?> requirement = parent.getTasks().get(id - 1);
+            return requirement.isCompleted(playerId) && requirement.isVisible(playerId);
+        }
+        else return true;
     }
     
     public void write(TaskData task, JsonObject out) {
@@ -214,18 +207,6 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public Quest getParent() {
         return parent;
-    }
-    
-    public List<QuestTask<?>> getRequirements() {
-        return requirements;
-    }
-    
-    public void addRequirement(QuestTask<?> task) {
-        requirements.add(task);
-    }
-    
-    public void clearRequirements() {
-        requirements.clear();
     }
     
     public abstract float getCompletedRatio(Team team);

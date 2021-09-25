@@ -40,7 +40,6 @@ public class Quest {
     public static QuestTicker serverTicker;
     
     private final QuestRewards rewards = new QuestRewards(this);
-    public int nextTaskId;
     private UUID questId;
     private String name;
     private String description;
@@ -549,21 +548,13 @@ public class Quest {
     
     public void removeTask(QuestTask<?> task) {
         int index = tasks.indexOf(task);
-        if (index + 1 < tasks.size()) {
-            QuestTask<?> nextTask = tasks.get(index + 1);
-            nextTask.clearRequirements();
-        
-            if (index > 0) {
-                nextTask.addRequirement(tasks.get(index - 1));
-            }
-        }
     
         task.onDelete();
     
         tasks.remove(index);
-        nextTaskId = 0;
+        int nextTaskId = 0;
         for (QuestTask<?> questTask : tasks) {
-            questTask.updateId();
+            questTask.updateId(nextTaskId++);
         }
         
         for (Team team : TeamManager.getInstance().getTeams()) {
