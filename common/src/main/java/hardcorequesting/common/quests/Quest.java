@@ -547,6 +547,30 @@ public class Quest {
         return tasks;
     }
     
+    public void removeTask(QuestTask<?> task) {
+        int index = tasks.indexOf(task);
+        if (index + 1 < tasks.size()) {
+            QuestTask<?> nextTask = tasks.get(index + 1);
+            nextTask.clearRequirements();
+        
+            if (index > 0) {
+                nextTask.addRequirement(tasks.get(index - 1));
+            }
+        }
+    
+        task.onDelete();
+    
+        tasks.remove(index);
+        nextTaskId = 0;
+        for (QuestTask<?> questTask : tasks) {
+            questTask.updateId();
+        }
+        
+        for (Team team : TeamManager.getInstance().getTeams()) {
+            team.getQuestData(this.getQuestId()).clearTaskData(this);
+        }
+    }
+    
     public void sendUpdatedDataToTeam(Player player) {
         sendUpdatedDataToTeam(QuestingDataManager.getInstance().getQuestingData(player).getTeam());
     }

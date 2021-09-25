@@ -183,26 +183,12 @@ public final class QuestGraphic extends EditableGraphic {
                             TextMenu.display(gui, playerId, task.getDescription(), true,
                                     task::setDescription);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                            if (i + 1 < quest.getTasks().size()) {
-                                quest.getTasks().get(i + 1).clearRequirements();
                             
-                                if (i > 0) {
-                                    quest.getTasks().get(i + 1).addRequirement(quest.getTasks().get(i - 1));
-                                }
-                            }
                             if (selectedTask == task) {
                                 setSelectedTask(null);
                             }
-                        
-                            task.onDelete();
-                        
-                            quest.getTasks().remove(i);
-                            quest.nextTaskId = 0;
-                            for (QuestTask<?> questTask : quest.getTasks()) {
-                                questTask.updateId();
-                            }
-                        
-                            quest.getQuestData(playerId).clearTaskData(quest);
+                            
+                            quest.removeTask(task);
                             SaveHelper.add(EditType.TASK_REMOVE);
                         }
                     } else if (task == selectedTask) {
