@@ -13,6 +13,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 
+import java.util.List;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
@@ -56,7 +57,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         addScrollBar(scrollBar = new ScrollBar(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X) {
             @Override
             public boolean isVisible() {
-                return DeathStatsManager.getInstance().getDeathStats().length > VISIBLE_PLAYERS;
+                return DeathStatsManager.getInstance().getDeathStats().size() > VISIBLE_PLAYERS;
             }
         });
     }
@@ -65,11 +66,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-        int start = scrollBar.isVisible() ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
+        List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
+        int start = scrollBar.isVisible() ? Math.round((deathStats.size() - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
+        int end = Math.min(deathStats.size(), start + VISIBLE_PLAYERS);
         for (int i = start; i < end; i++) {
-            DeathStat stats = deathStats[i];
+            DeathStat stats = deathStats.get(i);
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
@@ -153,11 +154,11 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             playerId = null;
         } else {
             showBest = showTotal = false;
-            DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-            int start = scrollBar.isVisible() ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
+            List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
+            int start = scrollBar.isVisible() ? Math.round((deathStats.size() - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
+            int end = Math.min(deathStats.size(), start + VISIBLE_PLAYERS);
             for (int i = start; i < end; i++) {
-                DeathStat stats = deathStats[i];
+                DeathStat stats = deathStats.get(i);
                 
                 if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {

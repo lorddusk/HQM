@@ -16,7 +16,7 @@ import java.util.*;
 public class DeathStatsManager extends SimpleSerializable {
     private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths);
     private final Map<UUID, DeathStat> deathMap = new HashMap<>();
-    private DeathStat[] clientDeathList;
+    private final List<DeathStat> clientDeathList = new ArrayList<>();
     private DeathStat clientBest;
     private DeathStat clientTotal;
     
@@ -36,19 +36,18 @@ public class DeathStatsManager extends SimpleSerializable {
         return deathMap.computeIfAbsent(uuid, DeathStat::new);
     }
     
-    public DeathStat[] getDeathStats() {
+    public List<DeathStat> getDeathStats() {
         return clientDeathList;
     }
     
     private void updateClientDeathList() {
-        clientDeathList = new DeathStat[deathMap.size()];
-        int id = 0;
+        clientDeathList.clear();
         for (DeathStat deathStat : deathMap.values()) {
             deathStat.totalDeaths = -1;
-            clientDeathList[id++] = deathStat;
+            clientDeathList.add(deathStat);
         }
-        
-        Arrays.sort(clientDeathList, DEATH_COMPARATOR);
+    
+        clientDeathList.sort(DEATH_COMPARATOR);
         
         clientBest = new DeathStat.DeathStatBest(clientDeathList);
         clientTotal = new DeathStat.DeathStatTotal(clientDeathList);

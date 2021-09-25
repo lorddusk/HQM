@@ -94,20 +94,20 @@ public class DeathStat {
         private static final String[] placePrefixes = {"first", "second", "third"};
         private final Map<DeathType, String> messages = new EnumMap<>(DeathType.class);
         
-        public DeathStatBest(DeathStat[] clientDeathList) {
+        public DeathStatBest(List<DeathStat> clientDeathList) {
             super(null);
             for (DeathType type : DeathType.values()) {
-                Arrays.sort(clientDeathList, deathTypeComparator.get(type));
-                if (clientDeathList.length < 1) {
+                clientDeathList.sort(deathTypeComparator.get(type));
+                if (clientDeathList.isEmpty()) {
                     deaths.put(type, 0);
                     messages.put(type, GuiColor.RED + I18n.get("hqm.deathStat.noOneDied"));
                 } else {
-                    deaths.put(type, clientDeathList[0].getDeaths(type));
+                    deaths.put(type, clientDeathList.get(0).getDeaths(type));
                     StringBuilder builder = new StringBuilder();
                     int currentValue = 0;
                     int standing = 0;
-                    for (int j = 0; j < clientDeathList.length; j++) {
-                        int value = clientDeathList[j].getDeaths(type);
+                    for (int j = 0; j < clientDeathList.size(); j++) {
+                        int value = clientDeathList.get(j).getDeaths(type);
                         if (value < currentValue) {
                             standing = j;
                             if (value == 0 || standing >= 3) {
@@ -119,7 +119,7 @@ public class DeathStat {
                             builder.append("\n");
                         }
                         builder.append(colourPrefixes[standing]).append(I18n.get("hqm.deathStat." + placePrefixes[standing]));
-                        builder.append(GuiColor.WHITE + " ").append(clientDeathList[j].getName()).append(": ").append(clientDeathList[j].getDeaths(type));
+                        builder.append(GuiColor.WHITE + " ").append(clientDeathList.get(j).getName()).append(": ").append(clientDeathList.get(j).getDeaths(type));
                     }
                     messages.put(type, builder.toString());
                 }
@@ -141,7 +141,7 @@ public class DeathStat {
         
         public Map<DeathType, Integer> counts = new EnumMap<>(DeathType.class);
         
-        public DeathStatTotal(DeathStat[] clientDeathList) {
+        public DeathStatTotal(List<DeathStat> clientDeathList) {
             super(null);
             for (DeathType type : DeathType.values()) {
                 int counter = 0;
