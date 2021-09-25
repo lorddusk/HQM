@@ -300,11 +300,14 @@ public class GuiQuestBook extends GuiBase {
     }
     
     @Override
-    public boolean mouseScrolled(double x, double y, double scroll) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+        double mX = mouseX - left;
+        double mY = mouseY - top;
+        
         if (editMenu != null) {
-            editMenu.onScroll(x, y, scroll);
+            editMenu.onScroll(mX, mY, scroll);
         } else {
-            pageGraphic.onScroll(x, y, scroll);
+            pageGraphic.onScroll(mX, mY, scroll);
         }
         return true;
     }
