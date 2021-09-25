@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.death.DeathType;
@@ -49,17 +49,13 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private UUID playerId;
     private boolean showTotal;
     private boolean showBest;
-    private ScrollBar scrollBar;
+    private final ExtendedScrollBar<DeathStat> scrollBar;
     
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
         super(guiQuestBook, playerId);
         
-        addScrollBar(scrollBar = new ScrollBar(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X) {
-            @Override
-            public boolean isVisible() {
-                return DeathStatsManager.getInstance().getDeathStats().size() > VISIBLE_PLAYERS;
-            }
-        });
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X,
+                VISIBLE_PLAYERS, () -> DeathStatsManager.getInstance().getDeathStats()));
     }
     
     @Override
@@ -68,7 +64,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         
         List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
         int statY = PLAYERS_Y;
-        for (DeathStat stats : scrollBar.getVisibleEntries(deathStats, VISIBLE_PLAYERS)) {
+        for (DeathStat stats : scrollBar.getVisibleEntries()) {
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
@@ -153,9 +149,9 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             playerId = null;
         } else {
             showBest = showTotal = false;
-            List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
+            
             int statY = PLAYERS_Y;
-            for (DeathStat stats : scrollBar.getVisibleEntries(deathStats, VISIBLE_PLAYERS)) {
+            for (DeathStat stats : scrollBar.getVisibleEntries()) {
                 
                 if (gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {

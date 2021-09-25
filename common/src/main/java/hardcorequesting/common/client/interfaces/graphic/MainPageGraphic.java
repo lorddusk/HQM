@@ -8,7 +8,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
@@ -22,7 +22,6 @@ import net.minecraft.network.chat.FormattedText;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MainPageGraphic extends EditableGraphic {
@@ -31,16 +30,12 @@ public class MainPageGraphic extends EditableGraphic {
     private static final int DESCRIPTION_Y = 20;
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
     
-    private final ScrollBar mainDescriptionScroll;
+    private final ExtendedScrollBar<FormattedText> mainDescriptionScroll;
     
     public MainPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME);
-        addScrollBar(mainDescriptionScroll = new ScrollBar(gui, 312, 18, 186, 171, 69, DESCRIPTION_X) {
-            @Override
-            public boolean isVisible() {
-                return Quest.getMainDescription(MainPageGraphic.this.gui).size() > VISIBLE_MAIN_DESCRIPTION_LINES;
-            }
-        });
+        addScrollBar(mainDescriptionScroll = new ExtendedScrollBar<>(gui, 312, 18, 186, 171, 69, DESCRIPTION_X,
+                VISIBLE_MAIN_DESCRIPTION_LINES, () -> Quest.getMainDescription(gui)));
     }
     
     @Override
@@ -48,8 +43,7 @@ public class MainPageGraphic extends EditableGraphic {
         super.draw(matrices, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
-        List<FormattedText> description = mainDescriptionScroll.getVisibleEntries(Quest.getMainDescription(gui), VISIBLE_MAIN_DESCRIPTION_LINES);
-        gui.drawString(matrices, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+        gui.drawString(matrices, mainDescriptionScroll.getVisibleEntries(), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
             gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);

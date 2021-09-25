@@ -6,8 +6,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
@@ -34,7 +34,7 @@ public class PickMobMenu extends GuiEditMenu {
     private Entry mob;
     private int amount;
     
-    private final ScrollBar scrollBar;
+    private final ExtendedScrollBar<Entry> scrollBar;
     private final List<Entry> rawMobs;
     private final List<Entry> mobs;
     private final ArrowSelectionHelper selectionHelper;
@@ -54,12 +54,8 @@ public class PickMobMenu extends GuiEditMenu {
         this.textKey = textKey;
         this.amount = initAmount;
         
-        addScrollBar(scrollBar = new ScrollBar(gui, 160, 18, 186, 171, 69, START_X) {
-            @Override
-            public boolean isVisible() {
-                return mobs.size() > VISIBLE_MOBS;
-            }
-        });
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, START_X,
+                VISIBLE_MOBS, () -> PickMobMenu.this.mobs));
         
         addTextBox(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {
             @Override
@@ -147,7 +143,7 @@ public class PickMobMenu extends GuiEditMenu {
         selectionHelper.render(matrices, mX, mY);
         
         int mobY = START_Y;
-        for (Entry entry : scrollBar.getVisibleEntries(mobs, VISIBLE_MOBS)) {
+        for (Entry entry : scrollBar.getVisibleEntries()) {
             boolean selected = entry.equals(mob);
             boolean inBounds = gui.inBounds(START_X, mobY, 130, 6, mX, mY);
             
@@ -169,7 +165,7 @@ public class PickMobMenu extends GuiEditMenu {
         selectionHelper.onClick(mX, mY);
         
         int mobY = START_Y;
-        for (Entry entry : scrollBar.getVisibleEntries(mobs, VISIBLE_MOBS)) {
+        for (Entry entry : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, mobY, 130, 6, mX, mY)) {
                 if (entry.equals(mob)) {
                     mob = null;

@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.event.EventTrigger;
@@ -48,7 +49,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private final QuestRewardsGraphic rewardsGraphic;
     
-    private final ScrollBar descriptionScroll;
+    private final ExtendedScrollBar<FormattedText> descriptionScroll;
     private final ScrollBar taskScroll;
     private List<FormattedText> cachedDescription;
     
@@ -75,12 +76,7 @@ public final class QuestGraphic extends EditableGraphic {
         rewardsGraphic = new QuestRewardsGraphic(quest, playerId, gui);
         this.onOpen(gui.getPlayer());
         
-        addScrollBar(descriptionScroll = new ScrollBar(gui, 155, 28, 64, 249, 102, START_X) {
-            @Override
-            public boolean isVisible() {
-                return getCachedDescription().size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
+        addScrollBar(descriptionScroll = new ExtendedScrollBar<>(gui, 155, 28, 64, 249, 102, START_X, VISIBLE_DESCRIPTION_LINES, this::getCachedDescription));
     
         addScrollBar(taskScroll = new ScrollBar(gui, 155, 100, 29, 242, 102, START_X) {
             @Override
@@ -105,7 +101,7 @@ public final class QuestGraphic extends EditableGraphic {
         
         gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
         
-        List<FormattedText> description = descriptionScroll.getVisibleEntries(getCachedDescription(), VISIBLE_DESCRIPTION_LINES);
+        List<FormattedText> description = descriptionScroll.getVisibleEntries();
         gui.drawString(matrices, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
         
         int id = 0;

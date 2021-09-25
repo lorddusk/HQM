@@ -6,7 +6,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
@@ -27,7 +27,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
     private final Consumer<String> resultConsumer;
     private String advancement;
     
-    private final ScrollBar scrollBar;
+    private final ExtendedScrollBar<String> scrollBar;
     
     private final List<String> rawAdvancemenNames;
     private final List<String> advancementNames;
@@ -43,12 +43,8 @@ public class PickAdvancementMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
         
-        addScrollBar(scrollBar = new ScrollBar(gui, 160, 18, 186, 171, 69, START_X) {
-            @Override
-            public boolean isVisible() {
-                return advancementNames.size() > VISIBLE_MOBS;
-            }
-        });
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, START_X,
+                VISIBLE_MOBS, () -> PickAdvancementMenu.this.advancementNames));
         
         addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
             @Override
@@ -111,7 +107,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
         selectionHelper.render(matrices, mX, mY);
         
         int nameY = START_Y;
-        for (String name : scrollBar.getVisibleEntries(advancementNames, VISIBLE_MOBS)) {
+        for (String name : scrollBar.getVisibleEntries()) {
             boolean selected = name.equals(advancement);
             boolean inBounds = gui.inBounds(START_X, nameY, 130, 6, mX, mY);
             
@@ -133,7 +129,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
         selectionHelper.onClick(mX, mY);
         
         int nameY = START_Y;
-        for (String name : scrollBar.getVisibleEntries(advancementNames, VISIBLE_MOBS)) {
+        for (String name : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, nameY, 130, 6, mX, mY)) {
                 
                 if (name.equals(advancement)) {

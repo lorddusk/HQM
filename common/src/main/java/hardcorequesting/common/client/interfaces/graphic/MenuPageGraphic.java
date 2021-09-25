@@ -9,8 +9,8 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.items.ModItems;
@@ -50,7 +50,7 @@ public class MenuPageGraphic extends EditableGraphic {
     private static final int INFO_REPUTATION_OFFSET_Y = 12;
     private static final int REPUTATION_OFFSET_Y = 24;
     
-    private final ScrollBar reputationDisplayScroll;
+    private final ExtendedScrollBar<Reputation> reputationDisplayScroll;
     {
         addButton(new LargeButton(gui, "Reset", 90, 190) {
             @Override
@@ -72,12 +72,8 @@ public class MenuPageGraphic extends EditableGraphic {
     
     public MenuPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
-        addScrollBar(reputationDisplayScroll = new ScrollBar(gui, 160, 125, 87, 164, 69, INFO_LEFT_X) {
-            @Override
-            public boolean isVisible() {
-                return ReputationManager.getInstance().size() > VISIBLE_DISPLAY_REPUTATIONS;
-            }
-        });
+        addScrollBar(reputationDisplayScroll = new ExtendedScrollBar<>(gui, 160, 125, 87, 164, 69, INFO_LEFT_X,
+                VISIBLE_DISPLAY_REPUTATIONS, () -> ReputationManager.getInstance().getReputationList()));
     }
     
     @Override
@@ -169,7 +165,7 @@ public class MenuPageGraphic extends EditableGraphic {
         
         int repY = INFO_REPUTATION_Y + INFO_REPUTATION_OFFSET_Y;
         
-        for (Reputation reputation : reputationDisplayScroll.getVisibleEntries(reputations, VISIBLE_DISPLAY_REPUTATIONS)) {
+        for (Reputation reputation : reputationDisplayScroll.getVisibleEntries()) {
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.drawAndGetTooltip(matrices, gui, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, repY,

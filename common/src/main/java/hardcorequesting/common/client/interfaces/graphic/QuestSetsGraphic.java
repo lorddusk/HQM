@@ -6,6 +6,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.config.HQMConfig;
@@ -47,7 +48,7 @@ public class QuestSetsGraphic extends EditableGraphic {
     private static QuestSet selectedSet;
     
     private final BookPage.SetsPage page;
-    private final ScrollBar setScroll;
+    private final ExtendedScrollBar<QuestSet> setScroll;
     private final ScrollBar descriptionScroll;
     
     {
@@ -92,12 +93,8 @@ public class QuestSetsGraphic extends EditableGraphic {
             }
         });
     
-        addScrollBar(setScroll = new ScrollBar(gui, 160, 18, 186, 171, 69, LIST_X) {
-            @Override
-            public boolean isVisible() {
-                return Quest.getQuestSets().size() > VISIBLE_SETS;
-            }
-        });
+        addScrollBar(setScroll = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, LIST_X,
+                VISIBLE_SETS, Quest::getQuestSets));
     }
     
     public static void loginReset() {
@@ -117,7 +114,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         
         int setY = LIST_Y;
-        for (QuestSet questSet : setScroll.getVisibleEntries(questSets, VISIBLE_SETS)) {
+        for (QuestSet questSet : setScroll.getVisibleEntries()) {
             
             String name = questSet.getName(questSets.indexOf(questSet));
             int total = questSet.getQuests().size();
@@ -254,7 +251,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         List<QuestSet> questSets = Quest.getQuestSets();
     
         int setY = LIST_Y;
-        for (QuestSet questSet : setScroll.getVisibleEntries(questSets, VISIBLE_SETS)) {
+        for (QuestSet questSet : setScroll.getVisibleEntries()) {
             
             if (gui.inBounds(LIST_X, setY, gui.getStringWidth(questSet.getName(questSets.indexOf(questSet))), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {

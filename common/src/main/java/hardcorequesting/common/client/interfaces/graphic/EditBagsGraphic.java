@@ -12,8 +12,8 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -41,8 +41,8 @@ public class EditBagsGraphic extends EditableGraphic {
     public static final int VISIBLE_GROUPS = 8;
     
     private final BookPage.BagsPage page;
-    private final ScrollBar groupScroll;
-    private final ScrollBar tierScroll;
+    private final ExtendedScrollBar<Group> groupScroll;
+    private final ExtendedScrollBar<GroupTier> tierScroll;
     
     {
         addButton(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
@@ -79,28 +79,19 @@ public class EditBagsGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
         this.page = page;
     
-        addScrollBar(groupScroll = new ScrollBar(gui, 160, 18, 186, 171, 69, GROUPS_X) {
-            @Override
-            public boolean isVisible() {
-                return Group.getGroups().size() > VISIBLE_GROUPS;
-            }
-        });
+        addScrollBar(groupScroll = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, GROUPS_X,
+                VISIBLE_GROUPS, () -> new ArrayList<>(Group.getGroups().values())));
     
-        addScrollBar(tierScroll = new ScrollBar(gui, 312, 18, 186, 171, 69, TIERS_X) {
-            @Override
-            public boolean isVisible() {
-                return GroupTierManager.getInstance().getTiers().size() > VISIBLE_TIERS;
-            }
-        });
+        addScrollBar(tierScroll = new ExtendedScrollBar<>(gui, 312, 18, 186, 171, 69, TIERS_X,
+                VISIBLE_TIERS, () -> GroupTierManager.getInstance().getTiers()));
     }
     
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         int yPos = TIERS_Y;
-        for (GroupTier groupTier : tierScroll.getVisibleEntries(tiers, VISIBLE_TIERS)) {
+        for (GroupTier groupTier : tierScroll.getVisibleEntries()) {
             
             String str = groupTier.getName();
             boolean inBounds = gui.inBounds(TIERS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
@@ -125,9 +116,8 @@ public class EditBagsGraphic extends EditableGraphic {
             yPos += TIERS_SPACING;
         }
         
-        List<Group> groups = new ArrayList<>(Group.getGroups().values());
         yPos = GROUPS_Y;
-        for (Group group : groupScroll.getVisibleEntries(groups, VISIBLE_GROUPS)) {
+        for (Group group : groupScroll.getVisibleEntries()) {
             
             FormattedText str = Translator.plain(group.getDisplayName());
             boolean inBounds = gui.inBounds(GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
@@ -162,9 +152,8 @@ public class EditBagsGraphic extends EditableGraphic {
         super.onClick(mX, mY, button);
         
         //Handle click on groups
-        List<Group> groups = new ArrayList<>(Group.getGroups().values());
         int posY = GROUPS_Y;
-        for (Group group : groupScroll.getVisibleEntries(groups, VISIBLE_GROUPS)) {
+        for (Group group : groupScroll.getVisibleEntries()) {
             
             if (gui.inBounds(GROUPS_X, posY, gui.getStringWidth(group.getDisplayName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
@@ -192,7 +181,7 @@ public class EditBagsGraphic extends EditableGraphic {
         //Handle click on tiers
         List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         posY = TIERS_Y;
-        for (GroupTier groupTier : tierScroll.getVisibleEntries(tiers, VISIBLE_TIERS)) {
+        for (GroupTier groupTier : tierScroll.getVisibleEntries()) {
             
             if (gui.inBounds(TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
