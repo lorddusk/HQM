@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTeam;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.items.ModItems;
@@ -72,7 +73,7 @@ public class MenuPageGraphic extends EditableGraphic {
     
     public MenuPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.BAG, EditMode.REPUTATION);
-        addScrollBar(reputationDisplayScroll = new ExtendedScrollBar<>(gui, 160, 125, 87, 164, 69, INFO_LEFT_X,
+        addScrollBar(reputationDisplayScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.NORMAL, 160, 125, INFO_LEFT_X,
                 VISIBLE_DISPLAY_REPUTATIONS, () -> ReputationManager.getInstance().getReputationList()));
     }
     

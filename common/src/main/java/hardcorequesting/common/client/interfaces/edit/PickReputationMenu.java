@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.Translator;
@@ -32,7 +33,7 @@ public class PickReputationMenu extends GuiEditMenu {
         super(gui, playerId);
         this.resultConsumer = resultConsumer;
         this.selectedReputation = reputation;
-        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X,
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 23, EditReputationGraphic.REPUTATION_LIST_X,
                 EditReputationGraphic.VISIBLE_REPUTATIONS, () -> ReputationManager.getInstance().getReputationList()));
     }
     

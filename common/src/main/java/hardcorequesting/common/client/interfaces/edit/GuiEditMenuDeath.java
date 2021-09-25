@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.death.DeathType;
@@ -54,7 +55,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
         super(guiQuestBook, playerId);
         
-        addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, 160, 18, 186, 171, 69, PLAYERS_X,
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, ScrollBar.Size.LONG, 160, 18, PLAYERS_X,
                 VISIBLE_PLAYERS, () -> DeathStatsManager.getInstance().getDeathStats()));
     }
     

@@ -10,8 +10,8 @@ public class ExtendedScrollBar<T> extends ScrollBar {
     private final Supplier<List<T>> listSupplier;
     private final int visibleEntries;
     
-    public ExtendedScrollBar(GuiBase gui, int x, int y, int h, int u, int v, int left, int visibleEntries, Supplier<List<T>> listSupplier) {
-        super(gui, x, y, h, u, v, left);
+    public ExtendedScrollBar(GuiBase gui, Size size, int x, int y, int left, int visibleEntries, Supplier<List<T>> listSupplier) {
+        super(gui, size, x, y, left);
         this.listSupplier = listSupplier;
         this.visibleEntries = visibleEntries;
     }

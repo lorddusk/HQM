@@ -86,14 +86,14 @@ public class QuestSetsGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.SWAP_SELECT, EditMode.DELETE);
         this.page = page;
         
-        addScrollBar(descriptionScroll = new ScrollBar(gui, 312, 18, 64, 249, 102, DESCRIPTION_X) {
+        addScrollBar(descriptionScroll = new ScrollBar(gui, ScrollBar.Size.SMALL, 312, 18, DESCRIPTION_X) {
             @Override
             public boolean isVisible() {
                 return selectedSet != null && selectedSet.getDescription(QuestSetsGraphic.this.gui).size() > VISIBLE_DESCRIPTION_LINES;
             }
         });
     
-        addScrollBar(setScroll = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, LIST_X,
+        addScrollBar(setScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, LIST_X,
                 VISIBLE_SETS, Quest::getQuestSets));
     }
     

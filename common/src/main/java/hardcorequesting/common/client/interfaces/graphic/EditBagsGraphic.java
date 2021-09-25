@@ -14,6 +14,7 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -79,10 +80,10 @@ public class EditBagsGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
         this.page = page;
     
-        addScrollBar(groupScroll = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, GROUPS_X,
+        addScrollBar(groupScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, GROUPS_X,
                 VISIBLE_GROUPS, () -> new ArrayList<>(Group.getGroups().values())));
     
-        addScrollBar(tierScroll = new ExtendedScrollBar<>(gui, 312, 18, 186, 171, 69, TIERS_X,
+        addScrollBar(tierScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 312, 18, TIERS_X,
                 VISIBLE_TIERS, () -> GroupTierManager.getInstance().getTiers()));
     }
     

@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
@@ -34,7 +35,7 @@ public class MainPageGraphic extends EditableGraphic {
     
     public MainPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME);
-        addScrollBar(mainDescriptionScroll = new ExtendedScrollBar<>(gui, 312, 18, 186, 171, 69, DESCRIPTION_X,
+        addScrollBar(mainDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 312, 18, DESCRIPTION_X,
                 VISIBLE_MAIN_DESCRIPTION_LINES, () -> Quest.getMainDescription(gui)));
     }
     

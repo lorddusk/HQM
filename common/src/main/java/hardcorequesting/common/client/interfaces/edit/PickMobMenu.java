@@ -5,10 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
-import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
-import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.*;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
@@ -54,7 +51,7 @@ public class PickMobMenu extends GuiEditMenu {
         this.textKey = textKey;
         this.amount = initAmount;
         
-        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, START_X,
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickMobMenu.this.mobs));
         
         addTextBox(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {

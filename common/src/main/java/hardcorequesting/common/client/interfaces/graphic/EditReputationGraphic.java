@@ -66,14 +66,14 @@ public class EditReputationGraphic extends EditableGraphic {
     
     public EditReputationGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.REPUTATION_VALUE, EditMode.DELETE);
-        addScrollBar(reputationTierScroll = new ScrollBar(gui, 312, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
+        addScrollBar(reputationTierScroll = new ScrollBar(gui, ScrollBar.Size.LONG, 312, 23, EditReputationGraphic.REPUTATION_MARKER_LIST_X) {
             @Override
             public boolean isVisible() {
                 return selectedReputation != null && selectedReputation.getMarkerCount() > VISIBLE_REPUTATION_TIERS;
             }
         });
     
-        addScrollBar(reputationScroll = new ScrollBar(gui, 160, 23, 186, 171, 69, EditReputationGraphic.REPUTATION_LIST_X) {
+        addScrollBar(reputationScroll = new ScrollBar(gui, ScrollBar.Size.LONG, 160, 23, EditReputationGraphic.REPUTATION_LIST_X) {
             @Override
             public boolean isVisible() {
                 return (EditReputationGraphic.this.gui.getCurrentMode() != EditMode.CREATE || selectedReputation == null) && ReputationManager.getInstance().size() > VISIBLE_REPUTATIONS;

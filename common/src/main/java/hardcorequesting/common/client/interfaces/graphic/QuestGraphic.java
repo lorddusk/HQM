@@ -76,9 +76,9 @@ public final class QuestGraphic extends EditableGraphic {
         rewardsGraphic = new QuestRewardsGraphic(quest, playerId, gui);
         this.onOpen(gui.getPlayer());
         
-        addScrollBar(descriptionScroll = new ExtendedScrollBar<>(gui, 155, 28, 64, 249, 102, START_X, VISIBLE_DESCRIPTION_LINES, this::getCachedDescription));
+        addScrollBar(descriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.SMALL, 155, 28, START_X, VISIBLE_DESCRIPTION_LINES, this::getCachedDescription));
     
-        addScrollBar(taskScroll = new ScrollBar(gui, 155, 100, 29, 242, 102, START_X) {
+        addScrollBar(taskScroll = new ScrollBar(gui, ScrollBar.Size.TINY, 155, 100, START_X) {
             @Override
             public boolean isVisible() {
                 return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks() > VISIBLE_TASKS;

@@ -37,7 +37,7 @@ public abstract class TaskGraphic extends Graphic {
         this.gui = gui;
         this.task = task;
         
-        addScrollBar(taskDescriptionScroll = new ScrollBar(gui, 312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
+        addScrollBar(taskDescriptionScroll = new ScrollBar(gui, ScrollBar.Size.SMALL, 312, 18, TASK_DESCRIPTION_X) {
             @Override
             public boolean isVisible() {
                 return task.getCachedLongDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;

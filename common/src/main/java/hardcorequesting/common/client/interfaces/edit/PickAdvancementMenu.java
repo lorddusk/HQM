@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
@@ -43,7 +44,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
         
-        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, 160, 18, 186, 171, 69, START_X,
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickAdvancementMenu.this.advancementNames));
         
         addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {

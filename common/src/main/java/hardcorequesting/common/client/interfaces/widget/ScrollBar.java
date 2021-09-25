@@ -20,22 +20,18 @@ public class ScrollBar {
     
     private final int x;
     private final int y;
-    private final int h;
-    private final int u;
-    private final int v;
     private final int left;
+    private final Size size;
     
     private double scroll;
     private boolean isScrolling;
     private final GuiBase gui;
     
-    public ScrollBar(GuiBase gui, int x, int y, int h, int u, int v, int left) {
+    public ScrollBar(GuiBase gui, Size size, int x, int y, int left) {
         this.gui = gui;
         this.x = x;
         this.y = y;
-        this.h = h;
-        this.u = u;
-        this.v = v;
+        this.size = size;
         this.left = left;
     }
     
@@ -52,14 +48,14 @@ public class ScrollBar {
     public void draw(PoseStack matrices) {
         if (isVisible()) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            this.gui.drawRect(matrices, x, y, u, v, SCROLL_WIDTH, h);
+            this.gui.drawRect(matrices, x, y, size.u, size.v, SCROLL_WIDTH, size.length);
             this.gui.drawRect(matrices, x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
     
     @Environment(EnvType.CLIENT)
     public void onClick(int mX, int mY) {
-        if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, h, mX, mY)) {
+        if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, size.length, mX, mY)) {
             isScrolling = true;
             updateScroll(mY);
         }
@@ -88,7 +84,7 @@ public class ScrollBar {
     }
     
     public float getScroll() {
-        return (float) scroll / (h - SCROLL_BAR_HEIGHT - 2);
+        return (float) scroll / (size.length - SCROLL_BAR_HEIGHT - 2);
     }
     
     public <T> List<T> getVisibleEntries(List<T> list, int visibleEntries) {
@@ -103,8 +99,8 @@ public class ScrollBar {
         scroll = newScroll;
         if (scroll < 0) {
             scroll = 0;
-        } else if (scroll > h - SCROLL_BAR_HEIGHT - 2) {
-            scroll = h - SCROLL_BAR_HEIGHT - 2;
+        } else if (scroll > size.length - SCROLL_BAR_HEIGHT - 2) {
+            scroll = size.length - SCROLL_BAR_HEIGHT - 2;
         }
         if (scroll != old) {
             onUpdate();
@@ -117,8 +113,23 @@ public class ScrollBar {
     
     @Environment(EnvType.CLIENT)
     public void onScroll(double mX, double mY, double scroll) {
-        if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, h, mX, mY)) {
+        if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, size.length, mX, mY)) {
             setScroll(this.scroll - scroll);
+        }
+    }
+    
+    public enum Size {
+        TINY(242, 102, 29),
+        SMALL(249, 102, 64),
+        NORMAL(164, 69, 87),
+        LONG(171, 69, 186);
+        
+        private final int u, v, length;
+    
+        Size(int u, int v, int length) {
+            this.u = u;
+            this.v = v;
+            this.length = length;
         }
     }
 }

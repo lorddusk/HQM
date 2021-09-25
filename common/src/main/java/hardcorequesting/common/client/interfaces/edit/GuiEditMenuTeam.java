@@ -201,14 +201,14 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             }
         });
         
-        addScrollBar(inviteScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
+        addScrollBar(inviteScroll = new ScrollBar(gui, ScrollBar.Size.LONG, 155, 22, PLAYER_X) {
             @Override
             public boolean isVisible() {
                 return inviteTeam == null && getTeam().isSingle() && getTeam().getInvites() != null && getTeam().getInvites().size() > VISIBLE_INVITES;
             }
         });
         
-        addScrollBar(memberScroll = new ScrollBar(gui, 155, 22, 186, 171, 69, PLAYER_X) {
+        addScrollBar(memberScroll = new ScrollBar(gui, ScrollBar.Size.LONG, 155, 22, PLAYER_X) {
             @Override
             public boolean isVisible() {
                 return (inviteTeam != null && inviteTeam.getPlayers().size() > VISIBLE_MEMBERS) || (!getTeam().isSingle() && getTeam().getPlayers().size() > VISIBLE_MEMBERS);
