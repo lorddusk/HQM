@@ -7,10 +7,6 @@ import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.reward.ReputationReward;
-import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
@@ -151,23 +147,7 @@ public class EditReputationGraphic extends EditableGraphic {
                             selectedReputation = null;
                         }
                         
-                        for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask<?> task : quest.getTasks()) {
-                                if (task instanceof ReputationTask) {
-                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
-                                    List<ReputationTask.Part> settings = reputationTask.getSettings();
-                                    settings.removeIf(setting -> reputation.equals(setting.getReputation()));
-                                }
-                            }
-                            
-                            List<ReputationReward> rewards = quest.getRewards().getReputationRewards();
-                            if (rewards != null) {
-                                rewards.removeIf(reward -> reputation.equals(reward.getReward()));
-                            }
-                            
-                        }
-                        
-                        reputationManager.getReputations().remove(reputation.getId());
+                        reputationManager.removeReputation(reputation);
                         SaveHelper.add(EditType.REPUTATION_REMOVE);
                     }
                     return;
@@ -197,21 +177,6 @@ public class EditReputationGraphic extends EditableGraphic {
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, marker));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                        for (Quest quest : Quest.getQuests().values()) {
-                            for (QuestTask<?> task : quest.getTasks()) {
-                                if (task instanceof ReputationTask<?>) {
-                                    ReputationTask<?> reputationTask = (ReputationTask<?>) task;
-                                    for (ReputationTask.Part setting : reputationTask.getSettings()) {
-                                        if (marker.equals(setting.getLower())) {
-                                            setting.setLower(null);
-                                        }
-                                        if (marker.equals(setting.getUpper())) {
-                                            setting.setUpper(null);
-                                        }
-                                    }
-                                }
-                            }
-                        }
                         
                         selectedReputation.remove(marker);
                         SaveHelper.add(EditType.REPUTATION_MARKER_REMOVE);

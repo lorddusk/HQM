@@ -2,8 +2,11 @@ package hardcorequesting.common.reputation;
 
 import com.google.gson.reflect.TypeToken;
 import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.SimpleSerializable;
+import hardcorequesting.common.quests.reward.ReputationReward;
+import hardcorequesting.common.quests.task.QuestTask;
 
 import java.util.*;
 
@@ -36,6 +39,21 @@ public class ReputationManager extends SimpleSerializable {
     
     public void addReputation(Reputation reputation) {
         reputationMap.put(reputation.getId(), reputation);
+    }
+    
+    public void removeReputation(Reputation reputation) {
+        for (Quest quest : Quest.getQuests().values()) {
+            for (QuestTask<?> task : quest.getTasks()) {
+                task.onRemovedReputation(reputation);
+            }
+        
+            List<ReputationReward> rewards = quest.getRewards().getReputationRewards();
+            if (rewards != null) {
+                rewards.removeIf(reward -> reputation.equals(reward.getReward()));
+            }
+        }
+    
+        getReputations().remove(reputation.getId());
     }
     
     public int size() {

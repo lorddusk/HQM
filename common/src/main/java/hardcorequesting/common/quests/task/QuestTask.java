@@ -17,6 +17,8 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.reputation.Reputation;
+import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
@@ -287,5 +289,11 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public void onBlockUsed(Player playerEntity, Level world, InteractionHand hand) {
+    }
+    
+    public void onRemovedReputation(Reputation reputation) {
+    }
+    
+    public void onRemovedRepMarker(ReputationMarker marker) {
     }
 }

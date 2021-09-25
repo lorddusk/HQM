@@ -3,7 +3,9 @@ package hardcorequesting.common.reputation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -406,6 +408,12 @@ public class Reputation {
     }
     
     public void remove(ReputationMarker marker) {
+        for (Quest quest : Quest.getQuests().values()) {
+            for (QuestTask<?> task : quest.getTasks()) {
+                task.onRemovedRepMarker(marker);
+            }
+        }
+        
         markers.remove(marker);
         sort();
     }

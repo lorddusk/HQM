@@ -96,6 +96,23 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
         QuestTaskAdapter.taskReputationListMap.put(this, list);
     }
     
+    @Override
+    public void onRemovedReputation(Reputation reputation) {
+        parts.getElements().removeIf(setting -> reputation.equals(setting.getReputation()));
+    }
+    
+    @Override
+    public void onRemovedRepMarker(ReputationMarker marker) {
+        for (ReputationTask.Part setting : parts) {
+            if (marker.equals(setting.getLower())) {
+                setting.setLower(null);
+            }
+            if (marker.equals(setting.getUpper())) {
+                setting.setUpper(null);
+            }
+        }
+    }
+    
     public static class Part {
         
         private final Reputation reputation;
