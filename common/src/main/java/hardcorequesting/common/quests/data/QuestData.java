@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class QuestData {
@@ -74,8 +75,8 @@ public class QuestData {
         claimableRewards.add(playerId, canClaim);
     }
     
-    public boolean canClaimPlayerReward(Player player) {
-        int id = getId(player);
+    public boolean canClaimPlayerReward(UUID playerId) {
+        int id = getId(playerId);
         return (id >= 0 && id < claimableRewards.size()) && claimableRewards.get(id);
     }
     
@@ -87,7 +88,7 @@ public class QuestData {
             claimFullReward();
             updateTeam = true;
         } else {
-            claimReward(player);
+            claimReward(player.getUUID());
         }
         
         if (updateTeam) {
@@ -96,8 +97,8 @@ public class QuestData {
             quest.sendUpdatedData((ServerPlayer) player);
     }
     
-    private void claimReward(Player player) {
-        int id = getId(player);
+    private void claimReward(UUID playerId) {
+        int id = getId(playerId);
         if (id >= 0 && id < claimableRewards.size()) {
             claimableRewards.set(id, false);
         }
@@ -116,12 +117,12 @@ public class QuestData {
         claimableRewards.set(rewardId, true);
     }
     
-    private int getId(Player player) {
-        Team team = QuestingDataManager.getInstance().getQuestingData(player).getTeam();
+    private int getId(UUID playerId) {
+        Team team = QuestingDataManager.getInstance().getQuestingData(playerId).getTeam();
         int id = 0;
         for (PlayerEntry entry : team.getPlayers()) {
             if (entry.isInTeam()) {
-                if (entry.getUUID().equals(player.getUUID())) {
+                if (entry.getUUID().equals(playerId)) {
                     return id;
                 }
                 id++;

@@ -1,26 +1,27 @@
 package hardcorequesting.common.client.interfaces.edit;
 
-import hardcorequesting.common.client.interfaces.GuiBase;
-import net.minecraft.world.entity.player.Player;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 
+import java.util.UUID;
 import java.util.function.IntConsumer;
 
-public class IntInputMenu extends GuiEditMenuExtended {
+public class IntInputMenu extends GuiEditMenu {
     
     private final IntConsumer resultConsumer;
     private int amount;
     
-    public static void display(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
-        gui.setEditMenu(new IntInputMenu(gui, player, title, initAmount, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+        gui.setEditMenu(new IntInputMenu(gui, playerId, title, initAmount, resultConsumer));
     }
     
-    public IntInputMenu(GuiBase gui, Player player, String title, int initAmount, IntConsumer resultConsumer) {
-        super(gui, player, true, -1, -1, 25, 30);
-        
+    public IntInputMenu(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
+        super(gui, playerId, true);
+    
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        textBoxes.add(new TextBoxNumber(gui, 0, title) {
+        addTextBox(new NumberTextBox(gui, 25, 30, title) {
             @Override
             protected int getValue() {
                 return amount;
@@ -34,22 +35,7 @@ public class IntInputMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(amount);
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return null;
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
     }
 }

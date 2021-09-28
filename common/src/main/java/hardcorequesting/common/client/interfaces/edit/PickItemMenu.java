@@ -8,12 +8,13 @@ import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
@@ -71,32 +72,31 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private ItemPrecision precision;
     private boolean clicked;
     private TextBoxGroup.TextBox amountTextBox;
-    private TextBoxGroup textBoxes;
-    private int lastClicked;
+    private long lastClicked;
     
     /**
      * Create and display the menu.
      */
-    public static <T> void display(GuiBase gui, Player player, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, and include text bar for amounts.
      */
-    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, include text bar for amounts, and allow choice of precision.
      */
-    public static <T> void display(GuiBase gui, Player player, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, player, obj, type, amount, true, precision, true, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiBase gui, Player player, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
-        super(gui, player, true);
+    private PickItemMenu(GuiQuestBook gui, UUID playerId, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
+        super(gui, playerId, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
         this.precisionInput = precisionInput;
@@ -107,18 +107,17 @@ public class PickItemMenu<T> extends GuiEditMenu {
         
         searchItems = Collections.emptyList();
         
-        playerItems = type.createPlayerEntries(player);
+        playerItems = type.createPlayerEntries(Minecraft.getInstance().player);
         
-        textBoxes = new TextBoxGroup();
         if (amountInput) {
-            textBoxes.add(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
+            addTextBox(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
                 protected boolean isCharacterValid(char c, String rest) {
                     return Character.isDigit(c);
                 }
                 
                 @Override
-                public void textChanged(GuiBase gui) {
+                public void textChanged() {
                     try {
                         int number;
                         if (getText().equals("")) {
@@ -139,9 +138,9 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 }
             });
         }
-        textBoxes.add(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
+        addTextBox(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override
-            public void textChanged(GuiBase gui) {
+            public void textChanged() {
                 startSearch(getText());
             }
         });
@@ -163,10 +162,10 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         checkSearchResult();
         
-        super.draw(matrices, gui, mX, mY);
+        super.draw(matrices, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
         type.draw(selected, matrices, gui, 70, 15, mX, mY);
         gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
@@ -174,8 +173,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
         
         gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
         drawList(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
-        
-        textBoxes.draw(matrices, gui);
         
         if (usePrecision()) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -189,21 +186,19 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         drawListMouseOver(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         drawListMouseOver(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (clickList(gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY)) return;
         if (clickList(gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY)) return;
-        
-        textBoxes.onClick(gui, mX, mY);
         
         if (usePrecision()) {
             if (inArrowBounds(gui, mX, mY, true)) {
@@ -219,20 +214,13 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
-        
-        textBoxes.onKeyStroke(gui, c, k);
-    }
-    
-    @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         clicked = false;
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         if (!type.isEmpty(selected)) {
             resultConsumer.accept(new Result<>(selected, amount, precision, type));
         }
@@ -274,13 +262,14 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 if (element != null) {
                     selected = element;
                     
-                    int lastDiff = player.tickCount - lastClicked;
+                    long tickCount = Minecraft.getInstance().level.getGameTime();
+                    long lastDiff = tickCount - lastClicked;
                     if (0 <= lastDiff && lastDiff < 6 && !type.isEmpty(selected)) {
-                        save(gui);
-                        close(gui);
+                        save();
+                        close();
                         return true;
                     } else {
-                        lastClicked = player.tickCount;
+                        lastClicked = tickCount;
                     }
                 }
                 break;

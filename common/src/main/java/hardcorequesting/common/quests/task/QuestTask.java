@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -15,7 +17,8 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
+import hardcorequesting.common.reputation.Reputation;
+import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
@@ -36,14 +39,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
     
     private final Class<Data> dataType;
     public String description;
     protected Quest parent;
-    private final List<QuestTask<?>> requirements;
     private String longDescription;
     private int id;
     private List<FormattedText> cachedDescription;
@@ -51,10 +54,8 @@ public abstract class QuestTask<Data extends TaskData> {
     public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
         this.dataType = dataType;
         this.parent = parent;
-        this.requirements = new ArrayList<>();
         this.description = description;
         this.longDescription = longDescription;
-        updateId();
     }
     
     public static void completeQuest(Quest quest, UUID uuid) {
@@ -90,7 +91,7 @@ public abstract class QuestTask<Data extends TaskData> {
         }
         
         Player player = QuestingData.getPlayer(uuid);
-        if (player instanceof ServerPlayer && !quest.hasReward(player)) {
+        if (player instanceof ServerPlayer && !quest.hasReward(uuid)) {
             // when there is no reward and it just completes the quest play the music
             NetworkManager.sendToPlayer(ClientChange.SOUND.build(Sounds.COMPLETE), (ServerPlayer) player);
         }
@@ -104,16 +105,8 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract void read(JsonObject object);
     
-    public void updateId() {
-        this.id = parent.nextTaskId++;
-    }
-    
-    public boolean allowManual() {
-        return false;
-    }
-    
-    public boolean allowDetect() {
-        return false;
+    public void updateId(int id) {
+        this.id = id;
     }
     
     public boolean isCompleted(Player player) {
@@ -124,14 +117,12 @@ public abstract class QuestTask<Data extends TaskData> {
         return getData(uuid).completed;
     }
     
-    public boolean isVisible(Player player) {
-        Iterator<QuestTask<?>> itr = this.requirements.iterator();
-        QuestTask<?> requirement;
-        do {
-            if (!itr.hasNext()) return true;
-            requirement = itr.next();
-        } while (requirement.isCompleted(player) && requirement.isVisible(player));
-        return false;
+    public boolean isVisible(UUID playerId) {
+        if (id > 0) {
+            QuestTask<?> requirement = parent.getTasks().get(id - 1);
+            return requirement.isCompleted(playerId) && requirement.isVisible(playerId);
+        }
+        else return true;
     }
     
     public void write(TaskData task, JsonObject out) {
@@ -204,17 +195,7 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     @Environment(EnvType.CLIENT)
-    private TaskGraphic graphic;
-    
-    @Environment(EnvType.CLIENT)
-    protected abstract TaskGraphic createGraphic();
-    
-    @Environment(EnvType.CLIENT)
-    public final TaskGraphic getGraphic() {
-        if (graphic == null)
-            graphic = Objects.requireNonNull(createGraphic());
-        return graphic;
-    }
+    public abstract TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui);
     
     public abstract void onUpdate(Player player);
     
@@ -228,18 +209,6 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public Quest getParent() {
         return parent;
-    }
-    
-    public List<QuestTask<?>> getRequirements() {
-        return requirements;
-    }
-    
-    public void addRequirement(QuestTask<?> task) {
-        requirements.add(task);
-    }
-    
-    public void clearRequirements() {
-        requirements.clear();
     }
     
     public abstract float getCompletedRatio(Team team);
@@ -320,5 +289,11 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public void onBlockUsed(Player playerEntity, Level world, InteractionHand hand) {
+    }
+    
+    public void onRemovedReputation(Reputation reputation) {
+    }
+    
+    public void onRemovedRepMarker(ReputationMarker marker) {
     }
 }

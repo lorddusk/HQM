@@ -13,9 +13,9 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSink;
 import net.minecraft.util.StringDecomposer;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class GuiEditMenuCommandEditor extends TextMenu {
     
@@ -25,23 +25,23 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     private boolean[] edited;
     private String added;
     
-    public GuiEditMenuCommandEditor(GuiQuestBook gui, Player player) {
-        super(gui, player, "", false, -1, null);
-        this.quest = GuiQuestBook.selectedQuest;
+    public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId, Quest quest) {
+        super(gui, playerId, "", false, -1, null);
+        this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings();
         this.edited = new boolean[this.commands.length];
         this.id = -1;
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
             if (this.commands.length > 0) {
                 this.id = this.commands.length - 1;
-                this.text.setTextAndCursor(gui, this.commands[this.id]);
+                this.text.setTextAndCursor(this.commands[this.id]);
             }
         }
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
@@ -58,7 +58,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         if (this.id < 0) this.added = this.text.getText();
         else if (this.commands != null) {
             if (!this.commands[this.id].equals(this.text.getText())) {
@@ -87,8 +87,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
@@ -107,8 +107,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         int i = 0;
         if (this.commands != null && this.commands.length > 0) {
             for (; i < this.commands.length; i++) {
@@ -122,7 +122,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
                         }
                     }
                     this.id = i;
-                    this.text.setTextAndCursor(gui, this.commands[this.id]);
+                    this.text.setTextAndCursor(this.commands[this.id]);
                 }
             }
         }
@@ -130,7 +130,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
             if (this.id == -1) return;
             if (this.commands != null) this.commands[this.id] = this.text.getText();
             this.id = -1;
-            this.text.setTextAndCursor(gui, this.added);
+            this.text.setTextAndCursor(this.added);
         }
     }
     

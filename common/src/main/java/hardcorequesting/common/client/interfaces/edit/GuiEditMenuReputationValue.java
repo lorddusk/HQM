@@ -1,24 +1,26 @@
 package hardcorequesting.common.client.interfaces.edit;
 
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.minecraft.world.entity.player.Player;
 
-public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
+import java.util.UUID;
+
+public class GuiEditMenuReputationValue extends GuiEditMenu {
     
     private ReputationMarker marker;
     private int value;
     
-    public GuiEditMenuReputationValue(GuiBase gui, Player player, ReputationMarker marker) {
-        super(gui, player, true, -1, -1, 25, 30);
-        
+    public GuiEditMenuReputationValue(GuiQuestBook gui, UUID playerId, ReputationMarker marker) {
+        super(gui, playerId, true);
+    
         this.marker = marker;
         this.value = marker.getValue();
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repValue.tierValue") {
+        addTextBox(new NumberTextBox(gui, 25, 30, "hqm.repValue.tierValue") {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;
@@ -37,24 +39,9 @@ public class GuiEditMenuReputationValue extends GuiEditMenuExtended {
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return null;
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
-    }
-    
-    @Override
-    public void save(GuiBase gui) {
+    public void save() {
         marker.setValue(value);
-        GuiQuestBook.selectedReputation.sort();
+        EditReputationGraphic.selectedReputation.sort();
         SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);
     }
 }

@@ -3,14 +3,15 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.CompleteQuestTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.CompleteQuestTaskData;
-import hardcorequesting.common.quests.task.client.CompleteQuestTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -37,12 +38,12 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new CompleteQuestTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new CompleteQuestTaskGraphic(this, parts, playerId, gui);
     }
     
-    public boolean completed(int id, Player player) {
-        return getData(player).getValue(id);
+    public boolean completed(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     @SuppressWarnings("unused")
@@ -126,11 +127,6 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     @Override
     public void copyProgress(CompleteQuestTaskData own, CompleteQuestTaskData other) {
         own.update(other);
-    }
-    
-    @Override
-    public boolean allowDetect() {
-        return true;
     }
     
     @Override

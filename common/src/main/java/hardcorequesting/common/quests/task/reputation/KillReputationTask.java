@@ -1,12 +1,13 @@
 package hardcorequesting.common.quests.task.reputation;
 
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.KillReputationTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ReputationKillTaskData;
-import hardcorequesting.common.quests.task.client.KillReputationTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
@@ -32,8 +33,8 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new KillReputationTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new KillReputationTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override
@@ -76,7 +77,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
         Player killer = KillMobsTask.getKiller(source);
-        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer) && !this.isCompleted(killer) && !killer.equals(entity)) {
+        if (killer != null && parent.isEnabled(killer) && parent.isAvailable(killer) && this.isVisible(killer.getUUID()) && !this.isCompleted(killer) && !killer.equals(entity)) {
             if (entity instanceof Player && isPlayerInRange((Player) entity)) {
                 ReputationKillTaskData killData = getData(killer);
                 if (killData.kills < kills) {

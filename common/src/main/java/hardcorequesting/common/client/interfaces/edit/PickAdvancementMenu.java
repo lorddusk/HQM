@@ -3,17 +3,22 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.*;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-public class PickAdvancementMenu extends GuiEditMenuExtended {
+public class PickAdvancementMenu extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 20;
@@ -23,35 +28,48 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     private final Consumer<String> resultConsumer;
     private String advancement;
     
-    private ScrollBar scrollBar;
+    private final ExtendedScrollBar<String> scrollBar;
     
-    private List<String> rawAdvancemenNames;
-    private List<String> advancementNames;
+    private final List<String> rawAdvancemenNames;
+    private final List<String> advancementNames;
+    private final ArrowSelectionHelper selectionHelper;
     
-    public static void display(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new PickAdvancementMenu(gui, player, advancement, resultConsumer));
+    public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
     }
     
-    private PickAdvancementMenu(GuiQuestBook gui, Player player, String advancement, Consumer<String> resultConsumer) {
-        super(gui, player, false, 180, 70, 180, 150);
-        
+    private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
+        super(gui, playerId, false);
+    
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
         
-        scrollBar = new ScrollBar(160, 18, 186, 171, 69, START_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return advancementNames.size() > VISIBLE_MOBS;
-            }
-        };
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
+                VISIBLE_MOBS, () -> PickAdvancementMenu.this.advancementNames));
         
-        textBoxes.add(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
             @Override
-            public void textChanged(GuiBase gui) {
-                super.textChanged(gui);
+            public void textChanged() {
+                super.textChanged();
                 updateAdvancements(getText());
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+            @Override
+            protected void onArrowClick(boolean left) {
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return "Exact Advancement";
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return "Completing the exact advancement is required.";
+            }
+        };
         
         rawAdvancemenNames = new ArrayList<>();
         advancementNames = new ArrayList<>();
@@ -81,20 +99,21 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        scrollBar.draw(matrices, gui);
+    
+        selectionHelper.render(matrices, mX, mY);
         
-        int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            boolean selected = advancementNames.get(i).equals(advancement);
-            boolean inBounds = gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY);
+        int nameY = START_Y;
+        for (String name : scrollBar.getVisibleEntries()) {
+            boolean selected = name.equals(advancement);
+            boolean inBounds = gui.inBounds(START_X, nameY, 130, 6, mX, mY);
             
-            gui.drawString(matrices, Translator.plain(advancementNames.get(i)), START_X, START_Y + OFFSET_Y * (i - start), 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(matrices, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            nameY += OFFSET_Y;
         }
         
         gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
@@ -105,61 +124,35 @@ public class PickAdvancementMenu extends GuiEditMenuExtended {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
-        scrollBar.onClick(gui, mX, mY);
+        selectionHelper.onClick(mX, mY);
         
-        int start = scrollBar.isVisible(gui) ? Math.round((advancementNames.size() - VISIBLE_MOBS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(advancementNames.size(), start + VISIBLE_MOBS);
-        for (int i = start; i < end; i++) {
-            if (gui.inBounds(START_X, START_Y + (i - start) * OFFSET_Y, 130, 6, mX, mY)) {
+        int nameY = START_Y;
+        for (String name : scrollBar.getVisibleEntries()) {
+            if (gui.inBounds(START_X, nameY, 130, 6, mX, mY)) {
                 
-                if (advancementNames.get(i).equals(advancement)) {
+                if (name.equals(advancement)) {
                     advancement = null;
                 } else {
-                    advancement = advancementNames.get(i);
+                    advancement = name;
                 }
                 break;
             }
+            nameY += OFFSET_Y;
         }
     }
     
     @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         
-        scrollBar.onRelease(gui, mX, mY);
+        selectionHelper.onRelease();
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return "Exact Advancement";
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return "Completing the exact advancement is required.";
-    }
-    
-    @Override
-    public void onDrag(GuiBase gui, int mX, int mY) {
-        super.onDrag(gui, mX, mY);
-        scrollBar.onDrag(gui, mX, mY);
-    }
-    
-    @Override
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
-        super.onScroll(gui, mX, mY, scroll);
-        scrollBar.onScroll(gui, mX, mY, scroll);
-    }
-    
-    @Override
-    public void save(GuiBase gui) {
+    public void save() {
         resultConsumer.accept(advancement);
     }
 }

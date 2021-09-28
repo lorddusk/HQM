@@ -1,12 +1,13 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.DeathTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.DeathTaskData;
-import hardcorequesting.common.quests.task.client.DeathTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -33,8 +34,8 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new DeathTaskGraphic(this);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new DeathTaskGraphic(this, playerId, gui);
     }
     
     @Override
@@ -75,7 +76,7 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     @Override
     public void onLivingDeath(LivingEntity player, DamageSource source) {
         if (player instanceof ServerPlayer) {
-            if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible((Player) player) && !isCompleted((Player) player)) {
+            if (parent.isEnabled((Player) player) && parent.isAvailable((Player) player) && this.isVisible(player.getUUID()) && !isCompleted((Player) player)) {
                 DeathTaskData deathData = getData((Player) player);
                 if (deathData.getDeaths() < deaths) {
                     deathData.setDeaths(deathData.getDeaths() + 1);

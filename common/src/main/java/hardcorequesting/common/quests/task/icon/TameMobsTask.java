@@ -3,13 +3,14 @@ package hardcorequesting.common.quests.task.icon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.TameMobsTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TameTaskData;
-import hardcorequesting.common.quests.task.client.TameMobsTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -42,8 +43,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new TameMobsTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new TameMobsTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override
@@ -71,8 +72,8 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     }
     
-    public int tamed(int id, Player player) {
-        return getData(player).getValue(id);
+    public int tamed(int id, UUID playerId) {
+        return getData(playerId).getValue(id);
     }
     
     @Override
@@ -132,7 +133,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     
     @Override
     public void onAnimalTame(Player tamer, Entity entity) {
-        if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer) && !isCompleted(tamer)) {
+        if (tamer != null && parent.isEnabled(tamer) && parent.isAvailable(tamer) && this.isVisible(tamer.getUUID()) && !isCompleted(tamer)) {
             TameTaskData data = getData(tamer);
             boolean updated = false;
             for (int i = 0; i < parts.size(); i++) {
@@ -160,7 +161,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
                 for (int i = 0; i < parts.size(); i++) {
                     Part part = parts.get(i);
                     
-                    if (tamed(i, tamer) < part.count) {
+                    if (tamed(i, tamer.getUUID()) < part.count) {
                         done = false;
                         break;
                     }

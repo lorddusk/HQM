@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task.client;
+package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -11,11 +11,10 @@ import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends ListTaskGraphic<Part> {
@@ -27,12 +26,12 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     
     private final IconLayoutTask<Part, ?> task;
     
-    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts) {
-        super(parts);
+    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui);
         this.task = task;
     }
     
-    protected abstract void drawElementText(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y);
+    protected abstract void drawElementText(PoseStack matrices, Part part, int id, int x, int y);
     
     @Override
     protected List<Positioned<Part>> positionParts(List<Part> parts) {
@@ -47,33 +46,32 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, Part part, int id, int x, int y, int mX, int mY) {
         int textX = x + X_TEXT_OFFSET, textY = y + Y_TEXT_OFFSET;
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
         gui.drawString(matrices, Translator.plain(part.getName()), textX, textY, 0x404040);
-        drawElementText(matrices, gui, player, part, id, textX + X_TEXT_INDENT, textY + 9);
-        return null;
+        drawElementText(matrices, part, id, textX + X_TEXT_INDENT, textY + 9);
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
-            PickItemMenu.display(gui, player, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
+            PickItemMenu.display(gui, playerId, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                     result -> task.setIcon(id, result.get()));
             return true;
         } else if (mode == EditMode.RENAME) {
-            TextMenu.display(gui, player, part.getName(), 110,
+            TextMenu.display(gui, playerId, part.getName(), 110,
                     result -> task.setName(id, result));
             return true;
         } else {
-            return super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), ITEM_SIZE, ITEM_SIZE, mX, mY);
     }
 }

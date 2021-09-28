@@ -77,8 +77,7 @@ public class QuestAdapter {
             return new ReputationBar(
                     GsonHelper.getAsString(object, REPUTATION_ID),
                     GsonHelper.getAsInt(object, X),
-                    GsonHelper.getAsInt(object, Y),
-                    -1
+                    GsonHelper.getAsInt(object, Y)
             );
         }
     };

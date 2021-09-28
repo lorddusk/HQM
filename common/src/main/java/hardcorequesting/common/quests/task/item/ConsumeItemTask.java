@@ -1,5 +1,8 @@
 package hardcorequesting.common.quests.task.item;
 
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
@@ -16,6 +19,12 @@ public class ConsumeItemTask extends ItemRequirementTask {
     
     public ConsumeItemTask(Quest parent, String description, String longDescription) {
         super(parent, description, longDescription);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return ItemTaskGraphic.createConsumeGraphic(this, parts, playerId, gui, true);
     }
     
     public boolean increaseFluid(FluidStack fluidVolume, UUID playerId, boolean action) {
@@ -78,11 +87,6 @@ public class ConsumeItemTask extends ItemRequirementTask {
     @Environment(EnvType.CLIENT)
     @Override
     public boolean mayUseFluids() {
-        return true;
-    }
-    
-    @Override
-    public boolean allowManual() {
         return true;
     }
 }

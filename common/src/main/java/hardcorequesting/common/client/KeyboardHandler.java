@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -51,13 +50,10 @@ public class KeyboardHandler {
         keyMap.put(key, mode);
     }
     
-    public static boolean pressedHotkey(GuiQuestBook gui, int key, EditButton[] buttons) {
-        if (key == GLFW.GLFW_KEY_BACKSPACE) {
-            gui.goBack();
-            return true;
-        } else if (Quest.canQuestsBeEdited()) {
-            if (key >= GLFW.GLFW_KEY_1 && key <= GLFW.GLFW_KEY_0) {
-                int i = key - GLFW.GLFW_KEY_1;
+    public static boolean handleEditModeHotkey(int key, EditButton[] buttons) {
+        if (Quest.canQuestsBeEdited()) {
+            if (GLFW.GLFW_KEY_0 <= key && key <= GLFW.GLFW_KEY_9) {
+                int i = key == GLFW.GLFW_KEY_0 ? 9 : key - GLFW.GLFW_KEY_1;
                 if (i < buttons.length) {
                     buttons[i].click();
                     return true;

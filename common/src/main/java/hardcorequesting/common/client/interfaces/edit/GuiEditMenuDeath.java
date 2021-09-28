@@ -2,10 +2,10 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.death.DeathType;
@@ -13,8 +13,8 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
@@ -50,38 +50,29 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private UUID playerId;
     private boolean showTotal;
     private boolean showBest;
-    private ScrollBar scrollBar;
+    private final ExtendedScrollBar<DeathStat> scrollBar;
     
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, Player player) {
-        super(guiQuestBook, player);
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
+        super(guiQuestBook, playerId);
         
-        playerId = player.getUUID();
-        
-        scrollBar = new ScrollBar(160, 18, 186, 171, 69, PLAYERS_X) {
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return DeathStatsManager.getInstance().getDeathStats().length > VISIBLE_PLAYERS;
-            }
-        };
+        addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, ScrollBar.Size.LONG, 160, 18, PLAYERS_X,
+                VISIBLE_PLAYERS, () -> DeathStatsManager.getInstance().getDeathStats()));
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
-        scrollBar.draw(matrices, gui);
-        
-        DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-        int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-        int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
-        for (int i = start; i < end; i++) {
-            DeathStat stats = deathStats[i];
+        List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
+        int statY = PLAYERS_Y;
+        for (DeathStat stats : scrollBar.getVisibleEntries()) {
             
             boolean selected = stats.getUuid().equals(playerId);
-            boolean inBounds = gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY);
-            gui.drawString(matrices, Translator.plain((i + 1) + ". " + stats.getName()), PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, getColor(selected, inBounds));
+            boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
+            gui.drawString(matrices, Translator.plain((deathStats.indexOf(stats) + 1) + ". " + stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
-            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), PLAYERS_Y + (i - start) * PLAYERS_SPACING, 0x404040);
+            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
+            statY += PLAYERS_SPACING;
         }
         
         gui.drawString(matrices, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
@@ -126,8 +117,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void renderTooltip(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.renderTooltip(matrices, gui, mX, mY);
+    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+        super.drawTooltip(matrices, mX, mY);
         
         DeathStat stats = getDeathStat();
         if (stats != null) {
@@ -146,10 +137,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
-        
-        scrollBar.onClick(gui, mX, mY);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(Translator.translatable(BEST_LABEL)), 9, mX, mY)) {
             showBest = !showBest;
@@ -161,40 +150,24 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             playerId = null;
         } else {
             showBest = showTotal = false;
-            DeathStat[] deathStats = DeathStatsManager.getInstance().getDeathStats();
-            int start = scrollBar.isVisible(gui) ? Math.round((deathStats.length - VISIBLE_PLAYERS) * scrollBar.getScroll()) : 0;
-            int end = Math.min(deathStats.length, start + VISIBLE_PLAYERS);
-            for (int i = start; i < end; i++) {
-                DeathStat stats = deathStats[i];
+            
+            int statY = PLAYERS_Y;
+            for (DeathStat stats : scrollBar.getVisibleEntries()) {
                 
-                if (gui.inBounds(PLAYERS_X, PLAYERS_Y + (i - start) * PLAYERS_SPACING, 130, 9, mX, mY)) {
+                if (gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY)) {
                     if (stats.getUuid().equals(playerId)) {
                         playerId = null;
                     } else {
                         playerId = stats.getUuid();
                     }
                 }
+                statY += PLAYERS_SPACING;
             }
         }
     }
     
     @Override
-    public void onDrag(GuiBase gui, int mX, int mY) {
-        scrollBar.onDrag(gui, mX, mY);
-    }
-    
-    @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        scrollBar.onRelease(gui, mX, mY);
-    }
-    
-    @Override
-    public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
-        scrollBar.onScroll(gui, mX, mY, scroll);
-    }
-    
-    @Override
-    public void save(GuiBase gui) {
+    public void save() {
         
     }
     

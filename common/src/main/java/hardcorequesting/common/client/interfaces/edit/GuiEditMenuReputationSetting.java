@@ -1,21 +1,21 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
+public class GuiEditMenuReputationSetting extends GuiEditMenu {
     
     private static final int BARS_X = 20;
     private static final int LOWER_Y = 50;
@@ -27,12 +27,13 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
-    private ReputationTask task;
+    private ReputationTask<?> task;
     private int id;
+    private final ArrowSelectionHelper selectionHelper;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, Player player, ReputationTask task, int id, ReputationTask.Part setting) {
-        super(gui, player, true, 25, 25, -1, -1);
-        
+    public GuiEditMenuReputationSetting(GuiQuestBook gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
+        super(gui, playerId, true);
+    
         this.task = task;
         this.id = id;
         ReputationManager reputationManager = ReputationManager.getInstance();
@@ -79,11 +80,47 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
                 inverted = val;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 25, 25) {
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (reputation != null) {
+                    ReputationManager reputationManager = ReputationManager.getInstance();
+                    reputationId += left ? -1 : 1;
+                    if (reputationId < 0) {
+                        reputationId = reputationManager.getReputations().size() - 1;
+                    } else if (reputationId >= reputationManager.getReputations().size()) {
+                        reputationId = 0;
+                    }
+                    lower = null;
+                    upper = null;
+                    reputation = reputationManager.getReputationList().get(reputationId);
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                if (ReputationManager.getInstance().getReputations().isEmpty()) {
+                    return I18n.get("hqm.repSetting.invalid");
+                } else {
+                    return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
+                }
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                if (ReputationManager.getInstance().getReputations().isEmpty()) {
+                    return I18n.get("hqm.repReward.noValidReps");
+                } else {
+                    return null;
+                }
+            }
+        };
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         if (reputation != null) {
             
@@ -92,28 +129,30 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, lower, lower == null ? "" : "Selected: " + lower.getLabel(), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, player, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? "" : "Selected: " + upper.getLabel(), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.draw(matrices, (GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, player, true, lower, upper, inverted, null, null, false);
+            info = reputation.drawAndGetTooltip(matrices, (GuiQuestBook) gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);
             
             
             if (info != null) {
                 gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
             }
         }
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (reputation != null) {
             ReputationMarker marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
@@ -134,44 +173,19 @@ public class GuiEditMenuReputationSetting extends GuiEditMenuExtended {
                 }
             }
         }
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected void onArrowClick(boolean left) {
-        if (reputation != null) {
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            reputationId += left ? -1 : 1;
-            if (reputationId < 0) {
-                reputationId = reputationManager.getReputations().size() - 1;
-            } else if (reputationId >= reputationManager.getReputations().size()) {
-                reputationId = 0;
-            }
-            lower = null;
-            upper = null;
-            reputation = reputationManager.getReputationList().get(reputationId);
-        }
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
+        
+        selectionHelper.onRelease();
     }
     
     @Override
-    protected String getArrowText() {
-        if (ReputationManager.getInstance().getReputations().isEmpty()) {
-            return I18n.get("hqm.repSetting.invalid");
-        } else {
-            return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
-        }
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        if (ReputationManager.getInstance().getReputations().isEmpty()) {
-            return I18n.get("hqm.repReward.noValidReps");
-        } else {
-            return null;
-        }
-    }
-    
-    @Override
-    public void save(GuiBase gui) {
+    public void save() {
         if (reputation != null) {
             task.setSetting(id, new ReputationTask.Part(reputation, lower, upper, inverted));
         }

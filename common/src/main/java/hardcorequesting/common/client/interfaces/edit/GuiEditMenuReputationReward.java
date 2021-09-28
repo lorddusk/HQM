@@ -1,33 +1,38 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
-import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 
-public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
+public class GuiEditMenuReputationReward extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 50;
     private static final int ERROR_Y = 20;
     private static final int OFFSET = 15;
-    private List<ReputationReward> rewards;
+    
+    private final Consumer<List<ReputationReward>> resultConsumer;
+    private final List<ReputationReward> rewards;
     private ReputationReward selectedReward;
     private List<FormattedText> error;
+    private final NumberTextBox valueTextBox;
+    private final ArrowSelectionHelper selectionHelper;
     
-    public GuiEditMenuReputationReward(GuiBase gui, Player player, List<ReputationReward> rewards) {
-        super(gui, player, true, 185, 25, 185, 55);
-        
+    public GuiEditMenuReputationReward(GuiQuestBook gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+        super(gui, playerId, true);
+        this.resultConsumer = resultConsumer;
+    
         this.rewards = new ArrayList<>();
         if (rewards != null) {
             for (ReputationReward reward : rewards) {
@@ -35,7 +40,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         }
         
-        textBoxes.add(new TextBoxNumber(gui, 0, "hqm.repReward.value") {
+        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value") {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;
@@ -57,45 +62,73 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             }
         });
         
-        buttons.add(new LargeButton("hqm.repReward.create", 20, 20) {
+        addButton(new LargeButton(gui, "hqm.repReward.create", 20, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible() {
                 return isValid();
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick() {
                 GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
             }
         });
         
-        buttons.add(new LargeButton("hqm.repReward.delete", 80, 20) {
+        addButton(new LargeButton(gui, "hqm.repReward.delete", 80, 20) {
             @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
+            public boolean isVisible() {
                 return isValid() && selectedReward != null;
             }
             
             @Override
-            public void onClick(GuiBase gui, Player player) {
+            public void onClick() {
                 GuiEditMenuReputationReward.this.rewards.remove(selectedReward);
                 selectedReward = null;
             }
         });
+        
+        selectionHelper = new ArrowSelectionHelper(gui, 185, 25) {
+    
+            @Override
+            protected boolean isArrowVisible() {
+                return isValid() && selectedReward != null;
+            }
+    
+            @Override
+            protected void onArrowClick(boolean left) {
+                if (selectedReward != null && selectedReward.getReward() != null) {
+                    ReputationManager reputationManager = ReputationManager.getInstance();
+                    for (int i = 0; i < reputationManager.getReputationList().size(); i++) {
+                        if (reputationManager.getReputationList().get(i).equals(selectedReward.getReward())) {
+                            int id = i + (left ? -1 : 1);
+                            if (id < 0) {
+                                id = reputationManager.getReputationList().size() - 1;
+                            } else if (id >= reputationManager.getReputationList().size()) {
+                                id = 0;
+                            }
+                            selectedReward.setReward(reputationManager.getReputationList().get(id));
+                            break;
+                        }
+                    }
+                }
+            }
+    
+            @Override
+            protected String getArrowText() {
+                return selectedReward.getReward().getName();
+            }
+    
+            @Override
+            protected String getArrowDescription() {
+                return null;
+            }
+    
+        };
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
@@ -111,11 +144,13 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
             
             gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);
         }
+        
+        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
@@ -124,46 +159,21 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
                         selectedReward = null;
                     } else {
                         selectedReward = rewards.get(i);
-                        textBoxes.getTextBoxes().get(0).reloadText(gui);
+                        valueTextBox.reloadText();
                     }
                     break;
                 }
             }
         }
+        
+        selectionHelper.onClick(mX, mY);
     }
     
     @Override
-    protected boolean isArrowVisible() {
-        return isValid() && selectedReward != null;
-    }
-    
-    @Override
-    protected void onArrowClick(boolean left) {
-        if (selectedReward != null && selectedReward.getReward() != null) {
-            ReputationManager reputationManager = ReputationManager.getInstance();
-            for (int i = 0; i < reputationManager.getReputationList().size(); i++) {
-                if (reputationManager.getReputationList().get(i).equals(selectedReward.getReward())) {
-                    int id = i + (left ? -1 : 1);
-                    if (id < 0) {
-                        id = reputationManager.getReputationList().size() - 1;
-                    } else if (id >= reputationManager.getReputationList().size()) {
-                        id = 0;
-                    }
-                    selectedReward.setReward(reputationManager.getReputationList().get(id));
-                    break;
-                }
-            }
-        }
-    }
-    
-    @Override
-    protected String getArrowText() {
-        return selectedReward.getReward().getName();
-    }
-    
-    @Override
-    protected String getArrowDescription() {
-        return null;
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
+        
+        selectionHelper.onRelease();
     }
     
     private boolean isValid() {
@@ -171,8 +181,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenuExtended {
     }
     
     @Override
-    public void save(GuiBase gui) {
-        GuiQuestBook.selectedQuest.getRewards().setReputationRewards(rewards.isEmpty() ? null : rewards);
-        SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
+    public void save() {
+        resultConsumer.accept(rewards);
     }
 }

@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task.client;
+package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -13,11 +13,10 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.Part> {
@@ -29,9 +28,10 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     
     private final CompleteQuestTask task;
     
-    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts) {
-        super(parts);
+    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        super(task, parts, playerId, gui);
         this.task = task;
+        addDetectButton(task);
     }
     
     @Override
@@ -47,13 +47,13 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, CompleteQuestTask.Part part, int id, int x, int y, int mX, int mY) {
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
         if (part.getQuest() != null) {
             gui.drawString(matrices, Translator.plain(part.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            if (task.completed(id, player)) {
+            if (task.completed(id, playerId)) {
                 gui.drawString(matrices, Translator.translatable("hqm.completedMenu.visited", GuiColor.GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
         } else {
@@ -61,12 +61,11 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.secondline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.completionTask.thirdline", GuiColor.RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
         }
-        return null;
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, CompleteQuestTask.Part part, int id) {
-        if (super.handlePartClick(gui, player, mode, part, id)) {
+    protected boolean handlePartClick(EditMode mode, CompleteQuestTask.Part part, int id) {
+        if (super.handlePartClick(mode, part, id)) {
             return true;
         } else if (Quest.speciallySelectedQuestId != null) {
             parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
@@ -77,7 +76,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<CompleteQuestTask.Part> pos) {
+    protected boolean isInPartBounds(int mX, int mY, Positioned<CompleteQuestTask.Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), ITEM_SIZE, ITEM_SIZE, mX, mY);
     }
 }

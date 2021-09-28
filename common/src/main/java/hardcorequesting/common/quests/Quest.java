@@ -1,38 +1,26 @@
 package hardcorequesting.common.quests;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.ClientChange;
-import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.*;
-import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.event.EventTrigger;
-import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.reward.QuestRewards;
-import hardcorequesting.common.quests.task.DeathTask;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.TaskType;
-import hardcorequesting.common.quests.task.item.ConsumeItemTask;
-import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
-import hardcorequesting.common.util.*;
+import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.HQMUtil;
+import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -45,30 +33,13 @@ import java.util.stream.Collectors;
 
 public class Quest {
     
-    private static final int VISIBLE_DESCRIPTION_LINES = 7;
-    private static final int VISIBLE_TASKS = 3;
-    //region pixelinfo
-    public static final int START_X = 20;
-    private static final int TEXT_HEIGHT = 9;
-    private static final int TASK_LABEL_START_Y = 100;
-    private static final int TASK_MARGIN = 2;
-    private static final int TITLE_START_Y = 15;
-    private static final int DESCRIPTION_START_Y = 30;
-    private static final int TASK_DESCRIPTION_X = 180;
-    private static final int TASK_DESCRIPTION_Y = 20;
     @Deprecated
     public static boolean isEditing = false;
     public static UUID speciallySelectedQuestId = null;
     public static QuestTicker clientTicker;
     public static QuestTicker serverTicker;
-    private final List<LargeButton> buttons = new ArrayList<>();
-    private final ScrollBar descriptionScroll;
-    private final ScrollBar taskDescriptionScroll;
-    private final ScrollBar taskScroll;
-    private final List<ScrollBar> scrollBars = new ArrayList<>();
     
     private final QuestRewards rewards = new QuestRewards(this);
-    public int nextTaskId;
     private UUID questId;
     private String name;
     private String description;
@@ -77,8 +48,6 @@ public class Quest {
     private List<UUID> optionLinks;
     private List<UUID> reversedOptionLinks;
     private List<QuestTask<?>> tasks;
-    private List<FormattedText> cachedDescription;
-    private QuestTask<?> selectedTask;
     private RepeatInfo repeatInfo = new RepeatInfo(RepeatType.NONE, 0, 0);
     private TriggerType triggerType = TriggerType.NONE;
     private int triggerTasks = 1;
@@ -106,160 +75,6 @@ public class Quest {
             return parent.isVisible(playerId, isVisibleCache, isLinkFreeCache) || parent.isCompleted(playerId);
         }
     };
-    
-    {
-        buttons.add(new LargeButton("hqm.quest.manualSubmit", 185, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return selectedTask.allowManual();
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask.allowManual() && !selectedTask.isCompleted(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.quest.manualDetect", 185, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return selectedTask.allowDetect();
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask.allowDetect() && !selectedTask.isCompleted(player);
-            }
-            
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(selectedTask));
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.quest.requirement", 185, 200) {
-            @Override
-            @Environment(EnvType.CLIENT)
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            @Environment(EnvType.CLIENT)
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof DeathTask && Quest.canQuestsBeEdited();
-            }
-            
-            @Override
-            @Environment(EnvType.CLIENT)
-            public void onClick(GuiBase gui, Player player) {
-                DeathTask task = (DeathTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
-            }
-        });
-        
-        buttons.add(new LargeButton("hqm.quest.requirement", 250, 95) {
-            @Override
-            @Environment(EnvType.CLIENT)
-            public boolean isEnabled(GuiBase gui, Player player) {
-                return true;
-            }
-            
-            @Override
-            @Environment(EnvType.CLIENT)
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask != null && selectedTask instanceof KillReputationTask && Quest.canQuestsBeEdited();
-            }
-            
-            @Override
-            @Environment(EnvType.CLIENT)
-            public void onClick(GuiBase gui, Player player) {
-                KillReputationTask task = (KillReputationTask) selectedTask;
-                IntInputMenu.display(gui, player, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
-            }
-        });
-        
-        
-        buttons.add(new LargeButton("hqm.quest.selectTask", 250, 200) {
-            @Override
-            public boolean isEnabled(GuiBase gui, Player player) {
-                QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
-                if (data != null && data.selectedQuestId != null && data.selectedQuestId.equals(getQuestId())) {
-                    return data.selectedTask != selectedTask.getId();
-                }
-                return false;
-            }
-            
-            @Override
-            public boolean isVisible(GuiBase gui, Player player) {
-                return selectedTask instanceof ConsumeItemTask && !selectedTask.isCompleted(player);
-            }
-            
-            @Environment(EnvType.CLIENT)
-            @Override
-            public void onClick(GuiBase gui, Player player) {
-                //update locally too, then we don't have to refresh all the data(i.e. the server won't notify us about the change we already know about)
-                QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = getQuestId();
-                QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask.getId();
-                
-                player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", selectedTask.getDescription()).withStyle(ChatFormatting.GREEN), false);
-                
-                //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
-                GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
-            }
-        });
-        
-        int itemIds = 0;
-        for (final TaskType taskType : TaskType.values()) {
-            buttons.add(new LargeButton(taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
-                @Override
-                public boolean isEnabled(GuiBase gui, Player player) {
-                    return true;
-                }
-                
-                @Environment(EnvType.CLIENT)
-                @Override
-                public boolean isVisible(GuiBase gui, Player player) {
-                    return canQuestsBeEdited() && selectedTask == null && ((GuiQuestBook) gui).getCurrentMode() == EditMode.TASK;
-                }
-                
-                @Override
-                public void onClick(GuiBase gui, Player player) {
-                    taskType.addTask(Quest.this);
-                }
-            });
-        }
-    }
-    
-    {
-        scrollBars.add(descriptionScroll = new ScrollBar(155, 28, 64, 249, 102, START_X) {
-            @Environment(EnvType.CLIENT)
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return getCachedDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        scrollBars.add(taskDescriptionScroll = new ScrollBar(312, 18, 64, 249, 102, TASK_DESCRIPTION_X) {
-            @Environment(EnvType.CLIENT)
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return selectedTask != null && selectedTask.getCachedLongDescription(gui).size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
-        
-        scrollBars.add(taskScroll = new ScrollBar(155, 100, 29, 242, 102, START_X) {
-            @Environment(EnvType.CLIENT)
-            @Override
-            public boolean isVisible(GuiBase gui) {
-                return tasks.size() > VISIBLE_TASKS && getVisibleTasks(gui) > VISIBLE_TASKS;
-            }
-        });
-    }
     
     public Quest(String name, String description, int x, int y, boolean isBig) {
         do {
@@ -347,8 +162,8 @@ public class Quest {
         return rewards;
     }
     
-    public boolean hasReward(Player player) {
-        return getRewards().hasReward(getQuestData(player), player);
+    public boolean hasReward(UUID playerId) {
+        return getRewards().hasReward(playerId);
     }
     
     public RepeatInfo getRepeatInfo() {
@@ -466,7 +281,7 @@ public class Quest {
         return isVisible(player.getUUID());
     }
     
-    boolean isVisible(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    public boolean isVisible(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isVisible(player.getUUID(), isVisibleCache, isLinkFreeCache);
     }
     
@@ -489,7 +304,7 @@ public class Quest {
         return isEnabled(player.getUUID());
     }
     
-    boolean isEnabled(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    public boolean isEnabled(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
         return isEnabled(player.getUUID(), true, isVisibleCache, isLinkFreeCache);
     }
     
@@ -509,7 +324,7 @@ public class Quest {
         return isLinkFree(player.getUUID(), new HashMap<>());
     }
     
-    boolean isLinkFree(Player player, Map<Quest, Boolean> cache) {
+    public boolean isLinkFree(Player player, Map<Quest, Boolean> cache) {
         return isLinkFree(player.getUUID(), cache);
     }
     
@@ -664,7 +479,7 @@ public class Quest {
     
     @Environment(EnvType.CLIENT)
     public int getColorFilter(Player player, int tick) {
-        boolean hasReward = hasReward(player);
+        boolean hasReward = hasReward(player.getUUID());
         if (canQuestsBeEdited() && !isVisible(player)) {
             return HQMConfig.QUEST_INVISIBLE;
         } else if (!isEnabled(player)) {
@@ -721,213 +536,6 @@ public class Quest {
         return poly.contains(x, y);
     }
     
-    @Environment(EnvType.CLIENT)
-    private List<FormattedText> getCachedDescription(GuiBase gui) {
-        if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
-        }
-        return cachedDescription;
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void drawMenu(PoseStack matrices, GuiQuestBook gui, Player player, int mX, int mY) {
-        QuestData data = getQuestData(player);
-        if (!canQuestsBeEdited() && selectedTask != null && !selectedTask.isVisible(player)) {
-            if (tasks.size() > 0) {
-                selectedTask = tasks.get(0);
-            } else {
-                selectedTask = null;
-            }
-        }
-        
-        gui.drawString(matrices, Translator.plain(name), START_X, TITLE_START_Y, 0x404040);
-        
-        int startLine = descriptionScroll.isVisible(gui) ? Math.round((getCachedDescription(gui).size() - VISIBLE_DESCRIPTION_LINES) * descriptionScroll.getScroll()) : 0;
-        gui.drawString(matrices, getCachedDescription(gui), startLine, VISIBLE_DESCRIPTION_LINES, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
-        
-        int id = 0;
-        int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
-        int end = Math.min(start + VISIBLE_TASKS, tasks.size());
-        for (int i = start; i < end; i++) {
-            QuestTask<?> task = tasks.get(i);
-            boolean isVisible = task.isVisible(player);
-            if (isVisible || Quest.canQuestsBeEdited()) {
-                boolean completed = task.isCompleted(player);
-                int yPos = getTaskY(gui, id);
-                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY);
-                boolean isSelected = task == selectedTask;
-                gui.drawString(matrices, Translator.plain(task.getDescription()), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
-                
-                id++;
-            }
-        }
-        
-        for (LargeButton button : buttons) {
-            button.draw(matrices, gui, player, mX, mY);
-        }
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices, gui);
-        }
-        
-        rewards.draw(matrices, gui, player, mX, mY, data);
-        
-        if (selectedTask != null) {
-            /*if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
-                if (selectedTask instanceof QuestTaskItems) {
-                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskChangeTo"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-                } else {
-                    gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeOnly"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-                }
-            } else {*/
-            List<FormattedText> description = selectedTask.getCachedLongDescription(gui);
-            int taskStartLine = taskDescriptionScroll.isVisible(gui) ? Math.round((description.size() - VISIBLE_DESCRIPTION_LINES) * taskDescriptionScroll.getScroll()) : 0;
-            gui.drawString(matrices, description, taskStartLine, VISIBLE_DESCRIPTION_LINES, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
-            
-            selectedTask.getGraphic().draw(matrices, gui, player, mX, mY);
-            //}
-        } else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
-        /*} else if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CHANGE_TASK) {
-            gui.drawString(gui.getLinesFromText(Translator.translate("hqm.quest.itemTaskTypeChange"), 0.7F, 130), 180, 20, 0.7F, 0x404040);*/
-        }
-    
-        for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, gui, player, mX, mY);
-        }
-    
-        rewards.drawTooltips(matrices, gui, player, mX, mY, data);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private int getVisibleTasks(GuiBase gui) {
-        if (canQuestsBeEdited()) {
-            return tasks.size();
-        }
-        
-        int count = 0;
-        for (QuestTask<?> task : tasks) {
-            if (task.isVisible(((GuiQuestBook) gui).getPlayer())) {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private int getTaskY(GuiQuestBook gui, int id) {
-        return TASK_LABEL_START_Y + id * (TEXT_HEIGHT + TASK_MARGIN);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void onClick(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        if (b == 1) {
-            gui.loadMap();
-        } else {
-            int id = 0;
-            int start = taskScroll.isVisible(gui) ? Math.round((getVisibleTasks(gui) - VISIBLE_TASKS) * taskScroll.getScroll()) : 0;
-            int end = Math.min(start + VISIBLE_TASKS, tasks.size());
-            for (int i = start; i < end; i++) {
-                QuestTask<?> task = tasks.get(i);
-                if (task.isVisible(player) || canQuestsBeEdited()) {
-                    if (gui.inBounds(START_X, getTaskY(gui, id), gui.getStringWidth(task.getDescription()), TEXT_HEIGHT, mX, mY)) {
-                        if (gui.isOpBook && Screen.hasShiftDown()) {
-                            OPBookHelper.reverseTaskCompletion(task, player);
-                            return;
-                        }
-                        if (canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-                            gui.setCurrentMode(EditMode.NORMAL);
-                        }
-                        if (canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
-                            if (gui.getCurrentMode() == EditMode.RENAME) {
-                                TextMenu.display(gui, player, task.getDescription(), true,
-                                        task::setDescription);
-                            } else if (gui.getCurrentMode() == EditMode.DELETE) {
-                                if (i + 1 < tasks.size()) {
-                                    tasks.get(i + 1).clearRequirements();
-                                    
-                                    if (i > 0) {
-                                        tasks.get(i + 1).addRequirement(tasks.get(i - 1));
-                                    }
-                                }
-                                if (selectedTask == task) {
-                                    selectedTask = null;
-                                }
-                                
-                                task.onDelete();
-                                
-                                tasks.remove(i);
-                                nextTaskId = 0;
-                                for (QuestTask<?> questTask : tasks) {
-                                    questTask.updateId();
-                                }
-    
-                                getQuestData(player).clearTaskData(this);
-                                SaveHelper.add(EditType.TASK_REMOVE);
-                            }
-                        } else if (task == selectedTask) {
-                            selectedTask = null;
-                        } else {
-                            selectedTask = task;
-                            taskDescriptionScroll.resetScroll();
-                        }
-                        break;
-                    }
-                    
-                    id++;
-                }
-            }
-            
-            for (ScrollBar scrollBar : scrollBars) {
-                scrollBar.onClick(gui, mX, mY);
-            }
-    
-            rewards.onClick(gui, player, mX, mY);
-    
-            if (selectedTask != null) {
-                selectedTask.getGraphic().onClick(gui, player, mX, mY, b);
-            }
-            
-            
-            for (LargeButton button : buttons) {
-                if (button.inButtonBounds(gui, mX, mY) && button.isVisible(gui, player) && button.isEnabled(gui, player)) {
-                    button.onClick(gui, player);
-                    break;
-                }
-            }
-            
-            if (gui.getCurrentMode() == EditMode.RENAME) {
-                if (gui.inBounds(START_X, TITLE_START_Y, 140, TEXT_HEIGHT, mX, mY)) {
-                    TextMenu.display(gui, player, getName(), true, this::setName);
-                } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, player, getDescription(), false, this::setDescription);
-                } else if (selectedTask != null && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * TEXT_HEIGHT * 0.7), mX, mY)) {
-                    TextMenu.display(gui, player, selectedTask.getLongDescription(), false,
-                            selectedTask::setLongDescription);
-                }
-            }
-            
-            if (canQuestsBeEdited() && selectedTask != null && gui.getCurrentMode() == EditMode.TASK) {
-                selectedTask = null;
-            }
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void onDrag(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(gui, mX, mY);
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void onRelease(GuiQuestBook gui, Player player, int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(gui, mX, mY);
-        }
-    }
-    
     public QuestData createData(int players) {
         QuestData data = new QuestData(players);
         data.verifyTasksSize(this);
@@ -936,6 +544,22 @@ public class Quest {
     
     public List<QuestTask<?>> getTasks() {
         return tasks;
+    }
+    
+    public void removeTask(QuestTask<?> task) {
+        int index = tasks.indexOf(task);
+    
+        task.onDelete();
+    
+        tasks.remove(index);
+        int nextTaskId = 0;
+        for (QuestTask<?> questTask : tasks) {
+            questTask.updateId(nextTaskId++);
+        }
+        
+        for (Team team : TeamManager.getInstance().getTeams()) {
+            team.getQuestData(this.getQuestId()).clearTaskData(this);
+        }
     }
     
     public void sendUpdatedDataToTeam(Player player) {
@@ -976,42 +600,10 @@ public class Quest {
     
     public void setDescription(String description) {
         this.description = description;
-        cachedDescription = null;
     }
     
     public boolean hasSameSetAs(Quest child) {
         return child.set.equals(set);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void onScroll(GuiQuestBook gui, double x, double y, double scroll) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onScroll(gui, x, y, scroll);
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public void onOpen(GuiQuestBook gui, Player player) {
-        if (selectedTask == null) {
-            for (QuestTask task : tasks) {
-                if (!task.isCompleted(player)) {
-                    selectedTask = task;
-                    break;
-                }
-            }
-        }
-        
-        if (selectedTask == null && tasks.size() > 0)
-            selectedTask = tasks.get(0);
-        
-        QuestingDataManager.getInstance().getQuestingData(player).selectedQuestId = getQuestId();
-        QuestingDataManager.getInstance().getQuestingData(player).selectedTask = selectedTask == null ? -1 : selectedTask.getId();
-        if (selectedTask != null) {
-            //NetworkManager.sendToServer(ClientChange.SELECT_QUEST.build(selectedTask));
-            GeneralUsage.sendBookSelectTaskUpdate(Quest.this.selectedTask);
-        }
-        
-        EventTrigger.instance().onQuestSelected(new EventTrigger.QuestSelectedEvent(player, this.getQuestId()));
     }
     
     public boolean hasSet(QuestSet selectedSet) {

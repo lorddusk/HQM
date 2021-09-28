@@ -3,6 +3,9 @@ package hardcorequesting.common.quests.task.reputation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.ReputationTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -10,8 +13,6 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.client.ReputationTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.Team;
@@ -39,8 +40,8 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new ReputationTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new ReputationTaskGraphic(this, parts, playerId, gui);
     }
     
     @Deprecated
@@ -93,6 +94,23 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
                 list.add(constructor);
         }
         QuestTaskAdapter.taskReputationListMap.put(this, list);
+    }
+    
+    @Override
+    public void onRemovedReputation(Reputation reputation) {
+        parts.getElements().removeIf(setting -> reputation.equals(setting.getReputation()));
+    }
+    
+    @Override
+    public void onRemovedRepMarker(ReputationMarker marker) {
+        for (ReputationTask.Part setting : parts) {
+            if (marker.equals(setting.getLower())) {
+                setting.setLower(null);
+            }
+            if (marker.equals(setting.getUpper())) {
+                setting.setUpper(null);
+            }
+        }
     }
     
     public static class Part {

@@ -3,6 +3,9 @@ package hardcorequesting.common.quests.task.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -12,15 +15,12 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.quests.task.client.ItemTaskGraphic;
-import hardcorequesting.common.quests.task.client.TaskGraphic;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
@@ -40,8 +40,8 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     @Environment(EnvType.CLIENT)
     @Override
-    protected TaskGraphic createGraphic() {
-        return new ItemTaskGraphic(this, parts);
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return new ItemTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override
@@ -68,12 +68,12 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         parent.setIconIfEmpty(stack);
     }
     
-    public int getProgress(Player player, int id) {
+    public int getProgress(UUID playerId, int id) {
         if (id >= parts.size()) {
             return 0;
         }
         
-        return getData(player).getValue(id);
+        return getData(playerId).getValue(id);
     }
     
     @Environment(EnvType.CLIENT)

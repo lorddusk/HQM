@@ -1,12 +1,12 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
     
@@ -28,17 +28,17 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private GuiEditMenuTeam parent;
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiQuestBook gui, Player player, GuiEditMenuTeam parent) {
-        super(gui, player);
+    protected GuiEditMenuTeamList(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
+        super(gui, playerId);
         this.parent = parent;
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
-        drawArrow(matrices, gui, mX, mY, true);
-        drawArrow(matrices, gui, mX, mY, false);
+        drawArrow(matrices, mX, mY, true);
+        drawArrow(matrices, mX, mY, false);
         
         TeamLiteStat[] teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
@@ -62,8 +62,8 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (isArrowEnabled(true) && gui.inBounds(ARROW_X_LEFT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair--;
@@ -73,16 +73,16 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     @Override
-    public void close(GuiBase gui) {
+    public void close() {
         gui.setEditMenu(parent);
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         
     }
     
-    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(PoseStack matrices, int mX, int mY, boolean left) {
         int x = left ? ARROW_X_LEFT : ARROW_X_RIGHT;
         int srcY = 0;
         

@@ -4,11 +4,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.GroupTier;
-import hardcorequesting.common.client.interfaces.*;
+import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.world.entity.player.Player;
+
+import java.util.UUID;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     
@@ -29,26 +34,24 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private static final int TIERS_WEIGHTS_TEXT_Y = 65;
     private GroupTier tier;
     private GroupTier original;
-    private TextBoxGroup textBoxes;
     private boolean clicked;
     
-    public GuiEditMenuTier(GuiQuestBook gui, Player player, GroupTier original) {
-        super(gui, player, true);
+    public GuiEditMenuTier(GuiQuestBook gui, UUID playerId, GroupTier original) {
+        super(gui, playerId, true);
         this.original = original;
         this.tier = original.copy();
-        this.textBoxes = new TextBoxGroup();
         
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             final int id = i;
-            textBoxes.add(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
+            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
                 @Override
                 protected boolean isCharacterValid(char c, String rest) {
                     return rest.length() < 6 && Character.isDigit(c);
                 }
                 
                 @Override
-                public void textChanged(GuiBase gui) {
+                public void textChanged() {
                     try {
                         int number;
                         if (getText().equals("")) {
@@ -67,8 +70,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
-        super.draw(matrices, gui, mX, mY);
+    public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
         
         gui.drawString(matrices, Translator.plain(tier.getName()), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
         
@@ -89,13 +92,11 @@ public class GuiEditMenuTier extends GuiEditMenu {
         drawArrow(matrices, gui, mX, mY, true);
         drawArrow(matrices, gui, mX, mY, false);
         gui.drawCenteredString(matrices, Translator.plain(tier.getColor().getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 1F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
-        
-        textBoxes.draw(matrices, gui);
     }
     
     @Override
-    public void onClick(GuiBase gui, int mX, int mY, int b) {
-        super.onClick(gui, mX, mY, b);
+    public void onClick(int mX, int mY, int b) {
+        super.onClick(mX, mY, b);
         
         if (inArrowBounds(gui, mX, mY, true)) {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
@@ -104,25 +105,16 @@ public class GuiEditMenuTier extends GuiEditMenu {
             tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
             clicked = true;
         }
-        
-        textBoxes.onClick(gui, mX, mY);
     }
     
     @Override
-    public void onKeyStroke(GuiBase gui, char c, int k) {
-        super.onKeyStroke(gui, c, k);
-        
-        textBoxes.onKeyStroke(gui, c, k);
-    }
-    
-    @Override
-    public void onRelease(GuiBase gui, int mX, int mY) {
-        super.onRelease(gui, mX, mY);
+    public void onRelease(int mX, int mY, int button) {
+        super.onRelease(mX, mY, button);
         clicked = false;
     }
     
     @Override
-    public void save(GuiBase gui) {
+    public void save() {
         original.load(tier);
         SaveHelper.add(EditType.TIER_CHANGE);
     }

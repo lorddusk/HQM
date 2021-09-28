@@ -1,6 +1,9 @@
 package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
@@ -20,6 +23,12 @@ public class DetectItemTask extends ItemRequirementTask {
         super(parent, description, longDescription);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
+    }
+    
+    @Environment(EnvType.CLIENT)
+    @Override
+    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
+        return ItemTaskGraphic.createDetectGraphic(this, parts, playerId, gui);
     }
     
     @Environment(EnvType.CLIENT)
@@ -118,11 +127,6 @@ public class DetectItemTask extends ItemRequirementTask {
         if (updated) {
             doCompletionCheck(data, playerID);
         }
-    }
-    
-    @Override
-    public boolean allowDetect() {
-        return true;
     }
     
 }

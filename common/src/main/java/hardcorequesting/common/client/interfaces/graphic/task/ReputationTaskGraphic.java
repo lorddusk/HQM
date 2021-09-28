@@ -1,4 +1,4 @@
-package hardcorequesting.common.quests.task.client;
+package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
@@ -13,11 +13,11 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> {
@@ -26,14 +26,12 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     
     private final ReputationTask<?> task;
     
-    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts) {
-        super(parts);
-        this.task = task;
-        startOffsetY = 0;
+    public ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
+        this(task, parts, playerId, gui, 0);
     }
     
-    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, int startOffsetY) {
-        super(parts);
+    protected ReputationTaskGraphic(ReputationTask<?> task, PartList<ReputationTask.Part> parts, UUID playerId, GuiQuestBook gui, int startOffsetY) {
+        super(task, parts, playerId, gui);
         this.task = task;
         this.startOffsetY = startOffsetY;
     }
@@ -50,36 +48,45 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
         return list;
     }
     
-    protected Player getPlayerForRender(Player player) {
-        return player;
+    protected boolean shouldShowPlayer() {
+        return true;
     }
     
     @Override
-    protected List<FormattedText> drawPart(PoseStack matrices, GuiQuestBook gui, Player player, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(PoseStack matrices, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
         if (part.getReputation() == null) {
             gui.drawRect(matrices, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
-            return null;
         } else {
-            String text = part.getReputation().draw(matrices, gui, x, y, mX, mY, null, getPlayerForRender(player), true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(player));
-            return text == null ? null : Collections.singletonList(Translator.plain(text));
+            part.getReputation().draw(matrices, gui, x, y, mX, mY, shouldShowPlayer() ? playerId : null, true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(playerId));
         }
     }
     
     @Override
-    protected boolean isInPartBounds(GuiQuestBook gui, int mX, int mY, Positioned<ReputationTask.Part> pos) {
+    protected List<FormattedText> getPartTooltip(Positioned<ReputationTask.Part> pos, int id, int mX, int mY) {
+        ReputationTask.Part part = pos.getElement();
+        if (part.getReputation() != null) {
+            String text = part.getReputation().getTooltip(gui, pos.getX(), pos.getY(), mX, mY, playerId);
+            if (text != null)
+                return Collections.singletonList(Translator.plain(text));
+        }
+        return null;
+    }
+    
+    @Override
+    protected boolean isInPartBounds(int mX, int mY, Positioned<ReputationTask.Part> pos) {
         return gui.inBounds(pos.getX(), pos.getY(), Reputation.BAR_WIDTH, 20, mX, mY);
     }
     
     @Override
-    protected boolean handlePartClick(GuiQuestBook gui, Player player, EditMode mode, ReputationTask.Part part, int id) {
+    protected boolean handlePartClick(EditMode mode, ReputationTask.Part part, int id) {
         if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-            gui.setEditMenu(new GuiEditMenuReputationSetting(gui, player, task, id, part));
+            gui.setEditMenu(new GuiEditMenuReputationSetting(gui, playerId, task, id, part));
             return true;
         } else {
-            return super.handlePartClick(gui, player, mode, part, id);
+            return super.handlePartClick(mode, part, id);
         }
     }
 }
