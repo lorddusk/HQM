@@ -114,23 +114,23 @@ public class QuestRewardsGraphic extends Graphic {
     
     private void drawItemRewards(PoseStack matrices, int mX, int mY) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
-        NonNullList<ItemStack> choiceRewards = rewards.getReward();
+        NonNullList<ItemStack> choiceRewards = rewards.getRewardChoice();
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(matrices, gui, itemRewards, REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
+            drawRewards(matrices, gui, itemRewards, REWARD_Y, -1, mX, mY, MAX_REWARD_SLOTS);
             if (!choiceRewards.isEmpty() || Quest.canQuestsBeEdited()) {
                 gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
-                drawRewards(matrices, gui, choiceRewards, REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+                drawRewards(matrices, gui, choiceRewards, REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
             }
         } else if (!choiceRewards.isEmpty()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(matrices, gui, choiceRewards, REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+            drawRewards(matrices, gui, choiceRewards, REWARD_Y, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
         }
     }
     
     private void drawItemRewardTooltips(PoseStack matrices, int mX, int mY) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
-        NonNullList<ItemStack> choiceRewards = rewards.getReward();
+        NonNullList<ItemStack> choiceRewards = rewards.getRewardChoice();
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
             drawRewardMouseOver(matrices, gui, itemRewards, REWARD_Y, -1, mX, mY);
             if (!choiceRewards.isEmpty() || Quest.canQuestsBeEdited()) {
@@ -205,7 +205,7 @@ public class QuestRewardsGraphic extends Graphic {
     @Override
     public void onClick(int mX, int mY, int b) {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
-        NonNullList<ItemStack> choiceRewards = rewards.getReward();
+        NonNullList<ItemStack> choiceRewards = rewards.getRewardChoice();
         List<ReputationReward> reputationRewards = rewards.getReputationRewards();
         
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
