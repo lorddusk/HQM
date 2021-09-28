@@ -29,6 +29,10 @@ architectury {
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
     modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+    // Used for some extra events/hooks
+    modApi "dev.architectury:architectury-fabric:${project.architectury_version}"
+
     modApi("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
@@ -36,14 +40,15 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
     depend("org.jetbrains:annotations:19.0.0")
+
+    // Used for storing player-attached data
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
     depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
+    // Used for interaction with fluid systems
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
+    // Used for parsing the config file
     depend("blue.endless:jankson:1.2.1")
-    modImplementation("me.shedaniel.cloth.api:cloth-api:${project.cloth}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
 
     implementation(project(path: ":common", configuration: "dev")) {
         transitive = false

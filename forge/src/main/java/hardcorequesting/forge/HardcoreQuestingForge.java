@@ -110,8 +110,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
-            if (event.getEntityLiving() instanceof Player) {
-                Player player = (Player) event.getEntityLiving();
+            if (event.getEntityLiving() instanceof Player player) {
                 if (player instanceof FakePlayer
                     || event.isCanceled()
                     || player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
@@ -123,7 +122,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 while (iter.hasNext()) {
                     ItemEntity entityItem = iter.next();
                     ItemStack stack = entityItem.getItem();
-                    if (!stack.isEmpty() && stack.getItem().equals(ModItems.book.get())) {
+                    if (stack.is(ModItems.book.get())) {
                         player.getInventory().add(stack);
                         iter.remove();
                     }
@@ -137,10 +136,10 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                 return;
             }
-            
-            if (event.getOriginal().getInventory().contains(new ItemStack(ModItems.book.get()))) {
-                ItemStack bookStack = new ItemStack(ModItems.book.get());
-                for (ItemStack stack : event.getOriginal().getInventory().armor) {
+    
+            ItemStack bookStack = new ItemStack(ModItems.book.get());
+            if (event.getOriginal().getInventory().contains(bookStack)) {
+                for (ItemStack stack : event.getOriginal().getInventory().items) {
                     if (bookStack.sameItem(stack)) {
                         bookStack = stack.copy();
                         break;

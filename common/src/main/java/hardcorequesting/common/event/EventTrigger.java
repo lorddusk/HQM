@@ -47,8 +47,8 @@ public class EventTrigger {
         HardcoreQuestingCore.platform.registerOnBlockBreak(this::onBlockBreak);
         HardcoreQuestingCore.platform.registerOnItemPickup(this::onItemPickUp);
         HardcoreQuestingCore.platform.registerOnCrafting(this::onCrafting);
-        HardcoreQuestingCore.platform.registerOnAnvilCrafting(this::onAnvilCrafting);
-        HardcoreQuestingCore.platform.registerOnSmelting(this::onSmelting);
+        HardcoreQuestingCore.platform.registerOnAnvilCrafting(this::onCrafting);
+        HardcoreQuestingCore.platform.registerOnSmelting(this::onCrafting);
         HardcoreQuestingCore.platform.registerOnAdvancement(this::onAdvancement);
         HardcoreQuestingCore.platform.registerOnAnimalTame(this::onAnimalTame);
         instance = this;
@@ -109,23 +109,7 @@ public class EventTrigger {
     public void onCrafting(Player player, ItemStack stack) {
         if (player.level.isClientSide)
             return;
-        for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(player, stack);
-        }
-    }
-    
-    public void onAnvilCrafting(Player player, ItemStack stack) {
-        if (player.level.isClientSide)
-            return;
-        for (QuestTask task : getTasks(Type.CRAFTING)) {
-            task.onCrafting(player, stack);
-        }
-    }
-    
-    public void onSmelting(Player player, ItemStack stack) {
-        if (player.level.isClientSide)
-            return;
-        for (QuestTask task : getTasks(Type.CRAFTING)) {
+        for (QuestTask<?> task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack);
         }
     }

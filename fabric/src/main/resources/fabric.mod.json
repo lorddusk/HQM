@@ -37,7 +37,7 @@
     "fabric": ">=0.36.1",
     "minecraft": "1.17.x",
     "java": ">=16",
-    "cloth-api": ">=2.0.54",
+    "architectury": ">=2.5.28",
     "libblockattributes_core": ">=0.9.0",
     "libblockattributes_fluids": ">=0.9.0",
     "cardinal-components-base": ">=3.1.1",
