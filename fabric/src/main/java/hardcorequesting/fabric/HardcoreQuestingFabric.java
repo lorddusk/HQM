@@ -28,6 +28,7 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -292,6 +293,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
+    @Environment(EnvType.CLIENT)
     public void renderFluidStack(FluidStack fluid, PoseStack matrices, int x1, int y1, int x2, int y2) {
         // Behaves like FluidVolume.renderGuiRect(), but uses the provided PoseStack
         List<FluidRenderFace> faces = new ArrayList<>();
