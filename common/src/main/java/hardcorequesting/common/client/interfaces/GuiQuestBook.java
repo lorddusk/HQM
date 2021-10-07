@@ -722,7 +722,10 @@ public class GuiQuestBook extends GuiBase {
     }
     
     @Override
-    public boolean mouseScrolled(double x, double y, double scroll) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+        double x = mouseX - left;
+        double y = mouseY - top;
+        
         if (editMenu != null) {
             editMenu.onScroll(this, x, y, scroll);
         } else if (selectedQuest != null) {
