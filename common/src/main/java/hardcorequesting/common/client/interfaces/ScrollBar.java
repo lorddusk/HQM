@@ -43,6 +43,7 @@ public class ScrollBar {
     @Environment(EnvType.CLIENT)
     public void draw(GuiBase gui) {
         if (isVisible(gui)) {
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             gui.drawRect(x, y, u, v, SCROLL_WIDTH, h);
             gui.drawRect(x + 1, y + 1 + scroll, SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
