@@ -5,13 +5,11 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -53,11 +51,6 @@ public class QuestBookItem extends Item {
     @SuppressWarnings("deprecation")
     public InteractionResultHolder<ItemStack> use(Level world, Player player, @NotNull InteractionHand hand) {
         if (world.isClientSide && Quest.isEditing && !HQMUtil.isGameSingleplayer()) {
-            Quest.setEditMode(false);
-        }
-        
-        if (!world.isClientSide && Quest.isEditing && HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
-            player.sendMessage(Translator.translatable("hqm.command.editMode.disableSync").withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)), Util.NIL_UUID);
             Quest.setEditMode(false);
         }
         

@@ -39,7 +39,6 @@ import java.util.stream.StreamSupport;
 public class QuestLine {
     
     private static QuestLine activeQuestLine;
-    public static boolean doServerSync;
     private static boolean hasLoadedMainSound;
     
     public final ReputationManager reputationManager;
@@ -150,8 +149,7 @@ public class QuestLine {
             QuestLine questLine = getActiveQuestLine();
             NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, !side, side, player), player);
     
-            if (QuestLine.doServerSync)
-                NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), player);
+            NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), player);
     
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), player);
             NetworkManager.sendToPlayer(new TeamStatsMessage(StreamSupport.stream(questLine.teamManager.getNamedTeams().spliterator(), false)), player);
