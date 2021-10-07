@@ -721,7 +721,7 @@ public class Quest {
     }
     
     public static boolean canQuestsBeEdited() {
-        if (isEditing && !HQMUtil.isGameSingleplayer()) {
+        if (isEditing && !HQMUtil.isSinglePlayerOnly()) {
             setEditMode(false);
         }
         return isEditing;

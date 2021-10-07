@@ -4,13 +4,11 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Style;
 
 import java.util.Arrays;
 
@@ -20,10 +18,7 @@ public class EditSubCommand implements CommandHandler.SubCommand {
         return builder
                 .requires(source -> source.hasPermission(4))
                 .executes(context -> {
-                    if (HQMUtil.isGameSingleplayer() && QuestLine.doServerSync) {
-                        context.getSource().sendSuccess(Translator.translatable("hqm.command.editMode.disableSync").setStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)), false);
-                        Quest.setEditMode(false);
-                    } else if (HQMUtil.isGameSingleplayer()) {
+                    if (HQMUtil.isSinglePlayerOnly()) {
                         boolean newEditModeState = !Quest.canQuestsBeEdited();
                         Quest.setEditMode(newEditModeState);
                         if (newEditModeState) {

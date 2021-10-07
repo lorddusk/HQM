@@ -40,7 +40,7 @@ public class PlayerTracker {
         else if (HQMConfig.getInstance().Message.NO_HARDCORE_MESSAGE)
             player.sendMessage(Translator.translatable("hqm.message.noHardcore"), Util.NIL_UUID);
         
-        if (!HQMUtil.isGameSingleplayer()) {
+        if (!HQMUtil.isSinglePlayerOnly()) {
             Quest.setEditMode(false);
         }
         
