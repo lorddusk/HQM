@@ -19,6 +19,7 @@ import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import me.shedaniel.cloth.api.common.events.v1.*;
 import me.shedaniel.cloth.api.utils.v1.GameInstanceUtils;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -255,6 +256,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     }
     
     @Override
+    @Environment(EnvType.CLIENT)
     public void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2) {
         ((FabricFluidStack) fluid)._volume.renderGuiRect(x1, y1, x2, y2);
     }
