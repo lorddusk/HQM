@@ -85,17 +85,15 @@ public class QuestAdapter {
     private static final Type STRING_LIST_TYPE = new TypeToken<List<String>>() {}.getType();
     private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
     public static Quest QUEST;
-    private static Map<String, Quest> nameToQuestMap = new HashMap<>();
-    private static List<ReputationBar> reputationBarList = new ArrayList<>();
-    private static Map<Quest, List<UUID>> requirementMapping = new HashMap<>();
-    private static Map<Quest, List<UUID>> prerequisiteMapping = new HashMap<>();
-    private static Map<Quest, List<UUID>> optionMapping = new HashMap<>();
-    private static Map<Quest, List<UUID>> optionLinkMapping = new HashMap<>();
-    private static Map<ReputationReward, String> reputationRewardMapping = new HashMap<>();
-    private static final Adapter<ReputationReward> REPUTATION_REWARD_ADAPTER = new Adapter<ReputationReward>() {
+    private static final Map<Quest, List<UUID>> requirementMapping = new HashMap<>();
+    private static final Map<Quest, List<UUID>> prerequisiteMapping = new HashMap<>();
+    private static final Map<Quest, List<UUID>> optionMapping = new HashMap<>();
+    private static final Map<Quest, List<UUID>> optionLinkMapping = new HashMap<>();
+    private static final Map<ReputationReward, String> reputationRewardMapping = new HashMap<>();
+    private static final Adapter<ReputationReward> REPUTATION_REWARD_ADAPTER = new Adapter<>() {
         private static final String REPUTATION = "reputation";
         private static final String VALUE = "value";
-        
+    
         @Override
         public JsonElement serialize(ReputationReward src) {
             return object()
@@ -103,11 +101,11 @@ public class QuestAdapter {
                     .add(VALUE, src.getValue())
                     .build();
         }
-        
+    
         @Override
         public ReputationReward deserialize(JsonElement json) throws JsonParseException {
             JsonObject object = json.getAsJsonObject();
-            
+        
             ReputationReward result = new ReputationReward(null, GsonHelper.getAsInt(object, VALUE));
             reputationRewardMapping.put(result, GsonHelper.getAsString(object, REPUTATION));
             return result;
@@ -182,7 +180,7 @@ public class QuestAdapter {
                             builder.add(PARENT_REQUIREMENT, src.getParentRequirementCount());
                         if (!src.getTasks().isEmpty()) {
                             JsonArrayBuilder array = array();
-                            for (QuestTask task : src.getTasks()) {
+                            for (QuestTask<?> task : src.getTasks()) {
                                 array.add(QuestTaskAdapter.TASK_ADAPTER.serialize(task));
                             }
                             builder.add(TASKS, array.build());
@@ -280,12 +278,11 @@ public class QuestAdapter {
             return stacks;
         }
     };
-    public static final Adapter<QuestSet> QUEST_SET_ADAPTER = new Adapter<QuestSet>() {
+    public static final Adapter<QuestSet> QUEST_SET_ADAPTER = new Adapter<>() {
         private static final String NAME = "name";
         private static final String DESCRIPTION = "description";
         private static final String QUESTS = "quests";
         private static final String REPUTATION_BAR = "reputationBar";
-        private static final String REPUTATION_BAR_OLD = "reputation";
         
         private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
@@ -296,7 +293,6 @@ public class QuestAdapter {
         
         @Override
         public JsonElement serialize(QuestSet src) {
-            reputationBarList.clear();
             return object()
                     .add(NAME, src.getName())
                     .add(QUESTS, array()
@@ -322,10 +318,7 @@ public class QuestAdapter {
         
         @Override
         public QuestSet deserialize(JsonElement json) throws JsonParseException {
-            requirementMapping.clear();
-            optionMapping.clear();
-            reputationBarList.clear();
-            QuestTaskAdapter.taskReputationListMap.clear();
+            List<ReputationBar> reputationBars = new ArrayList<>();
             List<Quest> quests = new ArrayList<>();
             JsonObject object = json.getAsJsonObject();
             
@@ -338,7 +331,7 @@ public class QuestAdapter {
                 }
             }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, REPUTATION_BAR)) {
-                reputationBarList.add(REPUTATION_BAR_ADAPTER.deserialize(element));
+                reputationBars.add(REPUTATION_BAR_ADAPTER.deserialize(element));
             }
             
             QuestSet set = null;
@@ -358,15 +351,7 @@ public class QuestAdapter {
                 for (Quest quest : quests) {
                     quest.setQuestSet(set);
                 }
-                for (Map.Entry<Quest, List<UUID>> entry : requirementMapping.entrySet()) {
-                    for (UUID i : entry.getValue())
-                        entry.getKey().addRequirement(i);
-                }
-                for (Map.Entry<Quest, List<UUID>> entry : optionMapping.entrySet()) {
-                    for (UUID i : entry.getValue())
-                        entry.getKey().addOptionLink(i);
-                }
-                for (ReputationBar reputationBar : reputationBarList) {
+                for (ReputationBar reputationBar : reputationBars) {
                     for (ReputationBar r : new ArrayList<>(set.getReputationBars())) {
                         if (r.sameLocation(reputationBar))
                             set.removeRepBar(r);
@@ -380,18 +365,32 @@ public class QuestAdapter {
     };
     
     public static void postLoad() throws IOException {
+        for (Map.Entry<Quest, List<UUID>> entry : requirementMapping.entrySet()) {
+            for (UUID i : entry.getValue())
+                entry.getKey().addRequirement(i);
+        }
+        requirementMapping.clear();
+        
         for (Map.Entry<Quest, List<UUID>> entry : prerequisiteMapping.entrySet()) {
             for (UUID link : entry.getValue()) {
                 entry.getKey().addRequirement(link);
             }
         }
         prerequisiteMapping.clear();
+        
+        for (Map.Entry<Quest, List<UUID>> entry : optionMapping.entrySet()) {
+            for (UUID i : entry.getValue())
+                entry.getKey().addOptionLink(i);
+        }
+        optionMapping.clear();
+        
         for (Map.Entry<Quest, List<UUID>> entry : optionLinkMapping.entrySet()) {
             for (UUID link : entry.getValue()) {
                 entry.getKey().addOptionLink(link);
             }
         }
         optionLinkMapping.clear();
+        
         for (Map.Entry<ReputationReward, String> entry : reputationRewardMapping.entrySet()) {
             String rep = entry.getValue();
             Reputation reputation = ReputationManager.getInstance().getReputations().get(rep);
@@ -400,6 +399,7 @@ public class QuestAdapter {
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();
+        
         for (Map.Entry<ReputationTask<?>, List<QuestTaskAdapter.ReputationSettingConstructor>> entry : QuestTaskAdapter.taskReputationListMap.entrySet()) {
             List<ReputationTask.Part> partList = entry.getKey().getSettings();
             partList.clear();
@@ -411,7 +411,6 @@ public class QuestAdapter {
             }
         }
         QuestTaskAdapter.taskReputationListMap.clear();
-        nameToQuestMap.clear();
     }
     
 }
