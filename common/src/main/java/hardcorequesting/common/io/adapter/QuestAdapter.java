@@ -318,7 +318,6 @@ public class QuestAdapter {
             requirementMapping.clear();
             optionMapping.clear();
             reputationBarList.clear();
-            QuestTaskAdapter.taskReputationListMap.clear();
             List<Quest> quests = new ArrayList<>();
             JsonObject object = json.getAsJsonObject();
             
