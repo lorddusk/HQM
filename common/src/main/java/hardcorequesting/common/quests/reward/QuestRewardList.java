@@ -4,7 +4,7 @@ import java.util.*;
 
 public class QuestRewardList<T> implements List<QuestReward<T>> {
     
-    protected List<QuestReward<T>> list;
+    protected final List<QuestReward<T>> list;
     
     public QuestRewardList() {
         this.list = new LinkedList<>();

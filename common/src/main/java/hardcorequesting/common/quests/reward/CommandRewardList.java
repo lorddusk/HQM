@@ -12,18 +12,18 @@ public class CommandRewardList extends QuestRewardList<CommandReward.Command> {
             reward.getReward().execute(player);
     }
     
-    public void set(String[] commands) {
+    public void set(List<String> commands) {
         clear();
         if (commands != null)
             for (String command : commands)
                 add(new CommandReward(new CommandReward.Command(command)));
     }
     
-    public String[] asStrings() {
+    public List<String> asStrings() {
         List<String> commands = new ArrayList<>();
         for (QuestReward<CommandReward.Command> reward : list)
             commands.add(reward.getReward().asString());
-        return commands.toArray(new String[0]);
+        return commands;
     }
     
     public void add(String command) {
