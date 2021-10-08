@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.platform.NetworkManager;
@@ -55,6 +57,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -84,6 +87,19 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public void onInitialize() {
         HardcoreQuestingCore.initialize(this);
         ModCapabilities.init();
+        
+        PlayerEvent.PLAYER_CLONE.register((newPlayer, oldPlayer, wonGame) -> {
+            if (HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
+            if (!wonGame && !oldPlayer.isSpectator() && !newPlayer.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+                int invSize = oldPlayer.inventory.getContainerSize();
+                for (int i = 0; i < invSize; i++) {
+                    ItemStack stack = oldPlayer.inventory.getItem(i);
+                    if (stack.getItem().equals(ModItems.book.get())) {
+                        newPlayer.inventory.setItem(i, stack);
+                    }
+                }
+            }
+        });
     }
     
     @Override
