@@ -19,22 +19,27 @@ import java.util.UUID;
 
 public class GuiEditMenuCommandEditor extends TextMenu {
     
-    private Quest quest;
+    private static final int START_X = 190, START_Y = 65;
+    private static final int END_X = 300;
+    private static final int LINE_HEIGHT = 10;
+    
+    private final Quest quest;
     private int id;
-    private String[] commands;
-    private boolean[] edited;
+    private final Entry[] commands;
     private String added;
+    
+    private record Entry(String command, boolean edited)
+    {}
     
     public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, "", false, -1, null);
         this.quest = quest;
-        this.commands = this.quest.getRewards().getCommandRewardsAsStrings().toArray(String[]::new);
-        this.edited = new boolean[this.commands.length];
+        this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream().map(s -> new Entry(s, false)).toArray(Entry[]::new);
         this.id = -1;
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
             if (this.commands.length > 0) {
                 this.id = this.commands.length - 1;
-                this.text.setTextAndCursor(this.commands[this.id]);
+                this.text.setTextAndCursor(this.commands[this.id].command);
             }
         }
     }
@@ -42,45 +47,37 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
-        int i = 0;
-        if (this.commands != null && this.commands.length > 0) {
-            for (; i < this.commands.length; i++) {
-                if (this.commands[i].isEmpty()) {
-                    drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xFF0000);
-                } else {
-                    drawStringTrimmed(matrices, gui, Translator.plain(this.commands[i]), 190, 65 + (i * 10), edited[i] ? 0xFF4500 : 0x000000);
-                }
+        
+        for (int i = 0; i < this.commands.length; i++) {
+            Entry entry = commands[i];
+            if (entry.command.isEmpty()) {
+                drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, START_Y + (i * LINE_HEIGHT), 0xFF0000);
+            } else {
+                drawStringTrimmed(matrices, gui, Translator.plain(entry.command), START_X, getLineY(i), entry.edited ? 0xFF4500 : 0x000000);
             }
         }
         if (this.added != null && !this.added.isEmpty()) {
-            drawStringTrimmed(matrices, gui, Translator.plain(this.added), 190, 65 + (i * 10), 0x447449);
+            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(this.commands.length), 0x447449);
         }
     }
     
     @Override
     public void save() {
-        if (this.id < 0) this.added = this.text.getText();
-        else if (this.commands != null) {
-            if (!this.commands[this.id].equals(this.text.getText())) {
-                this.edited[this.id] = true;
-                this.commands[this.id] = this.text.getText();
-            }
-        }
-        
+        storeCurrentText();
+    
         if (this.added != null && !this.added.isEmpty()) {
             quest.getRewards().addCommand(this.added);
             SaveHelper.add(EditType.COMMAND_ADD);
         }
-        if (this.commands != null) {
-            for (int i = this.commands.length - 1; i >= 0; i--) {
-                if (edited[i]) {
-                    if (commands[i].isEmpty()) {
-                        quest.getRewards().removeCommand(i);
-                        SaveHelper.add(EditType.COMMAND_REMOVE);
-                    } else {
-                        quest.getRewards().editCommand(i, this.commands[i]);
-                        SaveHelper.add(EditType.COMMAND_CHANGE);
-                    }
+        for (int i = this.commands.length - 1; i >= 0; i--) {
+            Entry entry = commands[i];
+            if (entry.edited) {
+                if (entry.command.isEmpty()) {
+                    quest.getRewards().removeCommand(i);
+                    SaveHelper.add(EditType.COMMAND_REMOVE);
+                } else {
+                    quest.getRewards().editCommand(i, entry.command);
+                    SaveHelper.add(EditType.COMMAND_CHANGE);
                 }
             }
         }
@@ -89,48 +86,68 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     @Override
     public void drawTooltip(PoseStack matrices, int mX, int mY) {
         super.drawTooltip(matrices, mX, mY);
-        int i = 0;
-        if (this.commands != null && this.commands.length > 0) {
-            for (; i < this.commands.length; i++) {
-                if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
-                    if (this.commands[i].isEmpty()) {
-                        drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), 190, 65 + (i * 10), 0xF76767);
-                    } else {
-                        drawStringTrimmed(matrices, gui, Translator.plain(this.commands[i]), 190, 65 + (i * 10), edited[i] ? 0xF9AB7A : 0x969696);
-                    }
+        
+        for (int i = 0; i < this.commands.length; i++) {
+            if (isOnCommand(i, mX, mY)) {
+                Entry entry = this.commands[i];
+                if (entry.command.isEmpty()) {
+                    drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, getLineY(i), 0xF76767);
+                } else {
+                    drawStringTrimmed(matrices, gui, Translator.plain(entry.command), START_X, getLineY(i), entry.edited ? 0xF9AB7A : 0x969696);
                 }
             }
         }
         if (this.added != null && !this.added.isEmpty()) {
-            drawStringTrimmed(matrices, gui, Translator.plain(this.added), 190, 65 + (i * 10), 0x5A9B60);
+            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(this.commands.length), 0x5A9B60);
         }
     }
     
     @Override
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
-        int i = 0;
-        if (this.commands != null && this.commands.length > 0) {
-            for (; i < this.commands.length; i++) {
-                if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
-                    if (this.id == i) return;
-                    if (this.id < 0) this.added = this.text.getText();
-                    else {
-                        if (!this.commands[this.id].equals(this.text.getText())) {
-                            this.edited[this.id] = true;
-                            this.commands[this.id] = this.text.getText();
-                        }
-                    }
-                    this.id = i;
-                    this.text.setTextAndCursor(this.commands[this.id]);
-                }
+        
+        for (int i = 0; i < this.commands.length; i++) {
+            if (isOnCommand(i, mX, mY)) {
+                selectCommand(i);
+                return;
             }
         }
-        if (mX > 190 && mX < 300 && mY > 65 + (i * 10) && mY < 65 + ((i + 1) * 10)) {
-            if (this.id == -1) return;
-            if (this.commands != null) this.commands[this.id] = this.text.getText();
-            this.id = -1;
-            this.text.setTextAndCursor(this.added);
+        
+        if (isOnCommand(this.commands.length, mX, mY)) {
+            selectAddedCommand();
+        }
+    }
+    
+    private boolean isOnCommand(int id, int mX, int mY) {
+        int minY = getLineY(id);
+        return START_X < mX && mX < END_X && minY < mY && mY < minY + LINE_HEIGHT;
+    }
+    
+    private int getLineY(int line) {
+        return START_Y + (line * LINE_HEIGHT);
+    }
+    
+    private void selectCommand(int id) {
+        if (this.id == id) return;
+        storeCurrentText();
+        this.id = id;
+        this.text.setTextAndCursor(this.commands[id].command);
+    }
+    
+    private void selectAddedCommand() {
+        if (this.id == -1) return;
+        storeCurrentText();
+        this.id = -1;
+        this.text.setTextAndCursor(this.added);
+    }
+    
+    private void storeCurrentText() {
+        String command = this.text.getText();
+        if (this.id < 0) this.added = command;
+        else {
+            if (!this.commands[this.id].command.equals(command)) {
+                this.commands[this.id] = new Entry(command, true);
+            }
         }
     }
     
