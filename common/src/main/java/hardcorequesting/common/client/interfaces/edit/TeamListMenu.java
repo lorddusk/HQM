@@ -27,10 +27,10 @@ public class TeamListMenu extends GuiEditMenu {
     private static final int ARROW_W = 20;
     private static final int ARROW_H = 9;
     
-    private final GuiEditMenuTeam parent;
+    private final TeamMenu parent;
     private int pagePair = 0;
     
-    protected TeamListMenu(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
+    protected TeamListMenu(GuiQuestBook gui, UUID playerId, TeamMenu parent) {
         super(gui, playerId);
         this.parent = parent;
     }

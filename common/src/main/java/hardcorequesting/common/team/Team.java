@@ -16,13 +16,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Team {
     public static boolean reloadedInvites;
     @Nullable
     private UUID id = null;
     private List<PlayerEntry> players = new ArrayList<>();
-    private List<Team> invites;
+    private final List<Team> invites;
     private String name;
     private Map<String, Integer> reputation;
     private Map<UUID, QuestData> questData;
@@ -287,12 +288,20 @@ public class Team {
         }
     }
     
+    @NotNull
     public List<Team> getInvites() {
         return invites;
     }
     
+    /**
+     * Returns all player entries in the team. This includes both team members and invited players.
+     */
     public List<PlayerEntry> getPlayers() {
         return players;
+    }
+    
+    public List<PlayerEntry> getTeamMembers() {
+        return players.stream().filter(PlayerEntry::isInTeam).collect(Collectors.toList());
     }
     
     public void create(String name) {
