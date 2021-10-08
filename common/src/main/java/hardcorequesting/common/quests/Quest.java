@@ -862,14 +862,14 @@ public class Quest {
         }
         if (!rewards.isEmpty() || canQuestsBeEdited()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_SELECT_REWARD_SLOTS);
+            drawRewards(gui, rewards.toList(), REWARD_Y, -1, mX, mY, MAX_REWARD_SLOTS);
             if (!rewardChoices.isEmpty() || canQuestsBeEdited()) {
                 gui.drawString(matrices, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
-                drawRewards(gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+                drawRewards(gui, rewardChoices.toList(), REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
             }
         } else if (!rewardChoices.isEmpty()) {
             gui.drawString(matrices, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
-            drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_REWARD_SLOTS);
+            drawRewards(gui, rewardChoices.toList(), REWARD_Y, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
         }
         
         for (LargeButton button : buttons) {

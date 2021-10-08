@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.ScrollBar;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
@@ -119,6 +120,12 @@ public class ReputationBar {
         
         private ReputationBar bar;
         private boolean isNew;
+        private final ScrollBar scrollBar = new ScrollBar(160, 23, 186, 171, 69, Reputation.REPUTATION_LIST_X) {
+            @Override
+            public boolean isVisible(GuiBase gui) {
+                return ReputationManager.getInstance().size() > GuiQuestBook.VISIBLE_REPUTATIONS;
+            }
+        };
         
         public EditGui(GuiBase guiBase, Player player, ReputationBar bar) {
             super(guiBase, player);
@@ -137,7 +144,7 @@ public class ReputationBar {
         public void draw(PoseStack matrices, GuiBase guiB, int mX, int mY) {
             ReputationManager reputationManager = ReputationManager.getInstance();
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -151,6 +158,8 @@ public class ReputationBar {
                 gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             }
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), Reputation.REPUTATION_MARKER_LIST_X, Reputation.REPUTATION_LIST_Y, 1F, 0x404040);
+    
+            scrollBar.draw(gui);
         }
         
         @Environment(EnvType.CLIENT)
@@ -159,7 +168,7 @@ public class ReputationBar {
             ReputationManager reputationManager = ReputationManager.getInstance();
             
             GuiQuestBook gui = (GuiQuestBook) guiB;
-            int start = gui.reputationScroll.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * gui.reputationScroll.getScroll()) : 0;
+            int start = scrollBar.isVisible(gui) ? Math.round((reputationManager.size() - GuiQuestBook.VISIBLE_REPUTATIONS) * scrollBar.getScroll()) : 0;
             int end = Math.min(start + GuiQuestBook.VISIBLE_REPUTATIONS, reputationManager.size());
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (int i = start; i < end; i++) {
@@ -173,6 +182,23 @@ public class ReputationBar {
                     close(guiB);
                 }
             }
+            
+            scrollBar.onClick(gui, mX, mY);
+        }
+    
+        @Override
+        public void onDrag(GuiBase gui, int mX, int mY) {
+            scrollBar.onDrag(gui, mX, mY);
+        }
+    
+        @Override
+        public void onRelease(GuiBase gui, int mX, int mY) {
+            scrollBar.onRelease(gui, mX, mY);
+        }
+    
+        @Override
+        public void onScroll(GuiBase gui, double mX, double mY, double scroll) {
+            scrollBar.onScroll(gui, mX, mY, scroll);
         }
         
         @Override
