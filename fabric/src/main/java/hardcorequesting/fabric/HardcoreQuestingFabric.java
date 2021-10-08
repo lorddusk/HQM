@@ -17,6 +17,7 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import me.shedaniel.architectury.event.events.BlockEvent;
+import me.shedaniel.architectury.event.events.EntityEvent;
 import me.shedaniel.architectury.event.events.PlayerEvent;
 import me.shedaniel.architectury.utils.GameInstance;
 import net.fabricmc.api.EnvType;
@@ -70,9 +71,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform {
-    public static final List<BiConsumer<LivingEntity, DamageSource>> LIVING_DEATH = Lists.newArrayList();
-    public static final List<BiConsumer<Player, ItemStack>> CRAFTING = Lists.newArrayList();
-    public static final List<BiConsumer<ServerPlayer, Advancement>> ADVANCEMENT = Lists.newArrayList();
+    public static final List<BiConsumer<Player, ItemStack>> ANVIL_CRAFTING = Lists.newArrayList();
     public static final List<BiConsumer<Player, Entity>> ANIMAL_TAME = Lists.newArrayList();
     private final NetworkManager networkManager = new FabricNetworkManager();
     
@@ -187,27 +186,30 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> consumer) {
-        LIVING_DEATH.add(consumer);
+        EntityEvent.LIVING_DEATH.register((entity, source) -> {
+            consumer.accept(entity, source);
+            return InteractionResult.PASS;
+        });
     }
     
     @Override
     public void registerOnCrafting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        PlayerEvent.CRAFT_ITEM.register((player, constructed, inventory) -> consumer.accept(player, constructed));
     }
     
     @Override
     public void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        ANVIL_CRAFTING.add(consumer);
     }
     
     @Override
     public void registerOnSmelting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        PlayerEvent.SMELT_ITEM.register(consumer::accept);
     }
     
     @Override
     public void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> consumer) {
-        ADVANCEMENT.add(consumer);
+        PlayerEvent.PLAYER_ADVANCEMENT.register(consumer::accept);
     }
     
     @Override
