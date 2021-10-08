@@ -14,8 +14,11 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSink;
 import net.minecraft.util.StringDecomposer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class GuiEditMenuCommandEditor extends TextMenu {
     
@@ -25,7 +28,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     
     private final Quest quest;
     private int id;
-    private final Entry[] commands;
+    private final List<Entry> commands;
     private String added;
     
     private record Entry(String command, boolean edited)
@@ -34,12 +37,14 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, "", false, -1, null);
         this.quest = quest;
-        this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream().map(s -> new Entry(s, false)).toArray(Entry[]::new);
+        this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()
+                .map(s -> new Entry(s, false)).collect(Collectors.toCollection(ArrayList::new));
+        
         this.id = -1;
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
-            if (this.commands.length > 0) {
-                this.id = this.commands.length - 1;
-                this.text.setTextAndCursor(this.commands[this.id].command);
+            if (!this.commands.isEmpty()) {
+                this.id = this.commands.size() - 1;
+                this.text.setTextAndCursor(this.commands.get(this.id).command);
             }
         }
     }
@@ -48,8 +53,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        for (int i = 0; i < this.commands.length; i++) {
-            Entry entry = commands[i];
+        for (int i = 0; i < this.commands.size(); i++) {
+            Entry entry = commands.get(i);
             if (entry.command.isEmpty()) {
                 drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, START_Y + (i * LINE_HEIGHT), 0xFF0000);
             } else {
@@ -57,7 +62,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
             }
         }
         if (this.added != null && !this.added.isEmpty()) {
-            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(this.commands.length), 0x447449);
+            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(getLineForAdded()), 0x447449);
         }
     }
     
@@ -69,8 +74,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
             quest.getRewards().addCommand(this.added);
             SaveHelper.add(EditType.COMMAND_ADD);
         }
-        for (int i = this.commands.length - 1; i >= 0; i--) {
-            Entry entry = commands[i];
+        for (int i = this.commands.size() - 1; i >= 0; i--) {
+            Entry entry = commands.get(i);
             if (entry.edited) {
                 if (entry.command.isEmpty()) {
                     quest.getRewards().removeCommand(i);
@@ -87,9 +92,9 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     public void drawTooltip(PoseStack matrices, int mX, int mY) {
         super.drawTooltip(matrices, mX, mY);
         
-        for (int i = 0; i < this.commands.length; i++) {
+        for (int i = 0; i < this.commands.size(); i++) {
             if (isOnCommand(i, mX, mY)) {
-                Entry entry = this.commands[i];
+                Entry entry = this.commands.get(i);
                 if (entry.command.isEmpty()) {
                     drawStringTrimmed(matrices, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, getLineY(i), 0xF76767);
                 } else {
@@ -98,7 +103,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
             }
         }
         if (this.added != null && !this.added.isEmpty()) {
-            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(this.commands.length), 0x5A9B60);
+            drawStringTrimmed(matrices, gui, Translator.plain(this.added), START_X, getLineY(getLineForAdded()), 0x5A9B60);
         }
     }
     
@@ -106,14 +111,14 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        for (int i = 0; i < this.commands.length; i++) {
+        for (int i = 0; i < this.commands.size(); i++) {
             if (isOnCommand(i, mX, mY)) {
                 selectCommand(i);
                 return;
             }
         }
         
-        if (isOnCommand(this.commands.length, mX, mY)) {
+        if (isOnCommand(getLineForAdded(), mX, mY)) {
             selectAddedCommand();
         }
     }
@@ -127,11 +132,15 @@ public class GuiEditMenuCommandEditor extends TextMenu {
         return START_Y + (line * LINE_HEIGHT);
     }
     
+    private int getLineForAdded() {
+        return commands.size();
+    }
+    
     private void selectCommand(int id) {
         if (this.id == id) return;
         storeCurrentText();
         this.id = id;
-        this.text.setTextAndCursor(this.commands[id].command);
+        this.text.setTextAndCursor(this.commands.get(id).command);
     }
     
     private void selectAddedCommand() {
@@ -145,8 +154,8 @@ public class GuiEditMenuCommandEditor extends TextMenu {
         String command = this.text.getText();
         if (this.id < 0) this.added = command;
         else {
-            if (!this.commands[this.id].command.equals(command)) {
-                this.commands[this.id] = new Entry(command, true);
+            if (!this.commands.get(this.id).command.equals(command)) {
+                this.commands.set(this.id, new Entry(command, true));
             }
         }
     }
