@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class GuiEditMenuCommandEditor extends TextMenu {
+public class EditCommandRewardsMenu extends TextMenu {
     
     private static final int START_X = 190, START_Y = 65;
     private static final int END_X = 300;
@@ -34,7 +34,7 @@ public class GuiEditMenuCommandEditor extends TextMenu {
     private record Entry(String command, boolean edited)
     {}
     
-    public GuiEditMenuCommandEditor(GuiQuestBook gui, UUID playerId, Quest quest) {
+    public EditCommandRewardsMenu(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, "", false, -1, null);
         this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
+import hardcorequesting.common.client.interfaces.edit.EditCommandRewardsMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
@@ -294,7 +294,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     protected void setEditMode(EditMode editMode) {
         if (editMode == EditMode.COMMAND_CREATE || editMode == EditMode.COMMAND_CHANGE) {
-            gui.setEditMenu(new GuiEditMenuCommandEditor(gui, playerId, quest));
+            gui.setEditMenu(new EditCommandRewardsMenu(gui, playerId, quest));
         } else super.setEditMode(editMode);
     }
 }
