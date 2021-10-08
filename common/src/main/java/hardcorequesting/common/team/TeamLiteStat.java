@@ -3,17 +3,22 @@ package hardcorequesting.common.team;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.TeamStatsMessage;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TeamLiteStat {
     
     private static final Map<String, TeamLiteStat> clientTeams = new HashMap<>();
-    private static TeamLiteStat[] clientTeamsList;
-    private static Comparator<TeamLiteStat> teamComparator = Comparator.comparingDouble(TeamLiteStat::getProgress).reversed();
-    private String name;
-    private int players;
-    private int lives;
-    private float progress;
+    private static List<TeamLiteStat> clientTeamsList;
+    
+    private static final Comparator<TeamLiteStat> teamComparator = Comparator.comparingDouble(TeamLiteStat::getProgress).reversed();
+    
+    private final String name;
+    private final int players;
+    private final int lives;
+    private final float progress;
     
     public TeamLiteStat(String name, int players, int lives, float progress) {
         this.name = name;
@@ -44,15 +49,10 @@ public class TeamLiteStat {
     }
     
     private static void updateTeams() {
-        clientTeamsList = new TeamLiteStat[clientTeams.size()];
-        int id = 0;
-        for (TeamLiteStat teamLiteStat : clientTeams.values())
-            clientTeamsList[id++] = teamLiteStat;
-        
-        Arrays.sort(clientTeamsList, teamComparator);
+        clientTeamsList = clientTeams.values().stream().sorted(teamComparator).toList();
     }
     
-    public static TeamLiteStat[] getTeamStats() {
+    public static List<TeamLiteStat> getTeamStats() {
         return clientTeamsList;
     }
     

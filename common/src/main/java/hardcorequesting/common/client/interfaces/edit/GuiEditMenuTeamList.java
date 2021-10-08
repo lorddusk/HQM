@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 
+import java.util.List;
 import java.util.UUID;
 
 public class GuiEditMenuTeamList extends GuiEditMenu {
@@ -40,12 +41,12 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         drawArrow(matrices, mX, mY, true);
         drawArrow(matrices, mX, mY, false);
         
-        TeamLiteStat[] teamStats = TeamLiteStat.getTeamStats();
+        List<TeamLiteStat> teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
-        int end = Math.min(start + TEAMS_PER_PAIR, teamStats.length);
+        int end = Math.min(start + TEAMS_PER_PAIR, teamStats.size());
         
         for (int i = start; i < end; i++) {
-            TeamLiteStat teamStat = teamStats[i];
+            TeamLiteStat teamStat = teamStats.get(i);
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
@@ -93,6 +94,6 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     private boolean isArrowEnabled(boolean left) {
-        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamLiteStat.getTeamStats().length / TEAMS_PER_PAIR) - 1);
+        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamLiteStat.getTeamStats().size() / TEAMS_PER_PAIR) - 1);
     }
 }
