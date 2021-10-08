@@ -10,13 +10,14 @@ import net.minecraft.server.MinecraftServer;
 public class HQMUtil {
     
     /**
-     * A true and save way to determine if a player is actually in a single player only game. No Server nor Integrated Server (LAN World)
+     * Determines if a player is in a single player only game.
+     * A LAN-server does in this context not count as single player only.
      *
-     * @return true if the player plays in a real single player world
+     * @return false if the current server is a dedicated server or LAN-server, true otherwise.
      */
-    public static boolean isGameSingleplayer() {
+    public static boolean isSinglePlayerOnly() {
         MinecraftServer server = HardcoreQuestingCore.getServer();
-        return server != null && server.isSingleplayer();
+        return server != null && !server.isPublished();
     }
 }
     

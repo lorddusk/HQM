@@ -9,7 +9,6 @@ import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.quests.Quest;
-import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.team.RewardSetting;
 
 import java.io.IOException;
@@ -152,7 +151,6 @@ public class HQMConfig {
         
         RewardSetting.isAllModeEnabled = getInstance().MULTI_REWARD;
         BagItem.displayGui = getInstance().Loot.REWARD_INTERFACE;
-        QuestLine.doServerSync = getInstance().Starting.SERVER_SYNC;
         
         Quest.isEditing = getInstance().Editing.USE_EDITOR;
         if (HardcoreQuestingCore.proxy.isClient()) {
@@ -187,9 +185,6 @@ public class HQMConfig {
         //@Name("Auto-start questing mode")
         @Comment("If set to true, new worlds will automatically activate Questing mode")
         public boolean AUTO_QUESTING = true;
-        //@Name("Enable server sync")
-        @Comment("Set to true to enable the sending of quests from the server to all clients that connect to it")
-        public boolean SERVER_SYNC = false;
     }
     
     public static class Loot {
