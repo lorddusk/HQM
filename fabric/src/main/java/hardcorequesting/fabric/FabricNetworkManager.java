@@ -2,6 +2,8 @@ package hardcorequesting.fabric;
 
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.platform.NetworkManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,6 +17,7 @@ import java.util.function.Consumer;
 
 public class FabricNetworkManager implements NetworkManager {
     
+    @Environment(EnvType.CLIENT)
     @Override
     public void registerS2CHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer) {
         ClientPlayNetworking.registerGlobalReceiver(id,
@@ -57,6 +60,7 @@ public class FabricNetworkManager implements NetworkManager {
                 }, buf));
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     public void sendToServer(ResourceLocation id, FriendlyByteBuf buf) {
         ClientPlayNetworking.send(id, buf);
