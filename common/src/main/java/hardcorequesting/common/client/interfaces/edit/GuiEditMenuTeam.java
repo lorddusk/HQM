@@ -183,7 +183,7 @@ public class GuiEditMenuTeam extends GuiEditMenu {
         addButton(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
-                gui.setEditMenu(new GuiEditMenuTeamList(gui, playerId, self));
+                gui.setEditMenu(new TeamListMenu(gui, playerId, GuiEditMenuTeam.this));
             }
         });
         

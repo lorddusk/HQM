@@ -9,7 +9,7 @@ import hardcorequesting.common.util.Translator;
 import java.util.List;
 import java.util.UUID;
 
-public class GuiEditMenuTeamList extends GuiEditMenu {
+public class TeamListMenu extends GuiEditMenu {
     
     private static final int TEAM_X = 20;
     private static final int TEAM_X_2ND_PAGE = 180;
@@ -26,10 +26,11 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private static final int ARROW_SRC_Y = 69;
     private static final int ARROW_W = 20;
     private static final int ARROW_H = 9;
-    private GuiEditMenuTeam parent;
+    
+    private final GuiEditMenuTeam parent;
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
+    protected TeamListMenu(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
         super(gui, playerId);
         this.parent = parent;
     }
