@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
@@ -19,10 +18,8 @@ import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
@@ -43,8 +40,7 @@ public class QuestLine {
     public final TeamManager teamManager;
     public final Serializable descriptionManager;
     
-    public String mainDescription = "No description";
-    private List<FormattedText> cachedMainDescription;
+    private String mainDescription = "No description";
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
     private final List<Serializable> serializables = Lists.newArrayList();
@@ -67,7 +63,7 @@ public class QuestLine {
         
             @Override
             public String saveToString() {
-                return mainDescription;
+                return getMainDescription();
             }
     
             @Override
@@ -141,9 +137,12 @@ public class QuestLine {
         }
     }
     
+    public String getMainDescription() {
+        return mainDescription;
+    }
+    
     public void setMainDescription(String mainDescription) {
         this.mainDescription = mainDescription;
-        this.cachedMainDescription = null;
     }
     
     public void save(@Nullable DataWriter cfgWriter, @Nullable DataWriter dataWriter) {
@@ -158,24 +157,15 @@ public class QuestLine {
     
     public void loadAll(DataReader cfgReader, DataReader dataReader) {
         HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", cfgReader);
+        
         for (Serializable serializable : serializables) {
-            if (serializable.isData())
-                serializable.load(dataReader);
-            else serializable.load(cfgReader);
+            serializable.load(serializable.isData() ? dataReader : cfgReader);
         }
+        
         SaveHelper.onLoad();
         
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public List<FormattedText> getMainDescription(GuiBase gui) {
-        if (cachedMainDescription == null) {
-            cachedMainDescription = gui.getLinesFromText(Translator.plain(mainDescription), 0.7F, 130);
-        }
-        
-        return cachedMainDescription;
     }
 }

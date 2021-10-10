@@ -26,7 +26,7 @@ public class QuestLineSyncMessage implements IMessage {
     }
     
     public QuestLineSyncMessage(QuestLine questLine) {
-        this.mainDescription = questLine.mainDescription;
+        this.mainDescription = questLine.getMainDescription();
         this.reputations = questLine.reputationManager.saveToString();
         this.bags = questLine.groupTierManager.saveToString();
         this.questsSets = Maps.newLinkedHashMap();
@@ -73,7 +73,6 @@ public class QuestLineSyncMessage implements IMessage {
         
         private void handle(QuestLineSyncMessage message, PacketContext ctx) {
             LocalDataManager data = new LocalDataManager();
-            data.provide("description.txt", message.mainDescription);
             data.provide(ReputationManager.FILE_PATH, message.reputations);
             data.provide(GroupTierManager.FILE_PATH, message.bags);
             JsonObject object = new JsonObject();
@@ -85,7 +84,7 @@ public class QuestLineSyncMessage implements IMessage {
                 data.provide("sets/" + entry.getKey() + ".json", entry.getValue());
             }
             QuestLine questLine = QuestLine.getActiveQuestLine();
-            questLine.descriptionManager.load(data);
+            questLine.setMainDescription(message.mainDescription);
             questLine.reputationManager.load(data);
             questLine.groupTierManager.load(data);
             questLine.questSetsManager.load(data);

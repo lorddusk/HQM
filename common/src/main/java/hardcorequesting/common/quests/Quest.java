@@ -2,7 +2,6 @@ package hardcorequesting.common.quests;
 
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.IMessage;
@@ -20,7 +19,6 @@ import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -103,13 +101,8 @@ public class Quest {
         return QuestLine.getActiveQuestLine().questSetsManager.questSets;
     }
     
-    @Environment(EnvType.CLIENT)
-    public static List<FormattedText> getMainDescription(GuiBase gui) {
-        return QuestLine.getActiveQuestLine().getMainDescription(gui);
-    }
-    
     public static String getRawMainDescription() {
-        return QuestLine.getActiveQuestLine().mainDescription;
+        return QuestLine.getActiveQuestLine().getMainDescription();
     }
     
     public static Quest getQuest(UUID questId) {

@@ -48,14 +48,14 @@ public class FileDataManager implements DataReader, DataWriter {
     @Override
     public Stream<String> readAll(DirectoryStream.Filter<Path> filter) {
         
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, filter))
-        {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, filter)) {
+            
             List<Path> paths = new ArrayList<>();
             stream.forEach(paths::add);
             
             return paths.stream().flatMap(file -> SaveHandler.load(file).stream());
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
+            
             LOGGER.warn("File search failed.", e);
             return Stream.empty();
         }

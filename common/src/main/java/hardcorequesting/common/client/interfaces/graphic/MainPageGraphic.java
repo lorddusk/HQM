@@ -23,6 +23,7 @@ import net.minecraft.network.chat.FormattedText;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * A graphic element for displaying the main page of the quest book,
@@ -36,11 +37,13 @@ public class MainPageGraphic extends EditableGraphic {
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
     
     private final ExtendedScrollBar<FormattedText> mainDescriptionScroll;
+    private List<FormattedText> cachedMainDescription;
     
     public MainPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME);
+        prepareDescription();
         addScrollBar(mainDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 312, 18, DESCRIPTION_X,
-                VISIBLE_MAIN_DESCRIPTION_LINES, () -> Quest.getMainDescription(gui)));
+                VISIBLE_MAIN_DESCRIPTION_LINES, () -> MainPageGraphic.this.cachedMainDescription));
     }
     
     @Override
@@ -88,8 +91,15 @@ public class MainPageGraphic extends EditableGraphic {
             }
         } else {
             if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, gui.getPlayer().getUUID(), Quest.getRawMainDescription(), false, QuestLine.getActiveQuestLine()::setMainDescription);
+                TextMenu.display(gui, gui.getPlayer().getUUID(), Quest.getRawMainDescription(), false, desc -> {
+                    QuestLine.getActiveQuestLine().setMainDescription(desc);
+                    prepareDescription();
+                });
             }
         }
+    }
+    
+    private void prepareDescription() {
+        cachedMainDescription = gui.getLinesFromText(Translator.plain(Quest.getRawMainDescription()), 0.7F, 130);
     }
 }
