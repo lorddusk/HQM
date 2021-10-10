@@ -4,6 +4,19 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public interface FileProvider {
+    
+    FileProvider EMPTY = new FileProvider() {
+        @Override
+        public Optional<String> get() {
+            return Optional.empty();
+        }
+    
+        @Override
+        public void set(String str) {
+            throw new UnsupportedOperationException("Can not save to empty provider.");
+        }
+    };
+    
     Optional<String> get();
     
     void set(String str);

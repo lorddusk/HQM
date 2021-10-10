@@ -45,4 +45,9 @@ public class FileDataManager implements DataManager {
     public FileProvider resolveData(String name) {
         return new FileProvider.PathProvider(dataPath.resolve(name));
     }
+    
+    @Override
+    public String toString() {
+        return "File data.";
+    }
 }

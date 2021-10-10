@@ -1,7 +1,6 @@
 package hardcorequesting.common.quests;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
@@ -12,6 +11,7 @@ import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataManager;
 import hardcorequesting.common.io.FileProvider;
+import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -30,10 +30,8 @@ import net.minecraft.world.entity.player.Player;
 
 import java.io.FileFilter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -55,7 +53,7 @@ public class QuestLine {
     private final Optional<DataManager> dataManager;
     private final List<Serializable> serializables = Lists.newArrayList();
     @Deprecated
-    private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
+    private final LocalDataManager localData = new LocalDataManager();
     
     private QuestLine(Optional<DataManager> dataManager) {
         if (HardcoreQuestingCore.platform.isClient()) {
@@ -161,7 +159,7 @@ public class QuestLine {
     }
     
     public void loadAll() {
-        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with %d temp paths. (%s)", tempPaths.size(), tempPaths.keySet().stream().sorted().collect(Collectors.joining(", ")));
+        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", dataManager);
         for (Serializable serializable : serializables) {
             serializable.load();
         }
@@ -194,28 +192,27 @@ public class QuestLine {
     }
     
     public Optional<FileProvider> resolve(String name) {
-        Optional<FileProvider> provider = dataManager.map(dataManager1 -> dataManager1.resolve(name));
-        if (provider.isEmpty())
-            provider = Optional.ofNullable(tempPaths.get(name));
-        return provider;
+        return Optional.of(dataManager.map(dataManager1 -> dataManager1.resolve(name))
+                .orElseGet(() -> localData.resolve(name)));
     }
     
     public Stream<String> resolveAll(FileFilter filter) {
-        return dataManager.map(dataManager1 -> dataManager1.resolveAll(filter)).orElse(Stream.empty());
+        return dataManager.map(dataManager1 -> dataManager1.resolveAll(filter))
+                .orElseGet(() -> localData.resolveAll(filter));
     }
     
     public Optional<FileProvider> resolveData(String name) {
-        Optional<FileProvider> provider = dataManager.map(dataManager1 -> dataManager1.resolveData(name));
-        if (provider.isEmpty())
-            provider = Optional.ofNullable(tempPaths.get(name));
-        return provider;
+        return Optional.of(dataManager.map(dataManager1 -> dataManager1.resolveData(name))
+                .orElseGet(() -> localData.resolveData(name)));
     }
     
+    @Deprecated
     public void provideTemp(SimpleSerializable serializable, String str) {
-        provideTemp(serializable.filePath(), str);
+        localData.provideTemp(serializable, str);
     }
     
+    @Deprecated
     public void provideTemp(String path, String str) {
-        tempPaths.put(path, new FileProvider.StringProvider(str));
+        localData.provideTemp(path, str);
     }
 }
