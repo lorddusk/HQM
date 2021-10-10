@@ -112,8 +112,10 @@ loom {
     runs {
         gametest {
             server()
-            name = "Game Test"
-            vmArg "-Dfabric-api.gametest.server=true"
+            name "Game Test"
+            vmArg "-Dfabric-api.gametest"
+            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/junit.xml"
+            runDir "build/gametest"
         }
     }
 }
