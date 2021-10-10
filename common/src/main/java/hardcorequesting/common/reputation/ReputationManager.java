@@ -14,8 +14,8 @@ public class ReputationManager extends SimpleSerializable {
     public static final String FILE_PATH = "reputations.json";
     final Map<String, Reputation> reputationMap = new HashMap<>();
     
-    public ReputationManager(QuestLine parent) {
-        super(parent);
+    public ReputationManager() {
+        super();
     }
     
     public static ReputationManager getInstance() {

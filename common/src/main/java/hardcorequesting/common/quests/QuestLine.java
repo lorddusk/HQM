@@ -28,6 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -41,6 +42,8 @@ public class QuestLine {
     public final DeathStatsManager deathStatsManager;
     public final QuestSetsManager questSetsManager;
     public final TeamManager teamManager;
+    public final Serializable descriptionManager;
+    
     public String mainDescription = "No description";
     private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
@@ -51,30 +54,36 @@ public class QuestLine {
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
-        this.reputationManager = new ReputationManager(this);
-        this.groupTierManager = new GroupTierManager(this);
-        this.questingDataManager = new QuestingDataManager(this);
-        this.deathStatsManager = new DeathStatsManager(this);
-        this.questSetsManager = new QuestSetsManager(this);
-        this.teamManager = new TeamManager(this);
-        GroupTier.initBaseTiers(this);
+        this.reputationManager = new ReputationManager();
+        this.groupTierManager = new GroupTierManager();
+        this.questingDataManager = new QuestingDataManager();
+        this.deathStatsManager = new DeathStatsManager();
+        this.questSetsManager = new QuestSetsManager();
+        this.teamManager = new TeamManager();
+        this.descriptionManager = new SimpleSerializable() {
+            @Override
+            public String filePath() {
+                return "description.txt";
+            }
         
-        add(new Serializable() {
             @Override
-            public void save(DataWriter writer) {
-                writer.write("description.txt", mainDescription);
+            public String saveToString() {
+                return mainDescription;
             }
-            
+        
             @Override
-            public void load(DataReader reader) {
-                setMainDescription(reader.read("description.txt").orElse("No description"));
+            public void loadFromString(Optional<String> string) {
+                setMainDescription(string.orElse("No description"));
             }
-            
+        
             @Override
             public boolean isData() {
                 return false;
             }
-        });
+        };
+        GroupTier.initBaseTiers(this);
+    
+        add(descriptionManager);
         add(this.questingDataManager.state);
         add(this.deathStatsManager);
         add(this.reputationManager);

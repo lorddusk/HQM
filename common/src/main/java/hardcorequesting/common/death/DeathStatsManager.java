@@ -21,8 +21,8 @@ public class DeathStatsManager extends SimpleSerializable {
     private DeathStat clientBest;
     private DeathStat clientTotal;
     
-    public DeathStatsManager(QuestLine parent) {
-        super(parent);
+    public DeathStatsManager() {
+        super();
     }
     
     public static DeathStatsManager getInstance() {

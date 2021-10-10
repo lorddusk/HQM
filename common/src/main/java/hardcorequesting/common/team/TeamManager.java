@@ -23,8 +23,8 @@ public class TeamManager extends SimpleSerializable {
     
     private final Set<Team> teams = Sets.newConcurrentHashSet();
     
-    public TeamManager(QuestLine parent) {
-        super(parent);
+    public TeamManager() {
+        super();
     }
     
     public static TeamManager getInstance() {

@@ -17,8 +17,8 @@ public class GroupTierManager extends SimpleSerializable {
     public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
     private final List<GroupTier> tiers = Lists.newArrayList();
     
-    public GroupTierManager(QuestLine parent) {
-        super(parent);
+    public GroupTierManager() {
+        super();
     }
     
     public static GroupTierManager getInstance() {

@@ -23,17 +23,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QuestingDataManager {
     public static final String STATE_FILE_PATH = "state.json";
     public static final String DATA_FILE_PATH = "data.json";
-    private final QuestLine parent;
     public final State state;
     public final Data data;
     private boolean hardcoreActive;
     private boolean questActive;
     public Map<UUID, QuestingData> questingData = new ConcurrentHashMap<>();
     
-    public QuestingDataManager(QuestLine parent) {
-        this.parent = parent;
-        this.state = new State(parent);
-        this.data = new Data(parent);
+    public QuestingDataManager() {
+        this.state = new State();
+        this.data = new Data();
     }
     
     public static QuestingDataManager getInstance() {
@@ -101,8 +99,8 @@ public class QuestingDataManager {
     }
     
     public class State extends SimpleSerializable {
-        public State(QuestLine parent) {
-            super(parent);
+        public State() {
+            super();
         }
         
         @Override
@@ -138,8 +136,8 @@ public class QuestingDataManager {
     }
     
     public class Data extends SimpleSerializable {
-        public Data(QuestLine parent) {
-            super(parent);
+        public Data() {
+            super();
         }
         
         @Override

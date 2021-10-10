@@ -41,10 +41,8 @@ public class QuestSetsManager implements Serializable {
     
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public final List<QuestSet> questSets = Lists.newArrayList();
-    private final QuestLine parent;
     
-    public QuestSetsManager(QuestLine parent) {
-        this.parent = parent;
+    public QuestSetsManager() {
     }
     
     public static QuestSetsManager getInstance() {
