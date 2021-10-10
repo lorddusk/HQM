@@ -11,7 +11,6 @@ import hardcorequesting.common.io.FileProvider;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
-import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
@@ -87,14 +86,10 @@ public class QuestSetsManager implements Serializable {
                         for (JsonElement element : jsonElement.getAsJsonArray()) {
                             order.add(element.getAsString());
                         }
-                        parent.basePath.ifPresent(path -> {
-                            for (File file : path.toFile().listFiles(QUEST_SET_FILTER)) {
-                                SaveHandler.load(file.toPath())
-                                        .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
-                                        .filter(Predicates.not(questSets::contains))
-                                        .ifPresent(questSets::add);
-                            }
-                        });
+                        parent.resolveAll(QUEST_SET_FILTER)
+                                .flatMap(setText -> SaveHandler.load(setText, QuestSet.class).stream())
+                                .filter(Predicates.not(questSets::contains))
+                                .forEach(questSets::add);
                         questSets.sort((s1, s2) -> {
                             if (s1.equals(s2)) return 0;
                             int is1 = order.indexOf(s1.getName());

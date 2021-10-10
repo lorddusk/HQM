@@ -7,6 +7,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.event.PlayerDeathEventListener;
 import hardcorequesting.common.event.PlayerTracker;
 import hardcorequesting.common.event.WorldEventListener;
+import hardcorequesting.common.io.FileDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.proxies.ClientProxy;
@@ -54,7 +55,7 @@ public class HardcoreQuestingCore {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        QuestLine.reset(Optional.of(packDir), Optional.of(dataDir));
+        QuestLine.reset(Optional.of(new FileDataManager(packDir, dataDir)));
         
         HQMConfig.loadConfig();
         

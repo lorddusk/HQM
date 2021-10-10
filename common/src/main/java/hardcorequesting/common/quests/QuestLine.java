@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
+import hardcorequesting.common.io.DataManager;
 import hardcorequesting.common.io.FileProvider;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
@@ -27,14 +28,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.FileFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -52,19 +52,16 @@ public class QuestLine {
     private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
-    @Deprecated
-    public final Optional<Path> basePath;
-    @Deprecated
-    public final Optional<Path> dataPath;
+    private final Optional<DataManager> dataManager;
     private final List<Serializable> serializables = Lists.newArrayList();
+    @Deprecated
     private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
     
-    private QuestLine(Optional<Path> basePath, Optional<Path> dataPath) {
+    private QuestLine(Optional<DataManager> dataManager) {
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
-        this.basePath = basePath;
-        this.dataPath = dataPath;
+        this.dataManager = dataManager;
         this.reputationManager = new ReputationManager(this);
         this.groupTierManager = new GroupTierManager(this);
         this.questingDataManager = new QuestingDataManager(this);
@@ -72,21 +69,6 @@ public class QuestLine {
         this.questSetsManager = new QuestSetsManager(this);
         this.teamManager = new TeamManager(this);
         GroupTier.initBaseTiers(this);
-        
-        try {
-            if (this.basePath.isPresent()) {
-                if (!Files.exists(this.basePath.get())) {
-                    Files.createDirectories(this.basePath.get());
-                }
-            }
-            if (this.dataPath.isPresent()) {
-                if (!Files.exists(this.dataPath.get())) {
-                    Files.createDirectories(this.dataPath.get());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         
         add(new Serializable() {
             @Override
@@ -136,13 +118,13 @@ public class QuestLine {
             SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
             hasLoadedMainSound = true;
         }
-        QuestLine questLine = reset(Optional.empty(), Optional.empty());
+        QuestLine questLine = reset(Optional.empty());
         questLine.loadAll();
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
-    public static QuestLine reset(Optional<Path> basePath, Optional<Path> dataPath) {
-        return activeQuestLine = new QuestLine(basePath, dataPath);
+    public static QuestLine reset(Optional<DataManager> dataManager) {
+        return activeQuestLine = new QuestLine(dataManager);
     }
     
     public static void sendDataToClient(ServerPlayer player) {
@@ -212,16 +194,20 @@ public class QuestLine {
     }
     
     public Optional<FileProvider> resolve(String name) {
-        Optional<FileProvider> provider = basePath.map(path -> new FileProvider.PathProvider(path.resolve(name)));
-        if (provider.isEmpty() && tempPaths.containsKey(name))
-            provider = Optional.of(tempPaths.get(name));
+        Optional<FileProvider> provider = dataManager.map(dataManager1 -> dataManager1.resolve(name));
+        if (provider.isEmpty())
+            provider = Optional.ofNullable(tempPaths.get(name));
         return provider;
     }
     
+    public Stream<String> resolveAll(FileFilter filter) {
+        return dataManager.map(dataManager1 -> dataManager1.resolveAll(filter)).orElse(Stream.empty());
+    }
+    
     public Optional<FileProvider> resolveData(String name) {
-        Optional<FileProvider> provider = dataPath.map(path -> new FileProvider.PathProvider(path.resolve(name)));
-        if (provider.isEmpty() && tempPaths.containsKey(name))
-            provider = Optional.of(tempPaths.get(name));
+        Optional<FileProvider> provider = dataManager.map(dataManager1 -> dataManager1.resolveData(name));
+        if (provider.isEmpty())
+            provider = Optional.ofNullable(tempPaths.get(name));
         return provider;
     }
     

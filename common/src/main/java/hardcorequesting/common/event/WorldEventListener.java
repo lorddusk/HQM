@@ -1,6 +1,7 @@
 package hardcorequesting.common.event;
 
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.io.FileDataManager;
 import hardcorequesting.common.quests.QuestLine;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -14,7 +15,7 @@ public class WorldEventListener {
     public static void onLoad(ResourceKey<Level> worldRegistryKey, ServerLevel world) {
         if (!world.isClientSide && world.dimension().equals(Level.OVERWORLD)) {
             Path hqm = getWorldPath(world).resolve("hqm");
-            QuestLine questLine = QuestLine.reset(Optional.of(HardcoreQuestingCore.packDir), Optional.of(hqm));
+            QuestLine questLine = QuestLine.reset(Optional.of(new FileDataManager(HardcoreQuestingCore.packDir, hqm)));
             questLine.loadAll();
         }
     }
