@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 
 public class LocalDataManager implements DataReader {
     
-    private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
+    private final Map<String, String> tempPaths = Maps.newHashMap();
     
     @Override
     public Optional<String> read(String name) {
-        return tempPaths.getOrDefault(name, FileProvider.EMPTY).get();
+        return Optional.ofNullable(tempPaths.get(name));
     }
     
     @Override
@@ -21,7 +21,7 @@ public class LocalDataManager implements DataReader {
     }
     
     public void provideTemp(String path, String str) {
-        tempPaths.put(path, new FileProvider.StringProvider(str));
+        tempPaths.put(path, str);
     }
     
     @Override

@@ -51,7 +51,7 @@ public class FileDataManager implements DataReader, DataWriter {
     
     @Override
     public Optional<String> read(String name) {
-        return new FileProvider.PathProvider(basePath.resolve(name)).get();
+        return SaveHandler.load(basePath.resolve(name));
     }
     
     @Override
@@ -64,18 +64,18 @@ public class FileDataManager implements DataReader, DataWriter {
     
     @Override
     public Optional<String> readData(String name) {
-        return dataPath == null ? Optional.empty() : new FileProvider.PathProvider(dataPath.resolve(name)).get();
+        return dataPath == null ? Optional.empty() : SaveHandler.load(dataPath.resolve(name));
     }
     
     @Override
     public void write(String name, String text) {
-        new FileProvider.PathProvider(basePath.resolve(name)).set(text);
+        SaveHandler.save(basePath.resolve(name), text);
     }
     
     @Override
     public void writeData(String name, String text) {
         if (dataPath != null)
-            new FileProvider.PathProvider(dataPath.resolve(name)).set(text);
+            SaveHandler.save(dataPath.resolve(name), text);
     }
     
     @Override
