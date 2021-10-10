@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GroupTierManager extends SimpleSerializable {
+    public static final String FILE_PATH = "bags.json";
     public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
     private final List<GroupTier> tiers = Lists.newArrayList();
     
@@ -38,7 +39,7 @@ public class GroupTierManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "bags.json";
+        return FILE_PATH;
     }
     
     @Override

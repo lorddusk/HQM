@@ -1,7 +1,6 @@
 package hardcorequesting.common.io;
 
 import com.google.common.collect.Maps;
-import hardcorequesting.common.quests.SimpleSerializable;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +17,6 @@ public class LocalDataManager implements DataManager {
     @Override
     public FileProvider resolveData(String name) {
         return resolve(name);
-    }
-    
-    public void provideTemp(SimpleSerializable serializable, String str) {
-        provideTemp(serializable.filePath(), str);
     }
     
     public void provideTemp(String path, String str) {

@@ -15,6 +15,7 @@ import java.util.*;
 
 public class DeathStatsManager extends SimpleSerializable {
     private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths);
+    public static final String FILE_PATH = "deaths.json";
     private final Map<UUID, DeathStat> deathMap = new HashMap<>();
     private final List<DeathStat> clientDeathList = new ArrayList<>();
     private DeathStat clientBest;
@@ -114,7 +115,7 @@ public class DeathStatsManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "deaths.json";
+        return FILE_PATH;
     }
     
     @Override

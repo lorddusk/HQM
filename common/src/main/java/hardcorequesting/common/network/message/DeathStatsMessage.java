@@ -52,7 +52,7 @@ public class DeathStatsMessage implements IMessage {
                 LocalDataManager dataManager = new LocalDataManager();
                 if (message._deathMap != null) {
                     List<DeathStat> stats = Lists.newArrayList(message._deathMap.values());
-                    dataManager.provideTemp(DeathStatsManager.getInstance(), SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
+                    dataManager.provideTemp(DeathStatsManager.FILE_PATH, SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
                 }
                 DeathStatsManager.getInstance().load(dataManager);
             }

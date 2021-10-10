@@ -10,7 +10,6 @@ import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataManager;
-import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -25,10 +24,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -46,12 +43,10 @@ public class QuestLine {
     private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
-    private final Optional<DataManager> dataManager;
+    private final DataManager dataManager;
     private final List<Serializable> serializables = Lists.newArrayList();
-    @Deprecated
-    private final LocalDataManager localData = new LocalDataManager();
     
-    private QuestLine(Optional<DataManager> dataManager) {
+    private QuestLine(DataManager dataManager) {
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
@@ -105,17 +100,17 @@ public class QuestLine {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void receiveDataFromServer(Player receiver, boolean remote) {
+    public static void receiveDataFromServer(DataManager dataManager) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
             hasLoadedMainSound = true;
         }
-        QuestLine questLine = reset(Optional.empty());
+        QuestLine questLine = reset(dataManager);
         questLine.loadAll();
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
-    public static QuestLine reset(Optional<DataManager> dataManager) {
+    public static QuestLine reset(DataManager dataManager) {
         return activeQuestLine = new QuestLine(dataManager);
     }
     
@@ -140,7 +135,7 @@ public class QuestLine {
     
     public void saveAll() {
         for (Serializable serializable : serializables) {
-            serializable.save(dataManager.orElse(localData));
+            serializable.save(dataManager);
         }
         SaveHelper.onSave();
     }
@@ -148,14 +143,14 @@ public class QuestLine {
     public void saveData() {
         for (Serializable serializable : serializables) {
             if (serializable.isData())
-                serializable.save(dataManager.orElse(localData));
+                serializable.save(dataManager);
         }
     }
     
     public void loadAll() {
         HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", dataManager);
         for (Serializable serializable : serializables) {
-            serializable.load(dataManager.orElse(localData));
+            serializable.load(dataManager);
         }
         SaveHelper.onLoad();
         
@@ -171,15 +166,5 @@ public class QuestLine {
         }
         
         return cachedMainDescription;
-    }
-    
-    @Deprecated
-    public void provideTemp(SimpleSerializable serializable, String str) {
-        localData.provideTemp(serializable, str);
-    }
-    
-    @Deprecated
-    public void provideTemp(String path, String str) {
-        localData.provideTemp(path, str);
     }
 }

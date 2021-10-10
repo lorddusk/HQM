@@ -19,7 +19,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TeamManager extends SimpleSerializable {
-    private Set<Team> teams = Sets.newConcurrentHashSet();
+    public static final String FILE_PATH = "teams.json";
+    
+    private final Set<Team> teams = Sets.newConcurrentHashSet();
     
     public TeamManager(QuestLine parent) {
         super(parent);
@@ -31,7 +33,7 @@ public class TeamManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "teams.json";
+        return FILE_PATH;
     }
     
     @Override

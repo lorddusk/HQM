@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class HardcoreQuestingCore {
     public static final String ID = "hardcorequesting";
@@ -55,7 +54,7 @@ public class HardcoreQuestingCore {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        QuestLine.reset(Optional.of(new FileDataManager(packDir, dataDir)));
+        QuestLine.reset(new FileDataManager(packDir, dataDir));
         
         HQMConfig.loadConfig();
         

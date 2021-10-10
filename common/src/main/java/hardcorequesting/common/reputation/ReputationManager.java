@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.task.QuestTask;
 import java.util.*;
 
 public class ReputationManager extends SimpleSerializable {
+    public static final String FILE_PATH = "reputations.json";
     final Map<String, Reputation> reputationMap = new HashMap<>();
     
     public ReputationManager(QuestLine parent) {
@@ -62,7 +63,7 @@ public class ReputationManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "reputations.json";
+        return FILE_PATH;
     }
     
     @Override

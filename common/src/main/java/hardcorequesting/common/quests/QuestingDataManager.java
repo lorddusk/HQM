@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestingDataManager {
+    public static final String STATE_FILE_PATH = "state.json";
+    public static final String DATA_FILE_PATH = "data.json";
     private final QuestLine parent;
     public final State state;
     public final Data data;
@@ -110,7 +112,7 @@ public class QuestingDataManager {
         
         @Override
         public String filePath() {
-            return "state.json";
+            return STATE_FILE_PATH;
         }
         
         @Override
@@ -151,7 +153,7 @@ public class QuestingDataManager {
         
         @Override
         public String filePath() {
-            return "data.json";
+            return DATA_FILE_PATH;
         }
         
         @Override
