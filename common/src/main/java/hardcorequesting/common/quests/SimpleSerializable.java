@@ -16,22 +16,12 @@ public abstract class SimpleSerializable implements StringSerializable, Serializ
     
     @Override
     public final void save(DataWriter writer) {
-        if (isData()) {
-            writer.writeData(filePath(), saveToString());
-        } else {
-            writer.write(filePath(), saveToString());
-        }
+        writer.write(filePath(), saveToString());
     }
     
     @Override
     public final void load(DataReader reader) {
         loadFromString(Optional.empty());
-        Optional<String> str;
-        if (isData()) {
-            str = reader.readData(filePath());
-        } else {
-            str = reader.read(filePath());
-        }
-        loadFromString(str);
+        loadFromString(reader.read(filePath()));
     }
 }

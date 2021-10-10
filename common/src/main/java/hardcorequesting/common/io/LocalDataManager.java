@@ -15,11 +15,6 @@ public class LocalDataManager implements DataReader {
         return Optional.ofNullable(tempPaths.get(name));
     }
     
-    @Override
-    public Optional<String> readData(String name) {
-        return read(name);
-    }
-    
     public void provideTemp(String path, String str) {
         tempPaths.put(path, str);
     }

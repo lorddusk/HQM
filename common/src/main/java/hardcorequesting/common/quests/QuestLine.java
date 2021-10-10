@@ -25,6 +25,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -105,7 +106,7 @@ public class QuestLine {
             hasLoadedMainSound = true;
         }
         QuestLine questLine = reset();
-        questLine.loadAll(reader);
+        questLine.loadAll(reader, reader);
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
@@ -132,24 +133,22 @@ public class QuestLine {
         this.cachedMainDescription = null;
     }
     
-    public void saveAll(DataWriter writer) {
+    public void save(@Nullable DataWriter cfgWriter, @Nullable DataWriter dataWriter) {
         for (Serializable serializable : serializables) {
-            serializable.save(writer);
+            if (dataWriter != null && serializable.isData())
+                serializable.save(dataWriter);
+            else if (cfgWriter != null && !serializable.isData())
+                serializable.save(cfgWriter);
         }
         SaveHelper.onSave();
     }
     
-    public void saveData(DataWriter writer) {
+    public void loadAll(DataReader cfgReader, DataReader dataReader) {
+        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", cfgReader);
         for (Serializable serializable : serializables) {
             if (serializable.isData())
-                serializable.save(writer);
-        }
-    }
-    
-    public void loadAll(DataReader reader) {
-        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", reader);
-        for (Serializable serializable : serializables) {
-            serializable.load(reader);
+                serializable.load(dataReader);
+            else serializable.load(cfgReader);
         }
         SaveHelper.onLoad();
         

@@ -7,6 +7,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.event.PlayerDeathEventListener;
 import hardcorequesting.common.event.PlayerTracker;
 import hardcorequesting.common.event.WorldEventListener;
+import hardcorequesting.common.io.FileDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.proxies.ClientProxy;
@@ -29,6 +30,7 @@ public class HardcoreQuestingCore {
     
     public static Path configDir;
     public static Path packDir;
+    public static FileDataManager packManager;
     
     public static final Logger LOGGER = LogManager.getFormatterLogger("Hardcore Questing Mode");
     
@@ -46,6 +48,7 @@ public class HardcoreQuestingCore {
         
         configDir = platform.getConfigDir().resolve("hqm");
         packDir = configDir.resolve("default");
+        packManager = new FileDataManager(packDir);
         try {
             FileUtils.deleteDirectory(configDir.resolve("remote").toFile());
         } catch (IOException e) {

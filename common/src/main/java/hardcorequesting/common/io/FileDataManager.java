@@ -1,9 +1,7 @@
 package hardcorequesting.common.io;
 
-import hardcorequesting.common.HardcoreQuestingCore;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -16,33 +14,23 @@ import java.util.stream.Stream;
 
 public class FileDataManager implements DataReader, DataWriter {
     
-    private final Path basePath;
-    @Nullable
-    private final Path dataPath;
+    private final Path path;
     
-    public static FileDataManager createForServer(MinecraftServer server) {
+    public static FileDataManager createForWorldData(MinecraftServer server) {
         Path hqm = getWorldPath(server).resolve("hqm");
-        return new FileDataManager(HardcoreQuestingCore.packDir, hqm);
-    }
-    
-    public static FileDataManager createForExport() {
-        return new FileDataManager(HardcoreQuestingCore.packDir, null);
+        return new FileDataManager(hqm);
     }
     
     private static Path getWorldPath(MinecraftServer server) {
         return server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
     }
     
-    public FileDataManager(Path basePath, @Nullable Path dataPath) {
-        this.basePath = basePath;
-        this.dataPath = dataPath;
+    public FileDataManager(Path path) {
+        this.path = path;
     
         try {
-            if (!Files.exists(this.basePath)) {
-                Files.createDirectories(this.basePath);
-            }
-            if (dataPath != null && !Files.exists(this.dataPath)) {
-                Files.createDirectories(this.dataPath);
+            if (!Files.exists(this.path)) {
+                Files.createDirectories(this.path);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,31 +39,20 @@ public class FileDataManager implements DataReader, DataWriter {
     
     @Override
     public Optional<String> read(String name) {
-        return SaveHandler.load(basePath.resolve(name));
+        return SaveHandler.load(path.resolve(name));
     }
     
     @Override
     public Stream<String> readAll(FileFilter filter) {
         //TODO use different function that doesn't catch IOException to have access to more information if an I/O error occurs.
-        File[] files = basePath.toFile().listFiles(filter);
+        File[] files = path.toFile().listFiles(filter);
         return files == null ? Stream.empty() : Arrays.stream(files)
                 .flatMap(file -> SaveHandler.load(file).stream());
     }
     
     @Override
-    public Optional<String> readData(String name) {
-        return dataPath == null ? Optional.empty() : SaveHandler.load(dataPath.resolve(name));
-    }
-    
-    @Override
     public void write(String name, String text) {
-        SaveHandler.save(basePath.resolve(name), text);
-    }
-    
-    @Override
-    public void writeData(String name, String text) {
-        if (dataPath != null)
-            SaveHandler.save(dataPath.resolve(name), text);
+        SaveHandler.save(path.resolve(name), text);
     }
     
     @Override

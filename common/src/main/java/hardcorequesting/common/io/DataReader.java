@@ -10,6 +10,4 @@ public interface DataReader {
     default Stream<String> readAll(FileFilter filter) {
         return Stream.empty();
     }
-    
-    Optional<String> readData(String name);
 }

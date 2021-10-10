@@ -84,7 +84,7 @@ public class QuestLineSyncMessage implements IMessage {
             for (Map.Entry<String, String> entry : message.questsSets.entrySet()) {
                 dataManager.provideTemp("sets/" + entry.getKey() + ".json", entry.getValue());
             }
-            QuestLine.getActiveQuestLine().loadAll(dataManager);
+            QuestLine.getActiveQuestLine().loadAll(dataManager, dataManager);
         }
     }
 }

@@ -76,7 +76,6 @@ public class PlayerDataSyncMessage implements IMessage {
             cachedDataManager.provideTemp(QuestingDataManager.STATE_FILE_PATH, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
             cachedDataManager.provideTemp(DeathStatsManager.FILE_PATH, message.deaths);
             QuestLine.receiveDataFromServer(cachedDataManager);
-            QuestLine.getActiveQuestLine().loadAll(cachedDataManager);
         }
     }
 }
