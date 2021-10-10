@@ -27,7 +27,7 @@ public interface FileProvider {
     }
     
     class StringProvider implements FileProvider {
-        private String s;
+        private final String s;
         
         public StringProvider(String str) {
             s = str;
@@ -40,7 +40,7 @@ public interface FileProvider {
         
         @Override
         public void set(String str) {
-            s = str;
+            throw new UnsupportedOperationException("Should not save with cached string.");
         }
     }
 }
