@@ -3,20 +3,21 @@ package hardcorequesting.common.io;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class LocalDataManager implements DataManager {
+public class LocalDataManager implements DataReader {
     
     private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
     
     @Override
-    public FileProvider resolve(String name) {
-        return tempPaths.getOrDefault(name, FileProvider.EMPTY);
+    public Optional<String> read(String name) {
+        return tempPaths.getOrDefault(name, FileProvider.EMPTY).get();
     }
     
     @Override
-    public FileProvider resolveData(String name) {
-        return resolve(name);
+    public Optional<String> readData(String name) {
+        return read(name);
     }
     
     public void provideTemp(String path, String str) {

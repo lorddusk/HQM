@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-public class FileDataManager implements DataManager {
+public class FileDataManager implements DataReader, DataWriter {
     
     private final Path basePath;
     @Nullable
@@ -49,8 +50,8 @@ public class FileDataManager implements DataManager {
     }
     
     @Override
-    public FileProvider resolve(String name) {
-        return new FileProvider.PathProvider(basePath.resolve(name));
+    public Optional<String> read(String name) {
+        return new FileProvider.PathProvider(basePath.resolve(name)).get();
     }
     
     @Override
@@ -62,14 +63,19 @@ public class FileDataManager implements DataManager {
     }
     
     @Override
-    public FileProvider resolveData(String name) {
-        return dataPath == null ? FileProvider.EMPTY : new FileProvider.PathProvider(dataPath.resolve(name));
+    public Optional<String> readData(String name) {
+        return dataPath == null ? Optional.empty() : new FileProvider.PathProvider(dataPath.resolve(name)).get();
+    }
+    
+    @Override
+    public void write(String name, String text) {
+        new FileProvider.PathProvider(basePath.resolve(name)).set(text);
     }
     
     @Override
     public void writeData(String name, String text) {
         if (dataPath != null)
-            resolve(name).set(text);
+            new FileProvider.PathProvider(dataPath.resolve(name)).set(text);
     }
     
     @Override
