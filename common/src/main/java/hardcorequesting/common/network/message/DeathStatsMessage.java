@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
-import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
@@ -49,12 +48,11 @@ public class DeathStatsMessage implements IMessage {
         
         private void handle(DeathStatsMessage message, PacketContext ctx) {
             if (!message.local) {
-                LocalDataManager dataManager = new LocalDataManager();
+                DeathStatsManager.getInstance().clear();
                 if (message._deathMap != null) {
                     List<DeathStat> stats = Lists.newArrayList(message._deathMap.values());
-                    dataManager.provide(DeathStatsManager.FILE_PATH, SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
+                    DeathStatsManager.getInstance().loadFromString(SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
                 }
-                DeathStatsManager.getInstance().load(dataManager);
             }
         }
     }

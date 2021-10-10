@@ -6,4 +6,9 @@ public interface StringSerializable {
     void clear();
     
     void loadFromString(String string);
+    
+    default void clearAndLoad(String string) {
+        clear();
+        loadFromString(string);
+    }
 }
