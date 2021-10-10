@@ -80,36 +80,9 @@ public class QuestSetsManager implements Serializable {
                 .map(SaveHandler.JSON_PARSER::parse)
                 .ifPresent(jsonElement -> {
                     if (jsonElement.isJsonArray()) {
-                        List<String> order = Lists.newArrayList();
-                        for (JsonElement element : jsonElement.getAsJsonArray()) {
-                            order.add(element.getAsString());
-                        }
-                        reader.readAll(QUEST_SET_FILTER)
-                                .flatMap(setText -> SaveHandler.load(setText, QuestSet.class).stream())
-                                .filter(Predicates.not(questSets::contains))
-                                .forEach(questSets::add);
-                        questSets.sort((s1, s2) -> {
-                            if (s1.equals(s2)) return 0;
-                            int is1 = order.indexOf(s1.getName());
-                            int is2 = order.indexOf(s2.getName());
-                            if (is1 == -1) {
-                                return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
-                            }
-                            if (is2 == -1) return -1;
-                            if (is1 == is2) return 0;
-                            return is1 < is2 ? -1 : 1;
-                        });
+                        loadSetsFromJsonOld(reader, jsonElement.getAsJsonArray());
                     } else {
-                        List<String> sets = Lists.newArrayList();
-                        for (JsonElement element : jsonElement.getAsJsonObject().get("sets").getAsJsonArray()) {
-                            sets.add(element.getAsString());
-                        }
-                        for (String set : sets) {
-                            reader.read("sets/" + set + ".json")
-                                    .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
-                                    .filter(Predicates.not(questSets::contains))
-                                    .ifPresent(questSets::add);
-                        }
+                        loadSetsFromJson(reader, jsonElement);
                     }
                 });
         try {
@@ -118,5 +91,41 @@ public class QuestSetsManager implements Serializable {
             HardcoreQuestingCore.LOGGER.warn("Failed loading quest sets for remote", e);
         }
         HardcoreQuestingCore.LOGGER.info("Loaded %d quests from %d quest sets.", quests.size(), questSets.size());
+    }
+    
+    private void loadSetsFromJson(DataReader reader, JsonElement jsonElement) {
+        List<String> sets = Lists.newArrayList();
+        for (JsonElement element : jsonElement.getAsJsonObject().get("sets").getAsJsonArray()) {
+            sets.add(element.getAsString());
+        }
+        for (String set : sets) {
+            reader.read("sets/" + set + ".json")
+                    .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
+                    .filter(Predicates.not(questSets::contains))
+                    .ifPresent(questSets::add);
+        }
+    }
+    
+    // Loads sets with format from before HQM fabric 0.3.0 / HQM 5.5.0
+    private void loadSetsFromJsonOld(DataReader reader, JsonArray jsonArray) {
+        List<String> order = Lists.newArrayList();
+        for (JsonElement element : jsonArray) {
+            order.add(element.getAsString());
+        }
+        reader.readAll(QUEST_SET_FILTER)
+                .flatMap(setText -> SaveHandler.load(setText, QuestSet.class).stream())
+                .filter(Predicates.not(questSets::contains))
+                .forEach(questSets::add);
+        questSets.sort((s1, s2) -> {
+            if (s1.equals(s2)) return 0;
+            int is1 = order.indexOf(s1.getName());
+            int is2 = order.indexOf(s2.getName());
+            if (is1 == -1) {
+                return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
+            }
+            if (is2 == -1) return -1;
+            if (is1 == is2) return 0;
+            return is1 < is2 ? -1 : 1;
+        });
     }
 }
