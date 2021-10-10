@@ -10,7 +10,6 @@ import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataManager;
-import hardcorequesting.common.io.FileProvider;
 import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
@@ -28,10 +27,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
-import java.io.FileFilter;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -69,13 +66,13 @@ public class QuestLine {
         
         add(new Serializable() {
             @Override
-            public void save() {
-                resolve("description.txt").set(mainDescription);
+            public void save(DataManager dataManager) {
+                dataManager.resolve("description.txt").set(mainDescription);
             }
             
             @Override
-            public void load() {
-                setMainDescription(resolve("description.txt").get().orElse("No description"));
+            public void load(DataManager dataManager) {
+                setMainDescription(dataManager.resolve("description.txt").get().orElse("No description"));
             }
             
             @Override
@@ -143,7 +140,7 @@ public class QuestLine {
     
     public void saveAll() {
         for (Serializable serializable : serializables) {
-            serializable.save();
+            serializable.save(dataManager.orElse(localData));
         }
         SaveHelper.onSave();
     }
@@ -151,14 +148,14 @@ public class QuestLine {
     public void saveData() {
         for (Serializable serializable : serializables) {
             if (serializable.isData())
-                serializable.save();
+                serializable.save(dataManager.orElse(localData));
         }
     }
     
     public void loadAll() {
         HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", dataManager);
         for (Serializable serializable : serializables) {
-            serializable.load();
+            serializable.load(dataManager.orElse(localData));
         }
         SaveHelper.onLoad();
         
@@ -174,21 +171,6 @@ public class QuestLine {
         }
         
         return cachedMainDescription;
-    }
-    
-    public FileProvider resolve(String name) {
-        return dataManager.map(dataManager1 -> dataManager1.resolve(name))
-                .orElseGet(() -> localData.resolve(name));
-    }
-    
-    public Stream<String> resolveAll(FileFilter filter) {
-        return dataManager.map(dataManager1 -> dataManager1.resolveAll(filter))
-                .orElseGet(() -> localData.resolveAll(filter));
-    }
-    
-    public FileProvider resolveData(String name) {
-        return dataManager.map(dataManager1 -> dataManager1.resolveData(name))
-                .orElseGet(() -> localData.resolveData(name));
     }
     
     @Deprecated

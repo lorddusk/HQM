@@ -1,5 +1,6 @@
 package hardcorequesting.common.quests;
 
+import hardcorequesting.common.io.DataManager;
 import hardcorequesting.common.io.FileProvider;
 
 import java.util.Optional;
@@ -14,22 +15,22 @@ public abstract class SimpleSerializable implements StringSerializable, Serializ
     public abstract String filePath();
     
     @Override
-    public final void save() {
+    public final void save(DataManager dataManager) {
         if (isData()) {
-            parent.resolveData(filePath()).set(saveToString());
+            dataManager.resolveData(filePath()).set(saveToString());
         } else {
-            parent.resolve(filePath()).set(saveToString());
+            dataManager.resolve(filePath()).set(saveToString());
         }
     }
     
     @Override
-    public final void load() {
+    public final void load(DataManager dataManager) {
         loadFromString(Optional.empty());
         FileProvider provider;
         if (isData()) {
-            provider = parent.resolveData(filePath());
+            provider = dataManager.resolveData(filePath());
         } else {
-            provider = parent.resolve(filePath());
+            provider = dataManager.resolve(filePath());
         }
         loadFromString(provider.get());
     }

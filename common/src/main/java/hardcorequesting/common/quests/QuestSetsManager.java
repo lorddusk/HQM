@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.io.DataManager;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
@@ -55,25 +56,25 @@ public class QuestSetsManager implements Serializable {
     }
     
     @Override
-    public void save() {
+    public void save(DataManager dataManager) {
         JsonObject object = new JsonObject();
         JsonArray array = new JsonArray();
         questSets.stream().map(QuestSet::getFilename).distinct().forEach(array::add);
         object.add("sets", array);
-        parent.resolve("sets.json").set(object.toString());
+        dataManager.resolve("sets.json").set(object.toString());
         
         for (QuestSet set : questSets) {
-            parent.resolve("sets/" + set.getFilename() + ".json").set(SaveHandler.save(set, QuestSet.class));
+            dataManager.resolve("sets/" + set.getFilename() + ".json").set(SaveHandler.save(set, QuestSet.class));
         }
     }
     
     @Override
-    public void load() {
+    public void load(DataManager dataManager) {
         quests.clear();
         questSets.clear();
         EventTrigger.instance().clear();
         
-        parent.resolve("sets.json")
+        dataManager.resolve("sets.json")
                 .get()
                 .map(SaveHandler.JSON_PARSER::parse)
                 .ifPresent(jsonElement -> {
@@ -82,7 +83,7 @@ public class QuestSetsManager implements Serializable {
                         for (JsonElement element : jsonElement.getAsJsonArray()) {
                             order.add(element.getAsString());
                         }
-                        parent.resolveAll(QUEST_SET_FILTER)
+                        dataManager.resolveAll(QUEST_SET_FILTER)
                                 .flatMap(setText -> SaveHandler.load(setText, QuestSet.class).stream())
                                 .filter(Predicates.not(questSets::contains))
                                 .forEach(questSets::add);
@@ -103,7 +104,7 @@ public class QuestSetsManager implements Serializable {
                             sets.add(element.getAsString());
                         }
                         for (String set : sets) {
-                            parent.resolve("sets/" + set + ".json")
+                            dataManager.resolve("sets/" + set + ".json")
                                     .get()
                                     .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
                                     .filter(Predicates.not(questSets::contains))

@@ -4,11 +4,11 @@ import com.google.common.collect.Lists;
 import com.google.gson.reflect.TypeToken;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
+import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
-import hardcorequesting.common.quests.QuestLine;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.List;
@@ -24,7 +24,6 @@ public class DeathStatsMessage implements IMessage {
     
     public DeathStatsMessage(boolean local) {
         this.local = local;
-        if (local) DeathStatsManager.getInstance().save();
     }
     
     @Override
@@ -50,12 +49,13 @@ public class DeathStatsMessage implements IMessage {
         
         private void handle(DeathStatsMessage message, PacketContext ctx) {
             if (!message.local) {
+                LocalDataManager dataManager = new LocalDataManager();
                 if (message._deathMap != null) {
                     List<DeathStat> stats = Lists.newArrayList(message._deathMap.values());
-                    QuestLine.getActiveQuestLine().provideTemp(DeathStatsManager.getInstance(), SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
+                    dataManager.provideTemp(DeathStatsManager.getInstance(), SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
                 }
+                DeathStatsManager.getInstance().load(dataManager);
             }
-            DeathStatsManager.getInstance().load();
         }
     }
 }
