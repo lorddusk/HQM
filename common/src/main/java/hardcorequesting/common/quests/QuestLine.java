@@ -9,7 +9,6 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
-import hardcorequesting.common.io.DataManager;
 import hardcorequesting.common.io.DataReader;
 import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.network.NetworkManager;
@@ -45,14 +44,12 @@ public class QuestLine {
     private List<FormattedText> cachedMainDescription;
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
-    private final DataManager dataManager;
     private final List<Serializable> serializables = Lists.newArrayList();
     
-    private QuestLine(DataManager dataManager) {
+    private QuestLine() {
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
-        this.dataManager = dataManager;
         this.reputationManager = new ReputationManager(this);
         this.groupTierManager = new GroupTierManager(this);
         this.questingDataManager = new QuestingDataManager(this);
@@ -102,18 +99,18 @@ public class QuestLine {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void receiveDataFromServer(DataManager dataManager) {
+    public static void receiveDataFromServer(DataReader reader) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
             hasLoadedMainSound = true;
         }
-        QuestLine questLine = reset(dataManager);
-        questLine.loadAll();
+        QuestLine questLine = reset();
+        questLine.loadAll(reader);
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
-    public static QuestLine reset(DataManager dataManager) {
-        return activeQuestLine = new QuestLine(dataManager);
+    public static QuestLine reset() {
+        return activeQuestLine = new QuestLine();
     }
     
     public static void sendDataToClient(ServerPlayer player) {
@@ -135,24 +132,24 @@ public class QuestLine {
         this.cachedMainDescription = null;
     }
     
-    public void saveAll() {
+    public void saveAll(DataWriter writer) {
         for (Serializable serializable : serializables) {
-            serializable.save(dataManager);
+            serializable.save(writer);
         }
         SaveHelper.onSave();
     }
     
-    public void saveData() {
+    public void saveData(DataWriter writer) {
         for (Serializable serializable : serializables) {
             if (serializable.isData())
-                serializable.save(dataManager);
+                serializable.save(writer);
         }
     }
     
-    public void loadAll() {
-        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", dataManager);
+    public void loadAll(DataReader reader) {
+        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", reader);
         for (Serializable serializable : serializables) {
-            serializable.load(dataManager);
+            serializable.load(reader);
         }
         SaveHelper.onLoad();
         

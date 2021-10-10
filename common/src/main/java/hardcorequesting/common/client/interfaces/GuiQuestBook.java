@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
+import hardcorequesting.common.io.FileDataManager;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.CloseBookMessage;
 import hardcorequesting.common.quests.*;
@@ -358,7 +359,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void save() {
-        QuestLine.getActiveQuestLine().saveAll();
+        QuestLine.getActiveQuestLine().saveAll(FileDataManager.createForExport());
         SaveHelper.onSave();
     }
     

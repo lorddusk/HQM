@@ -1,5 +1,10 @@
 package hardcorequesting.common.io;
 
+import hardcorequesting.common.HardcoreQuestingCore;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -10,9 +15,24 @@ import java.util.stream.Stream;
 
 public class FileDataManager implements DataManager {
     
-    private final Path basePath, dataPath;
+    private final Path basePath;
+    @Nullable
+    private final Path dataPath;
     
-    public FileDataManager(Path basePath, Path dataPath) {
+    public static FileDataManager createForServer(MinecraftServer server) {
+        Path hqm = getWorldPath(server).resolve("hqm");
+        return new FileDataManager(HardcoreQuestingCore.packDir, hqm);
+    }
+    
+    public static FileDataManager createForExport() {
+        return new FileDataManager(HardcoreQuestingCore.packDir, null);
+    }
+    
+    private static Path getWorldPath(MinecraftServer server) {
+        return server.getWorldPath(LevelResource.ROOT).toAbsolutePath().normalize();
+    }
+    
+    public FileDataManager(Path basePath, @Nullable Path dataPath) {
         this.basePath = basePath;
         this.dataPath = dataPath;
     
@@ -20,7 +40,7 @@ public class FileDataManager implements DataManager {
             if (!Files.exists(this.basePath)) {
                 Files.createDirectories(this.basePath);
             }
-            if (!Files.exists(this.dataPath)) {
+            if (dataPath != null && !Files.exists(this.dataPath)) {
                 Files.createDirectories(this.dataPath);
             }
         } catch (IOException e) {
@@ -43,7 +63,13 @@ public class FileDataManager implements DataManager {
     
     @Override
     public FileProvider resolveData(String name) {
-        return new FileProvider.PathProvider(dataPath.resolve(name));
+        return dataPath == null ? FileProvider.EMPTY : new FileProvider.PathProvider(dataPath.resolve(name));
+    }
+    
+    @Override
+    public void writeData(String name, String text) {
+        if (dataPath != null)
+            resolve(name).set(text);
     }
     
     @Override

@@ -70,13 +70,13 @@ public class PlayerDataSyncMessage implements IMessage {
         
         @Environment(EnvType.CLIENT)
         private void handle(PlayerDataSyncMessage message, PacketContext ctx) {
-            LocalDataManager cachedDataManager = new LocalDataManager();
+            cachedDataManager = new LocalDataManager();
             cachedDataManager.provideTemp(TeamManager.FILE_PATH, message.teams);
             cachedDataManager.provideTemp(QuestingDataManager.DATA_FILE_PATH, message.data);
             cachedDataManager.provideTemp(QuestingDataManager.STATE_FILE_PATH, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
             cachedDataManager.provideTemp(DeathStatsManager.FILE_PATH, message.deaths);
             QuestLine.receiveDataFromServer(cachedDataManager);
-            QuestLine.getActiveQuestLine().loadAll();
+            QuestLine.getActiveQuestLine().loadAll(cachedDataManager);
         }
     }
 }
