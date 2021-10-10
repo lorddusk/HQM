@@ -1,5 +1,7 @@
 package hardcorequesting.common.quests;
 
+import hardcorequesting.common.io.FileProvider;
+
 import java.util.Optional;
 
 public abstract class SimpleSerializable implements StringSerializable, Serializable {
@@ -27,12 +29,12 @@ public abstract class SimpleSerializable implements StringSerializable, Serializ
     @Override
     public final void load() {
         loadFromString(Optional.empty());
-        Optional<QuestLine.FileProvider> provider;
+        Optional<FileProvider> provider;
         if (isData()) {
             provider = parent.resolveData(filePath());
         } else {
             provider = parent.resolve(filePath());
         }
-        provider.map(QuestLine.FileProvider::get).ifPresent(this::loadFromString);
+        provider.map(FileProvider::get).ifPresent(this::loadFromString);
     }
 }

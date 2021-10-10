@@ -10,7 +10,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
-import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.io.FileProvider;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -212,15 +212,15 @@ public class QuestLine {
     }
     
     public Optional<FileProvider> resolve(String name) {
-        Optional<FileProvider> provider = basePath.map(path -> new PathProvider(path.resolve(name)));
-        if (!provider.isPresent() && tempPaths.containsKey(name))
+        Optional<FileProvider> provider = basePath.map(path -> new FileProvider.PathProvider(path.resolve(name)));
+        if (provider.isEmpty() && tempPaths.containsKey(name))
             provider = Optional.of(tempPaths.get(name));
         return provider;
     }
     
     public Optional<FileProvider> resolveData(String name) {
-        Optional<FileProvider> provider = dataPath.map(path -> new PathProvider(path.resolve(name)));
-        if (!provider.isPresent() && tempPaths.containsKey(name))
+        Optional<FileProvider> provider = dataPath.map(path -> new FileProvider.PathProvider(path.resolve(name)));
+        if (provider.isEmpty() && tempPaths.containsKey(name))
             provider = Optional.of(tempPaths.get(name));
         return provider;
     }
@@ -230,42 +230,6 @@ public class QuestLine {
     }
     
     public void provideTemp(String path, String str) {
-        tempPaths.put(path, new FileProvider() {
-            String s = str;
-            
-            @Override
-            public Optional<String> get() {
-                return Optional.of(s);
-            }
-            
-            @Override
-            public void set(String str) {
-                s = str;
-            }
-        });
-    }
-    
-    public interface FileProvider {
-        Optional<String> get();
-        
-        void set(String str);
-    }
-    
-    public static class PathProvider implements FileProvider {
-        private final Path path;
-        
-        public PathProvider(Path path) {
-            this.path = path;
-        }
-        
-        @Override
-        public Optional<String> get() {
-            return SaveHandler.load(path);
-        }
-        
-        @Override
-        public void set(String str) {
-            SaveHandler.save(path, str);
-        }
+        tempPaths.put(path, new FileProvider.StringProvider(str));
     }
 }
