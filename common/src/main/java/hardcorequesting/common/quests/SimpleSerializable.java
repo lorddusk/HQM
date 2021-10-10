@@ -3,8 +3,6 @@ package hardcorequesting.common.quests;
 import hardcorequesting.common.io.DataReader;
 import hardcorequesting.common.io.DataWriter;
 
-import java.util.Optional;
-
 public abstract class SimpleSerializable implements StringSerializable, Serializable {
     
     public SimpleSerializable() {
@@ -19,7 +17,7 @@ public abstract class SimpleSerializable implements StringSerializable, Serializ
     
     @Override
     public final void load(DataReader reader) {
-        loadFromString(Optional.empty());
-        loadFromString(reader.read(filePath()));
+        clear();
+        reader.read(filePath()).ifPresent(this::loadFromString);
     }
 }

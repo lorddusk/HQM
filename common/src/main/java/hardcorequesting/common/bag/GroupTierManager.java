@@ -8,7 +8,6 @@ import hardcorequesting.common.quests.SimpleSerializable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,10 +30,14 @@ public class GroupTierManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         groups.clear();
         tiers.clear();
-        string.flatMap(s -> SaveHandler.<List<GroupTier>>load(s, new TypeToken<List<GroupTier>>() {}.getType())).ifPresent(tiers::addAll);
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        SaveHandler.<List<GroupTier>>load(string, new TypeToken<List<GroupTier>>() {}.getType()).ifPresent(tiers::addAll);
     }
     
     @Override

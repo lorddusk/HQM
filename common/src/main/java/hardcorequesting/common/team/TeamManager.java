@@ -15,7 +15,10 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TeamManager extends SimpleSerializable {
@@ -42,11 +45,14 @@ public class TeamManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         teams.clear();
         TeamAdapter.clearInvitesMap();
-        List<Team> teams = string
-                .flatMap(s -> SaveHandler.<List<Team>>load(s, new TypeToken<List<Team>>() {}.getType()))
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        List<Team> teams = SaveHandler.<List<Team>>load(string, new TypeToken<List<Team>>() {}.getType())
                 .orElseGet(Lists::newArrayList);
         teams.stream().filter(team -> !team.isSingle()).forEach(TeamManager.getInstance()::addTeam);
         TeamAdapter.commitInvitesMap();

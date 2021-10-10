@@ -124,9 +124,13 @@ public class DeathStatsManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         deathMap.clear();
-        string.flatMap(s -> SaveHandler.<List<DeathStat>>load(s, new TypeToken<List<DeathStat>>() {}.getType())).ifPresent(list ->
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        SaveHandler.<List<DeathStat>>load(string, new TypeToken<List<DeathStat>>() {}.getType()).ifPresent(list ->
                 list.forEach(stat -> deathMap.put(stat.getUuid(), stat)));
         if (HardcoreQuestingCore.platform.isClient())
             updateClientDeathList();

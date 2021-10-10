@@ -17,7 +17,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestingDataManager {
@@ -117,21 +120,26 @@ public class QuestingDataManager {
         public boolean isData() {
             return true;
         }
-        
+    
         @Override
-        public void loadFromString(Optional<String> string) {
+        public void clear() {
             boolean autoQuesting = HQMConfig.getInstance().Starting.AUTO_QUESTING;
             boolean autoHardcore = HQMConfig.getInstance().Starting.AUTO_HARDCORE;
-            if (string.isPresent()) {
-                JsonObject object = new JsonParser().parse(new StringReader(string.get())).getAsJsonObject();
-                deactivate();
-                TeamManager.getInstance().deactivate();
-                if (object.get(SaveHandler.QUESTING).getAsBoolean() || autoQuesting) activateQuest(false);
-                if (object.get(SaveHandler.HARDCORE).getAsBoolean() || autoHardcore) activateHardcore();
-            } else {
-                if (autoQuesting) activateQuest(false);
-                if (autoHardcore) activateHardcore();
-            }
+            
+            if (autoQuesting) activateQuest(false);
+            if (autoHardcore) activateHardcore();
+        }
+    
+        @Override
+        public void loadFromString(String string) {
+            boolean autoQuesting = HQMConfig.getInstance().Starting.AUTO_QUESTING;
+            boolean autoHardcore = HQMConfig.getInstance().Starting.AUTO_HARDCORE;
+            
+            JsonObject object = new JsonParser().parse(new StringReader(string)).getAsJsonObject();
+            deactivate();
+            TeamManager.getInstance().deactivate();
+            if (object.get(SaveHandler.QUESTING).getAsBoolean() || autoQuesting) activateQuest(false);
+            if (object.get(SaveHandler.HARDCORE).getAsBoolean() || autoHardcore) activateHardcore();
         }
     }
     
@@ -158,11 +166,15 @@ public class QuestingDataManager {
         public boolean isData() {
             return true;
         }
-        
+    
         @Override
-        public void loadFromString(Optional<String> string) {
+        public void clear() {
             questingData.clear();
-            string.flatMap(s -> SaveHandler.<List<QuestingData>>load(s, new TypeToken<List<QuestingData>>() {}.getType()))
+        }
+    
+        @Override
+        public void loadFromString(String string) {
+            SaveHandler.<List<QuestingData>>load(string, new TypeToken<List<QuestingData>>() {}.getType())
                     .ifPresent(list -> list.forEach(d -> questingData.put(d.getPlayerId(), d)));
         }
     }

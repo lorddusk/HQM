@@ -28,7 +28,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -70,10 +69,15 @@ public class QuestLine {
             public String saveToString() {
                 return mainDescription;
             }
-        
+    
             @Override
-            public void loadFromString(Optional<String> string) {
-                setMainDescription(string.orElse("No description"));
+            public void clear() {
+                setMainDescription("No description");
+            }
+    
+            @Override
+            public void loadFromString(String string) {
+                setMainDescription(string);
             }
         
             @Override

@@ -8,7 +8,10 @@ import hardcorequesting.common.quests.SimpleSerializable;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.quests.task.QuestTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReputationManager extends SimpleSerializable {
     public static final String FILE_PATH = "reputations.json";
@@ -20,10 +23,6 @@ public class ReputationManager extends SimpleSerializable {
     
     public static ReputationManager getInstance() {
         return QuestLine.getActiveQuestLine().reputationManager;
-    }
-    
-    public void clear() {
-        reputationMap.clear();
     }
     
     public Map<String, Reputation> getReputations() {
@@ -77,9 +76,13 @@ public class ReputationManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         reputationMap.clear();
-        string.flatMap(s -> SaveHandler.<List<Reputation>>load(s, new TypeToken<List<Reputation>>() {}.getType()))
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        SaveHandler.<List<Reputation>>load(string, new TypeToken<List<Reputation>>() {}.getType())
                 .ifPresent(reputations -> reputations.forEach(this::addReputation));
     }
 }
