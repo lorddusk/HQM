@@ -10,6 +10,8 @@ import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataManager;
+import hardcorequesting.common.io.DataReader;
+import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -61,13 +63,13 @@ public class QuestLine {
         
         add(new Serializable() {
             @Override
-            public void save(DataManager dataManager) {
-                dataManager.resolve("description.txt").set(mainDescription);
+            public void save(DataWriter writer) {
+                writer.write("description.txt", mainDescription);
             }
             
             @Override
-            public void load(DataManager dataManager) {
-                setMainDescription(dataManager.resolve("description.txt").get().orElse("No description"));
+            public void load(DataReader reader) {
+                setMainDescription(reader.read("description.txt").orElse("No description"));
             }
             
             @Override

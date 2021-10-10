@@ -25,6 +25,6 @@ public class LocalDataManager implements DataManager {
     
     @Override
     public String toString() {
-        return String.format("Network data with %d temp paths. (%s)", tempPaths.size(), tempPaths.keySet().stream().sorted().collect(Collectors.joining(", ")));
+        return String.format("Network data with %d temp paths (%s)", tempPaths.size(), tempPaths.keySet().stream().sorted().collect(Collectors.joining(", ")));
     }
 }

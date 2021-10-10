@@ -34,7 +34,7 @@ public class FileDataManager implements DataManager {
     }
     
     @Override
-    public Stream<String> resolveAll(FileFilter filter) {
+    public Stream<String> readAll(FileFilter filter) {
         //TODO use different function that doesn't catch IOException to have access to more information if an I/O error occurs.
         File[] files = basePath.toFile().listFiles(filter);
         return files == null ? Stream.empty() : Arrays.stream(files)
@@ -48,6 +48,6 @@ public class FileDataManager implements DataManager {
     
     @Override
     public String toString() {
-        return "File data.";
+        return "File data";
     }
 }
