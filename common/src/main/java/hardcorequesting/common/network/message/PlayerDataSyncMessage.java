@@ -56,9 +56,6 @@ public class PlayerDataSyncMessage implements IMessage {
         SyncUtil.writeLargeString(this.data, buf);
     }
     
-    @Deprecated //Temporary while loading is becoming more sound
-    public static LocalDataManager cachedDataManager = new LocalDataManager();
-    
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {
         
         @Environment(EnvType.CLIENT)
@@ -70,12 +67,12 @@ public class PlayerDataSyncMessage implements IMessage {
         
         @Environment(EnvType.CLIENT)
         private void handle(PlayerDataSyncMessage message, PacketContext ctx) {
-            cachedDataManager = new LocalDataManager();
-            cachedDataManager.provideTemp(TeamManager.FILE_PATH, message.teams);
-            cachedDataManager.provideTemp(QuestingDataManager.DATA_FILE_PATH, message.data);
-            cachedDataManager.provideTemp(QuestingDataManager.STATE_FILE_PATH, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
-            cachedDataManager.provideTemp(DeathStatsManager.FILE_PATH, message.deaths);
-            QuestLine.receiveDataFromServer(cachedDataManager);
+            LocalDataManager data = new LocalDataManager();
+            data.provide(TeamManager.FILE_PATH, message.teams);
+            data.provide(QuestingDataManager.DATA_FILE_PATH, message.data);
+            data.provide(QuestingDataManager.STATE_FILE_PATH, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
+            data.provide(DeathStatsManager.FILE_PATH, message.deaths);
+            QuestLine.receiveDataFromServer(data);
         }
     }
 }

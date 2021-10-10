@@ -72,19 +72,23 @@ public class QuestLineSyncMessage implements IMessage {
         }
         
         private void handle(QuestLineSyncMessage message, PacketContext ctx) {
-            LocalDataManager dataManager = PlayerDataSyncMessage.cachedDataManager;
-            dataManager.provideTemp("description.txt", message.mainDescription);
-            dataManager.provideTemp(ReputationManager.FILE_PATH, message.reputations);
-            dataManager.provideTemp(GroupTierManager.FILE_PATH, message.bags);
+            LocalDataManager data = new LocalDataManager();
+            data.provide("description.txt", message.mainDescription);
+            data.provide(ReputationManager.FILE_PATH, message.reputations);
+            data.provide(GroupTierManager.FILE_PATH, message.bags);
             JsonObject object = new JsonObject();
             JsonArray sets = new JsonArray();
             for (String s : message.questsSets.keySet()) sets.add(s);
             object.add("sets", sets);
-            dataManager.provideTemp("sets.json", object.toString());
+            data.provide("sets.json", object.toString());
             for (Map.Entry<String, String> entry : message.questsSets.entrySet()) {
-                dataManager.provideTemp("sets/" + entry.getKey() + ".json", entry.getValue());
+                data.provide("sets/" + entry.getKey() + ".json", entry.getValue());
             }
-            QuestLine.getActiveQuestLine().loadAll(dataManager, dataManager);
+            QuestLine questLine = QuestLine.getActiveQuestLine();
+            questLine.descriptionManager.load(data);
+            questLine.reputationManager.load(data);
+            questLine.groupTierManager.load(data);
+            questLine.questSetsManager.load(data);
         }
     }
 }
