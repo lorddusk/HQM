@@ -7,7 +7,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.event.EventTrigger;
-import hardcorequesting.common.io.FileProvider;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
@@ -57,17 +56,14 @@ public class QuestSetsManager implements Serializable {
     
     @Override
     public void save() {
-        parent.resolve("sets.json", provider -> {
-            JsonObject object = new JsonObject();
-            JsonArray array = new JsonArray();
-            questSets.stream().map(QuestSet::getFilename).distinct().forEach(array::add);
-            object.add("sets", array);
-            provider.set(object.toString());
-        });
+        JsonObject object = new JsonObject();
+        JsonArray array = new JsonArray();
+        questSets.stream().map(QuestSet::getFilename).distinct().forEach(array::add);
+        object.add("sets", array);
+        parent.resolve("sets.json").set(object.toString());
+        
         for (QuestSet set : questSets) {
-            parent.resolve("sets/" + set.getFilename() + ".json", provider -> {
-                provider.set(SaveHandler.save(set, QuestSet.class));
-            });
+            parent.resolve("sets/" + set.getFilename() + ".json").set(SaveHandler.save(set, QuestSet.class));
         }
     }
     
@@ -78,7 +74,7 @@ public class QuestSetsManager implements Serializable {
         EventTrigger.instance().clear();
         
         parent.resolve("sets.json")
-                .flatMap(FileProvider::get)
+                .get()
                 .map(SaveHandler.JSON_PARSER::parse)
                 .ifPresent(jsonElement -> {
                     if (jsonElement.isJsonArray()) {
@@ -108,7 +104,7 @@ public class QuestSetsManager implements Serializable {
                         }
                         for (String set : sets) {
                             parent.resolve("sets/" + set + ".json")
-                                    .flatMap(FileProvider::get)
+                                    .get()
                                     .flatMap(setText -> SaveHandler.load(setText, QuestSet.class))
                                     .filter(Predicates.not(questSets::contains))
                                     .ifPresent(questSets::add);

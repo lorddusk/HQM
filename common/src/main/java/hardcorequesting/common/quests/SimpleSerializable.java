@@ -16,25 +16,21 @@ public abstract class SimpleSerializable implements StringSerializable, Serializ
     @Override
     public final void save() {
         if (isData()) {
-            parent.resolveData(filePath(), path -> {
-                path.set(saveToString());
-            });
+            parent.resolveData(filePath()).set(saveToString());
         } else {
-            parent.resolve(filePath(), path -> {
-                path.set(saveToString());
-            });
+            parent.resolve(filePath()).set(saveToString());
         }
     }
     
     @Override
     public final void load() {
         loadFromString(Optional.empty());
-        Optional<FileProvider> provider;
+        FileProvider provider;
         if (isData()) {
             provider = parent.resolveData(filePath());
         } else {
             provider = parent.resolve(filePath());
         }
-        provider.map(FileProvider::get).ifPresent(this::loadFromString);
+        loadFromString(provider.get());
     }
 }

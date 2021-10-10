@@ -31,7 +31,6 @@ import net.minecraft.world.entity.player.Player;
 import java.io.FileFilter;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -71,14 +70,12 @@ public class QuestLine {
         add(new Serializable() {
             @Override
             public void save() {
-                resolve("description.txt", provider -> provider.set(mainDescription));
+                resolve("description.txt").set(mainDescription);
             }
             
             @Override
             public void load() {
-                if (!resolve("description.txt", provider -> setMainDescription(provider.get().orElse("No description")))) {
-                    setMainDescription("No description");
-                }
+                setMainDescription(resolve("description.txt").get().orElse("No description"));
             }
             
             @Override
@@ -179,21 +176,9 @@ public class QuestLine {
         return cachedMainDescription;
     }
     
-    public boolean resolve(String name, Consumer<FileProvider> pathConsumer) {
-        Optional<FileProvider> provider = resolve(name);
-        provider.ifPresent(pathConsumer);
-        return provider.isPresent();
-    }
-    
-    public boolean resolveData(String name, Consumer<FileProvider> pathConsumer) {
-        Optional<FileProvider> provider = resolveData(name);
-        provider.ifPresent(pathConsumer);
-        return provider.isPresent();
-    }
-    
-    public Optional<FileProvider> resolve(String name) {
-        return Optional.of(dataManager.map(dataManager1 -> dataManager1.resolve(name))
-                .orElseGet(() -> localData.resolve(name)));
+    public FileProvider resolve(String name) {
+        return dataManager.map(dataManager1 -> dataManager1.resolve(name))
+                .orElseGet(() -> localData.resolve(name));
     }
     
     public Stream<String> resolveAll(FileFilter filter) {
@@ -201,9 +186,9 @@ public class QuestLine {
                 .orElseGet(() -> localData.resolveAll(filter));
     }
     
-    public Optional<FileProvider> resolveData(String name) {
-        return Optional.of(dataManager.map(dataManager1 -> dataManager1.resolveData(name))
-                .orElseGet(() -> localData.resolveData(name)));
+    public FileProvider resolveData(String name) {
+        return dataManager.map(dataManager1 -> dataManager1.resolveData(name))
+                .orElseGet(() -> localData.resolveData(name));
     }
     
     @Deprecated
