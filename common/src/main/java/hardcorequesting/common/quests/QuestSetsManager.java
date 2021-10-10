@@ -12,8 +12,9 @@ import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,15 +30,17 @@ public class QuestSetsManager implements Serializable {
     private static final Pattern STATE = Pattern.compile("^state\\.json$", Pattern.CASE_INSENSITIVE);
     private static final Pattern DATA = Pattern.compile("^data\\.json$", Pattern.CASE_INSENSITIVE);
     private static final Pattern SETS = Pattern.compile("^sets\\.json$", Pattern.CASE_INSENSITIVE);
-    private static final FileFilter QUEST_SET_FILTER =
-            pathname -> JSON.matcher(pathname.getName()).find()
-                        && !REPUTATIONS.matcher(pathname.getName()).find()
-                        && !BAGS.matcher(pathname.getName()).find()
-                        && !TEAMS.matcher(pathname.getName()).find()
-                        && !STATE.matcher(pathname.getName()).find()
-                        && !DATA.matcher(pathname.getName()).find()
-                        && !SETS.matcher(pathname.getName()).find()
-                        && !DEATHS.matcher(pathname.getName()).find();
+    private static final DirectoryStream.Filter<Path> QUEST_SET_FILTER = path -> {
+        String name = path.getFileName().toString();
+        return JSON.matcher(name).find()
+                && !REPUTATIONS.matcher(name).find()
+                && !BAGS.matcher(name).find()
+                && !TEAMS.matcher(name).find()
+                && !STATE.matcher(name).find()
+                && !DATA.matcher(name).find()
+                && !SETS.matcher(name).find()
+                && !DEATHS.matcher(name).find();
+    };
     
     public final Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     public final List<QuestSet> questSets = Lists.newArrayList();

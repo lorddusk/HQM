@@ -2,17 +2,20 @@ package hardcorequesting.common.io;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public class FileDataManager implements DataReader, DataWriter {
+    private static final Logger LOGGER = LogManager.getLogger("Hardcore Questing Mode");
     
     private final Path path;
     
@@ -43,11 +46,19 @@ public class FileDataManager implements DataReader, DataWriter {
     }
     
     @Override
-    public Stream<String> readAll(FileFilter filter) {
-        //TODO use different function that doesn't catch IOException to have access to more information if an I/O error occurs.
-        File[] files = path.toFile().listFiles(filter);
-        return files == null ? Stream.empty() : Arrays.stream(files)
-                .flatMap(file -> SaveHandler.load(file).stream());
+    public Stream<String> readAll(DirectoryStream.Filter<Path> filter) {
+        
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, filter))
+        {
+            List<Path> paths = new ArrayList<>();
+            stream.forEach(paths::add);
+            
+            return paths.stream().flatMap(file -> SaveHandler.load(file).stream());
+        } catch (IOException e)
+        {
+            LOGGER.warn("File search failed.", e);
+            return Stream.empty();
+        }
     }
     
     @Override
