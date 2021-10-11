@@ -3,23 +3,9 @@ package hardcorequesting.common.util;
 
 import hardcorequesting.common.client.interfaces.GuiColor;
 import net.minecraft.ChatFormatting;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
 
-import java.util.IllegalFormatException;
-
 public class Translator {
-    
-    @Deprecated
-    public static String get(String id, Object... args) {
-        String text = Language.getInstance().getOrDefault(id);
-    
-        try {
-            return String.format(text, args).replace("\\n", "\n");
-        } catch (IllegalFormatException var5) {
-            return "Format error: " + text;
-        }
-    }
     
     public static MutableComponent quest(int quests) {
         return plural("hqm.quest", quests);

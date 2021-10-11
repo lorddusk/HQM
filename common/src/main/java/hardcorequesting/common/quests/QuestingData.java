@@ -152,9 +152,9 @@ public class QuestingData {
                 if (entry.isInTeam() && !entry.getUUID().equals(player.getUUID())) {
                     Player other = getPlayer(entry.getUUID());
                     if (other != null) {
+                        String key = isDead ? "hqm.message.lostTeamLifeAndBan" : "hqm.message.lostTeamLife";
                         other.sendMessage(
-                                Translator.translatable("hqm.message.lostTeamLife", player.getScoreboardName(),
-                                        (isDead ? " " + Translator.get("hqm.message.andBanned") : ""),
+                                Translator.translatable(key, player.getScoreboardName(),
                                         Translator.lives(getLives())), Util.NIL_UUID);
                     }
                 }
