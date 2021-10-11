@@ -185,7 +185,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                 info = Translator.translatable("hqm.questBook.locked");
             gui.drawString(matrices, info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
-                FormattedText toClaim = Translator.pluralTranslated(unclaimed != 1, "hqm.questBook.unclaimedRewards", GuiColor.PURPLE, unclaimed);
+                FormattedText toClaim = Translator.translatable("hqm.questBook.unclaimedRewards", GuiColor.PURPLE, Translator.quest(unclaimed));
                 gui.drawString(matrices, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
             setY += GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING;
@@ -235,15 +235,15 @@ public class QuestSetsGraphic extends EditableGraphic {
         }
         
         List<FormattedText> info = new ArrayList<>();
-        info.add(Translator.pluralTranslated(total != 1, "hqm.questBook.totalQuests", GuiColor.GRAY, total));
-        info.add(Translator.pluralTranslated(enabled != 1, "hqm.questBook.unlockedQuests", GuiColor.CYAN, enabled));
-        info.add(Translator.pluralTranslated(completed != 1, "hqm.questBook.completedQuests", GuiColor.GREEN, completed));
-        info.add(Translator.pluralTranslated((enabled - completed) != 1, "hqm.questBook.totalQuests", GuiColor.LIGHT_BLUE, enabled - completed));
+        info.add(Translator.translatable("hqm.questBook.totalQuests", GuiColor.GRAY, Translator.quest(total)));
+        info.add(Translator.translatable("hqm.questBook.unlockedQuests", GuiColor.CYAN, Translator.quest(enabled)));
+        info.add(Translator.translatable("hqm.questBook.completedQuests", GuiColor.GREEN, Translator.quest(completed)));
+        info.add(Translator.translatable("hqm.questBook.availableQuests", GuiColor.LIGHT_BLUE, Translator.quest(enabled - completed)));
         if (reward > 0) {
-            info.add(Translator.pluralTranslated(reward != 1, "hqm.questBook.unclaimedQuests", GuiColor.PURPLE, reward));
+            info.add(Translator.translatable("hqm.questBook.unclaimedQuests", GuiColor.PURPLE, Translator.quest(reward)));
         }
         if (Quest.canQuestsBeEdited() && !Screen.hasControlDown()) {
-            info.add(Translator.pluralTranslated(realTotal != 1, "hqm.questBook.inclInvisiQuests", GuiColor.LIGHT_GRAY, realTotal));
+            info.add(Translator.translatable("hqm.questBook.inclInvisiQuests", GuiColor.LIGHT_GRAY, Translator.quest(realTotal)));
         }
         gui.drawString(matrices, info, x, y, 0.7F, 0x404040);
     }

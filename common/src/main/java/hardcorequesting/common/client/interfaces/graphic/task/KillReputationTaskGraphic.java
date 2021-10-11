@@ -49,9 +49,11 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
         int killCount = task.getKills(playerId);
         if (Quest.canQuestsBeEdited()) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.pluralTranslated(task.getKillsRequirement() != 1, "hqm.repKil.kills", killCount, task.getKillsRequirement()), 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {
-            gui.drawString(matrices, gui.getLinesFromText(killCount == task.getKillsRequirement() ? Translator.pluralTranslated(task.getKillsRequirement() != 1, "hqm.repKil.killCount", GuiColor.GREEN, task.getKillsRequirement()) : Translator.translatable("hqm.repKil.killCountOutOf", killCount, task.getKillsRequirement()), 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(matrices, gui.getLinesFromText(killCount == task.getKillsRequirement()
+                    ? Translator.translatable("hqm.repKil.killCount", GuiColor.GREEN, Translator.player(task.getKillsRequirement()))
+                    : Translator.translatable("hqm.repKil.killCountOutOf", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }
     }
 }

@@ -142,10 +142,10 @@ public final class SaveHelper {
             if (minutes == 0) {
                 return Translator.translatable("hqm.editType.savedRecent");
             } else {
-                return Translator.pluralTranslated(minutes != 1, "hqm.editType.savedMinutes", minutes);
+                return Translator.translatable("hqm.editType.savedTime", Translator.plural("hqm.minute", minutes));
             }
         } else {
-            return Translator.pluralTranslated(hours != 1, "hqm.editType.savedMinutes", hours);
+            return Translator.translatable("hqm.editType.savedTime", Translator.plural("hqm.hour", hours));
         }
     }
     

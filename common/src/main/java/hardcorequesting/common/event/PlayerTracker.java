@@ -60,6 +60,7 @@ public class PlayerTracker {
     
     private void sendLoginMessage(Player player) {
         player.sendMessage(Translator.translatable("hqm.message.hardcore").append(" ")
-                .append(Translator.pluralTranslated(getRemainingLives(player) != 1, "hqm.message.livesLeft", getRemainingLives(player))), Util.NIL_UUID);
+                .append(Translator.translatable("hqm.message.livesLeft",
+                        Translator.plural("hqm.life", getRemainingLives(player)))), Util.NIL_UUID);
     }
 }

@@ -62,10 +62,12 @@ public class CommandHandler {
             sender.sendSuccess(text, false);
         }
         
+        @Deprecated
         default void sendTranslatableChat(CommandSourceStack sender, String key, Object... args) {
             sender.sendSuccess(Translator.translatable(key, args), false);
         }
         
+        @Deprecated
         default void sendTranslatableChat(CommandSourceStack sender, boolean plural, String key, Object... args) {
             sender.sendSuccess(Translator.pluralTranslated(plural, key, args), false);
         }

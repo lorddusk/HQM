@@ -127,7 +127,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                 
                     if (editing && totalParentCount > 0) {
-                        txt += "\n" + GuiColor.GRAY + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), totalParentCount));
+                        txt += "\n" + GuiColor.GRAY + Translator.rawString(Translator.translatable("hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
                     
                         if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_R)) {
                             txt += " [" + I18n.get("hqm.questBook.holding", "R") + "]";
@@ -144,7 +144,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 
                     int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
                     if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), totalParentCount));
+                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.translatable("hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
                         shouldDrawText = true;
                         if (editing) {
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_E)) {
@@ -165,11 +165,11 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         txt += "\n" + GuiColor.MAGENTA;
                         int amount = quest.getParentRequirementCount();
                         if (amount < quest.getRequirements().size()) {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqOnly", amount));
+                            txt += Translator.rawString(Translator.translatable("hqm.questBook.reqOnly", Translator.quest(amount)));
                         } else if (amount > quest.getRequirements().size()) {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqMore", amount));
+                            txt += Translator.rawString(Translator.translatable("hqm.questBook.reqMore", Translator.quest(amount)));
                         } else {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqAll", amount));
+                            txt += Translator.rawString(Translator.translatable("hqm.questBook.reqAll", Translator.quest(amount)));
                         }
                     
                     }
@@ -242,7 +242,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                         parentInvisible = false;
                                         break;
                                     case TASK_TRIGGER:
-                                        invisibilityMessage = Translator.rawString(Translator.pluralTranslated(quest.getTriggerTasks() != 1, "hqm.questBook.invisCount", quest.getTriggerTasks()));
+                                        invisibilityMessage = Translator.rawString(Translator.plural("hqm.questBook.invisCount", quest.getTriggerTasks()));
                                         break;
                                     default:
                                         invisibilityMessage = null;
@@ -279,7 +279,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         }
                         int optionLinks = ids.size();
                         if (optionLinks > 0) {
-                            txt += "\n" + GuiColor.BLUE + Translator.rawString(Translator.pluralTranslated(optionLinks != 1, "hqm.questBook.optionLinks", optionLinks));
+                            txt += "\n" + GuiColor.BLUE + Translator.rawString(Translator.translatable("hqm.questBook.optionLinks", Translator.quest(optionLinks)));
                         
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_O)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "O") + "]";
@@ -308,7 +308,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                 
                     if (childCount > 0) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(childCount != 1, "hqm.questBook.childUnlocks", childCount));
+                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.translatable("hqm.questBook.childUnlocks", Translator.quest(childCount)));
                         if (editing) {
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_U)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "U") + "]";

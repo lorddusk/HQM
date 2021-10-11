@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 public class Translator {
     private static final Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)]]");
     
+    @Deprecated
     public static String get(String id, Object... args) {
         String text = Language.getInstance().getOrDefault(id);
     
@@ -26,14 +27,25 @@ public class Translator {
         }
     }
     
+    @Deprecated
     public static MutableComponent pluralTranslated(boolean plural, String id, Object... args) {
         return pluralFormat(text(get(id, args)), null, plural);
     }
     
-    public static MutableComponent pluralTranslated(boolean plural, String id, GuiColor color, Object... args) {
-        return pluralFormat(text(get(id, args)), color, plural);
+    public static MutableComponent quest(int quests) {
+        return plural("hqm.quest", quests);
     }
     
+    public static MutableComponent player(int players) {
+        return plural("hqm.player", players);
+    }
+    
+    public static MutableComponent plural(String id, int thing) {
+        String key = thing != 1 ? id + ".plural" : id;
+        return translatable(key, thing);
+    }
+    
+    @Deprecated
     private static MutableComponent pluralFormat(Component text, GuiColor color, boolean plural) {
         if (text == null) return new TextComponent("");
         try {

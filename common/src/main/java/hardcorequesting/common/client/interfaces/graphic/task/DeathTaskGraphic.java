@@ -40,8 +40,8 @@ public class DeathTaskGraphic extends TaskGraphic {
     public void draw(PoseStack matrices, int mX, int mY) {
         int died = task.getDeaths(playerId);
         FormattedText text = died == task.getDeathsRequired()
-                ? Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deaths", GuiColor.GREEN, task.getDeathsRequired())
-                : Translator.pluralTranslated(task.getDeathsRequired() != 0, "hqm.deathMenu.deathsOutOf", died, task.getDeathsRequired());
+                ? Translator.translatable("hqm.deathMenu.deaths", GuiColor.GREEN, Translator.plural("hqm.times", task.getDeathsRequired()))
+                : Translator.translatable("hqm.deathMenu.deathsOutOf", died, Translator.plural("hqm.times", task.getDeathsRequired()));
     
         gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     
