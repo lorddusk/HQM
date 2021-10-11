@@ -117,9 +117,9 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
     
     private void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
         QuestingDataManager.getInstance().getQuestingData(player).removeLives(player, amount);
-        sendTranslatableChat(source, "hqm.message.removeLivesFrom", Translator.lives(amount), player.getScoreboardName());
+        sendChat(source, Translator.translatable("hqm.message.removeLivesFrom", Translator.lives(amount), player.getScoreboardName()));
         if (source.getEntity() != player)
-            sendTranslatableChat(player.createCommandSourceStack(), "hqm.message.removeLivesBy", Translator.lives(amount), source.getTextName());
+            sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.message.removeLivesBy", Translator.lives(amount), source.getTextName()));
         currentLives(player);
     }
     
@@ -127,15 +127,15 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
         QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
         if (questingDataManager.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
             questingDataManager.getQuestingData(player).addLives(player, amount);
-            sendTranslatableChat(source, "hqm.message.addLivesTo", Translator.lives(amount), player.getScoreboardName());
+            sendChat(source, Translator.translatable("hqm.message.addLivesTo", Translator.lives(amount), player.getScoreboardName()));
             if (source.getEntity() != player)
-                sendTranslatableChat(player.createCommandSourceStack(), "hqm.message.addLivesBy", Translator.lives(amount), source.getTextName());
+                sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.message.addLivesBy", Translator.lives(amount), source.getTextName()));
         } else {
             questingDataManager.getQuestingData(player).addLives(player, amount);
-            sendTranslatableChat(source, "hqm.message.cantGiveMoreLives", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
-            sendTranslatableChat(source, "hqm.massage.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES);
+            sendChat(source, Translator.translatable("hqm.message.cantGiveMoreLives", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES));
+            sendChat(source, Translator.translatable("hqm.massage.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES));
             if (source.getEntity() != player)
-                sendTranslatableChat(player.createCommandSourceStack(), "hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName());
+                sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName()));
         }
         currentLives(player);
     }
@@ -144,7 +144,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
         Player player = HardcoreQuestingCore.getServer().getPlayerList().getPlayerByName(playerName);
         if (player != null) {
             int lives = QuestingDataManager.getInstance().getQuestingData(player).getLives();
-            sendTranslatableChat(source, "hqm.message.hasLivesRemaining", playerName, Translator.lives(lives));
+            sendChat(source, Translator.translatable("hqm.message.hasLivesRemaining", playerName, Translator.lives(lives)));
         } else {
             throw new CommandRuntimeException(new TranslatableComponent("hqm.message.noPlayer"));
         }
