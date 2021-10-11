@@ -1,6 +1,6 @@
 package hardcorequesting.common.util;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 
 public enum EditType {
@@ -78,20 +78,20 @@ public enum EditType {
         this.type = type;
     }
     
-    public String translate(int number) {
+    public String translate(int number) {   //TODO text component
         return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
     }
     
     public enum BaseEditType {
-        ADD("added", GuiColor.GREEN),
-        CHANGE("changed", GuiColor.ORANGE),
-        MOVE("moved", GuiColor.ORANGE),
-        REMOVE("removed", GuiColor.RED);
+        ADD("added", ChatFormatting.DARK_GREEN),
+        CHANGE("changed", ChatFormatting.GOLD),
+        MOVE("moved", ChatFormatting.GOLD),
+        REMOVE("removed", ChatFormatting.DARK_RED);
         
         private final String id;
-        private final GuiColor colour;
+        private final ChatFormatting colour;
         
-        BaseEditType(String id, GuiColor colour) {
+        BaseEditType(String id, ChatFormatting colour) {
             this.id = id;
             this.colour = colour;
         }

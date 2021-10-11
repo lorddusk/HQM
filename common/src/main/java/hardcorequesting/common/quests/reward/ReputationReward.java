@@ -1,7 +1,7 @@
 package hardcorequesting.common.quests.reward;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.reputation.Reputation;
+import net.minecraft.ChatFormatting;
 
 public class ReputationReward extends QuestReward<Reputation> {
     
@@ -20,12 +20,12 @@ public class ReputationReward extends QuestReward<Reputation> {
         this.value = value;
     }
     
-    public String getLabel() {
+    public String getLabel() {  //TODO text component
         if (reward != null) {
             String result = reward.getName() + ": ";
             
             if (value != 0) {
-                result += value > 0 ? GuiColor.GREEN : GuiColor.RED;
+                result += value > 0 ? ChatFormatting.DARK_GREEN : ChatFormatting.DARK_RED;
             }
             if (value > 0) {
                 result += "+";

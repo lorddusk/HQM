@@ -1,7 +1,7 @@
 package hardcorequesting.common.quests;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
@@ -76,6 +76,6 @@ public enum TriggerType {
     public abstract boolean isQuestVisible(Quest quest, UUID playerId);
     
     public String getMessage(Quest quest) {
-        return GuiColor.ORANGE + getName().getString(); //TODO don't do getString() here
+        return ChatFormatting.GOLD + getName().getString(); //TODO don't do getString() here
     }
 }

@@ -1,7 +1,6 @@
 package hardcorequesting.common.reputation;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -9,6 +8,7 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Player;
@@ -98,7 +98,7 @@ public class Reputation {
         
         if (error != null) {
             gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
-            gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, GuiColor.RED.getHexColor());
+            gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
             return;
         }
         
@@ -206,14 +206,14 @@ public class Reputation {
         }
         drawPointer(matrices, gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)));
         
-        String str;
+        String str; //TODO text component
         boolean selected = false;
         
         if (text != null) {
             str = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                str = GuiColor.RED + I18n.get("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
+                str = ChatFormatting.DARK_RED + I18n.get("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();

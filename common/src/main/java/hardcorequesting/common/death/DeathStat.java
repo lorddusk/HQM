@@ -1,8 +1,8 @@
 package hardcorequesting.common.death;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Player;
@@ -90,9 +90,9 @@ public class DeathStat {
     
     public static class DeathStatBest extends DeathStat {
         
-        private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
+        private static final String[] colourPrefixes = {ChatFormatting.YELLOW.toString(), ChatFormatting.GRAY.toString(), ChatFormatting.GOLD.toString()};
         private static final String[] placePrefixes = {"first", "second", "third"};
-        private final Map<DeathType, String> messages = new EnumMap<>(DeathType.class);
+        private final Map<DeathType, String> messages = new EnumMap<>(DeathType.class); //TODO use component instead of string
         
         public DeathStatBest(List<DeathStat> clientDeathList) {
             super(null);
@@ -100,7 +100,7 @@ public class DeathStat {
                 clientDeathList.sort(deathTypeComparator.get(type));
                 if (clientDeathList.isEmpty()) {
                     deaths.put(type, 0);
-                    messages.put(type, GuiColor.RED + I18n.get("hqm.deathStat.noOneDied"));
+                    messages.put(type, ChatFormatting.DARK_RED + I18n.get("hqm.deathStat.noOneDied"));
                 } else {
                     deaths.put(type, clientDeathList.get(0).getDeaths(type));
                     StringBuilder builder = new StringBuilder();
@@ -119,7 +119,7 @@ public class DeathStat {
                             builder.append("\n");
                         }
                         builder.append(colourPrefixes[standing]).append(I18n.get("hqm.deathStat." + placePrefixes[standing]));
-                        builder.append(GuiColor.WHITE + " ").append(clientDeathList.get(j).getName()).append(": ").append(clientDeathList.get(j).getDeaths(type));
+                        builder.append(ChatFormatting.WHITE + " ").append(clientDeathList.get(j).getName()).append(": ").append(clientDeathList.get(j).getDeaths(type));
                     }
                     messages.put(type, builder.toString());
                 }
@@ -160,8 +160,8 @@ public class DeathStat {
             int count = counts.get(type);
             return super.getDescription(type) + "\n\n" +
                    (count == 0 ?
-                           GuiColor.RED + I18n.get("hqm.deathStat.noOneDied") :
-                           GuiColor.GREEN.toString() + count + " " + I18n.get("hqm.deathStat.player" + (count == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
+                           ChatFormatting.DARK_RED + I18n.get("hqm.deathStat.noOneDied") :
+                           ChatFormatting.DARK_GREEN.toString() + count + " " + I18n.get("hqm.deathStat.player" + (count == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
         }
         
         @Override

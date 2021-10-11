@@ -1,7 +1,6 @@
 package hardcorequesting.common.items;
 
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.Quest;
@@ -10,11 +9,10 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -115,7 +113,7 @@ public class QuestBookItem extends Item {
                 Player useAsPlayer = QuestingData.getPlayer(compound.getString(NBT_PLAYER));
                 tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getScoreboardName()));
             } else
-                tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(GuiColor.RED.getHexColor() & 0xFFFFFF))));
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").withStyle(ChatFormatting.RED));
         }
     }
     
