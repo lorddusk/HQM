@@ -6,34 +6,24 @@ import hardcorequesting.common.client.interfaces.GuiColor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
-import net.minecraft.util.LazyLoadedValue;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Translator {
-    private static Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)]]");
-    
-    @SuppressWarnings("Convert2MethodRef")
-    private static final LazyLoadedValue<BiFunction<String, Object[], String>> storageTranslator = new LazyLoadedValue<>(() ->
-            Executor.call(() -> () -> (s, args) -> I18n.get(s, args), () -> () -> (s, args) -> {
-                String s1 = Language.getInstance().getOrDefault(s);
-                if (s1 == null) s1 = s;
-                
-                try {
-                    return String.format(s1, args);
-                } catch (IllegalFormatException var5) {
-                    return "Format error: " + s1;
-                }
-            }));
+    private static final Pattern pluralPattern = Pattern.compile("\\[\\[(.*)\\|\\|(.*)]]");
     
     public static String get(String id, Object... args) {
-        return storageTranslator.get().apply(id, args).replace("\\n", "\n");
+        String text = Language.getInstance().getOrDefault(id);
+    
+        try {
+            return String.format(text, args).replace("\\n", "\n");
+        } catch (IllegalFormatException var5) {
+            return "Format error: " + text;
+        }
     }
     
     public static MutableComponent pluralTranslated(boolean plural, String id, Object... args) {
