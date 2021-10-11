@@ -1,16 +1,15 @@
 package hardcorequesting.common.quests;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
-import hardcorequesting.common.io.SaveHandler;
+import hardcorequesting.common.io.DataReader;
+import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -19,22 +18,13 @@ import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -48,64 +38,52 @@ public class QuestLine {
     public final DeathStatsManager deathStatsManager;
     public final QuestSetsManager questSetsManager;
     public final TeamManager teamManager;
-    public String mainDescription = "No description";
-    private List<FormattedText> cachedMainDescription;
+    public final Serializable descriptionManager;
+    
+    private String mainDescription = "No description";
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
-    @Deprecated
-    public final Optional<Path> basePath;
-    @Deprecated
-    public final Optional<Path> dataPath;
     private final List<Serializable> serializables = Lists.newArrayList();
-    private final Map<String, FileProvider> tempPaths = Maps.newHashMap();
     
-    private QuestLine(Optional<Path> basePath, Optional<Path> dataPath) {
+    private QuestLine() {
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
         }
-        this.basePath = basePath;
-        this.dataPath = dataPath;
-        this.reputationManager = new ReputationManager(this);
-        this.groupTierManager = new GroupTierManager(this);
-        this.questingDataManager = new QuestingDataManager(this);
-        this.deathStatsManager = new DeathStatsManager(this);
-        this.questSetsManager = new QuestSetsManager(this);
-        this.teamManager = new TeamManager(this);
-        GroupTier.initBaseTiers(this);
-        
-        try {
-            if (this.basePath.isPresent()) {
-                if (!Files.exists(this.basePath.get())) {
-                    Files.createDirectories(this.basePath.get());
-                }
-            }
-            if (this.dataPath.isPresent()) {
-                if (!Files.exists(this.dataPath.get())) {
-                    Files.createDirectories(this.dataPath.get());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        add(new Serializable() {
+        this.reputationManager = new ReputationManager();
+        this.groupTierManager = new GroupTierManager();
+        this.questingDataManager = new QuestingDataManager();
+        this.deathStatsManager = new DeathStatsManager();
+        this.questSetsManager = new QuestSetsManager();
+        this.teamManager = new TeamManager();
+        this.descriptionManager = new SimpleSerializable() {
             @Override
-            public void save() {
-                resolve("description.txt", provider -> provider.set(mainDescription));
+            public String filePath() {
+                return "description.txt";
             }
-            
+        
             @Override
-            public void load() {
-                if (!resolve("description.txt", provider -> setMainDescription(provider.get().orElse("No description")))) {
-                    setMainDescription("No description");
-                }
+            public String saveToString() {
+                return getMainDescription();
             }
-            
+    
+            @Override
+            public void clear() {
+                setMainDescription("No description");
+            }
+    
+            @Override
+            public void loadFromString(String string) {
+                setMainDescription(string);
+            }
+        
             @Override
             public boolean isData() {
                 return false;
             }
-        });
+        };
+        GroupTier.initBaseTiers(this);
+    
+        add(descriptionManager);
         add(this.questingDataManager.state);
         add(this.deathStatsManager);
         add(this.reputationManager);
@@ -131,18 +109,18 @@ public class QuestLine {
     }
     
     @Environment(EnvType.CLIENT)
-    public static void receiveDataFromServer(Player receiver, boolean remote) {
+    public static void receiveDataFromServer(DataReader reader) {
         if (!hasLoadedMainSound) {
             SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
             hasLoadedMainSound = true;
         }
-        QuestLine questLine = reset(Optional.empty(), Optional.empty());
-        questLine.loadAll();
+        QuestLine questLine = reset();
+        questLine.loadAll(reader, reader);
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
-    public static QuestLine reset(Optional<Path> basePath, Optional<Path> dataPath) {
-        return activeQuestLine = new QuestLine(basePath, dataPath);
+    public static QuestLine reset() {
+        return activeQuestLine = new QuestLine();
     }
     
     public static void sendDataToClient(ServerPlayer player) {
@@ -159,113 +137,35 @@ public class QuestLine {
         }
     }
     
-    public void setMainDescription(String mainDescription) {
-        this.mainDescription = mainDescription;
-        this.cachedMainDescription = null;
+    public String getMainDescription() {
+        return mainDescription;
     }
     
-    public void saveAll() {
+    public void setMainDescription(String mainDescription) {
+        this.mainDescription = mainDescription;
+    }
+    
+    public void save(@Nullable DataWriter cfgWriter, @Nullable DataWriter dataWriter) {
         for (Serializable serializable : serializables) {
-            serializable.save();
+            if (dataWriter != null && serializable.isData())
+                serializable.save(dataWriter);
+            else if (cfgWriter != null && !serializable.isData())
+                serializable.save(cfgWriter);
         }
         SaveHelper.onSave();
     }
     
-    public void saveData() {
+    public void loadAll(DataReader cfgReader, DataReader dataReader) {
+        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", cfgReader);
+        
         for (Serializable serializable : serializables) {
-            if (serializable.isData())
-                serializable.save();
+            serializable.load(serializable.isData() ? dataReader : cfgReader);
         }
-    }
-    
-    public void loadAll() {
-        HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with %d temp paths. (%s)", tempPaths.size(), tempPaths.keySet().stream().sorted().collect(Collectors.joining(", ")));
-        for (Serializable serializable : serializables) {
-            serializable.load();
-        }
+        
         SaveHelper.onLoad();
         
         if (HardcoreQuestingCore.platform.isClient()) {
             resetClient();
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public List<FormattedText> getMainDescription(GuiBase gui) {
-        if (cachedMainDescription == null) {
-            cachedMainDescription = gui.getLinesFromText(Translator.plain(mainDescription), 0.7F, 130);
-        }
-        
-        return cachedMainDescription;
-    }
-    
-    public boolean resolve(String name, Consumer<FileProvider> pathConsumer) {
-        Optional<FileProvider> provider = resolve(name);
-        provider.ifPresent(pathConsumer);
-        return provider.isPresent();
-    }
-    
-    public boolean resolveData(String name, Consumer<FileProvider> pathConsumer) {
-        Optional<FileProvider> provider = resolveData(name);
-        provider.ifPresent(pathConsumer);
-        return provider.isPresent();
-    }
-    
-    public Optional<FileProvider> resolve(String name) {
-        Optional<FileProvider> provider = basePath.map(path -> new PathProvider(path.resolve(name)));
-        if (!provider.isPresent() && tempPaths.containsKey(name))
-            provider = Optional.of(tempPaths.get(name));
-        return provider;
-    }
-    
-    public Optional<FileProvider> resolveData(String name) {
-        Optional<FileProvider> provider = dataPath.map(path -> new PathProvider(path.resolve(name)));
-        if (!provider.isPresent() && tempPaths.containsKey(name))
-            provider = Optional.of(tempPaths.get(name));
-        return provider;
-    }
-    
-    public void provideTemp(SimpleSerializable serializable, String str) {
-        provideTemp(serializable.filePath(), str);
-    }
-    
-    public void provideTemp(String path, String str) {
-        tempPaths.put(path, new FileProvider() {
-            String s = str;
-            
-            @Override
-            public Optional<String> get() {
-                return Optional.of(s);
-            }
-            
-            @Override
-            public void set(String str) {
-                s = str;
-            }
-        });
-    }
-    
-    public interface FileProvider {
-        Optional<String> get();
-        
-        void set(String str);
-    }
-    
-    public static class PathProvider implements FileProvider {
-        private final Path path;
-        
-        public PathProvider(Path path) {
-            this.path = path;
-        }
-        
-        @Override
-        public Optional<String> get() {
-            return SaveHandler.load(path);
-        }
-        
-        @Override
-        public void set(String str) {
-            SaveHandler.save(path, str);
         }
     }
 }

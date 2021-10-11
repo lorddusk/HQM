@@ -3,6 +3,7 @@ package hardcorequesting.common.network.message;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
@@ -23,7 +24,7 @@ public class QuestLineSyncMessage implements IMessage {
     }
     
     public QuestLineSyncMessage(QuestLine questLine) {
-        this.mainDescription = questLine.mainDescription;
+        this.mainDescription = questLine.getMainDescription();
         this.reputations = questLine.reputationManager.saveToString();
         this.bags = questLine.groupTierManager.saveToString();
         this.questsSets = Maps.newLinkedHashMap();
@@ -70,18 +71,22 @@ public class QuestLineSyncMessage implements IMessage {
         
         private void handle(QuestLineSyncMessage message, PacketContext ctx) {
             QuestLine questLine = QuestLine.getActiveQuestLine();
-            questLine.provideTemp("description.txt", message.mainDescription);
-            questLine.provideTemp(questLine.reputationManager, message.reputations);
-            questLine.provideTemp(questLine.groupTierManager, message.bags);
-            JsonObject object = new JsonObject();
+            
             JsonArray sets = new JsonArray();
             for (String s : message.questsSets.keySet()) sets.add(s);
+            JsonObject object = new JsonObject();
             object.add("sets", sets);
-            questLine.provideTemp("sets.json", object.toString());
+    
+            LocalDataManager data = new LocalDataManager();
+            data.provide("sets.json", object.toString());
             for (Map.Entry<String, String> entry : message.questsSets.entrySet()) {
-                questLine.provideTemp("sets/" + entry.getKey() + ".json", entry.getValue());
+                data.provide("sets/" + entry.getKey() + ".json", entry.getValue());
             }
-            questLine.loadAll();
+            questLine.questSetsManager.load(data);
+            
+            questLine.setMainDescription(message.mainDescription);
+            questLine.reputationManager.clearAndLoad(message.reputations);
+            questLine.groupTierManager.clearAndLoad(message.bags);
         }
     }
 }

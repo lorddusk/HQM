@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
@@ -358,7 +359,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void save() {
-        QuestLine.getActiveQuestLine().saveAll();
+        QuestLine.getActiveQuestLine().save(HardcoreQuestingCore.packManager, null);
         SaveHelper.onSave();
     }
     

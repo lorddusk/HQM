@@ -1,9 +1,14 @@
 package hardcorequesting.common.quests;
 
-import java.util.Optional;
-
 public interface StringSerializable {
     String saveToString();
     
-    void loadFromString(Optional<String> string);
+    void clear();
+    
+    void loadFromString(String string);
+    
+    default void clearAndLoad(String string) {
+        clear();
+        loadFromString(string);
+    }
 }

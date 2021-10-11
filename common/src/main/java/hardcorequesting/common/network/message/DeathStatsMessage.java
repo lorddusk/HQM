@@ -8,7 +8,6 @@ import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
-import hardcorequesting.common.quests.QuestLine;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.List;
@@ -24,7 +23,6 @@ public class DeathStatsMessage implements IMessage {
     
     public DeathStatsMessage(boolean local) {
         this.local = local;
-        if (local) DeathStatsManager.getInstance().save();
     }
     
     @Override
@@ -50,12 +48,12 @@ public class DeathStatsMessage implements IMessage {
         
         private void handle(DeathStatsMessage message, PacketContext ctx) {
             if (!message.local) {
+                DeathStatsManager.getInstance().clear();
                 if (message._deathMap != null) {
                     List<DeathStat> stats = Lists.newArrayList(message._deathMap.values());
-                    QuestLine.getActiveQuestLine().provideTemp(DeathStatsManager.getInstance(), SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
+                    DeathStatsManager.getInstance().loadFromString(SaveHandler.save(stats, new TypeToken<List<DeathStat>>() {}.getType()));
                 }
             }
-            DeathStatsManager.getInstance().load();
         }
     }
 }

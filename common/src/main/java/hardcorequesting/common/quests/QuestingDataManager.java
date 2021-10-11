@@ -17,21 +17,24 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QuestingDataManager {
-    private final QuestLine parent;
+    public static final String STATE_FILE_PATH = "state.json";
+    public static final String DATA_FILE_PATH = "data.json";
     public final State state;
     public final Data data;
     private boolean hardcoreActive;
     private boolean questActive;
     public Map<UUID, QuestingData> questingData = new ConcurrentHashMap<>();
     
-    public QuestingDataManager(QuestLine parent) {
-        this.parent = parent;
-        this.state = new State(parent);
-        this.data = new Data(parent);
+    public QuestingDataManager() {
+        this.state = new State();
+        this.data = new Data();
     }
     
     public static QuestingDataManager getInstance() {
@@ -99,8 +102,8 @@ public class QuestingDataManager {
     }
     
     public class State extends SimpleSerializable {
-        public State(QuestLine parent) {
-            super(parent);
+        public State() {
+            super();
         }
         
         @Override
@@ -110,34 +113,39 @@ public class QuestingDataManager {
         
         @Override
         public String filePath() {
-            return "state.json";
+            return STATE_FILE_PATH;
         }
         
         @Override
         public boolean isData() {
             return true;
         }
-        
+    
         @Override
-        public void loadFromString(Optional<String> string) {
+        public void clear() {
             boolean autoQuesting = HQMConfig.getInstance().Starting.AUTO_QUESTING;
             boolean autoHardcore = HQMConfig.getInstance().Starting.AUTO_HARDCORE;
-            if (string.isPresent()) {
-                JsonObject object = new JsonParser().parse(new StringReader(string.get())).getAsJsonObject();
-                deactivate();
-                TeamManager.getInstance().deactivate();
-                if (object.get(SaveHandler.QUESTING).getAsBoolean() || autoQuesting) activateQuest(false);
-                if (object.get(SaveHandler.HARDCORE).getAsBoolean() || autoHardcore) activateHardcore();
-            } else {
-                if (autoQuesting) activateQuest(false);
-                if (autoHardcore) activateHardcore();
-            }
+            
+            if (autoQuesting) activateQuest(false);
+            if (autoHardcore) activateHardcore();
+        }
+    
+        @Override
+        public void loadFromString(String string) {
+            boolean autoQuesting = HQMConfig.getInstance().Starting.AUTO_QUESTING;
+            boolean autoHardcore = HQMConfig.getInstance().Starting.AUTO_HARDCORE;
+            
+            JsonObject object = new JsonParser().parse(new StringReader(string)).getAsJsonObject();
+            deactivate();
+            TeamManager.getInstance().deactivate();
+            if (object.get(SaveHandler.QUESTING).getAsBoolean() || autoQuesting) activateQuest(false);
+            if (object.get(SaveHandler.HARDCORE).getAsBoolean() || autoHardcore) activateHardcore();
         }
     }
     
     public class Data extends SimpleSerializable {
-        public Data(QuestLine parent) {
-            super(parent);
+        public Data() {
+            super();
         }
         
         @Override
@@ -151,18 +159,22 @@ public class QuestingDataManager {
         
         @Override
         public String filePath() {
-            return "data.json";
+            return DATA_FILE_PATH;
         }
         
         @Override
         public boolean isData() {
             return true;
         }
-        
+    
         @Override
-        public void loadFromString(Optional<String> string) {
+        public void clear() {
             questingData.clear();
-            string.flatMap(s -> SaveHandler.<List<QuestingData>>load(s, new TypeToken<List<QuestingData>>() {}.getType()))
+        }
+    
+        @Override
+        public void loadFromString(String string) {
+            SaveHandler.<List<QuestingData>>load(string, new TypeToken<List<QuestingData>>() {}.getType())
                     .ifPresent(list -> list.forEach(d -> questingData.put(d.getPlayerId(), d)));
         }
     }

@@ -1,14 +1,16 @@
 package hardcorequesting.common.network.message;
 
+import hardcorequesting.common.death.DeathStatsManager;
+import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.SyncUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 
@@ -65,13 +67,12 @@ public class PlayerDataSyncMessage implements IMessage {
         
         @Environment(EnvType.CLIENT)
         private void handle(PlayerDataSyncMessage message, PacketContext ctx) {
-            QuestLine.receiveDataFromServer(Minecraft.getInstance().player, message.remote);
-            QuestLine questLine = QuestLine.getActiveQuestLine();
-            questLine.provideTemp(questLine.teamManager, message.teams);
-            questLine.provideTemp(questLine.questingDataManager.data, message.data);
-            questLine.provideTemp(questLine.questingDataManager.state, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
-            questLine.provideTemp(questLine.deathStatsManager, message.deaths);
-            questLine.loadAll();
+            LocalDataManager data = new LocalDataManager();
+            data.provide(TeamManager.FILE_PATH, message.teams);
+            data.provide(QuestingDataManager.DATA_FILE_PATH, message.data);
+            data.provide(QuestingDataManager.STATE_FILE_PATH, QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
+            data.provide(DeathStatsManager.FILE_PATH, message.deaths);
+            QuestLine.receiveDataFromServer(data);
         }
     }
 }

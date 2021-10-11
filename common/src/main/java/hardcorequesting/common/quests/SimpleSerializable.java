@@ -1,38 +1,23 @@
 package hardcorequesting.common.quests;
 
-import java.util.Optional;
+import hardcorequesting.common.io.DataReader;
+import hardcorequesting.common.io.DataWriter;
 
 public abstract class SimpleSerializable implements StringSerializable, Serializable {
-    protected final QuestLine parent;
     
-    public SimpleSerializable(QuestLine parent) {
-        this.parent = parent;
+    public SimpleSerializable() {
     }
     
     public abstract String filePath();
     
     @Override
-    public final void save() {
-        if (isData()) {
-            parent.resolveData(filePath(), path -> {
-                path.set(saveToString());
-            });
-        } else {
-            parent.resolve(filePath(), path -> {
-                path.set(saveToString());
-            });
-        }
+    public final void save(DataWriter writer) {
+        writer.write(filePath(), saveToString());
     }
     
     @Override
-    public final void load() {
-        loadFromString(Optional.empty());
-        Optional<QuestLine.FileProvider> provider;
-        if (isData()) {
-            provider = parent.resolveData(filePath());
-        } else {
-            provider = parent.resolve(filePath());
-        }
-        provider.map(QuestLine.FileProvider::get).ifPresent(this::loadFromString);
+    public final void load(DataReader reader) {
+        clear();
+        reader.read(filePath()).ifPresent(this::loadFromString);
     }
 }

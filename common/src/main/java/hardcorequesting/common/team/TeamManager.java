@@ -15,14 +15,19 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class TeamManager extends SimpleSerializable {
-    private Set<Team> teams = Sets.newConcurrentHashSet();
+    public static final String FILE_PATH = "teams.json";
     
-    public TeamManager(QuestLine parent) {
-        super(parent);
+    private final Set<Team> teams = Sets.newConcurrentHashSet();
+    
+    public TeamManager() {
+        super();
     }
     
     public static TeamManager getInstance() {
@@ -31,7 +36,7 @@ public class TeamManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "teams.json";
+        return FILE_PATH;
     }
     
     @Override
@@ -40,11 +45,14 @@ public class TeamManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         teams.clear();
         TeamAdapter.clearInvitesMap();
-        List<Team> teams = string
-                .flatMap(s -> SaveHandler.<List<Team>>load(s, new TypeToken<List<Team>>() {}.getType()))
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        List<Team> teams = SaveHandler.<List<Team>>load(string, new TypeToken<List<Team>>() {}.getType())
                 .orElseGet(Lists::newArrayList);
         teams.stream().filter(team -> !team.isSingle()).forEach(TeamManager.getInstance()::addTeam);
         TeamAdapter.commitInvitesMap();

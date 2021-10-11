@@ -15,13 +15,14 @@ import java.util.*;
 
 public class DeathStatsManager extends SimpleSerializable {
     private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths);
+    public static final String FILE_PATH = "deaths.json";
     private final Map<UUID, DeathStat> deathMap = new HashMap<>();
     private final List<DeathStat> clientDeathList = new ArrayList<>();
     private DeathStat clientBest;
     private DeathStat clientTotal;
     
-    public DeathStatsManager(QuestLine parent) {
-        super(parent);
+    public DeathStatsManager() {
+        super();
     }
     
     public static DeathStatsManager getInstance() {
@@ -114,7 +115,7 @@ public class DeathStatsManager extends SimpleSerializable {
     
     @Override
     public String filePath() {
-        return "deaths.json";
+        return FILE_PATH;
     }
     
     @Override
@@ -123,9 +124,13 @@ public class DeathStatsManager extends SimpleSerializable {
     }
     
     @Override
-    public void loadFromString(Optional<String> string) {
+    public void clear() {
         deathMap.clear();
-        string.flatMap(s -> SaveHandler.<List<DeathStat>>load(s, new TypeToken<List<DeathStat>>() {}.getType())).ifPresent(list ->
+    }
+    
+    @Override
+    public void loadFromString(String string) {
+        SaveHandler.<List<DeathStat>>load(string, new TypeToken<List<DeathStat>>() {}.getType()).ifPresent(list ->
                 list.forEach(stat -> deathMap.put(stat.getUuid(), stat)));
         if (HardcoreQuestingCore.platform.isClient())
             updateClientDeathList();

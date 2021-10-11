@@ -1,9 +1,12 @@
 package hardcorequesting.common.quests;
 
+import hardcorequesting.common.io.DataReader;
+import hardcorequesting.common.io.DataWriter;
+
 public interface Serializable {
     boolean isData();
     
-    void save();
+    void save(DataWriter writer);
     
-    void load();
+    void load(DataReader reader);
 }
