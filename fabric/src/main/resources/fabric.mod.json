@@ -24,6 +24,9 @@
     "main": [
       "hardcorequesting.fabric.HardcoreQuestingFabric"
     ],
+    "fabric-gametest": [
+      "hardcorequesting.fabric.HQMTest"
+    ],
     "cardinal-components": [
       "hardcorequesting.fabric.capabilities.ModCapabilities"
     ]

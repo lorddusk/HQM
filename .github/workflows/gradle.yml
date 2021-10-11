@@ -30,4 +30,5 @@ jobs:
 #        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
 #        restore-keys: ${{ runner.os }}-gradle
     - name: Build with Gradle
+      timeout-minutes: 10
       run: ./gradlew build --stacktrace
