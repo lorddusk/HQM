@@ -113,7 +113,7 @@ public class EditBagsGraphic extends EditableGraphic {
             
             for (int j = 0; j < BagTier.values().length; j++) {
                 BagTier bagTier = BagTier.values()[j];
-                gui.drawCenteredString(matrices, Translator.text(groupTier.getWeights()[j] + "", bagTier.getColor()),
+                gui.drawCenteredString(matrices, Translator.text(groupTier.getWeights()[j] + "").withStyle(bagTier.getColor()),
                         TIERS_X + TIERS_SECOND_LINE_X + j * WEIGHT_SPACING,
                         yPos + TIERS_SECOND_LINE_Y, 0.7F,
                         WEIGHT_SPACING, 0, 0x404040);

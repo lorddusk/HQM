@@ -82,7 +82,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             BagTier bagTier = values[i];
             
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(matrices, Translator.text(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(matrices, bagTier.getColoredName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

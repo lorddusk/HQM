@@ -37,13 +37,14 @@ public class Translator {
     }
     
     public static MutableComponent text(String s, ChatFormatting formatting) {
-        return text(s).withStyle(Style.EMPTY.withColor(formatting));
+        return text(s).withStyle(formatting);
     }
     
     public static MutableComponent text(String s, TextColor color) {
         return text(s).withStyle(Style.EMPTY.withColor(color));
     }
     
+    @Deprecated
     public static MutableComponent text(String s, GuiColor color) {
         return text(s, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
     }
