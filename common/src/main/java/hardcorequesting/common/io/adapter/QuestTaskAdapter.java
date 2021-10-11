@@ -258,7 +258,6 @@ public class QuestTaskAdapter {
     public static final TypeAdapter<GetAdvancementTask.Part> ADVANCEMENT_TASK_ADAPTER = new TypeAdapter<>() {
         private final String ICON = "icon";
         private static final String FLUID_ICON = "fluid_icon";
-        private final String VISIBLE = "visible";
         private final String NAME = "name";
         private final String ADV_NAME = "adv_name";
     
@@ -277,8 +276,6 @@ public class QuestTaskAdapter {
             if (value.getAdvancement() != null) {
                 out.name(ADV_NAME).value(value.getAdvancement());
             }
-            if (value.getVisible() != GetAdvancementTask.Visibility.FULL)
-                out.name(VISIBLE).value(value.getVisible().name());
             out.endObject();
         }
     
@@ -302,8 +299,6 @@ public class QuestTaskAdapter {
                     }
                 } else if (name.equalsIgnoreCase(ADV_NAME)) {
                     result.setAdvancement(in.nextString());
-                } else if (name.equalsIgnoreCase(VISIBLE)) {
-                    result.setVisible(GetAdvancementTask.Visibility.valueOf(in.nextString()));
                 }
             }
             in.endObject();

@@ -12,7 +12,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.AdvancementTaskData;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
@@ -150,39 +149,10 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
         parts.read(GsonHelper.getAsJsonArray(object, ADVANCEMENTS, new JsonArray()), QuestTaskAdapter.ADVANCEMENT_TASK_ADAPTER);
     }
     
-    public enum Visibility {
-        FULL("Full"),
-        NONE("None");
-        
-        private final String id;
-        
-        Visibility(String id) {
-            this.id = id;
-        }
-        
-        // TODO: fix these
-        public String getName() {
-            return Translator.get("hqm.locationMenu.vis" + id + ".title");
-        }
-        
-        public String getDescription() {
-            return Translator.get("hqm.locationMenu.vis" + id + ".desc");
-        }
-    }
-    
     public static class Part extends IconLayoutTask.Part {
-        
-        private Visibility visible = Visibility.FULL;
+    
         private String adv_name;
-        
-        public Visibility getVisible() {
-            return visible;
-        }
-        
-        public void setVisible(Visibility visible) {
-            this.visible = visible;
-        }
-        
+    
         public void setAdvancement(String name) {
             this.adv_name = name;
         }
