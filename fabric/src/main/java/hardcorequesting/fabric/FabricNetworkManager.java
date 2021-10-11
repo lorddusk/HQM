@@ -3,8 +3,9 @@ package hardcorequesting.fabric;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.platform.NetworkManager;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.network.ClientSidePacketRegistry;
-import net.fabricmc.fabric.api.network.ServerSidePacketRegistry;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
@@ -15,47 +16,63 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class FabricNetworkManager implements NetworkManager {
-    private PacketContext fromFabric(net.fabricmc.fabric.api.network.PacketContext context) {
-        return new PacketContext() {
-            @Override
-            public Player getPlayer() {
-                return context.getPlayer();
-            }
-            
-            @Override
-            public Consumer<Runnable> getTaskQueue() {
-                return runnable -> context.getTaskQueue().execute(runnable);
-            }
-            
-            @Override
-            public boolean isClient() {
-                return context.getPacketEnvironment() == EnvType.CLIENT;
-            }
-        };
-    }
     
+    @Environment(EnvType.CLIENT)
     @Override
     public void registerS2CHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer) {
-        ClientSidePacketRegistry.INSTANCE.register(id, (packetContext, friendlyByteBuf) -> consumer.accept(fromFabric(packetContext), friendlyByteBuf));
+        ClientPlayNetworking.registerGlobalReceiver(id,
+                (client, handler, buf, sender) -> consumer.accept(new PacketContext() {
+                    @Override
+                    public Player getPlayer() {
+                        return client.player;
+                    }
+    
+                    @Override
+                    public Consumer<Runnable> getTaskQueue() {
+                        return client::execute;
+                    }
+    
+                    @Override
+                    public boolean isClient() {
+                        return true;
+                    }
+                }, buf));
     }
     
     @Override
     public void registerC2SHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer) {
-        ServerSidePacketRegistry.INSTANCE.register(id, (packetContext, friendlyByteBuf) -> consumer.accept(fromFabric(packetContext), friendlyByteBuf));
+        ServerPlayNetworking.registerGlobalReceiver(id,
+                (server, player, handler, buf, sender) -> consumer.accept(new PacketContext() {
+                    @Override
+                    public Player getPlayer() {
+                        return player;
+                    }
+    
+                    @Override
+                    public Consumer<Runnable> getTaskQueue() {
+                        return server::execute;
+                    }
+    
+                    @Override
+                    public boolean isClient() {
+                        return false;
+                    }
+                }, buf));
     }
     
+    @Environment(EnvType.CLIENT)
     @Override
     public void sendToServer(ResourceLocation id, FriendlyByteBuf buf) {
-        ClientSidePacketRegistry.INSTANCE.sendToServer(id, buf);
+        ClientPlayNetworking.send(id, buf);
     }
     
     @Override
     public void sendToPlayer(ServerPlayer player, ResourceLocation id, FriendlyByteBuf buf) {
-        ServerSidePacketRegistry.INSTANCE.sendToPlayer(player, id, buf);
+        ServerPlayNetworking.send(player, id, buf);
     }
     
     @Override
     public Packet<?> createToPlayerPacket(ResourceLocation id, FriendlyByteBuf buf) {
-        return ServerSidePacketRegistry.INSTANCE.toPacket(id, buf);
+        return ServerPlayNetworking.createS2CPacket(id, buf);
     }
 }
