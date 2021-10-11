@@ -6,6 +6,7 @@ import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -143,7 +144,7 @@ public class GuiReward extends GuiBase {
                             if (info.size() > 0) {
                                 str.add(Language.getInstance().getVisualOrder(info.get(0)));
                                 if (info.size() > 1) {
-                                    str.add(Language.getInstance().getVisualOrder(Translator.translatable("hqm.rewardGui.shiftInfo", GuiColor.GRAY)));
+                                    str.add(Language.getInstance().getVisualOrder(Translator.translatable("hqm.rewardGui.shiftInfo").withStyle(ChatFormatting.DARK_GRAY)));
                                 }
                             }
                             renderTooltip(matrices, str, mX0, mY0);

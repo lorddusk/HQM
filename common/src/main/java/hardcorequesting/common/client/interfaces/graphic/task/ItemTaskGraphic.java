@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -143,13 +142,13 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             str.add(FormattedText.composite(Translator.translatable("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + task.getProgress(playerId, id) + "/" + part.required)));
             if (part.hasItem() && Quest.canQuestsBeEdited()) {
                 str.add(FormattedText.EMPTY);
-                str.add(Translator.text(part.getPrecision().getName(), GuiColor.GRAY));
+                str.add(Translator.text(part.getPrecision().getName()).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (gui.isOpBook && Screen.hasShiftDown()) {
                 if (task.getProgress(playerId, id) == part.required) {
-                    str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.resetTask", GuiColor.RED)));
+                    str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.resetTask").withStyle(ChatFormatting.DARK_RED)));
                 } else {
-                    str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.completeTask", GuiColor.ORANGE)));
+                    str.addAll(Arrays.asList(FormattedText.EMPTY, FormattedText.EMPTY, Translator.translatable("hqm.questBook.completeTask").withStyle(ChatFormatting.GOLD)));
                 }
             }
             return str;

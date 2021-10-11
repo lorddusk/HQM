@@ -1,7 +1,6 @@
 package hardcorequesting.common.util;
 
 
-import hardcorequesting.common.client.interfaces.GuiColor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.*;
 
@@ -44,11 +43,6 @@ public class Translator {
         return text(s).withStyle(Style.EMPTY.withColor(color));
     }
     
-    @Deprecated
-    public static MutableComponent text(String s, GuiColor color) {
-        return text(s, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF));
-    }
-    
     public static MutableComponent translatable(String id, Object... args) {
         return new TranslatableComponent(id, args);
     }
@@ -59,9 +53,5 @@ public class Translator {
     
     public static MutableComponent translatable(String id, TextColor color, Object... args) {
         return translatable(id, args).withStyle(Style.EMPTY.withColor(color));
-    }
-    
-    public static MutableComponent translatable(String id, GuiColor color, Object... args) {
-        return translatable(id, TextColor.fromRgb(color.getHexColor() & 0xFFFFFF), args);
     }
 }

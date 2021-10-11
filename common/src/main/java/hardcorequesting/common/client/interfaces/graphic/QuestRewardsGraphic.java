@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
@@ -21,6 +20,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -195,7 +195,7 @@ public class QuestRewardsGraphic extends Graphic {
             if (commentLines != null) {
                 str.add(FormattedText.EMPTY);
                 for (FormattedText commentLine : commentLines) {
-                    str.add(Translator.text(Translator.rawString(commentLine), GuiColor.GRAY));
+                    str.add(Translator.text(Translator.rawString(commentLine)).withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
             gui.renderTooltipL(matrices, str, mX + gui.getLeft(), mY + gui.getTop());
@@ -260,7 +260,7 @@ public class QuestRewardsGraphic extends Graphic {
                         List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
                             list2.add(FormattedText.EMPTY);
-                            list2.add(Translator.translatable("hqm.quest.selected", GuiColor.GREEN));
+                            list2.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
                         }
                         gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
                     }

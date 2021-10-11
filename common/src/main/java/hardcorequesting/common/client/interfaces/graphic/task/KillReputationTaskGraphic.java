@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -12,6 +11,7 @@ import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 
 import java.util.UUID;
 
@@ -52,7 +52,7 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {
             gui.drawString(matrices, gui.getLinesFromText(killCount == task.getKillsRequirement()
-                    ? Translator.translatable("hqm.repKil.killCount", GuiColor.GREEN, Translator.player(task.getKillsRequirement()))
+                    ? Translator.translatable("hqm.repKil.killCount", Translator.player(task.getKillsRequirement())).withStyle(ChatFormatting.DARK_GREEN)
                     : Translator.translatable("hqm.repKil.killCountOutOf", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }
     }

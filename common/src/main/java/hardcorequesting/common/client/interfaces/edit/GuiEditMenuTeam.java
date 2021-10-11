@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -14,6 +13,7 @@ import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamError;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
@@ -275,10 +275,10 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                 String str = player.getDisplayName();
                 
                 if (player.isOwner()) {
-                    str += GuiColor.ORANGE + " [" + I18n.get("hqm.party.owner") + "]";
+                    str += ChatFormatting.GOLD + " [" + I18n.get("hqm.party.owner") + "]";
                 } else if (!player.isInTeam()) {
                     if (isOwner) {
-                        str += GuiColor.LIGHT_GRAY + " [" + I18n.get("hqm.party.invite") + "]";
+                        str += ChatFormatting.GRAY + " [" + I18n.get("hqm.party.invite") + "]";
                     } else {
                         continue;
                     }
@@ -309,12 +309,12 @@ public class GuiEditMenuTeam extends GuiEditMenu {
                         gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.currentSelection", selectedEntry.getDisplayName()), 0.7F, 70), 177, 52, 0.7F, 0x404040);
                         
                         if (selectedEntry.isOwner()) {
-                            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, GuiColor.RED.getHexColor());
+                            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, 0xff5555);
                         }
                     }
                     
                 } else {
-                    gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, GuiColor.RED.getHexColor());
+                    gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, 0xff5555);
                 }
             }
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.party.stats"), 0.7F, 70), 177, 192, 0.7F, 0x404040);
@@ -350,15 +350,16 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                //TODO clean up text composition
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + ChatFormatting.GOLD + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + GuiColor.ORANGE + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + ChatFormatting.GOLD + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
         
         if (TeamError.latestError != null) {
             if (inviteButton.inButtonBounds(mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(GuiColor.RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
             } else {
                 TeamError.latestError = null;
             }

@@ -3,7 +3,6 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
@@ -185,7 +184,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                 info = Translator.translatable("hqm.questBook.locked");
             gui.drawString(matrices, info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
-                FormattedText toClaim = Translator.translatable("hqm.questBook.unclaimedRewards", GuiColor.PURPLE, Translator.quest(unclaimed));
+                FormattedText toClaim = Translator.translatable("hqm.questBook.unclaimedRewards", Translator.quest(unclaimed)).withStyle(ChatFormatting.DARK_PURPLE);
                 gui.drawString(matrices, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
             setY += GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING;
@@ -235,15 +234,15 @@ public class QuestSetsGraphic extends EditableGraphic {
         }
         
         List<FormattedText> info = new ArrayList<>();
-        info.add(Translator.translatable("hqm.questBook.totalQuests", GuiColor.GRAY, Translator.quest(total)));
-        info.add(Translator.translatable("hqm.questBook.unlockedQuests", GuiColor.CYAN, Translator.quest(enabled)));
-        info.add(Translator.translatable("hqm.questBook.completedQuests", GuiColor.GREEN, Translator.quest(completed)));
-        info.add(Translator.translatable("hqm.questBook.availableQuests", GuiColor.LIGHT_BLUE, Translator.quest(enabled - completed)));
+        info.add(Translator.translatable("hqm.questBook.totalQuests", Translator.quest(total)).withStyle(ChatFormatting.DARK_GRAY));
+        info.add(Translator.translatable("hqm.questBook.unlockedQuests", Translator.quest(enabled)).withStyle(ChatFormatting.DARK_AQUA));
+        info.add(Translator.translatable("hqm.questBook.completedQuests", Translator.quest(completed)).withStyle(ChatFormatting.DARK_GREEN));
+        info.add(Translator.translatable("hqm.questBook.availableQuests", Translator.quest(enabled - completed)).withStyle(ChatFormatting.BLUE));
         if (reward > 0) {
-            info.add(Translator.translatable("hqm.questBook.unclaimedQuests", GuiColor.PURPLE, Translator.quest(reward)));
+            info.add(Translator.translatable("hqm.questBook.unclaimedQuests", Translator.quest(reward)).withStyle(ChatFormatting.DARK_PURPLE));
         }
         if (Quest.canQuestsBeEdited() && !Screen.hasControlDown()) {
-            info.add(Translator.translatable("hqm.questBook.inclInvisiQuests", GuiColor.LIGHT_GRAY, Translator.quest(realTotal)));
+            info.add(Translator.translatable("hqm.questBook.inclInvisiQuests", Translator.quest(realTotal)).withStyle(ChatFormatting.GRAY));
         }
         gui.drawString(matrices, info, x, y, 0.7F, 0x404040);
     }

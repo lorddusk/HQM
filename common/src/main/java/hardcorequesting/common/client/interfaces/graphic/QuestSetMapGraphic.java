@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.*;
@@ -20,6 +19,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -91,7 +91,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(mX, mY)) {
                 boolean shouldDrawText = false;
                 boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
-                String txt = "";
+                String txt = "";    //TODO Build this with components instead
             
                 if (enabled || editing) {
                     txt += quest.getName();
@@ -101,7 +101,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     if (editing) {
                         txt += "\n";
                     }
-                    txt += GuiColor.GRAY + I18n.get("hqm.questBook.lockedQuest");
+                    txt += ChatFormatting.DARK_GRAY + I18n.get("hqm.questBook.lockedQuest");
                 }
             
                 if (!enabled || editing) {
@@ -127,14 +127,14 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                 
                     if (editing && totalParentCount > 0) {
-                        txt += "\n" + GuiColor.GRAY + Translator.rawString(Translator.translatable("hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
+                        txt += "\n" + ChatFormatting.DARK_GRAY + Translator.rawString(Translator.translatable("hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
                     
                         if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_R)) {
                             txt += " [" + I18n.get("hqm.questBook.holding", "R") + "]";
                             for (Quest parent : quest.getRequirements()) {
-                                txt += "\n" + GuiColor.GRAY + parent.getName();
+                                txt += "\n" + ChatFormatting.DARK_GRAY + parent.getName();
                                 if (parent.isCompleted(player)) {
-                                    txt += " " + GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
+                                    txt += " " + ChatFormatting.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
                                 }
                             }
                         } else {
@@ -144,15 +144,15 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 
                     int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
                     if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.translatable("hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
+                        txt += "\n" + ChatFormatting.RED + Translator.rawString(Translator.translatable("hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount)));
                         shouldDrawText = true;
                         if (editing) {
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_E)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "E") + "]";
                                 for (Quest parent : externalQuests) {
-                                    txt += "\n" + GuiColor.PINK + parent.getName() + " (" + parent.getQuestSet().getName() + ")";
+                                    txt += "\n" + ChatFormatting.RED + parent.getName() + " (" + parent.getQuestSet().getName() + ")";
                                     if (parent.isCompleted(player)) {
-                                        txt += " " + GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
+                                        txt += " " + ChatFormatting.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
                                     }
                                 }
                             } else {
@@ -162,7 +162,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                 
                     if (editing && quest.getUseModifiedParentRequirement()) {
-                        txt += "\n" + GuiColor.MAGENTA;
+                        txt += "\n" + ChatFormatting.LIGHT_PURPLE;
                         int amount = quest.getParentRequirementCount();
                         if (amount < quest.getRequirements().size()) {
                             txt += Translator.rawString(Translator.translatable("hqm.questBook.reqOnly", Translator.quest(amount)));
@@ -177,10 +177,10 @@ public class QuestSetMapGraphic extends EditableGraphic {
             
                 if (enabled || editing) {
                     if (quest.isCompleted(player)) {
-                        txt += "\n" + GuiColor.GREEN + I18n.get("hqm.questBook.completed");
+                        txt += "\n" + ChatFormatting.DARK_GREEN + I18n.get("hqm.questBook.completed");
                     }
                     if (quest.hasReward(player.getUUID())) {
-                        txt += "\n" + GuiColor.PURPLE + I18n.get("hqm.questBook.unclaimedReward");
+                        txt += "\n" + ChatFormatting.DARK_PURPLE + I18n.get("hqm.questBook.unclaimedReward");
                     }
                 
                     String repeatMessage = enabled ? quest.getRepeatInfo().getMessage(quest, player) : quest.getRepeatInfo().getShortMessage();
@@ -199,16 +199,16 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         }
                     
                         if (totalTasks == 0) {
-                            txt += "\n" + GuiColor.RED + I18n.get("hqm.questBook.noTasks");
+                            txt += "\n" + ChatFormatting.DARK_RED + I18n.get("hqm.questBook.noTasks");
                         } else {
-                            txt += "\n" + GuiColor.CYAN + I18n.get("hqm.questBook.completedTasks", completedTasks, totalTasks);
+                            txt += "\n" + ChatFormatting.DARK_AQUA + I18n.get("hqm.questBook.completedTasks", completedTasks, totalTasks);
                         
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_T)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
                                 for (QuestTask<?> task : quest.getTasks()) {
-                                    txt += "\n" + GuiColor.CYAN + task.getDescription();
+                                    txt += "\n" + ChatFormatting.DARK_AQUA + task.getDescription();
                                     if (task.isCompleted(player)) {
-                                        txt += GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
+                                        txt += ChatFormatting.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
                                     }
                                 }
                             } else {
@@ -262,7 +262,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                             }
                         
                             if (invisibilityMessage != null) {
-                                txt += "\n" + GuiColor.LIGHT_BLUE + invisibilityMessage;
+                                txt += "\n" + ChatFormatting.BLUE + invisibilityMessage;
                             }
                         }
                     
@@ -279,13 +279,13 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         }
                         int optionLinks = ids.size();
                         if (optionLinks > 0) {
-                            txt += "\n" + GuiColor.BLUE + Translator.rawString(Translator.translatable("hqm.questBook.optionLinks", Translator.quest(optionLinks)));
+                            txt += "\n" + ChatFormatting.DARK_BLUE + Translator.rawString(Translator.translatable("hqm.questBook.optionLinks", Translator.quest(optionLinks)));
                         
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_O)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "O") + "]";
                                 for (UUID id : ids) {
                                     Quest option = Quest.getQuest(id);
-                                    txt += "\n" + GuiColor.BLUE + option.getName();
+                                    txt += "\n" + ChatFormatting.DARK_BLUE + option.getName();
                                     if (!option.hasSameSetAs(quest)) {
                                         txt += " (" + option.getQuestSet().getName() + ")";
                                     }
@@ -308,12 +308,12 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     }
                 
                     if (childCount > 0) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.translatable("hqm.questBook.childUnlocks", Translator.quest(childCount)));
+                        txt += "\n" + ChatFormatting.RED + Translator.rawString(Translator.translatable("hqm.questBook.childUnlocks", Translator.quest(childCount)));
                         if (editing) {
                             if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_U)) {
                                 txt += " [" + I18n.get("hqm.questBook.holding", "U") + "]";
                                 for (Quest child : externalQuests) {
-                                    txt += "\n" + GuiColor.PINK + child.getName() + " (" + child.getQuestSet().getName() + ")";
+                                    txt += "\n" + ChatFormatting.RED + child.getName() + " (" + child.getQuestSet().getName() + ")";
                                 }
                             } else {
                                 txt += " [" + I18n.get("hqm.questBook.hold", "U") + "]";
@@ -325,14 +325,14 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 }
             
                 if (editing) {
-                    txt += "\n\n" + GuiColor.GRAY + I18n.get("hqm.questBook.ctrlNonEditor");
+                    txt += "\n\n" + ChatFormatting.DARK_GRAY + I18n.get("hqm.questBook.ctrlNonEditor");
                 }
             
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (quest.isCompleted(player)) {
-                        txt += "\n\n" + GuiColor.RED + I18n.get("hqm.questBook.resetQuest");
+                        txt += "\n\n" + ChatFormatting.DARK_RED + I18n.get("hqm.questBook.resetQuest");
                     } else {
-                        txt += "\n\n" + GuiColor.ORANGE + I18n.get("hqm.questBook.completeQuest");
+                        txt += "\n\n" + ChatFormatting.GOLD + I18n.get("hqm.questBook.completeQuest");
                     }
                 }
             

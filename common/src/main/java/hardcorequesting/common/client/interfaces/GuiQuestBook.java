@@ -17,6 +17,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.network.chat.FormattedText;
@@ -173,7 +174,7 @@ public class GuiQuestBook extends GuiBase {
             renderTooltip(matrices, FormattedText.composite(
                     Translator.translatable("hqm.questBook.goBack"),
                     Translator.plain("\n"),
-                    Translator.translatable("hqm.questBook.rightClick", GuiColor.GRAY)
+                    Translator.translatable("hqm.questBook.rightClick").withStyle(ChatFormatting.DARK_GRAY)
             ), x + left, y + top);
         } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
             renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
