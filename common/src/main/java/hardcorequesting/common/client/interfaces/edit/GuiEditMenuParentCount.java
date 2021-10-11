@@ -7,7 +7,8 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.minecraft.client.resources.language.I18n;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
 
@@ -50,13 +51,13 @@ public class GuiEditMenuParentCount extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
-                return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
+            protected FormattedText getArrowText() {
+                return Translator.translatable("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".title");
             }
     
             @Override
-            protected String getArrowDescription() {
-                return I18n.get("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
+            protected FormattedText getArrowDescription() {
+                return Translator.translatable("hqm.parentCount.req" + (showModifiedParentRequirement ? "Count" : "All") + ".desc");
             }
     
         };

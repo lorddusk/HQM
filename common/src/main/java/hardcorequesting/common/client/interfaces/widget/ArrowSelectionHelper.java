@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 public abstract class ArrowSelectionHelper {
     private static final int ARROW_SRC_X = 244;
@@ -38,10 +38,10 @@ public abstract class ArrowSelectionHelper {
             drawArrow(matrices, gui, mX, mY, true);
             drawArrow(matrices, gui, mX, mY, false);
             
-            gui.drawCenteredString(matrices, Translator.plain(getArrowText()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
-            String description = getArrowDescription();
+            gui.drawCenteredString(matrices, getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            FormattedText description = getArrowDescription();
             if (description != null) {
-                gui.drawString(matrices, gui.getLinesFromText(Translator.plain(description), 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(matrices, gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
             }
         }
     }
@@ -79,7 +79,7 @@ public abstract class ArrowSelectionHelper {
     
     protected abstract void onArrowClick(boolean left);
     
-    protected abstract String getArrowText();
+    protected abstract FormattedText getArrowText();
     
-    protected abstract String getArrowDescription();
+    protected abstract FormattedText getArrowDescription();
 }

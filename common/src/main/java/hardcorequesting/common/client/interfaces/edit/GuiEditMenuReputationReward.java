@@ -114,12 +114,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
-                return selectedReward.getReward().getName();
+            protected FormattedText getArrowText() {
+                return Translator.plain(selectedReward.getReward().getName());
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return null;
             }
     

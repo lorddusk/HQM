@@ -1,9 +1,11 @@
 package hardcorequesting.common.quests;
 
 import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 public enum RepeatType {
@@ -132,14 +134,12 @@ public enum RepeatType {
         return str;
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getName() {
-        return I18n.get("hqm.repeat." + id + ".title");
+    public FormattedText getName() {
+        return Translator.translatable("hqm.repeat." + id + ".title");
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getDescription() {
-        return I18n.get("hqm.repeat." + id + ".desc");
+    public FormattedText getDescription() {
+        return Translator.translatable("hqm.repeat." + id + ".desc");
     }
     
     public boolean isUseTime() {

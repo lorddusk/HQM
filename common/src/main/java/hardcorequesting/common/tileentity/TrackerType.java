@@ -7,7 +7,8 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
-import net.minecraft.client.resources.language.I18n;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -122,12 +123,12 @@ public enum TrackerType {
         return valid;
     }
     
-    public String getName() {
-        return I18n.get("hqm.tracker." + id + ".title");
+    public FormattedText getName() {
+        return Translator.translatable("hqm.tracker." + id + ".title");
     }
     
-    public String getDescription() {
-        return I18n.get("hqm.tracker." + id + ".desc");
+    public FormattedText getDescription() {
+        return Translator.translatable("hqm.tracker." + id + ".desc");
     }
     
     public abstract int getMeta(TrackerBlockEntity tracker, Quest quest, int radius);

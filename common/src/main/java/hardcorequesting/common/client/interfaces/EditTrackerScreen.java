@@ -13,6 +13,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -50,12 +51,12 @@ public class EditTrackerScreen extends GuiBase {
             }
         
             @Override
-            protected String getArrowText() {
+            protected FormattedText getArrowText() {
                 return tracker.getTrackerType().getName();
             }
         
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return tracker.getTrackerType().getDescription();
             }
         };

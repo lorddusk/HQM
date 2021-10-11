@@ -10,6 +10,7 @@ import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
 
@@ -70,12 +71,12 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
+            protected FormattedText getArrowText() {
                 return type.getName();
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return type.getDescription();
             }
         };

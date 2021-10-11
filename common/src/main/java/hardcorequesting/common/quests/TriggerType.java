@@ -2,6 +2,7 @@ package hardcorequesting.common.quests;
 
 import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
 
@@ -56,12 +57,12 @@ public enum TriggerType {
         this.workAsInvisible = workAsInvisible;
     }
     
-    public String getName() {
-        return Translator.get("hqm.trigger." + id + ".title");
+    public FormattedText getName() {
+        return Translator.translatable("hqm.trigger." + id + ".title");
     }
     
-    public String getDescription() {
-        return Translator.get("hqm.trigger." + id + ".desc");
+    public FormattedText getDescription() {
+        return Translator.translatable("hqm.trigger." + id + ".desc");
     }
     
     public boolean isUseTaskCount() {
@@ -75,6 +76,6 @@ public enum TriggerType {
     public abstract boolean isQuestVisible(Quest quest, UUID playerId);
     
     public String getMessage(Quest quest) {
-        return GuiColor.ORANGE + getName();
+        return GuiColor.ORANGE + getName().getString(); //TODO don't do getString() here
     }
 }

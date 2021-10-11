@@ -9,7 +9,7 @@ import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,18 +99,18 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
+            protected FormattedText getArrowText() {
                 if (ReputationManager.getInstance().getReputations().isEmpty()) {
-                    return I18n.get("hqm.repSetting.invalid");
+                    return Translator.translatable("hqm.repSetting.invalid");
                 } else {
-                    return reputation != null ? reputation.getName() : I18n.get("hqm.repSetting.invalid");
+                    return reputation != null ? Translator.plain(reputation.getName()) : Translator.translatable("hqm.repSetting.invalid");
                 }
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 if (ReputationManager.getInstance().getReputations().isEmpty()) {
-                    return I18n.get("hqm.repReward.noValidReps");
+                    return Translator.translatable("hqm.repReward.noValidReps");
                 } else {
                     return null;
                 }
