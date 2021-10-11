@@ -24,7 +24,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     
     @Inject(method = "onTake", at = @At(value = "HEAD"))
     private void postCraft(Player player, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
-        for (BiConsumer<Player, ItemStack> consumer : HardcoreQuestingFabric.CRAFTING) {
+        for (BiConsumer<Player, ItemStack> consumer : HardcoreQuestingFabric.ANVIL_CRAFTING) {
             consumer.accept(player, itemStack);
         }
     }

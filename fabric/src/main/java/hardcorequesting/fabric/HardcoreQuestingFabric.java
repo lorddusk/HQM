@@ -9,6 +9,8 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.platform.NetworkManager;
@@ -16,8 +18,10 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
-import me.shedaniel.cloth.api.common.events.v1.*;
-import me.shedaniel.cloth.api.utils.v1.GameInstanceUtils;
+import me.shedaniel.architectury.event.events.BlockEvent;
+import me.shedaniel.architectury.event.events.EntityEvent;
+import me.shedaniel.architectury.event.events.PlayerEvent;
+import me.shedaniel.architectury.utils.GameInstance;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -26,6 +30,7 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -52,6 +57,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -68,9 +74,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform {
-    public static final List<BiConsumer<LivingEntity, DamageSource>> LIVING_DEATH = Lists.newArrayList();
-    public static final List<BiConsumer<Player, ItemStack>> CRAFTING = Lists.newArrayList();
-    public static final List<BiConsumer<ServerPlayer, Advancement>> ADVANCEMENT = Lists.newArrayList();
+    public static final List<BiConsumer<Player, ItemStack>> ANVIL_CRAFTING = Lists.newArrayList();
     public static final List<BiConsumer<Player, Entity>> ANIMAL_TAME = Lists.newArrayList();
     private final NetworkManager networkManager = new FabricNetworkManager();
     
@@ -83,6 +87,19 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public void onInitialize() {
         HardcoreQuestingCore.initialize(this);
         ModCapabilities.init();
+        
+        PlayerEvent.PLAYER_CLONE.register((newPlayer, oldPlayer, wonGame) -> {
+            if (HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
+            if (!wonGame && !oldPlayer.isSpectator() && !newPlayer.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+                int invSize = oldPlayer.inventory.getContainerSize();
+                for (int i = 0; i < invSize; i++) {
+                    ItemStack stack = oldPlayer.inventory.getItem(i);
+                    if (stack.getItem().equals(ModItems.book.get())) {
+                        newPlayer.inventory.setItem(i, stack);
+                    }
+                }
+            }
+        });
     }
     
     @Override
@@ -92,7 +109,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public MinecraftServer getServer() {
-        return GameInstanceUtils.getServer();
+        return GameInstance.getServer();
     }
     
     @Override
@@ -112,17 +129,17 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> consumer) {
-        WorldLoadCallback.EVENT.register(consumer::accept);
+        ServerWorldEvents.LOAD.register((server, world) -> consumer.accept(world.dimension(), world));
     }
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        WorldSaveCallback.EVENT.register((world, listener, flush) -> consumer.accept(world));
+        ServerWorldEvents.UNLOAD.register((server, world) -> consumer.accept(world));
     }
     
     @Override
     public void registerOnPlayerJoin(Consumer<ServerPlayer> consumer) {
-        PlayerJoinCallback.EVENT.register((connection, playerEntity) -> consumer.accept(playerEntity));
+        PlayerEvent.PLAYER_JOIN.register(consumer::accept);
     }
     
     @Override
@@ -155,8 +172,9 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnBlockPlace(BlockPlaced consumer) {
-        BlockPlaceCallback.EVENT.register((world, pos, state, placer, itemStack) -> {
-            consumer.onBlockPlaced(world, pos, state, placer);
+        BlockEvent.PLACE.register((level, pos, state, placer) -> {
+            if (placer instanceof LivingEntity)
+                consumer.onBlockPlaced(level, pos, state, (LivingEntity) placer);
             return InteractionResult.PASS;
         });
     }
@@ -171,37 +189,43 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnBlockBreak(BlockBroken consumer) {
-        BlockBreakCallback.EVENT.register(consumer::onBlockBroken);
+        BlockEvent.BREAK.register((level, pos, state, player, xp) -> {
+            consumer.onBlockBroken(level, pos, state, player);
+            return InteractionResult.PASS;
+        });
     }
     
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> consumer) {
-        ItemPickupCallback.EVENT.register(consumer::accept);
+        PlayerEvent.PICKUP_ITEM_POST.register((player, entity, stack) -> consumer.accept(player, stack));
     }
     
     @Override
     public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> consumer) {
-        LIVING_DEATH.add(consumer);
+        EntityEvent.LIVING_DEATH.register((entity, source) -> {
+            consumer.accept(entity, source);
+            return InteractionResult.PASS;
+        });
     }
     
     @Override
     public void registerOnCrafting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        PlayerEvent.CRAFT_ITEM.register((player, constructed, inventory) -> consumer.accept(player, constructed));
     }
     
     @Override
     public void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        ANVIL_CRAFTING.add(consumer);
     }
     
     @Override
     public void registerOnSmelting(BiConsumer<Player, ItemStack> consumer) {
-        CRAFTING.add(consumer);
+        PlayerEvent.SMELT_ITEM.register(consumer::accept);
     }
     
     @Override
     public void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> consumer) {
-        ADVANCEMENT.add(consumer);
+        PlayerEvent.PLAYER_ADVANCEMENT.register(consumer::accept);
     }
     
     @Override
