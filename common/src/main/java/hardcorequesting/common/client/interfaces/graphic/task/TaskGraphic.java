@@ -85,7 +85,7 @@ public abstract class TaskGraphic extends Graphic {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         if (gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-            TextMenu.display(gui, playerId, task.getLongDescription(), false, task::setLongDescription);
+            TextMenu.display(gui, playerId, task.getLangKeyLongDescription(), false, task::setLongDescription);
         }
     }
 }

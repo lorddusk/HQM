@@ -386,10 +386,10 @@ public class QuestTaskAdapter {
         
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.name());
-            if (!src.getDescription().equals(type.getName()))
-                builder.add(DESCRIPTION, src.getDescription());
-            if (!src.getLongDescription().equals(type.getDescription()))
-                builder.add(LONG_DESCRIPTION, src.getLongDescription());
+            if (!src.getLangKeyDescription().equals(type.getLangKeyName()))
+                builder.add(DESCRIPTION, src.getLangKeyDescription());
+            if (!src.getLangKeyLongDescription().equals(type.getLangKeyDescription()))
+                builder.add(LONG_DESCRIPTION, src.getLangKeyLongDescription());
             src.write(builder);
             return builder.build();
         }

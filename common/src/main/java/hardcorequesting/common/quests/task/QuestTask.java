@@ -159,8 +159,8 @@ public abstract class QuestTask<Data extends TaskData> {
         return description;
     }
     
-    public String getDescription() {
-        return Translator.get(description);
+    public FormattedText getDescription() {
+        return Translator.translatable(description);
     }
     
     public void setDescription(String description) {
@@ -171,8 +171,8 @@ public abstract class QuestTask<Data extends TaskData> {
         return longDescription;
     }
     
-    public String getLongDescription() {
-        return Translator.get(longDescription);
+    public FormattedText getLongDescription() {
+        return Translator.translatable(longDescription);
     }
     
     public void setLongDescription(String longDescription) {

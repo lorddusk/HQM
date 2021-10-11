@@ -115,7 +115,7 @@ public final class QuestGraphic extends EditableGraphic {
                 int yPos = getTaskY(id);
                 boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(matrices, Translator.plain(task.getDescription()), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(matrices, task.getDescription(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
                 id++;
             }
@@ -176,7 +176,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            TextMenu.display(gui, playerId, task.getDescription(), true,
+                            TextMenu.display(gui, playerId, task.getLangKeyDescription(), true,
                                     task::setDescription);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
