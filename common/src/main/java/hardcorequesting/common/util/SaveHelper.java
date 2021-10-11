@@ -107,7 +107,7 @@ public final class SaveHelper {
                         //since it's sorted, the first 0 means the rest is empty
                         break;
                     }
-                    gui.drawString(matrices, Translator.plain(element.type.translate(element.count)), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
+                    gui.drawString(matrices, element.type.translate(element.count), X + START_X + INDENT, Y + START_Y + (i + 3) * FONT_HEIGHT, 0.7F, 0x404040);
                     others -= element.count;
                 }
                 if (others > 0) {
