@@ -186,9 +186,8 @@ public class QuestRewardsGraphic extends Graphic {
             List<FormattedText> str = new ArrayList<>();
             for (ReputationReward reputationReward : reputationRewards) {
                 if (reputationReward.getValue() != 0 && reputationReward.getReward() != null && reputationReward.getReward().isValid()) {
-                    str.add(Translator.plain(reputationReward.getLabel()));
+                    str.add(reputationReward.getLabel());
                 }
-                
             }
             
             List<FormattedText> commentLines = gui.getLinesFromText(Translator.translatable("hqm.quest.partyRepReward" + (data.teamRewardClaimed ? "Claimed" : "")), 1, 200);
