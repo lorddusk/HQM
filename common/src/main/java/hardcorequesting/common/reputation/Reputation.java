@@ -11,6 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -87,13 +88,13 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
         draw(matrices, gui, x, y, mX, mY, playerId, effects, lower, upper, inverted, active, text, completed);
         return info != null ? info : getTooltip(gui, x, y, mX, mY, playerId);
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, String text, boolean completed) {
+    public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
         String error = getError();
         
         if (error != null) {
@@ -206,14 +207,15 @@ public class Reputation {
         }
         drawPointer(matrices, gui, 0, x, y, ARROW_MARKER_Y, ARROW_SRC_NEUTRAL_X, mX, mY, neutral.equals(active) || (effects && ((lowerValue <= 0 && 0 <= upperValue) != inverted)));
         
-        String str; //TODO text component
+        FormattedText info;
         boolean selected = false;
         
         if (text != null) {
-            str = text;
+            info = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                str = ChatFormatting.DARK_RED + I18n.get("hqm.rep" + (inverted ? "no" : "any") + "ValueOf") + " " + name;
+                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf")
+                        .append(" " + name).withStyle(ChatFormatting.DARK_RED);
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -222,29 +224,29 @@ public class Reputation {
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
                         if (inverted) {
-                            str = name + " != " + lowerName;
+                            info = Translator.plain(name + " != " + lowerName);
                         } else {
-                            str = name + " == " + lowerName;
+                            info = Translator.plain(name + " == " + lowerName);
                         }
                     } else {
                         if (inverted) {
-                            str = I18n.get("hqm.rep.not") + " (" + lowerName + " <= " + name + " <= " + upperName + ")";
+                            info = Translator.translatable("hqm.rep.not").append(" (" + lowerName + " <= " + name + " <= " + upperName + ")");
                         } else {
-                            str = lowerName + " <= " + name + " <= " + upperName;
+                            info = Translator.plain(lowerName + " <= " + name + " <= " + upperName);
                         }
                     }
                 } else if (lower != null) {
-                    str = name + " " + (inverted ? "<" : ">=") + " " + lowerName;
+                    info = Translator.plain(name + " " + (inverted ? "<" : ">=") + " " + lowerName);
                 } else {
-                    str = name + " " + (inverted ? ">" : "<=") + " " + upperName;
+                    info = Translator.plain(name + " " + (inverted ? ">" : "<=") + " " + upperName);
                 }
             }
         } else {
-            str = name + ": " + current.getName() + " (" + value + ")";
+            info = Translator.plain(name + ": " + current.getName() + " (" + value + ")");
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
-        gui.drawString(matrices, Translator.plain(str), x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
+        gui.drawString(matrices, info, x + TEXT_X, y + TEXT_Y, 0.7F, selected ? 0x40AA40 : 0x404040);
     }
     
     @Environment(EnvType.CLIENT)
