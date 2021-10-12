@@ -3,7 +3,9 @@ package hardcorequesting.common.quests;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public enum TriggerType {
@@ -14,8 +16,8 @@ public enum TriggerType {
         }
         
         @Override
-        public String getMessage(Quest quest) {
-            return null;
+        public Optional<FormattedText> getMessage(Quest quest) {
+            return Optional.empty();
         }
     },
     QUEST_TRIGGER("quest", false, true) {
@@ -36,8 +38,8 @@ public enum TriggerType {
         }
         
         @Override
-        public String getMessage(Quest quest) {
-            return super.getMessage(quest) + " (" + quest.getTriggerTasks() + ")";
+        public Optional<FormattedText> getMessage(Quest quest) {
+            return Optional.of(getName().append(" (" + quest.getTriggerTasks() + ")").withStyle(ChatFormatting.GOLD));
         }
     },
     ANTI_TRIGGER("anti", false, false) {
@@ -57,7 +59,7 @@ public enum TriggerType {
         this.workAsInvisible = workAsInvisible;
     }
     
-    public FormattedText getName() {
+    public MutableComponent getName() {
         return Translator.translatable("hqm.trigger." + id + ".title");
     }
     
@@ -75,7 +77,7 @@ public enum TriggerType {
     
     public abstract boolean isQuestVisible(Quest quest, UUID playerId);
     
-    public String getMessage(Quest quest) {
-        return ChatFormatting.GOLD + getName().getString(); //TODO don't do getString() here
+    public Optional<FormattedText> getMessage(Quest quest) {
+        return Optional.of(getName().withStyle(ChatFormatting.GOLD));
     }
 }

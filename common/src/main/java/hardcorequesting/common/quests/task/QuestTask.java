@@ -27,6 +27,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -159,7 +160,7 @@ public abstract class QuestTask<Data extends TaskData> {
         return description;
     }
     
-    public FormattedText getDescription() {
+    public MutableComponent getDescription() {
         return Translator.translatable(description);
     }
     
