@@ -2,9 +2,11 @@ package hardcorequesting.common.team;
 
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.TeamErrorMessage;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -15,8 +17,8 @@ public enum TeamError {
     
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static TeamError latestError;
-    private String header;
-    private String message;
+    private final String header;
+    private final String message;
     
     TeamError(String header, String message) {
         this.message = message;
@@ -24,13 +26,13 @@ public enum TeamError {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getMessage() {
-        return I18n.get(message);
+    public FormattedText getMessage() {
+        return Translator.translatable(message).withStyle(ChatFormatting.DARK_RED);
     }
     
     @Environment(EnvType.CLIENT)
-    public String getHeader() {
-        return I18n.get(header);
+    public FormattedText getHeader() {
+        return Translator.translatable(header).withStyle(ChatFormatting.DARK_RED);
     }
     
     public void sendToClient(Player player) {

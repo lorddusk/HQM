@@ -1,8 +1,10 @@
 package hardcorequesting.common.team;
 
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.FormattedText;
 
 public enum RewardSetting {
     ALL("hqm.team.allReward.title", "hqm.team.allReward.desc"),
@@ -10,8 +12,8 @@ public enum RewardSetting {
     RANDOM("hqm.team.randomReward.title", "hqm.team.randomReward.desc");
     
     public static boolean isAllModeEnabled;
-    private String title;
-    private String description;
+    private final String title;
+    private final String description;
     
     RewardSetting(String title, String description) {
         this.title = title;
@@ -23,12 +25,12 @@ public enum RewardSetting {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getTitle() {
-        return I18n.get(title);
+    public FormattedText getTitle() {
+        return Translator.translatable(title).withStyle(ChatFormatting.DARK_GREEN);
     }
     
     @Environment(EnvType.CLIENT)
-    public String getDescription() {
-        return I18n.get(description);
+    public FormattedText getDescription() {
+        return Translator.translatable(description).withStyle(ChatFormatting.DARK_GREEN);
     }
 }

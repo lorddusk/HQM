@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -350,16 +351,35 @@ public class GuiEditMenuTeam extends GuiEditMenu {
             int infoY = getInfoY();
             Team infoTeam = inviteTeam == null ? team : inviteTeam;
             if (gui.inBounds(INFO_BOX_X, infoY, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                //TODO clean up text composition
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_GREEN + infoTeam.getLifeSetting().getTitle() + "\n" + infoTeam.getLifeSetting().getDescription() + (isOwner ? "\n\n" + ChatFormatting.GOLD + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                
+                List<FormattedText> tooltip = new ArrayList<>();
+                tooltip.add(infoTeam.getLifeSetting().getTitle());
+                tooltip.addAll(gui.getLinesFromText(infoTeam.getLifeSetting().getDescription(), 1F, 200));
+                if (isOwner) {
+                    tooltip.add(FormattedText.EMPTY);
+                    tooltip.add(Translator.translatable("hqm.party.change").withStyle(ChatFormatting.GOLD));
+                }
+                gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
             } else if (gui.inBounds(INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SIZE, INFO_BOX_SIZE, mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_GREEN + infoTeam.getRewardSetting().getTitle() + "\n" + infoTeam.getRewardSetting().getDescription() + (isOwner ? "\n\n" + ChatFormatting.GOLD + I18n.get("hqm.party.change") : "")), 1F, 200), gui.getLeft() + mX, gui.getTop() + mY);
+                
+                List<FormattedText> tooltip = new ArrayList<>();
+                tooltip.add(infoTeam.getRewardSetting().getTitle());
+                tooltip.addAll(gui.getLinesFromText(infoTeam.getRewardSetting().getDescription(), 1F, 200));
+                if (isOwner) {
+                    tooltip.add(FormattedText.EMPTY);
+                    tooltip.add(Translator.translatable("hqm.party.change").withStyle(ChatFormatting.GOLD));
+                }
+                
+                gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
             }
         }
         
         if (TeamError.latestError != null) {
             if (inviteButton.inButtonBounds(mX, mY)) {
-                gui.renderTooltipL(matrices, gui.getLinesFromText(Translator.plain(ChatFormatting.DARK_RED + TeamError.latestError.getHeader() + "\n" + TeamError.latestError.getMessage()), 1F, 150), mX + gui.getLeft(), mY + gui.getTop());
+                List<FormattedText> tooltip = new ArrayList<>();
+                tooltip.add(TeamError.latestError.getHeader());
+                tooltip.addAll(gui.getLinesFromText(TeamError.latestError.getMessage(), 1F, 150));
+                gui.renderTooltipL(matrices, tooltip, mX + gui.getLeft(), mY + gui.getTop());
             } else {
                 TeamError.latestError = null;
             }
