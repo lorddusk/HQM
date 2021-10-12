@@ -247,7 +247,8 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 if (parentInvisible) {
                                     MutableComponent parentText = Translator.translatable("hqm.questBook.invisInherit");
                                     
-                                    invisibilityMessage.ifPresent(component -> parentText.append(" ").append(Translator.translatable("hqm.questBook.and").append(" ").append(component)));
+                                    if (invisibilityMessage.isPresent())
+                                        parentText = Translator.translatable("hqm.questBook.and", parentText, invisibilityMessage.get());
                                     
                                     invisibilityMessage = Optional.of(parentText);
                                 }

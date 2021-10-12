@@ -125,19 +125,17 @@ public enum RepeatType {
     
     @Environment(EnvType.CLIENT)
     private static FormattedText formatTime(int days, int hours) {
-        MutableComponent daysComp = Translator.text(days + " ").append(Translator.translatable("hqm.repeat." + (days == 1 ? "day" : "days")));
+        MutableComponent daysComp = Translator.plural("hqm.day", days);
         if (days > 0) {
             daysComp.withStyle(ChatFormatting.GRAY);
         }
         
-        MutableComponent hoursComp = Translator.text(hours + " ").append(Translator.translatable("hqm.repeat." + (hours == 1 ? "hour" : "hours")));
+        MutableComponent hoursComp = Translator.plural("hqm.hour", hours);
         if (hours > 0) {
             hoursComp.withStyle(ChatFormatting.GRAY);
         }
         
-        //TODO tweak lang stuff and use formatting for nicer text building
-        return Translator.text("").append(daysComp).append(" ").append(Translator.translatable("hqm.repeat.and"))
-                .append(" ").append(hoursComp).withStyle(ChatFormatting.DARK_GRAY);
+        return Translator.translatable("hqm.repeat.and", daysComp, hoursComp).withStyle(ChatFormatting.DARK_GRAY);
     }
     
     public FormattedText getName() {
