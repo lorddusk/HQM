@@ -297,21 +297,16 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         break;
                     }
                 }
-                
-                
+    
+    
                 switch (quest.getTriggerType()) {
-                    case ANTI_TRIGGER:
-                        invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisLocked"));
-                        break;
-                    case QUEST_TRIGGER:
+                    case ANTI_TRIGGER -> invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisLocked"));
+                    case QUEST_TRIGGER -> {
                         invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisPerm"));
                         parentInvisible = false;
-                        break;
-                    case TASK_TRIGGER:
-                        invisibilityMessage = Optional.of(Translator.plural("hqm.questBook.invisCount", quest.getTriggerTasks()));
-                        break;
-                    default:
-                        invisibilityMessage = Optional.empty();
+                    }
+                    case TASK_TRIGGER -> invisibilityMessage = Optional.of(Translator.plural("hqm.questBook.invisCount", quest.getTriggerTasks()));
+                    default -> invisibilityMessage = Optional.empty();
                 }
                 
                 if (parentInvisible) {
