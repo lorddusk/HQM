@@ -93,7 +93,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 gui.drawRect(matrices, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
-            gui.drawString(matrices, Translator.plain(stats.getName()), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
+            gui.drawString(matrices, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
             gui.drawString(matrices, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
             
             for (DeathType type : DeathType.values()) {
@@ -129,7 +129,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 
                 
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
-                    gui.renderTooltip(matrices, Translator.plain(stats.getDescription(type)), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(matrices, stats.getDescription(type), mX + gui.getLeft(), mY + gui.getTop());
                     break;
                 }
             }

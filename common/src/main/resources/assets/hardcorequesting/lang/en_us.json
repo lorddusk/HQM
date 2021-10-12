@@ -207,8 +207,6 @@
   "hqm.deathStat.worstPlayers": "Worst Players",
   "hqm.deathStat.everyone": "Everyone",
   "hqm.deathStat.noOneDied": "No one has died this way, yet.",
-  "hqm.deathStat.payer": "player",
-  "hqm.deathStat.payers": "players",
   "hqm.deathStat.diedThisWay": "have died this way.",
   "_comment": "======================================",
   "_comment": "TRACKER TYPES",
