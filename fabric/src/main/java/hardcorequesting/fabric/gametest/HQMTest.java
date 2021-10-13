@@ -2,6 +2,7 @@ package hardcorequesting.fabric.gametest;
 
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestSet;
+import hardcorequesting.common.quests.QuestingDataManager;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -39,8 +40,12 @@ public class HQMTest extends HQMTestBase implements FabricGameTest {
     }
     
     @GameTest(template = EMPTY_STRUCTURE)
-    public void initAsIncomplete(GameTestHelper helper) {
+    public void questCompletion(GameTestHelper helper) {
         Player player = helper.makeMockPlayer();
+        assertQuestCompletionStatus(QUEST_1, false, player);
+        getQuest(QUEST_1).completeQuest(player);
+        assertQuestCompletionStatus(QUEST_1, true, player);
+        QuestingDataManager.getInstance().getQuestingData(player).getTeam().resetCompletion(getQuest(QUEST_1));
         assertQuestCompletionStatus(QUEST_1, false, player);
         helper.succeed();
     }
