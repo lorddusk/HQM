@@ -1,4 +1,4 @@
-package hardcorequesting.fabric;
+package hardcorequesting.fabric.gametest;
 
 import hardcorequesting.common.io.LocalDataManager;
 import hardcorequesting.common.quests.Quest;

@@ -1,4 +1,4 @@
-package hardcorequesting.fabric;
+package hardcorequesting.fabric.gametest;
 
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestSet;
