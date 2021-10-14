@@ -27,7 +27,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private ReputationReward selectedReward;
     private List<FormattedText> error;
     private final NumberTextBox valueTextBox;
-    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuReputationReward(GuiQuestBook gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
         super(gui, playerId, true);
@@ -87,7 +86,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 185, 25) {
+        addClickable(new ArrowSelectionHelper(gui, 185, 25) {
     
             @Override
             protected boolean isArrowVisible() {
@@ -123,7 +122,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
                 return null;
             }
     
-        };
+        });
     }
     
     @Override
@@ -144,8 +143,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);
         }
-        
-        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
@@ -165,15 +162,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
                 }
             }
         }
-        
-        selectionHelper.onClick(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
     }
     
     private boolean isValid() {

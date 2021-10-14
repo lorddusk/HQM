@@ -30,7 +30,6 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     private boolean inverted;
     private ReputationTask<?> task;
     private int id;
-    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuReputationSetting(GuiQuestBook gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
         super(gui, playerId, true);
@@ -65,7 +64,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
             }
         }
         
-        addCheckBox(new AbstractCheckBox(gui, Translator.translatable("hqm.repSetting.invRange"), 21, 124) {
+        addClickable(new AbstractCheckBox(gui, Translator.translatable("hqm.repSetting.invRange"), 21, 124) {
             @Override
             protected boolean isVisible() {
                 return reputation != null;
@@ -82,7 +81,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 25, 25) {
+        addClickable(new ArrowSelectionHelper(gui, 25, 25) {
             @Override
             protected void onArrowClick(boolean left) {
                 if (reputation != null) {
@@ -116,7 +115,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
                     return null;
                 }
             }
-        };
+        });
     }
     
     @Override
@@ -147,8 +146,6 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
                 gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
             }
         }
-        
-        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
@@ -174,15 +171,6 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
                 }
             }
         }
-        
-        selectionHelper.onClick(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
     }
     
     @Override

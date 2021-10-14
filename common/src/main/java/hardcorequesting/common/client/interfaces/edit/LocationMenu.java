@@ -23,7 +23,6 @@ public class LocationMenu extends GuiEditMenu {
     private BlockPos.MutableBlockPos pos;
     private int radius;
     private String dimension;
-    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
         gui.setEditMenu(new LocationMenu(gui, playerId, visibility, initPos, initRadius, initDimension, resultConsumer));
@@ -121,7 +120,7 @@ public class LocationMenu extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 180, 30) {
+        addClickable(new ArrowSelectionHelper(gui, 180, 30) {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
@@ -140,28 +139,7 @@ public class LocationMenu extends GuiEditMenu {
             protected FormattedText getArrowDescription() {
                 return visibility.getDescription();
             }
-        };
-    }
-    
-    @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
-        
-        selectionHelper.render(matrices, mX, mY);
-    }
-    
-    @Override
-    public void onClick(int mX, int mY, int b) {
-        super.onClick(mX, mY, b);
-        
-        selectionHelper.onClick(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
+        });
     }
     
     @Override

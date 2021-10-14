@@ -33,7 +33,6 @@ public class PickMobMenu extends GuiEditMenu {
     private final ExtendedScrollBar<Entry> scrollBar;
     private final List<Entry> rawMobs;
     private final List<Entry> mobs;
-    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
         gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
@@ -73,7 +72,7 @@ public class PickMobMenu extends GuiEditMenu {
             }
         });
     
-        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+        addClickable(new ArrowSelectionHelper(gui, 180, 70) {
             @Override
             protected boolean isArrowVisible() {
                 return false;   //There is currently no precision for mobs. Change this if precision is ever added back
@@ -94,7 +93,7 @@ public class PickMobMenu extends GuiEditMenu {
                 return Translator.translatable("hqm." + textKey + "." + "type" + "Match.desc");
             }
         
-        };
+        });
         
         rawMobs = new ArrayList<>();
         mobs = new ArrayList<>();
@@ -136,8 +135,6 @@ public class PickMobMenu extends GuiEditMenu {
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
-        selectionHelper.render(matrices, mX, mY);
-        
         int mobY = START_Y;
         for (Entry entry : scrollBar.getVisibleEntries()) {
             boolean selected = entry.equals(mob);
@@ -158,8 +155,6 @@ public class PickMobMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        selectionHelper.onClick(mX, mY);
-        
         int mobY = START_Y;
         for (Entry entry : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, mobY, 130, 6, mX, mY)) {
@@ -172,13 +167,6 @@ public class PickMobMenu extends GuiEditMenu {
             }
             mobY += OFFSET_Y;
         }
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
     }
     
     @Override

@@ -33,7 +33,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
     
     private final List<String> rawAdvancemenNames;
     private final List<String> advancementNames;
-    private final ArrowSelectionHelper selectionHelper;
     
     public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
         gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
@@ -56,7 +55,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+        addClickable(new ArrowSelectionHelper(gui, 180, 70) {
             @Override
             protected void onArrowClick(boolean left) {
             }
@@ -70,7 +69,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
             protected FormattedText getArrowDescription() {
                 return Translator.plain("Completing the exact advancement is required.");
             }
-        };
+        });
         
         rawAdvancemenNames = new ArrayList<>();
         advancementNames = new ArrayList<>();
@@ -105,8 +104,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    
-        selectionHelper.render(matrices, mX, mY);
         
         int nameY = START_Y;
         for (String name : scrollBar.getVisibleEntries()) {
@@ -128,8 +125,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        selectionHelper.onClick(mX, mY);
-        
         int nameY = START_Y;
         for (String name : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, nameY, 130, 6, mX, mY)) {
@@ -143,13 +138,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
             }
             nameY += OFFSET_Y;
         }
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
     }
     
     @Override

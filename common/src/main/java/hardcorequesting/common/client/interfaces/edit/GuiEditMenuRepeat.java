@@ -20,7 +20,6 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
     private RepeatType type;
     private int days;
     private int hours;
-    private final ArrowSelectionHelper selectionHelper;
     
     public GuiEditMenuRepeat(GuiQuestBook gui, UUID playerId, Quest quest) {
         super(gui, playerId, true);
@@ -60,7 +59,7 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 25, 20) {
+        addClickable(new ArrowSelectionHelper(gui, 25, 20) {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
@@ -79,28 +78,7 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
             protected FormattedText getArrowDescription() {
                 return type.getDescription();
             }
-        };
-    }
-    
-    @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
-        
-        selectionHelper.render(matrices, mX, mY);
-    }
-    
-    @Override
-    public void onClick(int mX, int mY, int b) {
-        super.onClick(mX, mY, b);
-        
-        selectionHelper.onClick(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease(mX, mY);
+        });
     }
     
     @Override

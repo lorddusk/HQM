@@ -21,10 +21,8 @@ public abstract class Graphic {
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
-    private final List<AbstractCheckBox> checkBoxes = new ArrayList<>();
     {
-        drawables.add(textBoxes);
-        clickables.add(textBoxes);
+        addClickable(textBoxes);
     }
     
     public final void drawFull(PoseStack matrices, int mX, int mY) {
@@ -82,14 +80,12 @@ public abstract class Graphic {
     }
     
     protected void addButton(LargeButton button) {
-        drawables.add(button);
-        clickables.add(button);
+        addClickable(button);
         buttons.add(button);
     }
     
     protected void addScrollBar(ScrollBar scrollBar) {
-        drawables.add(scrollBar);
-        clickables.add(scrollBar);
+        addClickable(scrollBar);
         scrollBars.add(scrollBar);
     }
     
@@ -97,10 +93,9 @@ public abstract class Graphic {
         textBoxes.add(box);
     }
     
-    protected void addCheckBox(AbstractCheckBox box) {
-        drawables.add(box);
-        clickables.add(box);
-        checkBoxes.add(box);
+    protected <T extends Drawable & Clickable> void addClickable(T widget) {
+        drawables.add(widget);
+        clickables.add(widget);
     }
     
     protected void reloadTextBoxes() {
