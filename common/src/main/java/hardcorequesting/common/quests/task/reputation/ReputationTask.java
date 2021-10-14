@@ -35,8 +35,8 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
     
-    protected ReputationTask(TaskType<? extends ReputationTask<Data>> type, Class<Data> dataType, Quest parent, String description, String longDescription) {
-        super(type, dataType, parent, description, longDescription);
+    protected ReputationTask(TaskType<? extends ReputationTask<Data>> type, Class<Data> dataType, Quest parent) {
+        super(type, dataType, parent);
     }
     
     @Environment(EnvType.CLIENT)

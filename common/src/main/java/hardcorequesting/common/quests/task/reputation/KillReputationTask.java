@@ -26,8 +26,8 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private static final String KILLS = "kills";
     private int kills;
     
-    public KillReputationTask(Quest parent, String description, String longDescription) {
-        super(TaskType.REPUTATION_KILL, ReputationKillTaskData.class, parent, description, longDescription);
+    public KillReputationTask(Quest parent) {
+        super(TaskType.REPUTATION_KILL, ReputationKillTaskData.class, parent);
         
         register(EventTrigger.Type.DEATH);
     }

@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class ConsumeItemQDSTask extends ConsumeItemTask {
     
-    public ConsumeItemQDSTask(Quest parent, String description, String longDescription) {
-        super(TaskType.CONSUME_QDS, parent, description, longDescription);
+    public ConsumeItemQDSTask(Quest parent) {
+        super(TaskType.CONSUME_QDS, parent);
     }
     
     @Environment(EnvType.CLIENT)

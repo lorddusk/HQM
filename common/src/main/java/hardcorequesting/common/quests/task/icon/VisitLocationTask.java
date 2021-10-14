@@ -37,8 +37,8 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     private static final int CHECK_DELAY = 20;
     private int delay = 1;
     
-    public VisitLocationTask(Quest parent, String description, String longDescription) {
-        super(TaskType.LOCATION, LocationTaskData.class, EditType.Type.LOCATION, parent, description, longDescription);
+    public VisitLocationTask(Quest parent) {
+        super(TaskType.LOCATION, LocationTaskData.class, EditType.Type.LOCATION, parent);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }

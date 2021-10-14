@@ -66,7 +66,7 @@ public final class TaskType<T extends QuestTask<?>> {
     }
     
     public T addTask(Quest quest) {
-        T task = constructor.create(quest, getLangKeyName(), getLangKeyDescription());
+        T task = constructor.create(quest);
         task.updateId(quest.getTasks().size());
         quest.getTasks().add(task);
         SaveHelper.add(EditType.TASK_CREATE);
@@ -90,6 +90,6 @@ public final class TaskType<T extends QuestTask<?>> {
     }
     
     public interface TaskConstructor<T extends QuestTask<?>> {
-        T create(Quest quest, String name, String description);
+        T create(Quest quest);
     }
 }

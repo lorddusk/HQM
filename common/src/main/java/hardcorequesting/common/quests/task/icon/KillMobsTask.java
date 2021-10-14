@@ -32,8 +32,8 @@ import java.util.UUID;
 public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData> {
     private static final String MOBS = "mobs";
     
-    public KillMobsTask(Quest parent, String description, String longDescription) {
-        super(TaskType.KILL, MobTaskData.class, EditType.Type.MONSTER, parent, description, longDescription);
+    public KillMobsTask(Quest parent) {
+        super(TaskType.KILL, MobTaskData.class, EditType.Type.MONSTER, parent);
         register(EventTrigger.Type.DEATH);
     }
     

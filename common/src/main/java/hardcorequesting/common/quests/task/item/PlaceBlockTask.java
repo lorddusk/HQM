@@ -10,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class PlaceBlockTask extends ItemRequirementTask {
-    public PlaceBlockTask(Quest parent, String description, String longDescription) {
-        super(TaskType.BLOCK_PLACE, parent, description, longDescription);
+    public PlaceBlockTask(Quest parent) {
+        super(TaskType.BLOCK_PLACE, parent);
         
         register(EventTrigger.Type.ITEM_USED);
     }

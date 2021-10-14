@@ -22,8 +22,8 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     protected final PartList<T> parts;
     
     public IconLayoutTask(TaskType<? extends IconLayoutTask<T, Data>> type, Class<Data> dataType, EditType.Type editType,
-                          Quest parent, String description, String longDescription) {
-        super(type, dataType, parent, description, longDescription);
+                          Quest parent) {
+        super(type, dataType, parent);
         parts = new PartList<>(this::createEmpty, editType, LIMIT);
     }
     

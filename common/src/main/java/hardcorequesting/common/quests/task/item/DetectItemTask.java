@@ -20,8 +20,8 @@ import java.util.UUID;
 
 public class DetectItemTask extends ItemRequirementTask {
     
-    public DetectItemTask(Quest parent, String description, String longDescription) {
-        super(TaskType.DETECT, parent, description, longDescription);
+    public DetectItemTask(Quest parent) {
+        super(TaskType.DETECT, parent);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
     }

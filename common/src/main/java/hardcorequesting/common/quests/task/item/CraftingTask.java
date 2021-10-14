@@ -11,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class CraftingTask extends ItemRequirementTask {
     
-    public CraftingTask(Quest parent, String description, String longDescription) {
-        super(TaskType.CRAFT, parent, description, longDescription);
+    public CraftingTask(Quest parent) {
+        super(TaskType.CRAFT, parent);
         register(EventTrigger.Type.CRAFTING);
     }
     

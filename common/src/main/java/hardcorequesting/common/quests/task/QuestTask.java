@@ -53,12 +53,12 @@ public abstract class QuestTask<Data extends TaskData> {
     private int id;
     private List<FormattedText> cachedDescription;
     
-    public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent, String description, String longDescription) {
+    public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent) {
         this.type = type;
         this.dataType = dataType;
         this.parent = parent;
-        this.description = description;
-        this.longDescription = longDescription;
+        this.description = type.getLangKeyName();
+        this.longDescription = type.getLangKeyDescription();
     }
     
     public TaskType<?> getType() {

@@ -18,12 +18,12 @@ import java.util.UUID;
 
 public class ConsumeItemTask extends ItemRequirementTask {
     
-    public ConsumeItemTask(Quest parent, String description, String longDescription) {
-        this(TaskType.CONSUME, parent, description, longDescription);
+    public ConsumeItemTask(Quest parent) {
+        this(TaskType.CONSUME, parent);
     }
     
-    protected ConsumeItemTask(TaskType<? extends ConsumeItemTask> type, Quest parent, String description, String longDescription) {
-        super(type, parent, description, longDescription);
+    protected ConsumeItemTask(TaskType<? extends ConsumeItemTask> type, Quest parent) {
+        super(type, parent);
     }
     
     @Environment(EnvType.CLIENT)

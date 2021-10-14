@@ -30,8 +30,8 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     
     private final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.COMPLETION, LIMIT);
     
-    public CompleteQuestTask(Quest parent, String description, String longDescription) {
-        super(TaskType.COMPLETION, CompleteQuestTaskData.class, parent, description, longDescription);
+    public CompleteQuestTask(Quest parent) {
+        super(TaskType.COMPLETION, CompleteQuestTaskData.class, parent);
         
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }

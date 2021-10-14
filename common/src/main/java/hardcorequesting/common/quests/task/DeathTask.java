@@ -26,8 +26,8 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     private static final String DEATHS = "deaths";
     private int deaths;
     
-    public DeathTask(Quest parent, String description, String longDescription) {
-        super(TaskType.DEATH, DeathTaskData.class, parent, description, longDescription);
+    public DeathTask(Quest parent) {
+        super(TaskType.DEATH, DeathTaskData.class, parent);
         
         register(EventTrigger.Type.DEATH);
     }

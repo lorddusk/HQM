@@ -35,8 +35,8 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
     
-    public ItemRequirementTask(TaskType<? extends ItemRequirementTask> type, Quest parent, String description, String longDescription) {
-        super(type, ItemsTaskData.class, parent, description, longDescription);
+    public ItemRequirementTask(TaskType<? extends ItemRequirementTask> type, Quest parent) {
+        super(type, ItemsTaskData.class, parent);
     }
     
     @Environment(EnvType.CLIENT)

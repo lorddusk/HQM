@@ -19,8 +19,8 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     public static final String NULL_NAME = "item.null.name";
     private static final String BLOCKS = "blocks";
     
-    public BlockRequirementTask(TaskType<? extends BlockRequirementTask> type, Quest parent, String description, String longDescription) {
-        super(type, parent, description, longDescription);
+    public BlockRequirementTask(TaskType<? extends BlockRequirementTask> type, Quest parent) {
+        super(type, parent);
     }
     
     @Override

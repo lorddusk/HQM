@@ -33,8 +33,8 @@ import java.util.UUID;
 public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, AdvancementTaskData> {
     private static final String ADVANCEMENTS = "advancements";
     
-    public GetAdvancementTask(Quest parent, String description, String longDescription) {
-        super(TaskType.ADVANCEMENT, AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent, description, longDescription);
+    public GetAdvancementTask(Quest parent) {
+        super(TaskType.ADVANCEMENT, AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }
