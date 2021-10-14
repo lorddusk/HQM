@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -21,6 +22,7 @@ public abstract class Graphic {
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
+    private final List<AbstractCheckBox> checkBoxes = new ArrayList<>();
     
     public final void drawFull(PoseStack matrices, int mX, int mY) {
         draw(matrices, mX, mY);
@@ -34,6 +36,10 @@ public abstract class Graphic {
         }
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.draw(matrices);
+        }
+    
+        for (AbstractCheckBox checkbox : checkBoxes) {
+            checkbox.draw(matrices, mX, mY);
         }
         
         textBoxes.draw(matrices);
@@ -54,6 +60,9 @@ public abstract class Graphic {
         }
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onClick(mX, mY);
+        }
+        for (AbstractCheckBox checkbox : checkBoxes) {
+            checkbox.onClick(mX, mY);
         }
         
         textBoxes.onClick(mX, mY);
@@ -95,6 +104,10 @@ public abstract class Graphic {
     
     protected void addTextBox(TextBoxGroup.TextBox box) {
         textBoxes.add(box);
+    }
+    
+    protected void addCheckBox(AbstractCheckBox box) {
+        checkBoxes.add(box);
     }
     
     protected void reloadTextBoxes() {

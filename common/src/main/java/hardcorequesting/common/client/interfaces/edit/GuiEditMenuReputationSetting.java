@@ -65,7 +65,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
             }
         }
         
-        checkboxes.add(new AbstractCheckBox(gui, Translator.translatable("hqm.repSetting.invRange"), 21, 124) {
+        addCheckBox(new AbstractCheckBox(gui, Translator.translatable("hqm.repSetting.invRange"), 21, 124) {
             @Override
             protected boolean isVisible() {
                 return reputation != null;
