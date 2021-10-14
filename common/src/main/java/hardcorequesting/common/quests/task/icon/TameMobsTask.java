@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task.icon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.TameMobsTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -40,12 +37,6 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     public TameMobsTask(Quest parent) {
         super(TaskType.TAME, TameTaskData.class, EditType.Type.MONSTER, parent);
         register(EventTrigger.Type.ANIMAL_TAME);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new TameMobsTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

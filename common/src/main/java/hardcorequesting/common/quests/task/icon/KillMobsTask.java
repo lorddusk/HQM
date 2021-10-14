@@ -2,9 +2,6 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.KillMobsTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -13,8 +10,6 @@ import hardcorequesting.common.quests.data.MobTaskData;
 import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -35,12 +30,6 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     public KillMobsTask(Quest parent) {
         super(TaskType.KILL, MobTaskData.class, EditType.Type.MONSTER, parent);
         register(EventTrigger.Type.DEATH);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new KillMobsTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

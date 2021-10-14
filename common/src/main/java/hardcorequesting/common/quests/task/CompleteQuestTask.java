@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.CompleteQuestTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
@@ -14,8 +11,6 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.CompleteQuestTaskData;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,10 +31,8 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
         register(EventTrigger.Type.QUEST_COMPLETED, EventTrigger.Type.OPEN_BOOK);
     }
     
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new CompleteQuestTaskGraphic(this, parts, playerId, gui);
+    public PartList<Part> getParts() {
+        return parts;
     }
     
     public boolean completed(int id, UUID playerId) {

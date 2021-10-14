@@ -1,9 +1,6 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.DeathTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
@@ -11,8 +8,6 @@ import hardcorequesting.common.quests.data.DeathTaskData;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,12 +25,6 @@ public class DeathTask extends QuestTask<DeathTaskData> {
         super(TaskType.DEATH, DeathTaskData.class, parent);
         
         register(EventTrigger.Type.DEATH);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new DeathTaskGraphic(this, playerId, gui);
     }
     
     @Override

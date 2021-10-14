@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -18,8 +17,8 @@ public class KillMobsTaskGraphic extends IconTaskGraphic<KillMobsTask.Part> {
     
     private final KillMobsTask task;
     
-    public KillMobsTaskGraphic(KillMobsTask task, PartList<KillMobsTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public KillMobsTaskGraphic(KillMobsTask task, UUID playerId, GuiQuestBook gui) {
+        super(task, playerId, gui);
         this.task = task;
     }
     

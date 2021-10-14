@@ -5,7 +5,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.IconLayoutTask;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.Translator;
@@ -26,8 +25,8 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     
     private final IconLayoutTask<Part, ?> task;
     
-    public IconTaskGraphic(IconLayoutTask<Part, ?> task, PartList<Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public IconTaskGraphic(IconLayoutTask<Part, ?> task, UUID playerId, GuiQuestBook gui) {
+        super(task, task.getParts(), playerId, gui);
         this.task = task;
     }
     

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickAdvancementMenu;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -18,8 +17,8 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     
     private final GetAdvancementTask task;
     
-    public AdvancementTaskGraphic(GetAdvancementTask task, PartList<GetAdvancementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public AdvancementTaskGraphic(GetAdvancementTask task, UUID playerId, GuiQuestBook gui) {
+        super(task, playerId, gui);
         this.task = task;
         addDetectButton(task);
     }

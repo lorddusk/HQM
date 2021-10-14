@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -287,7 +288,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private void setSelectedTask(@Nullable QuestTask<?> task) {
         selectedTask = task;
-        taskGraphic = task == null ? null : task.createGraphic(playerId, gui);
+        taskGraphic = task == null ? null : TaskGraphics.create(task, playerId, gui);
     }
     
     @Override

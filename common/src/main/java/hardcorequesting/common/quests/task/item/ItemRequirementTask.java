@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -39,10 +36,8 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         super(type, ItemsTaskData.class, parent);
     }
     
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new ItemTaskGraphic(this, parts, playerId, gui);
+    public PartList<Part> getParts() {
+        return parts;
     }
     
     @Override

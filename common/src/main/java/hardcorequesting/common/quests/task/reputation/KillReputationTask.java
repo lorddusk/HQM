@@ -1,9 +1,6 @@
 package hardcorequesting.common.quests.task.reputation;
 
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.KillReputationTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
@@ -13,8 +10,6 @@ import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,12 +25,6 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
         super(TaskType.REPUTATION_KILL, ReputationKillTaskData.class, parent);
         
         register(EventTrigger.Type.DEATH);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new KillReputationTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

@@ -4,8 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -200,9 +198,6 @@ public abstract class QuestTask<Data extends TaskData> {
         getData(uuid).completed = true;
         completeQuest(parent, uuid);
     }
-    
-    @Environment(EnvType.CLIENT)
-    public abstract TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui);
     
     public abstract void onUpdate(Player player);
     

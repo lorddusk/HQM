@@ -27,6 +27,9 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
         parts = new PartList<>(this::createEmpty, editType, LIMIT);
     }
     
+    public PartList<T> getParts() {
+        return parts;
+    }
     
     protected abstract T createEmpty();
     

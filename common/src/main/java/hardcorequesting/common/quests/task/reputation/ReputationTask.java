@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task.reputation;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.ReputationTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -18,8 +15,6 @@ import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 
@@ -39,10 +34,8 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
         super(type, dataType, parent);
     }
     
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new ReputationTaskGraphic(this, parts, playerId, gui);
+    public PartList<Part> getParts() {
+        return parts;
     }
     
     @Deprecated
