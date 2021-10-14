@@ -382,10 +382,10 @@ public class QuestTaskAdapter {
     
         @Override
         public JsonElement serialize(QuestTask<?> src) {
-            TaskType type = TaskType.getType(src.getClass());
+            TaskType<?> type = TaskType.getType(src.getClass());
         
             JsonObjectBuilder builder = object()
-                    .add(TYPE, type.name());
+                    .add(TYPE, type.toDataName());
             if (!src.getLangKeyDescription().equals(type.getLangKeyName()))
                 builder.add(DESCRIPTION, src.getLangKeyDescription());
             if (!src.getLangKeyLongDescription().equals(type.getLangKeyDescription()))
@@ -397,7 +397,7 @@ public class QuestTaskAdapter {
         @Override
         public QuestTask<?> deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
-            TaskType type = TaskType.valueOf(GsonHelper.getAsString(object, TYPE));
+            TaskType<?> type = TaskType.fromDataName(GsonHelper.getAsString(object, TYPE));
             QuestTask<?> TASK = type.addTask(QUEST);
             if (object.has(DESCRIPTION)) TASK.setDescription(GsonHelper.getAsString(object, DESCRIPTION));
             if (object.has(LONG_DESCRIPTION)) TASK.setLongDescription(GsonHelper.getAsString(object, LONG_DESCRIPTION));

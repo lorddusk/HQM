@@ -57,8 +57,9 @@ public final class QuestGraphic extends EditableGraphic {
     private List<FormattedText> cachedDescription;
     
     {
-        for (final TaskType taskType : TaskType.values()) {
-            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
+        int ordinal = 0;
+        for (final TaskType<?> taskType : TaskType.values()) {
+            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (ordinal % 2) * 65, 50 + (ordinal / 2) * 20) {
                 @Override
                 public boolean isVisible() {
                     return Quest.canQuestsBeEdited() && selectedTask == null && QuestGraphic.this.gui.getCurrentMode() == EditMode.TASK;
@@ -69,6 +70,7 @@ public final class QuestGraphic extends EditableGraphic {
                     taskType.addTask(quest);
                 }
             });
+            ordinal++;
         }
     }
     
