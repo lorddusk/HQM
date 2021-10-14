@@ -110,7 +110,7 @@ public class LocationMenu extends GuiEditMenu {
         });
         
         
-        addButton(new LargeButton(gui, "hqm.locationMenu.location", 100, 20) {
+        addClickable(new LargeButton(gui, "hqm.locationMenu.location", 100, 20) {
             @Override
             public void onClick() {
                 Player player = Minecraft.getInstance().player;

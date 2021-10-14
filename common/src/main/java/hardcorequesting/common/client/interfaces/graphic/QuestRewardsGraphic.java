@@ -68,7 +68,7 @@ public class QuestRewardsGraphic extends Graphic {
         this.playerId = playerId;
         this.gui = gui;
     
-        addButton(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
+        addClickable(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
             @Override
             public boolean isEnabled() {
                 return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(playerId);

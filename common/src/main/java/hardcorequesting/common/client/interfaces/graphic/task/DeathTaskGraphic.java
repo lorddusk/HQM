@@ -23,7 +23,7 @@ public class DeathTaskGraphic extends TaskGraphic {
         super(playerId, gui, task);
         this.task = task;
     
-        addButton(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
+        addClickable(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
             @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited();

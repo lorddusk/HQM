@@ -25,16 +25,16 @@ public abstract class GuiEditMenu extends Graphic {
         this(gui, playerId);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
-        
-        addButton(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
+    
+        addClickable(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
             @Override
             public void onClick() {
                 save();
                 close();
             }
         });
-        
-        addButton(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
+    
+        addClickable(new LargeButton(gui, "hqm.edit.cancel", xOffset + 100, 200) {
             @Override
             public void onClick() {
                 close();

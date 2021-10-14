@@ -58,7 +58,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
         if (hasSubmitButton)
             graphic.addSubmitButton(task);
     
-        graphic.addButton(new LargeButton(gui, "hqm.quest.selectTask", 250, 200) {
+        graphic.addClickable(new LargeButton(gui, "hqm.quest.selectTask", 250, 200) {
             @Override
             public boolean isEnabled() {
                 QuestingData data = QuestingDataManager.getInstance().getQuestingData(playerId);

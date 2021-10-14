@@ -2,7 +2,10 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.widget.*;
+import hardcorequesting.common.client.interfaces.widget.Clickable;
+import hardcorequesting.common.client.interfaces.widget.Drawable;
+import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -18,7 +21,6 @@ public abstract class Graphic {
     
     private final List<Drawable> drawables = new ArrayList<>();
     private final List<Clickable> clickables = new ArrayList<>();
-    private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
     {
@@ -39,8 +41,8 @@ public abstract class Graphic {
     }
     
     public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, mX, mY);
+        for (Drawable drawable : drawables) {
+            drawable.renderTooltip(matrices, mX, mY);
         }
     }
     
@@ -77,11 +79,6 @@ public abstract class Graphic {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onScroll(x, y, scroll);
         }
-    }
-    
-    protected void addButton(LargeButton button) {
-        addClickable(button);
-        buttons.add(button);
     }
     
     protected void addScrollBar(ScrollBar scrollBar) {

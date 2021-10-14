@@ -41,7 +41,7 @@ public class EditReputationGraphic extends EditableGraphic {
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;
     {
-        addButton(new LargeButton(gui, "Create New", 180, 20) {
+        addClickable(new LargeButton(gui, "Create New", 180, 20) {
             @Override
             public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation == null;
@@ -54,7 +54,7 @@ public class EditReputationGraphic extends EditableGraphic {
             }
         });
     
-        addButton(new LargeButton(gui, "hqm.questBook.createTier", 20, 20) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createTier", 20, 20) {
             @Override
             public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation != null;

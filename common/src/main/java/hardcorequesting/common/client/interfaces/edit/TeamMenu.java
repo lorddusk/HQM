@@ -52,7 +52,7 @@ public class TeamMenu extends GuiEditMenu {
     public TeamMenu(GuiQuestBook gui, UUID playerId) {
         super(gui, playerId);
         
-        addButton(new LargeButton(gui, "hqm.party.create", 250, 20) {
+        addClickable(new LargeButton(gui, "hqm.party.create", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return teamName.getText().length() > 0;
@@ -69,7 +69,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(inviteButton = new LargeButton(gui, "hqm.party.invitePlayer", 250, 20) {
+        addClickable(inviteButton = new LargeButton(gui, "hqm.party.invitePlayer", 250, 20) {
             @Override
             public boolean isEnabled() {
                 return inviteName.getText().length() > 0;
@@ -86,7 +86,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.accept", 180, 20) {
+        addClickable(new LargeButton(gui, "hqm.party.accept", 180, 20) {
             @Override
             public boolean isVisible() {
                 return inviteTeam != null;
@@ -99,7 +99,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.decline", 240, 20) {
+        addClickable(new LargeButton(gui, "hqm.party.decline", 240, 20) {
             @Override
             public boolean isVisible() {
                 return inviteTeam != null;
@@ -112,7 +112,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
+        addClickable(new LargeButton(gui, "hqm.party.decideLater", 180, 40) {
             @Override
             public boolean isVisible() {
                 return inviteTeam != null;
@@ -124,7 +124,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, null, 250, 50) {
+        addClickable(new LargeButton(gui, null, 250, 50) {
             @Override
             public boolean isEnabled() {
                 return !selectedEntry.isOwner();
@@ -147,7 +147,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.leave", 250, 160) {
+        addClickable(new LargeButton(gui, "hqm.party.leave", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown();
@@ -164,7 +164,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.disband", 250, 160) {
+        addClickable(new LargeButton(gui, "hqm.party.disband", 250, 160) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasShiftDown() && Screen.hasControlDown();
@@ -182,7 +182,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.party.list", 250, 190) {
+        addClickable(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
                 gui.setEditMenu(new TeamListMenu(gui, playerId, TeamMenu.this));

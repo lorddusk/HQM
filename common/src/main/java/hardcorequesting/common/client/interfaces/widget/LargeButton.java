@@ -80,6 +80,7 @@ public abstract class LargeButton implements Drawable, Clickable {
         }
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
     public void renderTooltip(PoseStack matrices, int mX, int mY) {
         if (isVisible() && description != null && inButtonBounds(mX, mY)) {

@@ -57,7 +57,7 @@ public class MenuPageGraphic extends EditableGraphic {
     
     private final ExtendedScrollBar<Reputation> reputationDisplayScroll;
     {
-        addButton(new LargeButton(gui, "Reset", 90, 190) {
+        addClickable(new LargeButton(gui, "Reset", 90, 190) {
             @Override
             public boolean isEnabled() {
                 return Screen.hasControlDown() && Screen.hasShiftDown();

@@ -46,7 +46,7 @@ public class EditBagsGraphic extends EditableGraphic {
     private final ExtendedScrollBar<GroupTier> tierScroll;
     
     {
-        addButton(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
@@ -59,7 +59,7 @@ public class EditBagsGraphic extends EditableGraphic {
             }
         });
     
-        addButton(new LargeButton(gui, "hqm.questBook.createTier", 100, 200) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createTier", 100, 200) {
             @Override
             public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
