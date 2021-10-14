@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
@@ -64,7 +65,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
             }
         }
         
-        checkboxes.add(new CheckBox("hqm.repSetting.invRange", 21, 124) {
+        checkboxes.add(new AbstractCheckBox("hqm.repSetting.invRange", 21, 124) {
             @Override
             protected boolean isVisible() {
                 return reputation != null;
