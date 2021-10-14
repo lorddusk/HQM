@@ -51,7 +51,7 @@ public abstract class GuiEditMenu extends Graphic {
         super.draw(matrices, mX, mY);
         
         for (AbstractCheckBox checkbox : checkboxes) {
-            checkbox.draw(matrices, gui, mX, mY);
+            checkbox.draw(matrices, mX, mY);
         }
     }
     
@@ -65,7 +65,7 @@ public abstract class GuiEditMenu extends Graphic {
         super.onClick(mX, mY, b);
         
         for (AbstractCheckBox checkbox : checkboxes) {
-            checkbox.onClick(gui, mX, mY);
+            checkbox.onClick(mX, mY);
         }
     }
     

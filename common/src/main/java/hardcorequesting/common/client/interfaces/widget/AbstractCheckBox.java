@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -14,30 +13,25 @@ public abstract class AbstractCheckBox {
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
     
-    private int x;
-    private int y;
-    private String name;
-    private List<FormattedText> cached;
-    private int width = Integer.MAX_VALUE;
+    private final int x;
+    private final int y;
+    private final GuiBase gui;
+    private final List<FormattedText> cached;
     
-    protected AbstractCheckBox(String name, int x, int y) {
+    protected AbstractCheckBox(GuiBase gui, FormattedText label, int x, int y) {
+        this(gui, label, x, y, Integer.MAX_VALUE);
+    }
+    
+    protected AbstractCheckBox(GuiBase gui, FormattedText label, int x, int y, int width) {
         this.x = x;
         this.y = y;
-        this.name = name;
+        this.gui = gui;
+        cached = gui.getLinesFromText(label, 0.7F, width);
     }
     
-    protected AbstractCheckBox(String name, int x, int y, int width) {
-        this(name, x, y);
-        this.width = width;
-    }
-    
-    public void draw(PoseStack matrices, GuiBase gui, int mX, int mY) {
+    public void draw(PoseStack matrices, int mX, int mY) {
         if (!isVisible()) {
             return;
-        }
-        
-        if (cached == null) {
-            cached = gui.getLinesFromText(Translator.translatable(name), 0.7F, width);
         }
         
         boolean selected = getValue();
@@ -51,7 +45,7 @@ public abstract class AbstractCheckBox {
         gui.drawString(matrices, cached, x + 12, y + 2, 0.7F, 0x404040);
     }
     
-    public void onClick(GuiBase gui, int mX, int mY) {
+    public void onClick(int mX, int mY) {
         if (isVisible() && gui.inBounds(x, y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
             setValue(!getValue());
         }
