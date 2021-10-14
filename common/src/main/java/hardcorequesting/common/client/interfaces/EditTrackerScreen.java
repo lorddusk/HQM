@@ -113,10 +113,10 @@ public class EditTrackerScreen extends GuiBase {
         int mX = mX0 - left;
         int mY = mY0 - top;
         for (LargeButton button : buttons) {
-            button.draw(matrices, mX, mY);
+            button.render(matrices, mX, mY);
         }
         
-        textBoxes.draw(matrices);
+        textBoxes.render(matrices, mX, mY);
     
         drawCenteredString(matrices, tracker.getCurrentQuest() != null ? Translator.plain(tracker.getCurrentQuest().getName()) : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     

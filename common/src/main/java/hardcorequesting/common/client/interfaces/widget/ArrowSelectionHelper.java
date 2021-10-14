@@ -7,7 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.minecraft.network.chat.FormattedText;
 
-public abstract class ArrowSelectionHelper {
+public abstract class ArrowSelectionHelper implements Drawable {
     private static final int ARROW_SRC_X = 244;
     private static final int ARROW_SRC_Y = 176;
     private static final int ARROW_W = 6;
@@ -29,6 +29,7 @@ public abstract class ArrowSelectionHelper {
         ARROW_X_RIGHT = ARROW_X_LEFT + 130;
     }
     
+    @Override
     public void render(PoseStack matrices, int mX, int mY) {
         if (isArrowVisible()) {
             

@@ -2,10 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
-import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -19,10 +16,14 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public abstract class Graphic {
     
+    private final List<Drawable> drawables = new ArrayList<>();
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
     private final List<AbstractCheckBox> checkBoxes = new ArrayList<>();
+    {
+        drawables.add(textBoxes);
+    }
     
     public final void drawFull(PoseStack matrices, int mX, int mY) {
         draw(matrices, mX, mY);
@@ -31,18 +32,10 @@ public abstract class Graphic {
     
     public void draw(PoseStack matrices, int mX, int mY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        for (LargeButton button : buttons) {
-            button.draw(matrices, mX, mY);
-        }
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices);
-        }
-    
-        for (AbstractCheckBox checkbox : checkBoxes) {
-            checkbox.draw(matrices, mX, mY);
-        }
         
-        textBoxes.draw(matrices);
+        for (Drawable drawable : drawables) {
+            drawable.render(matrices, mX, mY);
+        }
     }
     
     public void drawTooltip(PoseStack matrices, int mX, int mY) {
@@ -95,10 +88,12 @@ public abstract class Graphic {
     }
     
     protected void addButton(LargeButton button) {
+        drawables.add(button);
         buttons.add(button);
     }
     
     protected void addScrollBar(ScrollBar scrollBar) {
+        drawables.add(scrollBar);
         scrollBars.add(scrollBar);
     }
     
@@ -107,6 +102,7 @@ public abstract class Graphic {
     }
     
     protected void addCheckBox(AbstractCheckBox box) {
+        drawables.add(box);
         checkBoxes.add(box);
     }
     

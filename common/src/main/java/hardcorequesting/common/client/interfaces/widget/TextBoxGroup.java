@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextBoxGroup {
+public class TextBoxGroup implements Drawable {
     
     private static final int TEXT_BOX_WIDTH = 64;
     private static final int TEXT_BOX_HEIGHT = 12;
@@ -32,8 +32,9 @@ public class TextBoxGroup {
         return textBoxes;
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices) {
+    public void render(PoseStack matrices, int mX, int mY) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible()) {
                 textBox.draw(matrices, selectedTextBox == textBox);

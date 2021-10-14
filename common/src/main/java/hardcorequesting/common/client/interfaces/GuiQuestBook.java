@@ -139,7 +139,7 @@ public class GuiQuestBook extends GuiBase {
             SaveHelper.render(matrices, this, x, y);
         }
         
-        saveButton.draw(matrices, x, y);
+        saveButton.render(matrices, x, y);
         
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(MAP_TEXTURE);

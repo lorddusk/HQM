@@ -10,7 +10,7 @@ import net.fabricmc.api.Environment;
 
 import java.util.List;
 
-public class ScrollBar {
+public class ScrollBar implements Drawable {
     
     private static final int SCROLL_WIDTH = 7;
     private static final int SCROLL_BAR_WIDTH = 5;
@@ -44,8 +44,9 @@ public class ScrollBar {
     protected void onUpdate() {
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices) {
+    public void render(PoseStack matrices, int mX, int mY) {
         if (isVisible()) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             this.gui.drawRect(matrices, x, y, size.u, size.v, SCROLL_WIDTH, size.length);
