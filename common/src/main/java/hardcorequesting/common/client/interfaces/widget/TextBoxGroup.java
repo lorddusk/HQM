@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextBoxGroup implements Drawable {
+public class TextBoxGroup implements Drawable, Clickable {
     
     private static final int TEXT_BOX_WIDTH = 64;
     private static final int TEXT_BOX_HEIGHT = 12;
@@ -42,8 +42,9 @@ public class TextBoxGroup implements Drawable {
         }
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void onClick(int mX, int mY) {
+    public boolean onClick(int mX, int mY) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible() && textBox.inBounds(mX, mY)) {
                 if (selectedTextBox == textBox) {
@@ -51,9 +52,10 @@ public class TextBoxGroup implements Drawable {
                 } else {
                     selectedTextBox = textBox;
                 }
-                break;
+                return true;
             }
         }
+        return false;
     }
     
     @Environment(EnvType.CLIENT)

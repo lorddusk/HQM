@@ -81,7 +81,7 @@ public class GuiEditMenuParentCount extends GuiEditMenu {
     public void onRelease(int mX, int mY, int button) {
         super.onRelease(mX, mY, button);
         
-        selectionHelper.onRelease();
+        selectionHelper.onRelease(mX, mY);
     }
     
     @Override

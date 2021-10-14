@@ -151,9 +151,7 @@ public class EditTrackerScreen extends GuiBase {
         int mY = (int) (mY0 - top);
     
         for (LargeButton button : buttons) {
-            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick();
-            }
+            button.onClick(mX, mY);
         }
     
         textBoxes.onClick(mX, mY);
@@ -165,8 +163,10 @@ public class EditTrackerScreen extends GuiBase {
     
     @Override
     public boolean mouseReleased(double mX0, double mY0, int b) {
+        int mX = (int) (mX0 - left);
+        int mY = (int) (mY0 - top);
         
-        selectionHelper.onRelease();
+        selectionHelper.onRelease(mX, mY);
         return true;
     }
     

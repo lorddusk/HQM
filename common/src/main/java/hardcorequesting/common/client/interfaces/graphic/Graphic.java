@@ -17,12 +17,14 @@ import java.util.List;
 public abstract class Graphic {
     
     private final List<Drawable> drawables = new ArrayList<>();
+    private final List<Clickable> clickables = new ArrayList<>();
     private final List<LargeButton> buttons = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
     private final List<AbstractCheckBox> checkBoxes = new ArrayList<>();
     {
         drawables.add(textBoxes);
+        clickables.add(textBoxes);
     }
     
     public final void drawFull(PoseStack matrices, int mX, int mY) {
@@ -45,20 +47,10 @@ public abstract class Graphic {
     }
     
     public void onClick(int mX, int mY, int b) {
-        for (LargeButton button : buttons) {
-            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick();
-                break;
-            }
+        for (Clickable clickable : clickables) {
+            if (clickable.onClick(mX, mY))
+                return;
         }
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onClick(mX, mY);
-        }
-        for (AbstractCheckBox checkbox : checkBoxes) {
-            checkbox.onClick(mX, mY);
-        }
-        
-        textBoxes.onClick(mX, mY);
     }
     
     public boolean keyPressed(int keyCode) {
@@ -70,14 +62,16 @@ public abstract class Graphic {
     }
     
     public void onDrag(int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(mX, mY);
+        for (Clickable clickable : clickables) {
+            if (clickable.onDrag(mX, mY))
+                return;
         }
     }
     
     public void onRelease(int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(mX, mY);
+        for (Clickable clickable : clickables) {
+            if (clickable.onRelease(mX, mY))
+                return;
         }
     }
     
@@ -89,11 +83,13 @@ public abstract class Graphic {
     
     protected void addButton(LargeButton button) {
         drawables.add(button);
+        clickables.add(button);
         buttons.add(button);
     }
     
     protected void addScrollBar(ScrollBar scrollBar) {
         drawables.add(scrollBar);
+        clickables.add(scrollBar);
         scrollBars.add(scrollBar);
     }
     
@@ -103,6 +99,7 @@ public abstract class Graphic {
     
     protected void addCheckBox(AbstractCheckBox box) {
         drawables.add(box);
+        clickables.add(box);
         checkBoxes.add(box);
     }
     

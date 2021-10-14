@@ -237,12 +237,7 @@ public class GuiQuestBook extends GuiBase {
             return true;
         }
         
-        boolean buttonClicked = false;
-    
-        if (saveButton.isVisible() && saveButton.isEnabled() && saveButton.inButtonBounds(x, y)) {
-            saveButton.onClick();
-            buttonClicked = true;
-        }
+        boolean buttonClicked = saveButton.onClick(x, y);
         
         if (Quest.canQuestsBeEdited()) {
             SaveHelper.onClick(this, x, y);

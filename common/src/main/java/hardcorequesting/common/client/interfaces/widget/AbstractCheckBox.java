@@ -8,7 +8,7 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
 
-public abstract class AbstractCheckBox implements Drawable {
+public abstract class AbstractCheckBox implements Drawable, Clickable {
     private static final int CHECK_BOX_SRC_X = 192;
     private static final int CHECK_BOX_SRC_Y = 102;
     private static final int CHECK_BOX_SIZE = 7;
@@ -46,10 +46,13 @@ public abstract class AbstractCheckBox implements Drawable {
         gui.drawString(matrices, cached, x + 12, y + 2, 0.7F, 0x404040);
     }
     
-    public void onClick(int mX, int mY) {
+    @Override
+    public boolean onClick(int mX, int mY) {
         if (isVisible() && gui.inBounds(x, y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY)) {
             setValue(!getValue());
+            return true;
         }
+        return false;
     }
     
     protected boolean isVisible() {
