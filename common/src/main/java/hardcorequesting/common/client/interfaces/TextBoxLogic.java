@@ -4,6 +4,8 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.font.TextFieldHelper;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -13,10 +15,10 @@ import java.util.stream.Collectors;
 @Environment(EnvType.CLIENT)
 public class TextBoxLogic {
     
+    private final TextFieldHelper helper;
     protected final GuiBase gui;
-    protected int cursor;
     protected int cursorPositionX;
-    protected boolean updatedCursor;
+    private int lastCursor;
     private String text;
     private List<String> lines;
     private int cursorPositionY;
@@ -30,9 +32,10 @@ public class TextBoxLogic {
         this.gui = gui;
         this.width = width;
         this.multiLine = multiLine;
-        this.text = Objects.requireNonNullElse(text, "");
-        textChanged();
-        resetCursor();
+        setText(Objects.requireNonNullElse(text, ""));
+        
+        helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
+                TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
     }
     
     public int getCursorLine() {
@@ -52,17 +55,12 @@ public class TextBoxLogic {
         this.mult = mult;
     }
     
-    @Environment(EnvType.CLIENT)
     public void addText(String str) {
-        String newText = text.substring(0, cursor) + str + text.substring(cursor);
-        
-        newText = getValidText(newText);
-        
-        if (newText.length() <= maxLength && (multiLine || gui.getStringWidth(newText) * mult <= width)) {
-            text = newText;
-            moveCursor(str.length());
-            textChanged();
-        }
+        helper.insertText(str);
+    }
+    
+    private boolean isTextValid(String newText) {
+        return newText.length() <= maxLength && (multiLine || gui.getStringWidth(newText) * mult <= width);
     }
     
     private String getValidText(String txt) {
@@ -82,27 +80,6 @@ public class TextBoxLogic {
     public void setWidth(int width) {
         this.width = width;
     }
-    
-    @Environment(EnvType.CLIENT)
-    private void deleteText(int direction) {
-        if (cursor + direction >= 0 && cursor + direction <= text.length()) {
-            if (direction > 0) {
-                text = text.substring(0, cursor) + text.substring(cursor + 1);
-            } else {
-                text = text.substring(0, cursor - 1) + text.substring(cursor);
-                moveCursor(direction);
-            }
-            textChanged();
-        }
-    }
-    
-    @Environment(EnvType.CLIENT)
-    private void moveCursor(int steps) {
-        cursor += steps;
-        
-        updateCursor();
-    }
-    
     
     public void textChanged() {
         lines = this.gui.getLinesFromText(Translator.plain(text), mult, width).stream().map(Translator::rawString).collect(Collectors.toList());
@@ -127,9 +104,9 @@ public class TextBoxLogic {
     }
     
     public void recalculateCursor() {
-        if (updatedCursor) {
+        if (getAndClearCursorFlag()) {
             if (multiLine) {
-                int tmpCursor = cursor;
+                int tmpCursor = helper.getCursorPos();
                 for (int i = 0; i < lines.size(); i++) {
                     if (tmpCursor <= lines.get(i).length()) {
                         cursorPositionX = (int) (mult * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
@@ -141,11 +118,9 @@ public class TextBoxLogic {
                     }
                 }
             } else {
-                cursorPositionX = (int) (mult * this.gui.getStringWidth(text.substring(0, cursor)));
+                cursorPositionX = (int) (mult * this.gui.getStringWidth(text.substring(0, helper.getCursorPos())));
                 cursorPositionY = 0;
             }
-            
-            updatedCursor = false;
         }
     }
     
@@ -154,66 +129,54 @@ public class TextBoxLogic {
         textChanged();
     }
     
-    @Environment(EnvType.CLIENT)
     public boolean onKeyStroke(int k) {
         if (k == GLFW.GLFW_KEY_LEFT) {
-            moveCursor(-1);
+            helper.moveByChars(-1);
             return true;
         } else if (k == GLFW.GLFW_KEY_RIGHT) {
-            moveCursor(1);
+            helper.moveByChars(1);
             return true;
         } else if (k == GLFW.GLFW_KEY_BACKSPACE) {
-            deleteText(-1);
+            helper.removeCharsFromCursor(-1);
             return true;
         } else if (k == GLFW.GLFW_KEY_DELETE) {
-            deleteText(1);
+            helper.removeCharsFromCursor(1);
             return true;
         } else if (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER) {
             addText("\\n");
             return true;
         } else if (k == GLFW.GLFW_KEY_HOME) {
-            cursor = 0;
-            updateCursor();
+            helper.setCursorToStart();
             return true;
         } else if (k == GLFW.GLFW_KEY_END) {
-            cursor = text.length();
-            updateCursor();
+            helper.setCursorToEnd();
             return true;
         }
         return false;
     }
     
-    @Environment(EnvType.CLIENT)
     public boolean onCharTyped(char c) {
-        if (isCharacterValid(c, getText())) {
-            addText(Character.toString(c));
-            return true;
-        }
-        return false;
-    }
-    
-    public void setCursor(int cursor) {
-        this.cursor = cursor;
-        updateCursor();
+        return helper.charTyped(c);
     }
     
     protected boolean isCharacterValid(char c, String rest) {
         return SharedConstants.isAllowedChatCharacter(c);
     }
     
-    private void updateCursor() {
-        if (cursor < 0) {
-            cursor = 0;
-        } else if (cursor > text.length()) {
-            cursor = text.length();
+    protected int getCursor() {
+        return helper.getCursorPos();
+    }
+    
+    protected boolean getAndClearCursorFlag() {
+        if (lastCursor != helper.getCursorPos()) {
+            lastCursor = helper.getCursorPos();
+            return true;
         }
-        
-        updatedCursor = true;
+        return false;
     }
     
     public void resetCursor() {
-        cursor = text.length();
-        updatedCursor = true;
+        helper.setCursorToEnd();
     }
     
     public void setTextAndCursor(String s) {
