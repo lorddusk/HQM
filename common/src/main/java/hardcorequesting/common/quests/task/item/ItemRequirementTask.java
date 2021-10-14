@@ -15,6 +15,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -34,8 +35,8 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
     
-    public ItemRequirementTask(Quest parent, String description, String longDescription) {
-        super(ItemsTaskData.class, parent, description, longDescription);
+    public ItemRequirementTask(TaskType<? extends ItemRequirementTask> type, Quest parent, String description, String longDescription) {
+        super(type, ItemsTaskData.class, parent, description, longDescription);
     }
     
     @Environment(EnvType.CLIENT)

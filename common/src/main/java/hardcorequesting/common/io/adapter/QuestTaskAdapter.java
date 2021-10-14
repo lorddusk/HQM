@@ -382,7 +382,7 @@ public class QuestTaskAdapter {
     
         @Override
         public JsonElement serialize(QuestTask<?> src) {
-            TaskType<?> type = TaskType.getType(src.getClass());
+            TaskType<?> type = src.getType();
         
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.toDataName());

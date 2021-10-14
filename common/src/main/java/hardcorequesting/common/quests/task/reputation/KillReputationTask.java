@@ -8,6 +8,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ReputationKillTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.quests.task.icon.KillMobsTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
@@ -26,7 +27,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private int kills;
     
     public KillReputationTask(Quest parent, String description, String longDescription) {
-        super(ReputationKillTaskData.class, parent, description, longDescription);
+        super(TaskType.REPUTATION_KILL, ReputationKillTaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.DEATH);
     }

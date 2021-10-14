@@ -4,6 +4,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.TaskType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 public class ConsumeItemQDSTask extends ConsumeItemTask {
     
     public ConsumeItemQDSTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(TaskType.CONSUME_QDS, parent, description, longDescription);
     }
     
     @Environment(EnvType.CLIENT)

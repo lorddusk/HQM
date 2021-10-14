@@ -3,13 +3,14 @@ package hardcorequesting.common.quests.task.reputation;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import net.minecraft.world.entity.player.Player;
 
 public class HaveReputationTask extends ReputationTask<TaskData> {
     
     public HaveReputationTask(Quest parent, String description, String longDescription) {
-        super(TaskData.class, parent, description, longDescription);
+        super(TaskType.REPUTATION, TaskData.class, parent, description, longDescription);
         
         register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);
     }

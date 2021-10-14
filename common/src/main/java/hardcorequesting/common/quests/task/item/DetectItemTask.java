@@ -8,6 +8,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public class DetectItemTask extends ItemRequirementTask {
     
     public DetectItemTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        super(TaskType.DETECT, parent, description, longDescription);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
     }

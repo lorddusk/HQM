@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.TaskType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
@@ -18,8 +19,8 @@ public abstract class BlockRequirementTask extends ItemRequirementTask {
     public static final String NULL_NAME = "item.null.name";
     private static final String BLOCKS = "blocks";
     
-    public BlockRequirementTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public BlockRequirementTask(TaskType<? extends BlockRequirementTask> type, Quest parent, String description, String longDescription) {
+        super(type, parent, description, longDescription);
     }
     
     @Override

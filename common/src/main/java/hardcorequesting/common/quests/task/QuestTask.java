@@ -45,6 +45,7 @@ import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
     
+    private final TaskType<?> type;
     private final Class<Data> dataType;
     public String description;
     protected Quest parent;
@@ -52,11 +53,16 @@ public abstract class QuestTask<Data extends TaskData> {
     private int id;
     private List<FormattedText> cachedDescription;
     
-    public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
+    public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent, String description, String longDescription) {
+        this.type = type;
         this.dataType = dataType;
         this.parent = parent;
         this.description = description;
         this.longDescription = longDescription;
+    }
+    
+    public TaskType<?> getType() {
+        return type;
     }
     
     public static void completeQuest(Quest quest, UUID uuid) {

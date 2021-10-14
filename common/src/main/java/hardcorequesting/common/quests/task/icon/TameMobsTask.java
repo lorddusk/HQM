@@ -11,6 +11,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TameTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -37,7 +38,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
     public TameMobsTask(Quest parent, String description, String longDescription) {
-        super(TameTaskData.class, EditType.Type.MONSTER, parent, description, longDescription);
+        super(TaskType.TAME, TameTaskData.class, EditType.Type.MONSTER, parent, description, longDescription);
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     

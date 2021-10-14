@@ -10,6 +10,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.AdvancementTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -33,7 +34,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent, String description, String longDescription) {
-        super(AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent, description, longDescription);
+        super(TaskType.ADVANCEMENT, AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent, description, longDescription);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }

@@ -6,6 +6,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.EditType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +21,10 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
     
     protected final PartList<T> parts;
     
-    public IconLayoutTask(Class<Data> dataType, EditType.Type type, Quest parent, String description, String longDescription) {
-        super(dataType, parent, description, longDescription);
-        parts = new PartList<>(this::createEmpty, type, LIMIT);
+    public IconLayoutTask(TaskType<? extends IconLayoutTask<T, Data>> type, Class<Data> dataType, EditType.Type editType,
+                          Quest parent, String description, String longDescription) {
+        super(type, dataType, parent, description, longDescription);
+        parts = new PartList<>(this::createEmpty, editType, LIMIT);
     }
     
     

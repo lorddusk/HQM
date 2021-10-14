@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,7 +19,11 @@ import java.util.UUID;
 public class ConsumeItemTask extends ItemRequirementTask {
     
     public ConsumeItemTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+        this(TaskType.CONSUME, parent, description, longDescription);
+    }
+    
+    protected ConsumeItemTask(TaskType<? extends ConsumeItemTask> type, Quest parent, String description, String longDescription) {
+        super(type, parent, description, longDescription);
     }
     
     @Environment(EnvType.CLIENT)

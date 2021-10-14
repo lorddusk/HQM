@@ -13,6 +13,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.Team;
@@ -34,8 +35,8 @@ public abstract class ReputationTask<Data extends TaskData> extends QuestTask<Da
     
     protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.REPUTATION_TASK, LIMIT);
     
-    public ReputationTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
-        super(dataType, parent, description, longDescription);
+    protected ReputationTask(TaskType<? extends ReputationTask<Data>> type, Class<Data> dataType, Quest parent, String description, String longDescription) {
+        super(type, dataType, parent, description, longDescription);
     }
     
     @Environment(EnvType.CLIENT)

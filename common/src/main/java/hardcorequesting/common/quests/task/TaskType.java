@@ -18,45 +18,36 @@ import java.util.Collection;
 import java.util.Map;
 
 public final class TaskType<T extends QuestTask<?>> {
-    public static final TaskType<ConsumeItemTask> CONSUME = new TaskType<>(ConsumeItemTask.class, "consume", ConsumeItemTask::new);
-    public static final TaskType<CraftingTask> CRAFT = new TaskType<>(CraftingTask.class, "craft", CraftingTask::new);
-    public static final TaskType<VisitLocationTask> LOCATION = new TaskType<>(VisitLocationTask.class, "location", VisitLocationTask::new);
-    public static final TaskType<ConsumeItemQDSTask> CONSUME_QDS = new TaskType<>(ConsumeItemQDSTask.class, "consumeQDS", ConsumeItemQDSTask::new);
-    public static final TaskType<DetectItemTask> DETECT = new TaskType<>(DetectItemTask.class, "detect", DetectItemTask::new);
-    public static final TaskType<KillMobsTask> KILL = new TaskType<>(KillMobsTask.class, "kill", KillMobsTask::new);
-    public static final TaskType<TameMobsTask> TAME = new TaskType<>(TameMobsTask.class, "tame", TameMobsTask::new);
-    public static final TaskType<DeathTask> DEATH = new TaskType<>(DeathTask.class, "death", DeathTask::new);
-    public static final TaskType<HaveReputationTask> REPUTATION = new TaskType<>(HaveReputationTask.class, "reputation", HaveReputationTask::new);
-    public static final TaskType<KillReputationTask> REPUTATION_KILL = new TaskType<>(KillReputationTask.class, "reputationKill", KillReputationTask::new);
-    public static final TaskType<GetAdvancementTask> ADVANCEMENT = new TaskType<>(GetAdvancementTask.class, "advancement", GetAdvancementTask::new);
-    public static final TaskType<CompleteQuestTask> COMPLETION = new TaskType<>(CompleteQuestTask.class, "completion", CompleteQuestTask::new);
-    public static final TaskType<BreakBlockTask> BLOCK_BREAK = new TaskType<>(BreakBlockTask.class, "break", BreakBlockTask::new);
-    public static final TaskType<PlaceBlockTask> BLOCK_PLACE = new TaskType<>(PlaceBlockTask.class, "place", PlaceBlockTask::new);
+    public static final TaskType<ConsumeItemTask> CONSUME = new TaskType<>("consume", ConsumeItemTask::new);
+    public static final TaskType<CraftingTask> CRAFT = new TaskType<>("craft", CraftingTask::new);
+    public static final TaskType<VisitLocationTask> LOCATION = new TaskType<>("location", VisitLocationTask::new);
+    public static final TaskType<ConsumeItemQDSTask> CONSUME_QDS = new TaskType<>("consumeQDS", ConsumeItemQDSTask::new);
+    public static final TaskType<DetectItemTask> DETECT = new TaskType<>("detect", DetectItemTask::new);
+    public static final TaskType<KillMobsTask> KILL = new TaskType<>("kill", KillMobsTask::new);
+    public static final TaskType<TameMobsTask> TAME = new TaskType<>("tame", TameMobsTask::new);
+    public static final TaskType<DeathTask> DEATH = new TaskType<>("death", DeathTask::new);
+    public static final TaskType<HaveReputationTask> REPUTATION = new TaskType<>("reputation", HaveReputationTask::new);
+    public static final TaskType<KillReputationTask> REPUTATION_KILL = new TaskType<>("reputationKill", KillReputationTask::new);
+    public static final TaskType<GetAdvancementTask> ADVANCEMENT = new TaskType<>("advancement", GetAdvancementTask::new);
+    public static final TaskType<CompleteQuestTask> COMPLETION = new TaskType<>("completion", CompleteQuestTask::new);
+    public static final TaskType<BreakBlockTask> BLOCK_BREAK = new TaskType<>("break", BreakBlockTask::new);
+    public static final TaskType<PlaceBlockTask> BLOCK_PLACE = new TaskType<>("place", PlaceBlockTask::new);
     
     private static final Map<String, TaskType<?>> TYPES = ImmutableMap.<String, TaskType<?>>builder().put("consume", CONSUME).put("craft", CRAFT)
             .put("location", LOCATION).put("consume_qds", CONSUME_QDS).put("detect", DETECT).put("kill", KILL).put("tame", TAME).put("death", DEATH)
             .put("reputation", REPUTATION).put("reputation_kill", REPUTATION_KILL).put("advancement", ADVANCEMENT).put("completion", COMPLETION)
             .put("block_break", BLOCK_BREAK).put("block_place", BLOCK_PLACE).build();
     
-    private final Class<T> clazz;
     private final String id;
     private final TaskConstructor<T> constructor;
     
-    private TaskType(Class<T> clazz, String id, TaskConstructor<T> constructor) {
-        this.clazz = clazz;
+    private TaskType(String id, TaskConstructor<T> constructor) {
         this.id = id;
         this.constructor = constructor;
     }
     
     public static Collection<TaskType<?>> values() {
         return TYPES.values();
-    }
-    
-    public static TaskType<?> getType(Class<?> clazz) {
-        for (TaskType<?> type : values()) {
-            if (type.clazz == clazz) return type;
-        }
-        throw new IllegalArgumentException(clazz.getName() + " does not have a valid task type");
     }
     
     public String toDataName() {

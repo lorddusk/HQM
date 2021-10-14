@@ -10,6 +10,7 @@ import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.LocationTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
@@ -37,7 +38,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     private int delay = 1;
     
     public VisitLocationTask(Quest parent, String description, String longDescription) {
-        super(LocationTaskData.class, EditType.Type.LOCATION, parent, description, longDescription);
+        super(TaskType.LOCATION, LocationTaskData.class, EditType.Type.LOCATION, parent, description, longDescription);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
