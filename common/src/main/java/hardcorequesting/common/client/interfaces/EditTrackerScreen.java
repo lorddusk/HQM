@@ -151,14 +151,13 @@ public class EditTrackerScreen extends GuiBase {
         int mY = (int) (mY0 - top);
     
         for (LargeButton button : buttons) {
-            button.onClick(mX, mY);
+            if (button.onClick(mX, mY))
+                return true;
         }
     
-        textBoxes.onClick(mX, mY);
-        
-        selectionHelper.onClick(mX, mY);
-    
-        return true;
+        return textBoxes.onClick(mX, mY)
+                || selectionHelper.onClick(mX, mY)
+                || super.mouseClicked(mX0, mY0, b);
     }
     
     @Override
@@ -166,8 +165,8 @@ public class EditTrackerScreen extends GuiBase {
         int mX = (int) (mX0 - left);
         int mY = (int) (mY0 - top);
         
-        selectionHelper.onRelease(mX, mY);
-        return true;
+        return selectionHelper.onRelease(mX, mY)
+                || super.mouseReleased(mX0, mY0, b);
     }
     
     @Override
