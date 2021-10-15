@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.network.NetworkManager;
@@ -26,7 +27,7 @@ public abstract class TaskGraphic extends Graphic {
     private static final int TASK_DESCRIPTION_X = 180;
     private static final int TASK_DESCRIPTION_Y = 20;
     
-    private final ScrollBar taskDescriptionScroll;
+    private final ExtendedScrollBar<FormattedText> taskDescriptionScroll;
     
     protected final UUID playerId;
     protected final GuiQuestBook gui;
@@ -38,12 +39,7 @@ public abstract class TaskGraphic extends Graphic {
         this.gui = gui;
         this.task = task;
         
-        addScrollBar(taskDescriptionScroll = new ScrollBar(gui, ScrollBar.Size.SMALL, 312, 18, TASK_DESCRIPTION_X) {
-            @Override
-            public boolean isVisible() {
-                return getCachedLongDescription().size() > VISIBLE_DESCRIPTION_LINES;
-            }
-        });
+        addScrollBar(taskDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.SMALL, 312, 18, TASK_DESCRIPTION_X, VISIBLE_DESCRIPTION_LINES, this::getCachedLongDescription));
     }
     
     protected void addSubmitButton(QuestTask<?> task) {
@@ -77,9 +73,9 @@ public abstract class TaskGraphic extends Graphic {
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
-        
-        List<FormattedText> description = taskDescriptionScroll.getVisibleEntries(getCachedLongDescription(), VISIBLE_DESCRIPTION_LINES);
-        gui.drawString(matrices, description, TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
+    
+        gui.drawString(matrices, taskDescriptionScroll.getVisibleEntries(),
+                TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     }
     
     @Override
