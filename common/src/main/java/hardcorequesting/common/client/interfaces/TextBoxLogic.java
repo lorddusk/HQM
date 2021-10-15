@@ -22,16 +22,17 @@ public class TextBoxLogic {
     private String text;
     private List<String> lines;
     private int cursorPositionY;
-    private final boolean multiLine;
+    private final boolean multiLine, acceptNewlines;
     private int width;
     private float mult = 1F;
     private int maxLength = Integer.MAX_VALUE;
     private int cursorLine;
     
-    public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine) {
+    public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine, boolean acceptNewlines) {
         this.gui = gui;
         this.width = width;
         this.multiLine = multiLine;
+        this.acceptNewlines = acceptNewlines;
         setText(Objects.requireNonNullElse(text, ""));
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
@@ -142,7 +143,7 @@ public class TextBoxLogic {
         } else if (k == GLFW.GLFW_KEY_DELETE) {
             helper.removeCharsFromCursor(1);
             return true;
-        } else if (multiLine && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
+        } else if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
             addText("\\n");
             return true;
         } else if (k == GLFW.GLFW_KEY_HOME) {

@@ -25,7 +25,7 @@ public class TextMenu extends AbstractTextMenu {
     }
     
     private TextMenu(GuiQuestBook gui, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
-        super(gui, txt);
+        super(gui, txt, !isName);
     
         this.resultConsumer = resultConsumer;
         this.limit = limit;

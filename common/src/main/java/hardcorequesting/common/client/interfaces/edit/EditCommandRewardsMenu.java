@@ -38,7 +38,7 @@ public class EditCommandRewardsMenu extends AbstractTextMenu {
     }
     
     private EditCommandRewardsMenu(GuiQuestBook gui, Quest quest) {
-        super(gui, "");
+        super(gui, "", false);
         this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()
                 .map(s -> new Entry(s, false)).collect(Collectors.toCollection(ArrayList::new));

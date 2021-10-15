@@ -17,14 +17,14 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     
     protected final TextBoxLogic textLogic;
     
-    protected AbstractTextMenu(GuiQuestBook gui, String text) {
+    protected AbstractTextMenu(GuiQuestBook gui, String text, boolean acceptsNewLines) {
         super(gui, false);
     
         if (text != null && !text.isEmpty()) {
             text = text.replace("\n", "\\n");
         }
         
-        this.textLogic = new TextBoxLogic(gui, text, 140, true);
+        this.textLogic = new TextBoxLogic(gui, text, 140, true, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
