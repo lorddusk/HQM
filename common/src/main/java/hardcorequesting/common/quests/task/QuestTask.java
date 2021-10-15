@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import hardcorequesting.common.client.ClientChange;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -21,8 +20,6 @@ import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
@@ -38,7 +35,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
@@ -49,7 +45,6 @@ public abstract class QuestTask<Data extends TaskData> {
     protected Quest parent;
     private String longDescription;
     private int id;
-    private List<FormattedText> cachedDescription;
     
     public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent) {
         this.type = type;
@@ -182,16 +177,6 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
-        cachedDescription = null;
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public List<FormattedText> getCachedLongDescription(GuiBase gui) {
-        if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(longDescription), 0.7F, 130);
-        }
-        
-        return cachedDescription;
     }
     
     public void completeTask(UUID uuid) {
