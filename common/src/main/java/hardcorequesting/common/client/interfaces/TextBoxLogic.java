@@ -1,6 +1,5 @@
 package hardcorequesting.common.client.interfaces;
 
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
@@ -8,40 +7,27 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
-public class TextBoxLogic {
+public abstract class TextBoxLogic {
     
     private final TextFieldHelper helper;
     protected final GuiBase gui;
-    protected int cursorPositionX;
+    protected int cursorPositionX, cursorPositionY;
     private int lastCursor;
     private String text;
-    private List<String> lines;
-    private int cursorPositionY;
-    private final boolean multiLine, acceptNewlines;
     private int width;
     private float mult = 1F;
     private int maxLength = Integer.MAX_VALUE;
-    private int cursorLine;
     
-    public TextBoxLogic(GuiBase gui, String text, int width, boolean multiLine, boolean acceptNewlines) {
+    public TextBoxLogic(GuiBase gui, String text, int width) {
         this.gui = gui;
         this.width = width;
-        this.multiLine = multiLine;
-        this.acceptNewlines = acceptNewlines;
         setText(Objects.requireNonNullElse(text, ""));
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
-    }
-    
-    public int getCursorLine() {
-        recalculateCursor();
-        return cursorLine;
     }
     
     public void setMaxLength(int maxLength) {
@@ -60,8 +46,8 @@ public class TextBoxLogic {
         helper.insertText(str);
     }
     
-    private boolean isTextValid(String newText) {
-        return newText.length() <= maxLength && (multiLine || gui.getStringWidth(newText) * mult <= width);
+    protected boolean isTextValid(String newText) {
+        return newText.length() <= maxLength;
     }
     
     private String getValidText(String txt) {
@@ -82,13 +68,7 @@ public class TextBoxLogic {
         this.width = width;
     }
     
-    public void textChanged() {
-        lines = this.gui.getLinesFromText(Translator.plain(text), mult, width).stream().map(Translator::rawString).collect(Collectors.toList());
-    }
-    
-    public List<String> getLines() {
-        return lines;
-    }
+    public abstract void textChanged();
     
     public String getText() {
         return text;
@@ -106,22 +86,8 @@ public class TextBoxLogic {
     
     public void recalculateCursor() {
         if (getAndClearCursorFlag()) {
-            if (multiLine && !lines.isEmpty()) {
-                int tmpCursor = helper.getCursorPos();
-                for (int i = 0; i < lines.size(); i++) {
-                    if (tmpCursor <= lines.get(i).length()) {
-                        cursorPositionX = (int) (mult * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                        cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * mult);
-                        cursorLine = i;
-                        break;
-                    } else {
-                        tmpCursor -= lines.get(i).length();
-                    }
-                }
-            } else {
-                cursorPositionX = (int) (mult * this.gui.getStringWidth(text.substring(0, helper.getCursorPos())));
-                cursorPositionY = 0;
-            }
+            cursorPositionX = (int) (mult * this.gui.getStringWidth(text.substring(0, helper.getCursorPos())));
+            cursorPositionY = 0;
         }
     }
     
@@ -142,9 +108,6 @@ public class TextBoxLogic {
             return true;
         } else if (k == GLFW.GLFW_KEY_DELETE) {
             helper.removeCharsFromCursor(1);
-            return true;
-        } else if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
-            addText("\\n");
             return true;
         } else if (k == GLFW.GLFW_KEY_HOME) {
             helper.setCursorToStart();

@@ -3,7 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.TextBoxLogic;
+import hardcorequesting.common.client.interfaces.MultilineTextBoxLogic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.FormattedText;
@@ -15,7 +15,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     private static final int START_Y = 20;
     private static final int LINES_PER_PAGE = 21;
     
-    protected final TextBoxLogic textLogic;
+    protected final MultilineTextBoxLogic textLogic;
     
     protected AbstractTextMenu(GuiQuestBook gui, String text, boolean acceptsNewLines) {
         super(gui, false);
@@ -24,7 +24,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
             text = text.replace("\n", "\\n");
         }
         
-        this.textLogic = new TextBoxLogic(gui, text, 140, true, acceptsNewLines);
+        this.textLogic = new MultilineTextBoxLogic(gui, text, 140, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override

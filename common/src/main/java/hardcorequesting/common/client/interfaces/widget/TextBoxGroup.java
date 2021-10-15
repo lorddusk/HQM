@@ -85,13 +85,18 @@ public class TextBoxGroup implements Drawable, Clickable {
         private final boolean scrollable;
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
-            super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH, false, false);
+            super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH);
             
             this.x = x;
             this.y = y;
             this.scrollable = scrollable;
         }
-        
+    
+        @Override
+        protected boolean isTextValid(String newText) {
+            return super.isTextValid(newText) && gui.getStringWidth(newText) * getMult() <= getWidth();
+        }
+    
         @Environment(EnvType.CLIENT)
         protected void draw(PoseStack matrices, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -112,7 +117,6 @@ public class TextBoxGroup implements Drawable, Clickable {
         @Environment(EnvType.CLIENT)
         @Override
         public void textChanged() {
-            super.textChanged();
             if (scrollable) {
                 updateVisible();
             }
