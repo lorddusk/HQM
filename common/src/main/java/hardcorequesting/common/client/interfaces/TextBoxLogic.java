@@ -142,7 +142,7 @@ public class TextBoxLogic {
         } else if (k == GLFW.GLFW_KEY_DELETE) {
             helper.removeCharsFromCursor(1);
             return true;
-        } else if (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER) {
+        } else if (multiLine && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
             addText("\\n");
             return true;
         } else if (k == GLFW.GLFW_KEY_HOME) {
