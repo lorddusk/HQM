@@ -81,17 +81,6 @@ public class GuiQuestBook extends GuiBase {
         super(NarratorChatListener.NO_TITLE);
         this.player = player;
         this.isOpBook = isOpBook;
-        
-        pageGraphic = page.createGraphic(this);
-        
-        if (Quest.canQuestsBeEdited()) {
-            Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
-        }
-        QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
-        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
-            SoundHandler.triggerFirstLore();
-            data.playedLore = true;
-        }
     }
     
     public static void resetBookPosition() {
@@ -107,6 +96,27 @@ public class GuiQuestBook extends GuiBase {
                 mc.setScreen(new GuiQuestBook(player, isOpBook));
             }
         }
+    }
+    
+    @Override
+    protected void init() {
+        pageGraphic = page.createGraphic(this);
+    
+        if (Quest.canQuestsBeEdited()) {
+            minecraft.keyboardHandler.setSendRepeatsToGui(true);
+        }
+        QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
+            SoundHandler.triggerFirstLore();
+            data.playedLore = true;
+        }
+    }
+    
+    @Override
+    public void removed() {
+        NetworkManager.sendToServer(new CloseBookMessage(player.getUUID()));
+        minecraft.keyboardHandler.setSendRepeatsToGui(false);
+        SoundHandler.stopLoreMusic();
     }
     
     public int getTick() {
@@ -313,13 +323,6 @@ public class GuiQuestBook extends GuiBase {
     public void tick() {
         ++tick;
         super.tick();
-    }
-    
-    @Override
-    public void removed() {
-        NetworkManager.sendToServer(new CloseBookMessage(player.getUUID()));
-        minecraft.keyboardHandler.setSendRepeatsToGui(true);
-        SoundHandler.stopLoreMusic();
     }
     
     @Override
