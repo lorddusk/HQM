@@ -8,9 +8,9 @@ import java.util.List;
 
 public class RepeatInfo {
     
-    private int days;
-    private int hours;
-    private RepeatType type;
+    private final int days;
+    private final int hours;
+    private final RepeatType type;
     
     public RepeatInfo(RepeatType type, int days, int hours) {
         this.days = days;
@@ -24,6 +24,10 @@ public class RepeatInfo {
     
     public int getHours() {
         return hours;
+    }
+    
+    public int getTotalHours() {
+        return days * 24 + hours;
     }
     
     public RepeatType getType() {

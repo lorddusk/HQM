@@ -13,7 +13,7 @@ public class QuestTicker {
             hours = level.getGameTime() / 1000;
             if (!isClient) {
                 for (Quest quest : Quest.getQuests().values()) {
-                    int total = quest.getRepeatInfo().getDays() * 24 + quest.getRepeatInfo().getHours();
+                    int total = quest.getRepeatInfo().getTotalHours();
                     if (quest.getRepeatInfo().getType() == RepeatType.INTERVAL) {
                         if (total != 0 && hours % total == 0) {
                             quest.resetAll();

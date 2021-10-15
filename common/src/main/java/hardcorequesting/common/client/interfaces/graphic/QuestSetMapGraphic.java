@@ -526,7 +526,10 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case REPEATABLE:
-                                gui.setEditMenu(new GuiEditMenuRepeat(gui, quest));
+                                RepeatInfoMenu.display(gui, quest.getRepeatInfo(), repeatInfo -> {
+                                    quest.setRepeatInfo(repeatInfo);
+                                    SaveHelper.add(EditType.REPEATABILITY_CHANGED);
+                                });
                                 break;
                             case REQUIRED_PARENTS:
                                 gui.setEditMenu(new GuiEditMenuParentCount(gui, quest));

@@ -4,28 +4,32 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.RepeatInfo;
 import hardcorequesting.common.quests.RepeatType;
-import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.HQMUtil;
-import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
-public class GuiEditMenuRepeat extends GuiEditMenu {
+import java.util.function.Consumer;
+
+public class RepeatInfoMenu extends GuiEditMenu {
     
-    private Quest quest;
+    private final Consumer<RepeatInfo> resultConsumer;
     private RepeatType type;
     private int days;
     private int hours;
     
-    public GuiEditMenuRepeat(GuiQuestBook gui, Quest quest) {
+    public static void display(GuiQuestBook gui, RepeatInfo info, Consumer<RepeatInfo> resultConsumer) {
+        gui.setEditMenu(new RepeatInfoMenu(gui, info, resultConsumer));
+    }
+    
+    private RepeatInfoMenu(GuiQuestBook gui, RepeatInfo info, Consumer<RepeatInfo> resultConsumer) {
         super(gui, true);
-        this.quest = quest;
-        this.type = quest.getRepeatInfo().getType();
-        days = quest.getRepeatInfo().getDays();
-        hours = quest.getRepeatInfo().getHours();
+        
+        this.resultConsumer = resultConsumer;
+        this.type = info.getType();
+        days = info.getDays();
+        hours = info.getHours();
         
         addTextBox(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days") {
             @Override
@@ -82,8 +86,7 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
     
     @Override
     public void save() {
-        quest.setRepeatInfo(new RepeatInfo(type, days, hours));
-        SaveHelper.add(EditType.REPEATABILITY_CHANGED);
+        resultConsumer.accept(new RepeatInfo(type, days, hours));
     }
     
     private abstract class TextBoxHidden extends NumberTextBox {
