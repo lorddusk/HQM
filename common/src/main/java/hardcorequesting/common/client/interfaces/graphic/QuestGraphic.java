@@ -179,7 +179,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            TextMenu.display(gui, playerId, task.getLangKeyDescription(), true,
+                            TextMenu.display(gui, task.getLangKeyDescription(), true,
                                     task::setDescription);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
@@ -212,9 +212,9 @@ public final class QuestGraphic extends EditableGraphic {
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(START_X, TITLE_START_Y, 140, GuiBase.TEXT_HEIGHT, mX, mY)) {
-                TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
+                TextMenu.display(gui, quest.getName(), true, quest::setName);
             } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-                TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
+                TextMenu.display(gui, quest.getDescription(), false, description -> {
                     cachedDescription = null;
                     quest.setDescription(description);
                 });

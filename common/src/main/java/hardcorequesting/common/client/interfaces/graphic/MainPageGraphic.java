@@ -90,7 +90,7 @@ public class MainPageGraphic extends EditableGraphic {
             }
         } else {
             if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, gui.getPlayer().getUUID(), Quest.getRawMainDescription(), false, desc -> {
+                TextMenu.display(gui, Quest.getRawMainDescription(), false, desc -> {
                     QuestLine.getActiveQuestLine().setMainDescription(desc);
                     cachedMainDescription = null;
                 });

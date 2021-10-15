@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -29,11 +28,11 @@ public class TextMenu extends GuiEditMenu {
     protected TextBoxLogic text;
     private final boolean isName;
     
-    public static void display(GuiQuestBook gui, UUID playerId, String txt, boolean isName, Consumer<String> resultConsumer) {
+    public static void display(GuiQuestBook gui, String txt, boolean isName, Consumer<String> resultConsumer) {
         gui.setEditMenu(new TextMenu(gui, txt, isName, -1, resultConsumer));
     }
     
-    public static void display(GuiQuestBook gui,String txt, int limit, Consumer<String> resultConsumer) {
+    public static void display(GuiQuestBook gui, String txt, int limit, Consumer<String> resultConsumer) {
         gui.setEditMenu(new TextMenu(gui, txt, true, limit, resultConsumer));
     }
     
