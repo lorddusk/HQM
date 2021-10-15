@@ -3,37 +3,35 @@ package hardcorequesting.common.client.interfaces.edit;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
-import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.HQMUtil;
-import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class GuiEditMenuTrigger extends GuiEditMenu {
+public class PickTriggerMenu extends GuiEditMenu {
     
+    private final Consumer<Result> resultConsumer;
     private TriggerType type;
-    private int triggerTasks;
-    private UUID questId;
+    private int count;
     
-    public GuiEditMenuTrigger(GuiQuestBook gui, UUID playerId, Quest quest) {
+    public PickTriggerMenu(GuiQuestBook gui, UUID playerId, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
         super(gui, playerId, true);
     
-        this.questId = quest.getQuestId();
-        this.type = quest.getTriggerType();
-        this.triggerTasks = quest.getTriggerTasks();
+        this.resultConsumer = resultConsumer;
+        this.type = typeIn;
+        this.count = countIn;
         
         addTextBox(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount") {
             @Override
             protected int getValue() {
-                return triggerTasks;
+                return count;
             }
             
             @Override
             protected void setValue(int number) {
-                triggerTasks = number;
+                count = number;
             }
             
             @Override
@@ -67,12 +65,8 @@ public class GuiEditMenuTrigger extends GuiEditMenu {
     
     @Override
     public void save() {
-        Quest quest = Quest.getQuest(questId);
-        if (quest != null) {
-            quest.setTriggerType(type);
-            quest.setTriggerTasks(Math.max(1, triggerTasks));
-            SaveHelper.add(EditType.VISIBILITY_CHANGED);
-        }
+        resultConsumer.accept(new Result(type, count));
     }
     
+    public static record Result(TriggerType type, int count) {}
 }
