@@ -50,7 +50,6 @@ public class GuiQuestBook extends GuiBase {
     //the page is static to keep the same page loaded when the book is reopened
     @NotNull
     private static BookPage page = BookPage.MainPage.INSTANCE;
-    @NotNull
     private Graphic pageGraphic;
     public final boolean isOpBook;
     private final Player player;
@@ -152,11 +151,11 @@ public class GuiQuestBook extends GuiBase {
         ResourceHelper.bindResource(MAP_TEXTURE);
         
         
-        if (shouldDisplayControlArrow(false)) {
-            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inArrowBounds(false, x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
+        if (shouldDisplayBackArrow()) {
+            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
         }
-        if (shouldDisplayControlArrow(true)) {
-            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inArrowBounds(true, x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
+        if (shouldDisplayMenuArrow()) {
+            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
         }
         
         if (editMenu == null) {
@@ -177,13 +176,13 @@ public class GuiQuestBook extends GuiBase {
     
         saveButton.renderTooltip(matrices, x, y);
         
-        if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
+        if (shouldDisplayBackArrow() && inBackArrowBounds(x, y)) {
             renderTooltip(matrices, FormattedText.composite(
                     Translator.translatable("hqm.questBook.goBack"),
                     Translator.plain("\n"),
                     Translator.translatable("hqm.questBook.rightClick").withStyle(ChatFormatting.DARK_GRAY)
             ), x + left, y + top);
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayMenuArrow() && inMenuArrowBounds(x, y)) {
             renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
         }
     }
@@ -227,14 +226,14 @@ public class GuiQuestBook extends GuiBase {
         int x = (int) (x0 - left);
         int y = (int) (y0 - top);
         
-        if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
+        if (shouldDisplayBackArrow() && inBackArrowBounds(x, y)) {
             button = 1;
             if (editMenu != null) {
                 editMenu.save();
                 editMenu.close();
                 return true;
             }
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayMenuArrow() && inMenuArrowBounds(x, y)) {
             if (editMenu != null) {
                 editMenu.save();
                 editMenu.close();
@@ -359,22 +358,22 @@ public class GuiQuestBook extends GuiBase {
         SaveHelper.onSave();
     }
     
-    private boolean shouldDisplayControlArrow(boolean isMenuArrow) {
-        return page.canGoBack() && (
-                editMenu == null && (!isMenuArrow || page.hasGoToMenuButton())
-                        || editMenu != null && !editMenu.hasButtons());
+    private boolean shouldDisplayMenuArrow() {
+        return page.canGoBack()
+                && (editMenu == null && page.hasGoToMenuButton()
+                || editMenu != null && !editMenu.hasButtons());
     }
     
-    private boolean inArrowBounds(boolean isMenuArrow, int mX, int mY) {
-        if (isMenuArrow) {
-            return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
-        } else {
-            return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
-        }
+    private boolean shouldDisplayBackArrow() {
+        return page.canGoBack() && (editMenu == null || !editMenu.hasButtons());
     }
     
-    private boolean shouldDisplayAndIsInArrowBounds(boolean isMenuArrow, int mX, int mY) {
-        return shouldDisplayControlArrow(isMenuArrow) && inArrowBounds(isMenuArrow, mX, mY);
+    private boolean inMenuArrowBounds(int mX, int mY) {
+        return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
+    }
+    
+    private boolean inBackArrowBounds(int mX, int mY) {
+        return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
     }
     
     public void setPage(BookPage page) {
