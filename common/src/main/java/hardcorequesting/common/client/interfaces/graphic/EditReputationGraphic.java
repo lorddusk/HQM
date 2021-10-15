@@ -3,7 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
+import hardcorequesting.common.client.interfaces.edit.EditRepTierValueMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -179,7 +179,11 @@ public class EditReputationGraphic extends EditableGraphic {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
                         TextMenu.display(gui, playerId, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
-                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, marker));
+                        EditRepTierValueMenu.display(gui, marker.getValue(), value -> {
+                            marker.setValue(value);
+                            EditReputationGraphic.selectedReputation.sort();
+                            SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);
+                        });
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         
                         selectedReputation.remove(marker);
