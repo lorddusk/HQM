@@ -106,7 +106,7 @@ public class TextBoxLogic {
     
     public void recalculateCursor() {
         if (getAndClearCursorFlag()) {
-            if (multiLine) {
+            if (multiLine && !lines.isEmpty()) {
                 int tmpCursor = helper.getCursorPos();
                 for (int i = 0; i < lines.size(); i++) {
                     if (tmpCursor <= lines.get(i).length()) {
