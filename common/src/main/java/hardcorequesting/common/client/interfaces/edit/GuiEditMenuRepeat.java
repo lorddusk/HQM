@@ -8,6 +8,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.RepeatInfo;
 import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
@@ -63,9 +64,9 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
-                    type = RepeatType.values()[(type.ordinal() + RepeatType.values().length - 1) % RepeatType.values().length];
+                    type = HQMUtil.cyclePrev(RepeatType.values(), type);
                 } else {
-                    type = RepeatType.values()[(type.ordinal() + 1) % RepeatType.values().length];
+                    type = HQMUtil.cycleNext(RepeatType.values(), type);
                 }
             }
     

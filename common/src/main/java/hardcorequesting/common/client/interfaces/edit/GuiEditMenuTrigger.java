@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
 import net.minecraft.network.chat.FormattedText;
 
@@ -46,9 +47,9 @@ public class GuiEditMenuTrigger extends GuiEditMenu {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
-                    type = TriggerType.values()[(type.ordinal() + TriggerType.values().length - 1) % TriggerType.values().length];
+                    type = HQMUtil.cyclePrev(TriggerType.values(), type);
                 } else {
-                    type = TriggerType.values()[(type.ordinal() + 1) % TriggerType.values().length];
+                    type = HQMUtil.cycleNext(TriggerType.values(), type);
                 }
             }
     

@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
+import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -124,9 +125,9 @@ public class LocationMenu extends GuiEditMenu {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
-                    visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + VisitLocationTask.Visibility.values().length - 1) % VisitLocationTask.Visibility.values().length];
+                    visibility = HQMUtil.cyclePrev(VisitLocationTask.Visibility.values(), visibility);
                 } else {
-                    visibility = VisitLocationTask.Visibility.values()[(visibility.ordinal() + 1) % VisitLocationTask.Visibility.values().length];
+                    visibility = HQMUtil.cycleNext(VisitLocationTask.Visibility.values(), visibility);
                 }
             }
     

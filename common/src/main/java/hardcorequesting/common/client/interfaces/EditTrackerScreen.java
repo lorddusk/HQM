@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
+import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -44,9 +45,9 @@ public class EditTrackerScreen extends GuiBase {
             @Override
             protected void onArrowClick(boolean left) {
                 if (left) {
-                    tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + TrackerType.values().length - 1) % TrackerType.values().length]);
+                    tracker.setTrackerType(HQMUtil.cyclePrev(TrackerType.values(), tracker.getTrackerType()));
                 } else {
-                    tracker.setTrackerType(TrackerType.values()[(tracker.getTrackerType().ordinal() + 1) % TrackerType.values().length]);
+                    tracker.setTrackerType(HQMUtil.cycleNext(TrackerType.values(), tracker.getTrackerType()));
                 }
             }
         
