@@ -547,11 +547,11 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case TRIGGER:
-                                gui.setEditMenu(new PickTriggerMenu(gui, quest.getTriggerType(), quest.getTriggerTasks(), result -> {
+                                PickTriggerMenu.display(gui, quest.getTriggerType(), quest.getTriggerTasks(), result -> {
                                     quest.setTriggerType(result.type());
                                     quest.setTriggerTasks(Math.max(1, result.count()));
                                     SaveHelper.add(EditType.VISIBILITY_CHANGED);
-                                }));
+                                });
                                 break;
                             case NORMAL:
                                 if (gui.isOpBook && Screen.hasShiftDown()) {

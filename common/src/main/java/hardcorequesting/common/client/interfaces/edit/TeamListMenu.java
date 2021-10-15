@@ -29,7 +29,11 @@ public class TeamListMenu extends GuiEditMenu {
     private final TeamMenu parent;
     private int pagePair = 0;
     
-    protected TeamListMenu(GuiQuestBook gui, TeamMenu parent) {
+    static void display(GuiQuestBook gui, TeamMenu parent) {
+        gui.setEditMenu(new TeamListMenu(gui, parent));
+    }
+    
+    private TeamListMenu(GuiQuestBook gui, TeamMenu parent) {
         super(gui);
         this.parent = parent;
     }

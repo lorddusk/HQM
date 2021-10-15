@@ -15,7 +15,11 @@ public class PickTriggerMenu extends GuiEditMenu {
     private TriggerType type;
     private int count;
     
-    public PickTriggerMenu(GuiQuestBook gui, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
+    public static void display(GuiQuestBook gui, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new PickTriggerMenu(gui, typeIn, countIn, resultConsumer));
+    }
+    
+    private PickTriggerMenu(GuiQuestBook gui, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
         super(gui, true);
     
         this.resultConsumer = resultConsumer;

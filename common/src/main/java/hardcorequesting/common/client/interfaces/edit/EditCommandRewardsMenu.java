@@ -33,7 +33,11 @@ public class EditCommandRewardsMenu extends TextMenu {
     private record Entry(String command, boolean edited)
     {}
     
-    public EditCommandRewardsMenu(GuiQuestBook gui, Quest quest) {
+    public static void display(GuiQuestBook gui, Quest quest) {
+        gui.setEditMenu(new EditCommandRewardsMenu(gui, quest));
+    }
+    
+    private EditCommandRewardsMenu(GuiQuestBook gui, Quest quest) {
         super(gui, "", false, -1, null);
         this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()

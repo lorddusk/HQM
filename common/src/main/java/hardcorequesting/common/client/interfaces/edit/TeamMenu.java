@@ -50,7 +50,11 @@ public class TeamMenu extends GuiEditMenu {
     private Team inviteTeam;
     private PlayerEntry selectedEntry;
     
-    public TeamMenu(GuiQuestBook gui, UUID playerId) {
+    public static void display(GuiQuestBook gui, UUID playerId) {
+        gui.setEditMenu(new TeamMenu(gui, playerId));
+    }
+    
+    private TeamMenu(GuiQuestBook gui, UUID playerId) {
         super(gui);
         
         this.playerId = playerId;
@@ -188,7 +192,7 @@ public class TeamMenu extends GuiEditMenu {
         addClickable(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
-                gui.setEditMenu(new TeamListMenu(gui, TeamMenu.this));
+                TeamListMenu.display(gui, TeamMenu.this);
             }
         });
         
