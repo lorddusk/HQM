@@ -1,32 +1,33 @@
 package hardcorequesting.common.bag;
 
 
-import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 
 public enum BagTier {
-    BASIC(GuiColor.GRAY),
-    GOOD(GuiColor.GREEN),
-    GREATER(GuiColor.BLUE),
-    EPIC(GuiColor.ORANGE),
-    LEGENDARY(GuiColor.PURPLE);
+    BASIC(ChatFormatting.DARK_GRAY),
+    GOOD(ChatFormatting.DARK_GREEN),
+    GREATER(ChatFormatting.DARK_BLUE),
+    EPIC(ChatFormatting.GOLD),
+    LEGENDARY(ChatFormatting.DARK_PURPLE);
     
     
-    private GuiColor color;
+    private final ChatFormatting color;
     
-    BagTier(GuiColor color) {
+    BagTier(ChatFormatting color) {
         this.color = color;
     }
     
-    public GuiColor getColor() {
+    public ChatFormatting getColor() {
         return color;
     }
     
     @Environment(EnvType.CLIENT)
-    public String getName() {
-        return I18n.get("hqm.bag." + this.name().toLowerCase());
+    public Component getColoredName() {
+        return Translator.translatable("hqm.bag." + this.name().toLowerCase()).withStyle(color);
     }
     
     @Override

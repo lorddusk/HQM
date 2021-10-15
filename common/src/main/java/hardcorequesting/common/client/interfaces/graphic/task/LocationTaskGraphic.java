@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.LocationMenu;
 import hardcorequesting.common.quests.task.PartList;
@@ -10,6 +9,7 @@ import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.FormattedText;
 
@@ -29,7 +29,7 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     @Override
     protected void drawElementText(PoseStack matrices, VisitLocationTask.Part part, int index, int x, int y) {
         if (task.visited(index, playerId)) {
-            gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited", GuiColor.GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
         } else if (part.getVisibility().doShowCoordinate()) {
             int row = 0;
             if (part.getRadius() >= 0) {

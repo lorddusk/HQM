@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,13 +62,13 @@ public class PickAdvancementMenu extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
-                return "Exact Advancement";
+            protected FormattedText getArrowText() {
+                return Translator.plain("Exact Advancement");
             }
     
             @Override
-            protected String getArrowDescription() {
-                return "Completing the exact advancement is required.";
+            protected FormattedText getArrowDescription() {
+                return Translator.plain("Completing the exact advancement is required.");
             }
         };
         

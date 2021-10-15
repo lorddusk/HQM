@@ -16,6 +16,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.GsonHelper;
@@ -186,12 +187,12 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
             return showRadius;
         }
         
-        public String getName() {
-            return Translator.get("hqm.locationMenu.vis" + id + ".title");
+        public FormattedText getName() {
+            return Translator.translatable("hqm.locationMenu.vis" + id + ".title");
         }
         
-        public String getDescription() {
-            return Translator.get("hqm.locationMenu.vis" + id + ".desc");
+        public FormattedText getDescription() {
+            return Translator.translatable("hqm.locationMenu.vis" + id + ".desc");
         }
     }
     

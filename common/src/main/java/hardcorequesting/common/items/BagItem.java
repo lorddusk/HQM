@@ -7,7 +7,6 @@ import hardcorequesting.common.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -75,7 +74,7 @@ public class BagItem extends Item {
     public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
         super.appendHoverText(stack, world, tooltip, context);
         
-        tooltip.add(new TextComponent(tier.getColor() + tier.getName()));
+        tooltip.add(tier.getColoredName());
     }
     
     private void openClientInterface(Player player, UUID groupId, int bag) {

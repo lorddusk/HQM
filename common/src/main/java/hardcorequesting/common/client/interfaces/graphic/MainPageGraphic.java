@@ -41,9 +41,8 @@ public class MainPageGraphic extends EditableGraphic {
     
     public MainPageGraphic(GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME);
-        prepareDescription();
         addScrollBar(mainDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 312, 18, DESCRIPTION_X,
-                VISIBLE_MAIN_DESCRIPTION_LINES, () -> MainPageGraphic.this.cachedMainDescription));
+                VISIBLE_MAIN_DESCRIPTION_LINES, this::getDescriptionLines));
     }
     
     @Override
@@ -93,13 +92,15 @@ public class MainPageGraphic extends EditableGraphic {
             if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
                 TextMenu.display(gui, gui.getPlayer().getUUID(), Quest.getRawMainDescription(), false, desc -> {
                     QuestLine.getActiveQuestLine().setMainDescription(desc);
-                    prepareDescription();
+                    cachedMainDescription = null;
                 });
             }
         }
     }
     
-    private void prepareDescription() {
-        cachedMainDescription = gui.getLinesFromText(Translator.plain(Quest.getRawMainDescription()), 0.7F, 130);
+    private List<FormattedText> getDescriptionLines() {
+        if (cachedMainDescription == null)
+            cachedMainDescription = gui.getLinesFromText(Translator.plain(Quest.getRawMainDescription()), 0.7F, 130);
+        return cachedMainDescription;
     }
 }

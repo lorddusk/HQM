@@ -10,6 +10,7 @@ import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -131,12 +132,12 @@ public class LocationMenu extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
+            protected FormattedText getArrowText() {
                 return visibility.getName();
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return visibility.getDescription();
             }
         };

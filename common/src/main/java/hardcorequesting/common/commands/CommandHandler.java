@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.common.commands.sub.*;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.util.Translator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -60,14 +59,6 @@ public class CommandHandler {
         
         default void sendChat(CommandSourceStack sender, Component text) {
             sender.sendSuccess(text, false);
-        }
-        
-        default void sendTranslatableChat(CommandSourceStack sender, String key, Object... args) {
-            sender.sendSuccess(Translator.translatable(key, args), false);
-        }
-        
-        default void sendTranslatableChat(CommandSourceStack sender, boolean plural, String key, Object... args) {
-            sender.sendSuccess(Translator.pluralTranslated(plural, key, args), false);
         }
     }
 }

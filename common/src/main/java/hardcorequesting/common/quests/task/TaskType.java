@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 public enum TaskType {
     CONSUME(ConsumeItemTask.class, "consume", ConsumeItemTask::new),
@@ -46,7 +47,7 @@ public enum TaskType {
     }
     
     public QuestTask<?> addTask(Quest quest) {
-        QuestTask<?> task = constructor.create(quest, getName(), getDescription());
+        QuestTask<?> task = constructor.create(quest, getLangKeyName(), getLangKeyDescription());
         task.updateId(quest.getTasks().size());
         quest.getTasks().add(task);
         SaveHelper.add(EditType.TASK_CREATE);
@@ -61,12 +62,12 @@ public enum TaskType {
         return "hqm.taskType." + id + ".title";
     }
     
-    public String getDescription() {
-        return Translator.get(getLangKeyDescription());
+    public FormattedText getDescription() {
+        return Translator.translatable(getLangKeyDescription());
     }
     
-    public String getName() {
-        return Translator.get(getLangKeyName());
+    public FormattedText getName() {
+        return Translator.translatable(getLangKeyName());
     }
     
     public interface TaskConstructor<T extends QuestTask<?>> {

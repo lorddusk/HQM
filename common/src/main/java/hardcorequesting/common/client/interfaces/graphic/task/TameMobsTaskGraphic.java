@@ -2,7 +2,6 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
 import hardcorequesting.common.quests.task.PartList;
@@ -10,6 +9,7 @@ import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
@@ -28,7 +28,7 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     protected void drawElementText(PoseStack matrices, TameMobsTask.Part part, int index, int x, int y) {
         int tamed = task.tamed(index, playerId);
         if (tamed == part.getCount()) {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed", GuiColor.GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
         } else {
             gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.getCount())), x, y, 0.7F, 0x404040);
         }

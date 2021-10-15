@@ -114,12 +114,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
-                return selectedReward.getReward().getName();
+            protected FormattedText getArrowText() {
+                return Translator.plain(selectedReward.getReward().getName());
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return null;
             }
     
@@ -132,7 +132,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
         
         if (isValid()) {
             for (int i = 0; i < rewards.size(); i++) {
-                FormattedText str = Translator.plain(rewards.get(i).getLabel());
+                FormattedText str = rewards.get(i).getLabel();
                 boolean hover = gui.inBounds(START_X, START_Y + i * OFFSET, gui.getStringWidth(str), 9, mX, mY);
                 boolean selected = rewards.get(i).equals(selectedReward);
                 gui.drawString(matrices, str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);

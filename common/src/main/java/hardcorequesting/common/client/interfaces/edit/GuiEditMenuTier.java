@@ -4,8 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.GroupTier;
+import hardcorequesting.common.bag.TierColor;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
@@ -82,7 +82,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
             BagTier bagTier = values[i];
             
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(matrices, Translator.text(bagTier.getName(), bagTier.getColor()), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(matrices, bagTier.getColoredName(), TIERS_WEIGHTS_X, posY, 0x404040);
         }
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -99,10 +99,10 @@ public class GuiEditMenuTier extends GuiEditMenu {
         super.onClick(mX, mY, b);
         
         if (inArrowBounds(gui, mX, mY, true)) {
-            tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + GuiColor.values().length - 1) % GuiColor.values().length]);
+            tier.setColor(TierColor.values()[(tier.getColor().ordinal() + TierColor.values().length - 1) % TierColor.values().length]);
             clicked = true;
         } else if (inArrowBounds(gui, mX, mY, false)) {
-            tier.setColor(GuiColor.values()[(tier.getColor().ordinal() + 1) % GuiColor.values().length]);
+            tier.setColor(TierColor.values()[(tier.getColor().ordinal() + 1) % TierColor.values().length]);
             clicked = true;
         }
     }

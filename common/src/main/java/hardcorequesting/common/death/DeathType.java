@@ -1,6 +1,7 @@
 package hardcorequesting.common.death;
 
-import net.minecraft.client.resources.language.I18n;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -126,8 +127,8 @@ public enum DeathType {
     //is only accurate if called in the values() order
     abstract boolean isSourceValid(DamageSource source);
     
-    public String getName() {
-        return I18n.get("hqm.deathType." + name);
+    public MutableComponent getName() {
+        return Translator.translatable("hqm.deathType." + name);
     }
 
     public static DeathType getClamped(int i) {

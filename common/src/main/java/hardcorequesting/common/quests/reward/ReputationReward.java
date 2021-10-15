@@ -1,7 +1,10 @@
 package hardcorequesting.common.quests.reward;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.reputation.Reputation;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ReputationReward extends QuestReward<Reputation> {
     
@@ -20,19 +23,17 @@ public class ReputationReward extends QuestReward<Reputation> {
         this.value = value;
     }
     
-    public String getLabel() {
+    public FormattedText getLabel() {
         if (reward != null) {
-            String result = reward.getName() + ": ";
+            MutableComponent component = Translator.text(reward.getName() + ": ");
             
+            MutableComponent valueComp = Translator.text(value > 0 ? "+" + value : String.valueOf(value));
             if (value != 0) {
-                result += value > 0 ? GuiColor.GREEN : GuiColor.RED;
+                valueComp.withStyle(value > 0 ? ChatFormatting.DARK_GREEN : ChatFormatting.DARK_RED);
             }
-            if (value > 0) {
-                result += "+";
-            }
-            result += value;
-            return result;
+            
+            return component.append(valueComp);
         }
-        return "";
+        return FormattedText.EMPTY;
     }
 }

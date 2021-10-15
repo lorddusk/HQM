@@ -8,7 +8,6 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.*;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -86,13 +85,13 @@ public class PickMobMenu extends GuiEditMenu {
             }
         
             @Override
-            protected String getArrowText() {
-                return I18n.get("hqm." + textKey + "." + "type" + "Match.title");
+            protected FormattedText getArrowText() {
+                return Translator.translatable("hqm." + textKey + "." + "type" + "Match.title");
             }
         
             @Override
-            protected String getArrowDescription() {
-                return I18n.get("hqm." + textKey + "." + "type" + "Match.desc");
+            protected FormattedText getArrowDescription() {
+                return Translator.translatable("hqm." + textKey + "." + "type" + "Match.desc");
             }
         
         };

@@ -1,10 +1,13 @@
 package hardcorequesting.common.death;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
+import com.google.common.collect.ImmutableList;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -37,19 +40,15 @@ public class DeathStat {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getName() throws IllegalArgumentException {
+    public MutableComponent getName() throws IllegalArgumentException {
         if (Minecraft.getInstance().level != null) {
             Player player = Minecraft.getInstance().level.getPlayerByUUID(this.uuid);
             if (player != null) {
-                return cachedName = player.getScoreboardName();
+                cachedName = player.getScoreboardName();
             }
         }
     
-        if (cachedName != null) {
-            return cachedName;
-        }
-        
-        return "<invalid>";
+        return Translator.text(Objects.requireNonNullElse(cachedName, "<invalid>"));
     }
     
     public String getCachedName() {
@@ -60,8 +59,8 @@ public class DeathStat {
         this.cachedName = cachedName;
     }
     
-    public String getDescription(DeathType type) {
-        return type.getName() + ": " + deaths.get(type);
+    public List<FormattedText> getDescription(DeathType type) {
+        return Collections.singletonList(type.getName().append(": " + deaths.get(type)));
     }
     
     public void increaseDeath(DeathType type) {
@@ -90,9 +89,9 @@ public class DeathStat {
     
     public static class DeathStatBest extends DeathStat {
         
-        private static final String[] colourPrefixes = {GuiColor.YELLOW.toString(), GuiColor.LIGHT_GRAY.toString(), GuiColor.ORANGE.toString()};
+        private static final ChatFormatting[] colourPrefixes = {ChatFormatting.YELLOW, ChatFormatting.GRAY, ChatFormatting.GOLD};
         private static final String[] placePrefixes = {"first", "second", "third"};
-        private final Map<DeathType, String> messages = new EnumMap<>(DeathType.class);
+        private final Map<DeathType, List<FormattedText>> messages = new EnumMap<>(DeathType.class);
         
         public DeathStatBest(List<DeathStat> clientDeathList) {
             super(null);
@@ -100,10 +99,10 @@ public class DeathStat {
                 clientDeathList.sort(deathTypeComparator.get(type));
                 if (clientDeathList.isEmpty()) {
                     deaths.put(type, 0);
-                    messages.put(type, GuiColor.RED + I18n.get("hqm.deathStat.noOneDied"));
+                    messages.put(type, Collections.singletonList(Translator.translatable("hqm.deathStat.noOneDied").withStyle(ChatFormatting.DARK_RED)));
                 } else {
                     deaths.put(type, clientDeathList.get(0).getDeaths(type));
-                    StringBuilder builder = new StringBuilder();
+                    ImmutableList.Builder<FormattedText> builder = ImmutableList.builder();
                     int currentValue = 0;
                     int standing = 0;
                     for (int j = 0; j < clientDeathList.size(); j++) {
@@ -115,25 +114,29 @@ public class DeathStat {
                             }
                         }
                         currentValue = value;
-                        if (j != 0) {
-                            builder.append("\n");
-                        }
-                        builder.append(colourPrefixes[standing]).append(I18n.get("hqm.deathStat." + placePrefixes[standing]));
-                        builder.append(GuiColor.WHITE + " ").append(clientDeathList.get(j).getName()).append(": ").append(clientDeathList.get(j).getDeaths(type));
+    
+                        MutableComponent player = clientDeathList.get(j).getName()
+                                .append(": " + clientDeathList.get(j).getDeaths(type)).withStyle(ChatFormatting.WHITE);
+                        builder.add(Translator.translatable("hqm.deathStat." + placePrefixes[standing]).withStyle(colourPrefixes[standing])
+                                .append(" ").append(player));
                     }
-                    messages.put(type, builder.toString());
+                    messages.put(type, builder.build());
                 }
             }
         }
         
         @Override
-        public String getName() {
-            return I18n.get("hqm.deathStat.worstPlayers");
+        public MutableComponent getName() {
+            return Translator.translatable("hqm.deathStat.worstPlayers");
         }
         
         @Override
-        public String getDescription(DeathType type) {
-            return type.getName() + "\n\n" + messages.get(type);
+        public List<FormattedText> getDescription(DeathType type) {
+            List<FormattedText> description = new ArrayList<>();
+            description.add(type.getName());
+            description.add(FormattedText.EMPTY);
+            description.addAll(messages.get(type));
+            return description;
         }
     }
     
@@ -156,17 +159,21 @@ public class DeathStat {
         }
         
         @Override
-        public String getDescription(DeathType type) {
+        public List<FormattedText> getDescription(DeathType type) {
+            List<FormattedText> description = new ArrayList<>(super.getDescription(type));
+            description.add(FormattedText.EMPTY);
             int count = counts.get(type);
-            return super.getDescription(type) + "\n\n" +
-                   (count == 0 ?
-                           GuiColor.RED + I18n.get("hqm.deathStat.noOneDied") :
-                           GuiColor.GREEN.toString() + count + " " + I18n.get("hqm.deathStat.player" + (count == 1 ? "" : "s")) + " " + I18n.get("hqm.deathStat.diedThisWay"));
+            if (count == 0)
+                description.add(Translator.translatable("hqm.deathStat.noOneDied").withStyle(ChatFormatting.DARK_RED));
+            else
+                description.add(Translator.plural("hqm.player", count).append(" ")
+                        .append(Translator.translatable("hqm.deathStat.diedThisWay")).withStyle(ChatFormatting.DARK_GREEN));
+            return description;
         }
         
         @Override
-        public String getName() {
-            return I18n.get("hqm.deathStat.everyone");
+        public MutableComponent getName() {
+            return Translator.translatable("hqm.deathStat.everyone");
         }
     }
 }

@@ -8,6 +8,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
 
@@ -54,12 +55,12 @@ public class GuiEditMenuTrigger extends GuiEditMenu {
             }
     
             @Override
-            protected String getArrowText() {
+            protected FormattedText getArrowText() {
                 return type.getName();
             }
     
             @Override
-            protected String getArrowDescription() {
+            protected FormattedText getArrowDescription() {
                 return type.getDescription();
             }
         };

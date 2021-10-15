@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.*;
@@ -20,20 +19,16 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * A graphic element for displaying the quest map for a specific quest set.
@@ -91,257 +86,309 @@ public class QuestSetMapGraphic extends EditableGraphic {
             if ((editing || quest.isVisible(player, isVisibleCache, isLinkFreeCache)) && quest.isMouseInObject(mX, mY)) {
                 boolean shouldDrawText = false;
                 boolean enabled = quest.isEnabled(player, isVisibleCache, isLinkFreeCache);
-                String txt = "";
-            
+                
+                List<FormattedText> tooltip = new ArrayList<>();
+                
                 if (enabled || editing) {
-                    txt += quest.getName();
+                    tooltip.add(Translator.plain(quest.getName()));
                 }
             
                 if (!enabled) {
-                    if (editing) {
-                        txt += "\n";
-                    }
-                    txt += GuiColor.GRAY + I18n.get("hqm.questBook.lockedQuest");
+                    tooltip.add(Translator.translatable("hqm.questBook.lockedQuest").withStyle(ChatFormatting.DARK_GRAY));
                 }
             
                 if (!enabled || editing) {
-                    int totalParentCount = 0;
-                    int totalCompletedCount = 0;
-                    int parentCount = 0;
-                    int completed = 0;
-                    List<Quest> externalQuests = new ArrayList<>();
-                    for (Quest parent : quest.getRequirements()) {
-                        totalParentCount++;
-                        boolean isCompleted = parent.isCompleted(player);
-                        if (isCompleted) {
-                            totalCompletedCount++;
-                        }
-                        if (!parent.hasSameSetAs(quest)) {
-                            externalQuests.add(parent);
-                            parentCount++;
-                            if (isCompleted) {
-                                completed++;
-                            }
-                        }
                     
-                    }
-                
-                    if (editing && totalParentCount > 0) {
-                        txt += "\n" + GuiColor.GRAY + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), totalParentCount));
-                    
-                        if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_R)) {
-                            txt += " [" + I18n.get("hqm.questBook.holding", "R") + "]";
-                            for (Quest parent : quest.getRequirements()) {
-                                txt += "\n" + GuiColor.GRAY + parent.getName();
-                                if (parent.isCompleted(player)) {
-                                    txt += " " + GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
-                                }
-                            }
-                        } else {
-                            txt += " [" + I18n.get("hqm.questBook.hold", "R") + "]";
-                        }
-                    }
-                
-                    int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
-                    if (parentCount - completed > allowedUncompleted || (editing && parentCount > 0)) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(totalParentCount != 1, "hqm.questBook.parentCountElsewhere", (totalParentCount - totalCompletedCount), totalParentCount));
-                        shouldDrawText = true;
-                        if (editing) {
-                            if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_E)) {
-                                txt += " [" + I18n.get("hqm.questBook.holding", "E") + "]";
-                                for (Quest parent : externalQuests) {
-                                    txt += "\n" + GuiColor.PINK + parent.getName() + " (" + parent.getQuestSet().getName() + ")";
-                                    if (parent.isCompleted(player)) {
-                                        txt += " " + GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
-                                    }
-                                }
-                            } else {
-                                txt += " [" + I18n.get("hqm.questBook.hold", "E") + "]";
-                            }
-                        }
-                    }
-                
-                    if (editing && quest.getUseModifiedParentRequirement()) {
-                        txt += "\n" + GuiColor.MAGENTA;
-                        int amount = quest.getParentRequirementCount();
-                        if (amount < quest.getRequirements().size()) {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqOnly", amount));
-                        } else if (amount > quest.getRequirements().size()) {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqMore", amount));
-                        } else {
-                            txt += Translator.rawString(Translator.pluralTranslated(amount != 1, "hqm.questBook.reqAll", amount));
-                        }
-                    
-                    }
+                    addParentTooltip(player.getUUID(), quest, editing, tooltip);
+    
+                    shouldDrawText |= addExternalParentTooltip(player.getUUID(), quest, editing, tooltip);
+    
+                    addRequirementTooltip(quest, editing, tooltip);
                 }
             
                 if (enabled || editing) {
                     if (quest.isCompleted(player)) {
-                        txt += "\n" + GuiColor.GREEN + I18n.get("hqm.questBook.completed");
+                        tooltip.add(Translator.translatable("hqm.questBook.completed").withStyle(ChatFormatting.DARK_GREEN));
                     }
                     if (quest.hasReward(player.getUUID())) {
-                        txt += "\n" + GuiColor.PURPLE + I18n.get("hqm.questBook.unclaimedReward");
+                        tooltip.add(Translator.translatable("hqm.questBook.unclaimedReward").withStyle(ChatFormatting.DARK_PURPLE));
                     }
-                
-                    String repeatMessage = enabled ? quest.getRepeatInfo().getMessage(quest, player) : quest.getRepeatInfo().getShortMessage();
-                    if (repeatMessage != null) {
-                        txt += "\n" + repeatMessage;
-                    }
+    
+                    tooltip.addAll(enabled
+                            ? quest.getRepeatInfo().getMessage(quest, player)
+                            : quest.getRepeatInfo().getShortMessage());
                 
                     if (editing) {
-                        int totalTasks = 0;
-                        int completedTasks = 0;
-                        for (QuestTask<?> task : quest.getTasks()) {
-                            totalTasks++;
-                            if (task.isCompleted(player)) {
-                                completedTasks++;
-                            }
-                        }
-                    
-                        if (totalTasks == 0) {
-                            txt += "\n" + GuiColor.RED + I18n.get("hqm.questBook.noTasks");
-                        } else {
-                            txt += "\n" + GuiColor.CYAN + I18n.get("hqm.questBook.completedTasks", completedTasks, totalTasks);
-                        
-                            if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_T)) {
-                                txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
-                                for (QuestTask<?> task : quest.getTasks()) {
-                                    txt += "\n" + GuiColor.CYAN + task.getDescription();
-                                    if (task.isCompleted(player)) {
-                                        txt += GuiColor.WHITE + " [" + I18n.get("hqm.questBook.completed") + "]";
-                                    }
-                                }
-                            } else {
-                                txt += " [" + I18n.get("hqm.questBook.holding", "T") + "]";
-                            }
-                        }
-                    
-                        String triggerMessage = quest.getTriggerType().getMessage(quest);
-                        if (triggerMessage != null) {
-                            txt += "\n" + triggerMessage;
-                        }
-                    
-                        if (!quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                            String invisibilityMessage;
-                            if (quest.isLinkFree(player, isLinkFreeCache)) {
-                                boolean parentInvisible = false;
-                                for (Quest parent : quest.getRequirements()) {
-                                    if (!parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
-                                        parentInvisible = true;
-                                        break;
-                                    }
-                                }
-                            
-                            
-                                switch (quest.getTriggerType()) {
-                                    case ANTI_TRIGGER:
-                                        invisibilityMessage = I18n.get("hqm.questBook.invisLocked");
-                                        break;
-                                    case QUEST_TRIGGER:
-                                        invisibilityMessage = I18n.get("hqm.questBook.invisPerm");
-                                        parentInvisible = false;
-                                        break;
-                                    case TASK_TRIGGER:
-                                        invisibilityMessage = Translator.rawString(Translator.pluralTranslated(quest.getTriggerTasks() != 1, "hqm.questBook.invisCount", quest.getTriggerTasks()));
-                                        break;
-                                    default:
-                                        invisibilityMessage = null;
-                                }
-                            
-                                if (parentInvisible) {
-                                    String parentText = I18n.get("hqm.questBook.invisInherit");
-                                    if (invisibilityMessage == null) {
-                                        invisibilityMessage = parentText;
-                                    } else {
-                                        invisibilityMessage = parentText + " " + I18n.get("hqm.questBook.and") + " " + invisibilityMessage;
-                                    }
-                                }
-                            
-                            } else {
-                                invisibilityMessage = I18n.get("hqm.questBook.invisOption");
-                            }
-                        
-                            if (invisibilityMessage != null) {
-                                txt += "\n" + GuiColor.LIGHT_BLUE + invisibilityMessage;
-                            }
-                        }
-                    
-                    
-                        List<UUID> ids = new ArrayList<>();
-                        for (Quest option : quest.getOptionLinks()) {
-                            ids.add(option.getQuestId());
-                        }
-                        for (Quest option : quest.getReversedOptionLinks()) {
-                            UUID id = option.getQuestId();
-                            if (!ids.contains(id)) {
-                                ids.add(id);
-                            }
-                        }
-                        int optionLinks = ids.size();
-                        if (optionLinks > 0) {
-                            txt += "\n" + GuiColor.BLUE + Translator.rawString(Translator.pluralTranslated(optionLinks != 1, "hqm.questBook.optionLinks", optionLinks));
-                        
-                            if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_O)) {
-                                txt += " [" + I18n.get("hqm.questBook.holding", "O") + "]";
-                                for (UUID id : ids) {
-                                    Quest option = Quest.getQuest(id);
-                                    txt += "\n" + GuiColor.BLUE + option.getName();
-                                    if (!option.hasSameSetAs(quest)) {
-                                        txt += " (" + option.getQuestSet().getName() + ")";
-                                    }
-                                }
-                            } else {
-                                txt += " [" + I18n.get("hqm.questBook.hold", "O") + "]";
-                            }
-                        }
-                    
+                        addTaskTooltip(player.getUUID(), quest, tooltip);
+    
+                        quest.getTriggerType().getMessage(quest).ifPresent(tooltip::add);
+    
+                        addInvisibilityTooltip(player, isVisibleCache, isLinkFreeCache, quest, tooltip);
+    
+                        addOptionLinkTooltip(quest, tooltip);
+    
                     }
-                
-                
-                    List<Quest> externalQuests = new ArrayList<>();
-                    int childCount = 0;
-                    for (Quest child : quest.getReversedRequirement()) {
-                        if (!quest.hasSameSetAs(child)) {
-                            childCount++;
-                            externalQuests.add(child);
-                        }
-                    }
-                
-                    if (childCount > 0) {
-                        txt += "\n" + GuiColor.PINK + Translator.rawString(Translator.pluralTranslated(childCount != 1, "hqm.questBook.childUnlocks", childCount));
-                        if (editing) {
-                            if (InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_U)) {
-                                txt += " [" + I18n.get("hqm.questBook.holding", "U") + "]";
-                                for (Quest child : externalQuests) {
-                                    txt += "\n" + GuiColor.PINK + child.getName() + " (" + child.getQuestSet().getName() + ")";
-                                }
-                            } else {
-                                txt += " [" + I18n.get("hqm.questBook.hold", "U") + "]";
-                            }
-                        }
-                    }
+    
+                    addChildTooltip(quest, editing, tooltip);
                     shouldDrawText = true;
-                
                 }
             
                 if (editing) {
-                    txt += "\n\n" + GuiColor.GRAY + I18n.get("hqm.questBook.ctrlNonEditor");
+                    tooltip.add(FormattedText.EMPTY);
+                    tooltip.add(Translator.translatable("hqm.questBook.ctrlNonEditor").withStyle(ChatFormatting.DARK_GRAY));
                 }
             
                 if (gui.isOpBook && Screen.hasShiftDown()) {
                     if (quest.isCompleted(player)) {
-                        txt += "\n\n" + GuiColor.RED + I18n.get("hqm.questBook.resetQuest");
+                        tooltip.add(FormattedText.EMPTY);
+                        tooltip.add(Translator.translatable("hqm.questBook.resetQuest").withStyle(ChatFormatting.DARK_RED));
                     } else {
-                        txt += "\n\n" + GuiColor.ORANGE + I18n.get("hqm.questBook.completeQuest");
+                        tooltip.add(FormattedText.EMPTY);
+                        tooltip.add(Translator.translatable("hqm.questBook.completeQuest").withStyle(ChatFormatting.GOLD));
                     }
                 }
             
                 if (shouldDrawText && gui.getCurrentMode() != EditMode.MOVE) {
-                    gui.renderTooltipL(matrices, Stream.of(txt.split("\n")).map(FormattedText::of).collect(Collectors.toList()), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(matrices, tooltip, mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
         }
+    }
+    
+    private int getParentCount(Quest quest) {
+        return quest.getRequirements().size();
+    }
+    
+    private int getCompletedParents(Quest quest, UUID playerId) {
+        int completed = 0;
+        for (Quest parent : quest.getRequirements()) {
+            if (parent.isCompleted(playerId))
+                completed++;
+        }
+        return completed;
+    }
+    
+    private List<Quest> getExternalQuests(Quest quest) {
+        List<Quest> externalQuests = new ArrayList<>();
+        for (Quest parent : quest.getRequirements()) {
+            if (!parent.hasSameSetAs(quest)) {
+                externalQuests.add(parent);
+            }
+        }
+        return externalQuests;
+    }
+    
+    private int getCompletedExternal(Quest quest, UUID playerId) {
+        int completed = 0;
+        for (Quest parent : quest.getRequirements()) {
+            if (!parent.hasSameSetAs(quest) && parent.isCompleted(playerId)) {
+                completed++;
+            }
+        }
+        return completed;
+    }
+    
+    private void addParentTooltip(UUID playerId, Quest quest, boolean editing, List<FormattedText> tooltip) {
+        int totalParentCount = getParentCount(quest);
+        if (editing && totalParentCount > 0) {
+            boolean holdingR = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_R);
+            
+            int totalCompletedCount = getCompletedParents(quest, playerId);
+            tooltip.add(Translator.translatable("hqm.questBook.parentCount", (totalParentCount - totalCompletedCount), Translator.quest(totalParentCount))
+                    .append(" ").append(holdingText(holdingR, "R")).withStyle(ChatFormatting.DARK_GRAY));
+            
+            if (holdingR) {
+                for (Quest parent : quest.getRequirements()) {
+                    MutableComponent component = Translator.text(parent.getName()).withStyle(ChatFormatting.DARK_GRAY);
+                    tooltip.add(component);
+                    if (parent.isCompleted(playerId)) {
+                        MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed"))
+                                .withStyle(ChatFormatting.WHITE);
+                        component.append(" ").append(completedComponent);
+                    }
+                }
+            }
+        }
+    }
+    
+    private boolean addExternalParentTooltip(UUID playerId, Quest quest, boolean editing, List<FormattedText> tooltip) {
+        List<Quest> externalQuests = getExternalQuests(quest);
+        int externalParents = externalQuests.size();
+        int completedExternal = getCompletedExternal(quest, playerId);
+        int allowedUncompleted = quest.getUseModifiedParentRequirement() ? Math.max(0, quest.getRequirements().size() - quest.getParentRequirementCount()) : 0;
+        if (externalParents - completedExternal > allowedUncompleted || (editing && externalParents > 0)) {
+            int parents = getParentCount(quest);
+            int completedParents = getCompletedParents(quest,playerId);
+            MutableComponent component = Translator.translatable("hqm.questBook.parentCountElsewhere", (parents - completedParents), Translator.quest(parents)).withStyle(ChatFormatting.RED);
+            tooltip.add(component);
+            if (editing) {
+                boolean holdingE = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_E);
+                component.append(" ").append(holdingText(holdingE, "E"));
+                if (holdingE) {
+                    for (Quest parent : externalQuests) {
+                        MutableComponent questComponent = Translator.text(parent.getName() + " (" + parent.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED);
+                        tooltip.add(questComponent);
+                        if (parent.isCompleted(playerId)) {
+                            MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
+                            questComponent.append(" ").append(completedComponent);
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    private void addRequirementTooltip(Quest quest, boolean editing, List<FormattedText> tooltip) {
+        if (editing && quest.getUseModifiedParentRequirement()) {
+            MutableComponent component;
+            int amount = quest.getParentRequirementCount();
+            int parentCount = getParentCount(quest);
+            if (amount < parentCount) {
+                component = Translator.translatable("hqm.questBook.reqOnly", Translator.quest(amount));
+            } else if (amount > parentCount) {
+                component = Translator.translatable("hqm.questBook.reqMore", Translator.quest(amount));
+            } else {
+                component = Translator.translatable("hqm.questBook.reqAll", Translator.quest(amount));
+            }
+            tooltip.add(component.withStyle(ChatFormatting.LIGHT_PURPLE));
+        }
+    }
+    
+    private void addTaskTooltip(UUID playerId, Quest quest, List<FormattedText> tooltip) {
+        int totalTasks = quest.getTasks().size();
+        int completedTasks = 0;
+        for (QuestTask<?> task : quest.getTasks()) {
+            if (task.isCompleted(playerId)) {
+                completedTasks++;
+            }
+        }
+        
+        if (totalTasks == 0) {
+            tooltip.add(Translator.translatable("hqm.questBook.noTasks").withStyle(ChatFormatting.DARK_RED));
+        } else {
+            boolean holdingT = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_T);
+            
+            tooltip.add(Translator.translatable("hqm.questBook.completedTasks", completedTasks, totalTasks)
+                    .append(" ").append(holdingText(holdingT, "T")).withStyle(ChatFormatting.DARK_AQUA));
+            
+            if (holdingT) {
+                for (QuestTask<?> task : quest.getTasks()) {
+                    MutableComponent component = task.getDescription().withStyle(ChatFormatting.DARK_AQUA);
+                    tooltip.add(component);
+                    if (task.isCompleted(playerId)) {
+                        component.append(" ").append(box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
+                    }
+                }
+            }
+        }
+    }
+    
+    private void addInvisibilityTooltip(Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache, Quest quest, List<FormattedText> tooltip) {
+        if (!quest.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+            Optional<MutableComponent> invisibilityMessage;
+            if (quest.isLinkFree(player, isLinkFreeCache)) {
+                boolean parentInvisible = false;
+                for (Quest parent : quest.getRequirements()) {
+                    if (!parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
+                        parentInvisible = true;
+                        break;
+                    }
+                }
+    
+    
+                switch (quest.getTriggerType()) {
+                    case ANTI_TRIGGER -> invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisLocked"));
+                    case QUEST_TRIGGER -> {
+                        invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisPerm"));
+                        parentInvisible = false;
+                    }
+                    case TASK_TRIGGER -> invisibilityMessage = Optional.of(Translator.plural("hqm.questBook.invisCount", quest.getTriggerTasks()));
+                    default -> invisibilityMessage = Optional.empty();
+                }
+                
+                if (parentInvisible) {
+                    MutableComponent parentText = Translator.translatable("hqm.questBook.invisInherit");
+                    
+                    if (invisibilityMessage.isPresent())
+                        parentText = Translator.translatable("hqm.questBook.and", parentText, invisibilityMessage.get());
+                    
+                    invisibilityMessage = Optional.of(parentText);
+                }
+                
+            } else {
+                invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisOption"));
+            }
+            
+            invisibilityMessage.ifPresent(component -> tooltip.add(component.withStyle(ChatFormatting.BLUE)));
+        }
+    }
+    
+    private void addOptionLinkTooltip(Quest quest, List<FormattedText> tooltip) {
+        List<UUID> ids = new ArrayList<>();
+        for (Quest option : quest.getOptionLinks()) {
+            ids.add(option.getQuestId());
+        }
+        for (Quest option : quest.getReversedOptionLinks()) {
+            UUID id = option.getQuestId();
+            if (!ids.contains(id)) {
+                ids.add(id);
+            }
+        }
+        int optionLinks = ids.size();
+        if (optionLinks > 0) {
+            boolean holdingO = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_O);
+            
+            tooltip.add(Translator.translatable("hqm.questBook.optionLinks", Translator.quest(optionLinks))
+                    .append(" ").append(holdingText(holdingO, "O")).withStyle(ChatFormatting.DARK_BLUE));
+            
+            if (holdingO) {
+                for (UUID id : ids) {
+                    Quest option = Quest.getQuest(id);
+                    MutableComponent component = Translator.text(option.getName()).withStyle(ChatFormatting.DARK_BLUE);
+                    tooltip.add(component);
+                    if (!option.hasSameSetAs(quest)) {
+                        component.append(" (" + option.getQuestSet().getName() + ")");
+                    }
+                }
+            }
+        }
+    }
+    
+    private void addChildTooltip(Quest quest, boolean editing, List<FormattedText> tooltip) {
+        List<Quest> externalQuests = new ArrayList<>();
+        int childCount = 0;
+        for (Quest child : quest.getReversedRequirement()) {
+            if (!quest.hasSameSetAs(child)) {
+                childCount++;
+                externalQuests.add(child);
+            }
+        }
+        
+        if (childCount > 0) {
+            MutableComponent component = Translator.translatable("hqm.questBook.childUnlocks", Translator.quest(childCount)).withStyle(ChatFormatting.RED);
+            tooltip.add(component);
+            if (editing) {
+                boolean holdingU = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_U);
+                component.append(" ").append(holdingText(holdingU, "U"));
+                
+                if (holdingU) {
+                    for (Quest child : externalQuests) {
+                        tooltip.add(Translator.text(child.getName() + " (" + child.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED));
+                    }
+                }
+            }
+        }
+    }
+    
+    private MutableComponent holdingText(boolean holding, String letter) {
+        return box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
+    }
+    
+    private MutableComponent box(MutableComponent component) {
+        return Translator.text("[").append(component).append("]");
     }
     
     private void drawConnectingLines(PoseStack matrices, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {

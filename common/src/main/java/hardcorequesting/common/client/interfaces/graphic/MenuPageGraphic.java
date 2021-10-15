@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
-import hardcorequesting.common.client.interfaces.GuiColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
@@ -22,6 +21,7 @@ import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
@@ -100,7 +100,7 @@ public class MenuPageGraphic extends EditableGraphic {
         if (manager.isHardcoreActive()) {
             boolean almostOut = manager.getQuestingData(player).getLives() == manager.getQuestingData(player).getLivesToStayAlive();
             if (almostOut) {
-                gui.drawString(matrices, Translator.translatable("hqm.questBook.deadOut", GuiColor.RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
+                gui.drawString(matrices, Translator.translatable("hqm.questBook.deadOut").withStyle(ChatFormatting.DARK_RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
             }
             
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -126,7 +126,7 @@ public class MenuPageGraphic extends EditableGraphic {
         
         
         int deaths = DeathStatsManager.getInstance().getDeathStat(player.getUUID()).getTotalDeaths();
-        gui.drawString(matrices, Translator.pluralTranslated(deaths != 1, "hqm.questBook.deaths", deaths), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
+        gui.drawString(matrices, Translator.translatable("hqm.questBook.deaths", Translator.plural("hqm.times", deaths)), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         gui.drawString(matrices, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
         
         if (!HQMConfig.getInstance().ENABLE_TEAMS) return;
@@ -136,7 +136,7 @@ public class MenuPageGraphic extends EditableGraphic {
         if (team.isSingle()) {
             int invites = team.getInvites() == null ? 0 : team.getInvites().size();
             if (invites > 0) {
-                str = Translator.pluralTranslated(invites != 1, "hqm.questBook.invites", invites);
+                str = Translator.translatable("hqm.questBook.invites", Translator.plural("hqm.invite", invites));
             } else {
                 str = Translator.translatable("hqm.questBook.notInParty");
             }
@@ -147,7 +147,7 @@ public class MenuPageGraphic extends EditableGraphic {
                     players++;
                 }
             }
-            str = Translator.pluralTranslated(players != 1, "hqm.questBook.inParty", players);
+            str = Translator.translatable("hqm.questBook.inParty", Translator.player(players));
         }
         
         gui.drawString(matrices, str, INFO_RIGHT_X, INFO_TEAM_Y + TEAM_TEXT_Y, 0.7F, 0x404040);
@@ -155,7 +155,7 @@ public class MenuPageGraphic extends EditableGraphic {
         
         if (gui.isOpBook) {
             gui.drawString(matrices, Translator.translatable("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, GuiColor.RED.getHexColor());
+            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, 0xff5555);
         }
         
         drawReputations(matrices, gui, mX, mY, player.getUUID());

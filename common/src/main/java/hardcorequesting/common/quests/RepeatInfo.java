@@ -1,7 +1,10 @@
 package hardcorequesting.common.quests;
 
 
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.List;
 
 public class RepeatInfo {
     
@@ -27,11 +30,11 @@ public class RepeatInfo {
         return type;
     }
     
-    public String getMessage(Quest quest, Player player) {
+    public List<FormattedText> getMessage(Quest quest, Player player) {
         return type.getMessage(quest, player, days, hours);
     }
     
-    public String getShortMessage() {
+    public List<FormattedText> getShortMessage() {
         return type.getShortMessage(days, hours);
     }
 }

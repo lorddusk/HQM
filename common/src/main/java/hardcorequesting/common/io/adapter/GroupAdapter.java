@@ -8,7 +8,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupTier;
-import hardcorequesting.common.client.interfaces.GuiColor;
+import hardcorequesting.common.bag.TierColor;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
@@ -106,14 +106,14 @@ public class GroupAdapter {
             JsonObject json = jsonElement.getAsJsonObject();
             int[] weights = new int[BagTier.values().length];
             String name = "";
-            GuiColor color = GuiColor.GRAY;
+            TierColor color = TierColor.GRAY;
             
             if(json.has(NAME) && json.get(NAME).isJsonPrimitive()){
                 name = json.get(NAME).getAsString();
             }
             if(json.has(COLOUR) && json.get(COLOUR).isJsonPrimitive()){
-                if(Enums.getIfPresent(GuiColor.class, json.get(COLOUR).getAsString()).isPresent()){
-                    color = GuiColor.valueOf(json.get(COLOUR).getAsString());
+                if(Enums.getIfPresent(TierColor.class, json.get(COLOUR).getAsString()).isPresent()){
+                    color = TierColor.valueOf(json.get(COLOUR).getAsString());
                 } else {
                     HardcoreQuestingCore.LOGGER.error("JsonElement '" + COLOUR + "' of 'Group Tier' cannot be mapped to a color!");
                 }

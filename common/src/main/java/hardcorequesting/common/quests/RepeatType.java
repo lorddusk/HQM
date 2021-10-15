@@ -1,91 +1,107 @@
 package hardcorequesting.common.quests;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import hardcorequesting.common.quests.data.QuestData;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.Collections;
+import java.util.List;
 
 public enum RepeatType {
     NONE("none", false) {
         @Environment(EnvType.CLIENT)
         @Override
-        public String getMessage(Quest quest, Player player, int days, int hours) {
-            return null;
+        public List<FormattedText> getMessage(Quest quest, Player player, int days, int hours) {
+            return Collections.emptyList();
         }
     },
     INSTANT("instant", false) {
         @Environment(EnvType.CLIENT)
         @Override
-        public String getMessage(Quest quest, Player player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.instant.message");
+        public List<FormattedText> getMessage(Quest quest, Player player, int days, int hours) {
+            return  ImmutableList.of(getMessageTitle(),
+                    Translator.translatable("hqm.repeat.instant.message").withStyle(ChatFormatting.DARK_GRAY));
         }
     
         @Environment(EnvType.CLIENT)
         @Override
-        public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + I18n.get("hqm.repeat.instant.message");
+        public List<FormattedText> getShortMessage(int days, int hours) {
+            return ImmutableList.of(Translator.translatable("hqm.repeat.instant.message").withStyle(ChatFormatting.YELLOW));
         }
     },
     INTERVAL("interval", true) {
         @Environment(EnvType.CLIENT)
         @Override
-        public String getMessage(Quest quest, Player player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.interval.message") + "\n" + formatTime(days, hours) + "\n" + formatIntervalTime(quest, player, days, hours);
+        public List<FormattedText> getMessage(Quest quest, Player player, int days, int hours) {
+            return  ImmutableList.of(getMessageTitle(),
+                    Translator.translatable("hqm.repeat.interval.message").withStyle(ChatFormatting.DARK_GRAY),
+                    formatTime(days, hours),
+                    formatIntervalTime(quest, player, days, hours));
         }
     
         @Environment(EnvType.CLIENT)
         @Override
-        public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + I18n.get("hqm.repeat.interval.message") + " (" + days + ":" + hours + ")";
+        public List<FormattedText> getShortMessage(int days, int hours) {
+            return ImmutableList.of(Translator.translatable("hqm.repeat.interval.message")
+                    .append(" (" + days + ":" + hours + ")").withStyle(ChatFormatting.YELLOW));
         }
     },
     TIME("time", true) {
         @Environment(EnvType.CLIENT)
         @Override
-        public String getMessage(Quest quest, Player player, int days, int hours) {
-            return super.getMessage(quest, player, days, hours) + GuiColor.GRAY + I18n.get("hqm.repeat.time.message") + "\n" + formatTime(days, hours) + formatCooldownTime(quest, player, days, hours);
+        public List<FormattedText> getMessage(Quest quest, Player player, int days, int hours) {
+            List<FormattedText> tooltip = Lists.newArrayList(getMessageTitle(),
+                    Translator.translatable("hqm.repeat.time.message").withStyle(ChatFormatting.DARK_GRAY),
+                    formatTime(days, hours));
+            
+            QuestData data = quest.getQuestData(player);
+            if (!data.available) {
+                tooltip.add(formatCooldownTime(quest, player, data, days, hours));
+            }
+            
+            return tooltip;
         }
     
         @Environment(EnvType.CLIENT)
         @Override
-        public String getShortMessage(int days, int hours) {
-            return GuiColor.YELLOW + I18n.get("hqm.repeat.time.message") + " (" + days + ":" + hours + ")";
+        public List<FormattedText> getShortMessage(int days, int hours) {
+            return ImmutableList.of(Translator.translatable("hqm.repeat.time.message")
+                    .append(" (" + days + ":" + hours + ")").withStyle(ChatFormatting.YELLOW));
         }
     };
     
-    private String id;
-    private boolean useTime;
+    private final String id;
+    private final boolean useTime;
     
     RepeatType(String id, boolean useTime) {
         this.id = id;
         this.useTime = useTime;
     }
     
-    /**
-     * Formats and produces text describing the reset time, given the cooldown time from a quest being finished to reset
-     */
     @Environment(EnvType.CLIENT)
-    private static String formatCooldownTime(Quest quest, Player player, int days, int hours) {
-        if (!quest.getQuestData(player).available) {
-            int timerDuration = days * 24 + hours;
-            long timerStart = quest.getQuestData(player).time;
-            long current = Quest.clientTicker.getHours();
-            int remaining = (int) (timerStart + timerDuration - current);
-            
-            return "\n" + formatRemainingTime(quest, player, remaining / 24, remaining % 24);
-        } else {
-            return "";
-        }
+    private static FormattedText formatCooldownTime(Quest quest, Player player, QuestData data, int days, int hours) {
+        int timerDuration = days * 24 + hours;
+        long timerStart = data.time;
+        long current = Quest.clientTicker.getHours();
+        int remaining = (int) (timerStart + timerDuration - current);
+        
+        return formatRemainingTime(quest, player, remaining / 24, remaining % 24);
     }
     
     /**
      * Formats and produces text describing the reset time, given the interval time between scheduled resets
      */
     @Environment(EnvType.CLIENT)
-    private static String formatIntervalTime(Quest quest, Player player, int days, int hours) {
+    private static FormattedText formatIntervalTime(Quest quest, Player player, int days, int hours) {
         if (days == 0 && hours == 0) {
-            return GuiColor.RED + I18n.get("hqm.repeat.invalid");
+            return Translator.translatable("hqm.repeat.invalid").withStyle(ChatFormatting.DARK_RED);
         }
         
         int interval = days * 24 + hours;
@@ -98,61 +114,51 @@ public enum RepeatType {
      * Formats and produces text describing the reset time, given the remaining time until the next reset
      */
     @Environment(EnvType.CLIENT)
-    private static String formatRemainingTime(Quest quest, Player player, int days, int hours) {
+    private static FormattedText formatRemainingTime(Quest quest, Player player, int days, int hours) {
         
         if (!quest.isAvailable(player)) {
-            return GuiColor.YELLOW + I18n.get("hqm.repeat.resetIn", formatTime(days, hours));
+            return Translator.translatable("hqm.repeat.resetIn", formatTime(days, hours)).withStyle(ChatFormatting.YELLOW);
         } else {
-            return GuiColor.GRAY + I18n.get("hqm.repeat.nextReset", formatTime(days, hours));
+            return Translator.translatable("hqm.repeat.nextReset", formatTime(days, hours)).withStyle(ChatFormatting.DARK_GRAY);
         }
     }
     
     @Environment(EnvType.CLIENT)
-    private static String formatTime(int days, int hours) {
-        String str = GuiColor.GRAY.toString();
+    private static FormattedText formatTime(int days, int hours) {
+        MutableComponent daysComp = Translator.plural("hqm.day", days);
         if (days > 0) {
-            str += GuiColor.LIGHT_GRAY;
+            daysComp.withStyle(ChatFormatting.GRAY);
         }
-        str += days;
-        str += " ";
-        str += I18n.get("hqm.repeat." + (days == 1 ? "day" : "days"));
         
-        str += GuiColor.GRAY;
-        
-        str += " " + I18n.get("hqm.repeat.and") + " ";
-        
+        MutableComponent hoursComp = Translator.plural("hqm.hour", hours);
         if (hours > 0) {
-            str += GuiColor.LIGHT_GRAY;
+            hoursComp.withStyle(ChatFormatting.GRAY);
         }
         
-        str += hours;
-        str += " ";
-        str += I18n.get("hqm.repeat." + (hours == 1 ? "hour" : "hours"));
-        
-        return str;
+        return Translator.translatable("hqm.repeat.and", daysComp, hoursComp).withStyle(ChatFormatting.DARK_GRAY);
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getName() {
-        return I18n.get("hqm.repeat." + id + ".title");
+    public FormattedText getName() {
+        return Translator.translatable("hqm.repeat." + id + ".title");
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getDescription() {
-        return I18n.get("hqm.repeat." + id + ".desc");
+    public FormattedText getDescription() {
+        return Translator.translatable("hqm.repeat." + id + ".desc");
     }
     
     public boolean isUseTime() {
         return useTime;
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getMessage(Quest quest, Player player, int days, int hours) {
-        return GuiColor.YELLOW + I18n.get("hqm.repeat.repeatable") + "\n";
+    private static FormattedText getMessageTitle() {
+        return Translator.translatable("hqm.repeat.repeatable").withStyle(ChatFormatting.YELLOW);
     }
     
     @Environment(EnvType.CLIENT)
-    public String getShortMessage(int days, int hours) {
-        return null;
+    public abstract List<FormattedText> getMessage(Quest quest, Player player, int days, int hours);
+    
+    @Environment(EnvType.CLIENT)
+    public List<FormattedText> getShortMessage(int days, int hours) {
+        return Collections.emptyList();
     }
 }

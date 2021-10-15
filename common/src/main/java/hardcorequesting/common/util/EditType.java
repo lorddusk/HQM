@@ -1,7 +1,8 @@
 package hardcorequesting.common.util;
 
-import hardcorequesting.common.client.interfaces.GuiColor;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 
 public enum EditType {
     QUEST_CREATE(BaseEditType.ADD, Type.QUEST),
@@ -78,20 +79,21 @@ public enum EditType {
         this.type = type;
     }
     
-    public String translate(int number) {
-        return basType.translate() + " " + type.translate() + ": " + basType.colour + number;
+    public FormattedText translate(int number) {
+        return basType.translate().append(" ").append(type.translate()).append(": ")
+                .append(Translator.text(String.valueOf(number)).withStyle(basType.colour));
     }
     
     public enum BaseEditType {
-        ADD("added", GuiColor.GREEN),
-        CHANGE("changed", GuiColor.ORANGE),
-        MOVE("moved", GuiColor.ORANGE),
-        REMOVE("removed", GuiColor.RED);
+        ADD("added", ChatFormatting.DARK_GREEN),
+        CHANGE("changed", ChatFormatting.GOLD),
+        MOVE("moved", ChatFormatting.GOLD),
+        REMOVE("removed", ChatFormatting.DARK_RED);
         
         private final String id;
-        private final GuiColor colour;
+        private final ChatFormatting colour;
         
-        BaseEditType(String id, GuiColor colour) {
+        BaseEditType(String id, ChatFormatting colour) {
             this.id = id;
             this.colour = colour;
         }
@@ -104,8 +106,8 @@ public enum EditType {
             throw new IllegalArgumentException("Type " + type + " does not have a base type " + this);
         }
         
-        private String translate() {
-            return I18n.get("hqm.editType." + id);
+        private MutableComponent translate() {
+            return Translator.translatable("hqm.editType." + id);
         }
     }
     
@@ -149,8 +151,8 @@ public enum EditType {
             this.id = id;
         }
         
-        private String translate() {
-            return I18n.get("hqm.editType." + id);
+        private MutableComponent translate() {
+            return Translator.translatable("hqm.editType." + id);
         }
     }
 }
