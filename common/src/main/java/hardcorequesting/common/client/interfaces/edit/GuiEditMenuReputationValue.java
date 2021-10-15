@@ -7,15 +7,13 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 
-import java.util.UUID;
-
 public class GuiEditMenuReputationValue extends GuiEditMenu {
     
     private ReputationMarker marker;
     private int value;
     
-    public GuiEditMenuReputationValue(GuiQuestBook gui, UUID playerId, ReputationMarker marker) {
-        super(gui, playerId, true);
+    public GuiEditMenuReputationValue(GuiQuestBook gui, ReputationMarker marker) {
+        super(gui, true);
     
         this.marker = marker;
         this.value = marker.getValue();

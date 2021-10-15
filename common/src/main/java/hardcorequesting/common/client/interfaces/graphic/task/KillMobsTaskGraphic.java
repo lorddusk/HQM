@@ -36,7 +36,7 @@ public class KillMobsTaskGraphic extends IconTaskGraphic<KillMobsTask.Part> {
     @Override
     protected boolean handlePartClick(EditMode mode, KillMobsTask.Part part, int id) {
         if (mode == EditMode.MOB) {
-            PickMobMenu.display(gui, playerId, part.getMob(), part.getCount(), "mobTask",
+            PickMobMenu.display(gui, part.getMob(), part.getCount(), "mobTask",
                     result -> task.setInfo(id, result.getMobId(), result.getAmount()));
             return true;
         } else {

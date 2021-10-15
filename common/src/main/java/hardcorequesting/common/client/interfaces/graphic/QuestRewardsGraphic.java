@@ -218,7 +218,7 @@ public class QuestRewardsGraphic extends Graphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
             if (isOnReputationIcon(gui, mX, mY)) {
-                gui.setEditMenu(new GuiEditMenuReputationReward(gui, playerId, reputationRewards, newRewards -> {
+                gui.setEditMenu(new GuiEditMenuReputationReward(gui, reputationRewards, newRewards -> {
                     rewards.setReputationRewards(newRewards.isEmpty() ? null : newRewards);
                     SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
                 }));
@@ -314,7 +314,7 @@ public class QuestRewardsGraphic extends Graphic {
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
-                        PickItemMenu.display(gui, playerId, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
+                        PickItemMenu.display(gui, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
                                 result -> rewards.setItemReward(result.getWithAmount(), id, !canSelect));
                     }
                 }

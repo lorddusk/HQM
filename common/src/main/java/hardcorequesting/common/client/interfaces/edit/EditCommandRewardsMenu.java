@@ -17,7 +17,6 @@ import net.minecraft.util.StringDecomposer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class EditCommandRewardsMenu extends TextMenu {
@@ -34,8 +33,8 @@ public class EditCommandRewardsMenu extends TextMenu {
     private record Entry(String command, boolean edited)
     {}
     
-    public EditCommandRewardsMenu(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(gui, playerId, "", false, -1, null);
+    public EditCommandRewardsMenu(GuiQuestBook gui, Quest quest) {
+        super(gui, "", false, -1, null);
         this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()
                 .map(s -> new Entry(s, false)).collect(Collectors.toCollection(ArrayList::new));

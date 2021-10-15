@@ -13,8 +13,6 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.UUID;
-
 public class GuiEditMenuRepeat extends GuiEditMenu {
     
     private Quest quest;
@@ -22,8 +20,8 @@ public class GuiEditMenuRepeat extends GuiEditMenu {
     private int days;
     private int hours;
     
-    public GuiEditMenuRepeat(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(gui, playerId, true);
+    public GuiEditMenuRepeat(GuiQuestBook gui, Quest quest) {
+        super(gui, true);
         this.quest = quest;
         this.type = quest.getRepeatInfo().getType();
         days = quest.getRepeatInfo().getDays();

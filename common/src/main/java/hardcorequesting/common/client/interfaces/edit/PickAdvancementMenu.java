@@ -16,7 +16,6 @@ import net.minecraft.network.chat.FormattedText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PickAdvancementMenu extends GuiEditMenu {
@@ -34,12 +33,12 @@ public class PickAdvancementMenu extends GuiEditMenu {
     private final List<String> rawAdvancemenNames;
     private final List<String> advancementNames;
     
-    public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
+    public static void display(GuiQuestBook gui, String advancement, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new PickAdvancementMenu(gui, advancement, resultConsumer));
     }
     
-    private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
-        super(gui, playerId, false);
+    private PickAdvancementMenu(GuiQuestBook gui, String advancement, Consumer<String> resultConsumer) {
+        super(gui, false);
     
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;

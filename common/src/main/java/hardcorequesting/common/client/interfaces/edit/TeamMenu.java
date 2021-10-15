@@ -40,6 +40,7 @@ public class TeamMenu extends GuiEditMenu {
     private static final int INFO_BOX_SRC_Y = 224;
     private static final int REWARD_SETTING_Y = 20;
     
+    private final UUID playerId;
     private final ScrollBar memberScroll;
     private final ExtendedScrollBar<Team> inviteScroll;
     private final LargeButton inviteButton;
@@ -50,7 +51,9 @@ public class TeamMenu extends GuiEditMenu {
     private PlayerEntry selectedEntry;
     
     public TeamMenu(GuiQuestBook gui, UUID playerId) {
-        super(gui, playerId);
+        super(gui);
+        
+        this.playerId = playerId;
         
         addClickable(new LargeButton(gui, "hqm.party.create", 250, 20) {
             @Override
@@ -185,7 +188,7 @@ public class TeamMenu extends GuiEditMenu {
         addClickable(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
-                gui.setEditMenu(new TeamListMenu(gui, playerId, TeamMenu.this));
+                gui.setEditMenu(new TeamListMenu(gui, TeamMenu.this));
             }
         });
         

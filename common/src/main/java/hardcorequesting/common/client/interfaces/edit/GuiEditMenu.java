@@ -6,23 +6,19 @@ import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.UUID;
-
 @Environment(EnvType.CLIENT)
 public abstract class GuiEditMenu extends Graphic {
     
     public static final int BOX_OFFSET = 30;
     private boolean hasButtons;
     protected final GuiQuestBook gui;
-    protected final UUID playerId;
     
-    protected GuiEditMenu(GuiQuestBook gui, UUID playerId) {
+    protected GuiEditMenu(GuiQuestBook gui) {
         this.gui = gui;
-        this.playerId = playerId;
     }
     
-    protected GuiEditMenu(GuiQuestBook gui, UUID playerId, boolean isControlOnFirstPage) {
-        this(gui, playerId);
+    protected GuiEditMenu(GuiQuestBook gui, boolean isControlOnFirstPage) {
+        this(gui);
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
     

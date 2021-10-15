@@ -13,8 +13,6 @@ import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 
-import java.util.UUID;
-
 public class GuiEditMenuTier extends GuiEditMenu {
     
     private static final int ARROW_X_LEFT = 20;
@@ -36,8 +34,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
     private GroupTier original;
     private boolean clicked;
     
-    public GuiEditMenuTier(GuiQuestBook gui, UUID playerId, GroupTier original) {
-        super(gui, playerId, true);
+    public GuiEditMenuTier(GuiQuestBook gui, GroupTier original) {
+        super(gui, true);
         this.original = original;
         this.tier = original.copy();
         

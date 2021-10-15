@@ -14,7 +14,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class LocationMenu extends GuiEditMenu {
@@ -25,12 +24,12 @@ public class LocationMenu extends GuiEditMenu {
     private int radius;
     private String dimension;
     
-    public static void display(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new LocationMenu(gui, playerId, visibility, initPos, initRadius, initDimension, resultConsumer));
+    public static void display(GuiQuestBook gui, VisitLocationTask.Visibility visibility, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new LocationMenu(gui, visibility, initPos, initRadius, initDimension, resultConsumer));
     }
     
-    private LocationMenu(GuiQuestBook gui, UUID playerId, VisitLocationTask.Visibility visibilityIn, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
-        super(gui, playerId, true);
+    private LocationMenu(GuiQuestBook gui, VisitLocationTask.Visibility visibilityIn, BlockPos initPos, int initRadius, String initDimension, Consumer<Result> resultConsumer) {
+        super(gui, true);
     
         this.resultConsumer = resultConsumer;
         this.visibility = visibilityIn;

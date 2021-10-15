@@ -30,7 +30,7 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         
             @Override
             public void onClick() {
-                IntInputMenu.display(gui, playerId, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
+                IntInputMenu.display(gui, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
     

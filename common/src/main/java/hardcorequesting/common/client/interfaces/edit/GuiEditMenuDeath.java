@@ -52,8 +52,8 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private boolean showBest;
     private final ExtendedScrollBar<DeathStat> scrollBar;
     
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook, UUID playerId) {
-        super(guiQuestBook, playerId);
+    public GuiEditMenuDeath(GuiQuestBook guiQuestBook) {
+        super(guiQuestBook);
         
         addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, ScrollBar.Size.LONG, 160, 18, PLAYERS_X,
                 VISIBLE_PLAYERS, () -> DeathStatsManager.getInstance().getDeathStats()));

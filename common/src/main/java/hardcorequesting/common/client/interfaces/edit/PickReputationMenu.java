@@ -11,7 +11,6 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -29,11 +28,11 @@ public class PickReputationMenu extends GuiEditMenu {
     }
     
     public static void display(GuiQuestBook gui, Reputation reputation, Consumer<Reputation> resultConsumer) {
-        gui.setEditMenu(new PickReputationMenu(gui, gui.getPlayer().getUUID(), reputation, resultConsumer));
+        gui.setEditMenu(new PickReputationMenu(gui, reputation, resultConsumer));
     }
     
-    private PickReputationMenu(GuiQuestBook gui, UUID playerId, Reputation reputation, Consumer<Reputation> resultConsumer) {
-        super(gui, playerId);
+    private PickReputationMenu(GuiQuestBook gui, Reputation reputation, Consumer<Reputation> resultConsumer) {
+        super(gui);
         this.resultConsumer = resultConsumer;
         this.selectedReputation = reputation;
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 23, EditReputationGraphic.REPUTATION_LIST_X,

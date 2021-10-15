@@ -71,32 +71,31 @@ public class PickItemMenu<T> extends GuiEditMenu {
     private int amount;
     private ItemPrecision precision;
     private boolean clicked;
-    private TextBoxGroup.TextBox amountTextBox;
     private long lastClicked;
     
     /**
      * Create and display the menu.
      */
-    public static <T> void display(GuiQuestBook gui, UUID playerId, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, playerId, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, T initial, Type<T> type, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, initial, type, 1, false, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, and include text bar for amounts.
      */
-    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, T obj, Type<T> type, int amount, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, obj, type, amount, true, ItemPrecision.PRECISE, false, resultConsumer));
     }
     
     /**
      * Create and display the menu, include text bar for amounts, and allow choice of precision.
      */
-    public static <T> void display(GuiQuestBook gui, UUID playerId, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
-        gui.setEditMenu(new PickItemMenu<>(gui, playerId, obj, type, amount, true, precision, true, resultConsumer));
+    public static <T> void display(GuiQuestBook gui, T obj, Type<T> type, int amount, ItemPrecision precision, Consumer<Result<T>> resultConsumer) {
+        gui.setEditMenu(new PickItemMenu<>(gui, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiQuestBook gui, UUID playerId, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
-        super(gui, playerId, true);
+    private PickItemMenu(GuiQuestBook gui, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
+        super(gui, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
         this.precisionInput = precisionInput;
@@ -110,7 +109,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         playerItems = type.createPlayerEntries(Minecraft.getInstance().player);
         
         if (amountInput) {
-            addTextBox(amountTextBox = new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
+            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
                 protected boolean isCharacterValid(char c, String rest) {
                     return Character.isDigit(c);

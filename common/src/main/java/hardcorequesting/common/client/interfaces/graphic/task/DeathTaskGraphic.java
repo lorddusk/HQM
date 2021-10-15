@@ -31,7 +31,7 @@ public class DeathTaskGraphic extends TaskGraphic {
         
             @Override
             public void onClick() {
-                IntInputMenu.display(gui, playerId, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
+                IntInputMenu.display(gui, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
     }

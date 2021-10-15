@@ -114,7 +114,7 @@ public class EditGroupGraphic extends EditableGraphic {
                     }
                     
                     final int id = i;
-                    PickItemMenu.display(gui, gui.getPlayer().getUUID(), stack, PickItemMenu.Type.ITEM, amount,
+                    PickItemMenu.display(gui, stack, PickItemMenu.Type.ITEM, amount,
                             result -> group.setItem(id, result.getWithAmount()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {

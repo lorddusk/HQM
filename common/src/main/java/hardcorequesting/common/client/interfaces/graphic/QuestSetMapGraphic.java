@@ -505,7 +505,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 SaveHelper.add(EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                PickItemMenu.display(gui, player.getUUID(), quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
+                                PickItemMenu.display(gui, quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                                         result -> {
                                             try {
                                                 quest.setIconStack(result.get());
@@ -526,10 +526,10 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case REPEATABLE:
-                                gui.setEditMenu(new GuiEditMenuRepeat(gui, player.getUUID(), quest));
+                                gui.setEditMenu(new GuiEditMenuRepeat(gui, quest));
                                 break;
                             case REQUIRED_PARENTS:
-                                gui.setEditMenu(new GuiEditMenuParentCount(gui, player.getUUID(), quest));
+                                gui.setEditMenu(new GuiEditMenuParentCount(gui, quest));
                                 break;
                             case QUEST_SELECTION:
                                 if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
@@ -547,7 +547,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case TRIGGER:
-                                gui.setEditMenu(new PickTriggerMenu(gui, player.getUUID(), quest.getTriggerType(), quest.getTriggerTasks(), result -> {
+                                gui.setEditMenu(new PickTriggerMenu(gui, quest.getTriggerType(), quest.getTriggerTasks(), result -> {
                                     quest.setTriggerType(result.type());
                                     quest.setTriggerTasks(Math.max(1, result.count()));
                                     SaveHelper.add(EditType.VISIBILITY_CHANGED);

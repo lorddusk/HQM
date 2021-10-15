@@ -179,7 +179,7 @@ public class EditReputationGraphic extends EditableGraphic {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
                         TextMenu.display(gui, playerId, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
-                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, marker));
+                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, marker));
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         
                         selectedReputation.remove(marker);

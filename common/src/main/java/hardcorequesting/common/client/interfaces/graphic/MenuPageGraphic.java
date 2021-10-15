@@ -191,7 +191,7 @@ public class MenuPageGraphic extends EditableGraphic {
         if (HQMConfig.getInstance().ENABLE_TEAMS && gui.inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
             gui.setEditMenu(new TeamMenu(gui, gui.getPlayer().getUUID()));
         } else if (gui.inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-            gui.setEditMenu(new GuiEditMenuDeath(gui, gui.getPlayer().getUUID()));
+            gui.setEditMenu(new GuiEditMenuDeath(gui));
         } else if (gui.inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
             gui.setPage(BookPage.SetsPage.INSTANCE);
         }

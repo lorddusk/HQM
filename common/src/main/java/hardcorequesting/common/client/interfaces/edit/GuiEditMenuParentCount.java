@@ -9,16 +9,14 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.UUID;
-
 public class GuiEditMenuParentCount extends GuiEditMenu {
     
     private boolean showModifiedParentRequirement;
     private int parentRequirementCount;
     private Quest quest;
     
-    public GuiEditMenuParentCount(GuiQuestBook gui, UUID playerId, Quest quest) {
-        super(gui, playerId, true);
+    public GuiEditMenuParentCount(GuiQuestBook gui, Quest quest) {
+        super(gui, true);
     
         this.quest = quest;
         this.parentRequirementCount = quest._getParentRequirementCount();

@@ -294,7 +294,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     protected void setEditMode(EditMode editMode) {
         if (editMode == EditMode.COMMAND_CREATE || editMode == EditMode.COMMAND_CHANGE) {
-            gui.setEditMenu(new EditCommandRewardsMenu(gui, playerId, quest));
+            gui.setEditMenu(new EditCommandRewardsMenu(gui, quest));
         } else super.setEditMode(editMode);
     }
 }

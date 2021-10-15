@@ -193,10 +193,10 @@ public class EditBagsGraphic extends EditableGraphic {
                         }
                         break;
                     case NORMAL:
-                        gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer().getUUID(), groupTier));
+                        gui.setEditMenu(new GuiEditMenuTier(gui, groupTier));
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer().getUUID(), groupTier.getName(), 110, groupTier::setName);
+                        TextMenu.display(gui, groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {

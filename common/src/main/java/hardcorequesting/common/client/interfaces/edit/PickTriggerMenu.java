@@ -7,7 +7,6 @@ import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.HQMUtil;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PickTriggerMenu extends GuiEditMenu {
@@ -16,8 +15,8 @@ public class PickTriggerMenu extends GuiEditMenu {
     private TriggerType type;
     private int count;
     
-    public PickTriggerMenu(GuiQuestBook gui, UUID playerId, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
-        super(gui, playerId, true);
+    public PickTriggerMenu(GuiQuestBook gui, TriggerType typeIn, int countIn, Consumer<Result> resultConsumer) {
+        super(gui, true);
     
         this.resultConsumer = resultConsumer;
         this.type = typeIn;

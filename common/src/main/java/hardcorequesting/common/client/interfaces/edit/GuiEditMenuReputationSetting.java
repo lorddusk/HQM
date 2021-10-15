@@ -23,6 +23,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     private static final int UPPER_Y = 90;
     private static final int RESULT_Y = 150;
     private static final int BAR_OFFSET_Y = 10;
+    
+    private final UUID playerId;
     private Reputation reputation;
     private int reputationId;
     private ReputationMarker lower;
@@ -32,8 +34,9 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     private int id;
     
     public GuiEditMenuReputationSetting(GuiQuestBook gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
-        super(gui, playerId, true);
+        super(gui, true);
     
+        this.playerId = playerId;
         this.task = task;
         this.id = id;
         ReputationManager reputationManager = ReputationManager.getInstance();
@@ -153,7 +156,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
         super.onClick(mX, mY, b);
         
         if (reputation != null) {
-            ReputationMarker marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
+            ReputationMarker marker = reputation.onActiveClick(gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY);
             if (marker != null) {
                 if (marker.equals(lower)) {
                     lower = null;
@@ -161,7 +164,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
                     lower = marker;
                 }
             } else {
-                marker = reputation.onActiveClick((GuiQuestBook) gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY);
+                marker = reputation.onActiveClick(gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY);
                 if (marker != null) {
                     if (marker.equals(upper)) {
                         upper = null;

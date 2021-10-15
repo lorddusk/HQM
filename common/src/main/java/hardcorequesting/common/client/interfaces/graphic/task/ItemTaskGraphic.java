@@ -195,10 +195,10 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
         if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
             if (task.mayUseFluids()) {
-                PickItemMenu.display(gui, playerId, part.stack, PickItemMenu.Type.ITEM_FLUID, part.required, part.getPrecision(),
+                PickItemMenu.display(gui, part.stack, PickItemMenu.Type.ITEM_FLUID, part.required, part.getPrecision(),
                         result -> task.setItem(result.get(), result.getAmount(), result.getPrecision(), id));
             } else {
-                PickItemMenu.display(gui, playerId, part.getStack(), PickItemMenu.Type.ITEM, part.required, part.getPrecision(),
+                PickItemMenu.display(gui, part.getStack(), PickItemMenu.Type.ITEM, part.required, part.getPrecision(),
                         result -> task.setItem(Either.left(result.get()), result.getAmount(), result.getPrecision(), id));
             }
             return true;

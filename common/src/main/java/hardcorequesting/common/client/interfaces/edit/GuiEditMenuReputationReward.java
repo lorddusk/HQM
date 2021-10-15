@@ -12,7 +12,6 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class GuiEditMenuReputationReward extends GuiEditMenu {
@@ -28,8 +27,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private List<FormattedText> error;
     private final NumberTextBox valueTextBox;
     
-    public GuiEditMenuReputationReward(GuiQuestBook gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
-        super(gui, playerId, true);
+    public GuiEditMenuReputationReward(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+        super(gui, true);
         this.resultConsumer = resultConsumer;
     
         this.rewards = new ArrayList<>();

@@ -30,15 +30,15 @@ public class TextMenu extends GuiEditMenu {
     private final boolean isName;
     
     public static void display(GuiQuestBook gui, UUID playerId, String txt, boolean isName, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new TextMenu(gui, playerId, txt, isName, -1, resultConsumer));
+        gui.setEditMenu(new TextMenu(gui, txt, isName, -1, resultConsumer));
     }
     
-    public static void display(GuiQuestBook gui, UUID playerId, String txt, int limit, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new TextMenu(gui, playerId, txt, true, limit, resultConsumer));
+    public static void display(GuiQuestBook gui,String txt, int limit, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new TextMenu(gui, txt, true, limit, resultConsumer));
     }
     
-    protected TextMenu(GuiQuestBook gui, UUID playerId, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
-        super(gui, playerId, false);
+    protected TextMenu(GuiQuestBook gui, String txt, boolean isName, int limit, Consumer<String> resultConsumer) {
+        super(gui, false);
     
         this.resultConsumer = resultConsumer;
         this.limit = limit;

@@ -7,7 +7,6 @@ import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 
 import java.util.List;
-import java.util.UUID;
 
 public class TeamListMenu extends GuiEditMenu {
     
@@ -30,8 +29,8 @@ public class TeamListMenu extends GuiEditMenu {
     private final TeamMenu parent;
     private int pagePair = 0;
     
-    protected TeamListMenu(GuiQuestBook gui, UUID playerId, TeamMenu parent) {
-        super(gui, playerId);
+    protected TeamListMenu(GuiQuestBook gui, TeamMenu parent) {
+        super(gui);
         this.parent = parent;
     }
     
