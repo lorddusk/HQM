@@ -33,10 +33,10 @@ public final class TaskType<T extends QuestTask<?>> {
     public static final TaskType<BreakBlockTask> BLOCK_BREAK = new TaskType<>("break", BreakBlockTask::new);
     public static final TaskType<PlaceBlockTask> BLOCK_PLACE = new TaskType<>("place", PlaceBlockTask::new);
     
-    private static final Map<String, TaskType<?>> TYPES = ImmutableMap.<String, TaskType<?>>builder().put("consume", CONSUME).put("craft", CRAFT)
-            .put("location", LOCATION).put("consume_qds", CONSUME_QDS).put("detect", DETECT).put("kill", KILL).put("tame", TAME).put("death", DEATH)
-            .put("reputation", REPUTATION).put("reputation_kill", REPUTATION_KILL).put("advancement", ADVANCEMENT).put("completion", COMPLETION)
-            .put("block_break", BLOCK_BREAK).put("block_place", BLOCK_PLACE).build();
+    private static final Map<String, TaskType<?>> TYPES = ImmutableMap.<String, TaskType<?>>builder().put("CONSUME", CONSUME).put("CRAFT", CRAFT)
+            .put("LOCATION", LOCATION).put("CONSUME_QDS", CONSUME_QDS).put("DETECT", DETECT).put("KILL", KILL).put("TAME", TAME).put("DEATH", DEATH)
+            .put("REPUTATION", REPUTATION).put("REPUTATION_KILL", REPUTATION_KILL).put("ADVANCEMENT", ADVANCEMENT).put("COMPLETION", COMPLETION)
+            .put("BLOCK_BREAK", BLOCK_BREAK).put("BLOCK_PLACE", BLOCK_PLACE).build();
     
     private final String id;
     private final TaskConstructor<T> constructor;
@@ -62,7 +62,7 @@ public final class TaskType<T extends QuestTask<?>> {
         TaskType<?> type = TYPES.get(str);
         if (type != null)
             return type;
-        else throw new IllegalArgumentException(str + "is not a valid task type name");
+        else throw new IllegalArgumentException(str + " is not a valid task type name");
     }
     
     public T addTask(Quest quest) {
