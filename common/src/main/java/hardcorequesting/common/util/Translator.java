@@ -54,4 +54,8 @@ public class Translator {
     public static MutableComponent translatable(String id, TextColor color, Object... args) {
         return translatable(id, args).withStyle(Style.EMPTY.withColor(color));
     }
+    
+    public static MutableComponent box(MutableComponent component) {
+        return text("[").append(component).append("]");
+    }
 }

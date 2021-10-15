@@ -16,8 +16,8 @@ import hardcorequesting.common.team.TeamError;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -270,11 +270,11 @@ public class TeamMenu extends GuiEditMenu {
             
             int memberY = PLAYER_Y;
             for (PlayerEntry player : memberScroll.getVisibleEntries(players, VISIBLE_MEMBERS)) {
-                String str = player.getDisplayName();
+                MutableComponent text = Translator.text(player.getDisplayName());
                 if (player.isOwner()) {
-                    str += ChatFormatting.GOLD + " [" + I18n.get("hqm.party.owner") + "]";
+                    text.append(" ").append(Translator.box(Translator.translatable("hqm.party.owner")).withStyle(ChatFormatting.GOLD));
                 } else if (!player.isInTeam()) {
-                    str += ChatFormatting.GRAY + " [" + I18n.get("hqm.party.invite") + "]";
+                    text.append(" ").append(Translator.box(Translator.translatable("hqm.party.invite")).withStyle(ChatFormatting.GRAY));
                 }
                 
                 int color = 0x404040;
@@ -285,7 +285,7 @@ public class TeamMenu extends GuiEditMenu {
                         color = 0x808080;
                     }
                 }
-                gui.drawString(matrices, Translator.plain(str), PLAYER_X, memberY, 0.7F, color);
+                gui.drawString(matrices, text, PLAYER_X, memberY, 0.7F, color);
                 memberY += PLAYER_SPACING;
             }
             

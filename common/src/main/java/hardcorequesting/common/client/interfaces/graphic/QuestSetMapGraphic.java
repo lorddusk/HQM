@@ -203,7 +203,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     MutableComponent component = Translator.text(parent.getName()).withStyle(ChatFormatting.DARK_GRAY);
                     tooltip.add(component);
                     if (parent.isCompleted(playerId)) {
-                        MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed"))
+                        MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed"))
                                 .withStyle(ChatFormatting.WHITE);
                         component.append(" ").append(completedComponent);
                     }
@@ -230,7 +230,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         MutableComponent questComponent = Translator.text(parent.getName() + " (" + parent.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED);
                         tooltip.add(questComponent);
                         if (parent.isCompleted(playerId)) {
-                            MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
+                            MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
                             questComponent.append(" ").append(completedComponent);
                         }
                     }
@@ -279,7 +279,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     MutableComponent component = task.getDescription().withStyle(ChatFormatting.DARK_AQUA);
                     tooltip.add(component);
                     if (task.isCompleted(playerId)) {
-                        component.append(" ").append(box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
+                        component.append(" ").append(Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
                     }
                 }
             }
@@ -384,11 +384,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     private MutableComponent holdingText(boolean holding, String letter) {
-        return box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
-    }
-    
-    private MutableComponent box(MutableComponent component) {
-        return Translator.text("[").append(component).append("]");
+        return Translator.box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
     }
     
     private void drawConnectingLines(PoseStack matrices, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
