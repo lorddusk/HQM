@@ -76,7 +76,6 @@ public class QuestBookItem extends Item {
                                     EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
                                     PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
                                     if (entry != null) {
-                                        entry.setBookOpen(true);
                                         GeneralUsage.sendOpenBook(player, true);
                                     } else {
                                         player.sendMessage(Translator.translatable("hqm.message.bookNoEntry"), Util.NIL_UUID);
@@ -93,7 +92,6 @@ public class QuestBookItem extends Item {
                     EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
                     PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
                     if (entry != null) {
-                        entry.setBookOpen(true);
                         GeneralUsage.sendOpenBook(player, false);
                     } else {
                         player.sendMessage(new TranslatableComponent("hqm.message.bookNoPlayer"), Util.NIL_UUID);

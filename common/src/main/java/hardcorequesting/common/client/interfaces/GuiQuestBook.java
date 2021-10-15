@@ -9,8 +9,6 @@ import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
-import hardcorequesting.common.network.NetworkManager;
-import hardcorequesting.common.network.message.CloseBookMessage;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.util.SaveHelper;
@@ -114,7 +112,6 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void removed() {
-        NetworkManager.sendToServer(new CloseBookMessage(player.getUUID()));
         minecraft.keyboardHandler.setSendRepeatsToGui(false);
         SoundHandler.stopLoreMusic();
     }

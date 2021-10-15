@@ -83,7 +83,6 @@ public enum TeamAction {
                         if (entry.isInTeam()) {
                             id++;
                         } else if (entry.getUUID().equals(player.getUUID())) {
-                            entry.setBookOpen(true);
                             entry.setInTeam(true);
                             QuestingDataManager.getInstance().getQuestingData(player).setTeam(inviteTeam);
                             
