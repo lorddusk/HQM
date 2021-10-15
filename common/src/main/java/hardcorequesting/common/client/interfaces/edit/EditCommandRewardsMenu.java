@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EditCommandRewardsMenu extends TextMenu {
+public class EditCommandRewardsMenu extends AbstractTextMenu {
     
     private static final int START_X = 190, START_Y = 65;
     private static final int END_X = 300;
@@ -38,7 +38,7 @@ public class EditCommandRewardsMenu extends TextMenu {
     }
     
     private EditCommandRewardsMenu(GuiQuestBook gui, Quest quest) {
-        super(gui, "", false, -1, null);
+        super(gui, "");
         this.quest = quest;
         this.commands = this.quest.getRewards().getCommandRewardsAsStrings().stream()
                 .map(s -> new Entry(s, false)).collect(Collectors.toCollection(ArrayList::new));
@@ -47,7 +47,7 @@ public class EditCommandRewardsMenu extends TextMenu {
         if (gui.getCurrentMode() == EditMode.COMMAND_CHANGE) {
             if (!this.commands.isEmpty()) {
                 this.id = this.commands.size() - 1;
-                this.text.setTextAndCursor(this.commands.get(this.id).command);
+                this.textLogic.setTextAndCursor(this.commands.get(this.id).command);
             }
         }
     }
@@ -143,18 +143,18 @@ public class EditCommandRewardsMenu extends TextMenu {
         if (this.id == id) return;
         storeCurrentText();
         this.id = id;
-        this.text.setTextAndCursor(this.commands.get(id).command);
+        this.textLogic.setTextAndCursor(this.commands.get(id).command);
     }
     
     private void selectAddedCommand() {
         if (this.id == -1) return;
         storeCurrentText();
         this.id = -1;
-        this.text.setTextAndCursor(this.added);
+        this.textLogic.setTextAndCursor(this.added);
     }
     
     private void storeCurrentText() {
-        String command = this.text.getText();
+        String command = this.textLogic.getText();
         if (this.id < 0) this.added = command;
         else {
             if (!this.commands.get(this.id).command.equals(command)) {
