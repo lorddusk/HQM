@@ -85,7 +85,11 @@ public class TextBoxGroup implements Drawable, Clickable {
         private final boolean scrollable;
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
-            super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH);
+            this(gui, str, x, y, scrollable, Integer.MAX_VALUE);
+        }
+        
+        public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit) {
+            super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH, charLimit);
             
             this.x = x;
             this.y = y;

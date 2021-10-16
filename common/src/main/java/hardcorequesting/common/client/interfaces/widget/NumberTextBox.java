@@ -11,15 +11,15 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
     private boolean loaded;
     
     public NumberTextBox(GuiBase gui, int x, int y, String title) {
-        super(gui, "", x, y, false);
+        super(gui, "", x, y, false, 32);
         loaded = true;
         reloadText();
         this.title = title;
     }
     
     @Override
-    protected boolean isCharacterValid(char c, String rest) {
-        return rest.length() < 32 && (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
+    protected boolean isCharacterValid(char c) {
+        return (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
     }
     
     protected boolean isNegativeAllowed() {

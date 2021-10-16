@@ -32,10 +32,10 @@ public class EditGroupGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
         this.group = group;
     
-        addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(group.getLimit()), 180, 30, false) {
+        addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(group.getLimit()), 180, 30, false, 3) {
             @Override
-            protected boolean isCharacterValid(char c, String rest) {
-                return rest.length() < 3 && Character.isDigit(c);
+            protected boolean isCharacterValid(char c) {
+                return Character.isDigit(c);
             }
         
             @Override

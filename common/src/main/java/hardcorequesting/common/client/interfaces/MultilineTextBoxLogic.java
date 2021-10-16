@@ -14,7 +14,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     private int cursorLine;
     
     public MultilineTextBoxLogic(GuiBase gui, String text, int width, boolean acceptNewlines) {
-        super(gui, text, width);
+        super(gui, text, width, Integer.MAX_VALUE);
         this.acceptNewlines = acceptNewlines;
     }
     

@@ -111,7 +111,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         if (amountInput) {
             addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
                 @Override
-                protected boolean isCharacterValid(char c, String rest) {
+                protected boolean isCharacterValid(char c) {
                     return Character.isDigit(c);
                 }
                 
@@ -119,7 +119,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
                 public void textChanged() {
                     try {
                         int number;
-                        if (getText().equals("")) {
+                        if (getText().isEmpty()) {
                             number = 1;
                         } else {
                             number = Integer.parseInt(getText());

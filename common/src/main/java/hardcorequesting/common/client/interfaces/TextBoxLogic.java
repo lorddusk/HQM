@@ -19,19 +19,16 @@ public abstract class TextBoxLogic {
     private String text;
     private int width;
     private float mult = 1F;
-    private int maxLength = Integer.MAX_VALUE;
+    private final int maxLength;
     
-    public TextBoxLogic(GuiBase gui, String text, int width) {
+    public TextBoxLogic(GuiBase gui, String text, int width, int charLimit) {
         this.gui = gui;
         this.width = width;
+        maxLength = charLimit;
         setText(Objects.requireNonNullElse(text, ""));
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
-    }
-    
-    public void setMaxLength(int maxLength) {
-        this.maxLength = maxLength;
     }
     
     public float getMult() {
@@ -53,7 +50,7 @@ public abstract class TextBoxLogic {
     private String getValidText(String txt) {
         StringBuilder builder = new StringBuilder();
         for (char c : txt.toCharArray()) {
-            if (isCharacterValid(c, builder.toString())) {
+            if (isCharacterValid(c)) {
                 builder.append(c);
             }
         }
@@ -123,7 +120,7 @@ public abstract class TextBoxLogic {
         return helper.charTyped(c);
     }
     
-    protected boolean isCharacterValid(char c, String rest) {
+    protected boolean isCharacterValid(char c) {
         return SharedConstants.isAllowedChatCharacter(c);
     }
     

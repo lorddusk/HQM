@@ -42,17 +42,17 @@ public class GuiEditMenuTier extends GuiEditMenu {
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             final int id = i;
-            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false) {
+            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false, 6) {
                 @Override
-                protected boolean isCharacterValid(char c, String rest) {
-                    return rest.length() < 6 && Character.isDigit(c);
+                protected boolean isCharacterValid(char c) {
+                    return Character.isDigit(c);
                 }
                 
                 @Override
                 public void textChanged() {
                     try {
                         int number;
-                        if (getText().equals("")) {
+                        if (getText().isEmpty()) {
                             number = 1;
                         } else {
                             number = Integer.parseInt(getText());
