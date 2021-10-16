@@ -14,7 +14,6 @@ public abstract class TextBoxLogic {
     
     private final TextFieldHelper helper;
     protected final GuiBase gui;
-    protected int cursorPositionX, cursorPositionY;
     private int lastCursor;
     private String text;
     private float mult = 1F;
@@ -59,16 +58,6 @@ public abstract class TextBoxLogic {
     
     public String getText() {
         return text;
-    }
-    
-    public int getCursorPositionX() {
-        checkCursor();
-        return cursorPositionX;
-    }
-    
-    public int getCursorPositionY() {
-        checkCursor();
-        return cursorPositionY;
     }
     
     public void checkCursor() {

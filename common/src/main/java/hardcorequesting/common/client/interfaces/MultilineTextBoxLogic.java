@@ -13,6 +13,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     private List<String> lines;
     private int cursorLine;
+    private int cursorPositionX, cursorPositionY;
     
     public MultilineTextBoxLogic(GuiBase gui, String text, int width, boolean acceptNewlines) {
         super(gui, text, Integer.MAX_VALUE);
@@ -27,6 +28,16 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     public List<String> getLines() {
         return lines;
+    }
+    
+    public int getCursorPositionX() {
+        checkCursor();
+        return cursorPositionX;
+    }
+    
+    public int getCursorPositionY() {
+        checkCursor();
+        return cursorPositionY;
     }
     
     @Override
