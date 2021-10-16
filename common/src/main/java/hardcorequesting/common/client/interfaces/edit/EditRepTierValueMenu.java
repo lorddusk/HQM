@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.client.interfaces.widget.NegativeNumberTextBox;
 
 import java.util.function.Consumer;
 
@@ -20,12 +20,7 @@ public class EditRepTierValueMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         this.value = valueIn;
         
-        addTextBox(new NumberTextBox(gui, 25, 30, "hqm.repValue.tierValue", () -> value, value1 -> value = value1) {
-            @Override
-            protected boolean isNegativeAllowed() {
-                return true;
-            }
-        });
+        addTextBox(new NegativeNumberTextBox(gui, 25, 30, "hqm.repValue.tierValue", () -> value, value1 -> value = value1));
     }
     
     @Override

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.NegativeNumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -38,16 +39,11 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         }
         
-        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value",
+        addTextBox(valueTextBox = new NegativeNumberTextBox(gui, 185, 55, "hqm.repReward.value",
                 () -> selectedReward.getValue(), value -> selectedReward.setValue(value)) {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;
-            }
-            
-            @Override
-            protected boolean isNegativeAllowed() {
-                return true;
             }
         });
         

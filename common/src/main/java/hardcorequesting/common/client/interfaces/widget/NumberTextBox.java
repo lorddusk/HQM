@@ -26,11 +26,7 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     
     @Override
     protected boolean isCharacterValid(char c) {
-        return (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
-    }
-    
-    protected boolean isNegativeAllowed() {
-        return false;
+        return Character.isDigit(c);
     }
     
     @Override
@@ -45,7 +41,7 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
         if (loaded) {
             try {
                 int number;
-                if (getText().equals("")) {
+                if (getText().isEmpty()) {
                     number = 1;
                 } else {
                     number = Integer.parseInt(getText());
