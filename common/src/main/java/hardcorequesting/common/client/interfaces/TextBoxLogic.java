@@ -21,7 +21,7 @@ public abstract class TextBoxLogic {
     public TextBoxLogic(GuiBase gui, String text, int charLimit) {
         this.gui = gui;
         maxLength = charLimit;
-        setText(Objects.requireNonNullElse(text, ""));
+        setText(getValidText(Objects.requireNonNullElse(text, "")));
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
@@ -32,7 +32,7 @@ public abstract class TextBoxLogic {
     }
     
     protected boolean isTextValid(String newText) {
-        return newText.length() <= maxLength;
+        return newText.length() <= maxLength && newText.chars().allMatch(value -> isCharacterValid((char) value));
     }
     
     private String getValidText(String txt) {
@@ -42,6 +42,7 @@ public abstract class TextBoxLogic {
                 builder.append(c);
             }
         }
+        
         return builder.toString();
     }
     
@@ -60,7 +61,7 @@ public abstract class TextBoxLogic {
     protected abstract void recalculateCursorDetails(int cursor);
     
     private void setText(String text) {
-        this.text = getValidText(text);
+        this.text = text;
         textChanged();
     }
     
