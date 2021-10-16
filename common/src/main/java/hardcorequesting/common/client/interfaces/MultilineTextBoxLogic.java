@@ -21,7 +21,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     }
     
     public int getCursorLine() {
-        recalculateCursor();
+        checkCursor();
         return cursorLine;
     }
     
@@ -43,23 +43,21 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     }
     
     @Override
-    public void recalculateCursor() {
+    protected void recalculateCursorDetails(int cursor) {
         if (!lines.isEmpty()) {
-            if (getAndClearCursorFlag()) {
-                int tmpCursor = getCursor();
-                for (int i = 0; i < lines.size(); i++) {
-                    if (tmpCursor <= lines.get(i).length()) {
-                        cursorPositionX = (int) (getMult() * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                        cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * getMult());
-                        cursorLine = i;
-                        break;
-                    } else {
-                        tmpCursor -= lines.get(i).length();
-                    }
+            int tmpCursor = cursor;
+            for (int i = 0; i < lines.size(); i++) {
+                if (tmpCursor <= lines.get(i).length()) {
+                    cursorPositionX = (int) (getMult() * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
+                    cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * getMult());
+                    cursorLine = i;
+                    break;
+                } else {
+                    tmpCursor -= lines.get(i).length();
                 }
             }
         } else {
-            super.recalculateCursor();
+            cursorPositionX = cursorPositionY = 0;
         }
     }
 }

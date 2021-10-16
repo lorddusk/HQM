@@ -62,21 +62,22 @@ public abstract class TextBoxLogic {
     }
     
     public int getCursorPositionX() {
-        recalculateCursor();
+        checkCursor();
         return cursorPositionX;
     }
     
     public int getCursorPositionY() {
-        recalculateCursor();
+        checkCursor();
         return cursorPositionY;
     }
     
-    public void recalculateCursor() {
-        if (getAndClearCursorFlag()) {
-            cursorPositionX = (int) (mult * this.gui.getStringWidth(text.substring(0, helper.getCursorPos())));
-            cursorPositionY = 0;
+    public void checkCursor() {
+        if (lastCursor != helper.getCursorPos()) {
+            recalculateCursorDetails(lastCursor = helper.getCursorPos());
         }
     }
+    
+    protected abstract void recalculateCursorDetails(int cursor);
     
     public void setText(String text) {
         this.text = getValidText(text);
@@ -116,14 +117,6 @@ public abstract class TextBoxLogic {
     
     protected int getCursor() {
         return helper.getCursorPos();
-    }
-    
-    protected boolean getAndClearCursorFlag() {
-        if (lastCursor != helper.getCursorPos()) {
-            lastCursor = helper.getCursorPos();
-            return true;
-        }
-        return false;
     }
     
     public void resetCursor() {

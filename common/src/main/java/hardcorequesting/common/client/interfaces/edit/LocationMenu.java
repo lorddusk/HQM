@@ -88,7 +88,7 @@ public class LocationMenu extends GuiEditMenu {
                 this.gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
             }
         });
-        locationBox.recalculateCursor();
+        locationBox.checkCursor();
         
         addTextBox(new TextBoxNumberNegative(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius") {
             @Override

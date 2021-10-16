@@ -134,14 +134,13 @@ public class TextBoxGroup implements Drawable, Clickable {
         
         @Environment(EnvType.CLIENT)
         @Override
-        public void recalculateCursor() {
+        protected void recalculateCursorDetails(int cursor) {
             if (scrollable) {
-                if (getAndClearCursorFlag()) {
-                    updateVisible();
-                    cursorPositionX = (int) (getMult() * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), getCursor() - start))));
-                }
+                updateVisible();
+                cursorPositionX = (int) (getMult() * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
             } else {
-                super.recalculateCursor();
+                cursorPositionX = (int) (getMult() * this.gui.getStringWidth(getText().substring(0, cursor)));
+                cursorPositionY = 0;
             }
         }
         
@@ -167,7 +166,7 @@ public class TextBoxGroup implements Drawable, Clickable {
         
         @Environment(EnvType.CLIENT)
         public void reloadText() {
-            recalculateCursor();
+            checkCursor();
         }
     
         @Environment(EnvType.CLIENT)
