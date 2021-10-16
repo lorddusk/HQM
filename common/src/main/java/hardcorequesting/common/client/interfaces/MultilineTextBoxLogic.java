@@ -9,13 +9,15 @@ import java.util.stream.Collectors;
 public class MultilineTextBoxLogic extends TextBoxLogic {
     
     private final boolean acceptNewlines;
+    private final int width;
     
     private List<String> lines;
     private int cursorLine;
     
     public MultilineTextBoxLogic(GuiBase gui, String text, int width, boolean acceptNewlines) {
-        super(gui, text, width, Integer.MAX_VALUE);
+        super(gui, text, Integer.MAX_VALUE);
         this.acceptNewlines = acceptNewlines;
+        this.width = width;
     }
     
     public int getCursorLine() {
@@ -29,7 +31,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     @Override
     public void textChanged() {
-        lines = this.gui.getLinesFromText(Translator.plain(getText()), getMult(), getWidth()).stream().map(Translator::rawString).collect(Collectors.toList());
+        lines = this.gui.getLinesFromText(Translator.plain(getText()), getMult(), width).stream().map(Translator::rawString).collect(Collectors.toList());
     }
     
     @Override

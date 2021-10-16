@@ -17,13 +17,11 @@ public abstract class TextBoxLogic {
     protected int cursorPositionX, cursorPositionY;
     private int lastCursor;
     private String text;
-    private int width;
     private float mult = 1F;
     private final int maxLength;
     
-    public TextBoxLogic(GuiBase gui, String text, int width, int charLimit) {
+    public TextBoxLogic(GuiBase gui, String text, int charLimit) {
         this.gui = gui;
-        this.width = width;
         maxLength = charLimit;
         setText(Objects.requireNonNullElse(text, ""));
         
@@ -55,14 +53,6 @@ public abstract class TextBoxLogic {
             }
         }
         return builder.toString();
-    }
-    
-    public int getWidth() {
-        return this.width;
-    }
-    
-    public void setWidth(int width) {
-        this.width = width;
     }
     
     public abstract void textChanged();

@@ -80,6 +80,7 @@ public class TextBoxGroup implements Drawable, Clickable {
         protected int offsetY = 3;
         protected final int x;
         protected final int y;
+        private int width;
         private int start;
         private String visibleText;
         private final boolean scrollable;
@@ -89,16 +90,21 @@ public class TextBoxGroup implements Drawable, Clickable {
         }
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit) {
-            super(gui, str, scrollable ? Integer.MAX_VALUE : WIDTH, charLimit);
+            super(gui, str, charLimit);
             
             this.x = x;
             this.y = y;
+            this.width = scrollable ? Integer.MAX_VALUE : WIDTH;
             this.scrollable = scrollable;
+        }
+    
+        public void setWidth(int width) {
+            this.width = width;
         }
     
         @Override
         protected boolean isTextValid(String newText) {
-            return super.isTextValid(newText) && gui.getStringWidth(newText) * getMult() <= getWidth();
+            return super.isTextValid(newText) && gui.getStringWidth(newText) * getMult() <= width;
         }
     
         @Environment(EnvType.CLIENT)
