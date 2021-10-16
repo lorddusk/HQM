@@ -14,6 +14,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     private static final int START_X = 20;
     private static final int START_Y = 20;
     private static final int LINES_PER_PAGE = 21;
+    private static final float TEXT_SCALE = 1F;
     
     protected final MultilineTextBoxLogic textLogic;
     
@@ -24,7 +25,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
             text = text.replace("\n", "\\n");
         }
         
-        this.textLogic = new MultilineTextBoxLogic(gui, text, 140, acceptsNewLines);
+        this.textLogic = new MultilineTextBoxLogic(gui, text, 140, TEXT_SCALE, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
@@ -67,8 +68,8 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         int page = textLogic.getCursorLine() / LINES_PER_PAGE;
-        gui.drawString(matrices, textLogic.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, 1F, 0x404040);
-        gui.drawCursor(matrices, START_X + textLogic.getCursorPositionX() - 1, START_Y + textLogic.getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, 1F, 0xFF909090);
+        gui.drawString(matrices, textLogic.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, TEXT_SCALE, 0x404040);
+        gui.drawCursor(matrices, START_X + textLogic.getCursorPositionX() - 1, START_Y + textLogic.getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, TEXT_SCALE, 0xFF909090);
     }
     
     @Override

@@ -10,15 +10,17 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     private final boolean acceptNewlines;
     private final int width;
+    private final float scale;
     
     private List<String> lines;
     private int cursorLine;
     private int cursorPositionX, cursorPositionY;
     
-    public MultilineTextBoxLogic(GuiBase gui, String text, int width, boolean acceptNewlines) {
+    public MultilineTextBoxLogic(GuiBase gui, String text, int width, float scale, boolean acceptNewlines) {
         super(gui, text, Integer.MAX_VALUE);
         this.acceptNewlines = acceptNewlines;
         this.width = width;
+        this.scale = scale;
     }
     
     public int getCursorLine() {
@@ -42,7 +44,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     @Override
     public void textChanged() {
-        lines = this.gui.getLinesFromText(Translator.plain(getText()), getMult(), width).stream().map(Translator::rawString).collect(Collectors.toList());
+        lines = this.gui.getLinesFromText(Translator.plain(getText()), scale, width).stream().map(Translator::rawString).collect(Collectors.toList());
     }
     
     @Override
@@ -59,8 +61,8 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
             int tmpCursor = cursor;
             for (int i = 0; i < lines.size(); i++) {
                 if (tmpCursor <= lines.get(i).length()) {
-                    cursorPositionX = (int) (getMult() * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                    cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * getMult());
+                    cursorPositionX = (int) (scale * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
+                    cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * scale);
                     cursorLine = i;
                     break;
                 } else {

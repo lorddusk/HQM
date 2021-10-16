@@ -83,6 +83,7 @@ public class TextBoxGroup implements Drawable, Clickable {
         protected int offsetY = 3;
         protected final int x;
         protected final int y;
+        private float scale = 1F;
         
         private int start;
         private String visibleText;
@@ -105,9 +106,13 @@ public class TextBoxGroup implements Drawable, Clickable {
             this.width = width;
         }
     
+        public void setScale(float scale) {
+            this.scale = scale;
+        }
+        
         @Override
         protected boolean isTextValid(String newText) {
-            return super.isTextValid(newText) && gui.getStringWidth(newText) * getMult() <= width;
+            return super.isTextValid(newText) && gui.getStringWidth(newText) * scale <= width;
         }
     
         @Environment(EnvType.CLIENT)
@@ -117,7 +122,7 @@ public class TextBoxGroup implements Drawable, Clickable {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             Vec2 mouse = Points.ofMouse();
             this.gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mouse.x - this.gui.getLeft(), mouse.y - this.gui.getTop()) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
-            this.gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, getMult(), 0x404040);
+            this.gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, scale, 0x404040);
             if (selected) {
                 this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
             }
@@ -140,9 +145,9 @@ public class TextBoxGroup implements Drawable, Clickable {
         protected void recalculateCursorDetails(int cursor) {
             if (scrollable) {
                 updateVisible();
-                cursorPositionX = (int) (getMult() * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
+                cursorPositionX = (int) (scale * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
             } else {
-                cursorPositionX = (int) (getMult() * this.gui.getStringWidth(getText().substring(0, cursor)));
+                cursorPositionX = (int) (scale * this.gui.getStringWidth(getText().substring(0, cursor)));
             }
         }
         
@@ -154,14 +159,14 @@ public class TextBoxGroup implements Drawable, Clickable {
             
             while (start < getCursor()) {
                 String text = getText().substring(start, getCursor());
-                if (this.gui.getStringWidth(text) * getMult() > WIDTH) {
+                if (this.gui.getStringWidth(text) * scale > WIDTH) {
                     start++;
                 } else {
                     break;
                 }
             }
             visibleText = getText().substring(start);
-            while (this.gui.getStringWidth(visibleText) * getMult() > WIDTH) {
+            while (this.gui.getStringWidth(visibleText) * scale > WIDTH) {
                 visibleText = visibleText.substring(0, visibleText.length() - 2);
             }
         }

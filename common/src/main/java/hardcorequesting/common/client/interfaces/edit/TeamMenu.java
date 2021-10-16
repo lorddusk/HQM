@@ -438,7 +438,7 @@ public class TeamMenu extends GuiEditMenu {
     private static class TextBoxName extends TextBoxGroup.TextBox {
         public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
             super(gui, str, x, y, true);
-            setMult(0.7F);
+            setScale(0.7F);
             offsetY = 5;
         }
     }

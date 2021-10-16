@@ -16,7 +16,6 @@ public abstract class TextBoxLogic {
     protected final GuiBase gui;
     private int lastCursor;
     private String text;
-    private float mult = 1F;
     private final int maxLength;
     
     public TextBoxLogic(GuiBase gui, String text, int charLimit) {
@@ -26,14 +25,6 @@ public abstract class TextBoxLogic {
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
-    }
-    
-    public float getMult() {
-        return mult;
-    }
-    
-    public void setMult(float mult) {
-        this.mult = mult;
     }
     
     public void addText(String str) {
@@ -68,7 +59,7 @@ public abstract class TextBoxLogic {
     
     protected abstract void recalculateCursorDetails(int cursor);
     
-    public void setText(String text) {
+    private void setText(String text) {
         this.text = getValidText(text);
         textChanged();
     }
