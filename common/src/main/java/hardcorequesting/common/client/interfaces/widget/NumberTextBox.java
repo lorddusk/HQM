@@ -4,17 +4,24 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.util.Translator;
 
-public abstract class NumberTextBox extends TextBoxGroup.TextBox {
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
+
+public class NumberTextBox extends TextBoxGroup.TextBox {
     
     public static final int TEXT_OFFSET = -10;
-    private String title;
-    private boolean loaded;
+    private final String title;
+    private final boolean loaded;
+    private final IntSupplier getter;
+    private final IntConsumer setter;
     
-    public NumberTextBox(GuiBase gui, int x, int y, String title) {
+    public NumberTextBox(GuiBase gui, int x, int y, String title, IntSupplier getter, IntConsumer setter) {
         super(gui, "", x, y, false, 32);
         loaded = true;
         reloadText();
         this.title = title;
+        this.getter = getter;
+        this.setter = setter;
     }
     
     @Override
@@ -43,7 +50,7 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
                 } else {
                     number = Integer.parseInt(getText());
                 }
-                setValue(number);
+                setter.accept(number);
             } catch (Exception ignored) {
             }
         }
@@ -51,10 +58,6 @@ public abstract class NumberTextBox extends TextBoxGroup.TextBox {
     
     @Override
     public void reloadText() {
-        setTextAndCursor(isVisible() ? String.valueOf(getValue()) : "0");
+        setTextAndCursor(isVisible() ? String.valueOf(getter.getAsInt()) : "0");
     }
-    
-    protected abstract int getValue();
-    
-    protected abstract void setValue(int number);
 }

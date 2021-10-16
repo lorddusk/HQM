@@ -15,12 +15,14 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 public class LocationMenu extends GuiEditMenu {
     
     private final Consumer<Result> resultConsumer;
     private VisitLocationTask.Visibility visibility;
-    private BlockPos.MutableBlockPos pos;
+    private final BlockPos.MutableBlockPos pos;
     private int radius;
     private String dimension;
     
@@ -37,41 +39,11 @@ public class LocationMenu extends GuiEditMenu {
         this.radius = initRadius;
         this.dimension = initDimension;
         
-        addTextBox(new TextBoxNumberNegative(gui, 20, 30, "hqm.locationMenu.xTarget") {
-            @Override
-            protected void setValue(int number) {
-                pos.setX(number);
-            }
-            
-            @Override
-            protected int getValue() {
-                return pos.getX();
-            }
-        });
+        addTextBox(new TextBoxNumberNegative(gui, 20, 30, "hqm.locationMenu.xTarget", pos::getX, pos::setX));
         
-        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + BOX_OFFSET, "hqm.locationMenu.yTarget") {
-            @Override
-            protected void setValue(int number) {
-                pos.setY(number);
-            }
-            
-            @Override
-            protected int getValue() {
-                return pos.getY();
-            }
-        });
+        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + BOX_OFFSET, "hqm.locationMenu.yTarget", pos::getY, pos::setY));
         
-        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + 2 * BOX_OFFSET, "hqm.locationMenu.zTarget") {
-            @Override
-            protected void setValue(int number) {
-                pos.setZ(number);
-            }
-            
-            @Override
-            protected int getValue() {
-                return pos.getZ();
-            }
-        });
+        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + 2 * BOX_OFFSET, "hqm.locationMenu.zTarget", pos::getZ, pos::setZ));
         
         TextBoxGroup.TextBox locationBox;
         addTextBox(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
@@ -90,17 +62,7 @@ public class LocationMenu extends GuiEditMenu {
         });
         locationBox.checkCursor();
         
-        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius") {
-            @Override
-            protected int getValue() {
-                return radius;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                radius = number;
-            }
-            
+        addTextBox(new TextBoxNumberNegative(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius", () -> radius, value -> radius = value) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
@@ -114,9 +76,11 @@ public class LocationMenu extends GuiEditMenu {
             @Override
             public void onClick() {
                 Player player = Minecraft.getInstance().player;
-                pos = new BlockPos.MutableBlockPos(player.getX(), player.getY(), player.getZ());
-                dimension = player.level.dimension().location().toString();
-                reloadTextBoxes();
+                if (player != null) {
+                    pos.set(player.getX(), player.getY(), player.getZ());
+                    dimension = player.level.dimension().location().toString();
+                    reloadTextBoxes();
+                }
             }
         });
         
@@ -147,9 +111,9 @@ public class LocationMenu extends GuiEditMenu {
         resultConsumer.accept(new Result(visibility, pos.immutable(), radius, dimension));
     }
     
-    private abstract static class TextBoxNumberNegative extends NumberTextBox {
-        public TextBoxNumberNegative(GuiQuestBook gui, int x, int y, String title) {
-            super(gui, x, y, title);
+    private static class TextBoxNumberNegative extends NumberTextBox {
+        public TextBoxNumberNegative(GuiQuestBook gui, int x, int y, String title, IntSupplier getter, IntConsumer setter) {
+            super(gui, x, y, title, getter, setter);
         }
         
         @Override

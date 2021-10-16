@@ -26,17 +26,7 @@ public class PickTriggerMenu extends GuiEditMenu {
         this.type = typeIn;
         this.count = countIn;
         
-        addTextBox(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount") {
-            @Override
-            protected int getValue() {
-                return count;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                count = number;
-            }
-            
+        addTextBox(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount", () -> count, value -> count = value) {
             @Override
             protected boolean isVisible() {
                 return type.isUseTaskCount();

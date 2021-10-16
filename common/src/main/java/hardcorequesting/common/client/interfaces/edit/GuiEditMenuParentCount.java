@@ -23,17 +23,8 @@ public class GuiEditMenuParentCount extends GuiEditMenu {
         this.showModifiedParentRequirement = quest.getUseModifiedParentRequirement();
         if (!showModifiedParentRequirement) this.parentRequirementCount = quest.getRequirements().size();
         
-        addTextBox(new NumberTextBox(gui, 25, 105, "hqm.parentCount.count") {
-            @Override
-            protected int getValue() {
-                return parentRequirementCount;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                parentRequirementCount = number;
-            }
-            
+        addTextBox(new NumberTextBox(gui, 25, 105, "hqm.parentCount.count",
+                () -> parentRequirementCount, value -> parentRequirementCount = value) {
             @Override
             protected boolean isVisible() {
                 return showModifiedParentRequirement;

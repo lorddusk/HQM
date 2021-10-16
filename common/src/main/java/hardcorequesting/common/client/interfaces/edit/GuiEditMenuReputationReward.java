@@ -38,7 +38,8 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         }
         
-        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value") {
+        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value",
+                () -> selectedReward.getValue(), value -> selectedReward.setValue(value)) {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;
@@ -47,16 +48,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             @Override
             protected boolean isNegativeAllowed() {
                 return true;
-            }
-            
-            @Override
-            protected int getValue() {
-                return selectedReward.getValue();
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                selectedReward.setValue(number);
             }
         });
         

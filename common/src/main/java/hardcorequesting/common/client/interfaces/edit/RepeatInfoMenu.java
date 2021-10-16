@@ -11,6 +11,8 @@ import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 public class RepeatInfoMenu extends GuiEditMenu {
     
@@ -31,34 +33,14 @@ public class RepeatInfoMenu extends GuiEditMenu {
         days = info.getDays();
         hours = info.getHours();
         
-        addTextBox(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days") {
-            @Override
-            protected int getValue() {
-                return days;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                days = number;
-            }
-        });
+        addTextBox(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days", () -> days, value -> days = value));
         
-        addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours") {
+        addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours", () -> hours, value -> hours = value) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
     
                 this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
-            }
-            
-            @Override
-            protected int getValue() {
-                return hours;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                hours = number;
             }
         });
         
@@ -89,10 +71,10 @@ public class RepeatInfoMenu extends GuiEditMenu {
         resultConsumer.accept(new RepeatInfo(type, days, hours));
     }
     
-    private abstract class TextBoxHidden extends NumberTextBox {
+    private class TextBoxHidden extends NumberTextBox {
         
-        public TextBoxHidden(GuiQuestBook gui, int x, int y, String title) {
-            super(gui, x, y, title);
+        public TextBoxHidden(GuiQuestBook gui, int x, int y, String title, IntSupplier getter, IntConsumer setter) {
+            super(gui, x, y, title, getter, setter);
         }
         
         @Override

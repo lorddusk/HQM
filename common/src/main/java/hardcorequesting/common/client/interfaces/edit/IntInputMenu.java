@@ -20,17 +20,7 @@ public class IntInputMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        addTextBox(new NumberTextBox(gui, 25, 30, title) {
-            @Override
-            protected int getValue() {
-                return amount;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                amount = number;
-            }
-        });
+        addTextBox(new NumberTextBox(gui, 25, 30, title, () -> amount, value -> amount = value));
     }
     
     @Override
