@@ -7,29 +7,24 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Objects;
-
 @Environment(EnvType.CLIENT)
 public abstract class TextBoxLogic {
     
     private final TextFieldHelper helper;
-    protected final GuiBase gui;
     private int lastCursor;
     private String text;
     private final int maxLength;
     
-    public TextBoxLogic(GuiBase gui, String text, int charLimit) {
-        this.gui = gui;
+    public TextBoxLogic(String text, int charLimit) {
         maxLength = charLimit;
-        this.text = getValidText(Objects.requireNonNullElse(text, ""));
+        this.text = text;
         
         helper = new TextFieldHelper(this::getText, this::setText, this::getStrippedClipboard,
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
     }
     
     protected String getStrippedClipboard() {
-        String text = TextFieldHelper.getClipboardContents(Minecraft.getInstance());
-        return getValidText(text);
+        return TextFieldHelper.getClipboardContents(Minecraft.getInstance());
     }
     
     public void addText(String str) {
@@ -38,10 +33,6 @@ public abstract class TextBoxLogic {
     
     protected boolean isTextValid(String newText) {
         return newText.length() <= maxLength;
-    }
-    
-    protected String getValidText(String txt) {
-        return SharedConstants.filterText(txt);
     }
     
     public abstract void textChanged();

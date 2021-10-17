@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces;
 
 import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 public class MultilineTextBoxLogic extends TextBoxLogic {
     
+    protected final GuiBase gui;
     private final boolean acceptNewlines;
     private final int width;
     private final float scale;
@@ -16,8 +18,9 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     private int cursorLine;
     private int cursorPositionX, cursorPositionY;
     
-    public MultilineTextBoxLogic(GuiBase gui, String text, int width, float scale, boolean acceptNewlines) {
-        super(gui, text, Integer.MAX_VALUE);
+    public MultilineTextBoxLogic(GuiBase gui, @NotNull String text, int width, float scale, boolean acceptNewlines) {
+        super(acceptNewlines ? text : text.replace("\n", ""), Integer.MAX_VALUE);
+        this.gui = gui;
         this.acceptNewlines = acceptNewlines;
         this.width = width;
         this.scale = scale;

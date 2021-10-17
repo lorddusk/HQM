@@ -33,8 +33,8 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     }
     
     @Override
-    protected String getValidText(String txt) {
-        return super.getValidText(txt).replaceAll(allowNegative ? "[^0-9-]" : "[^0-9]", "");
+    protected String getStrippedClipboard() {
+        return super.getStrippedClipboard().replaceAll(allowNegative ? "[^0-9-]" : "[^0-9]", "");
     }
     
     @Override

@@ -9,10 +9,12 @@ import hardcorequesting.common.client.interfaces.TextBoxLogic;
 import hardcorequesting.common.util.Points;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.SharedConstants;
 import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TextBoxGroup implements Drawable, Clickable {
     
@@ -77,7 +79,8 @@ public class TextBoxGroup implements Drawable, Clickable {
     public static class TextBox extends TextBoxLogic {
         
         private static final int WIDTH = 60;
-        
+    
+        protected final GuiBase gui;
         private final boolean scrollable;
         private int width;
         protected int offsetY = 3;
@@ -94,8 +97,9 @@ public class TextBoxGroup implements Drawable, Clickable {
         }
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit) {
-            super(gui, str, charLimit);
+            super(SharedConstants.filterText(Objects.requireNonNullElse(str, "")), charLimit);
             
+            this.gui = gui;
             this.x = x;
             this.y = y;
             this.width = scrollable ? Integer.MAX_VALUE : WIDTH;
@@ -119,6 +123,11 @@ public class TextBoxGroup implements Drawable, Clickable {
             return super.isTextValid(newText) && gui.getStringWidth(newText) * scale <= width;
         }
     
+        @Override
+        protected String getStrippedClipboard() {
+            return SharedConstants.filterText(super.getStrippedClipboard());
+        }
+    
         @Environment(EnvType.CLIENT)
         protected void draw(PoseStack matrices, boolean selected) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -128,6 +137,7 @@ public class TextBoxGroup implements Drawable, Clickable {
             this.gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mouse.x - this.gui.getLeft(), mouse.y - this.gui.getTop()) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
             this.gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, scale, 0x404040);
             if (selected) {
+                checkCursor();
                 this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
             }
         }

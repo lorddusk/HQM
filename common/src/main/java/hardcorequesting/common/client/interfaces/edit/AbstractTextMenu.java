@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.FormattedText;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public abstract class AbstractTextMenu extends GuiEditMenu {
@@ -25,7 +26,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
             text = text.replace("\n", "\\n");
         }
         
-        this.textLogic = new MultilineTextBoxLogic(gui, text, 140, TEXT_SCALE, acceptsNewLines);
+        this.textLogic = new MultilineTextBoxLogic(gui, Objects.requireNonNullElse(text, ""), 140, TEXT_SCALE, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
