@@ -91,5 +91,7 @@ public abstract class ArrowSelectionHelper implements Drawable, Clickable {
     
     protected abstract FormattedText getArrowText();
     
-    protected abstract FormattedText getArrowDescription();
+    protected FormattedText getArrowDescription() {
+        return null;
+    }
 }

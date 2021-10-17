@@ -6,7 +6,7 @@ import hardcorequesting.common.bag.*;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
+import hardcorequesting.common.client.interfaces.edit.EditBagTierMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -193,7 +193,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         }
                         break;
                     case NORMAL:
-                        gui.setEditMenu(new GuiEditMenuTier(gui, groupTier));
+                        EditBagTierMenu.display(gui, groupTier);
                         break;
                     case RENAME:
                         TextMenu.display(gui, groupTier.getName(), 110, groupTier::setName);
