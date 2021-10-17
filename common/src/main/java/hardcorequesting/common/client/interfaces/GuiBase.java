@@ -9,6 +9,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -340,5 +341,9 @@ public class GuiBase extends Screen {
             str = Translator.plain("Missing info");
         }
         return font.getSplitter().splitLines(str, (int) (width / mult), Style.EMPTY);
+    }
+    
+    public Font getFont() {
+        return font;
     }
 }

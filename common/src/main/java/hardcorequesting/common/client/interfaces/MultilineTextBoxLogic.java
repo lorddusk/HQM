@@ -1,10 +1,10 @@
 package hardcorequesting.common.client.interfaces;
 
-import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.Style;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MultilineTextBoxLogic extends TextBoxLogic {
     
@@ -12,7 +12,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     private final int width;
     private final float scale;
     
-    private List<String> lines;
+    private final List<String> lines = new ArrayList<>();
     private int cursorLine;
     private int cursorPositionX, cursorPositionY;
     
@@ -50,7 +50,11 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     }
     
     private void initLines() {
-        lines = this.gui.getLinesFromText(Translator.plain(getText()), scale, width).stream().map(Translator::rawString).collect(Collectors.toList());
+        lines.clear();
+    
+        String text = getText();
+        gui.getFont().getSplitter().splitLines(text, (int) (width / scale), Style.EMPTY, true,
+                (style, start, end) -> lines.add(text.substring(start, end)));
     }
     
     @Override
