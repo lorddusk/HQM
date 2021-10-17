@@ -40,15 +40,8 @@ public abstract class TextBoxLogic {
         return newText.length() <= maxLength;
     }
     
-    private String getValidText(String txt) {
-        StringBuilder builder = new StringBuilder();
-        for (char c : txt.toCharArray()) {
-            if (isCharacterValid(c)) {
-                builder.append(c);
-            }
-        }
-        
-        return builder.toString();
+    protected String getValidText(String txt) {
+        return SharedConstants.filterText(txt);
     }
     
     public abstract void textChanged();
@@ -94,13 +87,9 @@ public abstract class TextBoxLogic {
     }
     
     public boolean onCharTyped(char c) {
-        if (isCharacterValid(c))
+        if (SharedConstants.isAllowedChatCharacter(c))
             return helper.charTyped(c);
         else return false;
-    }
-    
-    protected boolean isCharacterValid(char c) {
-        return SharedConstants.isAllowedChatCharacter(c);
     }
     
     protected int getCursor() {

@@ -33,8 +33,15 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     }
     
     @Override
-    protected boolean isCharacterValid(char c) {
-        return Character.isDigit(c) || allowNegative && c == '-';
+    protected String getValidText(String txt) {
+        return super.getValidText(txt).replaceAll(allowNegative ? "[^0-9-]" : "[^0-9]", "");
+    }
+    
+    @Override
+    public boolean onCharTyped(char c) {
+        if (Character.isDigit(c) || allowNegative && c == '-')
+            return super.onCharTyped(c);
+        else return false;
     }
     
     @Override
