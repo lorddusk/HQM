@@ -87,6 +87,10 @@ public abstract class TextBoxLogic {
         return helper.getCursorPos();
     }
     
+    protected void setCursor(int cursor) {
+        helper.setCursorPos(cursor, false);
+    }
+    
     public void resetCursor() {
         helper.setCursorToEnd();
     }

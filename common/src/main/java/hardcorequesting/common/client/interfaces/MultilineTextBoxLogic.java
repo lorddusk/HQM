@@ -68,7 +68,13 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     @Override
     public boolean onKeyStroke(int k) {
-        if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
+        if (k == GLFW.GLFW_KEY_UP) {
+            changeLine(-1);
+            return true;
+        } else if (k == GLFW.GLFW_KEY_DOWN) {
+            changeLine(1);
+            return true;
+        } else if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
             addText("\n");
             return true;
         } else return super.onKeyStroke(k);
@@ -85,6 +91,18 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
             cursorLine = i;
         } else {
             cursorPositionX = cursorPositionY = 0;
+        }
+    }
+    
+    private void changeLine(int direction) {
+        int cursor = getCursor();
+        int line = getLineFor(cursor);
+        int newLineId = line + direction;
+        if (0 <= newLineId && newLineId < lines.size()) {
+            int offset = getCursor() - lines.get(line).start();
+            Line newLine = lines.get(newLineId);
+            int newOffset = Math.min(offset, newLine.text().length());
+            setCursor(newLine.start() + newOffset);
         }
     }
     
