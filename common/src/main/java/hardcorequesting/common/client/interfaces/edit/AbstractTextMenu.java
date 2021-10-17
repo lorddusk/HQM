@@ -22,10 +22,6 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     protected AbstractTextMenu(GuiQuestBook gui, String text, boolean acceptsNewLines) {
         super(gui, false);
     
-        if (text != null && !text.isEmpty()) {
-            text = text.replace("\n", "\\n");
-        }
-        
         this.textLogic = new MultilineTextBoxLogic(gui, Objects.requireNonNullElse(text, ""), 140, TEXT_SCALE, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
@@ -39,9 +35,6 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
             @Override
             public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
-                if (!clip.isEmpty()) {
-                    clip = clip.replace("\n", "\\n");
-                }
                 textLogic.addText(clip);
             }
         });
@@ -57,9 +50,6 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
             @Override
             public void onClick() {
                 String clip = Minecraft.getInstance().keyboardHandler.getClipboard();
-                if (!clip.isEmpty()) {
-                    clip = clip.replace("\n", "\\n");
-                }
                 textLogic.setTextAndCursor(clip);
             }
         });

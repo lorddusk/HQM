@@ -40,10 +40,6 @@ public class TextMenu extends AbstractTextMenu {
             str = I18n.get("hqm.textEditor.unnamed");
         }
         
-        if (!isName) {
-            str = str.replace("\\n", "\n");
-        }
-    
         if (limit >= 0) {
             while (gui.getStringWidth(str) > limit) {
                 str = str.substring(0, str.length() - 1);

@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces;
 
 import net.minecraft.network.chat.Style;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -57,14 +58,18 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
         lines.clear();
     
         String text = getText();
-        gui.getFont().getSplitter().splitLines(text, (int) (width / scale), Style.EMPTY, true,
-                (style, start, end) -> lines.add(new Line(text.substring(start, end), start)));
+        gui.getFont().getSplitter().splitLines(text, (int) (width / scale), Style.EMPTY, true, (style, start, end) -> {
+            String lineText = StringUtils.stripEnd(text.substring(start, end), " \n");
+            lines.add(new Line(lineText, start));
+        });
+        if (!text.isEmpty() && text.charAt(text.length() - 1) == '\n')
+            lines.add(new Line("", text.length()));
     }
     
     @Override
     public boolean onKeyStroke(int k) {
         if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
-            addText("\\n");
+            addText("\n");
             return true;
         } else return super.onKeyStroke(k);
     }
