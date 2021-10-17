@@ -33,7 +33,7 @@ public class EditGroupGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
         this.group = group;
     
-        addTextBox(new NumberTextBox(gui, 180, 30, FormattedText.EMPTY, group::getLimit, group::setLimit, 3));
+        addTextBox(new NumberTextBox(gui, 180, 30, FormattedText.EMPTY, false, 3, group::getLimit, group::setLimit));
     }
     
     @Override

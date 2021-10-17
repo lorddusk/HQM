@@ -13,22 +13,28 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     private final FormattedText title;
     private final IntSupplier getter;
     private final IntConsumer setter;
+    private final boolean allowNegative;
     
     public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, IntSupplier getter, IntConsumer setter) {
-        this(gui, x, y, title, getter, setter, 32);
+        this(gui, x, y, title, false, getter, setter);
     }
     
-    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, IntSupplier getter, IntConsumer setter, int charLimit) {
+    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, boolean allowNegative, IntSupplier getter, IntConsumer setter) {
+        this(gui, x, y, title, allowNegative, 32, getter, setter);
+    }
+    
+    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, boolean allowNegative, int charLimit, IntSupplier getter, IntConsumer setter) {
         super(gui, "", x, y, false, charLimit);
         this.title = title;
         this.getter = getter;
         this.setter = setter;
+        this.allowNegative = allowNegative;
         reloadText();
     }
     
     @Override
     protected boolean isCharacterValid(char c) {
-        return Character.isDigit(c);
+        return Character.isDigit(c) || allowNegative && c == '-';
     }
     
     @Override

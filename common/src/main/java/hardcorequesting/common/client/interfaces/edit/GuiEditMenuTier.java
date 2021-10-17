@@ -44,7 +44,7 @@ public class GuiEditMenuTier extends GuiEditMenu {
         for (int i = 0; i < values.length; i++) {
             final int id = i;
             addTextBox(new NumberTextBox(gui, TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y,
-                    FormattedText.EMPTY, () -> tier.getWeights()[id], value -> tier.getWeights()[id] = value, 6));
+                    FormattedText.EMPTY, false, 6, () -> tier.getWeights()[id], value -> tier.getWeights()[id] = value));
         }
     }
     

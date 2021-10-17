@@ -2,7 +2,10 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.widget.*;
+import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
@@ -34,11 +37,11 @@ public class LocationMenu extends GuiEditMenu {
         this.radius = initRadius;
         this.dimension = initDimension;
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30, Translator.translatable("hqm.locationMenu.xTarget"), pos::getX, pos::setX));
+        addTextBox(new NumberTextBox(gui, 20, 30, Translator.translatable("hqm.locationMenu.xTarget"), true, pos::getX, pos::setX));
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + BOX_OFFSET, Translator.translatable("hqm.locationMenu.yTarget"), pos::getY, pos::setY));
+        addTextBox(new NumberTextBox(gui, 20, 30 + BOX_OFFSET, Translator.translatable("hqm.locationMenu.yTarget"), true, pos::getY, pos::setY));
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.zTarget"), pos::getZ, pos::setZ));
+        addTextBox(new NumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.zTarget"), true, pos::getZ, pos::setZ));
         
         TextBoxGroup.TextBox locationBox;
         addTextBox(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
@@ -57,7 +60,7 @@ public class LocationMenu extends GuiEditMenu {
         });
         locationBox.checkCursor();
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 4 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.radius"), () -> radius, value -> radius = value) {
+        addTextBox(new NumberTextBox(gui, 20, 30 + 4 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.radius"), true, () -> radius, value -> radius = value) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
