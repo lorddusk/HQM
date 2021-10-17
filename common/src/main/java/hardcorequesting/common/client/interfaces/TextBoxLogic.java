@@ -23,8 +23,13 @@ public abstract class TextBoxLogic {
         maxLength = charLimit;
         this.text = getValidText(Objects.requireNonNullElse(text, ""));
         
-        helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
+        helper = new TextFieldHelper(this::getText, this::setText, this::getStrippedClipboard,
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
+    }
+    
+    protected String getStrippedClipboard() {
+        String text = TextFieldHelper.getClipboardContents(Minecraft.getInstance());
+        return getValidText(text);
     }
     
     public void addText(String str) {
@@ -32,7 +37,7 @@ public abstract class TextBoxLogic {
     }
     
     protected boolean isTextValid(String newText) {
-        return newText.length() <= maxLength && newText.chars().allMatch(value -> isCharacterValid((char) value));
+        return newText.length() <= maxLength;
     }
     
     private String getValidText(String txt) {
@@ -89,7 +94,9 @@ public abstract class TextBoxLogic {
     }
     
     public boolean onCharTyped(char c) {
-        return helper.charTyped(c);
+        if (isCharacterValid(c))
+            return helper.charTyped(c);
+        else return false;
     }
     
     protected boolean isCharacterValid(char c) {
