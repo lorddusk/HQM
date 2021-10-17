@@ -62,7 +62,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
             String lineText = StringUtils.stripEnd(text.substring(start, end), " \n");
             lines.add(new Line(lineText, start));
         });
-        if (!text.isEmpty() && text.charAt(text.length() - 1) == '\n')
+        if (text.isEmpty() || text.charAt(text.length() - 1) == '\n')
             lines.add(new Line("", text.length()));
     }
     
@@ -73,6 +73,12 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
             return true;
         } else if (k == GLFW.GLFW_KEY_DOWN) {
             changeLine(1);
+            return true;
+        } else if (k == GLFW.GLFW_KEY_HOME) {
+            setHome();
+            return true;
+        } else if (k == GLFW.GLFW_KEY_END) {
+            setEnd();
             return true;
         } else if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
             addText("\n");
@@ -92,6 +98,16 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
         } else {
             cursorPositionX = cursorPositionY = 0;
         }
+    }
+    
+    private void setHome() {
+        Line line = lines.get(getLineFor(getCursor()));
+        setCursor(line.start());
+    }
+    
+    private void setEnd() {
+        Line line = lines.get(getLineFor(getCursor()));
+        setCursor(line.start() + line.text().length());
     }
     
     private void changeLine(int direction) {
