@@ -21,7 +21,7 @@ public abstract class TextBoxLogic {
     public TextBoxLogic(GuiBase gui, String text, int charLimit) {
         this.gui = gui;
         maxLength = charLimit;
-        setText(getValidText(Objects.requireNonNullElse(text, "")));
+        this.text = getValidText(Objects.requireNonNullElse(text, ""));
         
         helper = new TextFieldHelper(this::getText, this::setText, TextFieldHelper.createClipboardGetter(Minecraft.getInstance()),
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);

@@ -21,6 +21,8 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
         this.acceptNewlines = acceptNewlines;
         this.width = width;
         this.scale = scale;
+        
+        initLines();
     }
     
     public int getCursorLine() {
@@ -44,6 +46,10 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
     @Override
     public void textChanged() {
+        initLines();
+    }
+    
+    private void initLines() {
         lines = this.gui.getLinesFromText(Translator.plain(getText()), scale, width).stream().map(Translator::rawString).collect(Collectors.toList());
     }
     

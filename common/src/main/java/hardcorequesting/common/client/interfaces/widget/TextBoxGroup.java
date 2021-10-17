@@ -100,6 +100,10 @@ public class TextBoxGroup implements Drawable, Clickable {
             this.y = y;
             this.width = scrollable ? Integer.MAX_VALUE : WIDTH;
             this.scrollable = scrollable;
+    
+            if (scrollable) {
+                updateVisible();
+            }
         }
     
         public void setWidth(int width) {

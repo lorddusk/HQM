@@ -42,7 +42,7 @@ public class EditGroupGraphic extends EditableGraphic {
             public void textChanged() {
                 try {
                     int number;
-                    if (getText().equals("")) {
+                    if (getText().isEmpty()) {
                         number = 1;
                     } else {
                         number = Integer.parseInt(getText());
