@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MultilineTextBoxLogic extends TextBoxLogic {
     
@@ -14,7 +15,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     private final int width;
     private final float scale;
     
-    private final List<String> lines = new ArrayList<>();
+    private final List<Line> lines = new ArrayList<>();
     private int cursorLine;
     private int cursorPositionX, cursorPositionY;
     
@@ -34,7 +35,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     }
     
     public List<String> getLines() {
-        return lines;
+        return lines.stream().map(Line::text).collect(Collectors.toList());
     }
     
     public int getCursorPositionX() {
@@ -57,7 +58,7 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     
         String text = getText();
         gui.getFont().getSplitter().splitLines(text, (int) (width / scale), Style.EMPTY, true,
-                (style, start, end) -> lines.add(text.substring(start, end)));
+                (style, start, end) -> lines.add(new Line(text.substring(start, end), start)));
     }
     
     @Override
@@ -71,19 +72,24 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     @Override
     protected void recalculateCursorDetails(int cursor) {
         if (!lines.isEmpty()) {
-            int tmpCursor = cursor;
-            for (int i = 0; i < lines.size(); i++) {
-                if (tmpCursor <= lines.get(i).length()) {
-                    cursorPositionX = (int) (scale * this.gui.getStringWidth(lines.get(i).substring(0, tmpCursor)));
-                    cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * scale);
-                    cursorLine = i;
-                    break;
-                } else {
-                    tmpCursor -= lines.get(i).length();
-                }
-            }
+            int i = getLineFor(cursor);
+            Line line = lines.get(i);
+            String text = getText().substring(line.start(), cursor);
+            cursorPositionX = (int) (scale * this.gui.getStringWidth(text));
+            cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * scale);
+            cursorLine = i;
         } else {
             cursorPositionX = cursorPositionY = 0;
         }
     }
+    
+    private int getLineFor(int cursor) {
+        for (int i = 0; i < lines.size(); i++) {
+            if (cursor < lines.get(i).start)
+                return i - 1;
+        }
+        return lines.size() - 1;
+    }
+    
+    private static record Line(String text, int start) {}
 }
