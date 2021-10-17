@@ -34,11 +34,11 @@ public class LocationMenu extends GuiEditMenu {
         this.radius = initRadius;
         this.dimension = initDimension;
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30, "hqm.locationMenu.xTarget", pos::getX, pos::setX));
+        addTextBox(new NegativeNumberTextBox(gui, 20, 30, Translator.translatable("hqm.locationMenu.xTarget"), pos::getX, pos::setX));
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + BOX_OFFSET, "hqm.locationMenu.yTarget", pos::getY, pos::setY));
+        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + BOX_OFFSET, Translator.translatable("hqm.locationMenu.yTarget"), pos::getY, pos::setY));
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, "hqm.locationMenu.zTarget", pos::getZ, pos::setZ));
+        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.zTarget"), pos::getZ, pos::setZ));
         
         TextBoxGroup.TextBox locationBox;
         addTextBox(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
@@ -57,7 +57,7 @@ public class LocationMenu extends GuiEditMenu {
         });
         locationBox.checkCursor();
         
-        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 4 * BOX_OFFSET, "hqm.locationMenu.radius", () -> radius, value -> radius = value) {
+        addTextBox(new NegativeNumberTextBox(gui, 20, 30 + 4 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.radius"), () -> radius, value -> radius = value) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);

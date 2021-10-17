@@ -39,7 +39,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         }
         
-        addTextBox(valueTextBox = new NegativeNumberTextBox(gui, 185, 55, "hqm.repReward.value",
+        addTextBox(valueTextBox = new NegativeNumberTextBox(gui, 185, 55, Translator.translatable("hqm.repReward.value"),
                 () -> selectedReward.getValue(), value -> selectedReward.setValue(value)) {
             @Override
             protected boolean isVisible() {

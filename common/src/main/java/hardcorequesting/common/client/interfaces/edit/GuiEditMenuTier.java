@@ -8,10 +8,11 @@ import hardcorequesting.common.bag.TierColor;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
 public class GuiEditMenuTier extends GuiEditMenu {
     
@@ -42,28 +43,8 @@ public class GuiEditMenuTier extends GuiEditMenu {
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             final int id = i;
-            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(tier.getWeights()[id]), TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y, false, 6) {
-                @Override
-                protected boolean isCharacterValid(char c) {
-                    return Character.isDigit(c);
-                }
-                
-                @Override
-                public void textChanged() {
-                    try {
-                        int number;
-                        if (getText().isEmpty()) {
-                            number = 1;
-                        } else {
-                            number = Integer.parseInt(getText());
-                        }
-                        
-                        tier.getWeights()[id] = number;
-                    } catch (Exception ignored) {
-                    }
-                    
-                }
-            });
+            addTextBox(new NumberTextBox(gui, TIERS_WEIGHTS_X + TIERS_TEXT_BOX_X, TIERS_WEIGHTS_Y + TIERS_WEIGHTS_SPACING * id + TIERS_TEXT_BOX_Y,
+                    FormattedText.EMPTY, () -> tier.getWeights()[id], value -> tier.getWeights()[id] = value, 6));
         }
     }
     

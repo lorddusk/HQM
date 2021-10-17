@@ -55,7 +55,7 @@ public class PickMobMenu extends GuiEditMenu {
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickMobMenu.this.mobs));
         
-        addTextBox(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills", () -> amount, value -> amount = value));
+        addTextBox(new NumberTextBox(gui, 180, 150, Translator.translatable("hqm." + textKey + ".reqKills"), () -> amount, value -> amount = value));
         
         addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
             @Override

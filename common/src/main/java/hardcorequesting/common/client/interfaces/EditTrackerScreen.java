@@ -61,7 +61,7 @@ public class EditTrackerScreen extends GuiBase {
                 return tracker.getTrackerType().getDescription();
             }
         };
-        textBoxes.add(new NumberTextBox(this, 20, 130, "hqm.menuTracker.radius.title", tracker::getRadius, tracker::setRadius) {
+        textBoxes.add(new NumberTextBox(this, 20, 130, Translator.translatable("hqm.menuTracker.radius.title"), tracker::getRadius, tracker::setRadius) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);

@@ -8,6 +8,7 @@ import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
@@ -94,14 +95,14 @@ public class PickItemMenu<T> extends GuiEditMenu {
         gui.setEditMenu(new PickItemMenu<>(gui, obj, type, amount, true, precision, true, resultConsumer));
     }
     
-    private PickItemMenu(GuiQuestBook gui, T element, final Type<T> type, final int amount, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
+    private PickItemMenu(GuiQuestBook gui, T element, final Type<T> type, final int amountIn, boolean amountInput, ItemPrecision precision, boolean precisionInput, Consumer<Result<T>> resultConsumer) {
         super(gui, true);
         this.resultConsumer = resultConsumer;
         this.type = type;
         this.precisionInput = precisionInput;
         
         this.selected = type.copyWith(element, 1);
-        this.amount = amount;
+        this.amount = amountIn;
         this.precision = precision;
         
         searchItems = Collections.emptyList();
@@ -109,33 +110,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         playerItems = type.createPlayerEntries(Minecraft.getInstance().player);
         
         if (amountInput) {
-            addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(amount), 100, 18, false) {
-                @Override
-                protected boolean isCharacterValid(char c) {
-                    return Character.isDigit(c);
-                }
-                
-                @Override
-                public void textChanged() {
-                    try {
-                        int number;
-                        if (getText().isEmpty()) {
-                            number = 1;
-                        } else {
-                            number = Integer.parseInt(getText());
-                        }
-                        
-                        if (number == 0) {
-                            number = 1;
-                        }
-                        
-                        PickItemMenu.this.amount = number;
-                        
-                    } catch (Exception ignored) {
-                    }
-                    
-                }
-            });
+            addTextBox(new NumberTextBox(gui, 100, 18, FormattedText.EMPTY, () -> amount, value -> amount = Math.max(1, value)));
         }
         addTextBox(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override

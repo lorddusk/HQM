@@ -33,9 +33,9 @@ public class RepeatInfoMenu extends GuiEditMenu {
         days = info.getDays();
         hours = info.getHours();
         
-        addTextBox(new TextBoxHidden(gui, 25, 100, "hqm.repeatMenu.days", () -> days, value -> days = value));
+        addTextBox(new TextBoxHidden(gui, 25, 100, Translator.translatable("hqm.repeatMenu.days"), () -> days, value -> days = value));
         
-        addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, "hqm.repeatMenu.hours", () -> hours, value -> hours = value) {
+        addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, Translator.translatable("hqm.repeatMenu.hours"), () -> hours, value -> hours = value) {
             @Override
             protected void draw(PoseStack matrices, boolean selected) {
                 super.draw(matrices, selected);
@@ -73,7 +73,7 @@ public class RepeatInfoMenu extends GuiEditMenu {
     
     private class TextBoxHidden extends NumberTextBox {
         
-        public TextBoxHidden(GuiQuestBook gui, int x, int y, String title, IntSupplier getter, IntConsumer setter) {
+        public TextBoxHidden(GuiQuestBook gui, int x, int y, FormattedText title, IntSupplier getter, IntConsumer setter) {
             super(gui, x, y, title, getter, setter);
         }
         

@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.util.Translator;
 
 import java.util.function.IntConsumer;
 
@@ -20,7 +21,7 @@ public class IntInputMenu extends GuiEditMenu {
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        addTextBox(new NumberTextBox(gui, 25, 30, title, () -> amount, value -> amount = value));
+        addTextBox(new NumberTextBox(gui, 25, 30, Translator.translatable(title), () -> amount, value -> amount = value));
     }
     
     @Override

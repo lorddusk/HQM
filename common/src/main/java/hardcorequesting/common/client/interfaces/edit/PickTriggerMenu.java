@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.quests.TriggerType;
 import hardcorequesting.common.util.HQMUtil;
+import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.function.Consumer;
@@ -26,7 +27,7 @@ public class PickTriggerMenu extends GuiEditMenu {
         this.type = typeIn;
         this.count = countIn;
         
-        addTextBox(new NumberTextBox(gui, 25, 135, "hqm.menuTrigger.taskCount", () -> count, value -> count = value) {
+        addTextBox(new NumberTextBox(gui, 25, 135, Translator.translatable("hqm.menuTrigger.taskCount"), () -> count, value -> count = value) {
             @Override
             protected boolean isVisible() {
                 return type.isUseTaskCount();
