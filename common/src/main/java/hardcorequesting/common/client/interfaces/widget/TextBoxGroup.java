@@ -10,6 +10,7 @@ import hardcorequesting.common.util.Points;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
@@ -105,6 +106,9 @@ public class TextBoxGroup implements Drawable, Clickable {
             this.width = scrollable ? Integer.MAX_VALUE : WIDTH;
             this.scrollable = scrollable;
     
+            start = 0;
+            visibleText = getText();
+            
             if (scrollable) {
                 updateVisible();
             }
@@ -139,6 +143,15 @@ public class TextBoxGroup implements Drawable, Clickable {
             if (selected) {
                 checkCursor();
                 this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
+                int cursor = getCursor();
+                int selection = getSelectionPos();
+                if (cursor != selection) {
+                    int selectStart = Math.max(start, Math.min(cursor, selection));
+                    int selectEnd = Math.min(start + visibleText.length(), Math.max(cursor, selection));
+                    Rect2i selectionSpace = new Rect2i(x + 3 + (int) (scale * gui.getStringWidth(getText().substring(start, selectStart))), y + offsetY - 1,
+                            (int) (scale * gui.getStringWidth(getText().substring(selectStart, selectEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
+                    gui.drawSelection(matrices, selectionSpace);
+                }
             }
         }
         
@@ -151,6 +164,9 @@ public class TextBoxGroup implements Drawable, Clickable {
         public void textChanged() {
             if (scrollable) {
                 updateVisible();
+            } else {
+                visibleText = getText();
+                start = 0;
             }
         }
         

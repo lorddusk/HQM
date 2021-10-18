@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -314,6 +315,29 @@ public class GuiBase extends Screen {
         matrices.translate(-x, -y, 0);
         GuiComponent.fill(matrices, x, y + 1, x + 1, y + 10, color);
         matrices.popPose();
+    }
+    
+    public void drawSelection(PoseStack matrices, Rect2i area) {
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tesselator.getBuilder();
+        RenderSystem.setShader(GameRenderer::getPositionShader);
+        RenderSystem.setShaderColor(0.0F, 0.0F, 255.0F, 255.0F);
+        RenderSystem.disableTexture();
+        RenderSystem.enableColorLogicOp();
+        RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+        int x0 = area.getX() + left;
+        int y0 = area.getY() + top;
+        int x1 = x0 + area.getWidth();
+        int y1 = y0 + area.getHeight();
+        bufferBuilder.vertex(matrices.last().pose(), x0, y1, 0F).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x1, y1, 0F).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x1, y0, 0F).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x0, y0, 0F).endVertex();
+    
+        tesselator.end();
+        RenderSystem.disableColorLogicOp();
+        RenderSystem.enableTexture();
     }
     
     public void drawString(PoseStack matrices, List<FormattedText> str, int x, int y, float mult, int color) {

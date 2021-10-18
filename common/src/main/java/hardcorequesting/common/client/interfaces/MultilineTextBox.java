@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.widget.Drawable;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.StringUtils;
@@ -54,9 +55,27 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
     
     @Override
     public void render(PoseStack matrices, int mX, int mY) {
-        int page = getCursorLine() / LINES_PER_PAGE;
-        gui.drawString(matrices, lines.stream().map(Line::text).map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, x, y, scale, 0x404040);
-        gui.drawCursor(matrices, x + getCursorPositionX() - 1, y + getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, scale, 0xFF909090);
+        int pageStart = getCursorLine() - (getCursorLine() % LINES_PER_PAGE);
+        gui.drawString(matrices, lines.stream().map(Line::text).map(FormattedText::of).collect(Collectors.toList()), pageStart, LINES_PER_PAGE, x, y, scale, 0x404040);
+        gui.drawCursor(matrices, x + getCursorPositionX() - 1, y + getCursorPositionY() - 3 - (int) (pageStart * GuiBase.TEXT_HEIGHT * scale), 10, scale, 0xFF909090);
+        int cursor = getCursor();
+        int selection = getSelectionPos();
+        if (cursor != selection) {
+            int selectStart = Math.min(cursor, selection);
+            int selectEnd = Math.max(cursor, selection);
+            int startLine = getLineFor(selectStart), endLine = getLineFor(selectEnd);
+            for (int lineId = startLine; lineId <= endLine; lineId++) {
+                if (pageStart <= lineId && lineId < pageStart + LINES_PER_PAGE) {
+                    Line line = lines.get(lineId);
+                    int lineStart = lineId == startLine ? selectStart : line.start();
+                    int lineEnd = lineId == endLine ? selectEnd : lines.get(lineId + 1).start();
+                    int lineY = (int) (GuiBase.TEXT_HEIGHT * (lineId - pageStart) * scale);
+                    Rect2i selectionSpace = new Rect2i(x + (int) (scale * gui.getStringWidth(getText().substring(line.start(), lineStart))),
+                            y - 1 + lineY, (int) (scale * gui.getStringWidth(getText().substring(lineStart, lineEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
+                    gui.drawSelection(matrices, selectionSpace);
+                }
+            }
+        }
     }
     
     @Override

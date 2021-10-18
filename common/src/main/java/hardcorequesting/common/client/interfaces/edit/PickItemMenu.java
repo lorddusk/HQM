@@ -115,6 +115,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         addTextBox(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
             @Override
             public void textChanged() {
+                super.textChanged();
                 startSearch(getText());
             }
         });

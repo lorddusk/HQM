@@ -53,6 +53,7 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     
     @Override
     public void textChanged() {
+        super.textChanged();
         try {
             int number;
             if (getText().isEmpty()) {

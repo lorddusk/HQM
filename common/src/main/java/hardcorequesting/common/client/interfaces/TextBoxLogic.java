@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.screens.Screen;
 import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
@@ -56,10 +57,10 @@ public abstract class TextBoxLogic {
     
     public boolean onKeyStroke(int k) {
         if (k == GLFW.GLFW_KEY_LEFT) {
-            helper.moveByChars(-1);
+            helper.moveByChars(-1, Screen.hasShiftDown());
             return true;
         } else if (k == GLFW.GLFW_KEY_RIGHT) {
-            helper.moveByChars(1);
+            helper.moveByChars(1, Screen.hasShiftDown());
             return true;
         } else if (k == GLFW.GLFW_KEY_BACKSPACE) {
             helper.removeCharsFromCursor(-1);
@@ -87,8 +88,12 @@ public abstract class TextBoxLogic {
         return helper.getCursorPos();
     }
     
+    protected int getSelectionPos() {
+        return helper.getSelectionPos();
+    }
+    
     protected void setCursor(int cursor) {
-        helper.setCursorPos(cursor, false);
+        helper.setCursorPos(cursor, Screen.hasShiftDown());
     }
     
     public void resetCursor() {
