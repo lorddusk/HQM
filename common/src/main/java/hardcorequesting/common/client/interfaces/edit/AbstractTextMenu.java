@@ -1,28 +1,24 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.MultilineTextBoxLogic;
+import hardcorequesting.common.client.interfaces.MultilineTextBox;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.FormattedText;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public abstract class AbstractTextMenu extends GuiEditMenu {
     private static final int START_X = 20;
     private static final int START_Y = 20;
-    private static final int LINES_PER_PAGE = 21;
     private static final float TEXT_SCALE = 1F;
     
-    protected final MultilineTextBoxLogic textLogic;
+    protected final MultilineTextBox textLogic;
     
     protected AbstractTextMenu(GuiQuestBook gui, String text, boolean acceptsNewLines) {
         super(gui, false);
     
-        this.textLogic = new MultilineTextBoxLogic(gui, Objects.requireNonNullElse(text, ""), 140, TEXT_SCALE, acceptsNewLines);
+        this.textLogic = new MultilineTextBox(gui, START_X, START_Y, Objects.requireNonNullElse(text, ""), 140, TEXT_SCALE, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override
@@ -58,9 +54,7 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
-        int page = textLogic.getCursorLine() / LINES_PER_PAGE;
-        gui.drawString(matrices, textLogic.getLines().stream().map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, START_X, START_Y, TEXT_SCALE, 0x404040);
-        gui.drawCursor(matrices, START_X + textLogic.getCursorPositionX() - 1, START_Y + textLogic.getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, TEXT_SCALE, 0xFF909090);
+        textLogic.render(matrices, mX, mY);
     }
     
     @Override

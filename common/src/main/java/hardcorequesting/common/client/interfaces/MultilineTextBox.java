@@ -1,5 +1,8 @@
 package hardcorequesting.common.client.interfaces;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.widget.Drawable;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -9,9 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MultilineTextBoxLogic extends TextBoxLogic {
+public class MultilineTextBox extends TextBoxLogic implements Drawable {
+    private static final int LINES_PER_PAGE = 21;
     
-    protected final GuiBase gui;
+    private final GuiBase gui;
+    private final int x, y;
     private final boolean acceptNewlines;
     private final int width;
     private final float scale;
@@ -20,9 +25,11 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
     private int cursorLine;
     private int cursorPositionX, cursorPositionY;
     
-    public MultilineTextBoxLogic(GuiBase gui, @NotNull String text, int width, float scale, boolean acceptNewlines) {
+    public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, float scale, boolean acceptNewlines) {
         super(acceptNewlines ? text : text.replace("\n", ""), Integer.MAX_VALUE);
         this.gui = gui;
+        this.x = x;
+        this.y = y;
         this.acceptNewlines = acceptNewlines;
         this.width = width;
         this.scale = scale;
@@ -30,23 +37,26 @@ public class MultilineTextBoxLogic extends TextBoxLogic {
         initLines();
     }
     
-    public int getCursorLine() {
+    private int getCursorLine() {
         checkCursor();
         return cursorLine;
     }
     
-    public List<String> getLines() {
-        return lines.stream().map(Line::text).collect(Collectors.toList());
-    }
-    
-    public int getCursorPositionX() {
+    private int getCursorPositionX() {
         checkCursor();
         return cursorPositionX;
     }
     
-    public int getCursorPositionY() {
+    private int getCursorPositionY() {
         checkCursor();
         return cursorPositionY;
+    }
+    
+    @Override
+    public void render(PoseStack matrices, int mX, int mY) {
+        int page = getCursorLine() / LINES_PER_PAGE;
+        gui.drawString(matrices, lines.stream().map(Line::text).map(FormattedText::of).collect(Collectors.toList()), page * LINES_PER_PAGE, LINES_PER_PAGE, x, y, scale, 0x404040);
+        gui.drawCursor(matrices, x + getCursorPositionX() - 1, y + getCursorPositionY() - 3 - page * LINES_PER_PAGE * GuiBase.TEXT_HEIGHT, 10, scale, 0xFF909090);
     }
     
     @Override
