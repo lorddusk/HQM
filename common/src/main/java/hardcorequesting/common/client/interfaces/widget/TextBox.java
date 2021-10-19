@@ -5,8 +5,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.TextBoxLogic;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Objects;
 
-public class TextBox extends TextBoxLogic {
+public class TextBox {
     private static final int TEXT_BOX_WIDTH = 64;
     private static final int TEXT_BOX_HEIGHT = 12;
     private static final int TEXT_BOX_SRC_X = 192;
@@ -24,12 +25,15 @@ public class TextBox extends TextBoxLogic {
     private static final int WIDTH = TEXT_BOX_WIDTH - 4;
     
     protected final GuiBase gui;
-    private final boolean scrollable;
-    private final int offsetY;
     protected final int x;
     protected final int y;
+    private final int maxLength;
+    private final boolean scrollable;
+    private final int offsetY;
     private final float scale;
+    private final TextFieldHelper helper;
     
+    private String text;
     private int lastCursor = -1;
     private int visibleStart;
     private String visibleText;
@@ -43,26 +47,44 @@ public class TextBox extends TextBoxLogic {
     }
     
     public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit, float scale) {
-        super(SharedConstants.filterText(Objects.requireNonNullElse(str, "")), charLimit);
-        
         this.gui = gui;
         this.x = x;
         this.y = y;
+        maxLength = charLimit;
         this.scrollable = scrollable;
         this.scale = scale;
         this.offsetY = (int) (TEXT_BOX_HEIGHT - scale * GuiBase.TEXT_HEIGHT);
+    
+        helper = new TextFieldHelper(this::getText, this::setText, this::getStrippedClipboard,
+                TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
         
+        this.text = SharedConstants.filterText(Objects.requireNonNullElse(str, ""));
         updateVisible();
     }
     
-    @Override
-    protected boolean isTextValid(String newText) {
-        return super.isTextValid(newText) && (scrollable || gui.getStringWidth(newText) * scale <= WIDTH);
+    public String getText() {
+        return text;
     }
     
-    @Override
+    private void setText(String text) {
+        this.text = text;
+        textChanged();
+    }
+    
+    protected boolean isTextValid(String newText) {
+        return newText.length() <= maxLength && (scrollable || gui.getStringWidth(newText) * scale <= WIDTH);
+    }
+    
     protected String getStrippedClipboard() {
-        return SharedConstants.filterText(super.getStrippedClipboard());
+        return SharedConstants.filterText(TextFieldHelper.getClipboardContents(Minecraft.getInstance()));
+    }
+    
+    public boolean onKeyStroke(int k) {
+        return helper.keyPressed(k);
+    }
+    
+    public boolean onCharTyped(char c) {
+        return helper.charTyped(c);
     }
     
     protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
@@ -75,8 +97,8 @@ public class TextBox extends TextBoxLogic {
         this.gui.drawString(matrices, visibleText, x + 3, y + offsetY, scale, 0x404040);
         
         if (selected) {
-            int cursor = getCursor();
-            int selection = getSelectionPos();
+            int cursor = helper.getCursorPos();
+            int selection = helper.getSelectionPos();
             
             int cursorPositionX = (int) (scale * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - visibleStart))));
             this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
@@ -101,14 +123,14 @@ public class TextBox extends TextBoxLogic {
         return true;
     }
     
-    @Override
     public void textChanged() {
         updateVisible();
     }
     
     public void checkCursor() {
-        if (lastCursor != getCursor()) {
-            lastCursor = getCursor();
+        int cursor = helper.getCursorPos();
+        if (lastCursor != cursor) {
+            lastCursor = cursor;
             updateVisible();
         }
     }
@@ -116,15 +138,16 @@ public class TextBox extends TextBoxLogic {
     private void updateVisible() {
         if (scrollable) {
             int visibleStart = this.visibleStart;
+            final int cursor = helper.getCursorPos();
             
             // Move the visible area if the cursor is too far to the left
-            if (getCursor() < visibleStart) {
-                visibleStart = getCursor();
+            if (cursor < visibleStart) {
+                visibleStart = cursor;
             }
             
             // Move the visible area if the cursor is too far to the right
-            while (visibleStart < getCursor()) {
-                String text = getText().substring(visibleStart, getCursor());
+            while (visibleStart < cursor) {
+                String text = getText().substring(visibleStart, cursor);
                 if (this.gui.getStringWidth(text) * scale > WIDTH)
                     visibleStart++;
                 else
@@ -157,5 +180,10 @@ public class TextBox extends TextBoxLogic {
     
     public boolean inBounds(double mX, double mY) {
         return gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mX, mY);
+    }
+    
+    protected void setTextAndCursor(String s) {
+        setText(s);
+        helper.setCursorToEnd();
     }
 }

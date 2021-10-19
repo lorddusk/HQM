@@ -2,6 +2,9 @@ package hardcorequesting.common.client.interfaces;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.widget.Drawable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -13,31 +16,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MultilineTextBox extends TextBoxLogic implements Drawable {
+public final class MultilineTextBox implements Drawable {
     private static final int LINES_PER_PAGE = 21;
     
     private final GuiBase gui;
     private final int x, y;
     private final boolean acceptNewlines;
     private final int width;
+    private final TextFieldHelper helper;
     
+    private String text;
     private final List<Line> lines = new ArrayList<>();
     
     public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, boolean acceptNewlines) {
-        super(acceptNewlines ? text : text.replace("\n", ""), Integer.MAX_VALUE);
         this.gui = gui;
         this.x = x;
         this.y = y;
         this.acceptNewlines = acceptNewlines;
         this.width = width;
-        
+    
+        helper = new TextFieldHelper(this::getText, this::setText, this::getClipboard,
+                TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), s -> true);
+    
+        this.text = stripForbidden(text);
         initLines();
+    }
+    
+    public String getText() {
+        return text;
+    }
+    
+    private void setText(String text) {
+        this.text = text;
+        initLines();
+    }
+    
+    private String getClipboard() {
+        return stripForbidden(TextFieldHelper.getClipboardContents(Minecraft.getInstance()));
+    }
+    
+    private String stripForbidden(String text) {
+        return acceptNewlines ? text : text.replace("\n", "");
     }
     
     @Override
     public void render(PoseStack matrices, int mX, int mY) {
-        int cursor = getCursor();
-        int selection = getSelectionPos();
+        int cursor = helper.getCursorPos();
+        int selection = helper.getSelectionPos();
         int cursorLine = getLineFor(cursor);
         int pageStartLine = cursorLine - (cursorLine % LINES_PER_PAGE);
         
@@ -81,7 +106,6 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
         return (line - pageStartLine) * GuiBase.TEXT_HEIGHT;
     }
     
-    @Override
     public boolean onKeyStroke(int k) {
         if (k == GLFW.GLFW_KEY_UP) {
             changeLine(-1);
@@ -96,17 +120,26 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
             setEnd();
             return true;
         } else if (acceptNewlines && (k == GLFW.GLFW_KEY_KP_ENTER || k == GLFW.GLFW_KEY_ENTER)) {
-            addText("\n");
+            helper.insertText("\n");
             return true;
-        } else return super.onKeyStroke(k);
+        } else return helper.keyPressed(k);
+    }
+    
+    public boolean onCharTyped(char c) {
+        return helper.charTyped(c);
+    }
+    
+    public void setTextAndCursor(String text) {
+        setText(text);
+        helper.setCursorToEnd();
     }
     
     private void changeLine(int direction) {
-        int cursor = getCursor();
+        int cursor = helper.getCursorPos();
         int line = getLineFor(cursor);
         int newLineId = line + direction;
         if (0 <= newLineId && newLineId < lines.size()) {
-            int offset = getCursor() - lines.get(line).start();
+            int offset = cursor - lines.get(line).start();
             Line newLine = lines.get(newLineId);
             int newOffset = Math.min(offset, newLine.text().length());
             setCursor(newLine.start() + newOffset);
@@ -114,18 +147,17 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
     }
     
     private void setHome() {
-        Line line = lines.get(getLineFor(getCursor()));
+        Line line = lines.get(getLineFor(helper.getCursorPos()));
         setCursor(line.start());
     }
     
     private void setEnd() {
-        Line line = lines.get(getLineFor(getCursor()));
+        Line line = lines.get(getLineFor(helper.getCursorPos()));
         setCursor(line.start() + line.text().length());
     }
     
-    @Override
-    public void textChanged() {
-        initLines();
+    private void setCursor(int cursor) {
+        helper.setCursorPos(cursor, Screen.hasShiftDown());
     }
     
     private void initLines() {
