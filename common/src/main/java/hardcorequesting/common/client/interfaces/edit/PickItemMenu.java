@@ -9,7 +9,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
@@ -112,7 +112,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         if (amountInput) {
             addTextBox(new NumberTextBox(gui, 100, 18, FormattedText.EMPTY, () -> amount, value -> amount = Math.max(1, value)));
         }
-        addTextBox(new TextBoxGroup.TextBox(gui, "", 230, 18, false) {
+        addTextBox(new TextBox(gui, "", 230, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();

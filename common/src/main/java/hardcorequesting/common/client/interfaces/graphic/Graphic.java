@@ -2,10 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.widget.Clickable;
-import hardcorequesting.common.client.interfaces.widget.Drawable;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -86,7 +83,7 @@ public abstract class Graphic {
         scrollBars.add(scrollBar);
     }
     
-    protected void addTextBox(TextBoxGroup.TextBox box) {
+    protected void addTextBox(TextBox box) {
         textBoxes.add(box);
     }
     
@@ -96,6 +93,6 @@ public abstract class Graphic {
     }
     
     protected void reloadTextBoxes() {
-        textBoxes.getTextBoxes().forEach(TextBoxGroup.TextBox::reloadText);
+        textBoxes.getTextBoxes().forEach(TextBox::reloadText);
     }
 }

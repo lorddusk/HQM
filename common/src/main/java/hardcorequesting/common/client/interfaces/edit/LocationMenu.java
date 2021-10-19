@@ -5,7 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
@@ -43,7 +43,7 @@ public class LocationMenu extends GuiEditMenu {
         
         addTextBox(new NumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.zTarget"), true, pos::getZ, pos::setZ));
     
-        addTextBox(new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
+        addTextBox(new TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
             @Override
             public void textChanged() {
                 super.textChanged();

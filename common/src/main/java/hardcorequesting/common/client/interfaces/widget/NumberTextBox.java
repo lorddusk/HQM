@@ -7,7 +7,7 @@ import net.minecraft.network.chat.FormattedText;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
-public class NumberTextBox extends TextBoxGroup.TextBox {
+public class NumberTextBox extends TextBox {
     
     public static final int TEXT_OFFSET = -10;
     private final FormattedText title;

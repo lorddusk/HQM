@@ -8,7 +8,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.network.chat.FormattedText;
@@ -46,7 +46,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickAdvancementMenu.this.advancementNames));
         
-        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBox(gui, "", 250, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();

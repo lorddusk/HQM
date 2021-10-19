@@ -57,7 +57,7 @@ public class PickMobMenu extends GuiEditMenu {
         
         addTextBox(new NumberTextBox(gui, 180, 150, Translator.translatable("hqm." + textKey + ".reqKills"), () -> amount, value -> amount = value));
         
-        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBox(gui, "", 250, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();

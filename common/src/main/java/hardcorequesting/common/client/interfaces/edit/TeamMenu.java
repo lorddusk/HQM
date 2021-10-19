@@ -8,7 +8,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
@@ -44,8 +44,8 @@ public class TeamMenu extends GuiEditMenu {
     private final ScrollBar memberScroll;
     private final ExtendedScrollBar<Team> inviteScroll;
     private final LargeButton inviteButton;
-    private final TextBoxGroup.TextBox teamName;
-    private final TextBoxGroup.TextBox inviteName;
+    private final TextBox teamName;
+    private final TextBox inviteName;
     
     private Team inviteTeam;
     private PlayerEntry selectedEntry;
@@ -196,7 +196,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addTextBox(teamName = new TextBoxGroup.TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
+        addTextBox(teamName = new TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
             @Override
             protected boolean isVisible() {
                 return getTeam().isSingle() && inviteTeam == null;
@@ -208,7 +208,7 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addTextBox(inviteName = new TextBoxGroup.TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
+        addTextBox(inviteName = new TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
             @Override
             protected boolean isVisible() {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
