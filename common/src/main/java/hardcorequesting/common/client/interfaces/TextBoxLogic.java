@@ -6,7 +6,6 @@ import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
-import org.lwjgl.glfw.GLFW;
 
 @Environment(EnvType.CLIENT)
 public abstract class TextBoxLogic {
@@ -47,26 +46,7 @@ public abstract class TextBoxLogic {
     }
     
     public boolean onKeyStroke(int k) {
-        if (k == GLFW.GLFW_KEY_LEFT) {
-            helper.moveByChars(-1, Screen.hasShiftDown());
-            return true;
-        } else if (k == GLFW.GLFW_KEY_RIGHT) {
-            helper.moveByChars(1, Screen.hasShiftDown());
-            return true;
-        } else if (k == GLFW.GLFW_KEY_BACKSPACE) {
-            helper.removeCharsFromCursor(-1);
-            return true;
-        } else if (k == GLFW.GLFW_KEY_DELETE) {
-            helper.removeCharsFromCursor(1);
-            return true;
-        } else if (k == GLFW.GLFW_KEY_HOME) {
-            helper.setCursorToStart();
-            return true;
-        } else if (k == GLFW.GLFW_KEY_END) {
-            helper.setCursorToEnd();
-            return true;
-        }
-        return false;
+        return helper.keyPressed(k);
     }
     
     public boolean onCharTyped(char c) {
