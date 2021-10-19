@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 public abstract class TextBoxLogic {
     
     private final TextFieldHelper helper;
-    private int lastCursor;
+    private int lastCursor = -1;
     private String text;
     private final int maxLength;
     

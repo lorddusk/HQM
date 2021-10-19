@@ -11,14 +11,13 @@ import java.util.Objects;
 public abstract class AbstractTextMenu extends GuiEditMenu {
     private static final int START_X = 20;
     private static final int START_Y = 20;
-    private static final float TEXT_SCALE = 1F;
     
     protected final MultilineTextBox textLogic;
     
     protected AbstractTextMenu(GuiQuestBook gui, String text, boolean acceptsNewLines) {
         super(gui, false);
     
-        this.textLogic = new MultilineTextBox(gui, START_X, START_Y, Objects.requireNonNullElse(text, ""), 140, TEXT_SCALE, acceptsNewLines);
+        this.textLogic = new MultilineTextBox(gui, START_X, START_Y, Objects.requireNonNullElse(text, ""), 140, acceptsNewLines);
     
         addClickable(new LargeButton(gui, "hqm.textEditor.copyAll", 185, 20) {
             @Override

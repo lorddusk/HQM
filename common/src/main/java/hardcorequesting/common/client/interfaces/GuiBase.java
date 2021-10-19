@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 
+import java.util.Collection;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -317,7 +318,7 @@ public class GuiBase extends Screen {
         matrices.popPose();
     }
     
-    public void drawSelection(PoseStack matrices, Rect2i area) {
+    public void drawSelection(PoseStack matrices, Collection<Rect2i> areas) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionShader);
@@ -326,15 +327,18 @@ public class GuiBase extends Screen {
         RenderSystem.enableColorLogicOp();
         RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        int x0 = area.getX() + left;
-        int y0 = area.getY() + top;
-        int x1 = x0 + area.getWidth();
-        int y1 = y0 + area.getHeight();
-        bufferBuilder.vertex(matrices.last().pose(), x0, y1, 0F).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x1, y1, 0F).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x1, y0, 0F).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x0, y0, 0F).endVertex();
-    
+        
+        for (Rect2i area : areas) {
+            int x0 = area.getX() + left;
+            int y0 = area.getY() + top;
+            int x1 = x0 + area.getWidth();
+            int y1 = y0 + area.getHeight();
+            bufferBuilder.vertex(matrices.last().pose(), x0, y1, 0F).endVertex();
+            bufferBuilder.vertex(matrices.last().pose(), x1, y1, 0F).endVertex();
+            bufferBuilder.vertex(matrices.last().pose(), x1, y0, 0F).endVertex();
+            bufferBuilder.vertex(matrices.last().pose(), x0, y0, 0F).endVertex();
+        }
+        
         tesselator.end();
         RenderSystem.disableColorLogicOp();
         RenderSystem.enableTexture();

@@ -20,79 +20,66 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
     private final int x, y;
     private final boolean acceptNewlines;
     private final int width;
-    private final float scale;
     
     private final List<Line> lines = new ArrayList<>();
-    private int cursorLine;
-    private int cursorPositionX, cursorPositionY;
     
-    public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, float scale, boolean acceptNewlines) {
+    public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, boolean acceptNewlines) {
         super(acceptNewlines ? text : text.replace("\n", ""), Integer.MAX_VALUE);
         this.gui = gui;
         this.x = x;
         this.y = y;
         this.acceptNewlines = acceptNewlines;
         this.width = width;
-        this.scale = scale;
         
         initLines();
     }
     
-    private int getCursorLine() {
-        checkCursor();
-        return cursorLine;
-    }
-    
-    private int getCursorPositionX() {
-        checkCursor();
-        return cursorPositionX;
-    }
-    
-    private int getCursorPositionY() {
-        checkCursor();
-        return cursorPositionY;
-    }
-    
     @Override
     public void render(PoseStack matrices, int mX, int mY) {
-        int pageStart = getCursorLine() - (getCursorLine() % LINES_PER_PAGE);
-        gui.drawString(matrices, lines.stream().map(Line::text).map(FormattedText::of).collect(Collectors.toList()), pageStart, LINES_PER_PAGE, x, y, scale, 0x404040);
-        gui.drawCursor(matrices, x + getCursorPositionX() - 1, y + getCursorPositionY() - 3 - (int) (pageStart * GuiBase.TEXT_HEIGHT * scale), 10, scale, 0xFF909090);
+        checkCursor();
         int cursor = getCursor();
         int selection = getSelectionPos();
+        int cursorLine = getLineFor(cursor);
+        int pageStartLine = cursorLine - (cursorLine % LINES_PER_PAGE);
+        
+        gui.drawString(matrices, lines.stream().skip(pageStartLine).limit(LINES_PER_PAGE).map(Line::text).map(FormattedText::of).collect(Collectors.toList()), x, y, 1F, 0x404040);
+        gui.drawCursor(matrices, x + getTextX(cursorLine, cursor) - 1, y + getTextY(cursorLine, pageStartLine) - 3, 10, 1F, 0xFF909090);
+        
         if (cursor != selection) {
             int selectStart = Math.min(cursor, selection);
             int selectEnd = Math.max(cursor, selection);
-            int startLine = getLineFor(selectStart), endLine = getLineFor(selectEnd);
-            for (int lineId = startLine; lineId <= endLine; lineId++) {
-                if (pageStart <= lineId && lineId < pageStart + LINES_PER_PAGE) {
-                    Line line = lines.get(lineId);
-                    int lineStart = lineId == startLine ? selectStart : line.start();
-                    int lineEnd = lineId == endLine ? selectEnd : lines.get(lineId + 1).start();
-                    int lineY = (int) (GuiBase.TEXT_HEIGHT * (lineId - pageStart) * scale);
-                    Rect2i selectionSpace = new Rect2i(x + (int) (scale * gui.getStringWidth(getText().substring(line.start(), lineStart))),
-                            y - 1 + lineY, (int) (scale * gui.getStringWidth(getText().substring(lineStart, lineEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
-                    gui.drawSelection(matrices, selectionSpace);
-                }
-            }
+            gui.drawSelection(matrices, calculateSelectionBoxes(selectStart, selectEnd, pageStartLine));
         }
     }
     
-    @Override
-    public void textChanged() {
-        initLines();
+    @NotNull
+    private List<Rect2i> calculateSelectionBoxes(int selectStart, int selectEnd, int pageStartLine) {
+        List<Rect2i> selections = new ArrayList<>();
+        int startLine = getLineFor(selectStart), endLine = getLineFor(selectEnd);
+        
+        for (int lineId = startLine; lineId <= endLine; lineId++) {
+            if (isLineVisible(lineId, pageStartLine)) {
+                Line line = lines.get(lineId);
+                int lineStart = lineId == startLine ? selectStart : line.start();
+                int lineEnd = lineId == endLine ? selectEnd : line.end();
+
+                selections.add(new Rect2i(x + getTextX(lineId, lineStart), y + getTextY(lineId, pageStartLine) - 1,
+                        gui.getStringWidth(getText().substring(lineStart, lineEnd)), GuiBase.TEXT_HEIGHT));
+            }
+        }
+        return selections;
     }
     
-    private void initLines() {
-        lines.clear();
+    private boolean isLineVisible(int line, int pageStartLine) {
+        return pageStartLine <= line && line < pageStartLine + LINES_PER_PAGE;
+    }
     
-        String text = getText();
-        gui.getFont().getSplitter().splitLines(text, (int) (width / scale), Style.EMPTY, true, (style, start, end) -> {
-            String lineText = StringUtils.stripEnd(text.substring(start, end), " \n");
-            lines.add(new Line(lineText, start));
-        });
-        if (text.isEmpty() || text.charAt(text.length() - 1) == '\n')
-            lines.add(new Line("", text.length()));
+    private int getTextX(int line, int cursor) {
+        return this.gui.getStringWidth(getText().substring(lines.get(line).start(), cursor));
+    }
+    
+    private int getTextY(int line, int pageStartLine) {
+        return (line - pageStartLine) * GuiBase.TEXT_HEIGHT;
     }
     
     @Override
@@ -115,17 +102,15 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
         } else return super.onKeyStroke(k);
     }
     
-    @Override
-    protected void recalculateCursorDetails(int cursor) {
-        if (!lines.isEmpty()) {
-            int i = getLineFor(cursor);
-            Line line = lines.get(i);
-            String text = getText().substring(line.start(), cursor);
-            cursorPositionX = (int) (scale * this.gui.getStringWidth(text));
-            cursorPositionY = (int) (GuiBase.TEXT_HEIGHT * i * scale);
-            cursorLine = i;
-        } else {
-            cursorPositionX = cursorPositionY = 0;
+    private void changeLine(int direction) {
+        int cursor = getCursor();
+        int line = getLineFor(cursor);
+        int newLineId = line + direction;
+        if (0 <= newLineId && newLineId < lines.size()) {
+            int offset = getCursor() - lines.get(line).start();
+            Line newLine = lines.get(newLineId);
+            int newOffset = Math.min(offset, newLine.text().length());
+            setCursor(newLine.start() + newOffset);
         }
     }
     
@@ -139,16 +124,25 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
         setCursor(line.start() + line.text().length());
     }
     
-    private void changeLine(int direction) {
-        int cursor = getCursor();
-        int line = getLineFor(cursor);
-        int newLineId = line + direction;
-        if (0 <= newLineId && newLineId < lines.size()) {
-            int offset = getCursor() - lines.get(line).start();
-            Line newLine = lines.get(newLineId);
-            int newOffset = Math.min(offset, newLine.text().length());
-            setCursor(newLine.start() + newOffset);
-        }
+    @Override
+    protected void recalculateCursorDetails(int cursor) {
+    }
+    
+    @Override
+    public void textChanged() {
+        initLines();
+    }
+    
+    private void initLines() {
+        lines.clear();
+        
+        String text = getText();
+        gui.getFont().getSplitter().splitLines(text, width, Style.EMPTY, true, (style, start, end) -> {
+            String lineText = StringUtils.stripEnd(text.substring(start, end), " \n");
+            lines.add(new Line(lineText, start, end));
+        });
+        if (text.isEmpty() || text.charAt(text.length() - 1) == '\n')
+            lines.add(new Line("", text.length(), text.length()));
     }
     
     private int getLineFor(int cursor) {
@@ -159,5 +153,5 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
         return lines.size() - 1;
     }
     
-    private static record Line(String text, int start) {}
+    private static record Line(String text, int start, int end) {}
 }

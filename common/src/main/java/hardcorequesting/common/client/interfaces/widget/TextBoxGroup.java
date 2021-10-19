@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.phys.Vec2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -150,7 +151,7 @@ public class TextBoxGroup implements Drawable, Clickable {
                     int selectEnd = Math.min(start + visibleText.length(), Math.max(cursor, selection));
                     Rect2i selectionSpace = new Rect2i(x + 3 + (int) (scale * gui.getStringWidth(getText().substring(start, selectStart))), y + offsetY - 1,
                             (int) (scale * gui.getStringWidth(getText().substring(selectStart, selectEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
-                    gui.drawSelection(matrices, selectionSpace);
+                    gui.drawSelection(matrices, Collections.singleton(selectionSpace));
                 }
             }
         }
