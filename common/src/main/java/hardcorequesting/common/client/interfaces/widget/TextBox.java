@@ -125,11 +125,19 @@ public class TextBox extends TextBoxLogic {
             // Move the visible area if the cursor is too far to the right
             while (visibleStart < getCursor()) {
                 String text = getText().substring(visibleStart, getCursor());
-                if (this.gui.getStringWidth(text) * scale > WIDTH) {
+                if (this.gui.getStringWidth(text) * scale > WIDTH)
                     visibleStart++;
-                } else {
+                else
                     break;
-                }
+            }
+            
+            // Move the visible area if there is unseen text to the left and unused space to the right
+            while (0 < visibleStart) {
+                String text = getText().substring(visibleStart - 1);
+                if (this.gui.getStringWidth(text) * scale <= WIDTH)
+                    visibleStart--;
+                else
+                    break;
             }
             
             setVisibleStart(visibleStart);
