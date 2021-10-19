@@ -36,7 +36,6 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
     
     @Override
     public void render(PoseStack matrices, int mX, int mY) {
-        checkCursor();
         int cursor = getCursor();
         int selection = getSelectionPos();
         int cursorLine = getLineFor(cursor);
@@ -122,10 +121,6 @@ public class MultilineTextBox extends TextBoxLogic implements Drawable {
     private void setEnd() {
         Line line = lines.get(getLineFor(getCursor()));
         setCursor(line.start() + line.text().length());
-    }
-    
-    @Override
-    protected void recalculateCursorDetails(int cursor) {
     }
     
     @Override

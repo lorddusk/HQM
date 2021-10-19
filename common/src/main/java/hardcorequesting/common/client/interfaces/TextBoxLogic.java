@@ -12,7 +12,6 @@ import org.lwjgl.glfw.GLFW;
 public abstract class TextBoxLogic {
     
     private final TextFieldHelper helper;
-    private int lastCursor = -1;
     private String text;
     private final int maxLength;
     
@@ -41,14 +40,6 @@ public abstract class TextBoxLogic {
     public String getText() {
         return text;
     }
-    
-    public void checkCursor() {
-        if (lastCursor != helper.getCursorPos()) {
-            recalculateCursorDetails(lastCursor = helper.getCursorPos());
-        }
-    }
-    
-    protected abstract void recalculateCursorDetails(int cursor);
     
     private void setText(String text) {
         this.text = text;

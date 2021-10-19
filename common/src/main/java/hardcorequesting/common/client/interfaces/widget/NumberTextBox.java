@@ -45,8 +45,8 @@ public class NumberTextBox extends TextBoxGroup.TextBox {
     }
     
     @Override
-    protected void draw(PoseStack matrices, boolean selected) {
-        super.draw(matrices, selected);
+    protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+        super.draw(matrices, selected, mX, mY);
         
         this.gui.drawString(matrices, title, x, y + TEXT_OFFSET, 0x404040);
     }

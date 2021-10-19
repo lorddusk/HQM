@@ -196,15 +196,19 @@ public class TeamMenu extends GuiEditMenu {
             }
         });
         
-        addTextBox(teamName = new TextBoxName(gui, "", 180, 26) {
+        addTextBox(teamName = new TextBoxGroup.TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
             @Override
             protected boolean isVisible() {
                 return getTeam().isSingle() && inviteTeam == null;
             }
+    
+            @Override
+            protected boolean isTextValid(String newText) {
+                return super.isTextValid(newText) && gui.getStringWidth(newText) <= GuiQuestBook.PAGE_WIDTH - TITLE_X - 10;
+            }
         });
-        teamName.setWidth((int) ((GuiQuestBook.PAGE_WIDTH - TITLE_X - 10) * 0.7F));
         
-        addTextBox(inviteName = new TextBoxName(gui, "", 180, 26) {
+        addTextBox(inviteName = new TextBoxGroup.TextBox(gui, "", 180, 26, true, Integer.MAX_VALUE, 0.7F) {
             @Override
             protected boolean isVisible() {
                 return !getTeam().isSingle() && getEntry(getTeam()).isOwner();
@@ -434,14 +438,4 @@ public class TeamMenu extends GuiEditMenu {
     private PlayerEntry getEntry(Team team) {
         return team.getEntry(this.playerId);
     }
-    
-    private static class TextBoxName extends TextBoxGroup.TextBox {
-        public TextBoxName(GuiQuestBook gui, String str, int x, int y) {
-            super(gui, str, x, y, true);
-            setScale(0.7F);
-            offsetY = 5;
-        }
-    }
-    
-    
 }

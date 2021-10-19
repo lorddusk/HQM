@@ -6,24 +6,20 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.TextBoxLogic;
-import hardcorequesting.common.util.Points;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Environment(EnvType.CLIENT)
 public class TextBoxGroup implements Drawable, Clickable {
-    
-    private static final int TEXT_BOX_WIDTH = 64;
-    private static final int TEXT_BOX_HEIGHT = 12;
-    private static final int TEXT_BOX_SRC_X = 192;
-    private static final int TEXT_BOX_SRC_Y = 77;
     
     private TextBox selectedTextBox;
     private final List<TextBox> textBoxes = new ArrayList<>();
@@ -37,17 +33,15 @@ public class TextBoxGroup implements Drawable, Clickable {
     }
     
     @Override
-    @Environment(EnvType.CLIENT)
     public void render(PoseStack matrices, int mX, int mY) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible()) {
-                textBox.draw(matrices, selectedTextBox == textBox);
+                textBox.draw(matrices, selectedTextBox == textBox, mX, mY);
             }
         }
     }
     
     @Override
-    @Environment(EnvType.CLIENT)
     public boolean onClick(int mX, int mY) {
         for (TextBox textBox : textBoxes) {
             if (textBox.isVisible() && textBox.inBounds(mX, mY)) {
@@ -62,7 +56,6 @@ public class TextBoxGroup implements Drawable, Clickable {
         return false;
     }
     
-    @Environment(EnvType.CLIENT)
     public boolean onKeyStroke(int k) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
             return selectedTextBox.onKeyStroke(k);
@@ -70,7 +63,6 @@ public class TextBoxGroup implements Drawable, Clickable {
         return false;
     }
     
-    @Environment(EnvType.CLIENT)
     public boolean onCharTyped(char c) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
             return selectedTextBox.onCharTyped(c);
@@ -79,135 +71,138 @@ public class TextBoxGroup implements Drawable, Clickable {
     }
     
     public static class TextBox extends TextBoxLogic {
+        private static final int TEXT_BOX_WIDTH = 64;
+        private static final int TEXT_BOX_HEIGHT = 12;
+        private static final int TEXT_BOX_SRC_X = 192;
+        private static final int TEXT_BOX_SRC_Y = 77;
         
-        private static final int WIDTH = 60;
+        // width used for text
+        private static final int WIDTH = TEXT_BOX_WIDTH - 4;
     
         protected final GuiBase gui;
         private final boolean scrollable;
-        private int width;
-        protected int offsetY = 3;
+        private final int offsetY;
         protected final int x;
         protected final int y;
-        private float scale = 1F;
+        private final float scale;
         
-        private int start;
+        private int lastCursor = -1;
+        private int visibleStart;
         private String visibleText;
-        private int cursorPositionX;
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable) {
             this(gui, str, x, y, scrollable, Integer.MAX_VALUE);
         }
         
         public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit) {
+            this(gui, str, x, y, scrollable, charLimit, 1F);
+        }
+        
+        public TextBox(GuiBase gui, String str, int x, int y, boolean scrollable, int charLimit, float scale) {
             super(SharedConstants.filterText(Objects.requireNonNullElse(str, "")), charLimit);
             
             this.gui = gui;
             this.x = x;
             this.y = y;
-            this.width = scrollable ? Integer.MAX_VALUE : WIDTH;
             this.scrollable = scrollable;
-    
-            start = 0;
-            visibleText = getText();
-            
-            if (scrollable) {
-                updateVisible();
-            }
-        }
-    
-        public void setWidth(int width) {
-            this.width = width;
-        }
-    
-        public void setScale(float scale) {
             this.scale = scale;
+            this.offsetY = (int) (TEXT_BOX_HEIGHT - scale * GuiBase.TEXT_HEIGHT);
+            
+            updateVisible();
         }
-        
+    
         @Override
         protected boolean isTextValid(String newText) {
-            return super.isTextValid(newText) && gui.getStringWidth(newText) * scale <= width;
+            return super.isTextValid(newText) && (scrollable || gui.getStringWidth(newText) * scale <= WIDTH);
         }
     
         @Override
         protected String getStrippedClipboard() {
             return SharedConstants.filterText(super.getStrippedClipboard());
         }
-    
-        @Environment(EnvType.CLIENT)
-        protected void draw(PoseStack matrices, boolean selected) {
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        
+        protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+            checkCursor();
             
+            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            Vec2 mouse = Points.ofMouse();
-            this.gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mouse.x - this.gui.getLeft(), mouse.y - this.gui.getTop()) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
-            this.gui.drawString(matrices, scrollable ? visibleText : getText(), x + 3, y + offsetY, scale, 0x404040);
+            
+            this.gui.drawRect(matrices, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mX, mY) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
+            this.gui.drawString(matrices, visibleText, x + 3, y + offsetY, scale, 0x404040);
+            
             if (selected) {
-                checkCursor();
-                this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
                 int cursor = getCursor();
                 int selection = getSelectionPos();
+                
+                int cursorPositionX = (int) (scale * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - visibleStart))));
+                this.gui.drawCursor(matrices, x + cursorPositionX + 2, y, 10, 1F, 0xFF909090);
+                
                 if (cursor != selection) {
-                    int selectStart = Math.max(start, Math.min(cursor, selection));
-                    int selectEnd = Math.min(start + visibleText.length(), Math.max(cursor, selection));
-                    Rect2i selectionSpace = new Rect2i(x + 3 + (int) (scale * gui.getStringWidth(getText().substring(start, selectStart))), y + offsetY - 1,
-                            (int) (scale * gui.getStringWidth(getText().substring(selectStart, selectEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
-                    gui.drawSelection(matrices, Collections.singleton(selectionSpace));
+                    int selectStart = Math.min(cursor, selection);
+                    int selectEnd = Math.max(cursor, selection);
+                    gui.drawSelection(matrices, Collections.singleton(getSelectionBox(selectStart, selectEnd)));
                 }
             }
+        }
+        
+        @NotNull
+        private Rect2i getSelectionBox(int selectStart, int selectEnd) {
+            selectStart = Math.max(visibleStart, selectStart);
+            selectEnd = Math.min(visibleStart + visibleText.length(), selectEnd);
+            return new Rect2i(x + 3 + (int) (scale * gui.getStringWidth(getText().substring(visibleStart, selectStart))), y + offsetY - 1,
+                    (int) (scale * gui.getStringWidth(getText().substring(selectStart, selectEnd))), (int) (scale * GuiBase.TEXT_HEIGHT));
         }
         
         protected boolean isVisible() {
             return true;
         }
         
-        @Environment(EnvType.CLIENT)
         @Override
         public void textChanged() {
-            if (scrollable) {
+            updateVisible();
+        }
+    
+        public void checkCursor() {
+            if (lastCursor != getCursor()) {
+                lastCursor = getCursor();
                 updateVisible();
-            } else {
-                visibleText = getText();
-                start = 0;
             }
         }
         
-        @Environment(EnvType.CLIENT)
-        @Override
-        protected void recalculateCursorDetails(int cursor) {
-            if (scrollable) {
-                updateVisible();
-                cursorPositionX = (int) (scale * this.gui.getStringWidth(visibleText.substring(0, Math.min(visibleText.length(), cursor - start))));
-            } else {
-                cursorPositionX = (int) (scale * this.gui.getStringWidth(getText().substring(0, cursor)));
-            }
-        }
-        
-        @Environment(EnvType.CLIENT)
         private void updateVisible() {
-            if (getCursor() < start) {
-                start = getCursor();
-            }
-            
-            while (start < getCursor()) {
-                String text = getText().substring(start, getCursor());
-                if (this.gui.getStringWidth(text) * scale > WIDTH) {
-                    start++;
-                } else {
-                    break;
+            if (scrollable) {
+                int visibleStart = this.visibleStart;
+                
+                // Move the visible area if the cursor is too far to the left
+                if (getCursor() < visibleStart) {
+                    visibleStart = getCursor();
                 }
-            }
-            visibleText = getText().substring(start);
-            while (this.gui.getStringWidth(visibleText) * scale > WIDTH) {
-                visibleText = visibleText.substring(0, visibleText.length() - 2);
+                
+                // Move the visible area if the cursor is too far to the right
+                while (visibleStart < getCursor()) {
+                    String text = getText().substring(visibleStart, getCursor());
+                    if (this.gui.getStringWidth(text) * scale > WIDTH) {
+                        visibleStart++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                setVisibleStart(visibleStart);
+            } else {
+                setVisibleStart(0);
             }
         }
         
-        @Environment(EnvType.CLIENT)
+        private void setVisibleStart(int visibleStart) {
+            this.visibleStart = visibleStart;
+            this.visibleText = gui.getFont().getSplitter().formattedHeadByWidth(getText().substring(visibleStart), (int) (WIDTH / scale), Style.EMPTY);
+        }
+        
         public void reloadText() {
             checkCursor();
         }
     
-        @Environment(EnvType.CLIENT)
         public boolean inBounds(double mX, double mY) {
             return gui.inBounds(x, y, TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT, mX, mY);
         }

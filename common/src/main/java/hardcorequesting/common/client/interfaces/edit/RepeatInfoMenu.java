@@ -37,8 +37,8 @@ public class RepeatInfoMenu extends GuiEditMenu {
         
         addTextBox(new TextBoxHidden(gui, 25, 100 + BOX_OFFSET, Translator.translatable("hqm.repeatMenu.hours"), () -> hours, value -> hours = value) {
             @Override
-            protected void draw(PoseStack matrices, boolean selected) {
-                super.draw(matrices, selected);
+            protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+                super.draw(matrices, selected, mX, mY);
     
                 this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }

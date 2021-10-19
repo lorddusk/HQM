@@ -42,9 +42,8 @@ public class LocationMenu extends GuiEditMenu {
         addTextBox(new NumberTextBox(gui, 20, 30 + BOX_OFFSET, Translator.translatable("hqm.locationMenu.yTarget"), true, pos::getY, pos::setY));
         
         addTextBox(new NumberTextBox(gui, 20, 30 + 2 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.zTarget"), true, pos::getZ, pos::setZ));
-        
-        TextBoxGroup.TextBox locationBox;
-        addTextBox(locationBox = new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
+    
+        addTextBox(new TextBoxGroup.TextBox(gui, initDimension, 20, 30 + 3 * BOX_OFFSET, true) {
             @Override
             public void textChanged() {
                 super.textChanged();
@@ -52,18 +51,17 @@ public class LocationMenu extends GuiEditMenu {
             }
             
             @Override
-            protected void draw(PoseStack matrices, boolean selected) {
-                super.draw(matrices, selected);
+            protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+                super.draw(matrices, selected, mX, mY);
                 
                 this.gui.drawString(matrices, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
             }
         });
-        locationBox.checkCursor();
         
         addTextBox(new NumberTextBox(gui, 20, 30 + 4 * BOX_OFFSET, Translator.translatable("hqm.locationMenu.radius"), true, () -> radius, value -> radius = value) {
             @Override
-            protected void draw(PoseStack matrices, boolean selected) {
-                super.draw(matrices, selected);
+            protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+                super.draw(matrices, selected, mX, mY);
     
                 this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
             }
