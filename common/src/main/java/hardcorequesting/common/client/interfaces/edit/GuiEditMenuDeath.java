@@ -69,7 +69,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
-            gui.drawString(matrices, Translator.plain((deathStats.indexOf(stats) + 1) + ". " + stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
+            gui.drawString(matrices, Translator.text((deathStats.indexOf(stats) + 1) + ". ").append(stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
             gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
             statY += PLAYERS_SPACING;
