@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.LocationMenu;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -21,8 +20,8 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     
     private final VisitLocationTask task;
     
-    public LocationTaskGraphic(VisitLocationTask task, PartList<VisitLocationTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public LocationTaskGraphic(VisitLocationTask task, UUID playerId, GuiQuestBook gui) {
+        super(task, playerId, gui);
         this.task = task;
     }
     

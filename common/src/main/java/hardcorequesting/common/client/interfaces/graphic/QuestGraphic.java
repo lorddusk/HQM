@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
+import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -57,8 +58,9 @@ public final class QuestGraphic extends EditableGraphic {
     private List<FormattedText> cachedDescription;
     
     {
-        for (final TaskType taskType : TaskType.values()) {
-            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (taskType.ordinal() % 2) * 65, 50 + (taskType.ordinal() / 2) * 20) {
+        int ordinal = 0;
+        for (final TaskType<?> taskType : TaskType.values()) {
+            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (ordinal % 2) * 65, 50 + (ordinal / 2) * 20) {
                 @Override
                 public boolean isVisible() {
                     return Quest.canQuestsBeEdited() && selectedTask == null && QuestGraphic.this.gui.getCurrentMode() == EditMode.TASK;
@@ -69,6 +71,7 @@ public final class QuestGraphic extends EditableGraphic {
                     taskType.addTask(quest);
                 }
             });
+            ordinal++;
         }
     }
     
@@ -285,7 +288,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private void setSelectedTask(@Nullable QuestTask<?> task) {
         selectedTask = task;
-        taskGraphic = task == null ? null : task.createGraphic(playerId, gui);
+        taskGraphic = task == null ? null : TaskGraphics.create(task, playerId, gui);
     }
     
     @Override

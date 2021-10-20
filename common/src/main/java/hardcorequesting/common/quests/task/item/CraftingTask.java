@@ -2,6 +2,7 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.TaskType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
@@ -10,8 +11,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class CraftingTask extends ItemRequirementTask {
     
-    public CraftingTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public CraftingTask(Quest parent) {
+        super(TaskType.CRAFT, parent);
         register(EventTrigger.Type.CRAFTING);
     }
     

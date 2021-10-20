@@ -2,18 +2,14 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.AdvancementTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.AdvancementTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
@@ -32,16 +28,10 @@ import java.util.UUID;
 public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, AdvancementTaskData> {
     private static final String ADVANCEMENTS = "advancements";
     
-    public GetAdvancementTask(Quest parent, String description, String longDescription) {
-        super(AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent, description, longDescription);
+    public GetAdvancementTask(Quest parent) {
+        super(TaskType.ADVANCEMENT, AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new AdvancementTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

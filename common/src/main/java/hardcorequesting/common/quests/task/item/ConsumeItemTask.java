@@ -1,11 +1,9 @@
 package hardcorequesting.common.quests.task.item;
 
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -17,14 +15,12 @@ import java.util.UUID;
 
 public class ConsumeItemTask extends ItemRequirementTask {
     
-    public ConsumeItemTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public ConsumeItemTask(Quest parent) {
+        this(TaskType.CONSUME, parent);
     }
     
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return ItemTaskGraphic.createConsumeGraphic(this, parts, playerId, gui, true);
+    protected ConsumeItemTask(TaskType<? extends ConsumeItemTask> type, Quest parent) {
+        super(type, parent);
     }
     
     public boolean increaseFluid(FluidStack fluidVolume, UUID playerId, boolean action) {

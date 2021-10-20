@@ -2,19 +2,15 @@ package hardcorequesting.common.quests.task.icon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.LocationTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.LocationTaskData;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.MinecraftServer;
@@ -36,16 +32,10 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     private static final int CHECK_DELAY = 20;
     private int delay = 1;
     
-    public VisitLocationTask(Quest parent, String description, String longDescription) {
-        super(LocationTaskData.class, EditType.Type.LOCATION, parent, description, longDescription);
+    public VisitLocationTask(Quest parent) {
+        super(TaskType.LOCATION, LocationTaskData.class, EditType.Type.LOCATION, parent);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
-    }
-    
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new LocationTaskGraphic(this, parts, playerId, gui);
     }
     
     @Override

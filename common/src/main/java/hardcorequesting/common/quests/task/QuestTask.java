@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import hardcorequesting.common.client.ClientChange;
-import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
@@ -23,8 +20,6 @@ import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
@@ -40,23 +35,27 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
     
+    private final TaskType<?> type;
     private final Class<Data> dataType;
     public String description;
     protected Quest parent;
     private String longDescription;
     private int id;
-    private List<FormattedText> cachedDescription;
     
-    public QuestTask(Class<Data> dataType, Quest parent, String description, String longDescription) {
+    public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent) {
+        this.type = type;
         this.dataType = dataType;
         this.parent = parent;
-        this.description = description;
-        this.longDescription = longDescription;
+        this.description = type.getLangKeyName();
+        this.longDescription = type.getLangKeyDescription();
+    }
+    
+    public TaskType<?> getType() {
+        return type;
     }
     
     public static void completeQuest(Quest quest, UUID uuid) {
@@ -178,25 +177,12 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
-        cachedDescription = null;
-    }
-    
-    @Environment(EnvType.CLIENT)
-    public List<FormattedText> getCachedLongDescription(GuiBase gui) {
-        if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(longDescription), 0.7F, 130);
-        }
-        
-        return cachedDescription;
     }
     
     public void completeTask(UUID uuid) {
         getData(uuid).completed = true;
         completeQuest(parent, uuid);
     }
-    
-    @Environment(EnvType.CLIENT)
-    public abstract TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui);
     
     public abstract void onUpdate(Player player);
     

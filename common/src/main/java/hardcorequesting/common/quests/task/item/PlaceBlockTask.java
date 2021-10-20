@@ -2,6 +2,7 @@ package hardcorequesting.common.quests.task.item;
 
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.task.TaskType;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -9,8 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class PlaceBlockTask extends ItemRequirementTask {
-    public PlaceBlockTask(Quest parent, String description, String longDescription) {
-        super(parent, description, longDescription);
+    public PlaceBlockTask(Quest parent) {
+        super(TaskType.BLOCK_PLACE, parent);
         
         register(EventTrigger.Type.ITEM_USED);
     }

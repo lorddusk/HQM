@@ -3,9 +3,6 @@ package hardcorequesting.common.quests.task.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.graphic.task.ItemTaskGraphic;
-import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.platform.FluidStack;
@@ -15,6 +12,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
@@ -34,14 +32,12 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     
     protected final PartList<Part> parts = new PartList<>(Part::new, EditType.Type.TASK_ITEM, LIMIT);
     
-    public ItemRequirementTask(Quest parent, String description, String longDescription) {
-        super(ItemsTaskData.class, parent, description, longDescription);
+    public ItemRequirementTask(TaskType<? extends ItemRequirementTask> type, Quest parent) {
+        super(type, ItemsTaskData.class, parent);
     }
     
-    @Environment(EnvType.CLIENT)
-    @Override
-    public TaskGraphic createGraphic(UUID playerId, GuiQuestBook gui) {
-        return new ItemTaskGraphic(this, parts, playerId, gui);
+    public PartList<Part> getParts() {
+        return parts;
     }
     
     @Override

@@ -5,7 +5,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.CompleteQuestTask;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Positioned;
 import hardcorequesting.common.util.SaveHelper;
@@ -28,8 +27,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     
     private final CompleteQuestTask task;
     
-    public CompleteQuestTaskGraphic(CompleteQuestTask task, PartList<CompleteQuestTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public CompleteQuestTaskGraphic(CompleteQuestTask task, UUID playerId, GuiQuestBook gui) {
+        super(task, task.getParts(), playerId, gui);
         this.task = task;
         addDetectButton(task);
     }

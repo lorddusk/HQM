@@ -11,7 +11,6 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
 import hardcorequesting.common.util.OPBookHelper;
 import hardcorequesting.common.util.Positioned;
@@ -43,19 +42,19 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     
     private final ItemRequirementTask task;
     
-    public ItemTaskGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        super(task, parts, playerId, gui);
+    public ItemTaskGraphic(ItemRequirementTask task, UUID playerId, GuiQuestBook gui) {
+        super(task, task.getParts(), playerId, gui);
         this.task = task;
     }
     
-    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId, gui);
+    public static ItemTaskGraphic createDetectGraphic(ItemRequirementTask task, UUID playerId, GuiQuestBook gui) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, playerId, gui);
         graphic.addDetectButton(task);
         return graphic;
     }
     
-    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, PartList<ItemRequirementTask.Part> parts, UUID playerId, GuiQuestBook gui, boolean hasSubmitButton) {
-        ItemTaskGraphic graphic = new ItemTaskGraphic(task, parts, playerId, gui);
+    public static ItemTaskGraphic createConsumeGraphic(ItemRequirementTask task, UUID playerId, GuiQuestBook gui, boolean hasSubmitButton) {
+        ItemTaskGraphic graphic = new ItemTaskGraphic(task, playerId, gui);
         if (hasSubmitButton)
             graphic.addSubmitButton(task);
     
