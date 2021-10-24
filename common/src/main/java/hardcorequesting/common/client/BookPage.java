@@ -171,4 +171,17 @@ public abstract class BookPage {
             return new EditGroupGraphic(gui, group);
         }
     }
+    
+    public static class TeamPage extends BookPage {
+        public static final TeamPage INSTANCE = new TeamPage(MenuPage.INSTANCE);
+        
+        private TeamPage(MenuPage parent) {
+            super(parent);
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new TeamMenuGraphic(gui, gui.getPlayer().getUUID());
+        }
+    }
 }

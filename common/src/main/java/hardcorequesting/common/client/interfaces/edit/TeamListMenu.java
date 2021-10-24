@@ -26,16 +26,14 @@ public class TeamListMenu extends GuiEditMenu {
     private static final int ARROW_W = 20;
     private static final int ARROW_H = 9;
     
-    private final TeamMenu parent;
     private int pagePair = 0;
     
-    static void display(GuiQuestBook gui, TeamMenu parent) {
-        gui.setEditMenu(new TeamListMenu(gui, parent));
+    public static void display(GuiQuestBook gui) {
+        gui.setEditMenu(new TeamListMenu(gui));
     }
     
-    private TeamListMenu(GuiQuestBook gui, TeamMenu parent) {
+    private TeamListMenu(GuiQuestBook gui) {
         super(gui);
-        this.parent = parent;
     }
     
     @Override
@@ -75,11 +73,6 @@ public class TeamListMenu extends GuiEditMenu {
         } else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair++;
         }
-    }
-    
-    @Override
-    public void close() {
-        gui.setEditMenu(parent);
     }
     
     @Override

@@ -7,7 +7,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenuDeath;
-import hardcorequesting.common.client.interfaces.edit.TeamMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -189,7 +188,7 @@ public class MenuPageGraphic extends EditableGraphic {
         super.onClick(mX, mY, button);
     
         if (HQMConfig.getInstance().ENABLE_TEAMS && gui.inBounds(INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-            TeamMenu.display(gui, gui.getPlayer().getUUID());
+            gui.setPage(BookPage.TeamPage.INSTANCE);
         } else if (gui.inBounds(INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
             gui.setEditMenu(new GuiEditMenuDeath(gui));
         } else if (gui.inBounds(INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, GuiQuestBook.PAGE_WIDTH, (int) (GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {

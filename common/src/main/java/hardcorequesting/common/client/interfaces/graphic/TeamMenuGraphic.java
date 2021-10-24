@@ -1,10 +1,11 @@
-package hardcorequesting.common.client.interfaces.edit;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.edit.TeamListMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class TeamMenu extends GuiEditMenu {
+public class TeamMenuGraphic extends Graphic {
     
     private static final int TITLE_X = 20;
     private static final int TITLE_Y = 20;
@@ -40,6 +41,7 @@ public class TeamMenu extends GuiEditMenu {
     private static final int INFO_BOX_SRC_Y = 224;
     private static final int REWARD_SETTING_Y = 20;
     
+    private final GuiQuestBook gui;
     private final UUID playerId;
     private final ScrollBar memberScroll;
     private final ExtendedScrollBar<Team> inviteScroll;
@@ -50,13 +52,8 @@ public class TeamMenu extends GuiEditMenu {
     private Team inviteTeam;
     private PlayerEntry selectedEntry;
     
-    public static void display(GuiQuestBook gui, UUID playerId) {
-        gui.setEditMenu(new TeamMenu(gui, playerId));
-    }
-    
-    private TeamMenu(GuiQuestBook gui, UUID playerId) {
-        super(gui);
-        
+    public TeamMenuGraphic(GuiQuestBook gui, UUID playerId) {
+        this.gui = gui;
         this.playerId = playerId;
         
         addClickable(new LargeButton(gui, "hqm.party.create", 250, 20) {
@@ -192,7 +189,7 @@ public class TeamMenu extends GuiEditMenu {
         addClickable(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
-                TeamListMenu.display(gui, TeamMenu.this);
+                TeamListMenu.display(gui);
             }
         });
         
@@ -414,11 +411,6 @@ public class TeamMenu extends GuiEditMenu {
                 team.nextRewardSetting();
             }
         }
-    }
-    
-    @Override
-    public void save() {
-        
     }
     
     private int getInfoY() {
