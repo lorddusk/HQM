@@ -17,7 +17,7 @@ public class DeathStat {
     
     static {
         for (DeathType type : DeathType.values()) {
-            deathTypeComparator.put(type, Comparator.comparingInt(stat -> stat.getDeaths(type)));
+            deathTypeComparator.put(type, Comparator.<DeathStat>comparingInt(stat -> stat.getDeaths(type)).reversed());
         }
     }
     
@@ -93,8 +93,9 @@ public class DeathStat {
         private static final String[] placePrefixes = {"first", "second", "third"};
         private final Map<DeathType, List<FormattedText>> messages = new EnumMap<>(DeathType.class);
         
-        public DeathStatBest(List<DeathStat> clientDeathList) {
+        public DeathStatBest(List<DeathStat> deathStats) {
             super(null);
+            List<DeathStat> clientDeathList = new ArrayList<>(deathStats);
             for (DeathType type : DeathType.values()) {
                 clientDeathList.sort(deathTypeComparator.get(type));
                 if (clientDeathList.isEmpty()) {
