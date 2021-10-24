@@ -184,4 +184,17 @@ public abstract class BookPage {
             return new TeamMenuGraphic(gui, gui.getPlayer().getUUID());
         }
     }
+    
+    public static class TeamListPage extends BookPage {
+        public static final TeamListPage INSTANCE = new TeamListPage(TeamPage.INSTANCE);
+    
+        private TeamListPage(TeamPage parent) {
+            super(parent);
+        }
+    
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new TeamListGraphic(gui);
+        }
+    }
 }

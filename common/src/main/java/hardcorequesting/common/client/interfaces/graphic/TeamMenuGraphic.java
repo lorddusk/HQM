@@ -2,10 +2,10 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.TeamListMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -189,7 +189,7 @@ public class TeamMenuGraphic extends Graphic {
         addClickable(new LargeButton(gui, "hqm.party.list", 250, 190) {
             @Override
             public void onClick() {
-                TeamListMenu.display(gui);
+                gui.setPage(BookPage.TeamListPage.INSTANCE);
             }
         });
         

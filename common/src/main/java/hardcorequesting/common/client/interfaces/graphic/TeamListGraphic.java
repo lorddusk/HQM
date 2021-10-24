@@ -1,4 +1,4 @@
-package hardcorequesting.common.client.interfaces.edit;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -8,7 +8,7 @@ import hardcorequesting.common.util.Translator;
 
 import java.util.List;
 
-public class TeamListMenu extends GuiEditMenu {
+public class TeamListGraphic extends Graphic {
     
     private static final int TEAM_X = 20;
     private static final int TEAM_X_2ND_PAGE = 180;
@@ -28,12 +28,10 @@ public class TeamListMenu extends GuiEditMenu {
     
     private int pagePair = 0;
     
-    public static void display(GuiQuestBook gui) {
-        gui.setEditMenu(new TeamListMenu(gui));
-    }
+    private final GuiQuestBook gui;
     
-    private TeamListMenu(GuiQuestBook gui) {
-        super(gui);
+    public TeamListGraphic(GuiQuestBook gui) {
+        this.gui = gui;
     }
     
     @Override
@@ -73,11 +71,6 @@ public class TeamListMenu extends GuiEditMenu {
         } else if (isArrowEnabled(false) && gui.inBounds(ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY)) {
             pagePair++;
         }
-    }
-    
-    @Override
-    public void save() {
-        
     }
     
     private void drawArrow(PoseStack matrices, int mX, int mY, boolean left) {
