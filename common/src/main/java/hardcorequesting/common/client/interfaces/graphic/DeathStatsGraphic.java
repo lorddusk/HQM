@@ -1,4 +1,4 @@
-package hardcorequesting.common.client.interfaces.edit;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
-public class GuiEditMenuDeath extends GuiEditMenu {
+public class DeathStatsGraphic extends Graphic {
     
     private static final int PLAYER_INFO_X = 180;
     private static final int PLAYER_INFO_Y = 20;
@@ -34,6 +34,7 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private static final int TYPE_LOCATION_Y = 50;
     private static final int TYPE_SPACING_X = 47;
     private static final int TYPE_SPACING_Y = 30;
+    private static final int TYPE_TEXT_WIDTH = 15;
     private static final int TEXT_OFFSET_X = 28;
     private static final int TEXT_OFFSET_Y = 7;
     private static final int PLAYERS_X = 20;
@@ -46,14 +47,16 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private static final int TOTAL_X = 255;
     private static final int LABEL_Y = 210;
     private static final int VISIBLE_PLAYERS = 10;
-    private static final float[] DIGIT_TEXT_SIZE = {1F, 1F, 0.8F, 0.6F, 0.4F};
+    
+    private final GuiQuestBook gui;
+    private final ExtendedScrollBar<DeathStat> scrollBar;
+    
     private UUID playerId;
     private boolean showTotal;
     private boolean showBest;
-    private final ExtendedScrollBar<DeathStat> scrollBar;
     
-    public GuiEditMenuDeath(GuiQuestBook guiQuestBook) {
-        super(guiQuestBook);
+    public DeathStatsGraphic(GuiQuestBook guiQuestBook) {
+        this.gui = guiQuestBook;
         
         addScrollBar(scrollBar = new ExtendedScrollBar<>(guiQuestBook, ScrollBar.Size.LONG, 160, 18, PLAYERS_X,
                 VISIBLE_PLAYERS, () -> DeathStatsManager.getInstance().getDeathStats()));
@@ -102,18 +105,28 @@ public class GuiEditMenuDeath extends GuiEditMenu {
                 int y = i / 3;
                 
                 FormattedText text = Translator.plain(stats.getDeaths(type) + "");
-                String str = Translator.rawString(text);
-                if (str.length() > 5)
+                float f = findScale(text);
+                if (TYPE_TEXT_WIDTH < f * gui.getFont().width(text)) {
                     text = Translator.translatable("hqm.deathMenu.lots");
-                str = Translator.rawString(text);
-                float f = DIGIT_TEXT_SIZE[str.length() - 1];
+                    f = findScale(text);
+                }
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
                 gui.drawString(matrices, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
             }
-            
-            
         }
-        
+    }
+    
+    private float findScale(FormattedText text) {
+        int width = gui.getFont().width(text);
+        if (width <= TYPE_TEXT_WIDTH) {
+            return 1.0F;
+        } else if (0.8F * width <= TYPE_TEXT_WIDTH) {
+            return 0.8F;
+        } else if (0.6F * width <= TYPE_TEXT_WIDTH) {
+            return 0.6F;
+        } else {
+            return 0.4F;
+        }
     }
     
     @Override
@@ -166,11 +179,6 @@ public class GuiEditMenuDeath extends GuiEditMenu {
         }
     }
     
-    @Override
-    public void save() {
-        
-    }
-    
     private DeathStat getDeathStat() {
         DeathStatsManager manager = DeathStatsManager.getInstance();
         if (showBest) {
@@ -187,6 +195,4 @@ public class GuiEditMenuDeath extends GuiEditMenu {
     private int getColor(boolean selected, boolean inBounds) {
         return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
     }
-    
-    
 }

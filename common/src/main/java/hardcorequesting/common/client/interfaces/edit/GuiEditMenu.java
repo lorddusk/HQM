@@ -13,12 +13,13 @@ public abstract class GuiEditMenu extends Graphic {
     private boolean hasButtons;
     protected final GuiQuestBook gui;
     
+    @Deprecated
     protected GuiEditMenu(GuiQuestBook gui) {
         this.gui = gui;
     }
     
     protected GuiEditMenu(GuiQuestBook gui, boolean isControlOnFirstPage) {
-        this(gui);
+        this.gui = gui;
         hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
     

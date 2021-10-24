@@ -62,10 +62,10 @@ public abstract class BookPage {
     }
     
     public static class MenuPage extends BookPage {
-        public static final MenuPage INSTANCE = new MenuPage(MainPage.INSTANCE);
+        public static final MenuPage INSTANCE = new MenuPage();
         
-        private MenuPage(MainPage parent) {
-            super(parent);
+        private MenuPage() {
+            super(MainPage.INSTANCE);
         }
     
         @Override
@@ -80,10 +80,10 @@ public abstract class BookPage {
     }
     
     public static class SetsPage extends BookPage {
-        public static final SetsPage INSTANCE = new SetsPage(MenuPage.INSTANCE);
+        public static final SetsPage INSTANCE = new SetsPage();
         
-        private SetsPage(MenuPage parent) {
-            super(parent);
+        private SetsPage() {
+            super(MenuPage.INSTANCE);
         }
     
         @Override
@@ -129,10 +129,10 @@ public abstract class BookPage {
     }
     
     public static class ReputationPage extends BookPage {
-        public static final ReputationPage INSTANCE = new ReputationPage(MenuPage.INSTANCE);
+        public static final ReputationPage INSTANCE = new ReputationPage();
         
-        private ReputationPage(MenuPage parent) {
-            super(parent);
+        private ReputationPage() {
+            super(MenuPage.INSTANCE);
         }
         
         @Override
@@ -142,10 +142,10 @@ public abstract class BookPage {
     }
     
     public static class BagsPage extends BookPage {
-        public static final BagsPage INSTANCE = new BagsPage(MenuPage.INSTANCE);
+        public static final BagsPage INSTANCE = new BagsPage();
         
-        private BagsPage(MenuPage parent) {
-            super(parent);
+        private BagsPage() {
+            super(MenuPage.INSTANCE);
         }
     
         @Override
@@ -173,10 +173,10 @@ public abstract class BookPage {
     }
     
     public static class TeamPage extends BookPage {
-        public static final TeamPage INSTANCE = new TeamPage(MenuPage.INSTANCE);
+        public static final TeamPage INSTANCE = new TeamPage();
         
-        private TeamPage(MenuPage parent) {
-            super(parent);
+        private TeamPage() {
+            super(MenuPage.INSTANCE);
         }
     
         @Override
@@ -186,15 +186,28 @@ public abstract class BookPage {
     }
     
     public static class TeamListPage extends BookPage {
-        public static final TeamListPage INSTANCE = new TeamListPage(TeamPage.INSTANCE);
+        public static final TeamListPage INSTANCE = new TeamListPage();
     
-        private TeamListPage(TeamPage parent) {
-            super(parent);
+        private TeamListPage() {
+            super(TeamPage.INSTANCE);
         }
     
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
             return new TeamListGraphic(gui);
+        }
+    }
+    
+    public static class DeathInfoPage extends BookPage {
+        public static final DeathInfoPage INSTANCE = new DeathInfoPage();
+        
+        private DeathInfoPage() {
+            super(MenuPage.INSTANCE);
+        }
+        
+        @Override
+        public Graphic createGraphic(GuiQuestBook gui) {
+            return new DeathStatsGraphic(gui);
         }
     }
 }
