@@ -15,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 public final class MultilineTextBox implements Drawable, Clickable {
@@ -28,6 +29,7 @@ public final class MultilineTextBox implements Drawable, Clickable {
     
     private String text;
     private final List<Line> lines = new ArrayList<>();
+    private boolean dragging;
     
     public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, boolean acceptNewlines) {
         this.gui = gui;
@@ -78,22 +80,52 @@ public final class MultilineTextBox implements Drawable, Clickable {
     
     @Override
     public boolean onClick(int mX, int mY) {
-        if (x <= mX && mX < x + width
-                && y <= mY && mY < y + LINES_PER_PAGE * GuiBase.TEXT_HEIGHT) {
-    
-            int lineId = (mY - y) / GuiBase.TEXT_HEIGHT;
-            Line line = lines.get(Mth.clamp(lineId, 0, lines.size() - 1));
-            
-            if (lineId >= lines.size())
-            {
-                setCursor(line.end());
-            } else {
-                int clickedIndex = gui.getFont().getSplitter().formattedIndexByWidth(line.text(), mX - x, Style.EMPTY);
-                setCursor(line.start() + clickedIndex);
-            }
+        OptionalInt cursor = getPosAtMouse(mX, mY);
+        if (cursor.isPresent()) {
+            setCursor(cursor.getAsInt());
+            dragging = true;
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public boolean onDrag(int mX, int mY) {
+        if (dragging) {
+            OptionalInt cursor = getPosAtMouse(mX, mY);
+            if (cursor.isPresent()) {
+                helper.setCursorPos(cursor.getAsInt(), true);
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean onRelease(int mX, int mY) {
+        if (dragging) {
+            dragging = false;
+            return true;
+        }
+        return false;
+    }
+    
+    private OptionalInt getPosAtMouse(int mX, int mY) {
+        if (x <= mX && mX < x + width
+                && y <= mY && mY < y + LINES_PER_PAGE * GuiBase.TEXT_HEIGHT) {
+        
+            int lineId = (mY - y) / GuiBase.TEXT_HEIGHT;
+            Line line = lines.get(Mth.clamp(lineId, 0, lines.size() - 1));
+        
+            if (lineId >= lines.size())
+            {
+                return OptionalInt.of(line.end());
+            } else {
+                int clickedIndex = gui.getFont().getSplitter().formattedIndexByWidth(line.text(), mX - x, Style.EMPTY);
+                return OptionalInt.of(line.start() + clickedIndex);
+            }
+        }
+        return OptionalInt.empty();
     }
     
     @NotNull
