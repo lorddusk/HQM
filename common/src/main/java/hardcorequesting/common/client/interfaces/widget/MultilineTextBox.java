@@ -1,7 +1,7 @@
-package hardcorequesting.common.client.interfaces;
+package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.widget.Drawable;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;

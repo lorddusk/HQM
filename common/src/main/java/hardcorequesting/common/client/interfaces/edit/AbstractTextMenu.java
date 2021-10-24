@@ -2,7 +2,7 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.MultilineTextBox;
+import hardcorequesting.common.client.interfaces.widget.MultilineTextBox;
 
 import java.util.Objects;
 
