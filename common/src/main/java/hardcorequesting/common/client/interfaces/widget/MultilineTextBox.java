@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class MultilineTextBox implements Drawable {
+public final class MultilineTextBox implements Drawable, Clickable {
     private static final int LINES_PER_PAGE = 21;
     
     private final GuiBase gui;
@@ -73,6 +74,26 @@ public final class MultilineTextBox implements Drawable {
             int selectEnd = Math.max(cursor, selection);
             gui.drawSelection(matrices, calculateSelectionBoxes(selectStart, selectEnd, pageStartLine));
         }
+    }
+    
+    @Override
+    public boolean onClick(int mX, int mY) {
+        if (x <= mX && mX < x + width
+                && y <= mY && mY < y + LINES_PER_PAGE * GuiBase.TEXT_HEIGHT) {
+    
+            int lineId = (mY - y) / GuiBase.TEXT_HEIGHT;
+            Line line = lines.get(Mth.clamp(lineId, 0, lines.size() - 1));
+            
+            if (lineId >= lines.size())
+            {
+                setCursor(line.end());
+            } else {
+                int clickedIndex = gui.getFont().getSplitter().formattedIndexByWidth(line.text(), mX - x, Style.EMPTY);
+                setCursor(line.start() + clickedIndex);
+            }
+            return true;
+        }
+        return false;
     }
     
     @NotNull
