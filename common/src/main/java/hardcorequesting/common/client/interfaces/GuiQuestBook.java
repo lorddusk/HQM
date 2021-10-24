@@ -97,7 +97,8 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     protected void init() {
-        pageGraphic = page.createGraphic(this);
+        if (pageGraphic == null)
+            pageGraphic = page.createGraphic(this);
     
         if (Quest.canQuestsBeEdited()) {
             minecraft.keyboardHandler.setSendRepeatsToGui(true);
