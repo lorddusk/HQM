@@ -55,10 +55,9 @@ public class TextBox {
         this.scale = scale;
         this.offsetY = (int) (TEXT_BOX_HEIGHT - scale * GuiBase.TEXT_HEIGHT);
     
+        this.text = SharedConstants.filterText(Objects.requireNonNullElse(str, ""));
         helper = new TextFieldHelper(this::getText, this::setText, this::getStrippedClipboard,
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
-        
-        this.text = SharedConstants.filterText(Objects.requireNonNullElse(str, ""));
         updateVisible();
     }
     

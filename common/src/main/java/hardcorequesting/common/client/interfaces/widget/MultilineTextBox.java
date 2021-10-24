@@ -34,11 +34,10 @@ public final class MultilineTextBox implements Drawable {
         this.y = y;
         this.acceptNewlines = acceptNewlines;
         this.width = width;
-    
+        
+        this.text = stripForbidden(text);
         helper = new TextFieldHelper(this::getText, this::setText, this::getClipboard,
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), s -> true);
-    
-        this.text = stripForbidden(text);
         initLines();
     }
     
