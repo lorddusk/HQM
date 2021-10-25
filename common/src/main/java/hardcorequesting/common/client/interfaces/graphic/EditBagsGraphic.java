@@ -7,7 +7,6 @@ import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditBagTierMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -95,7 +94,7 @@ public class EditBagsGraphic extends EditableGraphic {
         int yPos = TIERS_Y;
         for (GroupTier groupTier : tierScroll.getVisibleEntries()) {
             
-            String str = groupTier.getName();
+            FormattedText str = groupTier.getName();
             boolean inBounds = gui.inBounds(TIERS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             int color = groupTier.getColor().getHexColor();
             if (inBounds) {
@@ -103,7 +102,7 @@ public class EditBagsGraphic extends EditableGraphic {
                 color |= 0xBB << 24;
                 RenderSystem.enableBlend();
             }
-            gui.drawString(matrices, Translator.plain(str), TIERS_X, yPos, color);
+            gui.drawString(matrices, str, TIERS_X, yPos, color);
             if (inBounds) {
                 RenderSystem.disableBlend();
             }
@@ -197,7 +196,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         EditBagTierMenu.display(gui, groupTier);
                         break;
                     case RENAME:
-                        TextMenu.display(gui, groupTier.getName(), 110, groupTier::setName);
+                        WrappedTextMenu.display(gui, groupTier.getRawName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || LootGroup.getGroups().size() == 0) {

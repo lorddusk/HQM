@@ -91,7 +91,7 @@ public class GroupAdapter {
         @Override
         public JsonElement serialize(GroupTier src){
             return object()
-                .add(NAME, src.getRawName())
+                .add(NAME, src.getRawName().toJson())
                 .add(COLOUR, src.getColor().name())
                 .add(WEIGHTS, array().use(builder -> Arrays.stream(src.getWeights()).forEach(builder::add)).build())
                 .add(GROUPS, array().use(builder -> LootGroup.getGroups().values().stream().filter(group -> group.getTier().equals(src)).map(GROUP_ADAPTER::serialize).forEach(builder::add)).build())
@@ -107,11 +107,11 @@ public class GroupAdapter {
             
             JsonObject json = jsonElement.getAsJsonObject();
             int[] weights = new int[BagTier.values().length];
-            String name = "";
+            WrappedText name = null;
             TierColor color = TierColor.GRAY;
             
-            if(json.has(NAME) && json.get(NAME).isJsonPrimitive()){
-                name = json.get(NAME).getAsString();
+            if(json.has(NAME)) {
+                name = WrappedText.fromJson(json.get(NAME), false);
             }
             if(json.has(COLOUR) && json.get(COLOUR).isJsonPrimitive()){
                 if(Enums.getIfPresent(TierColor.class, json.get(COLOUR).getAsString()).isPresent()){
