@@ -5,6 +5,7 @@ import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -14,6 +15,7 @@ import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -79,7 +81,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                 for (QuestSet set : Quest.getQuestSets()) {
                     if (set.getName().startsWith("Unnamed set")) i++;
                 }
-                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), "No description"));
+                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), WrappedText.create("No description")));
                 SaveHelper.add(EditType.SET_CREATE);
             }
         });
@@ -311,7 +313,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, selectedSet.getDescription(), false, selectedSet::setDescription);
+                WrappedTextMenu.display(gui, selectedSet.getRawDescription(), false, selectedSet::setDescription);
             }
         }
     }

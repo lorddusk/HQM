@@ -311,8 +311,8 @@ public class QuestAdapter {
                             })
                             .build())
                     .use(builder -> {
-                        if (!src.getDescription().equalsIgnoreCase("No description"))
-                            builder.add(DESCRIPTION, src.getDescription());
+                        if (!src.getRawDescription().equals(WrappedText.create("No description")))
+                            builder.add(DESCRIPTION, src.getRawDescription().toJson());
                     })
                     .build();
         }
@@ -324,7 +324,7 @@ public class QuestAdapter {
             JsonObject object = json.getAsJsonObject();
             
             String name = GsonHelper.getAsString(object, NAME);
-            String description = GsonHelper.getAsString(object, DESCRIPTION, "No description");
+            WrappedText description = WrappedText.fromJson(object.get(DESCRIPTION), "No description", false);
             for (JsonElement element : GsonHelper.getAsJsonArray(object, QUESTS)) {
                 Quest quest = QUEST_ADAPTER.fromJsonTree(element);
                 if (quest != null) {
@@ -343,7 +343,7 @@ public class QuestAdapter {
                     break;
                 }
             }
-            if (name != null && description != null && set == null) {
+            if (name != null && set == null) {
                 set = new QuestSet(name, description);
                 Quest.getQuestSets().add(set);
                 SaveHelper.add(EditType.SET_CREATE);
