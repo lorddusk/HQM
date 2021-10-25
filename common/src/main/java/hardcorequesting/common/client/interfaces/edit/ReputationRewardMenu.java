@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class GuiEditMenuReputationReward extends GuiEditMenu {
+public class ReputationRewardMenu extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 50;
@@ -27,7 +27,11 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private List<FormattedText> error;
     private final NumberTextBox valueTextBox;
     
-    public GuiEditMenuReputationReward(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+    public static void display(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+        gui.setEditMenu(new ReputationRewardMenu(gui, rewards, resultConsumer));
+    }
+    
+    private ReputationRewardMenu(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
         super(gui, true);
         this.resultConsumer = resultConsumer;
     
@@ -54,7 +58,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             @Override
             public void onClick() {
-                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
+                ReputationRewardMenu.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
             }
         });
         
@@ -66,7 +70,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             @Override
             public void onClick() {
-                GuiEditMenuReputationReward.this.rewards.remove(selectedReward);
+                ReputationRewardMenu.this.rewards.remove(selectedReward);
                 selectedReward = null;
             }
         });
