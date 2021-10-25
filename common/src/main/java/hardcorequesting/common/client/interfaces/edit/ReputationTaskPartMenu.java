@@ -12,11 +12,11 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class GuiEditMenuReputationSetting extends GuiEditMenu {
+public class ReputationTaskPartMenu extends GuiEditMenu {
     
     private static final int BARS_X = 20;
     private static final int LOWER_Y = 50;
@@ -24,47 +24,34 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     private static final int RESULT_Y = 150;
     private static final int BAR_OFFSET_Y = 10;
     
+    private final Consumer<ReputationTask.Part> resultConsumer;
     private final UUID playerId;
-    private Reputation reputation;
-    private int reputationId;
+    private Reputation reputation = null;
+    private int reputationId = -1;
     private ReputationMarker lower;
     private ReputationMarker upper;
     private boolean inverted;
-    private ReputationTask<?> task;
-    private int id;
     
-    public GuiEditMenuReputationSetting(GuiQuestBook gui, UUID playerId, ReputationTask<?> task, int id, ReputationTask.Part setting) {
+    public static void display(GuiQuestBook gui, UUID playerId, ReputationTask.Part setting, Consumer<ReputationTask.Part> resultConsumer) {
+        gui.setEditMenu(new ReputationTaskPartMenu(gui, playerId, setting, resultConsumer));
+    }
+    
+    private ReputationTaskPartMenu(GuiQuestBook gui, UUID playerId, ReputationTask.Part setting, Consumer<ReputationTask.Part> resultConsumer) {
         super(gui, true);
     
+        this.resultConsumer = resultConsumer;
         this.playerId = playerId;
-        this.task = task;
-        this.id = id;
         ReputationManager reputationManager = ReputationManager.getInstance();
         if (setting.getReputation() == null) {
-            if (!reputationManager.getReputations().isEmpty()) {
-                reputation = reputationManager.getReputationList().get(0);
-                reputationId = 0;
-            } else {
-                reputationId = -1;
-            }
+            setReputation(0);
         } else {
-            reputation = setting.getReputation();
-            id = -1;
-            List<Reputation> reputationList = new ArrayList<>(reputationManager.getReputations().values());
-            for (int i = 0; i < reputationList.size(); i++) {
-                Reputation element = reputationList.get(i);
-                if (element.equals(reputation)) {
-                    id = i;
-                    break;
-                }
-            }
-            if (id == -1) {
-                reputation = null;
-            } else {
+            int id = reputationManager.getReputationList().indexOf(reputation);
+            if (reputationId != -1) {
+                setReputation(id);
                 lower = setting.getLower();
                 upper = setting.getUpper();
-                inverted = setting.isInverted();
-            }
+            } else setReputation(0);
+            inverted = setting.isInverted();
         }
         
         addClickable(new AbstractCheckBox(gui, Translator.translatable("hqm.repSetting.invRange"), 21, 124) {
@@ -87,17 +74,8 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
         addClickable(new ArrowSelectionHelper(gui, 25, 25) {
             @Override
             protected void onArrowClick(boolean left) {
-                if (reputation != null) {
-                    ReputationManager reputationManager = ReputationManager.getInstance();
-                    reputationId += left ? -1 : 1;
-                    if (reputationId < 0) {
-                        reputationId = reputationManager.getReputations().size() - 1;
-                    } else if (reputationId >= reputationManager.getReputations().size()) {
-                        reputationId = 0;
-                    }
-                    lower = null;
-                    upper = null;
-                    reputation = reputationManager.getReputationList().get(reputationId);
+                if (reputationId != -1) {
+                    setReputation(reputationId + (left ? -1 : 1));
                 }
             }
     
@@ -119,6 +97,20 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
                 }
             }
         });
+    }
+    
+    private void setReputation(int reputationId) {
+        List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
+        if (!reputations.isEmpty()) {
+            if (reputationId < 0)
+                this.reputationId = reputations.size() - 1;
+            else if (reputationId >= reputations.size())
+                this.reputationId = 0;
+            else this.reputationId = reputationId;
+            reputation = reputations.get(this.reputationId);
+            lower = null;
+            upper = null;
+        }
     }
     
     @Override
@@ -179,7 +171,7 @@ public class GuiEditMenuReputationSetting extends GuiEditMenu {
     @Override
     public void save() {
         if (reputation != null) {
-            task.setSetting(id, new ReputationTask.Part(reputation, lower, upper, inverted));
+            resultConsumer.accept(new ReputationTask.Part(reputation, lower, upper, inverted));
         }
     }
 }
