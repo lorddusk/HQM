@@ -532,7 +532,10 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 });
                                 break;
                             case REQUIRED_PARENTS:
-                                gui.setEditMenu(new GuiEditMenuParentCount(gui, quest));
+                                RequiredParentCountMenu.display(gui, quest.getUseModifiedParentRequirement(), quest.getParentRequirementCount(), value -> {
+                                    quest.setParentRequirementCount(value);
+                                    SaveHelper.add(EditType.PARENT_REQUIREMENT_CHANGED);
+                                });
                                 break;
                             case QUEST_SELECTION:
                                 if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
