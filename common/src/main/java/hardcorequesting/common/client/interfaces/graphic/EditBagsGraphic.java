@@ -8,6 +8,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditBagTierMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -120,7 +121,7 @@ public class EditBagsGraphic extends EditableGraphic {
         yPos = GROUPS_Y;
         for (Group group : groupScroll.getVisibleEntries()) {
             
-            FormattedText str = Translator.plain(group.getDisplayName());
+            FormattedText str = group.getDisplayName();
             boolean inBounds = gui.inBounds(GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             int color = group.getTier().getColor().getHexColor();
             boolean selected = group == selectedGroup;
@@ -165,7 +166,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         gui.setPage(page.forGroup(group));
                         break;
                     case RENAME:
-                        TextMenu.display(gui, group.getDisplayName(), true, group::setName);
+                        WrappedTextMenu.display(gui, group.getName(), true, group::setName);
                         break;
                     case DELETE:
                         Group.remove(group.getId());

@@ -40,7 +40,7 @@ public class EditGroupGraphic extends EditableGraphic {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        gui.drawString(matrices, Translator.plain(group.getDisplayName()), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
+        gui.drawString(matrices, group.getDisplayName(), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(group.getItems());
         items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {

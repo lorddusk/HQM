@@ -6,10 +6,9 @@ import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 public class Group {
     private GroupTier tier;
     private NonNullList<ItemStack> items;
-    private String name;
+    private WrappedText name;
     private int limit;
     private UUID groupId;
     
@@ -68,22 +67,21 @@ public class Group {
         this.tier = tier;
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getDisplayName() {
-        return hasName() ? name : I18n.get("hqm.bag.group", tier.getName());
+    public FormattedText getDisplayName() {
+        return hasName() ? name.getText() : Translator.translatable("hqm.bag.group", tier.getName());
     }
     
-    public String getName() {
-        return hasName() ? name : Translator.translatable("hqm.bag.group", tier.getName()).getString();
+    public WrappedText getName() {
+        return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
         SaveHelper.add(EditType.NAME_CHANGE);
     }
     
     public boolean hasName() {
-        return name != null && !name.isEmpty();
+        return name != null && !name.getRawText().isEmpty();
     }
     
     public NonNullList<ItemStack> getItems() {

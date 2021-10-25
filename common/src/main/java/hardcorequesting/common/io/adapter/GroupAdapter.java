@@ -9,6 +9,7 @@ import hardcorequesting.common.bag.BagTier;
 import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.TierColor;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 public class GroupAdapter {
     
-    public static final Adapter<Group> GROUP_ADAPTER = new Adapter<Group>() {
+    public static final Adapter<Group> GROUP_ADAPTER = new Adapter<>() {
         private static final String ID = "id";
         private static final String ITEMS = "items";
         private static final String NAME = "name";
@@ -29,7 +30,7 @@ public class GroupAdapter {
                 .add(ID, src.getId().toString())
                 .use(builder -> {
                     if(src.hasName()){
-                        builder.add(NAME, src.getName());
+                        builder.add(NAME, src.getName().toJson());
                     }
                 })
                 .add(LIMIT, src.getLimit())
@@ -61,7 +62,8 @@ public class GroupAdapter {
                 HardcoreQuestingCore.LOGGER.error("JsonElement '" + ID + "' for 'Group' can't be parsed to UUID!", e);
                 return null;
             }
-            group.setName(GsonHelper.getAsString(json, NAME, null));
+            if (json.has(NAME))
+                group.setName(WrappedText.fromJson(json.get(NAME), false));
             group.setLimit(json.get(LIMIT).getAsInt());
             
             if(json.has(ITEMS) && json.get(ITEMS).isJsonArray()){
@@ -80,7 +82,7 @@ public class GroupAdapter {
         }
     };
     
-    public static final Adapter<GroupTier> GROUP_TIER_ADAPTER = new Adapter<GroupTier>() {
+    public static final Adapter<GroupTier> GROUP_TIER_ADAPTER = new Adapter<>() {
         private static final String NAME = "name";
         private static final String COLOUR = "colour";
         private static final String WEIGHTS = "weights";
