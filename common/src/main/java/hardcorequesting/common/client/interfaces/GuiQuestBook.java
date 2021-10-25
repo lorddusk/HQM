@@ -360,13 +360,11 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private boolean shouldDisplayMenuArrow() {
-        return page.canGoBack()
-                && (editMenu == null && page.hasGoToMenuButton()
-                || editMenu != null && !editMenu.hasButtons());
+        return shouldDisplayBackArrow() && page.hasGoToMenuButton();
     }
     
     private boolean shouldDisplayBackArrow() {
-        return page.canGoBack() && (editMenu == null || !editMenu.hasButtons());
+        return page.canGoBack() && editMenu == null;
     }
     
     private boolean inMenuArrowBounds(int mX, int mY) {

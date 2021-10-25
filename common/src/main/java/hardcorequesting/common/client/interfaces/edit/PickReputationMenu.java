@@ -32,7 +32,7 @@ public class PickReputationMenu extends GuiEditMenu {
     }
     
     private PickReputationMenu(GuiQuestBook gui, Reputation reputation, Consumer<Reputation> resultConsumer) {
-        super(gui);
+        super(gui, false);
         this.resultConsumer = resultConsumer;
         this.selectedReputation = reputation;
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 23, EditReputationGraphic.REPUTATION_LIST_X,
@@ -41,6 +41,8 @@ public class PickReputationMenu extends GuiEditMenu {
     
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
+        super.draw(matrices, mX, mY);
+        
         int x = EditReputationGraphic.REPUTATION_LIST_X;
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
@@ -69,8 +71,6 @@ public class PickReputationMenu extends GuiEditMenu {
             
             if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                 selectedReputation = reputation;
-                save();
-                close();
             }
             y += EditReputationGraphic.REPUTATION_OFFSET;
         }
@@ -78,6 +78,7 @@ public class PickReputationMenu extends GuiEditMenu {
     
     @Override
     public void save() {
-        resultConsumer.accept(selectedReputation);
+        if (selectedReputation != null)
+            resultConsumer.accept(selectedReputation);
     }
 }

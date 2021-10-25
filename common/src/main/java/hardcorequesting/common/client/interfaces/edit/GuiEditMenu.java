@@ -10,17 +10,10 @@ import net.fabricmc.api.Environment;
 public abstract class GuiEditMenu extends Graphic {
     
     public static final int BOX_OFFSET = 30;
-    private boolean hasButtons;
     protected final GuiQuestBook gui;
-    
-    @Deprecated
-    protected GuiEditMenu(GuiQuestBook gui) {
-        this.gui = gui;
-    }
     
     protected GuiEditMenu(GuiQuestBook gui, boolean isControlOnFirstPage) {
         this.gui = gui;
-        hasButtons = true;
         int xOffset = isControlOnFirstPage ? 0 : 145;
     
         addClickable(new LargeButton(gui, "hqm.edit.ok", xOffset + 40, 200) {
@@ -39,23 +32,9 @@ public abstract class GuiEditMenu extends Graphic {
         });
     }
     
-    public void onClick(int mX, int mY, int b) {
-        if (!hasButtons && b == 1) {
-            save();
-            close();
-            return;
-        }
-        
-        super.onClick(mX, mY, b);
-    }
-    
     public void close() {
         gui.setEditMenu(null);
     }
     
     public abstract void save();
-    
-    public boolean hasButtons() {
-        return hasButtons;
-    }
 }
