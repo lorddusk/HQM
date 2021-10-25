@@ -2,7 +2,7 @@ package hardcorequesting.common.client.interfaces;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.bag.Group;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.util.Translator;
@@ -38,19 +38,19 @@ public class GuiReward extends GuiBase {
     private static final int MIDDLE_SRC_Y = 67;
     private static final int BOTTOM_SRC_Y = 107;
     private static final int TEXTURE_WIDTH = 170;
-    private Group group;
+    private LootGroup group;
     private int lines;
     private List<Reward> rewards;
     private FormattedText statisticsText;
     
-    public GuiReward(Group group, int bagTier, Player player) {
+    public GuiReward(LootGroup group, int bagTier, Player player) {
         super(NarratorChatListener.NO_TITLE);
         this.group = group;
         this.rewards = new ArrayList<>();
         
         
         int totalWeight = 0;
-        for (Group other : Group.getGroups().values()) {
+        for (LootGroup other : LootGroup.getGroups().values()) {
             if (other.isValid(player)) {
                 totalWeight += other.getTier().getWeights()[bagTier];
             }
@@ -77,9 +77,9 @@ public class GuiReward extends GuiBase {
     }
     
     public static void open(Player player, UUID groupId, int bag, int[] limits) {
-        Group rewardGroup = Group.getGroups().get(groupId);
+        LootGroup rewardGroup = LootGroup.getGroups().get(groupId);
         int i = 0;
-        for (Group group : Group.getGroups().values())
+        for (LootGroup group : LootGroup.getGroups().values())
             if (group.getLimit() != 0)
                 group.setRetrievalCount(player, limits[i++]);
         

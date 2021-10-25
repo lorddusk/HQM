@@ -1,7 +1,7 @@
 package hardcorequesting.common.items;
 
 import hardcorequesting.common.bag.BagTier;
-import hardcorequesting.common.bag.Group;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
@@ -36,14 +36,14 @@ public class BagItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         if (!world.isClientSide) {
             int totalWeight = 0;
-            for (Group group : Group.getGroups().values()) {
+            for (LootGroup group : LootGroup.getGroups().values()) {
                 if (group.isValid(player)) {
                     totalWeight += group.getTier().getWeights()[tierOrdinal];
                 }
             }
             if (totalWeight > 0) {
                 int rng = (int) (Math.random() * totalWeight);
-                for (Group group : Group.getGroups().values()) {
+                for (LootGroup group : LootGroup.getGroups().values()) {
                     if (group.isValid(player)) {
                         int weight = group.getTier().getWeights()[tierOrdinal];
                         if (rng < weight) {
@@ -89,7 +89,7 @@ public class BagItem extends Item {
         if (ItemBag.displayGui && player instanceof ServerPlayerEntity)
             NetworkManager.sendToPlayer(GuiType.BAG.build(data.toArray(new String[data.size()])), (ServerPlayerEntity) player);
             */
-        GeneralUsage.sendOpenBagUpdate(player, groupId, bag, ArrayUtils.toPrimitive(Group.getGroups().values().stream()
+        GeneralUsage.sendOpenBagUpdate(player, groupId, bag, ArrayUtils.toPrimitive(LootGroup.getGroups().values().stream()
                 .filter(group -> group.getLimit() != 0)
                 .map(group -> group.getRetrievalCount(player))
                 .toArray(Integer[]::new)));

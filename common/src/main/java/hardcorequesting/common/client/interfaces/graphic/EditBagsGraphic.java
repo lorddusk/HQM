@@ -43,7 +43,7 @@ public class EditBagsGraphic extends EditableGraphic {
     public static final int VISIBLE_GROUPS = 8;
     
     private final BookPage.BagsPage page;
-    private final ExtendedScrollBar<Group> groupScroll;
+    private final ExtendedScrollBar<LootGroup> groupScroll;
     private final ExtendedScrollBar<GroupTier> tierScroll;
     
     {
@@ -55,7 +55,7 @@ public class EditBagsGraphic extends EditableGraphic {
         
             @Override
             public void onClick() {
-                Group.add(new Group(null));
+                LootGroup.add(new LootGroup(null));
                 SaveHelper.add(EditType.GROUP_CREATE);
             }
         });
@@ -75,14 +75,14 @@ public class EditBagsGraphic extends EditableGraphic {
     
     }
     
-    private Group selectedGroup;
+    private LootGroup selectedGroup;
     
     public EditBagsGraphic(BookPage.BagsPage page, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.CREATE, EditMode.RENAME, EditMode.TIER, EditMode.DELETE);
         this.page = page;
     
         addScrollBar(groupScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, GROUPS_X,
-                VISIBLE_GROUPS, () -> new ArrayList<>(Group.getGroups().values())));
+                VISIBLE_GROUPS, () -> new ArrayList<>(LootGroup.getGroups().values())));
     
         addScrollBar(tierScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 312, 18, TIERS_X,
                 VISIBLE_TIERS, () -> GroupTierManager.getInstance().getTiers()));
@@ -119,7 +119,7 @@ public class EditBagsGraphic extends EditableGraphic {
         }
         
         yPos = GROUPS_Y;
-        for (Group group : groupScroll.getVisibleEntries()) {
+        for (LootGroup group : groupScroll.getVisibleEntries()) {
             
             FormattedText str = group.getDisplayName();
             boolean inBounds = gui.inBounds(GROUPS_X, yPos, gui.getStringWidth(str), GuiQuestBook.TEXT_HEIGHT, mX, mY);
@@ -155,7 +155,7 @@ public class EditBagsGraphic extends EditableGraphic {
         
         //Handle click on groups
         int posY = GROUPS_Y;
-        for (Group group : groupScroll.getVisibleEntries()) {
+        for (LootGroup group : groupScroll.getVisibleEntries()) {
             
             if (gui.inBounds(GROUPS_X, posY, gui.getStringWidth(group.getDisplayName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
@@ -169,7 +169,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         WrappedTextMenu.display(gui, group.getName(), true, group::setName);
                         break;
                     case DELETE:
-                        Group.remove(group.getId());
+                        LootGroup.remove(group.getId());
                         SaveHelper.add(EditType.GROUP_REMOVE);
                         break;
                     default:
@@ -200,11 +200,11 @@ public class EditBagsGraphic extends EditableGraphic {
                         TextMenu.display(gui, groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
-                        if (tiers.size() > 1 || Group.getGroups().size() == 0) {
+                        if (tiers.size() > 1 || LootGroup.getGroups().size() == 0) {
                             GroupTier replacementTier = tiers.get(0);
                             if (replacementTier == groupTier)
                                 replacementTier = tiers.get(1);
-                            for (Group group : Group.getGroups().values()) {
+                            for (LootGroup group : LootGroup.getGroups().values()) {
                                 if (group.getTier() == groupTier) {
                                     group.setTier(replacementTier);
                                 }

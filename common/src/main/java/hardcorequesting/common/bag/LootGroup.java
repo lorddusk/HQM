@@ -19,14 +19,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class Group {
+public class LootGroup {
     private GroupTier tier;
     private NonNullList<ItemStack> items;
     private WrappedText name;
     private int limit;
     private UUID groupId;
     
-    public Group(UUID groupId) {
+    public LootGroup(UUID groupId) {
         this.groupId = groupId;
         while (this.groupId == null || getGroups().containsKey(this.groupId)) {
             this.groupId = UUID.randomUUID();
@@ -43,7 +43,7 @@ public class Group {
         return GroupTierManager.getInstance().groups.size();
     }
     
-    public static Map<UUID, Group> getGroups() {
+    public static Map<UUID, LootGroup> getGroups() {
         return GroupTierManager.getInstance().groups;
     }
     
@@ -51,12 +51,12 @@ public class Group {
         getGroups().remove(groupId);
     }
     
-    public static void add(Group group) {
+    public static void add(LootGroup group) {
         getGroups().put(group.getId(), group);
     }
     
-    public static Group getGroup(UUID groupId) {
-        return Group.getGroups().get(groupId);
+    public static LootGroup getGroup(UUID groupId) {
+        return LootGroup.getGroups().get(groupId);
     }
     
     public GroupTier getTier() {
@@ -154,10 +154,10 @@ public class Group {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Group) {
-            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size()) {
+        if (obj instanceof LootGroup) {
+            if (Objects.equals(name, ((LootGroup) obj).name) && limit == ((LootGroup) obj).limit && items.size() == ((LootGroup) obj).items.size()) {
                 for (ItemStack stack : items) {
-                    if (!listContains(stack, ((Group) obj).items)) return false;
+                    if (!listContains(stack, ((LootGroup) obj).items)) return false;
                 }
                 return true;
             }

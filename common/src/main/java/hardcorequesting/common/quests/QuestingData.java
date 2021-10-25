@@ -2,8 +2,8 @@ package hardcorequesting.common.quests;
 
 import com.google.common.collect.Iterables;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupData;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
@@ -93,7 +93,7 @@ public class QuestingData {
     
     private void createGroupData() {
         groupData = new HashMap<>();
-        Group.getGroups().keySet().forEach(this::createGroupData);
+        LootGroup.getGroups().keySet().forEach(this::createGroupData);
     }
     
     private void createGroupData(UUID groupId) {
