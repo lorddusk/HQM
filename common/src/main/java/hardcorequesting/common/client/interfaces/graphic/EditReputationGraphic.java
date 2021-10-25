@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditRepTierValueMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.reputation.Reputation;
@@ -49,7 +50,7 @@ public class EditReputationGraphic extends EditableGraphic {
         
             @Override
             public void onClick() {
-                ReputationManager.getInstance().addReputation(new Reputation("Unnamed", "Neutral"));
+                ReputationManager.getInstance().addReputation(new Reputation());
                 SaveHelper.add(EditType.REPUTATION_ADD);
             }
         });
@@ -94,12 +95,12 @@ public class EditReputationGraphic extends EditableGraphic {
             int y = REPUTATION_LIST_Y;
             List<Reputation> reputationList = ReputationManager.getInstance().getReputationList();
             for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
-                String str = reputation.getName();
+                FormattedText str = reputation.getName().getText();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
                 boolean selected = reputation.equals(selectedReputation);
                 
-                gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(matrices, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
                 
                 y += REPUTATION_OFFSET;
             }
@@ -135,9 +136,8 @@ public class EditReputationGraphic extends EditableGraphic {
             
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
-                String str = reputation.getName();
-                
-                if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
+    
+                if (gui.inBounds(x, y, gui.getStringWidth(reputation.getName().getText()), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.NORMAL) {
                         if (reputation.equals(selectedReputation)) {
                             selectedReputation = null;
@@ -145,7 +145,7 @@ public class EditReputationGraphic extends EditableGraphic {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        TextMenu.display(gui, reputation.getName(), true, reputation::setName);
+                        WrappedTextMenu.display(gui, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;

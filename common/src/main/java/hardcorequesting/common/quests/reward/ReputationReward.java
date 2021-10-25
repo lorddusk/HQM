@@ -25,7 +25,7 @@ public class ReputationReward extends QuestReward<Reputation> {
     
     public FormattedText getLabel() {
         if (reward != null) {
-            MutableComponent component = Translator.text(reward.getName() + ": ");
+            MutableComponent component = reward.getName().getText().append(": ");
             
             MutableComponent valueComp = Translator.text(value > 0 ? "+" + value : String.valueOf(value));
             if (value != 0) {

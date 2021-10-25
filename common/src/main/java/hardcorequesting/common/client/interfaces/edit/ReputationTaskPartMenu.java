@@ -84,7 +84,7 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
                 if (ReputationManager.getInstance().getReputations().isEmpty()) {
                     return Translator.translatable("hqm.repSetting.invalid");
                 } else {
-                    return reputation != null ? Translator.plain(reputation.getName()) : Translator.translatable("hqm.repSetting.invalid");
+                    return reputation != null ? reputation.getName().getText() : Translator.translatable("hqm.repSetting.invalid");
                 }
             }
     

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.util.GsonHelper;
 
 public class ReputationAdapter {
@@ -44,7 +45,7 @@ public class ReputationAdapter {
         public JsonElement serialize(Reputation src) {
             return object()
                     .add(ID, src.getId())
-                    .add(NAME, src.getName())
+                    .add(NAME, src.getName().toJson())
                     .add(NEUTRAL, src.getNeutralName())
                     .add(MARKERS, array()
                             .use(builder -> {
@@ -61,7 +62,7 @@ public class ReputationAdapter {
             JsonObject object = json.getAsJsonObject();
             Reputation reputation = new Reputation(
                     GsonHelper.getAsString(object, ID, null),
-                    GsonHelper.getAsString(object, NAME, "Unnamed"),
+                    WrappedText.fromJson(object.get(NAME), "Unnamed", false),
                     GsonHelper.getAsString(object, NEUTRAL, "Neutral")
             );
             for (JsonElement element : GsonHelper.getAsJsonArray(object, MARKERS, EMPTY_ARRAY)) {

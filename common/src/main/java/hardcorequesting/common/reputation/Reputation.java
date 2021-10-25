@@ -6,6 +6,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -34,21 +35,21 @@ public class Reputation {
     private static final int TEXT_X = 5;
     private static final int TEXT_Y = 14;
     private String uuid;
-    private String name;
+    private WrappedText name;
     private final ReputationMarker neutral;
     private final List<ReputationMarker> markers;
     
-    public Reputation(String name, String neutralName) {
+    public Reputation() {
         Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         do {
             this.uuid = UUID.randomUUID().toString();
         } while (reputationMap.containsKey(this.uuid));
-        this.name = name;
-        this.neutral = new ReputationMarker(neutralName, 0, true);
+        this.name = WrappedText.create("Unnamed");
+        this.neutral = new ReputationMarker("Neutral", 0, true);
         this.markers = new ArrayList<>();
     }
     
-    public Reputation(String id, String name, String neutralName) {
+    public Reputation(String id, WrappedText name, String neutralName) {
         Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         this.uuid = id;
         while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
@@ -215,7 +216,7 @@ public class Reputation {
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
                 info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf")
-                        .append(" " + name).withStyle(ChatFormatting.DARK_RED);
+                        .append(" ").append(name.getText()).withStyle(ChatFormatting.DARK_RED);
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -224,25 +225,25 @@ public class Reputation {
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
                         if (inverted) {
-                            info = Translator.plain(name + " != " + lowerName);
+                            info = name.getText().append(" != " + lowerName);
                         } else {
-                            info = Translator.plain(name + " == " + lowerName);
+                            info = name.getText().append(" == " + lowerName);
                         }
                     } else {
                         if (inverted) {
-                            info = Translator.translatable("hqm.rep.not").append(" (" + lowerName + " <= " + name + " <= " + upperName + ")");
+                            info = Translator.translatable("hqm.rep.not").append(" (" + lowerName + " <= ").append(name.getText()).append(" <= " + upperName + ")");
                         } else {
-                            info = Translator.plain(lowerName + " <= " + name + " <= " + upperName);
+                            info = Translator.text(lowerName + " <= ").append(name.getText()).append(" <= " + upperName);
                         }
                     }
                 } else if (lower != null) {
-                    info = Translator.plain(name + " " + (inverted ? "<" : ">=") + " " + lowerName);
+                    info = name.getText().append(" " + (inverted ? "<" : ">=") + " " + lowerName);
                 } else {
-                    info = Translator.plain(name + " " + (inverted ? ">" : "<=") + " " + upperName);
+                    info = name.getText().append(" " + (inverted ? ">" : "<=") + " " + upperName);
                 }
             }
         } else {
-            info = Translator.plain(name + ": " + current.getName() + " (" + value + ")");
+            info = name.getText().append(": " + current.getName() + " (" + value + ")");
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
@@ -391,11 +392,11 @@ public class Reputation {
         }
     }
     
-    public String getName() {
+    public WrappedText getName() {
         return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
     }
     
