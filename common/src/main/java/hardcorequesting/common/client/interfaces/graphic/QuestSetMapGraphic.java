@@ -13,10 +13,7 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.reputation.ReputationBar;
-import hardcorequesting.common.util.EditType;
-import hardcorequesting.common.util.OPBookHelper;
-import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -90,7 +87,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 List<FormattedText> tooltip = new ArrayList<>();
                 
                 if (enabled || editing) {
-                    tooltip.add(Translator.plain(quest.getName()));
+                    tooltip.add(quest.getName().getText());
                 }
             
                 if (!enabled) {
@@ -200,7 +197,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             
             if (holdingR) {
                 for (Quest parent : quest.getRequirements()) {
-                    MutableComponent component = Translator.text(parent.getName()).withStyle(ChatFormatting.DARK_GRAY);
+                    MutableComponent component = parent.getName().getText().withStyle(ChatFormatting.DARK_GRAY);
                     tooltip.add(component);
                     if (parent.isCompleted(playerId)) {
                         MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed"))
@@ -347,7 +344,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             if (holdingO) {
                 for (UUID id : ids) {
                     Quest option = Quest.getQuest(id);
-                    MutableComponent component = Translator.text(option.getName()).withStyle(ChatFormatting.DARK_BLUE);
+                    MutableComponent component = option.getName().getText().withStyle(ChatFormatting.DARK_BLUE);
                     tooltip.add(component);
                     if (!option.hasSameSetAs(quest)) {
                         component.append(" (" + option.getQuestSet().getName() + ")");
@@ -458,7 +455,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             switch (gui.getCurrentMode()) {
                 case CREATE:
                     if (mX > 0) {
-                        Quest newQuest = new Quest("Unnamed", "Unnamed quest", 0, 0, false);
+                        Quest newQuest = new Quest(WrappedText.create("Unnamed"), WrappedText.create("Unnamed quest"), 0, 0, false);
                         newQuest.setGuiCenterX(mX);
                         newQuest.setGuiCenterY(mY);
                         newQuest.setQuestSet(set);

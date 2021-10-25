@@ -5,7 +5,6 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditCommandRewardsMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
@@ -95,7 +94,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private List<FormattedText> getCachedDescription() {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(quest.getDescription()), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(quest.getDescription().getText(), 0.7F, 130);
         }
         return cachedDescription;
     }
@@ -106,7 +105,7 @@ public final class QuestGraphic extends EditableGraphic {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
-        gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
+        gui.drawString(matrices, quest.getName().getText(), START_X, TITLE_START_Y, 0x404040);
         
         List<FormattedText> description = descriptionScroll.getVisibleEntries();
         gui.drawString(matrices, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
@@ -212,9 +211,9 @@ public final class QuestGraphic extends EditableGraphic {
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(START_X, TITLE_START_Y, 140, GuiBase.TEXT_HEIGHT, mX, mY)) {
-                TextMenu.display(gui, quest.getName(), true, quest::setName);
+                WrappedTextMenu.display(gui, quest.getName(), true, quest::setName);
             } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-                TextMenu.display(gui, quest.getDescription(), false, description -> {
+                WrappedTextMenu.display(gui, quest.getDescription(), false, description -> {
                     cachedDescription = null;
                     quest.setDescription(description);
                 });

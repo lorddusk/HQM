@@ -17,6 +17,7 @@ import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.server.MinecraftServer;
@@ -39,8 +40,8 @@ public class Quest {
     
     private final QuestRewards rewards = new QuestRewards(this);
     private UUID questId;
-    private String name;
-    private String description;
+    private WrappedText name;
+    private WrappedText description;
     private List<UUID> requirement;
     private List<UUID> reversedRequirement;
     private List<UUID> optionLinks;
@@ -74,7 +75,7 @@ public class Quest {
         }
     };
     
-    public Quest(String name, String description, int x, int y, boolean isBig) {
+    public Quest(WrappedText name, WrappedText description, int x, int y, boolean isBig) {
         do {
             this.questId = UUID.randomUUID();
         } while (getQuests().containsKey(this.questId));
@@ -262,11 +263,11 @@ public class Quest {
             getQuestSet().addQuest(this);
     }
     
-    public String getName() {
+    public WrappedText getName() {
         return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
     }
     
@@ -587,11 +588,11 @@ public class Quest {
         isBig = b;
     }
     
-    public String getDescription() {
+    public WrappedText getDescription() {
         return description;
     }
     
-    public void setDescription(String description) {
+    public void setDescription(WrappedText description) {
         this.description = description;
     }
     

@@ -18,6 +18,7 @@ import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.NonNullList;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
@@ -161,8 +162,8 @@ public class QuestAdapter {
             QuestRewards rewards = src.getRewards();
             return object()
                     .add(UUID, src.getQuestId().toString())
-                    .add(NAME, src.getName())
-                    .add(DESCRIPTION, src.getDescription())
+                    .add(NAME, src.getName().toJson())
+                    .add(DESCRIPTION, src.getDescription().toJson())
                     .add(X, src.getGuiX())
                     .add(Y, src.getGuiY())
                     .use(builder -> {
@@ -209,8 +210,8 @@ public class QuestAdapter {
             List<String> prerequisites = Collections.emptyList();
             List<String> optionLinks = Collections.emptyList();
             QUEST = new Quest(
-                    GsonHelper.getAsString(object, NAME, "Unnamed"),
-                    GsonHelper.getAsString(object, DESCRIPTION, "Unnamed quest"),
+                    WrappedText.fromJson(object.get(NAME), "Unnamed", false),
+                    WrappedText.fromJson(object.get(DESCRIPTION), "Unnamed quest", false),
                     GsonHelper.getAsInt(object, X, 0),
                     GsonHelper.getAsInt(object, Y, 0),
                     GsonHelper.getAsBoolean(object, BIG_ICON, false)

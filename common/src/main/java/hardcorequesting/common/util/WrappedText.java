@@ -26,6 +26,12 @@ public final class WrappedText {
         return new WrappedText(key, true);
     }
     
+    public static WrappedText fromJson(JsonElement element, String fallback, boolean isDefaultTranslated) {
+        if (element == null)
+            return new WrappedText(fallback, isDefaultTranslated);
+        else return fromJson(element, isDefaultTranslated);
+    }
+    
     public static WrappedText fromJson(JsonElement element, boolean isDefaultTranslated) {
         if (GsonHelper.isStringValue(element)) {    // Format used before migration to WrappedText
             return new WrappedText(element.getAsString(), isDefaultTranslated);

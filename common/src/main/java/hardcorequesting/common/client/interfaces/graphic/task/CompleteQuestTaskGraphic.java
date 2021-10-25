@@ -51,7 +51,7 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
         if (part.getQuest() != null) {
-            gui.drawString(matrices, Translator.plain(part.getName()), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawString(matrices, part.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
             if (task.completed(id, playerId)) {
                 gui.drawString(matrices, Translator.translatable("hqm.completedMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
             }
