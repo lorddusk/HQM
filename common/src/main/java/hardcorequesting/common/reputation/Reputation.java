@@ -215,8 +215,8 @@ public class Reputation {
             info = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf")
-                        .append(" ").append(name.getText()).withStyle(ChatFormatting.DARK_RED);
+                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf", name.getText())
+                        .withStyle(ChatFormatting.DARK_RED);
                 
             } else {
                 String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
@@ -225,25 +225,24 @@ public class Reputation {
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
                         if (inverted) {
-                            info = name.getText().append(" != " + lowerName);
+                            info = Translator.translatable("hqm.rep.not_equals", name, lowerName);
                         } else {
-                            info = name.getText().append(" == " + lowerName);
+                            info = Translator.translatable("hqm.rep.equals", name, lowerName);
                         }
                     } else {
+                        info = Translator.translatable("hqm.rep.between", lowerName, name.getText(), upperName);
                         if (inverted) {
-                            info = Translator.translatable("hqm.rep.not").append(" (" + lowerName + " <= ").append(name.getText()).append(" <= " + upperName + ")");
-                        } else {
-                            info = Translator.text(lowerName + " <= ").append(name.getText()).append(" <= " + upperName);
+                            info = Translator.translatable("hqm.rep.not", info);
                         }
                     }
                 } else if (lower != null) {
-                    info = name.getText().append(" " + (inverted ? "<" : ">=") + " " + lowerName);
+                    info = Translator.translatable(inverted ? "hqm.rep.min_inverted" : "hqm.rep.min", name, lowerName);
                 } else {
-                    info = name.getText().append(" " + (inverted ? ">" : "<=") + " " + upperName);
+                    info = Translator.translatable(inverted ? "hqm.rep.max_inverted" : "hqm.rep.max", name, upperName);
                 }
             }
         } else {
-            info = name.getText().append(": " + current.getName() + " (" + value + ")");
+            info = Translator.translatable("hqm.rep.current", name, current.getName(), value);
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
