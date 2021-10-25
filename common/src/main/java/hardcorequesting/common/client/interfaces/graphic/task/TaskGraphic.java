@@ -40,7 +40,7 @@ public abstract class TaskGraphic extends Graphic {
         this.gui = gui;
         this.task = task;
         
-        addScrollBar(taskDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.SMALL, 312, 18, TASK_DESCRIPTION_X, VISIBLE_DESCRIPTION_LINES, this::getCachedLongDescription));
+        addScrollBar(taskDescriptionScroll = new ExtendedScrollBar<>(gui, ScrollBar.Size.SMALL, 312, 18, TASK_DESCRIPTION_X, VISIBLE_DESCRIPTION_LINES, this::getCachedDescription));
     }
     
     protected void addSubmitButton(QuestTask<?> task) {
@@ -83,20 +83,20 @@ public abstract class TaskGraphic extends Graphic {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         if (gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-            WrappedTextMenu.display(gui, task.getLongDescription(), false, this::setLongDescription);
+            WrappedTextMenu.display(gui, task.getDescription(), false, this::setDescription);
         }
     }
     
-    private List<FormattedText> getCachedLongDescription() {
+    private List<FormattedText> getCachedDescription() {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(task.getLongDescription().getText(), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(task.getDescription().getText(), 0.7F, 130);
         }
         
         return cachedDescription;
     }
     
-    private void setLongDescription(WrappedText description) {
-        task.setLongDescription(description);
+    private void setDescription(WrappedText description) {
+        task.setDescription(description);
         cachedDescription = null;
     }
 }

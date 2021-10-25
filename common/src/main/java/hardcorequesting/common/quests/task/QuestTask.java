@@ -40,16 +40,16 @@ public abstract class QuestTask<Data extends TaskData> {
     private final TaskType<?> type;
     private final Class<Data> dataType;
     protected Quest parent;
-    public WrappedText description;
-    private WrappedText longDescription;
+    public WrappedText name;
+    private WrappedText description;
     private int id;
     
     public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent) {
         this.type = type;
         this.dataType = dataType;
         this.parent = parent;
-        this.description = WrappedText.createTranslated(type.getLangKeyName());
-        this.longDescription = WrappedText.createTranslated(type.getLangKeyDescription());
+        this.name = WrappedText.createTranslated(type.getLangKeyName());
+        this.description = WrappedText.createTranslated(type.getLangKeyDescription());
     }
     
     public TaskType<?> getType() {
@@ -153,20 +153,20 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract Data newQuestData();
     
+    public WrappedText getName() {
+        return name;
+    }
+    
+    public void setName(WrappedText name) {
+        this.name = name;
+    }
+    
     public WrappedText getDescription() {
         return description;
     }
     
     public void setDescription(WrappedText description) {
         this.description = description;
-    }
-    
-    public WrappedText getLongDescription() {
-        return longDescription;
-    }
-    
-    public void setLongDescription(WrappedText longDescription) {
-        this.longDescription = longDescription;
     }
     
     public void completeTask(UUID uuid) {

@@ -378,8 +378,8 @@ public class QuestTaskAdapter {
     public static Map<ReputationTask<?>, List<ReputationSettingConstructor>> taskReputationListMap = new HashMap<>();
     protected static final Adapter<QuestTask<?>> TASK_ADAPTER = new Adapter<>() {
         private static final String TYPE = "type";
-        private static final String DESCRIPTION = "description";
-        private static final String LONG_DESCRIPTION = "longDescription";
+        private static final String NAME = "description";
+        private static final String DESCRIPTION = "longDescription";
     
         @Override
         public JsonElement serialize(QuestTask<?> src) {
@@ -387,10 +387,10 @@ public class QuestTaskAdapter {
         
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.toDataName());
-            if (!src.getDescription().equals(WrappedText.createTranslated(type.getLangKeyName())))
+            if (!src.getName().equals(WrappedText.createTranslated(type.getLangKeyName())))
+                builder.add(NAME, src.getName().toJson());
+            if (!src.getDescription().equals(WrappedText.createTranslated(type.getLangKeyDescription())))
                 builder.add(DESCRIPTION, src.getDescription().toJson());
-            if (!src.getLongDescription().equals(WrappedText.createTranslated(type.getLangKeyDescription())))
-                builder.add(LONG_DESCRIPTION, src.getLongDescription().toJson());
             src.write(builder);
             return builder.build();
         }
@@ -400,10 +400,10 @@ public class QuestTaskAdapter {
             JsonObject object = json.getAsJsonObject();
             TaskType<?> type = TaskType.fromDataName(GsonHelper.getAsString(object, TYPE));
             QuestTask<?> TASK = type.addTask(QUEST);
+            if (object.has(NAME))
+                TASK.setName(WrappedText.fromJson(object.get(NAME), true));
             if (object.has(DESCRIPTION))
                 TASK.setDescription(WrappedText.fromJson(object.get(DESCRIPTION), true));
-            if (object.has(LONG_DESCRIPTION))
-                TASK.setLongDescription(WrappedText.fromJson(object.get(LONG_DESCRIPTION), true));
             TASK.read(object);
             return TASK;
         }

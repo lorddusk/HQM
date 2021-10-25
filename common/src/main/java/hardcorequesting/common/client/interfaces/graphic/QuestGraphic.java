@@ -117,9 +117,9 @@ public final class QuestGraphic extends EditableGraphic {
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(playerId);
                 int yPos = getTaskY(id);
-                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription().getText()), GuiBase.TEXT_HEIGHT, mX, mY);
+                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getName().getText()), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(matrices, task.getDescription().getText(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(matrices, task.getName().getText(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
                 id++;
             }
@@ -170,7 +170,7 @@ public final class QuestGraphic extends EditableGraphic {
         int id = 0;
         for (QuestTask<?> task : taskScroll.getVisibleEntries(quest.getTasks(), VISIBLE_TASKS)) {
             if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
-                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription().getText()), GuiBase.TEXT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getName().getText()), GuiBase.TEXT_HEIGHT, mX, mY)) {
                     if (gui.isOpBook && Screen.hasShiftDown()) {
                         OPBookHelper.reverseTaskCompletion(task, playerId);
                         return;
@@ -180,7 +180,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            WrappedTextMenu.display(gui, task.getDescription(), true, task::setDescription);
+                            WrappedTextMenu.display(gui, task.getName(), true, task::setName);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
                             if (selectedTask == task) {

@@ -276,7 +276,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             
             if (holdingT) {
                 for (QuestTask<?> task : quest.getTasks()) {
-                    MutableComponent component = task.getDescription().getText().withStyle(ChatFormatting.DARK_AQUA);
+                    MutableComponent component = task.getName().getText().withStyle(ChatFormatting.DARK_AQUA);
                     tooltip.add(component);
                     if (task.isCompleted(playerId)) {
                         component.append(" ").append(Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));

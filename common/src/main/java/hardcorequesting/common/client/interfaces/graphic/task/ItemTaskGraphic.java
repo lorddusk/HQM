@@ -79,7 +79,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = task.getParent().getQuestId();
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = task.getId();
             
-                Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", task.getDescription()).withStyle(ChatFormatting.GREEN), false);
+                Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", task.getName()).withStyle(ChatFormatting.GREEN), false);
             
                 GeneralUsage.sendBookSelectTaskUpdate(task);
             }
