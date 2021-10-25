@@ -3,6 +3,7 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.util.Either;
@@ -35,9 +36,9 @@ import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
 
 public class QuestTaskAdapter {
     
-    public static final Adapter<TaskData> QUEST_DATA_TASK_ADAPTER = new Adapter<TaskData>() {
+    public static final Adapter<TaskData> QUEST_DATA_TASK_ADAPTER = new Adapter<>() {
         private static final String TYPE = "type";
-        
+    
         @Override
         public JsonElement serialize(TaskData src) {
             JsonObjectBuilder builder = object()
@@ -45,19 +46,19 @@ public class QuestTaskAdapter {
             src.write(builder);
             return builder.build();
         }
-        
+    
         @Override
         public TaskData deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             return QuestDataType.valueOf(GsonHelper.getAsString(object, TYPE)).construct(object);
         }
     };
-    public static final TypeAdapter<ItemRequirementTask.Part> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<ItemRequirementTask.Part>() {
+    public static final TypeAdapter<ItemRequirementTask.Part> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<>() {
         private static final String ITEM = "item";
         private static final String FLUID = "fluid";
         private static final String REQUIRED = "required";
         private static final String PRECISION = "precision";
-        
+    
         @Override
         public void write(JsonWriter out, ItemRequirementTask.Part value) throws IOException {
             Optional<ItemStack> stack = value.stack.left();
@@ -82,7 +83,7 @@ public class QuestTaskAdapter {
                 out.name(PRECISION).value(ItemPrecision.getUniqueID(precision));
             out.endObject();
         }
-        
+    
         @Override
         public ItemRequirementTask.Part read(JsonReader in) throws IOException {
             in.beginObject();
@@ -132,7 +133,7 @@ public class QuestTaskAdapter {
         @Override
         public JsonElement serialize(VisitLocationTask.Part src) {
             return object()
-                    .add(NAME, src.getName())
+                    .add(NAME, src.getName().toJson())
                     .add(X, src.getPosition().getX())
                     .add(Y, src.getPosition().getY())
                     .add(Z, src.getPosition().getZ())
@@ -152,7 +153,8 @@ public class QuestTaskAdapter {
         public VisitLocationTask.Part deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             VisitLocationTask.Part result = new VisitLocationTask.Part();
-            result.setName(GsonHelper.getAsString(object, NAME));
+            if (object.has(NAME))
+                result.setName(WrappedText.fromJson(object.get(NAME), false));
             result.setPosition(new BlockPos(GsonHelper.getAsInt(object, X), GsonHelper.getAsInt(object, Y), GsonHelper.getAsInt(object, Z)));
             result.setDimension(GsonHelper.getAsString(object, DIM));
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
@@ -204,7 +206,6 @@ public class QuestTaskAdapter {
     
     public static final TypeAdapter<TameMobsTask.Part> TAME_ADAPTER = new TypeAdapter<>() {
         private static final String TAMES = "tames";
-        private static final String EXACT = "exact";
         private static final String TAME = "tame";
         private static final String ICON = "icon";
         private static final String FLUID_ICON = "fluid_icon";
@@ -213,7 +214,7 @@ public class QuestTaskAdapter {
         @Override
         public void write(JsonWriter out, TameMobsTask.Part value) throws IOException {
             out.beginObject();
-            out.name(NAME).value(value.getName());
+            Streams.write(value.getName().toJson(), out.name(NAME));
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
@@ -234,7 +235,7 @@ public class QuestTaskAdapter {
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
-                    result.setName(in.nextString());
+                    result.setName(WrappedText.fromJson(Streams.parse(in), false));
                 } else if (name.equalsIgnoreCase(ICON)) {
                     ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                     if (icon != null) {
@@ -265,7 +266,7 @@ public class QuestTaskAdapter {
         @Override
         public void write(JsonWriter out, GetAdvancementTask.Part value) throws IOException {
             out.beginObject();
-            out.name(NAME).value(value.getName());
+            Streams.write(value.getName().toJson(), out.name(NAME));
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
@@ -287,7 +288,7 @@ public class QuestTaskAdapter {
             while (in.hasNext()) {
                 String name = in.nextName();
                 if (name.equalsIgnoreCase(NAME)) {
-                    result.setName(in.nextString());
+                    result.setName(WrappedText.fromJson(Streams.parse(in), false));
                 } else if (name.equalsIgnoreCase(ICON)) {
                     ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.read(in);
                     if (icon != null) {
@@ -307,10 +308,9 @@ public class QuestTaskAdapter {
         }
     };
     
-    public static final TypeAdapter<CompleteQuestTask.Part> QUEST_COMPLETED_ADAPTER = new TypeAdapter<CompleteQuestTask.Part>() {
-        private final String VISIBLE = "visible";
+    public static final TypeAdapter<CompleteQuestTask.Part> QUEST_COMPLETED_ADAPTER = new TypeAdapter<>() {
         private final String QUEST_UUID = "quest_uuid";
-        
+    
         @Override
         public void write(JsonWriter out, CompleteQuestTask.Part value) throws IOException {
             out.beginObject();
@@ -319,7 +319,7 @@ public class QuestTaskAdapter {
             }
             out.endObject();
         }
-        
+    
         @Override
         public CompleteQuestTask.Part read(JsonReader in) throws IOException {
             in.beginObject();
@@ -345,7 +345,7 @@ public class QuestTaskAdapter {
         @Override
         public JsonElement serialize(KillMobsTask.Part src) {
             return object()
-                    .add(NAME, src.getName())
+                    .add(NAME, src.getName().toJson())
                     .use(builder -> {
                         Optional<ItemStack> item = src.getIconStack().left();
                         Optional<FluidStack> fluid = src.getIconStack().right();
@@ -361,7 +361,8 @@ public class QuestTaskAdapter {
         public KillMobsTask.Part deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             KillMobsTask.Part result = new KillMobsTask.Part();
-            result.setName(GsonHelper.getAsString(object, NAME, result.getName()));
+            if (object.has(NAME))
+                result.setName(WrappedText.fromJson(object.get(NAME), false));
             result.setMob(new ResourceLocation(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
             result.setCount(GsonHelper.getAsInt(object, KILLS, result.getCount()));
             if (object.has(ICON)) {
@@ -420,7 +421,7 @@ public class QuestTaskAdapter {
         ADVANCEMENT(AdvancementTaskData::construct),
         COMPLETED(CompleteQuestTaskData::construct);
         
-        private Function<JsonObject, TaskData> func;
+        private final Function<JsonObject, TaskData> func;
         
         QuestDataType(Function<JsonObject, TaskData> func) {
             this.func = func;
@@ -438,7 +439,7 @@ public class QuestTaskAdapter {
         private static final String INVERTED = "inverted";
         String reputation;
         boolean inverted;
-        private int upper, lower;
+        private final int upper, lower;
         
         private ReputationSettingConstructor(String reputation, int lower, int upper, boolean inverted) {
             this.reputation = reputation;

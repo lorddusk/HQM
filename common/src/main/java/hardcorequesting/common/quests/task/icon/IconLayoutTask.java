@@ -8,6 +8,7 @@ import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,13 +39,13 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
         parent.setIconIfEmpty(stack);
     }
     
-    public void setName(int id, String str) {
+    public void setName(int id, WrappedText str) {
         parts.getOrCreateForModify(id).setName(str);
     }
     
     public abstract static class Part {
         private Either<ItemStack, FluidStack> iconStack = Either.left(ItemStack.EMPTY);
-        private String name = "New";
+        private WrappedText name = WrappedText.create("New");
         
         public Either<ItemStack, FluidStack> getIconStack() {
             return iconStack;
@@ -58,11 +59,11 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
             this.iconStack = iconStack;
         }
     
-        public String getName() {
+        public WrappedText getName() {
             return name;
         }
     
-        public void setName(String name) {
+        public void setName(WrappedText name) {
             this.name = name;
         }
     }
