@@ -7,9 +7,9 @@ import hardcorequesting.common.client.interfaces.edit.PickReputationMenu;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
 
@@ -68,11 +68,11 @@ public class ReputationBar {
         
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        
-        String info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
+    
+        FormattedText info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
         
         if (info != null) {
-            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, info, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     

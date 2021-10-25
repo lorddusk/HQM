@@ -11,7 +11,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
@@ -89,18 +88,18 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
+    public FormattedText drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, FormattedText info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
         draw(matrices, gui, x, y, mX, mY, playerId, effects, lower, upper, inverted, active, text, completed);
         return info != null ? info : getTooltip(gui, x, y, mX, mY, playerId);
     }
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
-        String error = getError();
+        FormattedText error = getError();
         
         if (error != null) {
             gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
-            gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
+            gui.drawString(matrices, error, x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
             return;
         }
         
@@ -250,7 +249,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId) {
+    public FormattedText getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId) {
     
         if (getError() != null) {
             return null;
@@ -263,7 +262,7 @@ public class Reputation {
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
             int value = markers.get(i).getValue();
             if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
-                return markers.get(i).getName() + " (" + value + ")";
+                return Translator.plain(markers.get(i).getName() + " (" + value + ")");
             }
         }
         
@@ -272,19 +271,19 @@ public class Reputation {
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
-                return current.getName() + " (" + value + ")";
+                return Translator.plain(current.getName() + " (" + value + ")");
             }
         }
         
         if (isOnPointer(gui, 0, x, y, ARROW_MARKER_Y, mX, mY)) {
-            return neutral.getName();
+            return Translator.plain(neutral.getName());
         }
         
         return null;
     }
     
     @Environment(EnvType.CLIENT)
-    private String getError() {
+    private FormattedText getError() {
         String error = null;
         if (markers.size() < 2) {
             error = "atLeastTwo";
@@ -307,7 +306,7 @@ public class Reputation {
             }
         }
         
-        return error == null ? null : I18n.get("hqm.rep." + error);
+        return error == null ? null : Translator.translatable("hqm.rep." + error);
     }
     
     public ReputationMarker getCurrentMarker(int value) {

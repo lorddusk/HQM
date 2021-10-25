@@ -8,7 +8,6 @@ import hardcorequesting.common.client.interfaces.edit.ReputationTaskPartMenu;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.util.Positioned;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
@@ -67,9 +66,9 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     protected List<FormattedText> getPartTooltip(Positioned<ReputationTask.Part> pos, int id, int mX, int mY) {
         ReputationTask.Part part = pos.getElement();
         if (part.getReputation() != null) {
-            String text = part.getReputation().getTooltip(gui, pos.getX(), pos.getY(), mX, mY, playerId);
+            FormattedText text = part.getReputation().getTooltip(gui, pos.getX(), pos.getY(), mX, mY, playerId);
             if (text != null)
-                return Collections.singletonList(Translator.plain(text));
+                return Collections.singletonList(text);
         }
         return null;
     }
