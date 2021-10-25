@@ -21,6 +21,7 @@ import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -386,10 +387,10 @@ public class QuestTaskAdapter {
         
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.toDataName());
-            if (!src.getLangKeyDescription().equals(type.getLangKeyName()))
-                builder.add(DESCRIPTION, src.getLangKeyDescription());
-            if (!src.getLangKeyLongDescription().equals(type.getLangKeyDescription()))
-                builder.add(LONG_DESCRIPTION, src.getLangKeyLongDescription());
+            if (!src.getDescription().equals(WrappedText.createTranslated(type.getLangKeyName())))
+                builder.add(DESCRIPTION, src.getDescription().toJson());
+            if (!src.getLongDescription().equals(WrappedText.createTranslated(type.getLangKeyDescription())))
+                builder.add(LONG_DESCRIPTION, src.getLongDescription().toJson());
             src.write(builder);
             return builder.build();
         }
@@ -399,8 +400,10 @@ public class QuestTaskAdapter {
             JsonObject object = json.getAsJsonObject();
             TaskType<?> type = TaskType.fromDataName(GsonHelper.getAsString(object, TYPE));
             QuestTask<?> TASK = type.addTask(QUEST);
-            if (object.has(DESCRIPTION)) TASK.setDescription(GsonHelper.getAsString(object, DESCRIPTION));
-            if (object.has(LONG_DESCRIPTION)) TASK.setLongDescription(GsonHelper.getAsString(object, LONG_DESCRIPTION));
+            if (object.has(DESCRIPTION))
+                TASK.setDescription(WrappedText.fromJson(object.get(DESCRIPTION), true));
+            if (object.has(LONG_DESCRIPTION))
+                TASK.setLongDescription(WrappedText.fromJson(object.get(LONG_DESCRIPTION), true));
             TASK.read(object);
             return TASK;
         }

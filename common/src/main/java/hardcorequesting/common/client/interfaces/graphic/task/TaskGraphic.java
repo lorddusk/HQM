@@ -12,6 +12,7 @@ import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
@@ -82,20 +83,20 @@ public abstract class TaskGraphic extends Graphic {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         if (gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-            TextMenu.display(gui, task.getLangKeyLongDescription(), false, this::setLongDescription);
+            TextMenu.display(gui, task.getLongDescription().getRawText(), false, this::setLongDescription);
         }
     }
     
     private List<FormattedText> getCachedLongDescription() {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(task.getLongDescription(), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(task.getLongDescription().getText(), 0.7F, 130);
         }
         
         return cachedDescription;
     }
     
     private void setLongDescription(String description) {
-        task.setLongDescription(description);
+        task.setLongDescription(WrappedText.createTranslated(description));
         cachedDescription = null;
     }
 }

@@ -2,13 +2,14 @@ package hardcorequesting.common.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.GsonHelper;
 
 import java.util.Objects;
 
 /**
- * A text wrapper that can optionally be translatable
+ * A text wrapper that can optionally be translatable.
+ * @author kirderf1
  */
 public final class WrappedText {
     private static final String TEXT = "text", TRANSLATED = "isTranslationKey";
@@ -46,7 +47,7 @@ public final class WrappedText {
         this.shouldTranslate = shouldTranslate;
     }
     
-    public FormattedText getText() {
+    public MutableComponent getText() {
         if (shouldTranslate)
             return Translator.translatable(text);
         else
