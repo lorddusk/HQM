@@ -48,7 +48,7 @@ public class PickReputationMenu extends GuiEditMenu {
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
         for (Reputation reputation : scrollBar.getVisibleEntries()) {
-            FormattedText str = reputation.getName().getText();
+            FormattedText str = reputation.getName();
             
             boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
             boolean selected = reputation.equals(selectedReputation);
@@ -68,7 +68,7 @@ public class PickReputationMenu extends GuiEditMenu {
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
         for (Reputation reputation : scrollBar.getVisibleEntries()) {
-            FormattedText str = reputation.getName().getText();
+            FormattedText str = reputation.getName();
             
             if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                 selectedReputation = reputation;

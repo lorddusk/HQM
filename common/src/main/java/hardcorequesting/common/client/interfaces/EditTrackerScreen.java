@@ -109,7 +109,7 @@ public class EditTrackerScreen extends GuiBase {
         
         textBoxes.render(matrices, mX, mY);
     
-        drawCenteredString(matrices, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName().getText() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
+        drawCenteredString(matrices, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     
         selectionHelper.render(matrices, mX, mY);
     

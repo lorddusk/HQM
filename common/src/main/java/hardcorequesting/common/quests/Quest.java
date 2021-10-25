@@ -20,6 +20,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -263,7 +264,11 @@ public class Quest {
             getQuestSet().addQuest(this);
     }
     
-    public WrappedText getName() {
+    public MutableComponent getName() {
+        return name.getText();
+    }
+    
+    public WrappedText getRawName() {
         return name;
     }
     

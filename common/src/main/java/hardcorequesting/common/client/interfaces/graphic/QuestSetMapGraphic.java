@@ -87,7 +87,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 List<FormattedText> tooltip = new ArrayList<>();
                 
                 if (enabled || editing) {
-                    tooltip.add(quest.getName().getText());
+                    tooltip.add(quest.getName());
                 }
             
                 if (!enabled) {
@@ -197,7 +197,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             
             if (holdingR) {
                 for (Quest parent : quest.getRequirements()) {
-                    MutableComponent component = parent.getName().getText().withStyle(ChatFormatting.DARK_GRAY);
+                    MutableComponent component = parent.getName().withStyle(ChatFormatting.DARK_GRAY);
                     tooltip.add(component);
                     if (parent.isCompleted(playerId)) {
                         MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed"))
@@ -273,7 +273,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             
             if (holdingT) {
                 for (QuestTask<?> task : quest.getTasks()) {
-                    MutableComponent component = task.getName().getText().withStyle(ChatFormatting.DARK_AQUA);
+                    MutableComponent component = task.getName().withStyle(ChatFormatting.DARK_AQUA);
                     tooltip.add(component);
                     if (task.isCompleted(playerId)) {
                         component.append(" ").append(Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
@@ -344,7 +344,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             if (holdingO) {
                 for (UUID id : ids) {
                     Quest option = Quest.getQuest(id);
-                    MutableComponent component = option.getName().getText().withStyle(ChatFormatting.DARK_BLUE);
+                    MutableComponent component = option.getName().withStyle(ChatFormatting.DARK_BLUE);
                     tooltip.add(component);
                     if (!option.hasSameSetAs(quest)) {
                         component.append(" (" + option.getQuestSet().getName() + ")");

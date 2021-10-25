@@ -83,13 +83,13 @@ public abstract class TaskGraphic extends Graphic {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         if (gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-            WrappedTextMenu.display(gui, task.getDescription(), false, this::setDescription);
+            WrappedTextMenu.display(gui, task.getRawDescription(), false, this::setDescription);
         }
     }
     
     private List<FormattedText> getCachedDescription() {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(task.getDescription().getText(), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(task.getDescription(), 0.7F, 130);
         }
         
         return cachedDescription;

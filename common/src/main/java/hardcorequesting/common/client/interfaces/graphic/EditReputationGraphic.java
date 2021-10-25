@@ -95,7 +95,7 @@ public class EditReputationGraphic extends EditableGraphic {
             int y = REPUTATION_LIST_Y;
             List<Reputation> reputationList = ReputationManager.getInstance().getReputationList();
             for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
-                FormattedText str = reputation.getName().getText();
+                FormattedText str = reputation.getName();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
                 boolean selected = reputation.equals(selectedReputation);
@@ -107,7 +107,7 @@ public class EditReputationGraphic extends EditableGraphic {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName().getText());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
     
             int x = REPUTATION_MARKER_LIST_X;
@@ -137,7 +137,7 @@ public class EditReputationGraphic extends EditableGraphic {
             List<Reputation> reputationList = reputationManager.getReputationList();
             for (Reputation reputation : reputationScroll.getVisibleEntries(reputationList, VISIBLE_REPUTATIONS)) {
     
-                if (gui.inBounds(x, y, gui.getStringWidth(reputation.getName().getText()), FONT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(x, y, gui.getStringWidth(reputation.getName()), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.NORMAL) {
                         if (reputation.equals(selectedReputation)) {
                             selectedReputation = null;
@@ -145,7 +145,7 @@ public class EditReputationGraphic extends EditableGraphic {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        WrappedTextMenu.display(gui, reputation.getName(), true, reputation::setName);
+                        WrappedTextMenu.display(gui, reputation.getRawName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
@@ -162,10 +162,10 @@ public class EditReputationGraphic extends EditableGraphic {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName().getText());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    WrappedTextMenu.display(gui, selectedReputation.getNeutralName(), true, selectedReputation::setNeutralName);
+                    WrappedTextMenu.display(gui, selectedReputation.getRawNeutralName(), true, selectedReputation::setNeutralName);
                 }
                 return;
             }
@@ -177,7 +177,7 @@ public class EditReputationGraphic extends EditableGraphic {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        WrappedTextMenu.display(gui, marker.getName(), true, marker::setName);
+                        WrappedTextMenu.display(gui, marker.getRawName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         EditRepTierValueMenu.display(gui, marker.getValue(), value -> {
                             marker.setValue(value);

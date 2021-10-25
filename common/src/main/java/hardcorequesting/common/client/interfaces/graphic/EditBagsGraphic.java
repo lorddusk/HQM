@@ -165,7 +165,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         gui.setPage(page.forGroup(group));
                         break;
                     case RENAME:
-                        WrappedTextMenu.display(gui, group.getName(), true, group::setName);
+                        WrappedTextMenu.display(gui, group.getRawName(), true, group::setName);
                         break;
                     case DELETE:
                         LootGroup.remove(group.getId());

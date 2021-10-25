@@ -21,6 +21,7 @@ import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -153,7 +154,11 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract Data newQuestData();
     
-    public WrappedText getName() {
+    public MutableComponent getName() {
+        return name.getText();
+    }
+    
+    public WrappedText getRawName() {
         return name;
     }
     
@@ -161,7 +166,11 @@ public abstract class QuestTask<Data extends TaskData> {
         this.name = name;
     }
     
-    public WrappedText getDescription() {
+    public MutableComponent getDescription() {
+        return description.getText();
+    }
+    
+    public WrappedText getRawDescription() {
         return description;
     }
     

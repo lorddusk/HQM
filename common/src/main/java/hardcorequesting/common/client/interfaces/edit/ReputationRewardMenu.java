@@ -103,7 +103,7 @@ public class ReputationRewardMenu extends GuiEditMenu {
     
             @Override
             protected FormattedText getArrowText() {
-                return selectedReward.getReward().getName().getText();
+                return selectedReward.getReward().getName();
             }
         });
     }

@@ -18,7 +18,7 @@ public class ReputationAdapter {
         @Override
         public JsonElement serialize(ReputationMarker src) {
             return object()
-                    .add(NAME, src.getName().toJson())
+                    .add(NAME, src.getRawName().toJson())
                     .add(VALUE, src.getValue())
                     .build();
         }
@@ -45,8 +45,8 @@ public class ReputationAdapter {
         public JsonElement serialize(Reputation src) {
             return object()
                     .add(ID, src.getId())
-                    .add(NAME, src.getName().toJson())
-                    .add(NEUTRAL, src.getNeutralName().toJson())
+                    .add(NAME, src.getRawName().toJson())
+                    .add(NEUTRAL, src.getRawNeutralName().toJson())
                     .add(MARKERS, array()
                             .use(builder -> {
                                 for (int i = 0; i < src.getMarkerCount(); i++) {

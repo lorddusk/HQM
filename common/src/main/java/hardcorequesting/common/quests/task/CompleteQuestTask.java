@@ -145,7 +145,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
         
         public FormattedText getName() {
             Quest q = getQuest();
-            return (q != null) ? q.getName().getText() : Translator.plain("Use \"Select Quest\" to pick");
+            return (q != null) ? q.getName() : Translator.plain("Use \"Select Quest\" to pick");
         }
         
         public void setQuest(UUID quest_id) {

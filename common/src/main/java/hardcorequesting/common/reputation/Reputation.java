@@ -13,6 +13,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -64,8 +65,12 @@ public class Reputation {
         return uuid;
     }
     
-    public WrappedText getNeutralName() {
+    public MutableComponent getNeutralName() {
         return neutral.getName();
+    }
+    
+    public WrappedText getRawNeutralName() {
+        return neutral.getRawName();
     }
     
     public void setNeutralName(WrappedText name) {
@@ -219,8 +224,8 @@ public class Reputation {
                         .withStyle(ChatFormatting.DARK_RED);
                 
             } else {
-                Component lowerName = lower == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(lower.getValue())) : lower.getName().getText();
-                Component upperName = upper == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(upper.getValue())) : upper.getName().getText();
+                Component lowerName = lower == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(lower.getValue())) : lower.getName();
+                Component upperName = upper == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(upper.getValue())) : upper.getName();
                 
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
@@ -242,7 +247,7 @@ public class Reputation {
                 }
             }
         } else {
-            info = Translator.translatable("hqm.rep.current", name, current.getName().getText(), value);
+            info = Translator.translatable("hqm.rep.current", name, current.getName(), value);
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
@@ -263,7 +268,7 @@ public class Reputation {
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
             int value = markers.get(i).getValue();
             if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
-                return markers.get(i).getName().getText().append(" (" + value + ")");
+                return markers.get(i).getName().append(" (" + value + ")");
             }
         }
         
@@ -272,12 +277,12 @@ public class Reputation {
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
-                return current.getName().getText().append(" (" + value + ")");
+                return current.getName().append(" (" + value + ")");
             }
         }
         
         if (isOnPointer(gui, 0, x, y, ARROW_MARKER_Y, mX, mY)) {
-            return neutral.getName().getText();
+            return neutral.getName();
         }
         
         return null;
@@ -391,7 +396,11 @@ public class Reputation {
         }
     }
     
-    public WrappedText getName() {
+    public MutableComponent getName() {
+        return name.getText();
+    }
+    
+    public WrappedText getRawName() {
         return name;
     }
     

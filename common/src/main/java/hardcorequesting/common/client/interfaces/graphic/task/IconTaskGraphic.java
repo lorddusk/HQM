@@ -49,7 +49,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
         
-        gui.drawString(matrices, part.getName().getText(), textX, textY, 0x404040);
+        gui.drawString(matrices, part.getName(), textX, textY, 0x404040);
         drawElementText(matrices, part, id, textX + X_TEXT_INDENT, textY + 9);
     }
     
@@ -60,7 +60,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
                     result -> task.setIcon(id, result.get()));
             return true;
         } else if (mode == EditMode.RENAME) {
-            WrappedTextMenu.display(gui, part.getName(), 110,
+            WrappedTextMenu.display(gui, part.getRawName(), 110,
                     result -> task.setName(id, result));
             return true;
         } else {

@@ -30,7 +30,7 @@ public class GroupAdapter {
                 .add(ID, src.getId().toString())
                 .use(builder -> {
                     if(src.hasName()){
-                        builder.add(NAME, src.getName().toJson());
+                        builder.add(NAME, src.getRawName().toJson());
                     }
                 })
                 .add(LIMIT, src.getLimit())

@@ -71,7 +71,7 @@ public class LootGroup {
         return hasName() ? name.getText() : Translator.translatable("hqm.bag.group", tier.getName());
     }
     
-    public WrappedText getName() {
+    public WrappedText getRawName() {
         return name;
     }
     

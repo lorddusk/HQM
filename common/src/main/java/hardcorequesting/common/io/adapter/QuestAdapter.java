@@ -162,7 +162,7 @@ public class QuestAdapter {
             QuestRewards rewards = src.getRewards();
             return object()
                     .add(UUID, src.getQuestId().toString())
-                    .add(NAME, src.getName().toJson())
+                    .add(NAME, src.getRawName().toJson())
                     .add(DESCRIPTION, src.getDescription().toJson())
                     .add(X, src.getGuiX())
                     .add(Y, src.getGuiY())

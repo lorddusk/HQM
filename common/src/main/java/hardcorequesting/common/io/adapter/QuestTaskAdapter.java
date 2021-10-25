@@ -133,7 +133,7 @@ public class QuestTaskAdapter {
         @Override
         public JsonElement serialize(VisitLocationTask.Part src) {
             return object()
-                    .add(NAME, src.getName().toJson())
+                    .add(NAME, src.getRawName().toJson())
                     .add(X, src.getPosition().getX())
                     .add(Y, src.getPosition().getY())
                     .add(Z, src.getPosition().getZ())
@@ -214,7 +214,7 @@ public class QuestTaskAdapter {
         @Override
         public void write(JsonWriter out, TameMobsTask.Part value) throws IOException {
             out.beginObject();
-            Streams.write(value.getName().toJson(), out.name(NAME));
+            Streams.write(value.getRawName().toJson(), out.name(NAME));
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
@@ -266,7 +266,7 @@ public class QuestTaskAdapter {
         @Override
         public void write(JsonWriter out, GetAdvancementTask.Part value) throws IOException {
             out.beginObject();
-            Streams.write(value.getName().toJson(), out.name(NAME));
+            Streams.write(value.getRawName().toJson(), out.name(NAME));
             Optional<ItemStack> item = value.getIconStack().left();
             Optional<FluidStack> fluid = value.getIconStack().right();
             if (item.isPresent()) {
@@ -345,7 +345,7 @@ public class QuestTaskAdapter {
         @Override
         public JsonElement serialize(KillMobsTask.Part src) {
             return object()
-                    .add(NAME, src.getName().toJson())
+                    .add(NAME, src.getRawName().toJson())
                     .use(builder -> {
                         Optional<ItemStack> item = src.getIconStack().left();
                         Optional<FluidStack> fluid = src.getIconStack().right();
@@ -388,10 +388,10 @@ public class QuestTaskAdapter {
         
             JsonObjectBuilder builder = object()
                     .add(TYPE, type.toDataName());
-            if (!src.getName().equals(WrappedText.createTranslated(type.getLangKeyName())))
-                builder.add(NAME, src.getName().toJson());
-            if (!src.getDescription().equals(WrappedText.createTranslated(type.getLangKeyDescription())))
-                builder.add(DESCRIPTION, src.getDescription().toJson());
+            if (!src.getRawName().equals(WrappedText.createTranslated(type.getLangKeyName())))
+                builder.add(NAME, src.getRawName().toJson());
+            if (!src.getRawDescription().equals(WrappedText.createTranslated(type.getLangKeyDescription())))
+                builder.add(DESCRIPTION, src.getRawDescription().toJson());
             src.write(builder);
             return builder.build();
         }
