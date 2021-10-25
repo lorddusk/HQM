@@ -11,6 +11,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 
@@ -44,11 +45,11 @@ public class Reputation {
             this.uuid = UUID.randomUUID().toString();
         } while (reputationMap.containsKey(this.uuid));
         this.name = WrappedText.create("Unnamed");
-        this.neutral = new ReputationMarker("Neutral", 0, true);
+        this.neutral = new ReputationMarker(WrappedText.create("Neutral"), 0, true);
         this.markers = new ArrayList<>();
     }
     
-    public Reputation(String id, WrappedText name, String neutralName) {
+    public Reputation(String id, WrappedText name, WrappedText neutralName) {
         Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         this.uuid = id;
         while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
@@ -63,11 +64,11 @@ public class Reputation {
         return uuid;
     }
     
-    public String getNeutralName() {
+    public WrappedText getNeutralName() {
         return neutral.getName();
     }
     
-    public void setNeutralName(String name) {
+    public void setNeutralName(WrappedText name) {
         neutral.setName(name);
     }
     
@@ -218,8 +219,8 @@ public class Reputation {
                         .withStyle(ChatFormatting.DARK_RED);
                 
             } else {
-                String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
-                String upperName = upper == null ? null : Screen.hasShiftDown() ? String.valueOf(upper.getValue()) : upper.getName();
+                Component lowerName = lower == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(lower.getValue())) : lower.getName().getText();
+                Component upperName = upper == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(upper.getValue())) : upper.getName().getText();
                 
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
@@ -241,7 +242,7 @@ public class Reputation {
                 }
             }
         } else {
-            info = Translator.translatable("hqm.rep.current", name, current.getName(), value);
+            info = Translator.translatable("hqm.rep.current", name, current.getName().getText(), value);
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
@@ -262,7 +263,7 @@ public class Reputation {
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
             int value = markers.get(i).getValue();
             if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
-                return Translator.plain(markers.get(i).getName() + " (" + value + ")");
+                return markers.get(i).getName().getText().append(" (" + value + ")");
             }
         }
         
@@ -271,12 +272,12 @@ public class Reputation {
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
-                return Translator.plain(current.getName() + " (" + value + ")");
+                return current.getName().getText().append(" (" + value + ")");
             }
         }
         
         if (isOnPointer(gui, 0, x, y, ARROW_MARKER_Y, mX, mY)) {
-            return Translator.plain(neutral.getName());
+            return neutral.getName().getText();
         }
         
         return null;

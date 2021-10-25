@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditRepTierValueMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -14,6 +13,7 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
@@ -63,7 +63,7 @@ public class EditReputationGraphic extends EditableGraphic {
         
             @Override
             public void onClick() {
-                selectedReputation.add(new ReputationMarker("Unnamed", 0, false));
+                selectedReputation.add(new ReputationMarker(WrappedText.create("Unnamed"), 0, false));
                 SaveHelper.add(EditType.REPUTATION_MARKER_CREATE);
             }
         });
@@ -107,7 +107,7 @@ public class EditReputationGraphic extends EditableGraphic {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName().getText());
             gui.drawString(matrices, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
     
             int x = REPUTATION_MARKER_LIST_X;
@@ -162,10 +162,10 @@ public class EditReputationGraphic extends EditableGraphic {
         }
         
         if (selectedReputation != null) {
-            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
+            FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName().getText());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    TextMenu.display(gui, selectedReputation.getNeutralName(), true, selectedReputation::setNeutralName);
+                    WrappedTextMenu.display(gui, selectedReputation.getNeutralName(), true, selectedReputation::setNeutralName);
                 }
                 return;
             }
@@ -177,7 +177,7 @@ public class EditReputationGraphic extends EditableGraphic {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        TextMenu.display(gui, marker.getName(), true, marker::setName);
+                        WrappedTextMenu.display(gui, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
                         EditRepTierValueMenu.display(gui, marker.getValue(), value -> {
                             marker.setValue(value);

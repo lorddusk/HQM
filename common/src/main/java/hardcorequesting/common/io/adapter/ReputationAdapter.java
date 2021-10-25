@@ -11,14 +11,14 @@ import net.minecraft.util.GsonHelper;
 
 public class ReputationAdapter {
     private static final JsonArray EMPTY_ARRAY = new JsonArray();
-    private static final Adapter<ReputationMarker> REPUTATION_MARKER_ADAPTER = new Adapter<ReputationMarker>() {
+    private static final Adapter<ReputationMarker> REPUTATION_MARKER_ADAPTER = new Adapter<>() {
         private static final String NAME = "name";
         private static final String VALUE = "value";
         
         @Override
         public JsonElement serialize(ReputationMarker src) {
             return object()
-                    .add(NAME, src.getName())
+                    .add(NAME, src.getName().toJson())
                     .add(VALUE, src.getValue())
                     .build();
         }
@@ -28,14 +28,14 @@ public class ReputationAdapter {
             JsonObject object = json.getAsJsonObject();
             
             return new ReputationMarker(
-                    GsonHelper.getAsString(object, NAME, "Unnamed"),
+                    WrappedText.fromJson(object.get(NAME), "Unnamed", false),
                     GsonHelper.getAsInt(object, VALUE, 0),
                     false
             );
         }
     };
     
-    public static final Adapter<Reputation> REPUTATION_ADAPTER = new Adapter<Reputation>() {
+    public static final Adapter<Reputation> REPUTATION_ADAPTER = new Adapter<>() {
         private static final String ID = "id";
         private static final String NAME = "name";
         private static final String NEUTRAL = "neutral";
@@ -46,7 +46,7 @@ public class ReputationAdapter {
             return object()
                     .add(ID, src.getId())
                     .add(NAME, src.getName().toJson())
-                    .add(NEUTRAL, src.getNeutralName())
+                    .add(NEUTRAL, src.getNeutralName().toJson())
                     .add(MARKERS, array()
                             .use(builder -> {
                                 for (int i = 0; i < src.getMarkerCount(); i++) {
@@ -63,7 +63,7 @@ public class ReputationAdapter {
             Reputation reputation = new Reputation(
                     GsonHelper.getAsString(object, ID, null),
                     WrappedText.fromJson(object.get(NAME), "Unnamed", false),
-                    GsonHelper.getAsString(object, NEUTRAL, "Neutral")
+                    WrappedText.fromJson(object.get(NEUTRAL), "Neutral", false)
             );
             for (JsonElement element : GsonHelper.getAsJsonArray(object, MARKERS, EMPTY_ARRAY)) {
                 reputation.add(REPUTATION_MARKER_ADAPTER.deserialize(element));

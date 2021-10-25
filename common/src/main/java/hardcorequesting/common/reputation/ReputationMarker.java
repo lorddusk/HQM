@@ -1,24 +1,26 @@
 package hardcorequesting.common.reputation;
 
 
+import hardcorequesting.common.util.WrappedText;
+
 public class ReputationMarker implements Comparable<ReputationMarker> {
     
-    private String name;
+    private WrappedText name;
     private int value;
-    private boolean neutral;
+    private final boolean neutral;
     private int id;
     
-    public ReputationMarker(String name, int value, boolean neutral) {
+    public ReputationMarker(WrappedText name, int value, boolean neutral) {
         this.name = name;
         this.value = value;
         this.neutral = neutral;
     }
     
-    public String getName() {
+    public WrappedText getName() {
         return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
     }
     
@@ -32,7 +34,7 @@ public class ReputationMarker implements Comparable<ReputationMarker> {
     
     @Override
     public int compareTo(ReputationMarker o) {
-        return ((Integer) value).compareTo(o.value);
+        return Integer.compare(value, o.value);
     }
     
     public String getTitle() {
@@ -41,10 +43,6 @@ public class ReputationMarker implements Comparable<ReputationMarker> {
     
     public boolean isNeutral() {
         return neutral;
-    }
-    
-    public void setNeutral(boolean neutral) {
-        this.neutral = neutral;
     }
     
     public String getLabel() {
