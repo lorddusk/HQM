@@ -6,7 +6,7 @@ import hardcorequesting.common.bag.*;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuTier;
+import hardcorequesting.common.client.interfaces.edit.EditBagTierMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -46,7 +46,7 @@ public class EditBagsGraphic extends EditableGraphic {
     private final ExtendedScrollBar<GroupTier> tierScroll;
     
     {
-        addButton(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createGroup", 100, 175) {
             @Override
             public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
@@ -59,7 +59,7 @@ public class EditBagsGraphic extends EditableGraphic {
             }
         });
     
-        addButton(new LargeButton(gui, "hqm.questBook.createTier", 100, 200) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createTier", 100, 200) {
             @Override
             public boolean isVisible() {
                 return EditBagsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
@@ -165,7 +165,7 @@ public class EditBagsGraphic extends EditableGraphic {
                         gui.setPage(page.forGroup(group));
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer().getUUID(), group.getDisplayName(), true, group::setName);
+                        TextMenu.display(gui, group.getDisplayName(), true, group::setName);
                         break;
                     case DELETE:
                         Group.remove(group.getId());
@@ -193,10 +193,10 @@ public class EditBagsGraphic extends EditableGraphic {
                         }
                         break;
                     case NORMAL:
-                        gui.setEditMenu(new GuiEditMenuTier(gui, gui.getPlayer().getUUID(), groupTier));
+                        EditBagTierMenu.display(gui, groupTier);
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer().getUUID(), groupTier.getName(), 110, groupTier::setName);
+                        TextMenu.display(gui, groupTier.getName(), 110, groupTier::setName);
                         break;
                     case DELETE:
                         if (tiers.size() > 1 || Group.getGroups().size() == 0) {

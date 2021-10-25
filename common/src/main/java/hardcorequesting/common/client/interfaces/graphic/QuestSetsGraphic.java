@@ -55,7 +55,7 @@ public class QuestSetsGraphic extends EditableGraphic {
     private final ScrollBar descriptionScroll;
     
     {
-        addButton(new LargeButton(gui, "hqm.questBook.open", 245, 190) {
+        addClickable(new LargeButton(gui, "hqm.questBook.open", 245, 190) {
             @Override
             public boolean isVisible() {
                 return selectedSet != null;
@@ -67,7 +67,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             }
         });
     
-        addButton(new LargeButton(gui, "hqm.questBook.createSet", 185, 50) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createSet", 185, 50) {
             @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited() && QuestSetsGraphic.this.gui.getCurrentMode() == EditMode.CREATE;
@@ -276,7 +276,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        TextMenu.display(gui, gui.getPlayer().getUUID(), questSet.getName(), true,
+                        TextMenu.display(gui, questSet.getName(), true,
                                 result -> {
                                     if (!questSet.setName(result)) {
                                         gui.getPlayer().sendMessage(new TranslatableComponent("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)), Util.NIL_UUID);
@@ -311,7 +311,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, gui.getPlayer().getUUID(), selectedSet.getDescription(), false, selectedSet::setDescription);
+                TextMenu.display(gui, selectedSet.getDescription(), false, selectedSet::setDescription);
             }
         }
     }

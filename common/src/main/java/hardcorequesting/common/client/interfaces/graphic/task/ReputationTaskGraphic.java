@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationSetting;
+import hardcorequesting.common.client.interfaces.edit.ReputationTaskPartMenu;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.util.Positioned;
@@ -82,7 +82,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     @Override
     protected boolean handlePartClick(EditMode mode, ReputationTask.Part part, int id) {
         if (gui.getCurrentMode() == EditMode.REPUTATION_TASK) {
-            gui.setEditMenu(new GuiEditMenuReputationSetting(gui, playerId, task, id, part));
+            ReputationTaskPartMenu.display(gui, playerId, part, newPart -> task.setSetting(id, newPart));
             return true;
         } else {
             return super.handlePartClick(mode, part, id);

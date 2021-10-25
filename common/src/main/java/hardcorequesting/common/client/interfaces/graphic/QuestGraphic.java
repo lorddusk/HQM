@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuCommandEditor;
+import hardcorequesting.common.client.interfaces.edit.EditCommandRewardsMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
@@ -60,7 +60,7 @@ public final class QuestGraphic extends EditableGraphic {
     {
         int ordinal = 0;
         for (final TaskType<?> taskType : TaskType.values()) {
-            addButton(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (ordinal % 2) * 65, 50 + (ordinal / 2) * 20) {
+            addClickable(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (ordinal % 2) * 65, 50 + (ordinal / 2) * 20) {
                 @Override
                 public boolean isVisible() {
                     return Quest.canQuestsBeEdited() && selectedTask == null && QuestGraphic.this.gui.getCurrentMode() == EditMode.TASK;
@@ -179,7 +179,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            TextMenu.display(gui, playerId, task.getLangKeyDescription(), true,
+                            TextMenu.display(gui, task.getLangKeyDescription(), true,
                                     task::setDescription);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
@@ -212,9 +212,9 @@ public final class QuestGraphic extends EditableGraphic {
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(START_X, TITLE_START_Y, 140, GuiBase.TEXT_HEIGHT, mX, mY)) {
-                TextMenu.display(gui, playerId, quest.getName(), true, quest::setName);
+                TextMenu.display(gui, quest.getName(), true, quest::setName);
             } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-                TextMenu.display(gui, playerId, quest.getDescription(), false, description -> {
+                TextMenu.display(gui, quest.getDescription(), false, description -> {
                     cachedDescription = null;
                     quest.setDescription(description);
                 });
@@ -294,7 +294,7 @@ public final class QuestGraphic extends EditableGraphic {
     @Override
     protected void setEditMode(EditMode editMode) {
         if (editMode == EditMode.COMMAND_CREATE || editMode == EditMode.COMMAND_CHANGE) {
-            gui.setEditMenu(new GuiEditMenuCommandEditor(gui, playerId, quest));
+            EditCommandRewardsMenu.display(gui, quest);
         } else super.setEditMode(editMode);
     }
 }

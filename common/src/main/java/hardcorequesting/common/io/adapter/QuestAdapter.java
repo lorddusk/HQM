@@ -250,7 +250,7 @@ public class QuestAdapter {
                 rewards.setReputationRewards(reputationRewards);
             }
             if (object.has(REWARDS_COMMAND))
-                rewards.setCommandRewards(SaveHandler.GSON.<List<String>>fromJson(object.get(REWARDS_COMMAND), STRING_LIST_TYPE).toArray(new String[0]));
+                rewards.setCommandRewards(SaveHandler.GSON.<List<String>>fromJson(object.get(REWARDS_COMMAND), STRING_LIST_TYPE));
             if (hasUuid && QUEST.getQuestId() != null) {
                 optionalAdd(requirementMapping, requirement.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 optionalAdd(optionMapping, options.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));

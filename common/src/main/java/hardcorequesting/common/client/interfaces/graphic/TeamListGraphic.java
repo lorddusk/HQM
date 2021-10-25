@@ -1,4 +1,4 @@
-package hardcorequesting.common.client.interfaces.edit;
+package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -6,9 +6,9 @@ import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 
-import java.util.UUID;
+import java.util.List;
 
-public class GuiEditMenuTeamList extends GuiEditMenu {
+public class TeamListGraphic extends Graphic {
     
     private static final int TEAM_X = 20;
     private static final int TEAM_X_2ND_PAGE = 180;
@@ -25,12 +25,13 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     private static final int ARROW_SRC_Y = 69;
     private static final int ARROW_W = 20;
     private static final int ARROW_H = 9;
-    private GuiEditMenuTeam parent;
+    
     private int pagePair = 0;
     
-    protected GuiEditMenuTeamList(GuiQuestBook gui, UUID playerId, GuiEditMenuTeam parent) {
-        super(gui, playerId);
-        this.parent = parent;
+    private final GuiQuestBook gui;
+    
+    public TeamListGraphic(GuiQuestBook gui) {
+        this.gui = gui;
     }
     
     @Override
@@ -40,12 +41,12 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         drawArrow(matrices, mX, mY, true);
         drawArrow(matrices, mX, mY, false);
         
-        TeamLiteStat[] teamStats = TeamLiteStat.getTeamStats();
+        List<TeamLiteStat> teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
-        int end = Math.min(start + TEAMS_PER_PAIR, teamStats.length);
+        int end = Math.min(start + TEAMS_PER_PAIR, teamStats.size());
         
         for (int i = start; i < end; i++) {
-            TeamLiteStat teamStat = teamStats[i];
+            TeamLiteStat teamStat = teamStats.get(i);
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
@@ -72,16 +73,6 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
         }
     }
     
-    @Override
-    public void close() {
-        gui.setEditMenu(parent);
-    }
-    
-    @Override
-    public void save() {
-        
-    }
-    
     private void drawArrow(PoseStack matrices, int mX, int mY, boolean left) {
         int x = left ? ARROW_X_LEFT : ARROW_X_RIGHT;
         int srcY = 0;
@@ -93,6 +84,6 @@ public class GuiEditMenuTeamList extends GuiEditMenu {
     }
     
     private boolean isArrowEnabled(boolean left) {
-        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamLiteStat.getTeamStats().length / TEAMS_PER_PAIR) - 1);
+        return (left && pagePair > 0) || (!left && pagePair < Math.ceil((float) TeamLiteStat.getTeamStats().size() / TEAMS_PER_PAIR) - 1);
     }
 }

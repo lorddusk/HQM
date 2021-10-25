@@ -46,11 +46,11 @@ public class QuestRewards {
         this.rewardChoices.set(rewardChoice);
     }
     
-    public String[] getCommandRewardsAsStrings() {
+    public List<String> getCommandRewardsAsStrings() {
         return this.commandRewardList.asStrings();
     }
     
-    public void setCommandRewards(String[] commands) {
+    public void setCommandRewards(List<String> commands) {
         this.commandRewardList.set(commands);
     }
     

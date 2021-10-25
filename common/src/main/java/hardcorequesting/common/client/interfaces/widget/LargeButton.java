@@ -13,7 +13,7 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
 
-public abstract class LargeButton {
+public abstract class LargeButton implements Drawable, Clickable {
     
     private static final int BUTTON_SRC_X = 54;
     private static final int BUTTON_SRC_Y = 235;
@@ -57,8 +57,18 @@ public abstract class LargeButton {
     @Environment(EnvType.CLIENT)
     public abstract void onClick();
     
+    @Override
+    public boolean onClick(int mX, int mY) {
+        if (inButtonBounds(mX, mY) && isVisible() && isEnabled()) {
+            onClick();
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, int mX, int mY) {
+    public void render(PoseStack matrices, int mX, int mY) {
         if (isVisible()) {
             
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
@@ -70,6 +80,7 @@ public abstract class LargeButton {
         }
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
     public void renderTooltip(PoseStack matrices, int mX, int mY) {
         if (isVisible() && description != null && inButtonBounds(mX, mY)) {

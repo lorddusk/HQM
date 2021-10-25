@@ -22,7 +22,7 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         super(task, playerId, gui, 20);
         this.task = task;
         
-        addButton(new LargeButton(gui, "hqm.quest.requirement", 250, 95) {
+        addClickable(new LargeButton(gui, "hqm.quest.requirement", 250, 95) {
             @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited();
@@ -30,7 +30,7 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
         
             @Override
             public void onClick() {
-                IntInputMenu.display(gui, playerId, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
+                IntInputMenu.display(gui, "hqm.mobTask.reqKills", task.getKillsRequirement(), task::setKills);
             }
         });
     

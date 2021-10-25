@@ -2,9 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.client.interfaces.widget.LargeButton;
-import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -18,9 +16,13 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public abstract class Graphic {
     
-    private final List<LargeButton> buttons = new ArrayList<>();
+    private final List<Drawable> drawables = new ArrayList<>();
+    private final List<Clickable> clickables = new ArrayList<>();
     private final List<ScrollBar> scrollBars = new ArrayList<>();
     private final TextBoxGroup textBoxes = new TextBoxGroup();
+    {
+        addClickable(textBoxes);
+    }
     
     public final void drawFull(PoseStack matrices, int mX, int mY) {
         draw(matrices, mX, mY);
@@ -29,34 +31,23 @@ public abstract class Graphic {
     
     public void draw(PoseStack matrices, int mX, int mY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        for (LargeButton button : buttons) {
-            button.draw(matrices, mX, mY);
-        }
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.draw(matrices);
-        }
         
-        textBoxes.draw(matrices);
+        for (Drawable drawable : drawables) {
+            drawable.render(matrices, mX, mY);
+        }
     }
     
     public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, mX, mY);
+        for (Drawable drawable : drawables) {
+            drawable.renderTooltip(matrices, mX, mY);
         }
     }
     
     public void onClick(int mX, int mY, int b) {
-        for (LargeButton button : buttons) {
-            if (button.inButtonBounds(mX, mY) && button.isVisible() && button.isEnabled()) {
-                button.onClick();
-                break;
-            }
+        for (Clickable clickable : clickables) {
+            if (clickable.onClick(mX, mY))
+                return;
         }
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onClick(mX, mY);
-        }
-        
-        textBoxes.onClick(mX, mY);
     }
     
     public boolean keyPressed(int keyCode) {
@@ -68,14 +59,16 @@ public abstract class Graphic {
     }
     
     public void onDrag(int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onDrag(mX, mY);
+        for (Clickable clickable : clickables) {
+            if (clickable.onDrag(mX, mY))
+                return;
         }
     }
     
     public void onRelease(int mX, int mY, int b) {
-        for (ScrollBar scrollBar : scrollBars) {
-            scrollBar.onRelease(mX, mY);
+        for (Clickable clickable : clickables) {
+            if (clickable.onRelease(mX, mY))
+                return;
         }
     }
     
@@ -85,19 +78,21 @@ public abstract class Graphic {
         }
     }
     
-    protected void addButton(LargeButton button) {
-        buttons.add(button);
-    }
-    
     protected void addScrollBar(ScrollBar scrollBar) {
+        addClickable(scrollBar);
         scrollBars.add(scrollBar);
     }
     
-    protected void addTextBox(TextBoxGroup.TextBox box) {
+    protected void addTextBox(TextBox box) {
         textBoxes.add(box);
     }
     
+    protected <T extends Drawable & Clickable> void addClickable(T widget) {
+        drawables.add(widget);
+        clickables.add(widget);
+    }
+    
     protected void reloadTextBoxes() {
-        textBoxes.getTextBoxes().forEach(TextBoxGroup.TextBox::reloadText);
+        textBoxes.getTextBoxes().forEach(TextBox::reloadText);
     }
 }

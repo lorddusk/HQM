@@ -57,11 +57,11 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     @Override
     protected boolean handlePartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
-            PickItemMenu.display(gui, playerId, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
+            PickItemMenu.display(gui, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                     result -> task.setIcon(id, result.get()));
             return true;
         } else if (mode == EditMode.RENAME) {
-            TextMenu.display(gui, playerId, part.getName(), 110,
+            TextMenu.display(gui, part.getName(), 110,
                     result -> task.setName(id, result));
             return true;
         } else {

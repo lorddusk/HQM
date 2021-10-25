@@ -3,7 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationValue;
+import hardcorequesting.common.client.interfaces.edit.EditRepTierValueMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
@@ -41,7 +41,7 @@ public class EditReputationGraphic extends EditableGraphic {
     private final ScrollBar reputationScroll;
     private final ScrollBar reputationTierScroll;
     {
-        addButton(new LargeButton(gui, "Create New", 180, 20) {
+        addClickable(new LargeButton(gui, "Create New", 180, 20) {
             @Override
             public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation == null;
@@ -54,7 +54,7 @@ public class EditReputationGraphic extends EditableGraphic {
             }
         });
     
-        addButton(new LargeButton(gui, "hqm.questBook.createTier", 20, 20) {
+        addClickable(new LargeButton(gui, "hqm.questBook.createTier", 20, 20) {
             @Override
             public boolean isVisible() {
                 return EditReputationGraphic.this.gui.getCurrentMode() == EditMode.CREATE && selectedReputation != null;
@@ -145,7 +145,7 @@ public class EditReputationGraphic extends EditableGraphic {
                             selectedReputation = reputation;
                         }
                     } else if (gui.getCurrentMode() == EditMode.RENAME) {
-                        TextMenu.display(gui, playerId, reputation.getName(), true, reputation::setName);
+                        TextMenu.display(gui, reputation.getName(), true, reputation::setName);
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         if (selectedReputation == reputation) {
                             selectedReputation = null;
@@ -165,7 +165,7 @@ public class EditReputationGraphic extends EditableGraphic {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
             if (gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY)) {
                 if (gui.getCurrentMode() == EditMode.RENAME) {
-                    TextMenu.display(gui, playerId, selectedReputation.getNeutralName(), true, selectedReputation::setNeutralName);
+                    TextMenu.display(gui, selectedReputation.getNeutralName(), true, selectedReputation::setNeutralName);
                 }
                 return;
             }
@@ -177,9 +177,13 @@ public class EditReputationGraphic extends EditableGraphic {
                 
                 if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
-                        TextMenu.display(gui, playerId, marker.getName(), true, marker::setName);
+                        TextMenu.display(gui, marker.getName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
-                        gui.setEditMenu(new GuiEditMenuReputationValue(gui, playerId, marker));
+                        EditRepTierValueMenu.display(gui, marker.getValue(), value -> {
+                            marker.setValue(value);
+                            EditReputationGraphic.selectedReputation.sort();
+                            SaveHelper.add(EditType.REPUTATION_MARKER_CHANGE);
+                        });
                     } else if (gui.getCurrentMode() == EditMode.DELETE) {
                         
                         selectedReputation.remove(marker);

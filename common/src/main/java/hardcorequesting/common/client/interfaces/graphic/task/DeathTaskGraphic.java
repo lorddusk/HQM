@@ -23,7 +23,7 @@ public class DeathTaskGraphic extends TaskGraphic {
         super(playerId, gui, task);
         this.task = task;
     
-        addButton(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
+        addClickable(new LargeButton(gui, "hqm.quest.requirement", 185, 200) {
             @Override
             public boolean isVisible() {
                 return Quest.canQuestsBeEdited();
@@ -31,7 +31,7 @@ public class DeathTaskGraphic extends TaskGraphic {
         
             @Override
             public void onClick() {
-                IntInputMenu.display(gui, playerId, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
+                IntInputMenu.display(gui, "hqm.deathTask.reqDeathCount", task.getDeathsRequired(), task::setDeaths);
             }
         });
     }

@@ -17,7 +17,7 @@ public class GroupTier {
     public GroupTier(String name, TierColor color, int... weights) {
         this.name = name;
         this.color = color;
-        this.weights = Arrays.copyOf(weights, weights.length);
+        this.weights = Arrays.copyOf(weights, BagTier.values().length);
     }
     
     public static void initBaseTiers(QuestLine questLine) {
@@ -62,6 +62,6 @@ public class GroupTier {
     public void load(GroupTier tier) {
         this.name = tier.name;
         this.color = tier.color;
-        this.weights = Arrays.copyOf(tier.weights, tier.weights.length);
+        this.weights = Arrays.copyOf(tier.weights, BagTier.values().length);
     }
 }

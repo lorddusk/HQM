@@ -9,8 +9,6 @@ import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
-import hardcorequesting.common.network.NetworkManager;
-import hardcorequesting.common.network.message.CloseBookMessage;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.util.SaveHelper;
@@ -52,7 +50,6 @@ public class GuiQuestBook extends GuiBase {
     //the page is static to keep the same page loaded when the book is reopened
     @NotNull
     private static BookPage page = BookPage.MainPage.INSTANCE;
-    @NotNull
     private Graphic pageGraphic;
     public final boolean isOpBook;
     private final Player player;
@@ -81,17 +78,6 @@ public class GuiQuestBook extends GuiBase {
         super(NarratorChatListener.NO_TITLE);
         this.player = player;
         this.isOpBook = isOpBook;
-        
-        pageGraphic = page.createGraphic(this);
-        
-        if (Quest.canQuestsBeEdited()) {
-            Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
-        }
-        QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
-        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
-            SoundHandler.triggerFirstLore();
-            data.playedLore = true;
-        }
     }
     
     public static void resetBookPosition() {
@@ -107,6 +93,27 @@ public class GuiQuestBook extends GuiBase {
                 mc.setScreen(new GuiQuestBook(player, isOpBook));
             }
         }
+    }
+    
+    @Override
+    protected void init() {
+        if (pageGraphic == null)
+            pageGraphic = page.createGraphic(this);
+    
+        if (Quest.canQuestsBeEdited()) {
+            minecraft.keyboardHandler.setSendRepeatsToGui(true);
+        }
+        QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+        if (!data.playedLore && SoundHandler.hasLoreMusic()) {
+            SoundHandler.triggerFirstLore();
+            data.playedLore = true;
+        }
+    }
+    
+    @Override
+    public void removed() {
+        minecraft.keyboardHandler.setSendRepeatsToGui(false);
+        SoundHandler.stopLoreMusic();
     }
     
     public int getTick() {
@@ -139,17 +146,17 @@ public class GuiQuestBook extends GuiBase {
             SaveHelper.render(matrices, this, x, y);
         }
         
-        saveButton.draw(matrices, x, y);
+        saveButton.render(matrices, x, y);
         
         applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(MAP_TEXTURE);
         
         
-        if (shouldDisplayControlArrow(false)) {
-            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inArrowBounds(false, x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
+        if (shouldDisplayBackArrow()) {
+            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
         }
-        if (shouldDisplayControlArrow(true)) {
-            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inArrowBounds(true, x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
+        if (shouldDisplayMenuArrow()) {
+            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
         }
         
         if (editMenu == null) {
@@ -170,13 +177,13 @@ public class GuiQuestBook extends GuiBase {
     
         saveButton.renderTooltip(matrices, x, y);
         
-        if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
+        if (shouldDisplayBackArrow() && inBackArrowBounds(x, y)) {
             renderTooltip(matrices, FormattedText.composite(
                     Translator.translatable("hqm.questBook.goBack"),
                     Translator.plain("\n"),
                     Translator.translatable("hqm.questBook.rightClick").withStyle(ChatFormatting.DARK_GRAY)
             ), x + left, y + top);
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayMenuArrow() && inMenuArrowBounds(x, y)) {
             renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
         }
     }
@@ -220,14 +227,14 @@ public class GuiQuestBook extends GuiBase {
         int x = (int) (x0 - left);
         int y = (int) (y0 - top);
         
-        if (shouldDisplayAndIsInArrowBounds(false, x, y)) {
+        if (shouldDisplayBackArrow() && inBackArrowBounds(x, y)) {
             button = 1;
             if (editMenu != null) {
                 editMenu.save();
                 editMenu.close();
                 return true;
             }
-        } else if (shouldDisplayAndIsInArrowBounds(true, x, y)) {
+        } else if (shouldDisplayMenuArrow() && inMenuArrowBounds(x, y)) {
             if (editMenu != null) {
                 editMenu.save();
                 editMenu.close();
@@ -237,12 +244,7 @@ public class GuiQuestBook extends GuiBase {
             return true;
         }
         
-        boolean buttonClicked = false;
-    
-        if (saveButton.isVisible() && saveButton.isEnabled() && saveButton.inButtonBounds(x, y)) {
-            saveButton.onClick();
-            buttonClicked = true;
-        }
+        boolean buttonClicked = saveButton.onClick(x, y);
         
         if (Quest.canQuestsBeEdited()) {
             SaveHelper.onClick(this, x, y);
@@ -321,13 +323,6 @@ public class GuiQuestBook extends GuiBase {
     }
     
     @Override
-    public void removed() {
-        NetworkManager.sendToServer(new CloseBookMessage(player.getUUID()));
-        minecraft.keyboardHandler.setSendRepeatsToGui(true);
-        SoundHandler.stopLoreMusic();
-    }
-    
-    @Override
     public boolean isPauseScreen() {
         return false;
     }
@@ -364,22 +359,20 @@ public class GuiQuestBook extends GuiBase {
         SaveHelper.onSave();
     }
     
-    private boolean shouldDisplayControlArrow(boolean isMenuArrow) {
-        return page.canGoBack() && (
-                editMenu == null && (!isMenuArrow || page.hasGoToMenuButton())
-                        || editMenu != null && !editMenu.hasButtons());
+    private boolean shouldDisplayMenuArrow() {
+        return shouldDisplayBackArrow() && page.hasGoToMenuButton();
     }
     
-    private boolean inArrowBounds(boolean isMenuArrow, int mX, int mY) {
-        if (isMenuArrow) {
-            return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
-        } else {
-            return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
-        }
+    private boolean shouldDisplayBackArrow() {
+        return page.canGoBack() && editMenu == null;
     }
     
-    private boolean shouldDisplayAndIsInArrowBounds(boolean isMenuArrow, int mX, int mY) {
-        return shouldDisplayControlArrow(isMenuArrow) && inArrowBounds(isMenuArrow, mX, mY);
+    private boolean inMenuArrowBounds(int mX, int mY) {
+        return inBounds(MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT, mX, mY);
+    }
+    
+    private boolean inBackArrowBounds(int mX, int mY) {
+        return inBounds(BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT, mX, mY);
     }
     
     public void setPage(BookPage page) {

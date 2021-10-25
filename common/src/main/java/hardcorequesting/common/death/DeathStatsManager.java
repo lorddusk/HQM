@@ -14,10 +14,10 @@ import net.minecraft.world.entity.player.Player;
 import java.util.*;
 
 public class DeathStatsManager extends SimpleSerializable {
-    private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths);
+    private static final Comparator<DeathStat> DEATH_COMPARATOR = Comparator.comparingInt(DeathStat::getTotalDeaths).reversed();
     public static final String FILE_PATH = "deaths.json";
     private final Map<UUID, DeathStat> deathMap = new HashMap<>();
-    private final List<DeathStat> clientDeathList = new ArrayList<>();
+    private List<DeathStat> clientDeathList = Collections.emptyList();
     private DeathStat clientBest;
     private DeathStat clientTotal;
     
@@ -42,13 +42,7 @@ public class DeathStatsManager extends SimpleSerializable {
     }
     
     private void updateClientDeathList() {
-        clientDeathList.clear();
-        for (DeathStat deathStat : deathMap.values()) {
-            deathStat.totalDeaths = -1;
-            clientDeathList.add(deathStat);
-        }
-    
-        clientDeathList.sort(DEATH_COMPARATOR);
+        clientDeathList = deathMap.values().stream().sorted(DEATH_COMPARATOR).toList();
         
         clientBest = new DeathStat.DeathStatBest(clientDeathList);
         clientTotal = new DeathStat.DeathStatTotal(clientDeathList);

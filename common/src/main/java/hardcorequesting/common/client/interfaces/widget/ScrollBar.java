@@ -10,7 +10,7 @@ import net.fabricmc.api.Environment;
 
 import java.util.List;
 
-public class ScrollBar {
+public class ScrollBar implements Drawable, Clickable {
     
     private static final int SCROLL_WIDTH = 7;
     private static final int SCROLL_BAR_WIDTH = 5;
@@ -44,8 +44,9 @@ public class ScrollBar {
     protected void onUpdate() {
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices) {
+    public void render(PoseStack matrices, int mX, int mY) {
         if (isVisible()) {
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             this.gui.drawRect(matrices, x, y, size.u, size.v, SCROLL_WIDTH, size.length);
@@ -53,34 +54,41 @@ public class ScrollBar {
         }
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void onClick(int mX, int mY) {
+    public boolean onClick(int mX, int mY) {
         if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, size.length, mX, mY)) {
             isScrolling = true;
             updateScroll(mY);
+            return true;
         }
+        return false;
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void onDrag(int mX, int mY) {
-        if (isVisible()) {
+    public boolean onDrag(int mX, int mY) {
+        if (isVisible() && isScrolling) {
             updateScroll(mY);
+            return true;
         }
+        return false;
     }
     
+    @Override
     @Environment(EnvType.CLIENT)
-    public void onRelease(int mX, int mY) {
-        if (isVisible()) {
+    public boolean onRelease(int mX, int mY) {
+        if (isVisible() && isScrolling) {
             updateScroll(mY);
             isScrolling = false;
+            return true;
         }
+        return false;
     }
     
     @Environment(EnvType.CLIENT)
     private void updateScroll(int mY) {
-        if (isScrolling) {
-            setScroll(mY - y - SCROLL_BAR_HEIGHT / 2);
-        }
+        setScroll(mY - y - SCROLL_BAR_HEIGHT / 2);
     }
     
     public float getScroll() {

@@ -203,7 +203,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     MutableComponent component = Translator.text(parent.getName()).withStyle(ChatFormatting.DARK_GRAY);
                     tooltip.add(component);
                     if (parent.isCompleted(playerId)) {
-                        MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed"))
+                        MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed"))
                                 .withStyle(ChatFormatting.WHITE);
                         component.append(" ").append(completedComponent);
                     }
@@ -230,7 +230,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         MutableComponent questComponent = Translator.text(parent.getName() + " (" + parent.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED);
                         tooltip.add(questComponent);
                         if (parent.isCompleted(playerId)) {
-                            MutableComponent completedComponent = box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
+                            MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
                             questComponent.append(" ").append(completedComponent);
                         }
                     }
@@ -279,7 +279,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     MutableComponent component = task.getDescription().withStyle(ChatFormatting.DARK_AQUA);
                     tooltip.add(component);
                     if (task.isCompleted(playerId)) {
-                        component.append(" ").append(box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
+                        component.append(" ").append(Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE));
                     }
                 }
             }
@@ -384,11 +384,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     private MutableComponent holdingText(boolean holding, String letter) {
-        return box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
-    }
-    
-    private MutableComponent box(MutableComponent component) {
-        return Translator.text("[").append(component).append("]");
+        return Translator.box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
     }
     
     private void drawConnectingLines(PoseStack matrices, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
@@ -509,7 +505,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 SaveHelper.add(EditType.QUEST_SIZE_CHANGE);
                                 break;
                             case ITEM:
-                                PickItemMenu.display(gui, player.getUUID(), quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
+                                PickItemMenu.display(gui, quest.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                                         result -> {
                                             try {
                                                 quest.setIconStack(result.get());
@@ -530,10 +526,16 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case REPEATABLE:
-                                gui.setEditMenu(new GuiEditMenuRepeat(gui, player.getUUID(), quest));
+                                RepeatInfoMenu.display(gui, quest.getRepeatInfo(), repeatInfo -> {
+                                    quest.setRepeatInfo(repeatInfo);
+                                    SaveHelper.add(EditType.REPEATABILITY_CHANGED);
+                                });
                                 break;
                             case REQUIRED_PARENTS:
-                                gui.setEditMenu(new GuiEditMenuParentCount(gui, player.getUUID(), quest));
+                                RequiredParentCountMenu.display(gui, quest.getUseModifiedParentRequirement(), quest.getParentRequirementCount(), value -> {
+                                    quest.setParentRequirementCount(value);
+                                    SaveHelper.add(EditType.PARENT_REQUIREMENT_CHANGED);
+                                });
                                 break;
                             case QUEST_SELECTION:
                                 if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
@@ -551,7 +553,11 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 }
                                 break;
                             case TRIGGER:
-                                gui.setEditMenu(new GuiEditMenuTrigger(gui, player.getUUID(), quest));
+                                PickTriggerMenu.display(gui, quest.getTriggerType(), quest.getTriggerTasks(), result -> {
+                                    quest.setTriggerType(result.type());
+                                    quest.setTriggerTasks(Math.max(1, result.count()));
+                                    SaveHelper.add(EditType.VISIBILITY_CHANGED);
+                                });
                                 break;
                             case NORMAL:
                                 if (gui.isOpBook && Screen.hasShiftDown()) {

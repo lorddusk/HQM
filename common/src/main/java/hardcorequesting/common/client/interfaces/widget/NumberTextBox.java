@@ -2,59 +2,72 @@ package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
-import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 
-public abstract class NumberTextBox extends TextBoxGroup.TextBox {
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
+
+public class NumberTextBox extends TextBox {
     
     public static final int TEXT_OFFSET = -10;
-    private String title;
-    private boolean loaded;
+    private final FormattedText title;
+    private final IntSupplier getter;
+    private final IntConsumer setter;
+    private final boolean allowNegative;
     
-    public NumberTextBox(GuiBase gui, int x, int y, String title) {
-        super(gui, "", x, y, false);
-        loaded = true;
-        reloadText();
+    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, IntSupplier getter, IntConsumer setter) {
+        this(gui, x, y, title, false, getter, setter);
+    }
+    
+    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, boolean allowNegative, IntSupplier getter, IntConsumer setter) {
+        this(gui, x, y, title, allowNegative, 32, getter, setter);
+    }
+    
+    public NumberTextBox(GuiBase gui, int x, int y, FormattedText title, boolean allowNegative, int charLimit, IntSupplier getter, IntConsumer setter) {
+        super(gui, "", x, y, false, charLimit);
         this.title = title;
+        this.getter = getter;
+        this.setter = setter;
+        this.allowNegative = allowNegative;
+        reloadText();
     }
     
     @Override
-    protected boolean isCharacterValid(char c, String rest) {
-        return rest.length() < 32 && (Character.isDigit(c) || (c == '-' && isNegativeAllowed()));
-    }
-    
-    protected boolean isNegativeAllowed() {
-        return false;
+    protected String getStrippedClipboard() {
+        return super.getStrippedClipboard().replaceAll(allowNegative ? "[^0-9-]" : "[^0-9]", "");
     }
     
     @Override
-    protected void draw(PoseStack matrices, boolean selected) {
-        super.draw(matrices, selected);
+    public boolean onCharTyped(char c) {
+        if (Character.isDigit(c) || allowNegative && c == '-')
+            return super.onCharTyped(c);
+        else return false;
+    }
+    
+    @Override
+    protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+        super.draw(matrices, selected, mX, mY);
         
-        this.gui.drawString(matrices, Translator.translatable(title), x, y + TEXT_OFFSET, 0x404040);
+        this.gui.drawString(matrices, title, x, y + TEXT_OFFSET, 0x404040);
     }
     
     @Override
     public void textChanged() {
-        if (loaded) {
-            try {
-                int number;
-                if (getText().equals("")) {
-                    number = 1;
-                } else {
-                    number = Integer.parseInt(getText());
-                }
-                setValue(number);
-            } catch (Exception ignored) {
+        super.textChanged();
+        try {
+            int number;
+            if (getText().isEmpty()) {
+                number = 1;
+            } else {
+                number = Integer.parseInt(getText());
             }
+            setter.accept(number);
+        } catch (Exception ignored) {
         }
     }
     
     @Override
     public void reloadText() {
-        setTextAndCursor(isVisible() ? String.valueOf(getValue()) : "0");
+        setTextAndCursor(isVisible() ? String.valueOf(getter.getAsInt()) : "0");
     }
-    
-    protected abstract int getValue();
-    
-    protected abstract void setValue(int number);
 }

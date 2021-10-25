@@ -57,7 +57,7 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     @Override
     protected boolean handlePartClick(EditMode mode, VisitLocationTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
-            LocationMenu.display(gui, playerId, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
+            LocationMenu.display(gui, part.getVisibility(), part.getPosition(), part.getRadius(), part.getDimension(),
                     result -> task.setInfo(id, result.getVisibility(), result.getPos(), result.getRadius(), result.getDimension()));
             return true;
         } else {

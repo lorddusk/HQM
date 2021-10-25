@@ -7,7 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.minecraft.network.chat.FormattedText;
 
-public abstract class ArrowSelectionHelper {
+public abstract class ArrowSelectionHelper implements Drawable, Clickable {
     private static final int ARROW_SRC_X = 244;
     private static final int ARROW_SRC_Y = 176;
     private static final int ARROW_W = 6;
@@ -29,6 +29,7 @@ public abstract class ArrowSelectionHelper {
         ARROW_X_RIGHT = ARROW_X_LEFT + 130;
     }
     
+    @Override
     public void render(PoseStack matrices, int mX, int mY) {
         if (isArrowVisible()) {
             
@@ -46,20 +47,29 @@ public abstract class ArrowSelectionHelper {
         }
     }
     
-    public void onClick(int mX, int mY) {
+    @Override
+    public boolean onClick(int mX, int mY) {
         if (isArrowVisible()) {
             if (inArrowBounds(gui, mX, mY, true)) {
                 onArrowClick(true);
                 clicked = true;
+                return true;
             } else if (inArrowBounds(gui, mX, mY, false)) {
                 onArrowClick(false);
                 clicked = true;
+                return true;
             }
         }
+        return false;
     }
     
-    public void onRelease() {
-        clicked = false;
+    @Override
+    public boolean onRelease(int mX, int mY) {
+        if (clicked) {
+            clicked = false;
+            return true;
+        }
+        return false;
     }
     
     protected boolean isArrowVisible() {
@@ -81,5 +91,7 @@ public abstract class ArrowSelectionHelper {
     
     protected abstract FormattedText getArrowText();
     
-    protected abstract FormattedText getArrowDescription();
+    protected FormattedText getArrowDescription() {
+        return null;
+    }
 }

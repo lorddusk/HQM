@@ -8,7 +8,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.network.chat.FormattedText;
@@ -16,7 +16,6 @@ import net.minecraft.network.chat.FormattedText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PickAdvancementMenu extends GuiEditMenu {
@@ -33,14 +32,13 @@ public class PickAdvancementMenu extends GuiEditMenu {
     
     private final List<String> rawAdvancemenNames;
     private final List<String> advancementNames;
-    private final ArrowSelectionHelper selectionHelper;
     
-    public static void display(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
-        gui.setEditMenu(new PickAdvancementMenu(gui, playerId, advancement, resultConsumer));
+    public static void display(GuiQuestBook gui, String advancement, Consumer<String> resultConsumer) {
+        gui.setEditMenu(new PickAdvancementMenu(gui, advancement, resultConsumer));
     }
     
-    private PickAdvancementMenu(GuiQuestBook gui, UUID playerId, String advancement, Consumer<String> resultConsumer) {
-        super(gui, playerId, false);
+    private PickAdvancementMenu(GuiQuestBook gui, String advancement, Consumer<String> resultConsumer) {
+        super(gui, false);
     
         this.resultConsumer = resultConsumer;
         this.advancement = advancement;
@@ -48,7 +46,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickAdvancementMenu.this.advancementNames));
         
-        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBox(gui, "", 250, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();
@@ -56,7 +54,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+        addClickable(new ArrowSelectionHelper(gui, 180, 70) {
             @Override
             protected void onArrowClick(boolean left) {
             }
@@ -70,7 +68,7 @@ public class PickAdvancementMenu extends GuiEditMenu {
             protected FormattedText getArrowDescription() {
                 return Translator.plain("Completing the exact advancement is required.");
             }
-        };
+        });
         
         rawAdvancemenNames = new ArrayList<>();
         advancementNames = new ArrayList<>();
@@ -105,8 +103,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    
-        selectionHelper.render(matrices, mX, mY);
         
         int nameY = START_Y;
         for (String name : scrollBar.getVisibleEntries()) {
@@ -128,8 +124,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        selectionHelper.onClick(mX, mY);
-        
         int nameY = START_Y;
         for (String name : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, nameY, 130, 6, mX, mY)) {
@@ -143,13 +137,6 @@ public class PickAdvancementMenu extends GuiEditMenu {
             }
             nameY += OFFSET_Y;
         }
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease();
     }
     
     @Override

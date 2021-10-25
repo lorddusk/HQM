@@ -7,8 +7,8 @@ import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.GuiEditMenuReputationReward;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
+import hardcorequesting.common.client.interfaces.edit.ReputationRewardMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
@@ -68,7 +68,7 @@ public class QuestRewardsGraphic extends Graphic {
         this.playerId = playerId;
         this.gui = gui;
     
-        addButton(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
+        addClickable(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
             @Override
             public boolean isEnabled() {
                 return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(playerId);
@@ -218,10 +218,10 @@ public class QuestRewardsGraphic extends Graphic {
         
         if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.REPUTATION_REWARD) {
             if (isOnReputationIcon(gui, mX, mY)) {
-                gui.setEditMenu(new GuiEditMenuReputationReward(gui, playerId, reputationRewards, newRewards -> {
+                ReputationRewardMenu.display(gui, reputationRewards, newRewards -> {
                     rewards.setReputationRewards(newRewards.isEmpty() ? null : newRewards);
                     SaveHelper.add(EditType.REPUTATION_REWARD_CHANGE);
-                }));
+                });
             }
         }
         
@@ -314,7 +314,7 @@ public class QuestRewardsGraphic extends Graphic {
                         }
                     } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
                         final int id = i;
-                        PickItemMenu.display(gui, playerId, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
+                        PickItemMenu.display(gui, itemRewards.get(i), PickItemMenu.Type.ITEM, itemRewards.get(i).isEmpty() ? 1 : itemRewards.get(i).getCount(),
                                 result -> rewards.setItemReward(result.getWithAmount(), id, !canSelect));
                     }
                 }

@@ -5,12 +5,13 @@ import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
-import hardcorequesting.common.client.interfaces.widget.TextBoxGroup;
+import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -32,27 +33,7 @@ public class EditGroupGraphic extends EditableGraphic {
         super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
         this.group = group;
     
-        addTextBox(new TextBoxGroup.TextBox(gui, String.valueOf(group.getLimit()), 180, 30, false) {
-            @Override
-            protected boolean isCharacterValid(char c, String rest) {
-                return rest.length() < 3 && Character.isDigit(c);
-            }
-        
-            @Override
-            public void textChanged() {
-                try {
-                    int number;
-                    if (getText().equals("")) {
-                        number = 1;
-                    } else {
-                        number = Integer.parseInt(getText());
-                    }
-                
-                    group.setLimit(number);
-                } catch (Exception ignored) {
-                }
-            }
-        });
+        addTextBox(new NumberTextBox(gui, 180, 30, FormattedText.EMPTY, false, 3, group::getLimit, group::setLimit));
     }
     
     @Override
@@ -114,7 +95,7 @@ public class EditGroupGraphic extends EditableGraphic {
                     }
                     
                     final int id = i;
-                    PickItemMenu.display(gui, gui.getPlayer().getUUID(), stack, PickItemMenu.Type.ITEM, amount,
+                    PickItemMenu.display(gui, stack, PickItemMenu.Type.ITEM, amount,
                             result -> group.setItem(id, result.getWithAmount()));
                     
                 } else if (gui.getCurrentMode() == EditMode.DELETE) {

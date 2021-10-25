@@ -19,6 +19,14 @@ public class HQMUtil {
         MinecraftServer server = HardcoreQuestingCore.getServer();
         return server != null && !server.isPublished();
     }
+    
+    public static <E extends Enum<E>> E cycleNext(E[] values, E value) {
+        return values[(value.ordinal() + 1) % values.length];
+    }
+    
+    public static <E extends Enum<E>> E cyclePrev(E[] values, E value) {
+        return values[(value.ordinal() + values.length - 1) % values.length];
+    }
 }
     
     /*

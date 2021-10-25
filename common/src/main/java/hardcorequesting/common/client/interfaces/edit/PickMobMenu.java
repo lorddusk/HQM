@@ -13,7 +13,10 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class PickMobMenu extends GuiEditMenu {
@@ -33,18 +36,17 @@ public class PickMobMenu extends GuiEditMenu {
     private final ExtendedScrollBar<Entry> scrollBar;
     private final List<Entry> rawMobs;
     private final List<Entry> mobs;
-    private final ArrowSelectionHelper selectionHelper;
     
-    public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
+    public static void display(GuiQuestBook gui, ResourceLocation initMobId, int initAmount, String textKey, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new PickMobMenu(gui, initMobId, initAmount, textKey, Collections.emptyList(), resultConsumer));
     }
     
-    public static void display(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        gui.setEditMenu(new PickMobMenu(gui, playerId, initMobId, initAmount, textKey, extraEntries, resultConsumer));
+    public static void display(GuiQuestBook gui, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+        gui.setEditMenu(new PickMobMenu(gui, initMobId, initAmount, textKey, extraEntries, resultConsumer));
     }
     
-    private PickMobMenu(GuiQuestBook gui, UUID playerId, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
-        super(gui, playerId, false);
+    private PickMobMenu(GuiQuestBook gui, ResourceLocation initMobId, int initAmount, String textKey, List<Entry> extraEntries, Consumer<Result> resultConsumer) {
+        super(gui, false);
     
         this.resultConsumer = resultConsumer;
         this.textKey = textKey;
@@ -53,19 +55,9 @@ public class PickMobMenu extends GuiEditMenu {
         addScrollBar(scrollBar = new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 160, 18, START_X,
                 VISIBLE_MOBS, () -> PickMobMenu.this.mobs));
         
-        addTextBox(new NumberTextBox(gui, 180, 150, "hqm." + textKey + ".reqKills") {
-            @Override
-            protected int getValue() {
-                return amount;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                amount = number;
-            }
-        });
+        addTextBox(new NumberTextBox(gui, 180, 150, Translator.translatable("hqm." + textKey + ".reqKills"), () -> amount, value -> amount = value));
         
-        addTextBox(new TextBoxGroup.TextBox(gui, "", 250, 18, false) {
+        addTextBox(new TextBox(gui, "", 250, 18, false) {
             @Override
             public void textChanged() {
                 super.textChanged();
@@ -73,7 +65,7 @@ public class PickMobMenu extends GuiEditMenu {
             }
         });
     
-        selectionHelper = new ArrowSelectionHelper(gui, 180, 70) {
+        addClickable(new ArrowSelectionHelper(gui, 180, 70) {
             @Override
             protected boolean isArrowVisible() {
                 return false;   //There is currently no precision for mobs. Change this if precision is ever added back
@@ -94,7 +86,7 @@ public class PickMobMenu extends GuiEditMenu {
                 return Translator.translatable("hqm." + textKey + "." + "type" + "Match.desc");
             }
         
-        };
+        });
         
         rawMobs = new ArrayList<>();
         mobs = new ArrayList<>();
@@ -136,8 +128,6 @@ public class PickMobMenu extends GuiEditMenu {
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
-        selectionHelper.render(matrices, mX, mY);
-        
         int mobY = START_Y;
         for (Entry entry : scrollBar.getVisibleEntries()) {
             boolean selected = entry.equals(mob);
@@ -158,8 +148,6 @@ public class PickMobMenu extends GuiEditMenu {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         
-        selectionHelper.onClick(mX, mY);
-        
         int mobY = START_Y;
         for (Entry entry : scrollBar.getVisibleEntries()) {
             if (gui.inBounds(START_X, mobY, 130, 6, mX, mY)) {
@@ -172,13 +160,6 @@ public class PickMobMenu extends GuiEditMenu {
             }
             mobY += OFFSET_Y;
         }
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease();
     }
     
     @Override

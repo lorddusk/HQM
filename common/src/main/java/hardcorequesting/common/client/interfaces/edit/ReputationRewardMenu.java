@@ -12,10 +12,9 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GuiEditMenuReputationReward extends GuiEditMenu {
+public class ReputationRewardMenu extends GuiEditMenu {
     
     private static final int START_X = 20;
     private static final int START_Y = 50;
@@ -27,10 +26,13 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
     private ReputationReward selectedReward;
     private List<FormattedText> error;
     private final NumberTextBox valueTextBox;
-    private final ArrowSelectionHelper selectionHelper;
     
-    public GuiEditMenuReputationReward(GuiQuestBook gui, UUID playerId, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
-        super(gui, playerId, true);
+    public static void display(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+        gui.setEditMenu(new ReputationRewardMenu(gui, rewards, resultConsumer));
+    }
+    
+    private ReputationRewardMenu(GuiQuestBook gui, List<ReputationReward> rewards, Consumer<List<ReputationReward>> resultConsumer) {
+        super(gui, true);
         this.resultConsumer = resultConsumer;
     
         this.rewards = new ArrayList<>();
@@ -40,29 +42,15 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             }
         }
         
-        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, "hqm.repReward.value") {
+        addTextBox(valueTextBox = new NumberTextBox(gui, 185, 55, Translator.translatable("hqm.repReward.value"), true,
+                () -> selectedReward.getValue(), value -> selectedReward.setValue(value)) {
             @Override
             protected boolean isVisible() {
                 return selectedReward != null;
             }
-            
-            @Override
-            protected boolean isNegativeAllowed() {
-                return true;
-            }
-            
-            @Override
-            protected int getValue() {
-                return selectedReward.getValue();
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                selectedReward.setValue(number);
-            }
         });
         
-        addButton(new LargeButton(gui, "hqm.repReward.create", 20, 20) {
+        addClickable(new LargeButton(gui, "hqm.repReward.create", 20, 20) {
             @Override
             public boolean isVisible() {
                 return isValid();
@@ -70,11 +58,11 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             @Override
             public void onClick() {
-                GuiEditMenuReputationReward.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
+                ReputationRewardMenu.this.rewards.add(new ReputationReward(ReputationManager.getInstance().getReputationList().get(0), 0));
             }
         });
         
-        addButton(new LargeButton(gui, "hqm.repReward.delete", 80, 20) {
+        addClickable(new LargeButton(gui, "hqm.repReward.delete", 80, 20) {
             @Override
             public boolean isVisible() {
                 return isValid() && selectedReward != null;
@@ -82,12 +70,12 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             @Override
             public void onClick() {
-                GuiEditMenuReputationReward.this.rewards.remove(selectedReward);
+                ReputationRewardMenu.this.rewards.remove(selectedReward);
                 selectedReward = null;
             }
         });
         
-        selectionHelper = new ArrowSelectionHelper(gui, 185, 25) {
+        addClickable(new ArrowSelectionHelper(gui, 185, 25) {
     
             @Override
             protected boolean isArrowVisible() {
@@ -117,13 +105,7 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             protected FormattedText getArrowText() {
                 return Translator.plain(selectedReward.getReward().getName());
             }
-    
-            @Override
-            protected FormattedText getArrowDescription() {
-                return null;
-            }
-    
-        };
+        });
     }
     
     @Override
@@ -144,8 +126,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
             
             gui.drawString(matrices, error, START_X, ERROR_Y, 0.7F, 0x404040);
         }
-        
-        selectionHelper.render(matrices, mX, mY);
     }
     
     @Override
@@ -165,15 +145,6 @@ public class GuiEditMenuReputationReward extends GuiEditMenu {
                 }
             }
         }
-        
-        selectionHelper.onClick(mX, mY);
-    }
-    
-    @Override
-    public void onRelease(int mX, int mY, int button) {
-        super.onRelease(mX, mY, button);
-        
-        selectionHelper.onRelease();
     }
     
     private boolean isValid() {

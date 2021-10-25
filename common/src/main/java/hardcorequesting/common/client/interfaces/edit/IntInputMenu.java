@@ -2,8 +2,8 @@ package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.util.Translator;
 
-import java.util.UUID;
 import java.util.function.IntConsumer;
 
 public class IntInputMenu extends GuiEditMenu {
@@ -11,27 +11,17 @@ public class IntInputMenu extends GuiEditMenu {
     private final IntConsumer resultConsumer;
     private int amount;
     
-    public static void display(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
-        gui.setEditMenu(new IntInputMenu(gui, playerId, title, initAmount, resultConsumer));
+    public static void display(GuiQuestBook gui, String title, int initAmount, IntConsumer resultConsumer) {
+        gui.setEditMenu(new IntInputMenu(gui, title, initAmount, resultConsumer));
     }
     
-    public IntInputMenu(GuiQuestBook gui, UUID playerId, String title, int initAmount, IntConsumer resultConsumer) {
-        super(gui, playerId, true);
+    public IntInputMenu(GuiQuestBook gui, String title, int initAmount, IntConsumer resultConsumer) {
+        super(gui, true);
     
         this.resultConsumer = resultConsumer;
         amount = initAmount;
         
-        addTextBox(new NumberTextBox(gui, 25, 30, title) {
-            @Override
-            protected int getValue() {
-                return amount;
-            }
-            
-            @Override
-            protected void setValue(int number) {
-                amount = number;
-            }
-        });
+        addTextBox(new NumberTextBox(gui, 25, 30, Translator.translatable(title), () -> amount, value -> amount = value));
     }
     
     @Override
