@@ -1,11 +1,18 @@
 package hardcorequesting.common.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.GsonHelper;
+
+import java.util.Objects;
 
 /**
  * A text wrapper that can optionally be translatable
  */
-public class WrappedText {
+public final class WrappedText {
+    private static final String TEXT = "text", TRANSLATED = "isTranslationKey";
+    
     
     private final String text;
     private final boolean shouldTranslate;
@@ -18,8 +25,24 @@ public class WrappedText {
         return new WrappedText(key, true);
     }
     
+    public static WrappedText fromJson(JsonElement element, boolean isDefaultTranslated) {
+        if (GsonHelper.isStringValue(element)) {    // Format used before migration to WrappedText
+            return new WrappedText(element.getAsString(), isDefaultTranslated);
+        } else {
+            JsonObject json = GsonHelper.convertToJsonObject(element, "wrapped text");
+            return new WrappedText(GsonHelper.getAsString(json, TEXT), GsonHelper.getAsBoolean(json, TRANSLATED));
+        }
+    }
+    
+    public JsonElement toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty(TEXT, text);
+        json.addProperty(TRANSLATED, shouldTranslate);
+        return json;
+    }
+    
     private WrappedText(String text, boolean shouldTranslate) {
-        this.text = text;
+        this.text = Objects.requireNonNull(text);
         this.shouldTranslate = shouldTranslate;
     }
     
@@ -36,5 +59,18 @@ public class WrappedText {
     
     public boolean shouldTranslate() {
         return shouldTranslate;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        WrappedText that = (WrappedText) o;
+        return shouldTranslate == that.shouldTranslate && text.equals(that.text);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(text, shouldTranslate);
     }
 }
