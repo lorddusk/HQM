@@ -54,7 +54,7 @@ public class TeamManager extends SimpleSerializable {
     public void loadFromString(String string) {
         List<Team> teams = SaveHandler.<List<Team>>load(string, new TypeToken<List<Team>>() {}.getType())
                 .orElseGet(Lists::newArrayList);
-        teams.stream().filter(team -> !team.isSingle()).forEach(TeamManager.getInstance()::addTeam);
+        teams.stream().filter(team -> team != null && !team.isSingle()).forEach(TeamManager.getInstance()::addTeam);
         TeamAdapter.commitInvitesMap();
         if (HardcoreQuestingCore.platform.isClient())
             TeamLiteStat.updateTeams(teams.stream().map(Team::toLiteStat).collect(Collectors.toList()));
