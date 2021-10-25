@@ -5,7 +5,7 @@ import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -83,7 +83,7 @@ public abstract class TaskGraphic extends Graphic {
     public void onClick(int mX, int mY, int b) {
         super.onClick(mX, mY, b);
         if (gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-            TextMenu.display(gui, task.getLongDescription().getRawText(), false, this::setLongDescription);
+            WrappedTextMenu.display(gui, task.getLongDescription(), false, this::setLongDescription);
         }
     }
     
@@ -95,8 +95,8 @@ public abstract class TaskGraphic extends Graphic {
         return cachedDescription;
     }
     
-    private void setLongDescription(String description) {
-        task.setLongDescription(WrappedText.createTranslated(description));
+    private void setLongDescription(WrappedText description) {
+        task.setLongDescription(description);
         cachedDescription = null;
     }
 }

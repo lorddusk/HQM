@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditCommandRewardsMenu;
 import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
@@ -17,7 +18,10 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
-import hardcorequesting.common.util.*;
+import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.OPBookHelper;
+import hardcorequesting.common.util.SaveHelper;
+import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
@@ -176,8 +180,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            TextMenu.display(gui, task.getDescription().getRawText(), true,
-                                    key -> task.setDescription(WrappedText.createTranslated(key)));
+                            WrappedTextMenu.display(gui, task.getDescription(), true, task::setDescription);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
                             if (selectedTask == task) {
