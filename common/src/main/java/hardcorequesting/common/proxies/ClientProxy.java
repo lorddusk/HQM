@@ -16,7 +16,8 @@ public class ClientProxy extends CommonProxy {
         super.init();
         Quest.clientTicker = new QuestTicker();
         HardcoreQuestingCore.platform.registerOnClientTick(minecraftClient -> Quest.clientTicker.tick(minecraftClient.level, true));
-    
+
+        TaskGraphics.register(TaskType.CHECKBOX, CheckBoxTaskGraphic::new);
         TaskGraphics.register(TaskType.CONSUME, (task, playerId, questBook) -> ItemTaskGraphic.createConsumeGraphic(task, playerId, questBook, true));
         TaskGraphics.register(TaskType.CRAFT, ItemTaskGraphic::new);
         TaskGraphics.register(TaskType.LOCATION, LocationTaskGraphic::new);
