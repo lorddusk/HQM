@@ -152,6 +152,8 @@
   "_comment": "======================================",
   "_comment": "TASK TYPES",
   "_comment": "======================================",
+  "hqm.taskType.checkbox.title": "Checkbox task",
+  "hqm.taskType.checkbox.desc": "A task where the player must check a checkbox.",
   "hqm.taskType.consume.title": "Consume task",
   "hqm.taskType.consume.desc": "A task where the player can hand in items or fluids. One can also use the Quest Delivery System to submit items and fluids.",
   "hqm.taskType.craft.title": "Crafting task",
