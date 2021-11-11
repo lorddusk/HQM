@@ -21,7 +21,9 @@ public class CheckBoxTask extends QuestTask<CheckBoxTaskData> {
 
     @Override
     public void onUpdate(Player player) {
-
+        if (getData(player).isToggled()) {
+            completeTask(player.getUUID());
+        }
     }
 
     @Override
@@ -42,7 +44,6 @@ public class CheckBoxTask extends QuestTask<CheckBoxTaskData> {
     protected void setComplete(CheckBoxTaskData data) {
         data.setToggled(true);
         data.completed = true;
-
     }
 
     @Override
@@ -66,6 +67,7 @@ public class CheckBoxTask extends QuestTask<CheckBoxTaskData> {
     }
     
     public void setToggled(UUID id, boolean toggled) {
-        getData(id).setToggled(toggled);
+        CheckBoxTaskData data = getData(id);
+        data.setToggled(toggled | data.completed);
     }
 }
