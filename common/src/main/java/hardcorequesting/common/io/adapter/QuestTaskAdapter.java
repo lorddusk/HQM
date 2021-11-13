@@ -415,8 +415,7 @@ public class QuestTaskAdapter {
         REPUTATION_KILL(ReputationKillTaskData::construct),
         TAME(TameTaskData::construct),
         ADVANCEMENT(AdvancementTaskData::construct),
-        COMPLETED(CompleteQuestTaskData::construct),
-        CHECKBOX(CheckBoxTaskData::construct);
+        COMPLETED(CompleteQuestTaskData::construct);
         
         private Function<JsonObject, TaskData> func;
         
