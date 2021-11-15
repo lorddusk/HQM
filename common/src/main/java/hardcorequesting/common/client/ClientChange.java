@@ -10,7 +10,9 @@ import hardcorequesting.common.network.message.ClientUpdateMessage;
 import hardcorequesting.common.network.message.SoundMessage;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.task.CheckBoxTask;
 import hardcorequesting.common.quests.task.QuestTask;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
 import hardcorequesting.common.tileentity.TrackerType;
 import net.minecraft.core.BlockPos;
@@ -146,6 +148,36 @@ public enum ClientChange {
         @Override
         public void parse(Player player, String data) {
             SoundHandler.handleLorePacket(player);
+        }
+    }),
+    COMPLETE_CHECKBOX_TASK(new ClientUpdater<CheckBoxTask>() {
+        private static final String QUEST = "quest";
+        private static final String TASK = "task";
+
+        @Override
+        public IMessage build(CheckBoxTask questTask) throws IOException {
+            StringWriter sWriter = new StringWriter();
+            JsonWriter writer = new JsonWriter(sWriter);
+            writer.beginObject();
+            writer.name(QUEST).value(questTask.getParent().getQuestId().toString());
+            writer.name(TASK).value(questTask.getId());
+            writer.endObject();
+            writer.close();
+            return new ClientUpdateMessage(COMPLETE_CHECKBOX_TASK, sWriter.toString());
+        }
+
+        @Override
+        public void parse(Player player, String data) {
+            JsonParser parser = new JsonParser();
+            JsonObject root = parser.parse(data).getAsJsonObject();
+            Quest quest = Quest.getQuest(UUID.fromString(root.get(QUEST).getAsString()));
+            int task = root.get(TASK).getAsInt();
+            if (quest != null && task > -1 && task < quest.getTasks().size()) {
+                QuestTask<?> taskObj = quest.getTasks().get(task);
+                if (taskObj.getType() == TaskType.CHECKBOX) {
+                    taskObj.completeTask(player.getUUID());
+                }
+            }
         }
     });
     

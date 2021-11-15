@@ -56,8 +56,4 @@ public class CheckBoxTask extends QuestTask<TaskData> {
     public void read(JsonObject object) {
 
     }
-
-    public void markCompleted(UUID playerId) {
-        setComplete(getData(playerId));
-    }
 }

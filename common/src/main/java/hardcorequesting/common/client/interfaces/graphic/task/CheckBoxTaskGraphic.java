@@ -28,9 +28,7 @@ public class CheckBoxTaskGraphic extends TaskGraphic {
             public void setValue(boolean val) {
                 if (val && !completed) {
                     completed = true;
-                    task.markCompleted(playerId); // sets local completed flag
-                                                  //  this doesn't actually do much - the server handles everything else
-                    NetworkManager.sendToServer(ClientChange.UPDATE_TASK.build(task));
+                    NetworkManager.sendToServer(ClientChange.COMPLETE_CHECKBOX_TASK.build(task));
                 }
             }
         });
