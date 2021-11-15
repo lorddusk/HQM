@@ -21,11 +21,7 @@ public class CheckBoxTask extends QuestTask<TaskData> {
 
     @Override
     public void onUpdate(Player player) {
-        if (getData(player).completed) {
-            // completed flag was set by client via update packet
-            // we need to properly update the quest, though
-            completeTask(player.getUUID());
-        }
+
     }
 
     @Override
