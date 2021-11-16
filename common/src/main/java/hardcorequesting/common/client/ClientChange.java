@@ -176,6 +176,7 @@ public enum ClientChange {
                 QuestTask<?> taskObj = quest.getTasks().get(task);
                 if (taskObj.getType() == TaskType.CHECKBOX) {
                     taskObj.completeTask(player.getUUID());
+                    quest.sendUpdatedDataToTeam(player);
                 }
             }
         }

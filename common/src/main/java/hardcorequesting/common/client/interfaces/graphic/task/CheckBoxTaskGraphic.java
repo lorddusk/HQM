@@ -5,10 +5,13 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.CheckBoxTask;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.TextComponent;
 
 import java.util.UUID;
 
+@Environment(EnvType.CLIENT)
 public class CheckBoxTaskGraphic extends TaskGraphic {
     private boolean completed;
 
