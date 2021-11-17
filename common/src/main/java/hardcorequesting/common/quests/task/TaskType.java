@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 
 public final class TaskType<T extends QuestTask<?>> {
+    public static final TaskType<CheckBoxTask> CHECKBOX = new TaskType<>("checkbox", CheckBoxTask::new);
     public static final TaskType<ConsumeItemTask> CONSUME = new TaskType<>("consume", ConsumeItemTask::new);
     public static final TaskType<CraftingTask> CRAFT = new TaskType<>("craft", CraftingTask::new);
     public static final TaskType<VisitLocationTask> LOCATION = new TaskType<>("location", VisitLocationTask::new);
@@ -33,7 +34,7 @@ public final class TaskType<T extends QuestTask<?>> {
     public static final TaskType<BreakBlockTask> BLOCK_BREAK = new TaskType<>("break", BreakBlockTask::new);
     public static final TaskType<PlaceBlockTask> BLOCK_PLACE = new TaskType<>("place", PlaceBlockTask::new);
     
-    private static final Map<String, TaskType<?>> TYPES = ImmutableMap.<String, TaskType<?>>builder().put("CONSUME", CONSUME).put("CRAFT", CRAFT)
+    private static final Map<String, TaskType<?>> TYPES = ImmutableMap.<String, TaskType<?>>builder().put("CHECKBOX", CHECKBOX).put("CONSUME", CONSUME).put("CRAFT", CRAFT)
             .put("LOCATION", LOCATION).put("CONSUME_QDS", CONSUME_QDS).put("DETECT", DETECT).put("KILL", KILL).put("TAME", TAME).put("DEATH", DEATH)
             .put("REPUTATION", REPUTATION).put("REPUTATION_KILL", REPUTATION_KILL).put("ADVANCEMENT", ADVANCEMENT).put("COMPLETION", COMPLETION)
             .put("BLOCK_BREAK", BLOCK_BREAK).put("BLOCK_PLACE", BLOCK_PLACE).build();
