@@ -63,9 +63,8 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     @Override
     public void setItem(int i, @NotNull ItemStack stack) {
         QuestTask<?> task = getCurrentTask();
-        if (task instanceof ConsumeItemTask) {
-            ConsumeItemTask consumeTask = (ConsumeItemTask) task;
-            
+        if (task instanceof ConsumeItemTask consumeTask) {
+    
             NonNullList<ItemStack> list = NonNullList.create();
             list.add(stack);
             if (consumeTask.increaseItems(list, this.getPlayerUUID())) {
@@ -109,7 +108,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
             this.syncToClientsNearby();
             
             //sync the quest line progress
-            QuestTask task = getCurrentTask();
+            QuestTask<?> task = getCurrentTask();
             if (task != null) {
                 Player player = QuestingData.getPlayer(this.getPlayerUUID());
                 if (player != null) {
@@ -131,7 +130,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     
     protected void updateState() {
         if (!this.level.isClientSide) {
-            QuestTask task = this.getCurrentTask();
+            QuestTask<?> task = this.getCurrentTask();
             boolean bound = false;
             if (task != null && !task.isCompleted(this.getPlayerUUID())) {
                 bound = true;
@@ -140,7 +139,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
         }
     }
     
-    public QuestTask getCurrentTask() {
+    public QuestTask<?> getCurrentTask() {
         if (this.getPlayerUUID() != null && selectedQuestId != null) {
             Quest quest = Quest.getQuest(selectedQuestId);
             if (quest != null && selectedTask >= 0 && selectedTask < quest.getTasks().size()) {
@@ -156,7 +155,7 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
         this.setQuestUUID(data.selectedQuestId);
         this.selectedTask = data.selectedTask;
         
-        QuestTask task = this.getCurrentTask();
+        QuestTask<?> task = this.getCurrentTask();
         if (task == null || task.isCompleted(this.getPlayerUUID())) {
             this.setPlayerUUID(null);
             this.setQuestUUID(null);
@@ -202,22 +201,24 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
 //        return 0;
 //    }
     
+    
     @Override
-    public void writeTile(CompoundTag nbt, NBTType type) {
+    protected void saveAdditional(CompoundTag compoundTag) {
+        super.saveAdditional(compoundTag);
         if (this.getPlayerUUID() != null && selectedQuestId != null) {
-            nbt.putUUID(NBT_PLAYER_UUID, this.getPlayerUUID());
-            nbt.putUUID(NBT_QUEST, this.getQuestUUID());
-            nbt.putByte(NBT_TASK, (byte) selectedTask);
+            compoundTag.putUUID(NBT_PLAYER_UUID, this.getPlayerUUID());
+            compoundTag.putUUID(NBT_QUEST, this.getQuestUUID());
+            compoundTag.putByte(NBT_TASK, (byte) selectedTask);
         }
     }
     
     @Override
-    public void readTile(CompoundTag nbt, NBTType type) {
-        if (nbt.contains(NBT_PLAYER_UUID + "Most")) {
-            this.setPlayerUUID(nbt.getUUID(NBT_PLAYER_UUID));
-            this.setQuestUUID(nbt.getUUID(NBT_QUEST));
-            selectedTask = nbt.getByte(NBT_TASK);
+    public void load(CompoundTag compoundTag) {
+        super.load(compoundTag);
+        if (compoundTag.contains(NBT_PLAYER_UUID + "Most")) {
+            this.setPlayerUUID(compoundTag.getUUID(NBT_PLAYER_UUID));
+            this.setQuestUUID(compoundTag.getUUID(NBT_QUEST));
+            selectedTask = compoundTag.getByte(NBT_TASK);
         }
     }
-    
 }
