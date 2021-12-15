@@ -32,7 +32,13 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected abstract boolean isInPartBounds(int mX, int mY, Positioned<Part> pos);
     
-    protected boolean handlePartClick(EditMode mode, Part part, int id) {
+    protected void handlePartClick(Part part, int id) {
+        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
+            handleEditPartClick(gui.getCurrentMode(), part, id);
+        }
+    }
+    
+    protected boolean handleEditPartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.DELETE) {
             parts.remove(id);
             return true;
@@ -71,11 +77,9 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     @Override
     public void onClick(int mX, int mY, int b) {
-        if (Quest.canQuestsBeEdited() && gui.getCurrentMode() != EditMode.NORMAL) {
-            int id = getClickedPart(mX, mY);
-            if (id >= 0)
-                handlePartClick(gui.getCurrentMode(), parts.getShownElements().get(id), id);
-        }
+        int id = getClickedPart(mX, mY);
+        if (id >= 0)
+            handlePartClick(parts.getShownElements().get(id), id);
         
         super.onClick(mX, mY, b);
     }
