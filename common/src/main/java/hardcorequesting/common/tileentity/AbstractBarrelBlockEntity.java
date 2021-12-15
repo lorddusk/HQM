@@ -11,15 +11,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity implements Container {
+public abstract class AbstractBarrelBlockEntity extends BlockEntity implements Container {
     
     private static final String NBT_PLAYER_UUID = "Player";
     private static final String NBT_QUEST = "Quest";
@@ -103,10 +105,12 @@ public abstract class AbstractBarrelBlockEntity extends AbstractBaseBlockEntity 
     public void clearContent() {}
     
     protected void doSync() {
-        if (!this.level.isClientSide) {
+        if (!this.level.isClientSide()) {
             // sync tile to client
-            this.syncToClientsNearby();
             
+            ServerLevel world = (ServerLevel) getLevel();
+            world.getChunkSource().blockChanged(getBlockPos());
+    
             //sync the quest line progress
             QuestTask<?> task = getCurrentTask();
             if (task != null) {
