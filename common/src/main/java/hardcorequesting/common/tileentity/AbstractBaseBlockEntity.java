@@ -2,6 +2,7 @@ package hardcorequesting.common.tileentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,10 +21,9 @@ public abstract class AbstractBaseBlockEntity extends BlockEntity {
     }
     
     @Override
-    public final CompoundTag save(CompoundTag compound) {
-        compound = super.save(compound);
-        this.writeTile(compound, NBTType.SAVE);
-        return compound;
+    protected void saveAdditional(CompoundTag compoundTag) {
+        super.saveAdditional(compoundTag);
+        this.writeTile(compoundTag, NBTType.SAVE);
     }
     
     public void writeTile(CompoundTag nbt, NBTType type) {}
@@ -34,7 +34,12 @@ public abstract class AbstractBaseBlockEntity extends BlockEntity {
         this.readTile(nbt, NBTType.SYNC);
     }
     
-    public abstract void syncToClientsNearby();
+    public final void syncToClientsNearby() {
+        if (!getLevel().isClientSide()) {
+            ServerLevel world = (ServerLevel) getLevel();
+            world.getChunkSource().blockChanged(getBlockPos());
+        }
+    }
     
     public enum NBTType {
         SAVE,

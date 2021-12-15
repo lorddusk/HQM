@@ -7,13 +7,10 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.fabric.FabricFluidStack;
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
-public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements FluidInsertable, BlockEntityClientSerializable {
+public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements FluidInsertable {
     public BarrelBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state);
     }
@@ -28,21 +25,5 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements Flui
             }
         }
         return fluidVolume;
-    }
-    
-    @NotNull
-    @Override
-    public CompoundTag toClientTag(CompoundTag tag) {
-        return this.save(tag);
-    }
-    
-    @Override
-    public void fromClientTag(@NotNull CompoundTag tag) {
-        this.load(tag);
-    }
-    
-    @Override
-    public void syncToClientsNearby() {
-        sync();
     }
 }

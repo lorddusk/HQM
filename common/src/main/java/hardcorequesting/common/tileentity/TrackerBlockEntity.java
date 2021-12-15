@@ -84,15 +84,14 @@ public class TrackerBlockEntity extends BlockEntity {
     }
     
     @Override
-    public CompoundTag save(CompoundTag compound) {
-        super.save(compound);
+    protected void saveAdditional(CompoundTag compoundTag) {
+        super.saveAdditional(compoundTag);
         
         if (quest != null) {
-            compound.putUUID(NBT_QUEST, quest.getQuestId());
+            compoundTag.putUUID(NBT_QUEST, quest.getQuestId());
         }
-        compound.putInt(NBT_RADIUS, radius);
-        compound.putByte(NBT_TYPE, (byte) type.ordinal());
-        return compound;
+        compoundTag.putInt(NBT_RADIUS, radius);
+        compoundTag.putByte(NBT_TYPE, (byte) type.ordinal());
     }
     
     public static void tick(Level level, BlockPos blockPos, BlockState blockState, TrackerBlockEntity blockEntity) {
