@@ -59,7 +59,7 @@ public abstract class LargeButton implements Drawable, Clickable {
     
     @Override
     public boolean onClick(int mX, int mY) {
-        if (inButtonBounds(mX, mY) && isVisible() && isEnabled()) {
+        if (isVisible() && isEnabled() && inButtonBounds(mX, mY)) {
             onClick();
             return true;
         }

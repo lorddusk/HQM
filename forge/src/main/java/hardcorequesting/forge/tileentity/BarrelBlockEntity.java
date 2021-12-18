@@ -6,9 +6,6 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.forge.ForgeFluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -18,7 +15,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 
 public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
@@ -85,25 +81,6 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
     
     public BarrelBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state);
-    }
-    
-    @Override
-    public void syncToClientsNearby() {
-        if (!getLevel().isClientSide()) {
-            ServerLevel world = (ServerLevel) getLevel();
-            world.getChunkSource().blockChanged(getBlockPos());
-        }
-    }
-    
-    @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return new ClientboundBlockEntityDataPacket(worldPosition, 10, getUpdateTag());
-    }
-    
-    @Nonnull
-    @Override
-    public CompoundTag getUpdateTag() {
-        return save(new CompoundTag());
     }
     
     @NotNull

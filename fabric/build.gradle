@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
 }
 
 repositories {
@@ -28,10 +28,10 @@ architectury {
 
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
-    modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
     // Used for some extra events/hooks
-    modApi "dev.architectury:architectury-fabric:${project.architectury_version}"
+    modImplementation "dev.architectury:architectury-fabric:${project.architectury_version}"
 
     modApi("me.shedaniel:RoughlyEnoughItems-api:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")

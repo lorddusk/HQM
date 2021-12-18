@@ -36,15 +36,15 @@
   ],
   "accessWidener": "hqm.accesswidener",
   "depends": {
-    "fabricloader": ">=0.11.3",
-    "fabric": ">=0.36.1",
-    "minecraft": "1.17.x",
-    "java": ">=16",
-    "architectury": ">=2.5.28",
-    "libblockattributes_core": ">=0.9.0",
-    "libblockattributes_fluids": ">=0.9.0",
-    "cardinal-components-base": ">=3.1.1",
-    "cardinal-components-entity": ">=3.1.1"
+    "fabricloader": ">=0.12.12",
+    "fabric": ">=0.44.0",
+    "minecraft": "1.18.x",
+    "java": ">=17",
+    "architectury": ">=3.2.51",
+    "libblockattributes_core": ">=0.10.0",
+    "libblockattributes_fluids": ">=0.10.0",
+    "cardinal-components-base": ">=4.0.1",
+    "cardinal-components-entity": ">=4.0.1"
   },
   "custom": {
     "cardinal-components": [

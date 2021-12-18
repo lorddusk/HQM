@@ -63,8 +63,8 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
     }
     
     @Override
-    protected boolean handlePartClick(EditMode mode, CompleteQuestTask.Part part, int id) {
-        if (super.handlePartClick(mode, part, id)) {
+    protected boolean handleEditPartClick(EditMode mode, CompleteQuestTask.Part part, int id) {
+        if (super.handleEditPartClick(mode, part, id)) {
             return true;
         } else if (Quest.speciallySelectedQuestId != null) {
             parts.getOrCreateForModify(id).setQuest(Quest.speciallySelectedQuestId);
