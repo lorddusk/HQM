@@ -161,29 +161,21 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
     }
     
     @Override
-    public void onClick(int mX, int mY, int b) {
+    protected void handlePartClick(ItemRequirementTask.Part part, int id) {
         if (gui.isOpBook && Screen.hasShiftDown()) {
-            int id = getClickedPart(mX, mY);
-            if (id >= 0) {
-                OPBookHelper.reverseRequirementCompletion(task, id, playerId);
-            }
+            OPBookHelper.reverseRequirementCompletion(task, id, playerId);
         } else if (Quest.canQuestsBeEdited()) {
-            super.onClick(mX, mY, b);
+            super.handlePartClick(part, id);
         } else {
             /* TODO REI
             if (Loader.isModLoaded("jei")) {
-                for (ItemRequirement item : getEditFriendlyItems(this.items)) {
-                    if (gui.inBounds(item.x, item.y, SIZE, SIZE, mX, mY)) {
-                        JEIIntegration.showItemStack(item.getStack());
-                        return;
-                    }
-                }
+                JEIIntegration.showItemStack(part.getStack());
             }*/
         }
     }
     
     @Override
-    protected boolean handlePartClick(EditMode mode, ItemRequirementTask.Part part, int id) {
+    protected boolean handleEditPartClick(EditMode mode, ItemRequirementTask.Part part, int id) {
         boolean doubleClick = false;
         long tickCount = Minecraft.getInstance().level.getGameTime();
         long lastDiff = tickCount - lastClicked;
@@ -203,7 +195,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             }
             return true;
         } else {
-            return super.handlePartClick(mode, part, id);
+            return super.handleEditPartClick(mode, part, id);
         }
     }
 }
