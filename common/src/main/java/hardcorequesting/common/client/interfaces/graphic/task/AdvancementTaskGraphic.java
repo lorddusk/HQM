@@ -31,13 +31,13 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     }
     
     @Override
-    protected boolean handlePartClick(EditMode mode, GetAdvancementTask.Part part, int id) {
+    protected boolean handleEditPartClick(EditMode mode, GetAdvancementTask.Part part, int id) {
         if (mode == EditMode.LOCATION) {
             PickAdvancementMenu.display(gui, part.getAdvancement(),
                     result -> task.setAdvancement(id, result));
             return true;
         } else {
-            return super.handlePartClick(mode, part, id);
+            return super.handleEditPartClick(mode, part, id);
         }
     }
 }

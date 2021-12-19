@@ -55,7 +55,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected boolean handlePartClick(EditMode mode, Part part, int id) {
+    protected boolean handleEditPartClick(EditMode mode, Part part, int id) {
         if (mode == EditMode.ITEM) {
             PickItemMenu.display(gui, part.getIconStack(), PickItemMenu.Type.ITEM_FLUID,
                     result -> task.setIcon(id, result.get()));
@@ -65,7 +65,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
                     result -> task.setName(id, result));
             return true;
         } else {
-            return super.handlePartClick(mode, part, id);
+            return super.handleEditPartClick(mode, part, id);
         }
     }
     
