@@ -33,7 +33,7 @@ public class MinecraftAdapter {
         public ItemStack deserialize(JsonElement json) {
             if (json.isJsonNull())
                 return ItemStack.EMPTY;
-            return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, json));
+            return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, PatchedNbtOps.INSTANCE, json));
         }
     };
     // A more restrictive version of ITEM_STACK that caps stack sizes at 1
