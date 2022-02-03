@@ -22,7 +22,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -145,14 +145,18 @@ public class QuestLine {
         this.mainDescription = mainDescription;
     }
     
-    public void save(@Nullable DataWriter cfgWriter, @Nullable DataWriter dataWriter) {
+    public void saveQuests(@NotNull DataWriter cfqWriter) {
         for (Serializable serializable : serializables) {
-            if (dataWriter != null && serializable.isData())
-                serializable.save(dataWriter);
-            else if (cfgWriter != null && !serializable.isData())
-                serializable.save(cfgWriter);
+            if (!serializable.isData())
+                serializable.save(cfqWriter);
         }
-        SaveHelper.onSave();
+    }
+    
+    public void saveData(@NotNull DataWriter dataWriter) {
+        for (Serializable serializable : serializables) {
+            if (serializable.isData())
+                serializable.save(dataWriter);
+        }
     }
     
     public void loadAll(DataReader cfgReader, DataReader dataReader) {

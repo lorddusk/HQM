@@ -355,7 +355,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     public void save() {
-        QuestLine.getActiveQuestLine().save(HardcoreQuestingCore.packManager, null);
+        QuestLine.getActiveQuestLine().saveQuests(HardcoreQuestingCore.packManager);
         SaveHelper.onSave();
     }
     

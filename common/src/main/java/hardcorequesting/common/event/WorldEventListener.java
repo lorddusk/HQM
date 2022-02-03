@@ -22,7 +22,7 @@ public class WorldEventListener {
     public static void onSave(ServerLevel world) {
         if (!world.isClientSide && world.dimension().equals(Level.OVERWORLD)) {
             LOGGER.info("Saving HQM world data");
-            QuestLine.getActiveQuestLine().save(null, FileDataManager.createForWorldData(world.getServer()));
+            QuestLine.getActiveQuestLine().saveData(FileDataManager.createForWorldData(world.getServer()));
         }
     }
 }
