@@ -15,6 +15,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.EntityEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -35,7 +36,6 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -141,12 +141,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> consumer) {
-        ServerWorldEvents.LOAD.register((server, world) -> consumer.accept(world.dimension(), world));
+        LifecycleEvent.SERVER_LEVEL_LOAD.register(level -> consumer.accept(level.dimension(), level));
     }
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        ServerWorldEvents.UNLOAD.register((server, world) -> consumer.accept(world));
+        LifecycleEvent.SERVER_LEVEL_SAVE.register(consumer::accept);
     }
     
     @Override
