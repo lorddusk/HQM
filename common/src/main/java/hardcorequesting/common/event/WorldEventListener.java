@@ -6,10 +6,14 @@ import hardcorequesting.common.quests.QuestLine;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class WorldEventListener {
+    private static final Logger LOGGER = LogManager.getLogger();
+    
     public static void onLoad(ResourceKey<Level> worldRegistryKey, ServerLevel world) {
-        if (!world.isClientSide && world.dimension().equals(Level.OVERWORLD)) {
+        if (!world.isClientSide && worldRegistryKey.equals(Level.OVERWORLD)) {
             QuestLine questLine = QuestLine.reset();
             questLine.loadAll(HardcoreQuestingCore.packManager, FileDataManager.createForWorldData(world.getServer()));
         }
@@ -17,7 +21,8 @@ public class WorldEventListener {
     
     public static void onSave(ServerLevel world) {
         if (!world.isClientSide && world.dimension().equals(Level.OVERWORLD)) {
-            QuestLine.getActiveQuestLine().save(null, FileDataManager.createForWorldData(world.getServer()));
+            LOGGER.info("Saving HQM world data");
+            QuestLine.getActiveQuestLine().saveData(FileDataManager.createForWorldData(world.getServer()));
         }
     }
 }
