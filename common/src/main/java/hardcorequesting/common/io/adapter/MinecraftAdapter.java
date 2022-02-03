@@ -37,7 +37,7 @@ public class MinecraftAdapter {
         public ItemStack deserialize(JsonElement json) {
             if (json.isJsonNull())
                 return ItemStack.EMPTY;
-            return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, json));
+            return ItemStack.of((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, PatchedNbtOps.INSTANCE, json));
         }
     };
     public static final Adapter<FluidStack> FLUID = new Adapter<FluidStack>() {
