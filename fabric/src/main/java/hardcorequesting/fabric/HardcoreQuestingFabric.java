@@ -20,6 +20,7 @@ import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import me.shedaniel.architectury.event.events.BlockEvent;
 import me.shedaniel.architectury.event.events.EntityEvent;
+import me.shedaniel.architectury.event.events.LifecycleEvent;
 import me.shedaniel.architectury.event.events.PlayerEvent;
 import me.shedaniel.architectury.utils.GameInstance;
 import net.fabricmc.api.EnvType;
@@ -30,7 +31,6 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -129,12 +129,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> consumer) {
-        ServerWorldEvents.LOAD.register((server, world) -> consumer.accept(world.dimension(), world));
+        LifecycleEvent.SERVER_WORLD_LOAD.register(level -> consumer.accept(level.dimension(), level));
     }
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        ServerWorldEvents.UNLOAD.register((server, world) -> consumer.accept(world));
+        LifecycleEvent.SERVER_WORLD_SAVE.register(consumer::accept);
     }
     
     @Override
