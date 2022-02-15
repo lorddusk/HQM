@@ -2,15 +2,18 @@ package hardcorequesting.common.team;
 
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.TeamStatsMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TeamLiteStat {
+    private static final Logger LOGGER = LogManager.getLogger();
     
     private static final Map<String, TeamLiteStat> clientTeams = new HashMap<>();
+    @Nullable
     private static List<TeamLiteStat> clientTeamsList;
     
     private static final Comparator<TeamLiteStat> teamComparator = Comparator.comparingDouble(TeamLiteStat::getProgress).reversed();
@@ -52,7 +55,14 @@ public class TeamLiteStat {
         clientTeamsList = clientTeams.values().stream().sorted(teamComparator).toList();
     }
     
+    @NotNull
     public static List<TeamLiteStat> getTeamStats() {
+        if (clientTeamsList == null) {
+            // We could also just avoid null values and initialize the list with an empty list, but then we might not notice if the server fails to send the TeamStatsMessage packet.
+            LOGGER.warn("Tried getting client teams list before getting them from the server. The initial packet might have failed to be sent!");
+            clientTeamsList = Collections.emptyList();
+        }
+        
         return clientTeamsList;
     }
     
