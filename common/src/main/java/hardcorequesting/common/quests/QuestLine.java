@@ -143,17 +143,17 @@ public class QuestLine {
     }
     
     public static void sendDataToClient(ServerPlayer player) {
+        QuestLine questLine = getActiveQuestLine();
         // Sync various data, but not for the player that hosts the server (if any), as they already share the same data as the server
         if (!player.getGameProfile().getName().equals(player.server.getSingleplayerName())) {
             boolean side = !HardcoreQuestingCore.platform.isClient();
-            QuestLine questLine = getActiveQuestLine();
             NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, !side, side, player), player);
     
             NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), player);
     
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), player);
-            NetworkManager.sendToPlayer(new TeamStatsMessage(StreamSupport.stream(questLine.teamManager.getNamedTeams().spliterator(), false)), player);
         }
+        NetworkManager.sendToPlayer(new TeamStatsMessage(StreamSupport.stream(questLine.teamManager.getNamedTeams().spliterator(), false)), player);
     }
     
     public void setMainDescription(String mainDescription) {
