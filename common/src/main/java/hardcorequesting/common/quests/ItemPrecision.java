@@ -1,14 +1,9 @@
 package hardcorequesting.common.quests;
 
 import com.google.common.collect.ImmutableList;
-import hardcorequesting.common.HardcoreQuestingCore;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.LinkedHashMap;
@@ -39,11 +34,7 @@ public abstract class ItemPrecision {
         protected boolean same(ItemStack stack1, ItemStack stack2) {
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<ResourceLocation, Tag<Item>> entry : HardcoreQuestingCore.getServer().getTags().getOrEmpty(Registry.ITEM_REGISTRY).getAllTags().entrySet()) {
-                if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
-                    return true;
-            }
-            return false;
+            return stack1.getTags().anyMatch(stack2::is);
         }
     };
     public static final ItemPrecision TAG_FUZZY = new ItemPrecision("tagFuzzy", true) {
@@ -51,11 +42,7 @@ public abstract class ItemPrecision {
         protected boolean same(ItemStack stack1, ItemStack stack2) {
             if (stack1.getItem() == stack2.getItem())
                 return true;
-            for (Map.Entry<ResourceLocation, Tag<Item>> entry : HardcoreQuestingCore.getServer().getTags().getOrEmpty(Registry.ITEM_REGISTRY).getAllTags().entrySet()) {
-                if (entry.getValue().contains(stack1.getItem()) && entry.getValue().contains(stack2.getItem()))
-                    return false;
-            }
-            return false;
+            return stack1.getTags().anyMatch(stack2::is);
         }
     };
     private static final LinkedHashMap<String, ItemPrecision> precisionTypes;

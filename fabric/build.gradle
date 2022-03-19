@@ -6,7 +6,7 @@ repositories {
     maven {
         url "https://ladysnake.jfrog.io/artifactory/mods"
         content {
-            includeGroup "io.github.onyxstudios.Cardinal-Components-API"
+            includeGroup "dev.onyxstudios.cardinal-components-api"
         }
     }
     maven {
@@ -42,8 +42,8 @@ dependencies {
     depend("org.jetbrains:annotations:19.0.0")
 
     // Used for storing player-attached data
-    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:${project.cardinal_components}")
-    depend("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:${project.cardinal_components}")
+    depend("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components}")
+    depend("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cardinal_components}")
     // Used for interaction with fluid systems
     depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
     depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
