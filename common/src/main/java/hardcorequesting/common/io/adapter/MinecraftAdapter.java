@@ -12,7 +12,6 @@ import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.util.Fraction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -92,7 +91,7 @@ public class MinecraftAdapter {
         public JsonElement serialize(FluidStack src) {
             return object()
                     .add(FLUID, Registry.FLUID.getKey(src.getFluid()).toString())
-                    .add(VOLUME, Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, src.getAmount().toNbt()))
+                    .add(VOLUME, Fraction.CODEC.encodeStart(JsonOps.INSTANCE, src.getAmount()).result().orElseThrow())
                     .build();
         }
         
@@ -101,7 +100,7 @@ public class MinecraftAdapter {
             JsonObject object = json.getAsJsonObject();
             
             Fluid fluid = Registry.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
-            Fraction amount = Fraction.fromNbt((CompoundTag) Dynamic.convert(JsonOps.INSTANCE, NbtOps.INSTANCE, object.get(VOLUME)));
+            Fraction amount = Fraction.CODEC.parse(JsonOps.INSTANCE, object.get(VOLUME)).result().orElseThrow();
             return HardcoreQuestingCore.platform.createFluidStack(fluid, amount);
         }
     };

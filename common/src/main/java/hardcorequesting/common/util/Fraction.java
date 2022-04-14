@@ -1,14 +1,23 @@
 package hardcorequesting.common.util;
 
 import com.google.common.math.LongMath;
-import net.minecraft.nbt.CompoundTag;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
 
+@SuppressWarnings("unused")
 public final class Fraction extends Number implements Comparable<Fraction> {
     private static final Fraction EMPTY = ofWhole(0);
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###.###");
+    
+    public static final Codec<Fraction> CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    Codec.LONG.fieldOf("n").forGetter(Fraction::getNumerator),
+                    Codec.LONG.fieldOf("d").forGetter(Fraction::getDenominator)
+            ).apply(instance, Fraction::of));
+    
     private final long numerator;
     private final long denominator;
     private final boolean integer;
@@ -160,19 +169,5 @@ public final class Fraction extends Number implements Comparable<Fraction> {
     public String toString() {
         if (integer) return toDecimalString();
         return String.format("%s (%d/%d)", toDecimalString(), numerator, denominator);
-    }
-    
-    public CompoundTag toNbt() {
-        CompoundTag tag = new CompoundTag();
-        tag.putLong("n", numerator);
-        tag.putLong("d", denominator);
-        return tag;
-    }
-    
-    public static Fraction fromNbt(CompoundTag tag) {
-        long w = tag.contains("w") ? tag.getLong("w") : 0;
-        long n = tag.getLong("n");
-        long d = Math.max(1, tag.getLong("d"));
-        return of(w, n, d);
     }
 }
