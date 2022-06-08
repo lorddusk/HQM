@@ -116,6 +116,7 @@ public class WrappedTextMenu extends AbstractTextMenu {
         String text = textLogic.getText();
         if (text == null || text.isEmpty()) {
             text = I18n.get("hqm.textEditor.unnamed");
+            this.isTranslated = false;
         }
         
         if (limit >= 0) {
