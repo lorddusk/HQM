@@ -3,7 +3,11 @@ plugins {
 }
 
 configurations {
+    common
     shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
 }
 
 architectury {
@@ -18,12 +22,7 @@ dependencies {
     forgeDependencies(implementation("blue.endless:jankson:1.2.1"))
     shadowCommon("blue.endless:jankson:1.2.0")
 
-    implementation(project(path: ":common", configuration: "dev")) {
-        transitive = false
-    }
-    developmentForge(project(path: ":common", configuration: "dev")) {
-        transitive = false
-    }
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
     }

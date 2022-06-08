@@ -18,7 +18,11 @@ repositories {
 }
 
 configurations {
+    common
     shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
 }
 
 architectury {
@@ -50,12 +54,7 @@ dependencies {
     // Used for parsing the config file
     depend("blue.endless:jankson:1.2.1")
 
-    implementation(project(path: ":common", configuration: "dev")) {
-        transitive = false
-    }
-    developmentFabric(project(path: ":common", configuration: "dev")) {
-        transitive = false
-    }
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) {
         transitive = false
     }
