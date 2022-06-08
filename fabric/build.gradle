@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 repositories {
@@ -43,7 +43,7 @@ dependencies {
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.roughlyenoughitems}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    depend("org.jetbrains:annotations:19.0.0")
+    depend("org.jetbrains:annotations:23.0.0")
 
     // Used for storing player-attached data
     depend("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components}")

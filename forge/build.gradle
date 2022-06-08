@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 configurations {
@@ -18,9 +18,9 @@ architectury {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${project.forge_version}"
 
-    compileOnly("org.jetbrains:annotations:19.0.0")
+    compileOnly("org.jetbrains:annotations:23.0.0")
     forgeDependencies(implementation("blue.endless:jankson:1.2.1"))
-    shadowCommon("blue.endless:jankson:1.2.0")
+    shadowCommon("blue.endless:jankson:1.2.1")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
