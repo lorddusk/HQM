@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.MultilineTextBox;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -16,6 +17,7 @@ import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
@@ -27,6 +29,8 @@ public class WrappedTextMenu extends AbstractTextMenu {
     private boolean isTranslated;
     @Nullable
     private List<FormattedText> translatedLines;
+    @Nullable
+    private String translatedText;
     
     public static void display(GuiQuestBook gui, WrappedText text, boolean isName, Consumer<WrappedText> resultConsumer) {
         gui.setEditMenu(new WrappedTextMenu(gui, text, isName, -1, resultConsumer));
@@ -54,25 +58,48 @@ public class WrappedTextMenu extends AbstractTextMenu {
             @Override
             public void setValue(boolean val) {
                 isTranslated = val;
-                updateTextColor(WrappedTextMenu.this.textLogic.getText());
+                onTextChanged(WrappedTextMenu.this.textLogic.getText());
             }
         });
-        this.textLogic.setListener(this::updateTextColor);
+        addClickable(new LargeButton(gui, "hqm.textEditor.asRawText", 180, 40) {
+            @Override
+            public boolean isEnabled() {
+                return translatedText != null;
+            }
     
-        this.updateTextColor(this.textLogic.getText());
+            @Override
+            public boolean isVisible() {
+                return isTranslated;
+            }
+    
+            @Override
+            public void onClick() {
+                setRawTextFromTranslation();
+            }
+        });
+        this.textLogic.setListener(this::onTextChanged);
+    
+        this.onTextChanged(this.textLogic.getText());
     }
     
-    private void updateTextColor(String text) {
+    private void onTextChanged(String text) {
         if (this.isTranslated && !I18n.exists(text)) {
             this.textLogic.setTextColor(0xAA0000);
         } else {
             this.textLogic.setTextColor(MultilineTextBox.DEFAULT_TEXT_COLOR);
         }
         if (this.isTranslated && I18n.exists(text)) {
-            this.translatedLines = gui.getFont().getSplitter().splitLines(I18n.get(text), 140, Style.EMPTY);
+            this.translatedText = Objects.requireNonNull(I18n.get(text));
+            this.translatedLines = gui.getFont().getSplitter().splitLines(this.translatedText, 140, Style.EMPTY);
         } else {
+            this.translatedText = null;
             this.translatedLines = null;
         }
+    }
+    
+    private void setRawTextFromTranslation() {
+        this.isTranslated = false;
+        this.textLogic.setTextAndCursor(this.translatedText);   //This will indirectly call onTextChanged(String)
     }
     
     @Override

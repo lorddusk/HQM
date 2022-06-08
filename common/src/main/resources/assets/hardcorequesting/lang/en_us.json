@@ -626,6 +626,7 @@
   "_comment": "TEXT EDITOR",
   "_comment": "======================================",
   "hqm.textEditor.translationKey": "Translation Key?",
+  "hqm.textEditor.asRawText": "To raw text",
   "hqm.textEditor.unnamed": "Unnamed",
   "_comment": "======================================",
   "_comment": "PARTY MENU",
