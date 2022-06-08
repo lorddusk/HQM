@@ -11,14 +11,18 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class MultilineTextBox implements Drawable, Clickable {
+    public static final int DEFAULT_TEXT_COLOR = 0x404040;
+    
     private static final int LINES_PER_PAGE = 21;
     
     private final GuiBase gui;
@@ -30,6 +34,9 @@ public final class MultilineTextBox implements Drawable, Clickable {
     private String text;
     private final List<Line> lines = new ArrayList<>();
     private boolean dragging;
+    private int textColor = DEFAULT_TEXT_COLOR;
+    @Nullable
+    private Consumer<String> textListener = null;
     
     public MultilineTextBox(GuiBase gui, int x, int y, @NotNull String text, int width, boolean acceptNewlines) {
         this.gui = gui;
@@ -51,6 +58,8 @@ public final class MultilineTextBox implements Drawable, Clickable {
     private void setText(String text) {
         this.text = text;
         initLines();
+        if (this.textListener != null)
+            this.textListener.accept(text);
     }
     
     private String getClipboard() {
@@ -68,7 +77,7 @@ public final class MultilineTextBox implements Drawable, Clickable {
         int cursorLine = getLineFor(cursor);
         int pageStartLine = cursorLine - (cursorLine % LINES_PER_PAGE);
         
-        gui.drawString(matrices, lines.stream().skip(pageStartLine).limit(LINES_PER_PAGE).map(Line::text).map(FormattedText::of).collect(Collectors.toList()), x, y, 1F, 0x404040);
+        gui.drawString(matrices, lines.stream().skip(pageStartLine).limit(LINES_PER_PAGE).map(Line::text).map(FormattedText::of).collect(Collectors.toList()), x, y, 1F, textColor);
         gui.drawCursor(matrices, x + getTextX(cursorLine, cursor) - 1, y + getTextY(cursorLine, pageStartLine) - 3, 10, 1F, 0xFF909090);
         
         if (cursor != selection) {
@@ -184,6 +193,14 @@ public final class MultilineTextBox implements Drawable, Clickable {
     public void setTextAndCursor(String text) {
         setText(text);
         helper.setCursorToEnd();
+    }
+    
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+    
+    public void setListener(Consumer<String> listener) {
+        this.textListener = listener;
     }
     
     private void changeLine(int direction) {

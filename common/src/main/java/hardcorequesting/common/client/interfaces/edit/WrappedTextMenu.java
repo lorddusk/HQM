@@ -1,7 +1,8 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.widget.SimpleCheckBox;
+import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
+import hardcorequesting.common.client.interfaces.widget.MultilineTextBox;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -15,11 +16,10 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public class WrappedTextMenu extends AbstractTextMenu {
     
-    private final SimpleCheckBox translatedCheckbox;
-    
     private final Consumer<WrappedText> resultConsumer;
     private final int limit;
     private final boolean isName;
+    private boolean isTranslated;
     
     public static void display(GuiQuestBook gui, WrappedText text, boolean isName, Consumer<WrappedText> resultConsumer) {
         gui.setEditMenu(new WrappedTextMenu(gui, text, isName, -1, resultConsumer));
@@ -36,8 +36,31 @@ public class WrappedTextMenu extends AbstractTextMenu {
         this.limit = limit;
         
         this.isName = isName;
+        this.isTranslated = text.shouldTranslate();
         
-        addClickable(translatedCheckbox = new SimpleCheckBox(gui, Translator.translatable("hqm.textEditor.translationKey"), 180, 20, text.shouldTranslate()));
+        addClickable(new AbstractCheckBox(gui, Translator.translatable("hqm.textEditor.translationKey"), 180, 20) {
+            @Override
+            public boolean getValue() {
+                return isTranslated;
+            }
+    
+            @Override
+            public void setValue(boolean val) {
+                isTranslated = val;
+                updateTextColor(WrappedTextMenu.this.textLogic.getText());
+            }
+        });
+        this.textLogic.setListener(this::updateTextColor);
+    
+        this.updateTextColor(this.textLogic.getText());
+    }
+    
+    private void updateTextColor(String text) {
+        if (this.isTranslated && !I18n.exists(text)) {
+            this.textLogic.setTextColor(0xAA0000);
+        } else {
+            this.textLogic.setTextColor(MultilineTextBox.DEFAULT_TEXT_COLOR);
+        }
     }
     
     @Override
@@ -53,7 +76,7 @@ public class WrappedTextMenu extends AbstractTextMenu {
             }
         }
     
-        resultConsumer.accept(translatedCheckbox.getValue()
+        resultConsumer.accept(this.isTranslated
                 ? WrappedText.createTranslated(text)
                 : WrappedText.create(text));
         
