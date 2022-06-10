@@ -1,6 +1,6 @@
 package hardcorequesting.common.client;
 
-import hardcorequesting.common.bag.Group;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.*;
 import hardcorequesting.common.quests.Quest;
@@ -153,15 +153,15 @@ public abstract class BookPage {
             return new EditBagsGraphic(this, gui);
         }
         
-        public BookPage forGroup(Group group) {
+        public BookPage forGroup(LootGroup group) {
             return new GroupPage(this, group);
         }
     }
     
     public static class GroupPage extends BookPage {
-        private final Group group;
+        private final LootGroup group;
     
-        private GroupPage(BagsPage parent, Group group) {
+        private GroupPage(BagsPage parent, LootGroup group) {
             super(parent);
             this.group = group;
         }

@@ -2,7 +2,7 @@ package hardcorequesting.common.client.interfaces;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.bag.Group;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.util.Translator;
@@ -10,12 +10,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
@@ -41,19 +38,19 @@ public class GuiReward extends GuiBase {
     private static final int MIDDLE_SRC_Y = 67;
     private static final int BOTTOM_SRC_Y = 107;
     private static final int TEXTURE_WIDTH = 170;
-    private Group group;
+    private LootGroup group;
     private int lines;
     private List<Reward> rewards;
-    private String statisticsText;
+    private FormattedText statisticsText;
     
-    public GuiReward(Group group, int bagTier, Player player) {
+    public GuiReward(LootGroup group, int bagTier, Player player) {
         super(NarratorChatListener.NO_TITLE);
         this.group = group;
         this.rewards = new ArrayList<>();
         
         
         int totalWeight = 0;
-        for (Group other : Group.getGroups().values()) {
+        for (LootGroup other : LootGroup.getGroups().values()) {
             if (other.isValid(player)) {
                 totalWeight += other.getTier().getWeights()[bagTier];
             }
@@ -62,7 +59,7 @@ public class GuiReward extends GuiBase {
         int myWeight = group.getTier().getWeights()[bagTier];
         float chance = ((float) myWeight / totalWeight);
         
-        statisticsText = I18n.get("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
+        statisticsText = Translator.translatable("hqm.rewardGui.chance", ((int) (chance * 10000)) / 100F);
         
         
         lines = (int) Math.ceil((float) group.getItems().size() / ITEMS_PER_LINE);
@@ -80,9 +77,9 @@ public class GuiReward extends GuiBase {
     }
     
     public static void open(Player player, UUID groupId, int bag, int[] limits) {
-        Group rewardGroup = Group.getGroups().get(groupId);
+        LootGroup rewardGroup = LootGroup.getGroups().get(groupId);
         int i = 0;
-        for (Group group : Group.getGroups().values())
+        for (LootGroup group : LootGroup.getGroups().values())
             if (group.getLimit() != 0)
                 group.setRetrievalCount(player, limits[i++]);
         
@@ -110,17 +107,19 @@ public class GuiReward extends GuiBase {
         
         int mX = mX0 - left;
         int mY = mY0 - top;
+    
+        FormattedText title;
         
-        String title = group.getDisplayName();
-        
-        // fall back to the tier's name if this particular bag has no title,
+        // fall back to the tier's name if this particular reward has no title,
         // or if the user explicitly asked us to do so.
-        if (HQMConfig.getInstance().Loot.ALWAYS_USE_TIER || title == null || title.isEmpty()) {
-            title = I18n.get("hqm.rewardGui.tierReward", group.getTier().getName());
+        if (HQMConfig.getInstance().Loot.ALWAYS_USE_TIER || !group.hasName()) {
+            title = Translator.translatable("hqm.rewardGui.tierReward", group.getTier().getName());
+        } else {
+            title = group.getDisplayName();
         }
         
-        drawCenteredString(matrices, FormattedText.of(title, Style.EMPTY.withColor(TextColor.fromRgb(group.getTier().getColor().getHexColor() & 0xFFFFFF))), 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, 0x404040);
-        drawCenteredString(matrices, Translator.plain(statisticsText), 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
+        drawCenteredString(matrices, title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, group.getTier().getColor().getHexColor());
+        drawCenteredString(matrices, statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
         drawCenteredString(matrices, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
         for (Reward reward : rewards) {

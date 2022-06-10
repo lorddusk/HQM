@@ -6,10 +6,9 @@ import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -20,14 +19,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class Group {
+public class LootGroup {
     private GroupTier tier;
     private NonNullList<ItemStack> items;
-    private String name;
+    private WrappedText name;
     private int limit;
     private UUID groupId;
     
-    public Group(UUID groupId) {
+    public LootGroup(UUID groupId) {
         this.groupId = groupId;
         while (this.groupId == null || getGroups().containsKey(this.groupId)) {
             this.groupId = UUID.randomUUID();
@@ -44,7 +43,7 @@ public class Group {
         return GroupTierManager.getInstance().groups.size();
     }
     
-    public static Map<UUID, Group> getGroups() {
+    public static Map<UUID, LootGroup> getGroups() {
         return GroupTierManager.getInstance().groups;
     }
     
@@ -52,12 +51,12 @@ public class Group {
         getGroups().remove(groupId);
     }
     
-    public static void add(Group group) {
+    public static void add(LootGroup group) {
         getGroups().put(group.getId(), group);
     }
     
-    public static Group getGroup(UUID groupId) {
-        return Group.getGroups().get(groupId);
+    public static LootGroup getGroup(UUID groupId) {
+        return LootGroup.getGroups().get(groupId);
     }
     
     public GroupTier getTier() {
@@ -68,22 +67,21 @@ public class Group {
         this.tier = tier;
     }
     
-    @Environment(EnvType.CLIENT)
-    public String getDisplayName() {
-        return hasName() ? name : I18n.get("hqm.bag.group", tier.getName());
+    public FormattedText getDisplayName() {
+        return hasName() ? name.getText() : Translator.translatable("hqm.bag.group", tier.getName());
     }
     
-    public String getName() {
-        return hasName() ? name : Translator.translatable("hqm.bag.group", tier.getName()).getString();
+    public WrappedText getRawName() {
+        return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
         SaveHelper.add(EditType.NAME_CHANGE);
     }
     
     public boolean hasName() {
-        return name != null && !name.isEmpty();
+        return name != null && !name.getRawText().isEmpty();
     }
     
     public NonNullList<ItemStack> getItems() {
@@ -156,10 +154,10 @@ public class Group {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Group) {
-            if (Objects.equals(name, ((Group) obj).name) && limit == ((Group) obj).limit && items.size() == ((Group) obj).items.size()) {
+        if (obj instanceof LootGroup) {
+            if (Objects.equals(name, ((LootGroup) obj).name) && limit == ((LootGroup) obj).limit && items.size() == ((LootGroup) obj).items.size()) {
                 for (ItemStack stack : items) {
-                    if (!listContains(stack, ((Group) obj).items)) return false;
+                    if (!listContains(stack, ((LootGroup) obj).items)) return false;
                 }
                 return true;
             }

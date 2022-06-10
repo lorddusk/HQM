@@ -160,7 +160,7 @@ public class MenuPageGraphic extends EditableGraphic {
     }
     
     private void drawReputations(PoseStack matrices, GuiQuestBook gui, int mX, int mY, final UUID playerId) {
-        String info = null;
+        FormattedText info = null;
         
         List<Reputation> reputations = ReputationManager.getInstance().getReputationList();
         
@@ -177,7 +177,7 @@ public class MenuPageGraphic extends EditableGraphic {
         }
         
         if (info != null) {
-            gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(matrices, info, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     

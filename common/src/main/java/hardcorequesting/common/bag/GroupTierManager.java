@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GroupTierManager extends SimpleSerializable {
     public static final String FILE_PATH = "bags.json";
-    public final Map<UUID, Group> groups = new ConcurrentHashMap<>();
+    public final Map<UUID, LootGroup> groups = new ConcurrentHashMap<>();
     private final List<GroupTier> tiers = Lists.newArrayList();
     
     public GroupTierManager() {

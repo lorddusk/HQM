@@ -19,9 +19,8 @@ import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamLiteStat;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,17 +40,17 @@ public abstract class QuestTask<Data extends TaskData> {
     
     private final TaskType<?> type;
     private final Class<Data> dataType;
-    public String description;
     protected Quest parent;
-    private String longDescription;
+    public WrappedText name;
+    private WrappedText description;
     private int id;
     
     public QuestTask(TaskType<?> type, Class<Data> dataType, Quest parent) {
         this.type = type;
         this.dataType = dataType;
         this.parent = parent;
-        this.description = type.getLangKeyName();
-        this.longDescription = type.getLangKeyDescription();
+        this.name = WrappedText.createTranslated(type.getLangKeyName());
+        this.description = WrappedText.createTranslated(type.getLangKeyDescription());
     }
     
     public TaskType<?> getType() {
@@ -155,28 +154,28 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract Data newQuestData();
     
-    public String getLangKeyDescription() {
-        return description;
+    public MutableComponent getName() {
+        return name.getText();
+    }
+    
+    public WrappedText getRawName() {
+        return name;
+    }
+    
+    public void setName(WrappedText name) {
+        this.name = name;
     }
     
     public MutableComponent getDescription() {
-        return Translator.translatable(description);
+        return description.getText();
     }
     
-    public void setDescription(String description) {
+    public WrappedText getRawDescription() {
+        return description;
+    }
+    
+    public void setDescription(WrappedText description) {
         this.description = description;
-    }
-    
-    public String getLangKeyLongDescription() {
-        return longDescription;
-    }
-    
-    public FormattedText getLongDescription() {
-        return Translator.translatable(longDescription);
-    }
-    
-    public void setLongDescription(String longDescription) {
-        this.longDescription = longDescription;
     }
     
     public void completeTask(UUID uuid) {

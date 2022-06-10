@@ -11,6 +11,8 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.CompleteQuestTaskData;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -74,7 +76,7 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
                 if (data.getValue(i)) continue;
                 
                 Part task_quest = parts.get(i);
-                if (task_quest == null || task_quest.getName() == null || task_quest.getQuest() == null) continue;
+                if (task_quest == null || task_quest.getQuest() == null) continue;
                 
                 Quest quest = task_quest.getQuest();
                 if (quest != null) {
@@ -141,9 +143,9 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
             return (q != null) ? q.getIconStack() : Either.left(ItemStack.EMPTY);
         }
         
-        public String getName() {
+        public FormattedText getName() {
             Quest q = getQuest();
-            return (q != null) ? q.getName() : "Use \"Select Quest\" to pick";
+            return (q != null) ? q.getName() : Translator.plain("Use \"Select Quest\" to pick");
         }
         
         public void setQuest(UUID quest_id) {

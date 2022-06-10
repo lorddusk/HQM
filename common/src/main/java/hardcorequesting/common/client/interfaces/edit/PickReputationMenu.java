@@ -10,6 +10,7 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.FormattedText;
 
 import java.util.function.Consumer;
 
@@ -47,12 +48,12 @@ public class PickReputationMenu extends GuiEditMenu {
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
         for (Reputation reputation : scrollBar.getVisibleEntries()) {
-            String str = reputation.getName();
+            FormattedText str = reputation.getName();
             
             boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
             boolean selected = reputation.equals(selectedReputation);
             
-            gui.drawString(matrices, Translator.plain(str), x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+            gui.drawString(matrices, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             
             y += EditReputationGraphic.REPUTATION_OFFSET;
         }
@@ -67,7 +68,7 @@ public class PickReputationMenu extends GuiEditMenu {
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
         
         for (Reputation reputation : scrollBar.getVisibleEntries()) {
-            String str = reputation.getName();
+            FormattedText str = reputation.getName();
             
             if (gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY)) {
                 selectedReputation = reputation;

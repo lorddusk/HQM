@@ -8,8 +8,12 @@ import hardcorequesting.common.quests.task.PartList;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.EditType;
+import hardcorequesting.common.util.WrappedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * A base class for tasks with sub-elements that uses item icons for display.
@@ -38,13 +42,13 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
         parent.setIconIfEmpty(stack);
     }
     
-    public void setName(int id, String str) {
+    public void setName(int id, WrappedText str) {
         parts.getOrCreateForModify(id).setName(str);
     }
     
     public abstract static class Part {
         private Either<ItemStack, FluidStack> iconStack = Either.left(ItemStack.EMPTY);
-        private String name = "New";
+        private WrappedText name = WrappedText.create("New");
         
         public Either<ItemStack, FluidStack> getIconStack() {
             return iconStack;
@@ -57,13 +61,17 @@ public abstract class IconLayoutTask<T extends IconLayoutTask.Part, Data extends
         public void setIconStack(@NotNull Either<ItemStack, FluidStack> iconStack) {
             this.iconStack = iconStack;
         }
-    
-        public String getName() {
+        
+        public MutableComponent getName() {
+            return name.getText();
+        }
+        
+        public WrappedText getRawName() {
             return name;
         }
     
-        public void setName(String name) {
-            this.name = name;
+        public void setName(WrappedText name) {
+            this.name = Objects.requireNonNull(name);
         }
     }
 }

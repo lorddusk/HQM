@@ -1,7 +1,7 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import hardcorequesting.common.bag.Group;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
@@ -27,9 +27,9 @@ public class EditGroupGraphic extends EditableGraphic {
     private static final int GROUP_ITEMS_SPACING = 20;
     private static final int ITEMS_PER_LINE = 7;
     
-    private final Group group;
+    private final LootGroup group;
     
-    public EditGroupGraphic(GuiQuestBook gui, Group group) {
+    public EditGroupGraphic(GuiQuestBook gui, LootGroup group) {
         super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
         this.group = group;
     
@@ -40,7 +40,7 @@ public class EditGroupGraphic extends EditableGraphic {
     public void draw(PoseStack matrices, int mX, int mY) {
         super.draw(matrices, mX, mY);
         
-        gui.drawString(matrices, Translator.plain(group.getDisplayName()), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
+        gui.drawString(matrices, group.getDisplayName(), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(group.getItems());
         items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {

@@ -6,9 +6,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.BagTier;
-import hardcorequesting.common.bag.Group;
 import hardcorequesting.common.bag.GroupTier;
+import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.bag.TierColor;
+import hardcorequesting.common.util.WrappedText;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 
@@ -17,19 +18,19 @@ import java.util.UUID;
 
 public class GroupAdapter {
     
-    public static final Adapter<Group> GROUP_ADAPTER = new Adapter<Group>() {
+    public static final Adapter<LootGroup> GROUP_ADAPTER = new Adapter<>() {
         private static final String ID = "id";
         private static final String ITEMS = "items";
         private static final String NAME = "name";
         private static final String LIMIT = "limit";
         
         @Override
-        public JsonElement serialize(Group src){
+        public JsonElement serialize(LootGroup src){
             return object()
                 .add(ID, src.getId().toString())
                 .use(builder -> {
                     if(src.hasName()){
-                        builder.add(NAME, src.getName());
+                        builder.add(NAME, src.getRawName().toJson());
                     }
                 })
                 .add(LIMIT, src.getLimit())
@@ -38,7 +39,7 @@ public class GroupAdapter {
         }
         
         @Override
-        public Group deserialize(JsonElement jsonElement){
+        public LootGroup deserialize(JsonElement jsonElement){
             if(!jsonElement.isJsonObject()){
                 HardcoreQuestingCore.LOGGER.error(new JsonParseException("JsonElement for 'Group' is not a JsonObject but '" + jsonElement.getClass().getName() + "'!"));
                 return null;
@@ -54,14 +55,15 @@ public class GroupAdapter {
                 return null;
             }
             
-            Group group;
+            LootGroup group;
             try{
-                group = new Group(UUID.fromString(json.get(ID).getAsString()));
+                group = new LootGroup(UUID.fromString(json.get(ID).getAsString()));
             } catch(IllegalArgumentException e){
                 HardcoreQuestingCore.LOGGER.error("JsonElement '" + ID + "' for 'Group' can't be parsed to UUID!", e);
                 return null;
             }
-            group.setName(GsonHelper.getAsString(json, NAME, null));
+            if (json.has(NAME))
+                group.setName(WrappedText.fromJson(json.get(NAME), false));
             group.setLimit(json.get(LIMIT).getAsInt());
             
             if(json.has(ITEMS) && json.get(ITEMS).isJsonArray()){
@@ -73,14 +75,14 @@ public class GroupAdapter {
                 }
             }
             
-            if(!Group.getGroups().containsKey(group.getId())){
-                Group.add(group);
+            if(!LootGroup.getGroups().containsKey(group.getId())){
+                LootGroup.add(group);
             }
             return group;
         }
     };
     
-    public static final Adapter<GroupTier> GROUP_TIER_ADAPTER = new Adapter<GroupTier>() {
+    public static final Adapter<GroupTier> GROUP_TIER_ADAPTER = new Adapter<>() {
         private static final String NAME = "name";
         private static final String COLOUR = "colour";
         private static final String WEIGHTS = "weights";
@@ -89,10 +91,10 @@ public class GroupAdapter {
         @Override
         public JsonElement serialize(GroupTier src){
             return object()
-                .add(NAME, src.getRawName())
+                .add(NAME, src.getRawName().toJson())
                 .add(COLOUR, src.getColor().name())
                 .add(WEIGHTS, array().use(builder -> Arrays.stream(src.getWeights()).forEach(builder::add)).build())
-                .add(GROUPS, array().use(builder -> Group.getGroups().values().stream().filter(group -> group.getTier().equals(src)).map(GROUP_ADAPTER::serialize).forEach(builder::add)).build())
+                .add(GROUPS, array().use(builder -> LootGroup.getGroups().values().stream().filter(group -> group.getTier().equals(src)).map(GROUP_ADAPTER::serialize).forEach(builder::add)).build())
                 .build();
         }
         
@@ -105,11 +107,11 @@ public class GroupAdapter {
             
             JsonObject json = jsonElement.getAsJsonObject();
             int[] weights = new int[BagTier.values().length];
-            String name = "";
+            WrappedText name = null;
             TierColor color = TierColor.GRAY;
             
-            if(json.has(NAME) && json.get(NAME).isJsonPrimitive()){
-                name = json.get(NAME).getAsString();
+            if(json.has(NAME)) {
+                name = WrappedText.fromJson(json.get(NAME), false);
             }
             if(json.has(COLOUR) && json.get(COLOUR).isJsonPrimitive()){
                 if(Enums.getIfPresent(TierColor.class, json.get(COLOUR).getAsString()).isPresent()){
@@ -134,7 +136,7 @@ public class GroupAdapter {
             
             if(json.has(GROUPS) && json.get(GROUPS).isJsonArray()){
                 for(JsonElement element : json.get(GROUPS).getAsJsonArray()){
-                    Group group = GROUP_ADAPTER.deserialize(element);
+                    LootGroup group = GROUP_ADAPTER.deserialize(element);
                     if(group != null){
                         group.setTier(tier);
                     } else {

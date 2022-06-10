@@ -2,10 +2,11 @@ package hardcorequesting.common.quests;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.reputation.ReputationBar;
-import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -15,13 +16,13 @@ import java.util.stream.Collectors;
 public class QuestSet {
     
     private String name;
-    private String description;
+    private WrappedText description;
     private List<FormattedText> cachedDescription;
     private Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     private List<ReputationBar> reputationBars;
     private int id;
     
-    public QuestSet(String name, String description) {
+    public QuestSet(String name, WrappedText description) {
         this.name = name;
         this.description = description;
         this.reputationBars = new ArrayList<>();
@@ -93,7 +94,7 @@ public class QuestSet {
     @Environment(EnvType.CLIENT)
     public List<FormattedText> getDescription(GuiBase gui) {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(description), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(getDescription(), 0.7F, 130);
         }
         
         return cachedDescription;
@@ -159,11 +160,15 @@ public class QuestSet {
         return count;
     }
     
-    public String getDescription() {
+    public MutableComponent getDescription() {
+        return description.getText();
+    }
+    
+    public WrappedText getRawDescription() {
         return description;
     }
     
-    public void setDescription(String description) {
+    public void setDescription(WrappedText description) {
         this.description = description;
         cachedDescription = null;
     }

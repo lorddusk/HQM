@@ -1,20 +1,26 @@
 package hardcorequesting.common.bag;
 
 import hardcorequesting.common.quests.QuestLine;
+import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class GroupTier {
     
-    private String name;
+    private WrappedText name;
     private TierColor color;
     private int[] weights;
     
     public GroupTier(String name, TierColor color, int... weights) {
+        this(WrappedText.create(name), color, weights);
+    }
+    
+    public GroupTier(WrappedText name, TierColor color, int... weights) {
         this.name = name;
         this.color = color;
         this.weights = Arrays.copyOf(weights, BagTier.values().length);
@@ -31,15 +37,15 @@ public class GroupTier {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getName() {
-        return name == null || name.equals("") ? I18n.get("hqm.bag.unknown") : name;
+    public Component getName() {
+        return name == null || name.getRawText().isEmpty() ? Translator.translatable("hqm.bag.unknown") : name.getText();
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
     }
     
-    public String getRawName() {
+    public WrappedText getRawName() {
         return name;
     }
     

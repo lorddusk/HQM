@@ -6,12 +6,14 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Translator;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
@@ -34,21 +36,21 @@ public class Reputation {
     private static final int TEXT_X = 5;
     private static final int TEXT_Y = 14;
     private String uuid;
-    private String name;
+    private WrappedText name;
     private final ReputationMarker neutral;
     private final List<ReputationMarker> markers;
     
-    public Reputation(String name, String neutralName) {
+    public Reputation() {
         Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         do {
             this.uuid = UUID.randomUUID().toString();
         } while (reputationMap.containsKey(this.uuid));
-        this.name = name;
-        this.neutral = new ReputationMarker(neutralName, 0, true);
+        this.name = WrappedText.create("Unnamed");
+        this.neutral = new ReputationMarker(WrappedText.create("Neutral"), 0, true);
         this.markers = new ArrayList<>();
     }
     
-    public Reputation(String id, String name, String neutralName) {
+    public Reputation(String id, WrappedText name, WrappedText neutralName) {
         Map<String, Reputation> reputationMap = ReputationManager.getInstance().reputationMap;
         this.uuid = id;
         while (this.uuid == null || reputationMap.containsKey(this.uuid)) {
@@ -63,11 +65,15 @@ public class Reputation {
         return uuid;
     }
     
-    public String getNeutralName() {
+    public MutableComponent getNeutralName() {
         return neutral.getName();
     }
     
-    public void setNeutralName(String name) {
+    public WrappedText getRawNeutralName() {
+        return neutral.getRawName();
+    }
+    
+    public void setNeutralName(WrappedText name) {
         neutral.setName(name);
     }
     
@@ -88,18 +94,18 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, String info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
+    public FormattedText drawAndGetTooltip(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, FormattedText info, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
         draw(matrices, gui, x, y, mX, mY, playerId, effects, lower, upper, inverted, active, text, completed);
         return info != null ? info : getTooltip(gui, x, y, mX, mY, playerId);
     }
     
     @Environment(EnvType.CLIENT)
     public void draw(PoseStack matrices, GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId, boolean effects, ReputationMarker lower, ReputationMarker upper, boolean inverted, ReputationMarker active, FormattedText text, boolean completed) {
-        String error = getError();
+        FormattedText error = getError();
         
         if (error != null) {
             gui.drawRect(matrices, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
-            gui.drawString(matrices, Translator.plain(error), x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
+            gui.drawString(matrices, error, x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
             return;
         }
         
@@ -214,35 +220,34 @@ public class Reputation {
             info = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf")
-                        .append(" " + name).withStyle(ChatFormatting.DARK_RED);
+                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf", name.getText())
+                        .withStyle(ChatFormatting.DARK_RED);
                 
             } else {
-                String lowerName = lower == null ? null : Screen.hasShiftDown() ? String.valueOf(lower.getValue()) : lower.getName();
-                String upperName = upper == null ? null : Screen.hasShiftDown() ? String.valueOf(upper.getValue()) : upper.getName();
+                Component lowerName = lower == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(lower.getValue())) : lower.getName();
+                Component upperName = upper == null ? null : Screen.hasShiftDown() ? Translator.text(String.valueOf(upper.getValue())) : upper.getName();
                 
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
                         if (inverted) {
-                            info = Translator.plain(name + " != " + lowerName);
+                            info = Translator.translatable("hqm.rep.not_equals", name, lowerName);
                         } else {
-                            info = Translator.plain(name + " == " + lowerName);
+                            info = Translator.translatable("hqm.rep.equals", name, lowerName);
                         }
                     } else {
+                        info = Translator.translatable("hqm.rep.between", lowerName, name.getText(), upperName);
                         if (inverted) {
-                            info = Translator.translatable("hqm.rep.not").append(" (" + lowerName + " <= " + name + " <= " + upperName + ")");
-                        } else {
-                            info = Translator.plain(lowerName + " <= " + name + " <= " + upperName);
+                            info = Translator.translatable("hqm.rep.not", info);
                         }
                     }
                 } else if (lower != null) {
-                    info = Translator.plain(name + " " + (inverted ? "<" : ">=") + " " + lowerName);
+                    info = Translator.translatable(inverted ? "hqm.rep.min_inverted" : "hqm.rep.min", name, lowerName);
                 } else {
-                    info = Translator.plain(name + " " + (inverted ? ">" : "<=") + " " + upperName);
+                    info = Translator.translatable(inverted ? "hqm.rep.max_inverted" : "hqm.rep.max", name, upperName);
                 }
             }
         } else {
-            info = Translator.plain(name + ": " + current.getName() + " (" + value + ")");
+            info = Translator.translatable("hqm.rep.current", name, current.getName(), value);
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
@@ -250,7 +255,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    public String getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId) {
+    public FormattedText getTooltip(GuiQuestBook gui, int x, int y, int mX, int mY, UUID playerId) {
     
         if (getError() != null) {
             return null;
@@ -263,7 +268,7 @@ public class Reputation {
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
             int value = markers.get(i).getValue();
             if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
-                return markers.get(i).getName() + " (" + value + ")";
+                return markers.get(i).getName().append(" (" + value + ")");
             }
         }
         
@@ -272,7 +277,7 @@ public class Reputation {
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
-                return current.getName() + " (" + value + ")";
+                return current.getName().append(" (" + value + ")");
             }
         }
         
@@ -284,7 +289,7 @@ public class Reputation {
     }
     
     @Environment(EnvType.CLIENT)
-    private String getError() {
+    private FormattedText getError() {
         String error = null;
         if (markers.size() < 2) {
             error = "atLeastTwo";
@@ -307,7 +312,7 @@ public class Reputation {
             }
         }
         
-        return error == null ? null : I18n.get("hqm.rep." + error);
+        return error == null ? null : Translator.translatable("hqm.rep." + error);
     }
     
     public ReputationMarker getCurrentMarker(int value) {
@@ -391,11 +396,15 @@ public class Reputation {
         }
     }
     
-    public String getName() {
+    public MutableComponent getName() {
+        return name.getText();
+    }
+    
+    public WrappedText getRawName() {
         return name;
     }
     
-    public void setName(String name) {
+    public void setName(WrappedText name) {
         this.name = name;
     }
     

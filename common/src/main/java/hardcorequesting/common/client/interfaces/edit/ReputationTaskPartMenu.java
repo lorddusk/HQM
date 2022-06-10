@@ -84,7 +84,7 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
                 if (ReputationManager.getInstance().getReputations().isEmpty()) {
                     return Translator.translatable("hqm.repSetting.invalid");
                 } else {
-                    return reputation != null ? Translator.plain(reputation.getName()) : Translator.translatable("hqm.repSetting.invalid");
+                    return reputation != null ? reputation.getName() : Translator.translatable("hqm.repSetting.invalid");
                 }
             }
     
@@ -124,7 +124,7 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            String info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.plain("Selected: " + lower.getLabel()), false);
+            FormattedText info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.plain("Selected: " + lower.getLabel()), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
@@ -138,7 +138,7 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
             
             
             if (info != null) {
-                gui.renderTooltip(matrices, Translator.plain(info), mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltip(matrices, info, mX + gui.getLeft(), mY + gui.getTop());
             }
         }
     }

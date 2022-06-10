@@ -5,7 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.EditCommandRewardsMenu;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphic;
 import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
@@ -94,7 +94,7 @@ public final class QuestGraphic extends EditableGraphic {
     
     private List<FormattedText> getCachedDescription() {
         if (cachedDescription == null) {
-            cachedDescription = gui.getLinesFromText(Translator.plain(quest.getDescription()), 0.7F, 130);
+            cachedDescription = gui.getLinesFromText(quest.getDescription().getText(), 0.7F, 130);
         }
         return cachedDescription;
     }
@@ -105,7 +105,7 @@ public final class QuestGraphic extends EditableGraphic {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
-        gui.drawString(matrices, Translator.plain(quest.getName()), START_X, TITLE_START_Y, 0x404040);
+        gui.drawString(matrices, quest.getName(), START_X, TITLE_START_Y, 0x404040);
         
         List<FormattedText> description = descriptionScroll.getVisibleEntries();
         gui.drawString(matrices, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
@@ -116,9 +116,9 @@ public final class QuestGraphic extends EditableGraphic {
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(playerId);
                 int yPos = getTaskY(id);
-                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY);
+                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getName()), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(matrices, task.getDescription(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(matrices, task.getName(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
                 id++;
             }
@@ -169,7 +169,7 @@ public final class QuestGraphic extends EditableGraphic {
         int id = 0;
         for (QuestTask<?> task : taskScroll.getVisibleEntries(quest.getTasks(), VISIBLE_TASKS)) {
             if (task.isVisible(playerId) || Quest.canQuestsBeEdited()) {
-                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getDescription()), GuiBase.TEXT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(START_X, getTaskY(id), gui.getStringWidth(task.getName()), GuiBase.TEXT_HEIGHT, mX, mY)) {
                     if (gui.isOpBook && Screen.hasShiftDown()) {
                         OPBookHelper.reverseTaskCompletion(task, playerId);
                         return;
@@ -179,8 +179,7 @@ public final class QuestGraphic extends EditableGraphic {
                     }
                     if (Quest.canQuestsBeEdited() && (gui.getCurrentMode() == EditMode.RENAME || gui.getCurrentMode() == EditMode.DELETE)) {
                         if (gui.getCurrentMode() == EditMode.RENAME) {
-                            TextMenu.display(gui, task.getLangKeyDescription(), true,
-                                    task::setDescription);
+                            WrappedTextMenu.display(gui, task.getRawName(), true, task::setName);
                         } else if (gui.getCurrentMode() == EditMode.DELETE) {
                             
                             if (selectedTask == task) {
@@ -212,9 +211,9 @@ public final class QuestGraphic extends EditableGraphic {
     
         if (gui.getCurrentMode() == EditMode.RENAME) {
             if (gui.inBounds(START_X, TITLE_START_Y, 140, GuiBase.TEXT_HEIGHT, mX, mY)) {
-                TextMenu.display(gui, quest.getName(), true, quest::setName);
+                WrappedTextMenu.display(gui, quest.getRawName(), true, quest::setName);
             } else if (gui.inBounds(START_X, DESCRIPTION_START_Y, 130, (int) (VISIBLE_DESCRIPTION_LINES * GuiBase.TEXT_HEIGHT * 0.7), mX, mY)) {
-                TextMenu.display(gui, quest.getDescription(), false, description -> {
+                WrappedTextMenu.display(gui, quest.getDescription(), false, description -> {
                     cachedDescription = null;
                     quest.setDescription(description);
                 });
