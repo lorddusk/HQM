@@ -48,7 +48,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
             doCompletionCheck(data, playerId);
         }
         
-        return updated;
+        return action && updated;
     }
     
     public boolean canTakeItem(ItemStack stack, UUID playerId) {

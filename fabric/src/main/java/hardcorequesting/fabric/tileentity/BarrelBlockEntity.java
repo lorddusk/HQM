@@ -19,7 +19,7 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity implements Flui
     public FluidVolume attemptInsertion(FluidVolume fluidVolume, Simulation simulation) {
         QuestTask<?> task = getCurrentTask();
         if (task instanceof ConsumeItemTask) {
-            if (((ConsumeItemTask) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), this.getPlayerUUID(), true)) {
+            if (((ConsumeItemTask) task).increaseFluid(new FabricFluidStack(fluidVolume = fluidVolume.copy()), this.getPlayerUUID(), simulation.isAction())) {
                 this.updateState();
                 this.doSync();
             }
