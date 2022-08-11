@@ -1,6 +1,7 @@
 package hardcorequesting.common.tileentity;
 
 import hardcorequesting.common.blocks.ModBlocks;
+import hardcorequesting.common.blocks.TrackerBlock;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.interfaces.EditTrackerScreen;
 import hardcorequesting.common.client.interfaces.GuiBase;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -65,20 +67,8 @@ public class TrackerBlockEntity extends BlockEntity {
     public void load(CompoundTag compound) {
         super.load(compound);
         
-        // the following six lines are legacy code from the playername to UUID migration. can be removed in 1.14
-        if (compound.contains(NBT_QUEST)) {
-            try {
-                compound.putUUID(NBT_QUEST, UUID.fromString(compound.getString(NBT_QUEST)));
-            } catch (IllegalArgumentException ignored) {
-            }
-            compound.remove(NBT_QUEST);
-        }
+        questId = compound.getUUID(NBT_QUEST);
         
-        if (compound.contains(NBT_QUEST + "Most")) {
-            questId = compound.getUUID(NBT_QUEST);
-        } else {
-            quest = null;
-        }
         radius = compound.getInt(NBT_RADIUS);
         type = TrackerType.values()[compound.getByte(NBT_TYPE)];
     }
@@ -94,43 +84,30 @@ public class TrackerBlockEntity extends BlockEntity {
         compoundTag.putByte(NBT_TYPE, (byte) type.ordinal());
     }
     
-    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TrackerBlockEntity blockEntity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, TrackerBlockEntity blockEntity) {
         if (blockEntity.quest == null && blockEntity.questId != null) {
             blockEntity.quest = Quest.getQuest(blockEntity.questId);
             blockEntity.questId = null;
         }
 
-//        if (!world.isClient && delay++ == 20) {
-//            if (quest != null && Quest.getQuest(quest.getQuestId()) == null) {
-//                quest = null;
-//            }
-//            int oldMeta = world.getBlockState(pos).getBlock().getMetaFromState(ModBlocks.blockTracker.getDefaultState());
-//            int meta = 0;
-//            if (quest != null) {
-//                meta = type.getMeta(this, quest, radius);
-//            }
-//            
-//            if (oldMeta != meta) {
-//                world.setBlockState(pos, ModBlocks.blockTracker.getDefaultState(), 3);
-//                notifyUpdate(pos.getX(), pos.getY(), pos.getZ(), 2);
-//            }
-//            
-//            delay = 0;
-//        }
-    }
-    
-    private void notifyUpdate(int x, int y, int z, int i) {
-        if (i == 2 || x != worldPosition.getX() || y != worldPosition.getY() || z != worldPosition.getZ()) {
-            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
-            
-            if (i > 0) {
-                notifyUpdate(x - 1, y, z, i - 1);
-                notifyUpdate(x + 1, y, z, i - 1);
-                notifyUpdate(x, y - 1, z, i - 1);
-                notifyUpdate(x, y + 1, z, i - 1);
-                notifyUpdate(x, y, z - 1, i - 1);
-                notifyUpdate(x, y, z + 1, i - 1);
+        if (!level.isClientSide() && blockEntity.delay++ == 20) {
+            if (blockEntity.quest != null && Quest.getQuest(blockEntity.quest.getQuestId()) == null) {
+                blockEntity.quest = null;
             }
+            
+            int power;
+            if (blockEntity.quest != null) {
+                power = blockEntity.type.getPower(blockEntity, blockEntity.quest, blockEntity.radius);
+            } else {
+                power = 0;
+            }
+            
+            
+            if (state.getValue(TrackerBlock.POWER) != power) {
+                level.setBlock(pos, state.setValue(TrackerBlock.POWER, power), Block.UPDATE_ALL);
+            }
+    
+            blockEntity.delay = 0;
         }
     }
     

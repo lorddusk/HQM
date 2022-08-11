@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 public enum TrackerType {
     TEAM("team") {
         @Override
-        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
+        public int getPower(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : TeamManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
@@ -33,7 +33,7 @@ public enum TrackerType {
     },
     PLAYER("player") {
         @Override
-        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
+        public int getPower(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : TeamManager.getInstance().getTeams()) {
                 if (team.getQuestData(quest.getQuestId()).completed) {
@@ -64,7 +64,7 @@ public enum TrackerType {
     },
     PROGRESS_MAX("progressMax") {
         @Override
-        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
+        public int getPower(TrackerBlockEntity tracker, Quest quest, int radius) {
             int meta = 0;
             for (Team team : TeamManager.getInstance().getTeams()) {
                 int newMeta = (int) (quest.getProgress(team) * 15);
@@ -80,7 +80,7 @@ public enum TrackerType {
     },
     PROGRESS_CLOSE("progressClose") {
         @Override
-        public int getMeta(TrackerBlockEntity tracker, Quest quest, int radius) {
+        public int getPower(TrackerBlockEntity tracker, Quest quest, int radius) {
             double closest = 0;
             Player closestPlayer = null;
             for (ServerPlayer player : HardcoreQuestingCore.getServer().getPlayerList().getPlayers()) {
@@ -131,5 +131,5 @@ public enum TrackerType {
         return Translator.translatable("hqm.tracker." + id + ".desc");
     }
     
-    public abstract int getMeta(TrackerBlockEntity tracker, Quest quest, int radius);
+    public abstract int getPower(TrackerBlockEntity tracker, Quest quest, int radius);
 }
