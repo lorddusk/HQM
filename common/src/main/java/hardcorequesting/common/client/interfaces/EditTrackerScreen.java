@@ -61,14 +61,6 @@ public class EditTrackerScreen extends GuiBase {
                 return tracker.getTrackerType().getDescription();
             }
         };
-        textBoxes.add(new NumberTextBox(this, 20, 130, Translator.translatable("hqm.menuTracker.radius.title"), tracker::getRadius, tracker::setRadius) {
-            @Override
-            protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
-                super.draw(matrices, selected, mX, mY);
-            
-                this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
-            }
-        });
         
         buttons.add(new LargeButton(this, "hqm.edit.ok", 40, 200) {
             @Override
@@ -92,6 +84,17 @@ public class EditTrackerScreen extends GuiBase {
     
         this.left = (this.width - TEXTURE_WIDTH) / 2;
         this.top = (this.height - TEXTURE_HEIGHT) / 2;
+        
+        if (textBoxes.getTextBoxes().isEmpty()) {
+            textBoxes.add(new NumberTextBox(this, 20, 130, Translator.translatable("hqm.menuTracker.radius.title"), tracker::getRadius, tracker::setRadius) {
+                @Override
+                protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
+                    super.draw(matrices, selected, mX, mY);
+            
+                    this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                }
+            });
+        }
     }
     
     @Override

@@ -53,11 +53,10 @@ public enum GuiType {
         
         @Override
         public void open(Player player, String data) {
-            JsonParser parser = new JsonParser();
-            JsonObject root = parser.parse(data).getAsJsonObject();
+            JsonObject root = JsonParser.parseString(data).getAsJsonObject();
             BlockPos pos = BlockPos.of(root.get(BLOCK_POS).getAsLong());
             JsonElement quest = root.get(QUEST);
-            UUID questId = quest.isJsonNull() ? null : UUID.fromString(root.getAsString());
+            UUID questId = quest.isJsonNull() ? null : UUID.fromString(quest.getAsString());
             int radius = root.get(RADIUS).getAsInt();
             TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
             TrackerBlockEntity.openInterface(player, pos, questId, radius, type);
