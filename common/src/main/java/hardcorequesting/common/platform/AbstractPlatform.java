@@ -32,7 +32,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -111,8 +110,6 @@ public interface AbstractPlatform {
     CompoundTag getPlayerExtraTag(Player player);
     
     CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon);
-    
-    BlockBehaviour.Properties createDeliveryBlockProperties();
     
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
     

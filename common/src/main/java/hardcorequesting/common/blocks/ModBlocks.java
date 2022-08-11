@@ -9,6 +9,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Material;
 
 import java.util.function.Supplier;
 
@@ -25,7 +26,7 @@ public class ModBlocks {
     
     public static void init() {
         blockBarrel = RegisterHelper.registerBlock(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME,
-                () -> new DeliveryBlock(HardcoreQuestingCore.platform.createDeliveryBlockProperties()),
+                () -> new DeliveryBlock(Block.Properties.of(Material.WOOD).strength(1.0F)),
                 block -> new BlockItem(block, new Item.Properties().tab(ModCreativeTabs.HQMTab)));
         blockTracker = RegisterHelper.registerBlock(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME,
                 TrackerBlock::new,

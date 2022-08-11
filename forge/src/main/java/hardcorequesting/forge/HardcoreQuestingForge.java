@@ -46,7 +46,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
@@ -324,11 +323,6 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 return supplier.get();
             }
         };
-    }
-    
-    @Override
-    public BlockBehaviour.Properties createDeliveryBlockProperties() {
-        return BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.WOOD).requiresCorrectToolForDrops().strength(1.0F);
     }
     
     @Override

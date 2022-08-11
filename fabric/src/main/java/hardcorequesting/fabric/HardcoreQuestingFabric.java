@@ -38,7 +38,6 @@ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
@@ -69,10 +68,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
@@ -255,11 +252,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon) {
         return FabricItemGroupBuilder.create(name).icon(icon).build();
-    }
-    
-    @Override
-    public BlockBehaviour.Properties createDeliveryBlockProperties() {
-        return FabricBlockSettings.of(Material.WOOD).requiresTool().hardness(1.0F);
     }
     
     @Override
