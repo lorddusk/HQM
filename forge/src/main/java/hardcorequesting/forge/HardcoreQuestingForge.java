@@ -429,8 +429,8 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     }
     
     @Override
-    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
-        return tileEntityType.register(id, () -> BlockEntityType.Builder.of(constructor::apply).build(null));
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock) {
+        return tileEntityType.register(id, () -> BlockEntityType.Builder.of(constructor::apply, validBlock.get()).build(null));
     }
     
     @Override

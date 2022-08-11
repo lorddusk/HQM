@@ -34,8 +34,8 @@ public class ModBlocks {
     }
     
     public static void registerTileEntities() {
-        typeBarrel = RegisterHelper.registerTileEntity(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME, HardcoreQuestingCore.platform::createBarrelBlockEntity);
-        typeTracker = RegisterHelper.registerTileEntity(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME, TrackerBlockEntity::new);
+        typeBarrel = RegisterHelper.registerTileEntity(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME, HardcoreQuestingCore.platform::createBarrelBlockEntity, blockBarrel);
+        typeTracker = RegisterHelper.registerTileEntity(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME, TrackerBlockEntity::new, blockTracker);
 //        typePortal = RegisterHelper.registerTileEntity(PortalBlockEntity::new, new Identifier(HardcoreQuesting.ID, BlockInfo.QUEST_PORTAL_TE_KEY));
     }
 }

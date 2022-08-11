@@ -137,7 +137,7 @@ public interface AbstractPlatform {
     
     <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item);
     
-    <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor);
+    <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock);
     
     Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id);
     

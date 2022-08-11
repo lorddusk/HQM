@@ -35,7 +35,7 @@ public class RegisterHelper {
         ModRecipes.init();
     }
     
-    public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, BiFunction<BlockPos, BlockState, T> blockEntitySupplier) {
-        return HardcoreQuestingCore.platform.registerBlockEntity(id, blockEntitySupplier);
+    public static <T extends BlockEntity> Supplier<BlockEntityType<T>> registerTileEntity(String id, BiFunction<BlockPos, BlockState, T> blockEntitySupplier, Supplier<Block> validBlock) {
+        return HardcoreQuestingCore.platform.registerBlockEntity(id, blockEntitySupplier, validBlock);
     }
 }

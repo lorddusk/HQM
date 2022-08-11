@@ -336,9 +336,9 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor) {
+    public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply).build(null));
+        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply, validBlock.get()).build(null));
         return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
     }
     
