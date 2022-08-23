@@ -7,8 +7,8 @@ import hardcorequesting.common.commands.CommandStrings;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +23,23 @@ public class HelpSubCommand implements CommandHandler.SubCommand {
             builder = builder.then(literal(s).executes(context -> {
                 for (int i : command.getSyntaxOptions(context))
                     context.getSource().sendSuccess(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
-                            .append(new TextComponent(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.INFO_SUFFIX + i)), false);
+                            .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.INFO_SUFFIX + i)), false);
                 return 1;
             }));
         }
         return builder.executes(context -> {
-            MutableComponent output = new TextComponent("");
+            MutableComponent output = Component.literal("");
             output = output.append(Translator.translatable(CommandStrings.HELP_START));
             output = output.append(" ");
             List<String> commands = new ArrayList<>(CommandHandler.SUB_COMMANDS.keySet());
             
             for (int i = 0; i < commands.size() - 1; i++) {
-                output = output.append("/").append("hqm").append(" ").append(new TextComponent(commands.get(i)).withStyle(ChatFormatting.YELLOW));
+                output = output.append("/").append("hqm").append(" ").append(Component.literal(commands.get(i)).withStyle(ChatFormatting.YELLOW));
                 if (i != commands.size() - 2) {
                     output = output.append(", ");
                 }
             }
-            output = output.append(" and /").append("hqm").append(" ").append(new TextComponent(commands.get(commands.size() - 1)).withStyle(ChatFormatting.YELLOW)).append(".");
+            output = output.append(" and /").append("hqm").append(" ").append(Component.literal(commands.get(commands.size() - 1)).withStyle(ChatFormatting.YELLOW)).append(".");
             context.getSource().sendSuccess(output, false);
             return 1;
         });

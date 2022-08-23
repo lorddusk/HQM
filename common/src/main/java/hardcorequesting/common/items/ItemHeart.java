@@ -39,27 +39,27 @@ public class ItemHeart extends Item {
             ItemStack stack = player.getItemInHand(hand);
             if (value == 3) {
                 if (!questingDataManager.isHardcoreActive()) {
-                    player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.noHardcoreYet"));
                 } else if (questingDataManager.getQuestingData(player).getRawLives() < HQMConfig.getInstance().Hardcore.MAX_LIVES) {
                     questingDataManager.getQuestingData(player).addLives(player, 1);
-                    player.sendMessage(Translator.translatable("hqm.message.addOne"), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.addOne"));
                     int lives = questingDataManager.getQuestingData(player).getLives();
-                    player.sendMessage(Translator.translatable("hqm.message.haveRemaining", lives), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.haveRemaining", lives));
                     SoundHandler.play(Sounds.LIFE, player);
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                         
                     }
                 } else {
-                    player.sendMessage(Translator.translatable("hqm.message.haveMaxLives"), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.haveMaxLives"));
                 }
             }
             if (value == 4) {
                 if (!questingDataManager.isHardcoreActive()) {
-                    player.sendMessage(Translator.translatable("hqm.message.noHardcoreYet"), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.noHardcoreYet"));
                 } else {
                     SoundHandler.play(Sounds.ROTTEN, player);
-                    player.sendMessage(Translator.translatable("hqm.message.eatRottenHearth"), Util.NIL_UUID);
+                    player.sendSystemMessage(Translator.translatable("hqm.message.eatRottenHearth"));
                     questingDataManager.getQuestingData(player).removeLifeAndSendMessage(player);
                     DeathType.HQM.onDeath(player);
                     
@@ -92,7 +92,7 @@ public class ItemHeart extends Item {
                     if (newRot <= 0) {
                         // TODO who wrote this code lmao -bikeshedaniel
                         stack = new ItemStack(ModItems.rottenHeart.get());
-                        entityPlayer.sendMessage(Translator.translatable("hqm.message.hearthDecay"), Util.NIL_UUID);
+                        entityPlayer.sendSystemMessage(Translator.translatable("hqm.message.hearthDecay"));
                     } else {
                         tagCompound.putInt("RotTime", newRot - 1);
                     }

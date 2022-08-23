@@ -13,7 +13,7 @@ import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.team.*;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.Util;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.UserBanListEntry;
@@ -145,7 +145,7 @@ public class QuestingData {
     public void removeLifeAndSendMessage(@NotNull Player player) {
         boolean isDead = !removeLives(player, 1);
         if (!isDead) {
-            player.sendMessage(Translator.translatable("hqm.message.lostLife", Translator.lives(getLives())), Util.NIL_UUID);
+            player.sendSystemMessage(Translator.translatable("hqm.message.lostLife", Translator.lives(getLives())));
         }
         if (getTeam().isSharingLives()) {
             for (PlayerEntry entry : getTeam().getPlayers()) {
@@ -153,9 +153,9 @@ public class QuestingData {
                     Player other = getPlayer(entry.getUUID());
                     if (other != null) {
                         String key = isDead ? "hqm.message.lostTeamLifeAndBan" : "hqm.message.lostTeamLife";
-                        other.sendMessage(
+                        other.sendSystemMessage(
                                 Translator.translatable(key, player.getScoreboardName(),
-                                        Translator.lives(getLives())), Util.NIL_UUID);
+                                        Translator.lives(getLives())));
                     }
                 }
             }
@@ -247,7 +247,7 @@ public class QuestingData {
         MinecraftServer mcServer = player.getServer();
         
         if (mcServer.isSingleplayer()) {
-            player.displayClientMessage(new TranslatableComponent("hqm.message.singlePlayerHardcore"), true);
+            player.displayClientMessage(Component.translatable("hqm.message.singlePlayerHardcore"), true);
         } else {
             String setBanReason = "Out of lives in Hardcore Questing mode";
             String setBannedBy = "HQM";

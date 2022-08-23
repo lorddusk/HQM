@@ -13,7 +13,7 @@ import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -29,7 +29,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
                                             if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
                                             for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
@@ -39,7 +39,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                         }))
                                 .executes(context -> {
                                     if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
                                     for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
@@ -49,7 +49,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 }))
                         .executes(context -> {
                             if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
                             if (context.getSource().getEntity() instanceof Player)
@@ -62,7 +62,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))
                                         .executes(context -> {
                                             if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                                 return 1;
                                             }
                                             for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
@@ -72,7 +72,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                         }))
                                 .executes(context -> {
                                     if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                         return 1;
                                     }
                                     for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
@@ -82,7 +82,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 }))
                         .executes(context -> {
                             if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
                             if (context.getSource().getEntity() instanceof Player)
@@ -93,7 +93,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                 .then(Commands.argument("targets", EntityArgument.players())
                         .executes(context -> {
                             if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
                             currentLives(context.getSource(), EntityArgument.getPlayer(context, "targets"));
@@ -101,7 +101,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                         }))
                 .executes(context -> {
                     if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                        context.getSource().sendFailure(new TranslatableComponent("hqm.message.noHardcoreYet"));
+                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                         return 1;
                     }
                     if (context.getSource().getEntity() instanceof Player)
@@ -146,7 +146,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
             int lives = QuestingDataManager.getInstance().getQuestingData(player).getLives();
             sendChat(source, Translator.translatable("hqm.message.hasLivesRemaining", playerName, Translator.lives(lives)));
         } else {
-            throw new CommandRuntimeException(new TranslatableComponent("hqm.message.noPlayer"));
+            throw new CommandRuntimeException(Component.translatable("hqm.message.noPlayer"));
         }
     }
 }

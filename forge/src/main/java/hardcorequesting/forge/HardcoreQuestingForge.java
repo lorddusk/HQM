@@ -51,7 +51,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -63,9 +63,9 @@ import net.minecraftforge.event.entity.player.AdvancementEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.ModList;
@@ -97,7 +97,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
     private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, HardcoreQuestingCore.ID);
-    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, HardcoreQuestingCore.ID);
+    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
         NetworkingManager.init();
@@ -109,7 +109,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
-            if (event.getEntityLiving() instanceof Player player) {
+            if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
                     || event.isCanceled()
                     || player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
@@ -129,9 +129,9 @@ public class HardcoreQuestingForge implements AbstractPlatform {
             }
         });
         MinecraftForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
-            if (event.getPlayer() == null || event.getPlayer() instanceof FakePlayer
+            if (event.getEntity() == null || event.getEntity() instanceof FakePlayer
                 || !event.isWasDeath() || event.isCanceled()
-                || event.getPlayer().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                || event.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
                 || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                 return;
             }
@@ -144,7 +144,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                         break;
                     }
                 }
-                event.getPlayer().getInventory().add(bookStack);
+                event.getEntity().getInventory().add(bookStack);
             }
         });
     }
@@ -181,23 +181,23 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> biConsumer) {
-        MinecraftForge.EVENT_BUS.<WorldEvent.Load>addListener(load -> {
-            if (load.getWorld() instanceof ServerLevel)
-                biConsumer.accept(((Level) load.getWorld()).dimension(), (ServerLevel) load.getWorld());
+        MinecraftForge.EVENT_BUS.<LevelEvent.Load>addListener(load -> {
+            if (load.getLevel() instanceof ServerLevel)
+                biConsumer.accept(((Level) load.getLevel()).dimension(), (ServerLevel) load.getLevel());
         });
     }
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        MinecraftForge.EVENT_BUS.<WorldEvent.Save>addListener(save -> {
-            if (save.getWorld() instanceof ServerLevel)
-                consumer.accept((ServerLevel) save.getWorld());
+        MinecraftForge.EVENT_BUS.<LevelEvent.Save>addListener(save -> {
+            if (save.getLevel() instanceof ServerLevel)
+                consumer.accept((ServerLevel) save.getLevel());
         });
     }
     
     @Override
     public void registerOnPlayerJoin(Consumer<ServerPlayer> consumer) {
-        MinecraftForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> consumer.accept((ServerPlayer) event.getPlayer()));
+        MinecraftForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> consumer.accept((ServerPlayer) event.getEntity()));
     }
     
     @Override
@@ -218,23 +218,26 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnWorldTick(Consumer<Level> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.WorldTickEvent>addListener(event -> {
+        MinecraftForge.EVENT_BUS.<TickEvent.LevelTickEvent>addListener(event -> {
             if(event.phase == TickEvent.Phase.END)
-                consumer.accept(event.world);
+                consumer.accept(event.level);
         });
     }
-    
+
+    //Todo come back to this
     @Override
     public void registerOnHudRender(BiConsumer<PoseStack, Float> biConsumer) {
+        /*
         MinecraftForge.EVENT_BUS.<RenderGameOverlayEvent.Post>addListener(event -> {
             if (event.getType() == RenderGameOverlayEvent.ElementType.ALL)
                 biConsumer.accept(event.getMatrixStack(), event.getPartialTicks());
         });
+         */
     }
-    
+
     @Override
     public void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> triConsumer) {
-        MinecraftForge.EVENT_BUS.<PlayerInteractEvent.RightClickItem>addListener(event -> triConsumer.accept(event.getPlayer(), event.getWorld(), event.getHand()));
+        MinecraftForge.EVENT_BUS.<PlayerInteractEvent.RightClickItem>addListener(event -> triConsumer.accept(event.getEntity(), event.getLevel(), event.getHand()));
     }
     
     @Override
@@ -248,57 +251,57 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public void registerOnBlockUse(BlockUsed blockUsed) {
         MinecraftForge.EVENT_BUS.<PlayerInteractEvent.RightClickBlock>addListener(event -> {
-            blockUsed.onBlockUsed(event.getPlayer(), event.getWorld(), event.getHand(), event.getPos(), event.getFace());
+            blockUsed.onBlockUsed(event.getEntity(), event.getLevel(), event.getHand(), event.getPos(), event.getFace());
         });
     }
     
     @Override
     public void registerOnBlockBreak(BlockBroken blockBroken) {
         MinecraftForge.EVENT_BUS.<BlockEvent.BreakEvent>addListener(event -> {
-            blockBroken.onBlockBroken(event.getWorld(), event.getPos(), event.getState(), event.getPlayer());
+            blockBroken.onBlockBroken(event.getLevel(), event.getPos(), event.getState(), event.getPlayer());
         });
     }
     
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> biConsumer) {
         MinecraftForge.EVENT_BUS.<PlayerEvent.ItemPickupEvent>addListener(event -> {
-            biConsumer.accept(event.getPlayer(), event.getStack());
+            biConsumer.accept(event.getEntity(), event.getStack());
         });
     }
     
     @Override
     public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> biConsumer) {
         MinecraftForge.EVENT_BUS.<LivingDeathEvent>addListener(event -> {
-            biConsumer.accept(event.getEntityLiving(), event.getSource());
+            biConsumer.accept(event.getEntity(), event.getSource());
         });
     }
     
     @Override
     public void registerOnCrafting(BiConsumer<Player, ItemStack> triConsumer) {
         MinecraftForge.EVENT_BUS.<PlayerEvent.ItemCraftedEvent>addListener(event -> {
-            triConsumer.accept(event.getPlayer(), event.getCrafting());
+            triConsumer.accept(event.getEntity(), event.getCrafting());
         });
     }
     
     @Override
     public void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> triConsumer) {
         MinecraftForge.EVENT_BUS.<AnvilRepairEvent>addListener(event -> {
-            triConsumer.accept(event.getPlayer(), event.getItemResult());
+            triConsumer.accept(event.getEntity(), event.getOutput());
         });
     }
     
     @Override
     public void registerOnSmelting(BiConsumer<Player, ItemStack> triConsumer) {
         MinecraftForge.EVENT_BUS.<PlayerEvent.ItemSmeltedEvent>addListener(event -> {
-            triConsumer.accept(event.getPlayer(), event.getSmelting());
+            triConsumer.accept(event.getEntity(), event.getSmelting());
         });
     }
     
     @Override
     public void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> biConsumer) {
         MinecraftForge.EVENT_BUS.<AdvancementEvent>addListener(event -> {
-            if (event.getPlayer() instanceof ServerPlayer)
-                biConsumer.accept((ServerPlayer) event.getPlayer(), event.getAdvancement());
+            if (event.getEntity() instanceof ServerPlayer)
+                biConsumer.accept((ServerPlayer) event.getEntity(), event.getAdvancement());
         });
     }
     
@@ -383,11 +386,11 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public void renderFluidStack(FluidStack fluidStack, PoseStack matrices, int x1, int y1, int x2, int y2) {
         ForgeFluidStack stack = (ForgeFluidStack) fluidStack;
-        FluidAttributes attributes = stack.getFluid().getAttributes();
+        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(stack._stack.getFluid());
         ResourceLocation texture = attributes.getStillTexture(stack._stack);
         Material blockMaterial = ForgeHooksClient.getBlockMaterial(texture);
         TextureAtlasSprite sprite = blockMaterial.sprite();
-        int color = attributes.getColor(Minecraft.getInstance().level, BlockPos.ZERO);
+        int color = attributes.getTintColor();
         int a = 255;
         int r = (color >> 16 & 255);
         int g = (color >> 8 & 255);
@@ -404,7 +407,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public Fraction getBucketAmount() {
-        return Fraction.ofWhole(FluidAttributes.BUCKET_VOLUME);
+        return Fraction.ofWhole(FluidType.BUCKET_VOLUME);
     }
     
     @Override

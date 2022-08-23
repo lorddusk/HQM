@@ -34,7 +34,7 @@ public class CommandSave extends CommandBase {
     private static void save(ICommandSender sender, Object object, Type type, String name) throws CommandException {
         try {
             File file = SaveHandler.save(SaveHandler.getExportFile(name), object, type);
-            sender.sendMessage(new TextComponentTranslation(CommandStrings.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length())));
+            sender.sendMessage(Component.literalTranslation(CommandStrings.SAVE_SUCCESS, file.getPath().substring(HardcoreQuesting.configDir.getParentFile().getParent().length())));
         } catch (IOException e) {
             throw new CommandException(CommandStrings.SAVE_FAILED, name);
         }

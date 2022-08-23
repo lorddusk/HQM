@@ -13,7 +13,7 @@ import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 
@@ -38,7 +38,7 @@ public class EditTrackerScreen extends GuiBase {
     private final TextBoxGroup textBoxes = new TextBoxGroup();
     
     public EditTrackerScreen(final TrackerBlockEntity trackerIn) {
-        super(NarratorChatListener.NO_TITLE);
+        super(CommonComponents.EMPTY);
     
         this.tracker = trackerIn;
         selectionHelper = new ArrowSelectionHelper(this, 20, 30) {

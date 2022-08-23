@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
 public class EnableSubCommand implements CommandHandler.SubCommand {
@@ -15,9 +15,9 @@ public class EnableSubCommand implements CommandHandler.SubCommand {
                 .requires(source -> source.hasPermission(4))
                 .executes(context -> {
                     if (context.getSource().getLevel().getLevelData().isHardcore())
-                        context.getSource().sendSuccess(new TranslatableComponent("hqm.message.vanillaHardcoreOn"), true);
+                        context.getSource().sendSuccess(Component.translatable("hqm.message.vanillaHardcoreOn"), true);
                     else
-                        context.getSource().sendSuccess(new TranslatableComponent(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
+                        context.getSource().sendSuccess(Component.translatable(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
                     QuestingDataManager.getInstance().activateHardcore();
                     QuestingDataManager.getInstance().activateQuest(true);
                     if (context.getSource().getEntity() instanceof Player)

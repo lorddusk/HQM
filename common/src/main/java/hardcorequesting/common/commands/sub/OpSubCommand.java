@@ -8,7 +8,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
 public class OpSubCommand implements CommandHandler.SubCommand {
@@ -21,14 +21,14 @@ public class OpSubCommand implements CommandHandler.SubCommand {
                             Player player = EntityArgument.getPlayer(context, "targets");
                             if (QuestingDataManager.getInstance().hasData(player)) {
                                 player.getInventory().add(QuestBookItem.getOPBook(player));
-                            } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
+                            } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
                     Player player = (Player) context.getSource().getEntity();
                     if (QuestingDataManager.getInstance().hasData(player)) {
                         player.getInventory().add(QuestBookItem.getOPBook(player));
-                    } else context.getSource().sendFailure(new TranslatableComponent("hqm.message.noPlayer"));
+                    } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));
                     return 1;
                 });
     }

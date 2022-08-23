@@ -3,9 +3,9 @@ package hardcorequesting.common.quests.reward;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -27,8 +27,8 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         
         public void execute(Player player) {
             CommandSourceStack sourceStack = new CommandSourceStack(new WrapperCommandSource(player), player.position(), player.getRotationVector(),
-                    player.level instanceof ServerLevel ? (ServerLevel)player.level : null, PERMISSION_LEVEL, NAME, new TextComponent(NAME), player.level.getServer(), player);
-            player.getServer().getCommands().performCommand(sourceStack, commandString);
+                    player.level instanceof ServerLevel ? (ServerLevel)player.level : null, PERMISSION_LEVEL, NAME, Component.literal(NAME), player.level.getServer(), player);
+            player.getServer().getCommands().performCommand(player.level.getServer().getCommands().getDispatcher().parse(commandString, sourceStack), commandString);
         }
         
         public String asString() {
@@ -42,12 +42,12 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         private WrapperCommandSource(Player player) {
             this.player = player;
         }
-    
+
         @Override
-        public void sendMessage(Component component, UUID uuid) {
-        player.sendMessage(component, uuid);
+        public void sendSystemMessage(@NotNull Component component) {
+            player.sendSystemMessage(component);
         }
-    
+
         @Override
         public boolean acceptsSuccess() {
             return false;

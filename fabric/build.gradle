@@ -10,10 +10,7 @@ repositories {
         }
     }
     maven {
-        url "https://mod-buildcraft.com/maven"
-        content {
-            includeGroup "alexiil.mc.lib"
-        }
+        url "https://kneelawk.com/maven/"
     }
 }
 

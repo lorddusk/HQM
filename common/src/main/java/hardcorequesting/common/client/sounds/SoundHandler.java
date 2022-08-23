@@ -102,7 +102,7 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     private static SoundInstance play(ResourceLocation resource, float volume, float pitch) {
-        SoundInstance soundObj = new ClientSound(resource, volume, pitch);
+        SoundInstance soundObj = new ClientSound(resource, volume, pitch, Minecraft.getInstance().level.getRandom());
         Minecraft.getInstance().getSoundManager().play(soundObj);
         return soundObj;
     }

@@ -62,7 +62,7 @@ public class CommandLoad extends CommandBase {
             QuestSet set = SaveHandler.loadQuestSet(file);
             if (set != null) {
                 
-                sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, set.getName()));
+                sender.sendMessage(Component.literalTranslation(CommandStrings.LOAD_SUCCESS, set.getName()));
             } else {
                 throw new CommandException(CommandStrings.LOAD_FAILED);
             }
@@ -84,7 +84,7 @@ public class CommandLoad extends CommandBase {
             for (Reputation reputation : reputations) {
                 if (reputation != null) {
                     Reputation.addReputation(reputation);
-                    sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, "Reputation: " + reputation.getName()));
+                    sender.sendMessage(Component.literalTranslation(CommandStrings.LOAD_SUCCESS, "Reputation: " + reputation.getName()));
                 } else {
                     throw new CommandException(CommandStrings.LOAD_FAILED);
                 }
@@ -106,7 +106,7 @@ public class CommandLoad extends CommandBase {
             if (bags != null) {
                 GroupTier.getTiers().clear();
                 GroupTier.getTiers().addAll(bags);
-                sender.sendMessage(new TextComponentTranslation(CommandStrings.LOAD_SUCCESS, "Bags"));
+                sender.sendMessage(Component.literalTranslation(CommandStrings.LOAD_SUCCESS, "Bags"));
             } else {
                 throw new CommandException(CommandStrings.LOAD_FAILED);
             }

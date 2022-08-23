@@ -7,7 +7,7 @@ import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.CheckBoxTask;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.CommonComponents;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ public class CheckBoxTaskGraphic extends TaskGraphic {
         completed = task.isCompleted(playerId);
 
         // TODO custom checkbox label?
-        addClickable(new AbstractCheckBox(gui, TextComponent.EMPTY, START_X, START_Y) {
+        addClickable(new AbstractCheckBox(gui, CommonComponents.EMPTY, START_X, START_Y) {
             @Override
             public boolean getValue() {
                 return completed;

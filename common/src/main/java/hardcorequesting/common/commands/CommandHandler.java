@@ -8,7 +8,6 @@ import hardcorequesting.common.commands.sub.*;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
@@ -50,11 +49,11 @@ public class CommandHandler {
         }
         
         default void currentLives(Player player) {
-            player.createCommandSourceStack().sendSuccess(new TextComponent("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
+            player.createCommandSourceStack().sendSuccess(Component.literal("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void currentLives(CommandSourceStack source, Player player) {
-            source.sendSuccess(new TextComponent(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
+            source.sendSuccess(Component.literal(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void sendChat(CommandSourceStack sender, Component text) {
