@@ -3,17 +3,21 @@ package hardcorequesting.fabric.tileentity;
 import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.BlankVariantView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.impl.transfer.TransferApiImpl;
 
 import java.util.Iterator;
+import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
-public class QSDFluidTank implements SingleSlotStorage<FluidVariant>, InsertionOnlyStorage<FluidVariant> {
+public class QSDFluidTank implements InsertionOnlyStorage<FluidVariant> {
+    private final List<StorageView<FluidVariant>> blankView = List.of(new BlankVariantView<>(FluidVariant.blank(), FluidConstants.BUCKET));
     private final BarrelBlockEntity blockEntity;
 
     public QSDFluidTank(BarrelBlockEntity blockEntity) {
@@ -35,32 +39,7 @@ public class QSDFluidTank implements SingleSlotStorage<FluidVariant>, InsertionO
     }
 
     @Override
-    public boolean isResourceBlank() {
-        return true;
-    }
-
-    @Override
-    public FluidVariant getResource() {
-        return FluidVariant.blank();
-    }
-
-    @Override
-    public long getAmount() {
-        return 0;
-    }
-
-    @Override
-    public long getCapacity() {
-        return Integer.MAX_VALUE;
-    }
-
-    @Override
-    public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
-        return 0;
-    }
-
-    @Override
-    public boolean supportsExtraction() {
-        return false;
+    public Iterator<StorageView<FluidVariant>> iterator() {
+        return blankView.iterator();
     }
 }

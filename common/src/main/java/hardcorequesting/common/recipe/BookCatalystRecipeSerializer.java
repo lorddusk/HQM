@@ -1,4 +1,4 @@
-package hardcorequesting.forge;
+package hardcorequesting.common.recipe;
 
 import com.google.gson.JsonObject;
 import hardcorequesting.common.items.crafting.BookCatalystRecipe;
@@ -8,7 +8,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
 /**
- * Same as the corresponding class in the fabric module, but extends ForgeRegistryEntry
+ * Same as the corresponding class in the forge module, but does not extend ForgeRegistryEntry
  */
 public class BookCatalystRecipeSerializer implements RecipeSerializer<BookCatalystRecipe> {
     @Override

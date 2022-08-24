@@ -8,6 +8,7 @@ import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
+import hardcorequesting.common.recipe.BookCatalystRecipeSerializer;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
