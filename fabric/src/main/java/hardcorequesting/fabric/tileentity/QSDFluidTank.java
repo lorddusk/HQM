@@ -14,7 +14,7 @@ import java.util.Iterator;
 
 @SuppressWarnings("UnstableApiUsage")
 public class QSDFluidTank implements SingleSlotStorage<FluidVariant>, InsertionOnlyStorage<FluidVariant> {
-    private BarrelBlockEntity blockEntity;
+    private final BarrelBlockEntity blockEntity;
 
     public QSDFluidTank(BarrelBlockEntity blockEntity) {
         this.blockEntity = blockEntity;

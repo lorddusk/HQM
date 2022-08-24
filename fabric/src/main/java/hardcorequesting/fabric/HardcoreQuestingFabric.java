@@ -30,11 +30,13 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.impl.transfer.TransferApiImpl;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
@@ -75,6 +77,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("UnstableApiUsage")
 public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform {
     public static final List<BiConsumer<Player, ItemStack>> ANVIL_CRAFTING = Lists.newArrayList();
     private final NetworkManager networkManager = new FabricNetworkManager();
@@ -256,8 +259,8 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
 
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        Storage<FluidVariant> storageViews = FluidStorage.ITEM.find(stack, null);
-        if(storageViews != null) {
+        Storage<FluidVariant> storageViews = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        if (storageViews != null) {
             List<FluidStack> fluids = new ArrayList<>();
             for (StorageView<FluidVariant> view : storageViews) {
                 fluids.add(FluidStack.create(view.getResource().getFluid(), view.getAmount()));
