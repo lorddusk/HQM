@@ -243,9 +243,13 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             return stack.right().map(fluidStack -> fluidStack.getFluid() == fluid).orElse(false);
         }
         
-        public void setStack(ItemStack stack) {
+        public void setItemStack(ItemStack stack) {
             this.stack = Either.left(stack);
             this.permutations = null;
+        }
+
+        public void setFluidStack(FluidStack stack) {
+            this.stack = Either.right(stack);
         }
         
         private void setPermutations() {
