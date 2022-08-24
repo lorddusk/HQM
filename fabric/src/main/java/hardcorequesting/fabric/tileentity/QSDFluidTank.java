@@ -1,6 +1,8 @@
 package hardcorequesting.fabric.tileentity;
 
+import com.ibm.icu.impl.Pair;
 import dev.architectury.fluid.FluidStack;
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.quests.task.item.ItemRequirementTask;
@@ -51,7 +53,11 @@ public class QSDFluidTank extends SnapshotParticipant<QSDFluidTank.FluidQuestDat
     @Override
     protected void readSnapshot(FluidQuestData snapshot) {
         if(blockEntity.getCurrentTask() instanceof ConsumeItemTask task) {
-            snapshot.getFluids().forEach((integer, stack) -> task.getParts().get(integer).setFluidStack(stack));
+            ItemsTaskData data = task.getData(blockEntity.getPlayerUUID());
+            snapshot.getFluidData().forEach((integer, pair) -> {
+                task.getParts().get(integer).setFluidStack(pair.first);
+                data.setValue(integer, pair.second);
+            });
         }
     }
 
@@ -62,20 +68,21 @@ public class QSDFluidTank extends SnapshotParticipant<QSDFluidTank.FluidQuestDat
     }
 
     public static class FluidQuestData {
-        private Map<Integer, FluidStack> fluids;
+        private final Map<Integer, Pair<FluidStack, Integer>> fluids = new HashMap<>();
         public FluidQuestData(BarrelBlockEntity blockEntity) {
             if(blockEntity.getCurrentTask() instanceof ConsumeItemTask task) {
-                Map<Integer, FluidStack> fluidStacks = new HashMap<>();
                 for (int i = 0; i < task.getParts().size(); i++) {
                     ItemRequirementTask.Part part = task.getParts().get(i);
+                    ItemsTaskData data = task.getData(blockEntity.getPlayerUUID());
                     int finalI = i;
-                    part.stack.right().ifPresent(fluids -> fluidStacks.put(finalI, fluids));
+                    part.stack.right().ifPresent(fluid -> {
+                        fluids.put(finalI, Pair.of(fluid, data.getValue(finalI)));
+                    });
                 }
-                fluids = fluidStacks;
             }
         }
 
-        public Map<Integer, FluidStack> getFluids() {
+        public Map<Integer, Pair<FluidStack, Integer>> getFluidData() {
             return fluids;
         }
     }
