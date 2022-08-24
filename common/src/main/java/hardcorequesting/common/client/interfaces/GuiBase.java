@@ -3,8 +3,11 @@ package hardcorequesting.common.client.interfaces;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix4f;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.platform.FluidStack;
+import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,6 +19,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -185,7 +190,24 @@ public class GuiBase extends Screen {
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
         stack.pushPose();
         stack.translate(0, 0, getBlitOffset());
-        HardcoreQuestingCore.platform.renderFluidStack(fluid, stack, getLeft() + x, getTop() + y, getLeft() + x + 16, getTop() + y + 16);
+        int x1 = getLeft() + x;
+        int y1 = getTop() + y;
+        int x2 = getLeft() + x + 16;
+        int y2 = getTop() + y + 16;
+        TextureAtlasSprite sprite = FluidStackHooks.getStillTexture(fluid);
+        int color = FluidStackHooks.getColor(fluid);
+        int a = 255;
+        int r = (color >> 16 & 255);
+        int g = (color >> 8 & 255);
+        int b = (color & 255);
+        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
+        VertexConsumer builder = FluidUtils.getBlockMaterial(sprite.getName()).buffer(source, FluidUtils.CustomRenderTypes::createFluid);
+        Matrix4f matrix = stack.last().pose();
+        builder.vertex(matrix, x2, y1, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV0()).endVertex();
+        builder.vertex(matrix, x1, y1, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV0()).endVertex();
+        builder.vertex(matrix, x1, y2, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV1()).endVertex();
+        builder.vertex(matrix, x2, y2, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV1()).endVertex();
+        source.endBatch();
         stack.popPose();
     }
     

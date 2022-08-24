@@ -42,8 +42,6 @@
     "minecraft": ">=1.19.2",
     "java": ">=17",
     "architectury": ">=3.2.51",
-    "libblockattributes_core": ">=0.10.0",
-    "libblockattributes_fluids": ">=0.10.0",
     "cardinal-components-base": ">=4.0.1",
     "cardinal-components-entity": ">=4.0.1"
   },

@@ -1,9 +1,10 @@
 package hardcorequesting.common.quests.task.item;
 
-import hardcorequesting.common.platform.FluidStack;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.TaskType;
+import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -34,10 +35,10 @@ public class ConsumeItemTask extends ItemRequirementTask {
             }
             
             if (fluidVolume != null && item.isFluid(fluidVolume.getFluid())) {
-                Fraction amount = fluidVolume.getAmount().isLessThan(Fraction.ofWhole(item.required - data.getValue(i))) ? fluidVolume.getAmount() : Fraction.ofWhole(item.required - data.getValue(i));
+                Fraction amount = FluidUtils.getAmount(fluidVolume).isLessThan(Fraction.ofWhole(item.required - data.getValue(i))) ? FluidUtils.getAmount(fluidVolume) : Fraction.ofWhole(item.required - data.getValue(i));
                 if (action)
                     data.setValue(i, data.getValue(i) + amount.intValue());
-                fluidVolume.split(amount);
+                FluidUtils.split(fluidVolume, amount);
                 updated = true;
                 break;
             }

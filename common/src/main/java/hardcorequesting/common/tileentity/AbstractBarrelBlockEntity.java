@@ -104,7 +104,7 @@ public abstract class AbstractBarrelBlockEntity extends BlockEntity implements C
     @Override
     public void clearContent() {}
     
-    protected void doSync() {
+    public void doSync() {
         if (!this.level.isClientSide()) {
             // sync tile to client
             
@@ -132,7 +132,7 @@ public abstract class AbstractBarrelBlockEntity extends BlockEntity implements C
         return saveWithoutMetadata();
     }
     
-    protected void updateState() {
+    public void updateState() {
         if (!this.level.isClientSide) {
             QuestTask<?> task = this.getCurrentTask();
             boolean bound = false;

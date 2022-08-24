@@ -1,27 +1,18 @@
 package hardcorequesting.forge;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.math.Matrix4f;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.platform.NetworkManager;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -47,11 +38,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -332,17 +319,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
         return new BarrelBlockEntity(pos, state);
     }
-    
-    @Override
-    public FluidStack createEmptyFluidStack() {
-        return new ForgeFluidStack();
-    }
-    
-    @Override
-    public FluidStack createFluidStack(Fluid fluid, Fraction fraction) {
-        return new ForgeFluidStack(new net.minecraftforge.fluids.FluidStack(fluid, fraction.intValue()));
-    }
-    
+
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
         return stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
@@ -356,53 +333,9 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         for (int tank = 0; tank < handler.getTanks(); tank++) {
             net.minecraftforge.fluids.FluidStack fluid = handler.getFluidInTank(tank);
             if (!fluid.isEmpty())
-                fluids.add(new ForgeFluidStack(fluid));
+                fluids.add(FluidStack.create(fluid.getFluid(), fluid.getAmount()));
         }
         return fluids;
-    }
-    
-    // Private class extending RenderType as a simple workaround to access protected fields.
-    @OnlyIn(Dist.CLIENT)
-    private static class CustomRenderTypes extends RenderType {
-        private CustomRenderTypes(String string, VertexFormat arg, VertexFormat.Mode arg2, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {
-            super(string, arg, arg2, i, bl, bl2, runnable, runnable2);
-            throw new IllegalStateException("This class is not meant to be constructed!");
-        }
-        
-        private static RenderType createFluid(ResourceLocation location) {
-            return RenderType.create(
-                    HardcoreQuestingCore.ID + ":fluid_type",
-                    DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, true, false,
-                    RenderType.CompositeState.builder()
-                            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_SHADER)
-                            .setLightmapState(RenderStateShard.LIGHTMAP)
-                            .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
-                            .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-                            .createCompositeState(false));
-        }
-    
-    }
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public void renderFluidStack(FluidStack fluidStack, PoseStack matrices, int x1, int y1, int x2, int y2) {
-        ForgeFluidStack stack = (ForgeFluidStack) fluidStack;
-        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(stack._stack.getFluid());
-        ResourceLocation texture = attributes.getStillTexture(stack._stack);
-        Material blockMaterial = ForgeHooksClient.getBlockMaterial(texture);
-        TextureAtlasSprite sprite = blockMaterial.sprite();
-        int color = attributes.getTintColor();
-        int a = 255;
-        int r = (color >> 16 & 255);
-        int g = (color >> 8 & 255);
-        int b = (color & 255);
-        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-        VertexConsumer builder = blockMaterial.buffer(source, HardcoreQuestingForge.CustomRenderTypes::createFluid);
-        Matrix4f matrix = matrices.last().pose();
-        builder.vertex(matrix, x2, y1, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV0()).endVertex();
-        builder.vertex(matrix, x1, y1, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV0()).endVertex();
-        builder.vertex(matrix, x1, y2, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV1()).endVertex();
-        builder.vertex(matrix, x2, y2, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV1()).endVertex();
-        source.endBatch();
     }
     
     @Override

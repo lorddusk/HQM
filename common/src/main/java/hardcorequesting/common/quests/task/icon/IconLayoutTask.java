@@ -1,7 +1,7 @@
 package hardcorequesting.common.quests.task.icon;
 
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.platform.FluidStack;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
 import hardcorequesting.common.quests.task.PartList;

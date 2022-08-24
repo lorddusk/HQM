@@ -7,8 +7,9 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.platform.FluidStack;
+import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Fraction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -91,7 +92,7 @@ public class MinecraftAdapter {
         public JsonElement serialize(FluidStack src) {
             return object()
                     .add(FLUID, Registry.FLUID.getKey(src.getFluid()).toString())
-                    .add(VOLUME, Fraction.CODEC.encodeStart(JsonOps.INSTANCE, src.getAmount()).result().orElseThrow())
+                    .add(VOLUME, Fraction.CODEC.encodeStart(JsonOps.INSTANCE, FluidUtils.getAmount(src)).result().orElseThrow())
                     .build();
         }
         
@@ -101,7 +102,7 @@ public class MinecraftAdapter {
             
             Fluid fluid = Registry.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
             Fraction amount = Fraction.CODEC.parse(JsonOps.INSTANCE, object.get(VOLUME)).result().orElseThrow();
-            return HardcoreQuestingCore.platform.createFluidStack(fluid, amount);
+            return FluidStack.create(fluid, amount.intValue());
         }
     };
     

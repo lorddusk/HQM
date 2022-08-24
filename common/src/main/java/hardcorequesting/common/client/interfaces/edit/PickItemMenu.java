@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.edit;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.TextSearch;
 import hardcorequesting.common.client.interfaces.GuiBase;
@@ -11,7 +12,6 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.items.ModItems;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
@@ -335,7 +335,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
                     ItemStack newStack = stack.copy();
                     newStack.setCount(amount);
                     return newStack;
-                }, stack -> HardcoreQuestingCore.platform.createFluidStack(stack.getFluid(), Fraction.ofWhole(amount)));
+                }, stack -> FluidStack.create(stack.getFluid(), amount));
             }
         };
         

@@ -7,7 +7,7 @@ import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.util.Either;
-import hardcorequesting.common.platform.FluidStack;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.data.*;
 import hardcorequesting.common.quests.task.CompleteQuestTask;

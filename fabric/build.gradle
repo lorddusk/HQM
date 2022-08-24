@@ -9,9 +9,7 @@ repositories {
             includeGroup "dev.onyxstudios.cardinal-components-api"
         }
     }
-    maven {
-        url "https://kneelawk.com/maven/"
-    }
+    maven { url = "https://nexus.resourcefulbees.com/repository/maven-public/"}
 }
 
 configurations {
@@ -45,9 +43,9 @@ dependencies {
     // Used for storing player-attached data
     depend("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components}")
     depend("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cardinal_components}")
-    // Used for interaction with fluid systems
-    depend("alexiil.mc.lib:libblockattributes-core:${project.lba}")
-    depend("alexiil.mc.lib:libblockattributes-fluids:${project.lba}")
+    // Used for testing the fluid system
+    modImplementation 'RebornCore:RebornCore-1.19:+'
+    modImplementation 'TechReborn:TechReborn-1.19:+'
     // Used for parsing the config file
     depend("blue.endless:jankson:1.2.1")
 

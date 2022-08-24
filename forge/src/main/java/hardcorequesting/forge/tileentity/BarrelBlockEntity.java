@@ -3,7 +3,6 @@ package hardcorequesting.forge.tileentity;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
-import hardcorequesting.forge.ForgeFluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -55,7 +54,7 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
     
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
                 FluidStack duplicate = resource.copy();
-                if (((ConsumeItemTask) task).increaseFluid(new ForgeFluidStack(duplicate), playerUUID, action.execute()) && action.execute()) {
+                if (((ConsumeItemTask) task).increaseFluid(dev.architectury.fluid.FluidStack.create(duplicate.getFluid(), duplicate.getAmount()), playerUUID, action.execute()) && action.execute()) {
                     BarrelBlockEntity.this.updateState();
                     BarrelBlockEntity.this.doSync();
                 }
