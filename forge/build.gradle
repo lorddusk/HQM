@@ -22,6 +22,7 @@ dependencies {
     forgeDependencies(implementation("blue.endless:jankson:1.2.1"))
     shadowCommon("blue.endless:jankson:1.2.1")
     modImplementation "dev.architectury:architectury-forge:${project.architectury_version}"
+
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
