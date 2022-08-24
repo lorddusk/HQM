@@ -1,6 +1,5 @@
 package hardcorequesting.forge;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -210,17 +209,6 @@ public class HardcoreQuestingForge implements AbstractPlatform {
             if(event.phase == TickEvent.Phase.END)
                 consumer.accept(event.level);
         });
-    }
-
-    //Todo come back to this
-    @Override
-    public void registerOnHudRender(BiConsumer<PoseStack, Float> biConsumer) {
-        /*
-        MinecraftForge.EVENT_BUS.<RenderGameOverlayEvent.Post>addListener(event -> {
-            if (event.getType() == RenderGameOverlayEvent.ElementType.ALL)
-                biConsumer.accept(event.getMatrixStack(), event.getPartialTicks());
-        });
-         */
     }
 
     @Override

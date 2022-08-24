@@ -1,7 +1,6 @@
 package hardcorequesting.fabric;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
@@ -25,7 +24,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -160,12 +158,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public void registerOnWorldTick(Consumer<Level> consumer) {
         ServerTickEvents.END_WORLD_TICK.register(consumer::accept);
     }
-    
-    @Override
-    public void registerOnHudRender(BiConsumer<PoseStack, Float> consumer) {
-        HudRenderCallback.EVENT.register(consumer::accept);
-    }
-    
+
     @Override
     public void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> consumer) {
         UseItemCallback.EVENT.register((player, level, hand) -> {

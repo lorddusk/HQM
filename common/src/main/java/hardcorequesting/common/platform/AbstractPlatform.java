@@ -69,10 +69,7 @@ public interface AbstractPlatform {
     void registerOnClientTick(Consumer<Minecraft> consumer);
     
     void registerOnWorldTick(Consumer<Level> consumer);
-    
-    @Environment(EnvType.CLIENT)
-    void registerOnHudRender(BiConsumer<PoseStack, Float> consumer);
-    
+
     void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> consumer);
     
     void registerOnBlockPlace(BlockPlaced consumer);
