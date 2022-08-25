@@ -58,7 +58,7 @@ public class QDSFluidTank extends SnapshotParticipant<QDSFluidTank.FluidQuestDat
 
     /**
      * Gets the stored values of the fluids stored in the tank. Since the tank doesn't store
-     * any fluids, this will return an empty iterator.
+     * any fluids, this will return a blank iterator.
      * @return an iterator with no storage values
      */
     @Override
