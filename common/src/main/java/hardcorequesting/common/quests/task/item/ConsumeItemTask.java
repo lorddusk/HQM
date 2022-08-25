@@ -33,7 +33,7 @@ public class ConsumeItemTask extends ItemRequirementTask {
             if (data.isDone(i, item)) {
                 continue;
             }
-            
+
             if (fluidVolume != null && item.isFluid(fluidVolume.getFluid())) {
                 Fraction amount = FluidUtils.getAmount(fluidVolume).isLessThan(Fraction.ofWhole(item.required - data.getValue(i))) ? FluidUtils.getAmount(fluidVolume) : Fraction.ofWhole(item.required - data.getValue(i));
                 if (action)
@@ -42,11 +42,6 @@ public class ConsumeItemTask extends ItemRequirementTask {
                 updated = true;
                 break;
             }
-        }
-        
-        
-        if (action && updated) {
-            doCompletionCheck(data, playerId);
         }
         
         return action && updated;

@@ -104,6 +104,10 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             }
         }
 
+        if (updated) {
+            doCompletionCheck(data, playerId);
+        }
+
         return updated;
     }
     
