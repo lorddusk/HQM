@@ -14,13 +14,20 @@ This mod will add Hardcore mode with extra lives. If you use up your lives, your
 [[dependencies.hardcorequesting]]
 modId = "forge"
 mandatory = true
-versionRange = "[40,)"
+versionRange = "[43,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.hardcorequesting]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.18.2,)"
+versionRange = "[1.19.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hardcorequesting]]
+modId = "architectury"
+mandatory = true
+versionRange = "[6.2.43,)"
 ordering = "NONE"
 side = "BOTH"

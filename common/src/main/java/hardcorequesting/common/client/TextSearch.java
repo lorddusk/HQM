@@ -1,7 +1,7 @@
 package hardcorequesting.common.client;
 
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.platform.FluidStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -100,7 +100,7 @@ public class TextSearch<T> {
             for (Fluid fluid : Registry.FLUID) {
                 if (fluid instanceof EmptyFluid) continue;
                 if (!fluid.defaultFluidState().isSource()) continue;
-                FluidStack fluidVolume = HardcoreQuestingCore.platform.createFluidStack(fluid, HardcoreQuestingCore.platform.getBucketAmount());
+                FluidStack fluidVolume = FluidStack.create(fluid, HardcoreQuestingCore.platform.getBucketAmount().intValue());
                 String search = fluidVolume.getName().getString();
                 FLUIDS.add(new SearchEntry<>(search, search, fluidVolume));
             }

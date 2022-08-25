@@ -1,13 +1,13 @@
 package hardcorequesting.common.quests;
 
 import com.mojang.datafixers.util.Either;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.QuestDataUpdateMessage;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.reward.QuestRewards;
 import hardcorequesting.common.quests.task.QuestTask;

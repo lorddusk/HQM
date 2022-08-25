@@ -1,8 +1,8 @@
 package hardcorequesting.common.quests.task.item;
 
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.event.EventTrigger;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.TaskType;
@@ -106,7 +106,7 @@ public class DetectItemTask extends ItemRequirementTask {
                 if (!part.hasItem()) {
                     for (FluidStack fluidStack : HardcoreQuestingCore.platform.findFluidsIn(stack)) {
                         if (part.isFluid(fluidStack.getFluid())) {
-                            int amount = Math.min(fluidStack.getAmount().intValue(), part.required - data.getValue(i));
+                            int amount = Math.min(((int) fluidStack.getAmount()), part.required - data.getValue(i));
                             data.setValue(i, data.getValue(i) + amount);
                             updated = true;
                         }

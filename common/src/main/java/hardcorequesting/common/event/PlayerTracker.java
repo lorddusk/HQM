@@ -38,7 +38,7 @@ public class PlayerTracker {
         if (questingData.isHardcoreActive())
             sendLoginMessage(player);
         else if (HQMConfig.getInstance().Message.NO_HARDCORE_MESSAGE)
-            player.sendMessage(Translator.translatable("hqm.message.noHardcore"), Util.NIL_UUID);
+            player.sendSystemMessage(Translator.translatable("hqm.message.noHardcore"));
         
         if (!HQMUtil.isSinglePlayerOnly()) {
             Quest.setEditMode(false);
@@ -59,8 +59,8 @@ public class PlayerTracker {
     
     
     private void sendLoginMessage(Player player) {
-        player.sendMessage(Translator.translatable("hqm.message.hardcore").append(" ")
+        player.sendSystemMessage(Translator.translatable("hqm.message.hardcore").append(" ")
                 .append(Translator.translatable("hqm.message.livesLeft",
-                        Translator.lives(getRemainingLives(player)))), Util.NIL_UUID);
+                        Translator.lives(getRemainingLives(player)))));
     }
 }

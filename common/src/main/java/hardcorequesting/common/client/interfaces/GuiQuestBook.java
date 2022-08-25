@@ -17,7 +17,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -75,7 +75,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private GuiQuestBook(Player player, boolean isOpBook) {
-        super(NarratorChatListener.NO_TITLE);
+        super(CommonComponents.EMPTY);
         this.player = player;
         this.isOpBook = isOpBook;
     }

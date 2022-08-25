@@ -1,44 +1,39 @@
 package hardcorequesting.fabric;
 
-import alexiil.mc.lib.attributes.fluid.FluidAttributes;
-import alexiil.mc.lib.attributes.fluid.FluidVolumeUtil;
-import alexiil.mc.lib.attributes.fluid.GroupedFluidInvView;
-import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
-import alexiil.mc.lib.attributes.fluid.render.FluidRenderFace;
-import alexiil.mc.lib.attributes.fluid.render.FluidVolumeRenderer;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
-import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
-import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.BlockEvent;
 import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.platform.NetworkManager;
+import hardcorequesting.common.recipe.BookCatalystRecipeSerializer;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.fabric.capabilities.ModCapabilities;
 import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
@@ -69,19 +64,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("UnstableApiUsage")
 public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform {
     public static final List<BiConsumer<Player, ItemStack>> ANVIL_CRAFTING = Lists.newArrayList();
     private final NetworkManager networkManager = new FabricNetworkManager();
@@ -94,7 +86,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void onInitialize() {
         HardcoreQuestingCore.initialize(this);
-    
+
         //As of writing, architectury has misnamed these player parameters, with the first one called oldPlayer, while it actually is the second one that is the old player
         PlayerEvent.PLAYER_CLONE.register((newPlayer, oldPlayer, wonGame) -> {
             if (HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
@@ -108,6 +100,8 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
                 }
             }
         });
+        //noinspection UnstableApiUsage
+        FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((BarrelBlockEntity) blockEntity).fluidTank, ModBlocks.typeBarrel.get());
     }
     
     @Override
@@ -132,7 +126,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     
     @Override
     public void registerOnCommandRegistration(Consumer<CommandDispatcher<CommandSourceStack>> dispatcherConsumer) {
-        CommandRegistrationCallback.EVENT.register((commandDispatcher, b) -> dispatcherConsumer.accept(commandDispatcher));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcherConsumer.accept(dispatcher));
     }
     
     @Override
@@ -164,12 +158,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public void registerOnWorldTick(Consumer<Level> consumer) {
         ServerTickEvents.END_WORLD_TICK.register(consumer::accept);
     }
-    
-    @Override
-    public void registerOnHudRender(BiConsumer<PoseStack, Float> consumer) {
-        HudRenderCallback.EVENT.register(consumer::accept);
-    }
-    
+
     @Override
     public void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> consumer) {
         UseItemCallback.EVENT.register((player, level, hand) -> {
@@ -258,49 +247,23 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
         return new BarrelBlockEntity(pos, state);
     }
-    
-    @Override
-    public FluidStack createEmptyFluidStack() {
-        return new FabricFluidStack(FluidVolumeUtil.EMPTY);
-    }
-    
-    @Override
-    public FluidStack createFluidStack(Fluid fluid, Fraction amount) {
-        return new FabricFluidStack(FluidKeys.get(fluid).withAmount(FluidAmount.of(amount.getNumerator(), amount.getDenominator())));
-    }
-    
+
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        GroupedFluidInvView inv = FluidAttributes.GROUPED_INV_VIEW.get(stack);
-        Set<FluidKey> fluidTypes = inv.getStoredFluids();
-        if (fluidTypes.isEmpty())
-            return Collections.emptyList();
-        else {
+        Storage<FluidVariant> storageViews = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        if (storageViews != null) {
             List<FluidStack> fluids = new ArrayList<>();
-            for (FluidKey fluid : fluidTypes)
-                fluids.add(new FabricFluidStack(fluid.withAmount(inv.getAmount_F(fluid))));
+            for (StorageView<FluidVariant> view : storageViews) {
+                fluids.add(FluidStack.create(view.getResource().getFluid(), view.getAmount()));
+            }
             return fluids;
         }
+        return List.of();
     }
-    
-    @Override
-    @Environment(EnvType.CLIENT)
-    public void renderFluidStack(FluidStack fluid, PoseStack matrices, int x1, int y1, int x2, int y2) {
-        // Behaves like FluidVolume.renderGuiRect(), but uses the provided PoseStack
-        List<FluidRenderFace> faces = new ArrayList<>();
-        faces.add(FluidRenderFace.createFlatFaceZ(0, 0, 0, x2 - x1, y2 - y1, 0, 1 / 16.0, false, false));
-        FluidVolume volume = ((FabricFluidStack) fluid)._volume;
-        
-        matrices.pushPose();
-        matrices.translate(x1, y1, 0);
-        volume.render(faces, FluidVolumeRenderer.VCPS, matrices);
-        FluidVolumeRenderer.VCPS.draw();
-        matrices.popPose();
-    }
-    
+
     @Override
     public Fraction getBucketAmount() {
-        return Fraction.of(FluidAmount.BUCKET.whole, FluidAmount.BUCKET.numerator, FluidAmount.BUCKET.denominator);
+        return Fraction.of(1, 0, 1);
     }
     
     @SuppressWarnings("unchecked")

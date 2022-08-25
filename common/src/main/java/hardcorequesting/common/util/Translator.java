@@ -32,7 +32,7 @@ public class Translator {
     }
     
     public static MutableComponent text(String s) {
-        return s != null ? new TextComponent(s) : new TextComponent("");
+        return s != null ? Component.literal(s) : Component.literal("");
     }
     
     public static MutableComponent text(String s, ChatFormatting formatting) {
@@ -44,7 +44,7 @@ public class Translator {
     }
     
     public static MutableComponent translatable(String id, Object... args) {
-        return new TranslatableComponent(id, args);
+        return Component.translatable(id, args);
     }
     
     public static MutableComponent translatable(String id, ChatFormatting formatting, Object... args) {

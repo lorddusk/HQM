@@ -2,6 +2,7 @@ package hardcorequesting.common.platform;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
@@ -68,10 +69,7 @@ public interface AbstractPlatform {
     void registerOnClientTick(Consumer<Minecraft> consumer);
     
     void registerOnWorldTick(Consumer<Level> consumer);
-    
-    @Environment(EnvType.CLIENT)
-    void registerOnHudRender(BiConsumer<PoseStack, Float> consumer);
-    
+
     void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> consumer);
     
     void registerOnBlockPlace(BlockPlaced consumer);
@@ -112,20 +110,13 @@ public interface AbstractPlatform {
     CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon);
     
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
-    
-    FluidStack createEmptyFluidStack();
-    
-    FluidStack createFluidStack(Fluid fluid, Fraction amount);
-    
+
     /**
      * Obtains any fluids contained in the item stack.
      * If there is no fluid in the item stack, an empty list will be returned.
      */
     List<FluidStack> findFluidsIn(ItemStack stack);
-    
-    @Environment(EnvType.CLIENT)
-    void renderFluidStack(FluidStack fluid, PoseStack stack, int x1, int y1, int x2, int y2);
-    
+
     Fraction getBucketAmount();
     
     <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block);

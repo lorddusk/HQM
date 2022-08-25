@@ -3,9 +3,9 @@ package hardcorequesting.common.quests.task.item;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
+import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.io.adapter.Adapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
-import hardcorequesting.common.platform.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -81,7 +81,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         ItemsTaskData data = getData(playerId);
     
         boolean updated = false;
-        
+
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
             if (!item.hasItem() || data.isDone(i, item)) {
@@ -103,11 +103,11 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
                 }
             }
         }
-        
+
         if (updated) {
             doCompletionCheck(data, playerId);
         }
-        
+
         return updated;
     }
     
@@ -243,9 +243,13 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             return stack.right().map(fluidStack -> fluidStack.getFluid() == fluid).orElse(false);
         }
         
-        public void setStack(ItemStack stack) {
+        public void setItemStack(ItemStack stack) {
             this.stack = Either.left(stack);
             this.permutations = null;
+        }
+
+        public void setFluidStack(FluidStack stack) {
+            this.stack = Either.right(stack);
         }
         
         private void setPermutations() {

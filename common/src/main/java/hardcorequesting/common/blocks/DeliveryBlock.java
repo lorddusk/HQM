@@ -47,15 +47,15 @@ public class DeliveryBlock extends BaseEntityBlock {
                 if (!hold.isEmpty() && hold.getItem() instanceof QuestBookItem) {
                     ((AbstractBarrelBlockEntity) tile).storeSettings(player);
                     if (((AbstractBarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.bindTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()), Util.NIL_UUID);
+                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.bindTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()));
                     } else {
-                        player.sendMessage(Translator.translatable("hqm.message.noTaskSelected"), Util.NIL_UUID);
+                        player.sendSystemMessage(Translator.translatable("hqm.message.noTaskSelected"));
                     }
                 } else {
                     if (((AbstractBarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.boundTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()), Util.NIL_UUID);
+                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.boundTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()));
                     } else {
-                        player.sendMessage(Translator.translatable("tile.hqm:item_barrel.nonBound"), Util.NIL_UUID);
+                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.nonBound"));
                     }
                 }
             }

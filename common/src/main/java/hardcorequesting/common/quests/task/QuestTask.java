@@ -136,7 +136,7 @@ public abstract class QuestTask<Data extends TaskData> {
         return getData(player.getUUID());
     }
     
-    protected Data getData(UUID uuid) {
+    public Data getData(UUID uuid) {
         return getData(parent.getQuestData(uuid));
     }
     

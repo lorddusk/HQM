@@ -23,8 +23,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +77,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedQuestId = task.getParent().getQuestId();
                 QuestingDataManager.getInstance().getQuestingData(playerId).selectedTask = task.getId();
             
-                Minecraft.getInstance().player.displayClientMessage(new TranslatableComponent("tile.hqm:item_barrel.selectedTask", task.getName()).withStyle(ChatFormatting.GREEN), false);
+                Minecraft.getInstance().player.displayClientMessage(Component.translatable("tile.hqm:item_barrel.selectedTask", task.getName()).withStyle(ChatFormatting.GREEN), false);
             
                 GeneralUsage.sendBookSelectTaskUpdate(task);
             }
@@ -130,10 +128,10 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             List<FormattedText> str = new ArrayList<>();
             part.stack.ifRight(fluidStack -> {
                 List<Component> list = new ArrayList<>();
-                str.add(new TextComponent(fluidStack.getName().getString()));
+                str.add(Component.literal(fluidStack.getName().getString()));
                 if (Minecraft.getInstance().options.advancedItemTooltips) {
                     String entryId = Registry.FLUID.getKey(fluidStack.getFluid()).toString();
-                    list.add(new TextComponent(entryId).withStyle(ChatFormatting.DARK_GRAY));
+                    list.add(Component.literal(entryId).withStyle(ChatFormatting.DARK_GRAY));
                 }
                 str.addAll(list);
             }).ifLeft(itemStack -> str.addAll(gui.getTooltipFromItem(itemStack)));

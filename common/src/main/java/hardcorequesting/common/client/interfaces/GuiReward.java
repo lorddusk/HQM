@@ -8,9 +8,9 @@ import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.chat.NarratorChatListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -44,7 +44,7 @@ public class GuiReward extends GuiBase {
     private FormattedText statisticsText;
     
     public GuiReward(LootGroup group, int bagTier, Player player) {
-        super(NarratorChatListener.NO_TITLE);
+        super(CommonComponents.EMPTY);
         this.group = group;
         this.rewards = new ArrayList<>();
         

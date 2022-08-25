@@ -13,7 +13,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -56,7 +55,7 @@ public class QuestBookItem extends Item {
             ItemStack stack = player.getItemInHand(hand);
             QuestingDataManager questingData = QuestingDataManager.getInstance();
             if (!questingData.isQuestActive()) {
-                player.sendMessage(Translator.translatable("hqm.message.noQuestYet"), Util.NIL_UUID);
+                player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
             } else {
                 if (enabled) {
                     CompoundTag compound = stack.getTagElement("hqm");
@@ -78,14 +77,14 @@ public class QuestBookItem extends Item {
                                     if (entry != null) {
                                         GeneralUsage.sendOpenBook(player, true);
                                     } else {
-                                        player.sendMessage(Translator.translatable("hqm.message.bookNoEntry"), Util.NIL_UUID);
+                                        player.sendSystemMessage(Translator.translatable("hqm.message.bookNoEntry"));
                                     }
                                 }
                             } else {
-                                player.sendMessage(Translator.translatable("hqm.message.bookNoPermission"), Util.NIL_UUID);
+                                player.sendSystemMessage(Translator.translatable("hqm.message.bookNoPermission"));
                             }
                         } else {
-                            player.sendMessage(Translator.translatable("hqm.message.bookNoData"), Util.NIL_UUID);
+                            player.sendSystemMessage(Translator.translatable("hqm.message.bookNoData"));
                         }
                     }
                 } else {
@@ -94,7 +93,7 @@ public class QuestBookItem extends Item {
                     if (entry != null) {
                         GeneralUsage.sendOpenBook(player, false);
                     } else {
-                        player.sendMessage(new TranslatableComponent("hqm.message.bookNoPlayer"), Util.NIL_UUID);
+                        player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
                     }
                 }
             }
