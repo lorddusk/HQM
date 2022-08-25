@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[40,)"
 logoFile = "icon.png"
-authors = ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp", "ArclightTW", "shedaniel"]
+authors = ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp", "ArclightTW", "shedaniel", "kirderf1", "CodexAdrian"]
 license = "GNU-3.0"
 [[mods]]
 modId = "hardcorequesting"
