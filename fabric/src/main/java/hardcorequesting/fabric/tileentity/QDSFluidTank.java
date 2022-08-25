@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 /**
- * This fluid tank acts in much the same way that the fluid capability in Forge
+ * This fluid tank acts in much the same way that the fluid capability does in forge
  * The insert method is run whenever the mod attempts to insert a fluid into the tank.
  * Because the tank itself does not store any fluids, any method that tries to retrieve the data
  * from the tank will result in empties, just like forge. Before any breaking changes are made
