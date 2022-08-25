@@ -81,7 +81,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         ItemsTaskData data = getData(playerId);
     
         boolean updated = false;
-        
+
         for (int i = 0; i < parts.size(); i++) {
             Part item = parts.get(i);
             if (!item.hasItem() || data.isDone(i, item)) {
@@ -103,11 +103,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
                 }
             }
         }
-        
-        if (updated) {
-            doCompletionCheck(data, playerId);
-        }
-        
+
         return updated;
     }
     

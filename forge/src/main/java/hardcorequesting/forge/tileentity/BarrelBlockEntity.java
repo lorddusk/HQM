@@ -1,5 +1,6 @@
 package hardcorequesting.forge.tileentity;
 
+import hardcorequesting.common.quests.data.ItemsTaskData;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
@@ -50,11 +51,12 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         @Override
         public int fill(FluidStack resource, FluidAction action) {
             QuestTask<?> task = getCurrentTask();
-            if (task instanceof ConsumeItemTask) {
-    
+            if (task instanceof ConsumeItemTask consumeItemTask) {
                 UUID playerUUID = BarrelBlockEntity.this.getPlayerUUID();
                 FluidStack duplicate = resource.copy();
-                if (((ConsumeItemTask) task).increaseFluid(dev.architectury.fluid.FluidStack.create(duplicate.getFluid(), duplicate.getAmount()), playerUUID, action.execute()) && action.execute()) {
+                if (consumeItemTask.increaseFluid(dev.architectury.fluid.FluidStack.create(duplicate.getFluid(), duplicate.getAmount()), playerUUID, action.execute()) && action.execute()) {
+                    ItemsTaskData data = consumeItemTask.getData(getPlayerUUID());
+                    consumeItemTask.doCompletionCheck(data, getPlayerUUID());
                     BarrelBlockEntity.this.updateState();
                     BarrelBlockEntity.this.doSync();
                 }
