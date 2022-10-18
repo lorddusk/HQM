@@ -220,7 +220,7 @@ public class Reputation {
             info = text;
         } else if (current == null || lower != null || upper != null) {
             if (lower == null && upper == null) {
-                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf", name.getText())
+                info = Translator.translatable("hqm.rep" + (inverted ? "no" : "any") + "ValueOf", this.getName())
                         .withStyle(ChatFormatting.DARK_RED);
                 
             } else {
@@ -230,24 +230,24 @@ public class Reputation {
                 if (lower != null && upper != null) {
                     if (lower.equals(upper)) {
                         if (inverted) {
-                            info = Translator.translatable("hqm.rep.not_equals", name, lowerName);
+                            info = Translator.translatable("hqm.rep.not_equals", this.getName(), lowerName);
                         } else {
-                            info = Translator.translatable("hqm.rep.equals", name, lowerName);
+                            info = Translator.translatable("hqm.rep.equals", this.getName(), lowerName);
                         }
                     } else {
-                        info = Translator.translatable("hqm.rep.between", lowerName, name.getText(), upperName);
+                        info = Translator.translatable("hqm.rep.between", lowerName, this.getName(), upperName);
                         if (inverted) {
                             info = Translator.translatable("hqm.rep.not", info);
                         }
                     }
                 } else if (lower != null) {
-                    info = Translator.translatable(inverted ? "hqm.rep.min_inverted" : "hqm.rep.min", name, lowerName);
+                    info = Translator.translatable(inverted ? "hqm.rep.min_inverted" : "hqm.rep.min", this.getName(), lowerName);
                 } else {
-                    info = Translator.translatable(inverted ? "hqm.rep.max_inverted" : "hqm.rep.max", name, upperName);
+                    info = Translator.translatable(inverted ? "hqm.rep.max_inverted" : "hqm.rep.max", this.getName(), upperName);
                 }
             }
         } else {
-            info = Translator.translatable("hqm.rep.current", name, current.getName(), value);
+            info = Translator.translatable("hqm.rep.current", this.getName(), current.getName(), value);
             selected = completed || (effects && ((lowerValue <= current.getValue() && current.getValue() <= upperValue) != inverted));
         }
         
@@ -266,9 +266,8 @@ public class Reputation {
             int markerX = x + BAR_X - ARROW_SIZE / 2 + position + ARROW_MARKER_OFFSET;
             
             int markerY = y + BAR_Y + ARROW_MARKER_Y;
-            int value = markers.get(i).getValue();
-            if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
-                return markers.get(i).getName().append(" (" + value + ")");
+			if (gui.inBounds(markerX, markerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
+                return markers.get(i).getLabel();
             }
         }
         
@@ -277,7 +276,7 @@ public class Reputation {
             ReputationMarker current = getCurrentMarker(value);
             
             if (isOnPointer(gui, value, x, y, ARROW_POINTER_Y, mX, mY)) {
-                return current.getName().append(" (" + value + ")");
+                return current.getLabel();
             }
         }
         

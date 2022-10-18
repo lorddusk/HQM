@@ -16,6 +16,7 @@ import hardcorequesting.common.util.Translator;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -114,10 +115,10 @@ public class EditReputationGraphic extends EditableGraphic {
             int y = REPUTATION_MARKER_LIST_Y;
             
             for (ReputationMarker marker : reputationTierScroll.getVisibleEntries(selectedReputation.getMarkers(), VISIBLE_REPUTATION_TIERS)) {
-                String str = marker.getTitle();
+                Component title = marker.getTitle();
                 
-                boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
-                gui.drawString(matrices, Translator.plain(str), x, y, hover ? 0xAAAAAA : 0x404040);
+                boolean hover = gui.inBounds(x, y, gui.getStringWidth(title), FONT_HEIGHT, mX, mY);
+                gui.drawString(matrices, title, x, y, hover ? 0xAAAAAA : 0x404040);
                 
                 y += REPUTATION_OFFSET;
             }
@@ -173,9 +174,9 @@ public class EditReputationGraphic extends EditableGraphic {
             int x = REPUTATION_MARKER_LIST_X;
             int y = REPUTATION_MARKER_LIST_Y;
             for (ReputationMarker marker : reputationTierScroll.getVisibleEntries(selectedReputation.getMarkers(), VISIBLE_REPUTATION_TIERS)) {
-                String str = marker.getTitle();
+                Component title = marker.getTitle();
                 
-                if (gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY)) {
+                if (gui.inBounds(x, y, gui.getStringWidth(title), FONT_HEIGHT, mX, mY)) {
                     if (gui.getCurrentMode() == EditMode.RENAME) {
                         WrappedTextMenu.display(gui, marker.getRawName(), true, marker::setName);
                     } else if (gui.getCurrentMode() == EditMode.REPUTATION_VALUE) {
