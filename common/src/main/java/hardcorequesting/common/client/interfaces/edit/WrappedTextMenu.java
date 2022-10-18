@@ -18,12 +18,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public class WrappedTextMenu extends AbstractTextMenu {
     
-    private final Consumer<WrappedText> resultConsumer;
+    private final Consumer<Optional<WrappedText>> resultConsumer;
     private final int limit;
     private final boolean isName;
     private boolean isTranslated;
@@ -33,14 +34,25 @@ public class WrappedTextMenu extends AbstractTextMenu {
     private String translatedText;
     
     public static void display(GuiQuestBook gui, WrappedText text, boolean isName, Consumer<WrappedText> resultConsumer) {
+        gui.setEditMenu(new WrappedTextMenu(gui, text, isName, -1, unnamedDefault(resultConsumer)));
+    }
+    
+    public static void displayWithOptionalResult(GuiQuestBook gui, WrappedText text, boolean isName, Consumer<Optional<WrappedText>> resultConsumer) {
         gui.setEditMenu(new WrappedTextMenu(gui, text, isName, -1, resultConsumer));
     }
     
     public static void display(GuiQuestBook gui, WrappedText text, int limit, Consumer<WrappedText> resultConsumer) {
-        gui.setEditMenu(new WrappedTextMenu(gui, text, true, limit, resultConsumer));
+        gui.setEditMenu(new WrappedTextMenu(gui, text, true, limit, unnamedDefault(resultConsumer)));
     }
     
-    private WrappedTextMenu(GuiQuestBook gui, WrappedText text, boolean isName, int limit, Consumer<WrappedText> resultConsumer) {
+    /**
+     * If no text was entered, default to the "Unnamed" text
+     */
+    private static Consumer<Optional<WrappedText>> unnamedDefault(Consumer<WrappedText> consumer) {
+        return optional -> consumer.accept(optional.orElseGet(() -> WrappedText.create(I18n.get("hqm.textEditor.unnamed"))));
+    }
+    
+    private WrappedTextMenu(GuiQuestBook gui, WrappedText text, boolean isName, int limit, Consumer<Optional<WrappedText>> resultConsumer) {
         super(gui, text.getRawText(), !isName);
     
         this.resultConsumer = resultConsumer;
@@ -114,20 +126,19 @@ public class WrappedTextMenu extends AbstractTextMenu {
     @Override
     public void save() {
         String text = textLogic.getText();
-        if (text == null || text.isEmpty()) {
-            text = I18n.get("hqm.textEditor.unnamed");
-            this.isTranslated = false;
-        }
-        
         if (limit >= 0) {
             while (gui.getStringWidth(text) > limit) {
                 text = text.substring(0, text.length() - 1);
             }
         }
     
-        resultConsumer.accept(this.isTranslated
-                ? WrappedText.createTranslated(text)
-                : WrappedText.create(text));
+        if (text.isEmpty()) {
+            resultConsumer.accept(Optional.empty());
+        } else {
+            resultConsumer.accept(Optional.of(this.isTranslated
+                    ? WrappedText.createTranslated(text)
+                    : WrappedText.create(text)));
+        }
         
         if (isName) {
             SaveHelper.add(EditType.NAME_CHANGE);
