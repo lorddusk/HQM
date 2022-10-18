@@ -2,6 +2,7 @@ package hardcorequesting.common.reputation;
 
 
 import hardcorequesting.common.util.WrappedText;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 public class ReputationMarker implements Comparable<ReputationMarker> {
@@ -42,16 +43,16 @@ public class ReputationMarker implements Comparable<ReputationMarker> {
         return Integer.compare(value, o.value);
     }
     
-    public String getTitle() {
-        return name + ": " + value;
+    public MutableComponent getTitle() {
+        return this.getName().append(": " + value);
     }
     
     public boolean isNeutral() {
         return neutral;
     }
     
-    public String getLabel() {
-        return name + " (" + value + ")";
+    public MutableComponent getLabel() {
+        return this.getName().append(" (" + value + ")");
     }
     
     public int getId() {

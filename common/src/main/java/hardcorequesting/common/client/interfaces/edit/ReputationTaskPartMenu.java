@@ -124,12 +124,12 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            FormattedText info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.plain("Selected: " + lower.getLabel()), false);
+            FormattedText info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(lower.getLabel()), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.plain("Selected: " + upper.getLabel()), false);
+            info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(upper.getLabel()), false);
             
             gui.drawString(matrices, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
