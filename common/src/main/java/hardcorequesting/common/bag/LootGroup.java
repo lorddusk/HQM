@@ -8,10 +8,13 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -21,7 +24,8 @@ import java.util.stream.Collectors;
 
 public class LootGroup {
     private GroupTier tier;
-    private NonNullList<ItemStack> items;
+    private final NonNullList<ItemStack> items;
+    @Nullable
     private WrappedText name;
     private int limit;
     private UUID groupId;
@@ -68,20 +72,25 @@ public class LootGroup {
     }
     
     public FormattedText getDisplayName() {
-        return hasName() ? name.getText() : Translator.translatable("hqm.bag.group", tier.getName());
+        return name != null ? name.getText() : getDefaultName();
     }
     
+    @NotNull
     public WrappedText getRawName() {
-        return name;
+        return name != null ? name : WrappedText.create(getDefaultName().getString());
     }
     
-    public void setName(WrappedText name) {
+    private Component getDefaultName() {
+        return Translator.translatable("hqm.bag.group", tier.getName());
+    }
+    
+    public void setName(@Nullable WrappedText name) {
         this.name = name;
         SaveHelper.add(EditType.NAME_CHANGE);
     }
     
     public boolean hasName() {
-        return name != null && !name.getRawText().isEmpty();
+        return name != null;
     }
     
     public NonNullList<ItemStack> getItems() {
