@@ -126,7 +126,7 @@ public class QuestLine {
     public static void sendDataToClient(ServerPlayer player) {
         QuestLine questLine = getActiveQuestLine();
         // Sync various data, but not for the player that hosts the server (if any), as they already share the same data as the server
-        if (!player.getGameProfile().getName().equals(player.server.name())) {
+        if (!player.server.isSingleplayerOwner(player.getGameProfile())) {
             boolean side = !HardcoreQuestingCore.platform.isClient();
             NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, !side, side, player), player);
     
