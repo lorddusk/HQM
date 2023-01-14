@@ -180,45 +180,52 @@ public class EditBagsGraphic extends EditableGraphic {
         }
     
         //Handle click on tiers
-        List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
         posY = TIERS_Y;
         for (GroupTier groupTier : tierScroll.getVisibleEntries()) {
             
             if (gui.inBounds(TIERS_X, posY, gui.getStringWidth(groupTier.getName()), GuiQuestBook.TEXT_HEIGHT, mX, mY)) {
                 switch (gui.getCurrentMode()) {
-                    case TIER:
+                    case TIER -> {
                         if (selectedGroup != null) {
                             selectedGroup.setTier(groupTier);
                             SaveHelper.add(EditType.GROUP_CHANGE);
                         }
-                        break;
-                    case NORMAL:
-                        EditBagTierMenu.display(gui, groupTier);
-                        break;
-                    case RENAME:
-                        WrappedTextMenu.display(gui, groupTier.getRawName(), 110, groupTier::setName);
-                        break;
-                    case DELETE:
-                        if (tiers.size() > 1 || LootGroup.getGroups().size() == 0) {
-                            GroupTier replacementTier = tiers.get(0);
-                            if (replacementTier == groupTier)
-                                replacementTier = tiers.get(1);
-                            for (LootGroup group : LootGroup.getGroups().values()) {
-                                if (group.getTier() == groupTier) {
-                                    group.setTier(replacementTier);
-                                }
-                            }
-                            tiers.remove(groupTier);
+                    }
+                    case NORMAL -> EditBagTierMenu.display(gui, groupTier);
+                    case RENAME -> WrappedTextMenu.display(gui, groupTier.getRawName(), 110, groupTier::setName);
+                    case DELETE -> {
+                        if (replaceUseOfTier(groupTier)) {
+                            // With any uses of the tier replaced, we can now safely remove the tier
+                            GroupTierManager.getInstance().getTiers().remove(groupTier);
                             SaveHelper.add(EditType.TIER_REMOVE);
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
                 break;
             }
             posY += TIERS_SPACING;
         }
+    }
+    
+    private static boolean replaceUseOfTier(GroupTier groupTier) {
+        if (LootGroup.getGroups().size() > 0) {
+            List<GroupTier> tiers = GroupTierManager.getInstance().getTiers();
+            if (tiers.size() <= 1) {
+                return false;  // The last tier cannot be removed if there are groups left and no replacement tier
+            } else {
+                GroupTier replacementTier = tiers.get(0);
+                if (replacementTier == groupTier)
+                    replacementTier = tiers.get(1);
+                for (LootGroup group : LootGroup.getGroups().values()) {
+                    if (group.getTier() == groupTier) {
+                        group.setTier(replacementTier);
+                    }
+                }
+            }
+        }
+        return true;
     }
     
     @Override
