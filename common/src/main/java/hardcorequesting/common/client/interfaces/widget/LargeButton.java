@@ -11,7 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
 public abstract class LargeButton implements Drawable, Clickable {
     
@@ -24,7 +24,6 @@ public abstract class LargeButton implements Drawable, Clickable {
     private String description;
     private int x;
     private int y;
-    private List<FormattedText> lines;
     private final GuiBase gui;
     
     public LargeButton(GuiBase gui, String name, int x, int y) {
@@ -83,12 +82,13 @@ public abstract class LargeButton implements Drawable, Clickable {
     @Override
     @Environment(EnvType.CLIENT)
     public void renderTooltip(PoseStack matrices, int mX, int mY) {
-        if (isVisible() && description != null && inButtonBounds(mX, mY)) {
-            if (lines == null) {
-                lines = this.gui.getLinesFromText(getDescription(), 1, 200);
-            }
+        if (isVisible() && inButtonBounds(mX, mY)) {
+            FormattedText description = getDescription();
+            if (description != null) {
+                var lines = this.gui.getLinesFromText(getDescription(), 1, 200);
     
-            this.gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + this.gui.getLeft(), mY + this.gui.getTop());
+                this.gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + this.gui.getLeft(), mY + this.gui.getTop());
+            }
         }
     }
     
@@ -96,8 +96,9 @@ public abstract class LargeButton implements Drawable, Clickable {
         return Translator.translatable(name);
     }
     
+    @Nullable
     protected FormattedText getDescription() {
-        return Translator.translatable(description);
+        return description != null ? Translator.translatable(description) : null;
     }
     
 }
