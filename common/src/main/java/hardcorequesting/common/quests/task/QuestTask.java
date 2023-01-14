@@ -1,12 +1,10 @@
 package hardcorequesting.common.quests.task;
 
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestingData;
@@ -33,7 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.io.IOException;
 import java.util.UUID;
 
 public abstract class QuestTask<Data extends TaskData> {
@@ -122,14 +119,6 @@ public abstract class QuestTask<Data extends TaskData> {
             return requirement.isCompleted(playerId) && requirement.isVisible(playerId);
         }
         else return true;
-    }
-    
-    public void write(TaskData task, JsonObject out) {
-        task.write(new Adapter.JsonObjectBuilder(out));
-    }
-    
-    public void read(TaskData task, JsonReader in) throws IOException {
-        task.update(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
     }
     
     protected Data getData(Player player) {

@@ -1,5 +1,6 @@
 package hardcorequesting.common.network.message;
 
+import com.google.gson.*;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.io.adapter.QuestDataAdapter;
 import hardcorequesting.common.network.IMessage;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 public class QuestDataUpdateMessage implements IMessage {
     
+    private static final Gson GSON = new Gson();
     private UUID questId;
     private String data;
     private int players;
@@ -24,7 +26,7 @@ public class QuestDataUpdateMessage implements IMessage {
     
     public QuestDataUpdateMessage(UUID questId, int players, QuestData data) {
         this.questId = questId;
-        this.data = QuestDataAdapter.QUEST_DATA_ADAPTER.toJson(data);
+        this.data = GSON.toJson(QuestDataAdapter.serialize(data));
         this.players = players;
     }
     
@@ -54,12 +56,12 @@ public class QuestDataUpdateMessage implements IMessage {
         
         private void handle(QuestDataUpdateMessage message, PacketContext ctx) {
             try {
-                QuestData data = QuestDataAdapter.QUEST_DATA_ADAPTER.fromJson(message.data);
                 Quest quest = Quest.getQuest(message.questId);
                 if (quest != null) {
+                    QuestData data = QuestDataAdapter.deserialize(GSON.fromJson(message.data, JsonObject.class), quest);
                     quest.setQuestData(HardcoreQuestingCore.proxy.getPlayer(ctx), data);
                 }
-            } catch (IOException ignored) {
+            } catch (JsonSyntaxException ignored) {
             }
         }
     }
