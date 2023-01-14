@@ -35,7 +35,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
     
     public TameMobsTask(Quest parent) {
-        super(TaskType.TAME, TameTaskData.class, EditType.Type.MONSTER, parent);
+        super(TaskType.TAME.get(), TameTaskData.class, EditType.Type.MONSTER, parent);
         register(EventTrigger.Type.ANIMAL_TAME);
     }
     

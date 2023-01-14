@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BreakBlockTask extends BlockRequirementTask {
     public BreakBlockTask(Quest parent) {
-        super(TaskType.BLOCK_BREAK, parent);
+        super(TaskType.BLOCK_BREAK.get(), parent);
         
         register(EventTrigger.Type.BLOCK_BROKEN);
     }

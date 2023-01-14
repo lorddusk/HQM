@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class CheckBoxTask extends QuestTask<TaskData> {
     public CheckBoxTask(Quest parent) {
-        super(TaskType.CHECKBOX, TaskData.class, parent);
+        super(TaskType.CHECKBOX.get(), TaskData.class, parent);
     }
 
     @Override

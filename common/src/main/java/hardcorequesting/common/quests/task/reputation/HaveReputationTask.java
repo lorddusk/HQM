@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 public class HaveReputationTask extends ReputationTask<TaskData> {
     
     public HaveReputationTask(Quest parent) {
-        super(TaskType.REPUTATION, TaskData.class, parent);
+        super(TaskType.REPUTATION.get(), TaskData.class, parent);
         
         register(EventTrigger.Type.OPEN_BOOK, EventTrigger.Type.REPUTATION_CHANGE);
     }

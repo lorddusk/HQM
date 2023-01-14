@@ -174,7 +174,7 @@ public enum ClientChange {
             int task = root.get(TASK).getAsInt();
             if (quest != null && task > -1 && task < quest.getTasks().size()) {
                 QuestTask<?> taskObj = quest.getTasks().get(task);
-                if (taskObj.getType() == TaskType.CHECKBOX) {
+                if (taskObj.getType() == TaskType.CHECKBOX.get()) {
                     taskObj.completeTask(player.getUUID());
                     quest.sendUpdatedDataToTeam(player);
                 }

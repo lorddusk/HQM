@@ -1,5 +1,6 @@
 package hardcorequesting.common;
 
+import dev.architectury.registry.registries.Registries;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.config.HQMConfig;
@@ -13,6 +14,7 @@ import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.proxies.ClientProxy;
 import hardcorequesting.common.proxies.CommonProxy;
 import hardcorequesting.common.quests.QuestLine;
+import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.util.Executor;
 import hardcorequesting.common.util.RegisterHelper;
 import net.minecraft.server.MinecraftServer;
@@ -78,5 +80,9 @@ public class HardcoreQuestingCore {
             PlayerDeathEventListener.instance.onLivingDeath(livingEntity, source);
             EventTrigger.instance().onLivingDeath(livingEntity, source);
         });
+        
+        Registries registries = Registries.get(HardcoreQuestingCore.ID);
+        registries.<TaskType<?>>builder(TaskType.REGISTRY_KEY.location()).syncToClients().build();
+        TaskType.REGISTER.register();
     }
 }
