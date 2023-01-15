@@ -187,7 +187,7 @@ public class QuestingDataManager {
     }
     
     public void spawnBook(Player player) {
-        if (!Quest.canQuestsBeEdited() && !player.level.isClientSide && HQMConfig.getInstance().SPAWN_BOOK && !getQuestingData(player).receivedBook && isQuestActive()) {
+        if (!player.level.isClientSide && HQMConfig.getInstance().SPAWN_BOOK && !getQuestingData(player).receivedBook && isQuestActive()) {
             getQuestingData(player).receivedBook = true;
             CompoundTag hqmTag = new CompoundTag();
             CompoundTag extraTag = HardcoreQuestingCore.platform.getPlayerExtraTag(player);
