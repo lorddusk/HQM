@@ -63,7 +63,7 @@ public class QuestDataAdapter {
         
         JsonArray tasksJson = GsonHelper.getAsJsonArray(json, TASKS);
         List<TaskData> taskData = new ArrayList<>();
-        for (int i = 0; i < tasksJson.size(); i++) {
+        for (int i = 0; i < tasksJson.size() && i < quest.getTasks().size(); i++) {
             JsonElement taskJson = tasksJson.get(i);
             QuestTask<?> task = quest.getTasks().get(i);
             
