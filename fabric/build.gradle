@@ -44,8 +44,8 @@ dependencies {
     depend("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components}")
     depend("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cardinal_components}")
     // Used for testing the fluid system
-    modRuntimeOnly 'RebornCore:RebornCore-1.19:+'
-    modRuntimeOnly 'TechReborn:TechReborn-1.19:+'
+    modRuntimeOnly 'RebornCore:RebornCore-1.19:5.4.0'
+    modRuntimeOnly 'TechReborn:TechReborn-1.19:5.4.0'
     // Used for parsing the config file
     depend("blue.endless:jankson:1.2.1")
 
