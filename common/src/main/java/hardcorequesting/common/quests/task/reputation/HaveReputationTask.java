@@ -1,5 +1,6 @@
 package hardcorequesting.common.quests.task.reputation;
 
+import com.google.gson.JsonObject;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.TaskData;
@@ -45,6 +46,11 @@ public class HaveReputationTask extends ReputationTask<TaskData> {
     @Override
     public TaskData newQuestData() {
         return new TaskData();
+    }
+    
+    @Override
+    public TaskData loadData(JsonObject json) {
+        return TaskData.construct(json);
     }
     
     @Override

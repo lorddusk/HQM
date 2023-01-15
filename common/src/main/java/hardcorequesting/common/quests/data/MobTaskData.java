@@ -4,7 +4,6 @@ package hardcorequesting.common.quests.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class MobTaskData extends TaskData {
         }
     }
     
-    public static TaskData construct(JsonObject in) {
+    public static MobTaskData construct(JsonObject in) {
         MobTaskData data = new MobTaskData(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         JsonArray array = GsonHelper.getAsJsonArray(in, KILLED);
@@ -51,11 +50,6 @@ public class MobTaskData extends TaskData {
         for (int i = 0; i < other.killed.size(); i++) {
             setValue(i, Math.max(this.getValue(i), other.getValue(i)));
         }
-    }
-    
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.MOB;
     }
     
     @Override

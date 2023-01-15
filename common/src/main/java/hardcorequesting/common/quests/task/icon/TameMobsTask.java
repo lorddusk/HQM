@@ -74,6 +74,11 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
     }
     
     @Override
+    public TameTaskData loadData(JsonObject json) {
+        return TameTaskData.construct(json);
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

@@ -33,6 +33,11 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     }
     
     @Override
+    public DeathTaskData loadData(JsonObject json) {
+        return DeathTaskData.construct(json);
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

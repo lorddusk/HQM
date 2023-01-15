@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.data;
 
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
 public class DeathTaskData extends TaskData {
@@ -15,7 +14,7 @@ public class DeathTaskData extends TaskData {
         super();
     }
     
-    public static TaskData construct(JsonObject in) {
+    public static DeathTaskData construct(JsonObject in) {
         DeathTaskData data = new DeathTaskData();
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         data.deaths = GsonHelper.getAsInt(in, DEATHS);
@@ -32,11 +31,6 @@ public class DeathTaskData extends TaskData {
     
     public void merge(DeathTaskData data) {
         deaths = Math.max(this.deaths, data.deaths);
-    }
-    
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.DEATH;
     }
     
     @Override

@@ -133,6 +133,11 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     }
     
     @Override
+    public ItemsTaskData loadData(JsonObject json) {
+        return ItemsTaskData.construct(json);
+    }
+    
+    @Override
     public float getCompletedRatio(Team team) {
         ItemsTaskData data = getData(team);
         int done = 0;

@@ -63,6 +63,11 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     }
     
     @Override
+    public MobTaskData loadData(JsonObject json) {
+        return MobTaskData.construct(json);
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

@@ -100,6 +100,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     }
     
     @Override
+    public LocationTaskData loadData(JsonObject json) {
+        return LocationTaskData.construct(json);
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

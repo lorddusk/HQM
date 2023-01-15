@@ -143,6 +143,8 @@ public abstract class QuestTask<Data extends TaskData> {
     
     public abstract Data newQuestData();
     
+    public abstract Data loadData(JsonObject json);
+    
     public MutableComponent getName() {
         return name.getText();
     }

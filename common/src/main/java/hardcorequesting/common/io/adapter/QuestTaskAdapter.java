@@ -9,7 +9,6 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.util.Either;
 import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.quests.ItemPrecision;
-import hardcorequesting.common.quests.data.*;
 import hardcorequesting.common.quests.task.CompleteQuestTask;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
@@ -30,29 +29,11 @@ import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 
 import static hardcorequesting.common.io.adapter.QuestAdapter.QUEST;
 
 public class QuestTaskAdapter {
     
-    public static final Adapter<TaskData> QUEST_DATA_TASK_ADAPTER = new Adapter<>() {
-        private static final String TYPE = "type";
-    
-        @Override
-        public JsonElement serialize(TaskData src) {
-            JsonObjectBuilder builder = object()
-                    .add(TYPE, String.valueOf(src.getDataType()));
-            src.write(builder);
-            return builder.build();
-        }
-    
-        @Override
-        public TaskData deserialize(JsonElement json) {
-            JsonObject object = json.getAsJsonObject();
-            return QuestDataType.valueOf(GsonHelper.getAsString(object, TYPE)).construct(object);
-        }
-    };
     public static final TypeAdapter<ItemRequirementTask.Part> ITEM_REQUIREMENT_ADAPTER = new TypeAdapter<>() {
         private static final String ITEM = "item";
         private static final String FLUID = "fluid";
@@ -409,28 +390,6 @@ public class QuestTaskAdapter {
             return TASK;
         }
     };
-    
-    public enum QuestDataType {
-        GENERIC(TaskData::construct),
-        DEATH(DeathTaskData::construct),
-        ITEMS(ItemsTaskData::construct),
-        LOCATION(LocationTaskData::construct),
-        MOB(MobTaskData::construct),
-        REPUTATION_KILL(ReputationKillTaskData::construct),
-        TAME(TameTaskData::construct),
-        ADVANCEMENT(AdvancementTaskData::construct),
-        COMPLETED(CompleteQuestTaskData::construct);
-        
-        private final Function<JsonObject, TaskData> func;
-        
-        QuestDataType(Function<JsonObject, TaskData> func) {
-            this.func = func;
-        }
-        
-        public TaskData construct(JsonObject in) {
-            return func.apply(in);
-        }
-    }
     
     public static class ReputationSettingConstructor {
         private static final String REPUTATION = "reputation";

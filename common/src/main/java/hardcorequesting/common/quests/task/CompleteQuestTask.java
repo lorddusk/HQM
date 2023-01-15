@@ -52,6 +52,11 @@ public class CompleteQuestTask extends QuestTask<CompleteQuestTaskData> {
     }
     
     @Override
+    public CompleteQuestTaskData loadData(JsonObject json) {
+        return CompleteQuestTaskData.construct(json);
+    }
+    
+    @Override
     public void onQuestCompleted(EventTrigger.QuestCompletedEvent event) {
         checkCompleted(event.getPlayer());
     }

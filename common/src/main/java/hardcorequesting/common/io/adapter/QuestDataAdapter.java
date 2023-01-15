@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.task.QuestTask;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -32,8 +33,11 @@ public class QuestDataAdapter {
         json.addProperty(TIME, data.time);
         JsonArray tasks = new JsonArray();
         for (TaskData taskData : data.getTaskDataForSerialization()) {
-            if (taskData != null)
-                tasks.add(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.serialize(taskData));
+            if (taskData != null) {
+                Adapter.JsonObjectBuilder builder = Adapter.object();
+                taskData.write(builder);
+                tasks.add(builder.build());
+            }
             else
                 tasks.add(new JsonObject());  //Add empty object to keep order of task data
         }
@@ -59,8 +63,12 @@ public class QuestDataAdapter {
         
         JsonArray tasksJson = GsonHelper.getAsJsonArray(json, TASKS);
         List<TaskData> taskData = new ArrayList<>();
-        for (JsonElement taskJson : tasksJson)
-            taskData.add(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.deserialize(taskJson));
+        for (int i = 0; i < tasksJson.size(); i++) {
+            JsonElement taskJson = tasksJson.get(i);
+            QuestTask<?> task = quest.getTasks().get(i);
+            
+            taskData.add(task.loadData(taskJson.getAsJsonObject()));
+        }
         data.setTaskDataFromSerialization(taskData);
         
         return data;

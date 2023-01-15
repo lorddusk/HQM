@@ -53,6 +53,11 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     }
     
     @Override
+    public ReputationKillTaskData loadData(JsonObject json) {
+        return ReputationKillTaskData.construct(json);
+    }
+    
+    @Override
     public void onUpdate(Player player) {
         
     }

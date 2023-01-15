@@ -53,6 +53,11 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     }
     
     @Override
+    public AdvancementTaskData loadData(JsonObject json) {
+        return AdvancementTaskData.construct(json);
+    }
+    
+    @Override
     public void onAdvancement(ServerPlayer playerEntity) {
         checkAdvancement(playerEntity);
     }

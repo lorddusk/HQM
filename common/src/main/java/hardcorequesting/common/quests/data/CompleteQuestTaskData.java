@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class CompleteQuestTaskData extends TaskData {
         }
     }
     
-    public static TaskData construct(JsonObject in) {
+    public static CompleteQuestTaskData construct(JsonObject in) {
         CompleteQuestTaskData data = new CompleteQuestTaskData(GsonHelper.getAsInt(in, COUNT));
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         JsonArray array = GsonHelper.getAsJsonArray(in, QUESTS);
@@ -59,11 +58,6 @@ public class CompleteQuestTaskData extends TaskData {
     
     public boolean areAllCompleted(int size) {
         return quests.stream().limit(size).allMatch(Boolean::booleanValue);
-    }
-    
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.COMPLETED;
     }
     
     @Override
