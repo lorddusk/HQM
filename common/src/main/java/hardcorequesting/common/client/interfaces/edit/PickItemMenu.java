@@ -13,7 +13,6 @@ import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.quests.ItemPrecision;
-import hardcorequesting.common.util.Fraction;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -27,8 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,7 +63,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
     
     private final List<T> playerItems;
     private List<T> searchItems;
-    private Future<List<T>> search;
     
     private T selected;
     private int amount;
@@ -116,7 +112,8 @@ public class PickItemMenu<T> extends GuiEditMenu {
             @Override
             public void textChanged() {
                 super.textChanged();
-                startSearch(getText());
+                String text = getText();
+                searchItems = TextSearch.search(text, PickItemMenu.this.type::getSearchEntriesStream, ITEMS_TO_DISPLAY);
             }
         });
     }
@@ -138,8 +135,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
     
     @Override
     public void draw(PoseStack matrices, int mX, int mY) {
-        checkSearchResult();
-        
         super.draw(matrices, mX, mY);
         gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
         type.draw(selected, matrices, gui, 70, 15, mX, mY);
@@ -391,29 +386,6 @@ public class PickItemMenu<T> extends GuiEditMenu {
         }
         
         return playerFluids;
-    }
-    
-    private void startSearch(String text) {
-        searchItems.clear();
-        search = TextSearch.startSearch(text, type::getSearchEntriesStream, ITEMS_TO_DISPLAY);
-    }
-    
-    private void checkSearchResult() {
-        if(search != null && search.isDone()) {
-            if(search.isCancelled()) {
-                LOGGER.error("Item search had been cancelled, but the reference was kept!");
-                search = null;
-            } else {
-                try {
-                    searchItems = search.get();
-                    search = null;
-                } catch (ExecutionException e) {
-                    LOGGER.error("Item search failed with error: ", e.getCause());
-                    search = null;
-                } catch (InterruptedException ignored) {
-                }
-            }
-        }
     }
     
     public static class Result<T> {

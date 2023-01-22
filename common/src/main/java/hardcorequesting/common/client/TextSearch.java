@@ -14,9 +14,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -29,10 +26,6 @@ import java.util.stream.Stream;
  */
 public class TextSearch<T> {
     
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-    
-    private static Future<?> currentSearch;
-    
     public static List<SearchEntry<ItemStack>> ITEMS = new ArrayList<>();
     public static List<SearchEntry<FluidStack>> FLUIDS = new ArrayList<>();
     
@@ -40,14 +33,8 @@ public class TextSearch<T> {
         return stream.map(entry -> entry.map(mapper));
     }
     
-    public static <T> Future<List<T>> startSearch(String text, Supplier<Stream<SearchEntry<T>>> searchEntrySupplier, int limit) {
-        if (currentSearch != null)
-            currentSearch.cancel(true);
-        
-        TextSearch<T> search = new TextSearch<>(text, searchEntrySupplier, limit);
-        Future<List<T>> future = EXECUTOR.submit(search::doSearch);
-        currentSearch = future;
-        return future;
+    public static <T> List<T> search(String text, Supplier<Stream<SearchEntry<T>>> searchEntrySupplier, int limit) {
+        return new TextSearch<>(text, searchEntrySupplier, limit).doSearch();
     }
     
     private final String text;
