@@ -33,7 +33,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     private int delay = 1;
     
     public VisitLocationTask(Quest parent) {
-        super(TaskType.LOCATION, LocationTaskData.class, EditType.Type.LOCATION, parent);
+        super(TaskType.LOCATION.get(), LocationTaskData.class, EditType.Type.LOCATION, parent);
         
         register(EventTrigger.Type.SERVER, EventTrigger.Type.PLAYER);
     }
@@ -97,6 +97,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     @Override
     public LocationTaskData newQuestData() {
         return new LocationTaskData(parts.size());
+    }
+    
+    @Override
+    public LocationTaskData loadData(JsonObject json) {
+        return LocationTaskData.construct(json);
     }
     
     @Override

@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.data;
 
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
 public class TaskData {
@@ -18,10 +17,6 @@ public class TaskData {
         TaskData data = new TaskData();
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         return data;
-    }
-    
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.GENERIC;
     }
     
     public void write(Adapter.JsonObjectBuilder builder) {

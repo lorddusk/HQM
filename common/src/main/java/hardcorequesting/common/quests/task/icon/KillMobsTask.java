@@ -28,7 +28,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     private static final String MOBS = "mobs";
     
     public KillMobsTask(Quest parent) {
-        super(TaskType.KILL, MobTaskData.class, EditType.Type.MONSTER, parent);
+        super(TaskType.KILL.get(), MobTaskData.class, EditType.Type.MONSTER, parent);
         register(EventTrigger.Type.DEATH);
     }
     
@@ -60,6 +60,11 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     @Override
     public MobTaskData newQuestData() {
         return new MobTaskData(parts.size());
+    }
+    
+    @Override
+    public MobTaskData loadData(JsonObject json) {
+        return MobTaskData.construct(json);
     }
     
     @Override

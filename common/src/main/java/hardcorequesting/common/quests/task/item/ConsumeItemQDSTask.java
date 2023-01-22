@@ -6,6 +6,6 @@ import hardcorequesting.common.quests.task.TaskType;
 public class ConsumeItemQDSTask extends ConsumeItemTask {
     
     public ConsumeItemQDSTask(Quest parent) {
-        super(TaskType.CONSUME_QDS, parent);
+        super(TaskType.CONSUME_QDS.get(), parent);
     }
 }

@@ -22,7 +22,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     private int kills;
     
     public KillReputationTask(Quest parent) {
-        super(TaskType.REPUTATION_KILL, ReputationKillTaskData.class, parent);
+        super(TaskType.REPUTATION_KILL.get(), ReputationKillTaskData.class, parent);
         
         register(EventTrigger.Type.DEATH);
     }
@@ -50,6 +50,11 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     @Override
     public ReputationKillTaskData newQuestData() {
         return new ReputationKillTaskData();
+    }
+    
+    @Override
+    public ReputationKillTaskData loadData(JsonObject json) {
+        return ReputationKillTaskData.construct(json);
     }
     
     @Override

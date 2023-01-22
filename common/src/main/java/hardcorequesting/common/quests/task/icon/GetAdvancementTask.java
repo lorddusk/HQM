@@ -29,7 +29,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     private static final String ADVANCEMENTS = "advancements";
     
     public GetAdvancementTask(Quest parent) {
-        super(TaskType.ADVANCEMENT, AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent);
+        super(TaskType.ADVANCEMENT.get(), AdvancementTaskData.class, EditType.Type.ADVANCEMENT, parent);
         
         register(EventTrigger.Type.ADVANCEMENT, EventTrigger.Type.OPEN_BOOK);
     }
@@ -50,6 +50,11 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
     @Override
     public AdvancementTaskData newQuestData() {
         return new AdvancementTaskData(parts.size());
+    }
+    
+    @Override
+    public AdvancementTaskData loadData(JsonObject json) {
+        return AdvancementTaskData.construct(json);
     }
     
     @Override

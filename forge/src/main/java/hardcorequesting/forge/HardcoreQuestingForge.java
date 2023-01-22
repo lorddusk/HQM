@@ -2,6 +2,7 @@ package hardcorequesting.forge;
 
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.platform.forge.EventBuses;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
@@ -87,6 +88,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
+        EventBuses.registerModEventBus(HardcoreQuestingCore.ID, FMLJavaModLoadingContext.get().getModEventBus());
         NetworkingManager.init();
         HardcoreQuestingCore.initialize(this);
     

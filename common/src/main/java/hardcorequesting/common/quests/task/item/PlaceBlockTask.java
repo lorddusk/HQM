@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 
 public class PlaceBlockTask extends ItemRequirementTask {
     public PlaceBlockTask(Quest parent) {
-        super(TaskType.BLOCK_PLACE, parent);
+        super(TaskType.BLOCK_PLACE.get(), parent);
         
         register(EventTrigger.Type.ITEM_USED);
     }

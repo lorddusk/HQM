@@ -3,7 +3,6 @@ package hardcorequesting.common.quests.data;
 
 import com.google.gson.JsonObject;
 import hardcorequesting.common.io.adapter.Adapter;
-import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import net.minecraft.util.GsonHelper;
 
 public class ReputationKillTaskData extends TaskData {
@@ -15,16 +14,11 @@ public class ReputationKillTaskData extends TaskData {
         super();
     }
     
-    public static TaskData construct(JsonObject in) {
+    public static ReputationKillTaskData construct(JsonObject in) {
         ReputationKillTaskData data = new ReputationKillTaskData();
         data.completed = GsonHelper.getAsBoolean(in, COMPLETED, false);
         data.kills = GsonHelper.getAsInt(in, KILLS);
         return data;
-    }
-    
-    @Override
-    public QuestTaskAdapter.QuestDataType getDataType() {
-        return QuestTaskAdapter.QuestDataType.REPUTATION_KILL;
     }
     
     @Override

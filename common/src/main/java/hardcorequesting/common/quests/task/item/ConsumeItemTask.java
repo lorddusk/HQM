@@ -17,7 +17,7 @@ import java.util.UUID;
 public class ConsumeItemTask extends ItemRequirementTask {
     
     public ConsumeItemTask(Quest parent) {
-        this(TaskType.CONSUME, parent);
+        this(TaskType.CONSUME.get(), parent);
     }
     
     protected ConsumeItemTask(TaskType<? extends ConsumeItemTask> type, Quest parent) {

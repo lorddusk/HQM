@@ -11,14 +11,19 @@ import java.util.UUID;
 
 public class CheckBoxTask extends QuestTask<TaskData> {
     public CheckBoxTask(Quest parent) {
-        super(TaskType.CHECKBOX, TaskData.class, parent);
+        super(TaskType.CHECKBOX.get(), TaskData.class, parent);
     }
 
     @Override
     public TaskData newQuestData() {
         return new TaskData();
     }
-
+    
+    @Override
+    public TaskData loadData(JsonObject json) {
+        return TaskData.construct(json);
+    }
+    
     @Override
     public void onUpdate(Player player) {
 

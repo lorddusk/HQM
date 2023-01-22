@@ -1,95 +1,76 @@
 package hardcorequesting.common.io.adapter;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.TypeAdapter;
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.quests.data.TaskData;
+import hardcorequesting.common.quests.task.QuestTask;
+import net.minecraft.util.GsonHelper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class QuestDataAdapter {
+    public static final String REWARDS = "rewards";
+    public static final String COMPLETED = "completed";
+    public static final String CLAIMED = "claimed";
+    public static final String TASKS = "tasks";
+    public static final String AVAILABLE = "available";
+    public static final String TIME = "time";
     
-    public static final TypeAdapter<QuestData> QUEST_DATA_ADAPTER = new TypeAdapter<>() {
-        public static final String PLAYERS = "players";
-        public static final String REWARDS = "rewards";
-        public static final String COMPLETED = "completed";
-        public static final String CLAIMED = "claimed";
-        public static final String TASKS = "tasks";
-        public static final String TASKS_SIZE = "tasksSize";
-        public static final String AVAILABLE = "available";
-        public static final String TIME = "time";
-        
-        @Override
-        public void write(JsonWriter out, QuestData value) throws IOException {
-            out.beginObject();
-            out.name(REWARDS).beginArray();
-            for (boolean canClaim : value.getRewardsForSerialization())
-                out.value(canClaim);
-            out.endArray();
-            out.name(COMPLETED).value(value.completed);
-            out.name(CLAIMED).value(value.teamRewardClaimed);
-            out.name(AVAILABLE).value(value.available);
-            out.name(TIME).value(value.time);
-            out.name(TASKS).beginArray();
-            for (TaskData data : value.getTaskDataForSerialization()) {
-                if (data != null)
-                    QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.write(out, data);
-                else Streams.write(new JsonObject(), out);  //Add empty object to keep order of task data
+    public static JsonElement serialize(QuestData data) {
+        JsonObject json = new JsonObject();
+        JsonArray rewards = new JsonArray();
+        for (boolean canClaim : data.getRewardsForSerialization())
+            rewards.add(canClaim);
+        json.add(REWARDS, rewards);
+        json.addProperty(COMPLETED, data.completed);
+        json.addProperty(CLAIMED, data.teamRewardClaimed);
+        json.addProperty(AVAILABLE, data.available);
+        json.addProperty(TIME, data.time);
+        JsonArray tasks = new JsonArray();
+        for (TaskData taskData : data.getTaskDataForSerialization()) {
+            if (taskData != null) {
+                Adapter.JsonObjectBuilder builder = Adapter.object();
+                taskData.write(builder);
+                tasks.add(builder.build());
             }
-            out.endArray();
-            out.endObject();
+            else
+                tasks.add(new JsonObject());  //Add empty object to keep order of task data
         }
+        json.add(TASKS, tasks);
         
-        @Override
-        public QuestData read(JsonReader in) throws IOException {
-            QuestData data = new QuestData();
-            in.beginObject();
-            while (in.hasNext()) {
-                switch (in.nextName()) {
-                    case PLAYERS:
-                    case TASKS_SIZE:
-                        in.nextInt();   //Sizes are no longer used. Read it for backwards-compatibility
-                        break;
-                    case REWARDS:
-                        in.beginArray();
-                        List<Boolean> claimableRewards = new ArrayList<>();
-                        while (in.hasNext())
-                            claimableRewards.add(in.nextBoolean());
-                        data.setRewardsFromSerialization(claimableRewards);
-                        in.endArray();
-                        break;
-                    case COMPLETED:
-                        data.completed = in.nextBoolean();
-                        break;
-                    case CLAIMED:
-                        data.teamRewardClaimed = in.nextBoolean();
-                        break;
-                    case AVAILABLE:
-                        data.available = in.nextBoolean();
-                        break;
-                    case TIME:
-                        data.time = in.nextLong();
-                        break;
-                    case TASKS:
-                        in.beginArray();
-                        List<TaskData> taskData = new ArrayList<>();
-                        while (in.hasNext())
-                            taskData.add(QuestTaskAdapter.QUEST_DATA_TASK_ADAPTER.read(in));
-                        data.setTaskDataFromSerialization(taskData);
-                        in.endArray();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            in.endObject();
-            return data;
-        }
-    };
+        return json;
+    }
     
+    public static QuestData deserialize(JsonObject json, Quest quest) {
+        Objects.requireNonNull(quest);
+        QuestData data = new QuestData();
+        
+        JsonArray rewardsJson = GsonHelper.getAsJsonArray(json, REWARDS);
+        List<Boolean> claimableRewards = new ArrayList<>();
+        for (JsonElement canClaim : rewardsJson)
+            claimableRewards.add(GsonHelper.convertToBoolean(canClaim, "reward"));
+        data.setRewardsFromSerialization(claimableRewards);
+        
+        data.completed = GsonHelper.getAsBoolean(json, COMPLETED);
+        data.teamRewardClaimed = GsonHelper.getAsBoolean(json, CLAIMED);
+        data.available = GsonHelper.getAsBoolean(json, AVAILABLE);
+        data.time = GsonHelper.getAsLong(json, TIME);
+        
+        JsonArray tasksJson = GsonHelper.getAsJsonArray(json, TASKS);
+        List<TaskData> taskData = new ArrayList<>();
+        for (int i = 0; i < tasksJson.size() && i < quest.getTasks().size(); i++) {
+            JsonElement taskJson = tasksJson.get(i);
+            QuestTask<?> task = quest.getTasks().get(i);
+            
+            taskData.add(task.loadData(taskJson.getAsJsonObject()));
+        }
+        data.setTaskDataFromSerialization(taskData);
+        
+        return data;
+    }
 }

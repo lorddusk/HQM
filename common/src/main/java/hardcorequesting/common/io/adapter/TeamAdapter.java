@@ -3,6 +3,7 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestData;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -58,7 +59,7 @@ public class TeamAdapter {
                                 for (Map.Entry<UUID, QuestData> data : src.getQuestData().entrySet()) {
                                     builder.add(object()
                                             .add(QUEST_ID, data.getKey().toString())
-                                            .add(QUEST_DATA, QuestDataAdapter.QUEST_DATA_ADAPTER.toJsonTree(data.getValue()))
+                                            .add(QUEST_DATA, QuestDataAdapter.serialize(data.getValue()))
                                             .build());
                                 }
                             })
@@ -95,9 +96,10 @@ public class TeamAdapter {
             }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, QUEST_DATA_LIST)) {
                 JsonObject questDataObject = element.getAsJsonObject();
+                UUID questId = UUID.fromString(GsonHelper.getAsString(questDataObject, QUEST_ID));
                 team.getQuestData().put(
-                        UUID.fromString(GsonHelper.getAsString(questDataObject, QUEST_ID)),
-                        QuestDataAdapter.QUEST_DATA_ADAPTER.fromJsonTree(questDataObject.get(QUEST_DATA))
+                        questId,
+                        QuestDataAdapter.deserialize(GsonHelper.getAsJsonObject(questDataObject, QUEST_DATA), Quest.getQuest(questId))
                 );
             }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, INVITES)) {

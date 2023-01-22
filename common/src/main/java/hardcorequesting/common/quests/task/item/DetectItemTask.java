@@ -18,7 +18,7 @@ import java.util.UUID;
 public class DetectItemTask extends ItemRequirementTask {
     
     public DetectItemTask(Quest parent) {
-        super(TaskType.DETECT, parent);
+        super(TaskType.DETECT.get(), parent);
         
         register(EventTrigger.Type.CRAFTING, EventTrigger.Type.PICK_UP, EventTrigger.Type.OPEN_BOOK);
     }

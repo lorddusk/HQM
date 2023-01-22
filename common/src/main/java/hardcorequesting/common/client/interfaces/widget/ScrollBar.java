@@ -96,8 +96,14 @@ public class ScrollBar implements Drawable, Clickable {
     }
     
     public <T> List<T> getVisibleEntries(List<T> list, int visibleEntries) {
-        int start = this.isVisible() ? Math.round((list.size() - visibleEntries) * this.getScroll()) : 0;
-        int end = Math.min(list.size(), start + visibleEntries);
+        return getVisibleEntries(list, 1, visibleEntries);
+    }
+    
+    public <T> List<T> getVisibleEntries(List<T> list, int columns, int visibleRows) {
+        int rows = (int) Math.ceil((double) list.size() / (double) columns);
+        int hiddenRows = rows - visibleRows;
+        int start = columns * Math.max(0, Math.round(hiddenRows * this.getScroll()));
+        int end = Math.min(list.size(), start + columns * visibleRows);
         return list.subList(start, end);
     }
     

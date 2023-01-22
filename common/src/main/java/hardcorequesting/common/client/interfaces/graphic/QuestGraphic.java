@@ -28,6 +28,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +46,8 @@ public final class QuestGraphic extends EditableGraphic {
     private static final int TASK_MARGIN = 2;
     private static final int TITLE_START_Y = 15;
     private static final int DESCRIPTION_START_Y = 30;
+    private static final int TASK_SELECTION_ROWS = 8;
+    private static final int TASK_SELECTION_COLUMNS = 2;
     
     private final UUID playerId;
     private final Quest quest;
@@ -55,25 +58,9 @@ public final class QuestGraphic extends EditableGraphic {
     
     private final ExtendedScrollBar<FormattedText> descriptionScroll;
     private final ScrollBar taskScroll;
-    private List<FormattedText> cachedDescription;
+    private List<TaskType<?>> visibleTaskTypes;
     
-    {
-        int ordinal = 0;
-        for (final TaskType<?> taskType : TaskType.values()) {
-            addClickable(new LargeButton(gui, taskType.getLangKeyName(), taskType.getLangKeyDescription(), 185 + (ordinal % 2) * 65, 50 + (ordinal / 2) * 20) {
-                @Override
-                public boolean isVisible() {
-                    return Quest.canQuestsBeEdited() && selectedTask == null && QuestGraphic.this.gui.getCurrentMode() == EditMode.TASK;
-                }
-                
-                @Override
-                public void onClick() {
-                    taskType.addTask(quest);
-                }
-            });
-            ordinal++;
-        }
-    }
+    private List<FormattedText> cachedDescription;
     
     public QuestGraphic(UUID playerId, Quest quest, GuiQuestBook gui) {
         super(gui, EditMode.NORMAL, EditMode.RENAME, EditMode.TASK, /*EditMode.CHANGE_TASK,*/ EditMode.ITEM, EditMode.LOCATION, EditMode.MOB, EditMode.REPUTATION_TASK, EditMode.REPUTATION_REWARD, EditMode.COMMAND_CREATE, EditMode.COMMAND_CHANGE, EditMode.DELETE);
@@ -90,6 +77,54 @@ public final class QuestGraphic extends EditableGraphic {
                 return quest.getTasks().size() > VISIBLE_TASKS && getVisibleTasks() > VISIBLE_TASKS;
             }
         });
+        
+        List<TaskType<?>> taskTypes = new ArrayList<>(TaskType.values());
+        visibleTaskTypes = taskTypes;
+        
+        int buttons = Math.min(TaskType.values().size(), TASK_SELECTION_ROWS * TASK_SELECTION_COLUMNS);
+        for (int ordinal = 0; ordinal < buttons; ordinal++) {
+            final int i = ordinal;
+            addClickable(new LargeButton(gui, null, null, 185 + (ordinal % 2) * 65, 44 + (ordinal / 2) * 20) {
+                @Override
+                public boolean isVisible() {
+                    return isSelectingTaskType()
+                            && i < visibleTaskTypes.size();
+                }
+                
+                @Override
+                protected FormattedText getName() {
+                    return visibleTaskTypes.get(i).getName();
+                }
+                
+                @Override
+                protected FormattedText getDescription() {
+                    return visibleTaskTypes.get(i).getDescription();
+                }
+                
+                @Override
+                public void onClick() {
+                    visibleTaskTypes.get(i).addTask(quest);
+                }
+            });
+        }
+        
+        addScrollBar(new ExtendedScrollBar<>(gui, ScrollBar.Size.LONG, 313, 30, 185,
+                TASK_SELECTION_ROWS, TASK_SELECTION_COLUMNS, () -> taskTypes) {
+            @Override
+            public boolean isVisible() {
+                return super.isVisible() && isSelectingTaskType();
+            }
+            
+            @Override
+            protected void onUpdate() {
+                QuestGraphic.this.visibleTaskTypes = this.getVisibleEntries();
+            }
+        });
+    }
+    
+    private boolean isSelectingTaskType() {
+        return Quest.canQuestsBeEdited() && selectedTask == null
+                && this.gui.getCurrentMode() == EditMode.TASK;
     }
     
     private List<FormattedText> getCachedDescription() {

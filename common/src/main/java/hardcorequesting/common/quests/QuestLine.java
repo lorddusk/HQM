@@ -43,7 +43,8 @@ public class QuestLine {
     private String mainDescription = "No description";
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
-    private final List<Serializable> serializables = Lists.newArrayList();
+    private final List<Serializable> questSerializables = Lists.newArrayList();
+    private final List<Serializable> dataSerializables = Lists.newArrayList();
     
     private QuestLine() {
         if (HardcoreQuestingCore.platform.isClient()) {
@@ -101,7 +102,10 @@ public class QuestLine {
     }
     
     public void add(Serializable serializable) {
-        this.serializables.add(serializable);
+        if (serializable.isData())
+            this.dataSerializables.add(serializable);
+        else
+            this.questSerializables.add(serializable);
     }
     
     public static QuestLine getActiveQuestLine() {
@@ -146,24 +150,26 @@ public class QuestLine {
     }
     
     public void saveQuests(@NotNull DataWriter cfqWriter) {
-        for (Serializable serializable : serializables) {
-            if (!serializable.isData())
-                serializable.save(cfqWriter);
+        for (Serializable serializable : questSerializables) {
+            serializable.save(cfqWriter);
         }
     }
     
     public void saveData(@NotNull DataWriter dataWriter) {
-        for (Serializable serializable : serializables) {
-            if (serializable.isData())
-                serializable.save(dataWriter);
+        for (Serializable serializable : dataSerializables) {
+            serializable.save(dataWriter);
         }
     }
     
     public void loadAll(DataReader cfgReader, DataReader dataReader) {
         HardcoreQuestingCore.LOGGER.info("[HQM] Loading Quest Line, with data: %s", cfgReader);
         
-        for (Serializable serializable : serializables) {
-            serializable.load(serializable.isData() ? dataReader : cfgReader);
+        // Load quests and such before loading player and team data
+        for (Serializable serializable : questSerializables) {
+            serializable.load(cfgReader);
+        }
+        for (Serializable serializable : dataSerializables) {
+            serializable.load(dataReader);
         }
         
         SaveHelper.onLoad();
