@@ -258,8 +258,8 @@ public class QuestRewardsGraphic extends Graphic {
                     if (!rewards.get(i).isEmpty()) {
                         List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                         if (selected == i) {
-							str.add(TextComponent.EMPTY);
-							str.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
+                            str.add(TextComponent.EMPTY);
+                            str.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
                         }
                         gui.renderComponentTooltip(matrices, str, gui.getLeft() + mX, gui.getTop() + mY);
                     }
