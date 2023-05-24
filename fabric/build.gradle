@@ -27,7 +27,7 @@ architectury {
 
 dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 
     // Used for some extra events/hooks
     modImplementation "dev.architectury:architectury-fabric:${project.architectury_version}"
