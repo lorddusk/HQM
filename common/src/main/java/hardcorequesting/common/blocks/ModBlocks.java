@@ -27,10 +27,10 @@ public class ModBlocks {
     public static void init() {
         blockBarrel = RegisterHelper.registerBlock(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME,
                 () -> new DeliveryBlock(Block.Properties.of(Material.WOOD).strength(1.0F)),
-                block -> new BlockItem(block, new Item.Properties().tab(ModCreativeTabs.HQMTab)));
+                block -> new BlockItem(block, new Item.Properties().arch$tab(ModCreativeTabs.HQMTab)));
         blockTracker = RegisterHelper.registerBlock(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME,
                 TrackerBlock::new,
-                block -> new BlockItem(block, new Item.Properties().tab(ModCreativeTabs.HQMTab)));
+                block -> new BlockItem(block, new Item.Properties().arch$tab(ModCreativeTabs.HQMTab)));
 //        RegisterHelper.registerBlock(blockPortal, BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME, block -> new PortalBlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
     }
     

@@ -9,6 +9,6 @@ public class InvalidItem extends Item {
     public InvalidItem() {
         super(new Item.Properties()
                 .stacksTo(1)
-                .tab(ModCreativeTabs.HQMTab));
+                .arch$tab(ModCreativeTabs.HQMTab));
     }
 }

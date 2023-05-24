@@ -2,6 +2,7 @@ package hardcorequesting.common.recipe;
 
 import com.google.gson.JsonObject;
 import hardcorequesting.common.items.crafting.BookCatalystRecipe;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -15,14 +16,14 @@ public class BookCatalystRecipeSerializer implements RecipeSerializer<BookCataly
     public BookCatalystRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
         ShapedRecipe recipe = RecipeSerializer.SHAPED_RECIPE.fromJson(recipeId, json);
     
-        return new BookCatalystRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem());
+        return new BookCatalystRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem(RegistryAccess.EMPTY));
     }
     
     @Override
     public BookCatalystRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
         ShapedRecipe recipe = RecipeSerializer.SHAPED_RECIPE.fromNetwork(recipeId, buffer);
     
-        return new BookCatalystRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem());
+        return new BookCatalystRecipe(recipe.getId(), recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem(RegistryAccess.EMPTY));
     }
     
     @Override

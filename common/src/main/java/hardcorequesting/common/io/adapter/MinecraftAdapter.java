@@ -12,6 +12,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Fraction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +35,7 @@ public class MinecraftAdapter {
                 return nullVal();
             
             JsonObject jsonObj = new JsonObject();
-            jsonObj.addProperty("id", Registry.ITEM.getKey(src.getItem()).toString());
+            jsonObj.addProperty("id", BuiltInRegistries.ITEM.getKey(src.getItem()).toString());
             jsonObj.addProperty("Count", src.getCount());
             
             CompoundTag tag = src.getTag();
@@ -52,7 +53,7 @@ public class MinecraftAdapter {
                 return ItemStack.EMPTY;
             else {
                 JsonObject jsonObj = json.getAsJsonObject();
-                Item item = Registry.ITEM.get(new ResourceLocation(GsonHelper.getAsString(jsonObj, "id")));
+                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(jsonObj, "id")));
                 int count = GsonHelper.getAsByte(jsonObj, "Count");
                 ItemStack stack = new ItemStack(item, count);
                 
@@ -91,7 +92,7 @@ public class MinecraftAdapter {
         @Override
         public JsonElement serialize(FluidStack src) {
             return object()
-                    .add(FLUID, Registry.FLUID.getKey(src.getFluid()).toString())
+                    .add(FLUID, BuiltInRegistries.FLUID.getKey(src.getFluid()).toString())
                     .add(VOLUME, Fraction.CODEC.encodeStart(JsonOps.INSTANCE, FluidUtils.getAmount(src)).result().orElseThrow())
                     .build();
         }
@@ -100,7 +101,7 @@ public class MinecraftAdapter {
         public FluidStack deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             
-            Fluid fluid = Registry.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
+            Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
             Fraction amount = Fraction.CODEC.parse(JsonOps.INSTANCE, object.get(VOLUME)).result().orElseThrow();
             return FluidStack.create(fluid, amount.intValue());
         }

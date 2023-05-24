@@ -1,6 +1,6 @@
 {
   "parent":"hardcorequesting:item/base_item",
   "textures": {
-    "layer0":"hardcorequesting:items/hqm_invalid_item"
+    "layer0":"hardcorequesting:item/hqm_invalid_item"
   }
 }

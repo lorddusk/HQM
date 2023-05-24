@@ -21,6 +21,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 
@@ -130,7 +132,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
                 List<Component> list = new ArrayList<>();
                 str.add(Component.literal(fluidStack.getName().getString()));
                 if (Minecraft.getInstance().options.advancedItemTooltips) {
-                    String entryId = Registry.FLUID.getKey(fluidStack.getFluid()).toString();
+                    String entryId = BuiltInRegistries.FLUID.getKey(fluidStack.getFluid()).toString();
                     list.add(Component.literal(entryId).withStyle(ChatFormatting.DARK_GRAY));
                 }
                 str.addAll(list);

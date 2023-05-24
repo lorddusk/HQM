@@ -3,10 +3,8 @@ package hardcorequesting.common.client.interfaces;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -20,7 +18,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -29,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Collection;
@@ -134,10 +132,10 @@ public class GuiBase extends Screen {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(matrices.last().pose(), x, y + targetH, this.getBlitOffset()).uv((float) pt1[0], (float) pt1[1]).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y + targetH, this.getBlitOffset()).uv((float) pt2[0], (float) pt2[1]).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y, this.getBlitOffset()).uv((float) pt3[0], (float) pt3[1]).endVertex();
-        bufferBuilder.vertex(matrices.last().pose(), x, y, this.getBlitOffset()).uv((float) pt4[0], (float) pt4[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x, y + targetH, 0).uv((float) pt1[0], (float) pt1[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y + targetH, 0).uv((float) pt2[0], (float) pt2[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x + targetW, y, 0).uv((float) pt3[0], (float) pt3[1]).endVertex();
+        bufferBuilder.vertex(matrices.last().pose(), x, y, 0).uv((float) pt4[0], (float) pt4[1]).endVertex();
         tesselator.end();
     }
     
@@ -161,18 +159,15 @@ public class GuiBase extends Screen {
         
         applyColor(color);
         RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
-        RenderSystem.disableTexture();
         float scale = (float) this.minecraft.getWindow().getGuiScale();
         RenderSystem.lineWidth(1 + thickness * scale / 2F);
     
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-        builder.vertex(matrices.last().pose(), x1, y1, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        builder.vertex(matrices.last().pose(), x2, y2, getBlitOffset()).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(matrices.last().pose(), x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.vertex(matrices.last().pose(), x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
         tesselator.end();
-        
-        RenderSystem.enableTexture();
     }
     
     @Override
@@ -189,7 +184,7 @@ public class GuiBase extends Screen {
     
     public void drawFluid(FluidStack fluid, PoseStack stack, int x, int y) {
         stack.pushPose();
-        stack.translate(0, 0, getBlitOffset());
+        stack.translate(0, 0, 0);
         int x1 = getLeft() + x;
         int y1 = getTop() + y;
         int x2 = getLeft() + x + 16;
@@ -201,7 +196,7 @@ public class GuiBase extends Screen {
         int g = (color >> 8 & 255);
         int b = (color & 255);
         MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-        VertexConsumer builder = FluidUtils.getBlockMaterial(sprite.getName()).buffer(source, FluidUtils.CustomRenderTypes::createFluid);
+        VertexConsumer builder = FluidUtils.getBlockMaterial(sprite.atlasLocation()).buffer(source, FluidUtils.CustomRenderTypes::createFluid);
         Matrix4f matrix = stack.last().pose();
         builder.vertex(matrix, x2, y1, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV0()).endVertex();
         builder.vertex(matrix, x1, y1, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV0()).endVertex();
@@ -220,11 +215,6 @@ public class GuiBase extends Screen {
         RenderSystem.setShaderColor(r, g, b, a);
     }
     
-    public void drawIcon(ItemStack stack, int x, int y) {
-        itemRenderer.renderGuiItemDecorations(font, stack, x, y, null);
-        //drawTexturedModelRectFromIcon(left + x, top + y, icon, 16, 16);
-    }
-    
     public void drawItemBackground(PoseStack matrices, int x, int y, int mX, int mY, boolean selected) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
@@ -240,7 +230,7 @@ public class GuiBase extends Screen {
         drawItemBackground(matrices, x, y, mX, mY, selected);
         
         if (!stack.isEmpty()) {
-            drawItemStack(stack, x + 1, y + 1, true);
+            drawItemStack(matrices, stack, x + 1, y + 1, true);
             //itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x + left + 1, y + +top + 1, "");
         }
         //GlStateManager.disableLighting();
@@ -257,15 +247,15 @@ public class GuiBase extends Screen {
     }
     
     
-    public void drawItemStack(@NotNull ItemStack stack, int x, int y, boolean renderEffect) {
+    public void drawItemStack(PoseStack matrices, @NotNull ItemStack stack, int x, int y, boolean renderEffect) {
         try {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.enableDepthTest();
             
             ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
-            renderer.renderAndDecorateFakeItem(stack, getLeft() + x, getTop() + y);
-            renderer.renderGuiItemDecorations(font, stack, getLeft() + x, getTop() + y);
+            renderer.renderAndDecorateFakeItem(matrices, stack, getLeft() + x, getTop() + y);
+            renderer.renderGuiItemDecorations(matrices, font, stack, getLeft() + x, getTop() + y);
             
         } catch (Exception ignored) {
         }
@@ -301,9 +291,12 @@ public class GuiBase extends Screen {
         matrices.pushPose();
         matrices.scale(mult, mult, 1F);
         
-        MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-        font.drawInBatch(str.getString().isEmpty() ? FormattedCharSequence.EMPTY : Language.getInstance().getVisualOrder(str), (int) ((x + left) / mult), (int) ((y + top) / mult), color, shadow, matrices.last().pose(), immediate, false, 0, 15728880);
-        immediate.endBatch();
+        FormattedCharSequence text = str.getString().isEmpty() ? FormattedCharSequence.EMPTY : Language.getInstance().getVisualOrder(str);
+        float drawX = (x + this.left) / mult;
+        float drawY = (y + this.top) / mult;
+        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        this.font.drawInBatch(text, drawX, drawY, color, shadow, matrices.last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+        bufferSource.endBatch();
         
         matrices.popPose();
     }
@@ -345,7 +338,6 @@ public class GuiBase extends Screen {
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionShader);
         RenderSystem.setShaderColor(0.0F, 0.0F, 255.0F, 255.0F);
-        RenderSystem.disableTexture();
         RenderSystem.enableColorLogicOp();
         RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
@@ -363,7 +355,6 @@ public class GuiBase extends Screen {
         
         tesselator.end();
         RenderSystem.disableColorLogicOp();
-        RenderSystem.enableTexture();
     }
     
     public void drawString(PoseStack matrices, List<FormattedText> str, int x, int y, float mult, int color) {

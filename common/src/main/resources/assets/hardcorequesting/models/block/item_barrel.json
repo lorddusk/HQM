@@ -1,6 +1,6 @@
 {
   "parent": "block/leaves",
   "textures": {
-    "all": "hardcorequesting:blocks/hqm_item_barrel"
+    "all": "hardcorequesting:block/hqm_item_barrel"
   }
 }

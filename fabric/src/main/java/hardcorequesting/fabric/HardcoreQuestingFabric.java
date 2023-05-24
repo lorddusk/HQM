@@ -12,6 +12,7 @@ import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
@@ -23,7 +24,6 @@ import hardcorequesting.fabric.tileentity.BarrelBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -40,6 +40,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -237,12 +238,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public CompoundTag getPlayerExtraTag(Player player) {
         return ModCapabilities.PLAYER_EXTRA_DATA.get(player).tag;
     }
-    
+
     @Override
     public CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon) {
-        return FabricItemGroupBuilder.create(name).icon(icon).build();
+        return ModCreativeTabs.HQMTab.get();
     }
-    
+
     @Override
     public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
         return new BarrelBlockEntity(pos, state);
@@ -250,7 +251,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
 
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        Storage<FluidVariant> storageViews = FluidStorage.ITEM.find(stack, ContainerItemContext.withInitial(stack));
+        Storage<FluidVariant> storageViews = FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack));
         if (storageViews != null) {
             List<FluidStack> fluids = new ArrayList<>();
             for (StorageView<FluidVariant> view : storageViews) {
@@ -270,37 +271,37 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.BLOCK, location, block.get());
-        return () -> (T) Registry.BLOCK.get(location);
+        Registry.register(BuiltInRegistries.BLOCK, location, block.get());
+        return () -> (T) BuiltInRegistries.BLOCK.get(location);
     }
     
     @Override
     public Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> sound) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.SOUND_EVENT, location, sound.get());
-        return () -> Registry.SOUND_EVENT.get(location);
+        Registry.register(BuiltInRegistries.SOUND_EVENT, location, sound.get());
+        return () -> BuiltInRegistries.SOUND_EVENT.get(location);
     }
     
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.ITEM, location, item.get());
-        return () -> (T) Registry.ITEM.get(location);
+        Registry.register(BuiltInRegistries.ITEM, location, item.get());
+        return () -> (T) BuiltInRegistries.ITEM.get(location);
     }
     
     @SuppressWarnings("unchecked")
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply, validBlock.get()).build(null));
-        return () -> (BlockEntityType<T>) Registry.BLOCK_ENTITY_TYPE.get(location);
+        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply, validBlock.get()).build(null));
+        return () -> (BlockEntityType<T>) BuiltInRegistries.BLOCK_ENTITY_TYPE.get(location);
     }
     
     @Override
     public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
-        Registry.register(Registry.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
-        return () -> Registry.RECIPE_SERIALIZER.get(location);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
+        return () -> BuiltInRegistries.RECIPE_SERIALIZER.get(location);
     }
 }

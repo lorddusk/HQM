@@ -31,7 +31,7 @@ public enum Sounds {
     
     public static void registerSounds() {
         for (Sounds sound : Sounds.values()) {
-            sound.supplier = HardcoreQuestingCore.platform.registerSound(sound.soundId.getPath(), () -> new SoundEvent(sound.soundId));
+            sound.supplier = HardcoreQuestingCore.platform.registerSound(sound.soundId.getPath(), () -> SoundEvent.createVariableRangeEvent(sound.soundId));
         }
     }
 }

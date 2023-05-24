@@ -1,6 +1,6 @@
 {
   "parent":"hardcorequesting:item/base_item",
   "textures": {
-    "layer0":"hardcorequesting:items/heart"
+    "layer0":"hardcorequesting:item/heart"
   }
 }

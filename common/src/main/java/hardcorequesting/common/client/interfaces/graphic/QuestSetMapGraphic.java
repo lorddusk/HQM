@@ -64,7 +64,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         
         drawConnectingLines(matrices, player, isVisibleCache, isLinkFreeCache);
         
-        gui.setBlitOffset(50);
+        //gui.setBlitOffset(50);
         
         drawQuestIcons(matrices, mX, mY, player, isVisibleCache, isLinkFreeCache);
     }
@@ -440,7 +440,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 }
                 
                 final int iconX_ = iconX, iconY_ = iconY;
-                quest.getIconStack().ifLeft(itemStack -> gui.drawItemStack(itemStack, iconX_, iconY_, true))
+                quest.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, iconX_, iconY_, true))
                         .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, iconX_, iconY_));
             }
         }
