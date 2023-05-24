@@ -1,6 +1,5 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.ClientChange;
@@ -256,12 +255,11 @@ public class QuestRewardsGraphic extends Graphic {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (!rewards.get(i).isEmpty()) {
                         List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
-                        List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
-                            list2.add(FormattedText.EMPTY);
-                            list2.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
+                            str.add(Component.empty());
+                            str.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
                         }
-                        gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
+                        gui.renderComponentTooltip(matrices, str, gui.getLeft() + mX, gui.getTop() + mY);
                     }
                     break;
                 }
