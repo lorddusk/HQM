@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -256,12 +257,11 @@ public class QuestRewardsGraphic extends Graphic {
                 if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                     if (!rewards.get(i).isEmpty()) {
                         List<Component> str = rewards.get(i).getTooltipLines(Minecraft.getInstance().player, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
-                        List<FormattedText> list2 = Lists.newArrayList(str);
                         if (selected == i) {
-                            list2.add(FormattedText.EMPTY);
-                            list2.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
+                            str.add(TextComponent.EMPTY);
+                            str.add(Translator.translatable("hqm.quest.selected").withStyle(ChatFormatting.DARK_GREEN));
                         }
-                        gui.renderTooltipL(matrices, list2, gui.getLeft() + mX, gui.getTop() + mY);
+                        gui.renderComponentTooltip(matrices, str, gui.getLeft() + mX, gui.getTop() + mY);
                     }
                     break;
                 }
