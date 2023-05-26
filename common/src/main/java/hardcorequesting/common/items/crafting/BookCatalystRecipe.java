@@ -5,6 +5,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -12,7 +13,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 public class BookCatalystRecipe extends ShapedRecipe {
     
     public BookCatalystRecipe(ResourceLocation id, String group, int width, int height, NonNullList<Ingredient> ingredients, ItemStack result) {
-        super(id, group, width, height, ingredients, result);
+        super(id, group, CraftingBookCategory.MISC, width, height, ingredients, result);
     }
     
     @Override

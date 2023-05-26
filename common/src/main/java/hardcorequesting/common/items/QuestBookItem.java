@@ -31,7 +31,7 @@ public class QuestBookItem extends Item {
     private final boolean enabled;
     
     public QuestBookItem(boolean enabled) {
-        super(new Item.Properties().stacksTo(1).tab(ModCreativeTabs.HQMTab));
+        super(new Item.Properties().stacksTo(1).arch$tab(ModCreativeTabs.HQMTab));
         this.enabled = enabled;
     }
     

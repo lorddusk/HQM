@@ -9,6 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -36,10 +37,9 @@ public class SyncableTileMessage implements IMessage, IMessageHandler<SyncableTi
         BlockPos pos = buf.readBlockPos();
         this.data = buf.readNbt();
         
-        Level world = HardcoreQuestingCore.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, worldId));
+        Level world = HardcoreQuestingCore.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, worldId));
         if (world != null) {
             this.tileToSync = world.getBlockEntity(pos);
-            System.out.println(this.tileToSync.hashCode());
         }
     }
     

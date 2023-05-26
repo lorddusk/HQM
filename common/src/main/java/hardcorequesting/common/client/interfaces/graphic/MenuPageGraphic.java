@@ -116,7 +116,7 @@ public class MenuPageGraphic extends EditableGraphic {
             }
             
             for (int i = 0; i < count; i++) {
-                gui.drawItemStack(new ItemStack(ModItems.heart.get(), 1), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
+                gui.drawItemStack(matrices, new ItemStack(ModItems.heart.get(), 1), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
             }
         } else {
             gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.infiniteLives"), 0.5F, GuiQuestBook.PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);

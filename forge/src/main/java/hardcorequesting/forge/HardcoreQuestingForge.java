@@ -5,6 +5,7 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.forge.EventBuses;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
@@ -41,6 +42,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -54,7 +56,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -297,13 +298,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public CreativeModeTab createTab(ResourceLocation resourceLocation, Supplier<ItemStack> supplier) {
-        return new CreativeModeTab(String.format("%s.%s", resourceLocation.getNamespace(), resourceLocation.getPath())) {
-            @Nonnull
-            @Override
-            public ItemStack makeIcon() {
-                return supplier.get();
-            }
-        };
+        return ModCreativeTabs.HQMTab.get();
     }
     
     @Override
@@ -313,7 +308,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
 
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        return stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+        return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
                 .map(HardcoreQuestingForge::getAllFluidsIn)
                 .orElse(Collections.emptyList());
     }

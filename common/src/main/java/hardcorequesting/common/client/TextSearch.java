@@ -1,18 +1,19 @@
 package hardcorequesting.common.client;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.registry.CreativeTabRegistry;
 import hardcorequesting.common.HardcoreQuestingCore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -61,15 +62,8 @@ public class TextSearch<T> {
     public static void initItems() {
         if (ITEMS.isEmpty() || FLUIDS.isEmpty()) {
             clear();
-            NonNullList<ItemStack> stacks = NonNullList.create();
-            for (Item item : Registry.ITEM) {
-                try {
-                    item.fillItemCategory(item.getItemCategory(), stacks);
-                } catch (Exception ignore) {
-                }
-            }
             Player player = Minecraft.getInstance().player;
-            for (ItemStack stack : stacks) {
+            for (ItemStack stack : CreativeModeTabs.searchTab().getDisplayItems()) {
                 List tooltipList = stack.getTooltipLines(player, TooltipFlag.Default.NORMAL);
                 List advTooltipList = stack.getTooltipLines(player, TooltipFlag.Default.ADVANCED);
                 StringBuilder searchString = new StringBuilder();
@@ -84,7 +78,7 @@ public class TextSearch<T> {
                 }
                 ITEMS.add(new SearchEntry<>(searchString.toString(), advSearchString.toString(), stack));
             }
-            for (Fluid fluid : Registry.FLUID) {
+            for (Fluid fluid : BuiltInRegistries.FLUID) {
                 if (fluid instanceof EmptyFluid) continue;
                 if (!fluid.defaultFluidState().isSource()) continue;
                 FluidStack fluidVolume = FluidStack.create(fluid, HardcoreQuestingCore.platform.getBucketAmount().intValue());

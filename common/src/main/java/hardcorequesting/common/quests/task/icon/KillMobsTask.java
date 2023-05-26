@@ -11,6 +11,7 @@ import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -128,7 +129,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
             for (int i = 0; i < parts.size(); i++) {
                 Part part = parts.get(i);
                 if (part.count > data.getValue(i)) {
-                    EntityType<?> type = Registry.ENTITY_TYPE.get(part.mobId);
+                    EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(part.mobId);
                     if (type != null) {
                         if (type.equals(entity.getType())) {
                             data.setValue(i, data.getValue(i) + 1);
@@ -172,7 +173,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
     
     public static class Part extends IconLayoutTask.Part {
         
-        private ResourceLocation mobId = Registry.ENTITY_TYPE.getDefaultKey();
+        private ResourceLocation mobId = BuiltInRegistries.ENTITY_TYPE.getDefaultKey();
         private int count = 1;
         
         public ResourceLocation getMob() {
@@ -180,10 +181,10 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
         }
         
         public void setMob(ResourceLocation mobId) {
-            if (Registry.ENTITY_TYPE.getOptional(mobId).isPresent()) {
+            if (BuiltInRegistries.ENTITY_TYPE.getOptional(mobId).isPresent()) {
                 this.mobId = mobId;
             } else {
-                this.mobId = Registry.ENTITY_TYPE.getDefaultKey();
+                this.mobId = BuiltInRegistries.ENTITY_TYPE.getDefaultKey();
             }
         }
         

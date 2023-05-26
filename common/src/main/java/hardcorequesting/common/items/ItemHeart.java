@@ -28,7 +28,7 @@ public class ItemHeart extends Item {
     public ItemHeart(int value) {
         super(new Item.Properties()
                 .stacksTo(64)
-                .tab(ModCreativeTabs.HQMTab));
+                .arch$tab(ModCreativeTabs.HQMTab));
         this.value = value;
     }
     

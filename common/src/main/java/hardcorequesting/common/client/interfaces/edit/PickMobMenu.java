@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.widget.*;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -91,7 +92,7 @@ public class PickMobMenu extends GuiEditMenu {
         rawMobs = new ArrayList<>();
         mobs = new ArrayList<>();
         
-        for (EntityType<?> type : Registry.ENTITY_TYPE) {
+        for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
             if (type.canSummon()) {
                 rawMobs.add(new Entry(type));
             }
@@ -190,7 +191,7 @@ public class PickMobMenu extends GuiEditMenu {
         private final FormattedText description;
     
         private Entry(EntityType<?> type) {
-            this.id = Registry.ENTITY_TYPE.getKey(type);
+            this.id = BuiltInRegistries.ENTITY_TYPE.getKey(type);
             this.description = type.getDescription();
         }
         

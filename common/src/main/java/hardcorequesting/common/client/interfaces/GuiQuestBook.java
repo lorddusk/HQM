@@ -99,10 +99,7 @@ public class GuiQuestBook extends GuiBase {
     protected void init() {
         if (pageGraphic == null)
             pageGraphic = page.createGraphic(this);
-    
-        if (Quest.canQuestsBeEdited()) {
-            minecraft.keyboardHandler.setSendRepeatsToGui(true);
-        }
+
         QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
         if (!data.playedLore && SoundHandler.hasLoreMusic()) {
             SoundHandler.triggerFirstLore();
@@ -112,7 +109,6 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void removed() {
-        minecraft.keyboardHandler.setSendRepeatsToGui(false);
         SoundHandler.stopLoreMusic();
     }
     
@@ -126,8 +122,6 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void render(PoseStack matrices, int x0, int y0, float f) {
-        setBlitOffset(0);
-    
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
         
