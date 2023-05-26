@@ -13,7 +13,7 @@ public enum DeathType {
     LAVA("lava") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("lava");
+            return source.is(DamageTypes.LAVA);
         }
     },
     FIRE("fire") {
@@ -25,43 +25,43 @@ public enum DeathType {
     SUFFOCATION("suffocation") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("inWall");
+            return source.is(DamageTypes.IN_WALL);
         }
     },
     THORNS("thorns") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("thorns") || source.getMsgId().equals("cactus");
+            return source.is(DamageTypes.THORNS) || source.is(DamageTypes.CACTUS);
         }
     },
     DROWNING("drowning") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("drown");
+            return source.is(DamageTypes.DROWN);
         }
     },
     STARVATION("starvation") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("starve");
+            return source.is(DamageTypes.STARVE);
         }
     },
     FALL("fall") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("fall");
+            return source.is(DamageTypes.FALL);
         }
     },
     VOID("void") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("outOfWorld");
+            return source.is(DamageTypes.OUT_OF_WORLD);
         }
     },
     CRUSHED("crushed") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("anvil") || source.getMsgId().equals("fallingBlock");
+            return source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_BLOCK);
         }
     },
     EXPLOSION("explosions") {
@@ -73,13 +73,14 @@ public enum DeathType {
     MONSTER("monsters") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("mob") || source.getEntity() instanceof LivingEntity;
+            return source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO)
+                    || source.is(DamageTypes.MOB_PROJECTILE) || source.getEntity() instanceof LivingEntity;
         }
     },
     PLAYER("otherPlayers") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.getMsgId().equals("player") || source.getEntity() instanceof Player;
+            return source.is(DamageTypes.PLAYER_ATTACK) || source.getEntity() instanceof Player;
         }
     },
     MAGIC("magic") {
@@ -101,14 +102,14 @@ public enum DeathType {
         }
     };
     
-    private String name;
+    private final String name;
     
     DeathType(String name) {
         this.name = name;
     }
     
     public static void onDeath(Player player, DamageSource source) {
-        if (source != null && source.getMsgId() != null) {
+        if (source != null) {
             for (DeathType deathType : values()) {
                 if (deathType.isSourceValid(source)) {
                     deathType.onDeath(player);
