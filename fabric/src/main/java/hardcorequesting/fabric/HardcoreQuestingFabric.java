@@ -12,7 +12,6 @@ import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
@@ -55,7 +54,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -237,11 +235,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public CompoundTag getPlayerExtraTag(Player player) {
         return ModCapabilities.PLAYER_EXTRA_DATA.get(player).tag;
-    }
-
-    @Override
-    public CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon) {
-        return ModCreativeTabs.HQMTab.get();
     }
 
     @Override

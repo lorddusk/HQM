@@ -1,6 +1,5 @@
 package hardcorequesting.common.platform;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
@@ -14,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,7 +22,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -34,7 +31,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
@@ -106,9 +102,7 @@ public interface AbstractPlatform {
     void registerOnAnimalTame(BiConsumer<Player, Entity> consumer);
     
     CompoundTag getPlayerExtraTag(Player player);
-    
-    CreativeModeTab createTab(ResourceLocation name, Supplier<ItemStack> icon);
-    
+
     AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state);
 
     /**

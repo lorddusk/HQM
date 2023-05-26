@@ -5,7 +5,6 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.forge.EventBuses;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
@@ -19,7 +18,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,7 +28,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -68,7 +65,6 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -295,12 +291,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     public CompoundTag getPlayerExtraTag(Player playerEntity) {
         return playerEntity.getPersistentData();
     }
-    
-    @Override
-    public CreativeModeTab createTab(ResourceLocation resourceLocation, Supplier<ItemStack> supplier) {
-        return ModCreativeTabs.HQMTab.get();
-    }
-    
+
     @Override
     public AbstractBarrelBlockEntity createBarrelBlockEntity(BlockPos pos, BlockState state) {
         return new BarrelBlockEntity(pos, state);
