@@ -38,13 +38,13 @@
   ],
   "accessWidener": "hqm.accesswidener",
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": ">=0.44.0",
-    "minecraft": ">=1.19.2",
+    "fabricloader": ">=0.14",
+    "fabric": ">=0.81",
+    "minecraft": ">=1.19.4",
     "java": ">=17",
-    "architectury": ">=3.2.51",
-    "cardinal-components-base": ">=4.0.1",
-    "cardinal-components-entity": ">=4.0.1"
+    "architectury": ">=8",
+    "cardinal-components-base": ">=5",
+    "cardinal-components-entity": ">=5"
   },
   "custom": {
     "cardinal-components": [
