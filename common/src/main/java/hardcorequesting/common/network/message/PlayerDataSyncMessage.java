@@ -16,7 +16,8 @@ import net.minecraft.world.entity.player.Player;
 
 public class PlayerDataSyncMessage implements IMessage {
     
-    private boolean local, remote, questing, hardcore;
+    private boolean questing;
+    private boolean hardcore;
     private String teams;
     private String data;
     private String deaths;
@@ -24,9 +25,7 @@ public class PlayerDataSyncMessage implements IMessage {
     public PlayerDataSyncMessage() {
     }
     
-    public PlayerDataSyncMessage(QuestLine questLine, boolean local, boolean remote, Player player) {
-        this.local = local;
-        this.remote = remote;
+    public PlayerDataSyncMessage(QuestLine questLine, Player player) {
         this.questing = questLine.questingDataManager.isQuestActive();
         this.hardcore = questLine.questingDataManager.isHardcoreActive();
         this.teams = questLine.teamManager.saveToString(player);
@@ -36,8 +35,6 @@ public class PlayerDataSyncMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.local = buf.readBoolean();
-        this.remote = buf.readBoolean();
         this.questing = buf.readBoolean();
         this.hardcore = buf.readBoolean();
         this.teams = SyncUtil.readLargeString(buf);
@@ -47,8 +44,6 @@ public class PlayerDataSyncMessage implements IMessage {
     
     @Override
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeBoolean(this.local);
-        buf.writeBoolean(this.remote);
         buf.writeBoolean(this.questing);
         buf.writeBoolean(this.hardcore);
         SyncUtil.writeLargeString(this.teams, buf);

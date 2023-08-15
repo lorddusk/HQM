@@ -47,9 +47,6 @@ public class QuestLine {
     private final List<Serializable> dataSerializables = Lists.newArrayList();
     
     private QuestLine() {
-        if (HardcoreQuestingCore.platform.isClient()) {
-            resetClient();
-        }
         this.reputationManager = new ReputationManager();
         this.groupTierManager = new GroupTierManager();
         this.questingDataManager = new QuestingDataManager();
@@ -95,7 +92,7 @@ public class QuestLine {
     }
     
     @Environment(EnvType.CLIENT)
-    private void resetClient() {
+    private static void resetClient() {
         GuiQuestBook.resetBookPosition();
         
         QuestSetsGraphic.loginReset();
@@ -118,12 +115,19 @@ public class QuestLine {
             SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
             hasLoadedMainSound = true;
         }
-        QuestLine questLine = reset();
-        questLine.loadAll(reader, reader);
+        QuestLine questLine = getActiveQuestLine();
+        for (Serializable serializable : questLine.dataSerializables) {
+            serializable.load(reader);
+        }
         SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
     }
     
     public static QuestLine reset() {
+        SaveHelper.onLoad();
+        
+        if (HardcoreQuestingCore.platform.isClient()) {
+            resetClient();
+        }
         return activeQuestLine = new QuestLine();
     }
     
@@ -132,9 +136,9 @@ public class QuestLine {
         // Sync various data, but not for the player that hosts the server (if any), as they already share the same data as the server
         if (!player.server.isSingleplayerOwner(player.getGameProfile())) {
             boolean side = !HardcoreQuestingCore.platform.isClient();
-            NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, !side, side, player), player);
-    
             NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), player);
+            
+            NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, player), player);
     
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), player);
         }
@@ -170,12 +174,6 @@ public class QuestLine {
         }
         for (Serializable serializable : dataSerializables) {
             serializable.load(dataReader);
-        }
-        
-        SaveHelper.onLoad();
-        
-        if (HardcoreQuestingCore.platform.isClient()) {
-            resetClient();
         }
     }
 }
