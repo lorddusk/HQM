@@ -6,14 +6,12 @@ import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.bag.GroupTierManager;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
-import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataReader;
 import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
-import hardcorequesting.common.network.message.QuestLineSyncMessage;
 import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.TeamManager;
@@ -30,7 +28,6 @@ import java.util.stream.StreamSupport;
 public class QuestLine {
     
     private static QuestLine activeQuestLine;
-    private static boolean hasLoadedMainSound;
     
     public final ReputationManager reputationManager;
     public final GroupTierManager groupTierManager;
@@ -109,19 +106,6 @@ public class QuestLine {
         return activeQuestLine;
     }
     
-    @Environment(EnvType.CLIENT)
-    public static void receiveDataFromServer(DataReader reader) {
-        if (!hasLoadedMainSound) {
-            SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
-            hasLoadedMainSound = true;
-        }
-        QuestLine questLine = getActiveQuestLine();
-        for (Serializable serializable : questLine.dataSerializables) {
-            serializable.load(reader);
-        }
-        SoundHandler.loadLoreReading(HardcoreQuestingCore.configDir);
-    }
-    
     public static QuestLine reset() {
         SaveHelper.onLoad();
         
@@ -136,8 +120,6 @@ public class QuestLine {
         // Sync various data, but not for the player that hosts the server (if any), as they already share the same data as the server
         if (!player.server.isSingleplayerOwner(player.getGameProfile())) {
             boolean side = !HardcoreQuestingCore.platform.isClient();
-            NetworkManager.sendToPlayer(new QuestLineSyncMessage(questLine), player);
-            
             NetworkManager.sendToPlayer(new PlayerDataSyncMessage(questLine, player), player);
     
             NetworkManager.sendToPlayer(new DeathStatsMessage(side), player);

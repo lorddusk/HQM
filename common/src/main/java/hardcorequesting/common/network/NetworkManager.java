@@ -30,7 +30,6 @@ public class NetworkManager {
     public static void init() {
         registerMessage(OpenGuiMessage.Handler.class, OpenGuiMessage.class, id++, EnvType.CLIENT);
         
-        registerMessage(QuestLineSyncMessage.Handler.class, QuestLineSyncMessage.class, id++, EnvType.CLIENT);
         registerMessage(PlayerDataSyncMessage.Handler.class, PlayerDataSyncMessage.class, id++, EnvType.CLIENT);
         
         registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, EnvType.CLIENT);
