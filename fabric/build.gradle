@@ -1,10 +1,11 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 repositories {
     maven {
-        url "https://ladysnake.jfrog.io/artifactory/mods"
+        name = 'Ladysnake Mods'
+        url = 'https://maven.ladysnake.org/releases'
         content {
             includeGroup "dev.onyxstudios.cardinal-components-api"
         }
@@ -78,18 +79,18 @@ shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    archiveClassifier = "fabric"
 }
 
 jar {
     from "LICENSE"
-    classifier "dev"
+    archiveClassifier = "dev"
 }
 
 sourcesJar {
