@@ -70,7 +70,7 @@ public class QuestLineSyncMessage implements IMessage {
         }
         
         private void handle(QuestLineSyncMessage message, PacketContext ctx) {
-            QuestLine questLine = QuestLine.getActiveQuestLine();
+            QuestLine questLine = QuestLine.reset();
             
             JsonArray sets = new JsonArray();
             for (String s : message.questsSets.keySet()) sets.add(s);

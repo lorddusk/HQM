@@ -97,9 +97,10 @@ public class TeamAdapter {
             for (JsonElement element : GsonHelper.getAsJsonArray(object, QUEST_DATA_LIST)) {
                 JsonObject questDataObject = element.getAsJsonObject();
                 UUID questId = UUID.fromString(GsonHelper.getAsString(questDataObject, QUEST_ID));
+                Quest quest = Quest.getQuest(questId);
                 team.getQuestData().put(
                         questId,
-                        QuestDataAdapter.deserialize(GsonHelper.getAsJsonObject(questDataObject, QUEST_DATA), Quest.getQuest(questId))
+                        QuestDataAdapter.deserialize(GsonHelper.getAsJsonObject(questDataObject, QUEST_DATA), quest)
                 );
             }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, INVITES)) {
