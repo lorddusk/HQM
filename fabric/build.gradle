@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
 }
 
 repositories {
@@ -79,18 +79,18 @@ shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    archiveClassifier = "fabric"
 }
 
 jar {
     from "LICENSE"
-    classifier "dev"
+    archiveClassifier = "dev"
 }
 
 sourcesJar {

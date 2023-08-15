@@ -10,8 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class LargeButton implements Drawable, Clickable {
     
