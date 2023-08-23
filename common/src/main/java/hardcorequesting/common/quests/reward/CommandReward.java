@@ -27,8 +27,8 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
         
         public void execute(Player player) {
             CommandSourceStack sourceStack = new CommandSourceStack(new WrapperCommandSource(player), player.position(), player.getRotationVector(),
-                    player.level instanceof ServerLevel ? (ServerLevel)player.level : null, PERMISSION_LEVEL, NAME, Component.literal(NAME), player.level.getServer(), player);
-            player.getServer().getCommands().performCommand(player.level.getServer().getCommands().getDispatcher().parse(commandString, sourceStack), commandString);
+                    player.level() instanceof ServerLevel ? (ServerLevel)player.level() : null, PERMISSION_LEVEL, NAME, Component.literal(NAME), player.level().getServer(), player);
+            player.getServer().getCommands().performCommand(player.level().getServer().getCommands().getDispatcher().parse(commandString, sourceStack), commandString);
         }
         
         public String asString() {

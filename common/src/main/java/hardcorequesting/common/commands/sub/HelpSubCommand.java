@@ -22,7 +22,7 @@ public class HelpSubCommand implements CommandHandler.SubCommand {
             CommandHandler.SubCommand command = CommandHandler.SUB_COMMANDS.get(s);
             builder = builder.then(literal(s).executes(context -> {
                 for (int i : command.getSyntaxOptions(context))
-                    context.getSource().sendSuccess(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
+                    context.getSource().sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
                             .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.INFO_SUFFIX + i)), false);
                 return 1;
             }));
@@ -40,7 +40,8 @@ public class HelpSubCommand implements CommandHandler.SubCommand {
                 }
             }
             output = output.append(" and /").append("hqm").append(" ").append(Component.literal(commands.get(commands.size() - 1)).withStyle(ChatFormatting.YELLOW)).append(".");
-            context.getSource().sendSuccess(output, false);
+            MutableComponent finalOutput = output;
+            context.getSource().sendSuccess(() -> finalOutput, false);
             return 1;
         });
     }

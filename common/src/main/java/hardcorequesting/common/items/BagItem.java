@@ -27,7 +27,7 @@ public class BagItem extends Item {
     public int tierOrdinal;
     
     public BagItem(BagTier tier) {
-        super(new Item.Properties().durability(0).stacksTo(64).arch$tab(ModCreativeTabs.HQMTab));
+        super(new Item.Properties().durability(0).stacksTo(64));
         this.tier = tier;
         this.tierOrdinal = tier.ordinal();
     }

@@ -17,6 +17,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.FormattedText;
 
@@ -46,14 +47,14 @@ public class MainPageGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
-        gui.drawString(matrices, mainDescriptionScroll.getVisibleEntries(), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
-        gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
+        gui.drawString(graphics, mainDescriptionScroll.getVisibleEntries(), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+        gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-            gui.drawCenteredString(matrices, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
+            gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
         }
         if (questLine.front == null) {
             File file = new File(HardcoreQuestingCore.configDir.toFile(), "front.png");
@@ -71,9 +72,8 @@ public class MainPageGraphic extends EditableGraphic {
         }
     
         if (questLine.front != null) {
-            ResourceHelper.bindResource(questLine.front);
             gui.applyColor(0xFFFFFFFF);
-            gui.drawRect(matrices, 20, 20, 0, 0, 140, 180);
+            gui.drawRect(graphics, questLine.front, 20, 20, 0, 0, 140, 180);
         }
     }
     

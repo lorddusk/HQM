@@ -8,6 +8,7 @@ import hardcorequesting.common.items.BagItem;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
@@ -89,20 +90,18 @@ public class GuiReward extends GuiBase {
     }
     
     @Override
-    public void render(PoseStack matrices, int mX0, int mY0, float f) {
+    public void render(GuiGraphics graphics, int mX0, int mY0, float f) {
         applyColor(0xFFFFFFFF);
-        ResourceHelper.bindResource(TEXTURE);
-        
         
         int height = TOP_HEIGHT + MIDDLE_HEIGHT * lines + BOTTOM_HEIGHT;
         this.left = (this.width - TEXTURE_WIDTH) / 2;
         this.top = (this.height - height) / 2;
         
-        drawRect(matrices, 0, 0, 0, TOP_SRC_Y, TEXTURE_WIDTH, TOP_HEIGHT);
+        drawRect(graphics, TEXTURE, 0, 0, 0, TOP_SRC_Y, TEXTURE_WIDTH, TOP_HEIGHT);
         for (int i = 0; i < lines; i++) {
-            drawRect(matrices, 0, TOP_HEIGHT + i * MIDDLE_HEIGHT, 0, MIDDLE_SRC_Y, TEXTURE_WIDTH, MIDDLE_HEIGHT);
+            drawRect(graphics, TEXTURE, 0, TOP_HEIGHT + i * MIDDLE_HEIGHT, 0, MIDDLE_SRC_Y, TEXTURE_WIDTH, MIDDLE_HEIGHT);
         }
-        drawRect(matrices, 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0, BOTTOM_SRC_Y, TEXTURE_WIDTH, BOTTOM_HEIGHT);
+        drawRect(graphics, TEXTURE, 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0, BOTTOM_SRC_Y, TEXTURE_WIDTH, BOTTOM_HEIGHT);
         
         
         int mX = mX0 - left;
@@ -118,15 +117,13 @@ public class GuiReward extends GuiBase {
             title = group.getDisplayName();
         }
         
-        drawCenteredString(matrices, title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, group.getTier().getColor().getHexColor());
-        drawCenteredString(matrices, statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
-        drawCenteredString(matrices, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
+        drawCenteredString(graphics, title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, group.getTier().getColor().getHexColor());
+        drawCenteredString(graphics, statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
+        drawCenteredString(graphics, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
         
         for (Reward reward : rewards) {
             try {
-                drawItemStack(matrices, reward.stack, reward.x, reward.y, true);
-                //itemRenderer.renderItemOverlayIntoGUI(fontRendererObj, MinecraftClient.getInstance().getTextureManager(), reward.stack, reward.x + left + 1, reward.y + top + 1);
-                itemRenderer.renderGuiItemDecorations(matrices, font, reward.stack, (reward.x + left + 1), (reward.y + top + 1), "");
+                drawItemStack(graphics, reward.stack, reward.x, reward.y, true);
             } catch (Throwable ignored) {
             }
         }
@@ -135,7 +132,7 @@ public class GuiReward extends GuiBase {
             if (inBounds(reward.x, reward.y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 try {
                     if (Screen.hasShiftDown()) {
-                        renderTooltip(matrices, reward.stack, mX0, mY0);
+                        graphics.renderTooltip(getFont(), reward.stack, mX0, mY0);
                     } else {
                         List<FormattedCharSequence> str = new ArrayList<>();
                         try {
@@ -146,7 +143,7 @@ public class GuiReward extends GuiBase {
                                     str.add(Language.getInstance().getVisualOrder(Translator.translatable("hqm.rewardGui.shiftInfo").withStyle(ChatFormatting.DARK_GRAY)));
                                 }
                             }
-                            renderTooltip(matrices, str, mX0, mY0);
+                            graphics.renderTooltip(font, str, mX0, mY0);
                         } catch (Throwable ignored) {
                         }
                     }

@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
@@ -46,11 +47,10 @@ public class ScrollBar implements Drawable, Clickable {
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void render(PoseStack matrices, int mX, int mY) {
+    public void render(GuiGraphics graphics, int mX, int mY) {
         if (isVisible()) {
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            this.gui.drawRect(matrices, x, y, size.u, size.v, SCROLL_WIDTH, size.length);
-            this.gui.drawRect(matrices, x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
+            this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, size.u, size.v, SCROLL_WIDTH, size.length);
+            this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
     

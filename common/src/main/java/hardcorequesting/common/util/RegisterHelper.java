@@ -2,6 +2,7 @@ package hardcorequesting.common.util;
 
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
+import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.crafting.ModRecipes;
 import net.minecraft.core.BlockPos;
@@ -29,6 +30,7 @@ public class RegisterHelper {
     }
     
     public static void register() {
+        ModCreativeTabs.init();
         ModBlocks.init();
         ModBlocks.registerTileEntities();
         ModItems.init();

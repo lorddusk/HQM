@@ -10,6 +10,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
@@ -37,14 +38,14 @@ public class DeathTaskGraphic extends TaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
+    public void draw(GuiGraphics graphics, int mX, int mY) {
         int died = task.getDeaths(playerId);
         FormattedText text = died == task.getDeathsRequired()
                 ? Translator.translatable("hqm.deathMenu.deaths", Translator.plural("hqm.times", task.getDeathsRequired())).withStyle(ChatFormatting.DARK_GREEN)
                 : Translator.translatable("hqm.deathMenu.deathsOutOf", died, Translator.plural("hqm.times", task.getDeathsRequired()));
     
-        gui.drawString(matrices, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
+        gui.drawString(graphics, gui.getLinesFromText(text, 1F, 130), START_X, START_Y, 1F, 0x404040);
     
-        super.draw(matrices, mX, mY);
+        super.draw(graphics, mX, mY);
     }
 }

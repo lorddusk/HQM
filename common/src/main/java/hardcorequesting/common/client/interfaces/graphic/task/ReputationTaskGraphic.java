@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.ReputationTaskPartMenu;
@@ -10,6 +11,7 @@ import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
@@ -51,14 +53,13 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(GuiGraphics graphics, ReputationTask.Part part, int id, int x, int y, int mX, int mY) {
         gui.applyColor(0xFFFFFFFF);
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-    
+
         if (part.getReputation() == null) {
-            gui.drawRect(matrices, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
+            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
         } else {
-            part.getReputation().draw(matrices, gui, x, y, mX, mY, shouldShowPlayer() ? playerId : null, true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(playerId));
+            part.getReputation().draw(graphics, gui, x, y, mX, mY, shouldShowPlayer() ? playerId : null, true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(playerId));
         }
     }
     

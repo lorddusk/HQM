@@ -13,6 +13,7 @@ import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -88,36 +89,35 @@ public class EditTrackerScreen extends GuiBase {
         if (textBoxes.getTextBoxes().isEmpty()) {
             textBoxes.add(new NumberTextBox(this, 20, 130, Translator.translatable("hqm.menuTracker.radius.title"), tracker::getRadius, tracker::setRadius) {
                 @Override
-                protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
-                    super.draw(matrices, selected, mX, mY);
+                protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
+                    super.draw(graphics, selected, mX, mY);
             
-                    this.gui.drawString(matrices, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                    this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
                 }
             });
         }
     }
     
     @Override
-    public void render(PoseStack matrices, int mX0, int mY0, float f) {
+    public void render(GuiGraphics graphics, int mX0, int mY0, float f) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
-        ResourceHelper.bindResource(BG_TEXTURE);
-        drawRect(matrices, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+        drawRect(graphics, BG_TEXTURE, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT);
     
         int mX = mX0 - left;
         int mY = mY0 - top;
         for (LargeButton button : buttons) {
-            button.render(matrices, mX, mY);
+            button.render(graphics, mX, mY);
         }
         
-        textBoxes.render(matrices, mX, mY);
+        textBoxes.render(graphics, mX, mY);
     
-        drawCenteredString(matrices, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
+        drawCenteredString(graphics, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
     
-        selectionHelper.render(matrices, mX, mY);
+        selectionHelper.render(graphics, mX, mY);
     
         for (LargeButton button : buttons) {
-            button.renderTooltip(matrices, mX, mY);
+            button.renderTooltip(graphics, mX, mY);
         }
     }
     

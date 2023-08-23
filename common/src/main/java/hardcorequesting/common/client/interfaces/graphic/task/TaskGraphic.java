@@ -15,6 +15,7 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -72,10 +73,10 @@ public abstract class TaskGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
     
-        gui.drawString(matrices, taskDescriptionScroll.getVisibleEntries(),
+        gui.drawString(graphics, taskDescriptionScroll.getVisibleEntries(),
                 TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
     }
     

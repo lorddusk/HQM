@@ -14,7 +14,7 @@ public abstract class ItemPrecision {
     public static final ItemPrecision PRECISE = new ItemPrecision("precise") {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            return stack1.getItem() == stack2.getItem() && ItemStack.tagMatches(stack1, stack2);
+            return ItemStack.isSameItemSameTags(stack1, stack2);
         }
     };
     public static final ItemPrecision NBT_FUZZY = new ItemPrecision("nbtFuzzy") {

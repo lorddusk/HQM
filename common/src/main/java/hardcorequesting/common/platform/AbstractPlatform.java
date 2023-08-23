@@ -22,6 +22,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -122,5 +123,7 @@ public interface AbstractPlatform {
     <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock);
     
     Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id);
+
+    Supplier<CreativeModeTab> registerTab(String id, Supplier<CreativeModeTab> tab);
     
 }

@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
@@ -12,6 +13,7 @@ import hardcorequesting.common.death.DeathType;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -63,8 +65,8 @@ public class DeathStatsGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         List<DeathStat> deathStats = DeathStatsManager.getInstance().getDeathStats();
         int statY = PLAYERS_Y;
@@ -72,32 +74,30 @@ public class DeathStatsGraphic extends Graphic {
             
             boolean selected = stats.getUuid().equals(playerId);
             boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
-            gui.drawString(matrices, Translator.text((deathStats.indexOf(stats) + 1) + ". ").append(stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
+            gui.drawString(graphics, Translator.text((deathStats.indexOf(stats) + 1) + ". ").append(stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
-            gui.drawString(matrices, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
+            gui.drawString(graphics, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
             statY += PLAYERS_SPACING;
         }
         
-        gui.drawString(matrices, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
-        gui.drawString(matrices, Translator.translatable(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
+        gui.drawString(graphics, Translator.translatable(BEST_LABEL), BEST_X, LABEL_Y, getColor(showBest, gui.inBounds(BEST_X, LABEL_Y, gui.getStringWidth(BEST_LABEL), 9, mX, mY)));
+        gui.drawString(graphics, Translator.translatable(TOTAL_LABEL), TOTAL_X, LABEL_Y, getColor(showTotal, gui.inBounds(TOTAL_X, LABEL_Y, gui.getStringWidth(TOTAL_LABEL), 9, mX, mY)));
         
         DeathStat stats = getDeathStat();
         
         if (stats != null) {
-            
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            
+
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             for (int i = 0; i < DeathType.values().length; i++) {
                 int x = i % 3;
                 int y = i / 3;
                 
-                gui.drawRect(matrices, TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
-                gui.drawRect(matrices, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
+                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
+                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
-            gui.drawString(matrices, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
-            gui.drawString(matrices, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
             
             for (DeathType type : DeathType.values()) {
                 int i = type.ordinal();
@@ -111,7 +111,7 @@ public class DeathStatsGraphic extends Graphic {
                     f = findScale(text);
                 }
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
-                gui.drawString(matrices, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
+                gui.drawString(graphics, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
             }
         }
     }
@@ -130,8 +130,8 @@ public class DeathStatsGraphic extends Graphic {
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        super.drawTooltip(matrices, mX, mY);
+    public void drawTooltip(GuiGraphics graphics, int mX, int mY) {
+        super.drawTooltip(graphics, mX, mY);
         
         DeathStat stats = getDeathStat();
         if (stats != null) {
@@ -142,7 +142,7 @@ public class DeathStatsGraphic extends Graphic {
                 
                 
                 if (gui.inBounds(TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SIZE, BACKGROUND_SIZE, mX, mY)) {
-                    gui.renderTooltipL(matrices, stats.getDescription(type), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(graphics, stats.getDescription(type), mX + gui.getLeft(), mY + gui.getTop());
                     break;
                 }
             }

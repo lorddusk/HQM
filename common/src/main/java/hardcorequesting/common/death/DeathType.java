@@ -55,7 +55,7 @@ public enum DeathType {
     VOID("void") {
         @Override
         boolean isSourceValid(DamageSource source) {
-            return source.is(DamageTypes.OUT_OF_WORLD);
+            return source.is(DamageTypes.FELL_OUT_OF_WORLD);
         }
     },
     CRUSHED("crushed") {

@@ -186,7 +186,7 @@ public class QuestRewards {
         for (ItemStack stack : items) {
             boolean added = false;
             for (ItemStack stack1 : itemsToAdd) {
-                if (stack.sameItem(stack1) && ItemStack.tagMatches(stack, stack1)) {
+                if (ItemStack.isSameItemSameTags(stack, stack1)) {
                     stack1.grow(stack.getCount());
                     added = true;
                     break;
@@ -213,7 +213,7 @@ public class QuestRewards {
                     if (stack.isEmpty()) {
                         stack1.shrink(stack1.getMaxStackSize());
                         break;
-                    } else if (stack.sameItem(stack1) && ItemStack.tagMatches(stack1, stack)) {
+                    } else if (ItemStack.isSameItemSameTags(stack, stack1)) {
                         stack1.shrink(stack1.getMaxStackSize() - stack.getCount());
                         break;
                     }
@@ -242,7 +242,7 @@ public class QuestRewards {
                         iterator.remove();
                     }
                     break;
-                } else if (stack.sameItem(nextStack) && ItemStack.tagMatches(nextStack, stack)) {
+                } else if (ItemStack.isSameItemSameTags(stack, nextStack)) {
                     int amount = Math.min(nextStack.getMaxStackSize() - stack.getCount(), nextStack.getCount());
                     stack.grow(amount);
                     nextStack.shrink(amount);

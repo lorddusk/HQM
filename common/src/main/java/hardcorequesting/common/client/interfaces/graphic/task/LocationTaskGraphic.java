@@ -10,6 +10,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.Objects;
@@ -26,13 +27,13 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, VisitLocationTask.Part part, int index, int x, int y) {
+    protected void drawElementText(GuiGraphics graphics, VisitLocationTask.Part part, int index, int x, int y) {
         if (task.visited(index, playerId)) {
-            gui.drawString(matrices, Translator.translatable("hqm.locationMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.locationMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
         } else if (part.getVisibility().doShowCoordinate()) {
             int row = 0;
             if (part.getRadius() >= 0) {
-                gui.drawString(matrices, Translator.plain("(" + part.getPosition().toShortString() + ")"), x, y, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.plain("(" + part.getPosition().toShortString() + ")"), x, y, 0.7F, 0x404040);
                 row++;
             }
             
@@ -45,11 +46,11 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
                     if (part.getVisibility().doShowRadius()) {
                         str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.getRadius()), Translator.plain("]"));
                     }
-                    gui.drawString(matrices, str, x, y + 6*row, 0.7F, 0x404040);
+                    gui.drawString(graphics, str, x, y + 6*row, 0.7F, 0x404040);
                 }
                 
             } else {
-                gui.drawString(matrices, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, 0x404040);
             }
         }
     }

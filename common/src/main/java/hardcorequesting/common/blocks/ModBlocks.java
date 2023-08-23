@@ -9,7 +9,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.function.Supplier;
 
@@ -26,11 +26,11 @@ public class ModBlocks {
     
     public static void init() {
         blockBarrel = RegisterHelper.registerBlock(BlockInfo.ITEMBARREL_UNLOCALIZED_NAME,
-                () -> new DeliveryBlock(Block.Properties.of(Material.WOOD).strength(1.0F)),
-                block -> new BlockItem(block, new Item.Properties().arch$tab(ModCreativeTabs.HQMTab)));
+                () -> new DeliveryBlock(Block.Properties.of().mapColor(MapColor.WOOD).strength(1.0F)),
+                block -> new BlockItem(block, new Item.Properties()));
         blockTracker = RegisterHelper.registerBlock(BlockInfo.QUEST_TRACKER_UNLOCALIZED_NAME,
                 TrackerBlock::new,
-                block -> new BlockItem(block, new Item.Properties().arch$tab(ModCreativeTabs.HQMTab)));
+                block -> new BlockItem(block, new Item.Properties()));
 //        RegisterHelper.registerBlock(blockPortal, BlockInfo.QUEST_PORTAL_UNLOCALIZED_NAME, block -> new PortalBlockItem(block, new Item.Settings().group(HardcoreQuesting.HQMTab)));
     }
     

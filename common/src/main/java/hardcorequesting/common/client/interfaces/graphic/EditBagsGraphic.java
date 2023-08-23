@@ -16,6 +16,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
@@ -88,8 +89,8 @@ public class EditBagsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         int yPos = TIERS_Y;
         for (GroupTier groupTier : tierScroll.getVisibleEntries()) {
@@ -102,14 +103,14 @@ public class EditBagsGraphic extends EditableGraphic {
                 color |= 0xBB << 24;
                 RenderSystem.enableBlend();
             }
-            gui.drawString(matrices, str, TIERS_X, yPos, color);
+            gui.drawString(graphics, str, TIERS_X, yPos, color);
             if (inBounds) {
                 RenderSystem.disableBlend();
             }
             
             for (int j = 0; j < BagTier.values().length; j++) {
                 BagTier bagTier = BagTier.values()[j];
-                gui.drawCenteredString(matrices, Translator.text(groupTier.getWeights()[j] + "").withStyle(bagTier.getColor()),
+                gui.drawCenteredString(graphics, Translator.text(groupTier.getWeights()[j] + "").withStyle(bagTier.getColor()),
                         TIERS_X + TIERS_SECOND_LINE_X + j * WEIGHT_SPACING,
                         yPos + TIERS_SECOND_LINE_Y, 0.7F,
                         WEIGHT_SPACING, 0, 0x404040);
@@ -135,12 +136,12 @@ public class EditBagsGraphic extends EditableGraphic {
                 }
             }
             
-            gui.drawString(matrices, str, GROUPS_X, yPos, color);
+            gui.drawString(graphics, str, GROUPS_X, yPos, color);
             if (inBounds || selected) {
                 RenderSystem.disableBlend();
             }
             
-            gui.drawString(matrices, Translator.translatable("hqm.questBook.items", group.getItems().size()),
+            gui.drawString(graphics, Translator.translatable("hqm.questBook.items", group.getItems().size()),
                     GROUPS_X + GROUPS_SECOND_LINE_X,
                     yPos + GROUPS_SECOND_LINE_Y,
                     0.7F, 0x404040);

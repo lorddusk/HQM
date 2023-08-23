@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.quests.Quest;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 
 /**
  * A graphic which has a set of edit mode buttons to the left of the gui when editing quest line data.
@@ -24,23 +25,23 @@ public abstract class EditableGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
     
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
-                button.draw(gui, matrices, mX, mY);
+                button.draw(gui, graphics, mX, mY);
             }
         }
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        super.drawTooltip(matrices, mX, mY);
+    public void drawTooltip(GuiGraphics graphics, int mX, int mY) {
+        super.drawTooltip(graphics, mX, mY);
     
         if (Quest.canQuestsBeEdited()) {
             for (EditButton button : editButtons) {
-                button.drawInfo(gui, matrices, mX, mY);
+                button.drawInfo(gui, graphics, mX, mY);
             }
         }
     }

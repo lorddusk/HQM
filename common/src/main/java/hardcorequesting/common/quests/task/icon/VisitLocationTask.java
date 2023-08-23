@@ -143,7 +143,7 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
     
     @Override
     public void onPlayerTick(ServerPlayer playerEntity) {
-        if (!playerEntity.level.isClientSide) {
+        if (!playerEntity.level().isClientSide) {
             tick(playerEntity, true);
         }
     }

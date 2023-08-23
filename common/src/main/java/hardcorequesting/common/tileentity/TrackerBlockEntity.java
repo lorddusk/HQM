@@ -44,7 +44,7 @@ public class TrackerBlockEntity extends BlockEntity {
     
     @Environment(EnvType.CLIENT)
     public static void openInterface(Player player, BlockPos pos, UUID questId, int radius, TrackerType type) {
-        TrackerBlockEntity tracker = getTracker(player.level, pos);
+        TrackerBlockEntity tracker = getTracker(player.level(), pos);
         if (tracker != null) {
             tracker.questId = questId;
             tracker.quest = null;
@@ -56,7 +56,7 @@ public class TrackerBlockEntity extends BlockEntity {
     }
     
     public static void saveToServer(Player player, BlockPos pos, int radius, TrackerType type) {
-        TrackerBlockEntity tracker = getTracker(player.level, pos);
+        TrackerBlockEntity tracker = getTracker(player.level(), pos);
         if (Quest.canQuestsBeEdited() && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;

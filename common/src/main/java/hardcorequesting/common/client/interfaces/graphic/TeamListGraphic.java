@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.RenderRotation;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.List;
 
@@ -35,11 +36,11 @@ public class TeamListGraphic extends Graphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
-        drawArrow(matrices, mX, mY, true);
-        drawArrow(matrices, mX, mY, false);
+        drawArrow(graphics, mX, mY, true);
+        drawArrow(graphics, mX, mY, false);
         
         List<TeamLiteStat> teamStats = TeamLiteStat.getTeamStats();
         int start = pagePair * TEAMS_PER_PAIR;
@@ -50,15 +51,15 @@ public class TeamListGraphic extends Graphic {
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
-            gui.drawString(matrices, Translator.plain(teamStat.getName()), x, y, 0x404040);
-            gui.drawString(matrices, Translator.translatable("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
-            gui.drawString(matrices, Translator.translatable("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
-            gui.drawString(matrices, Translator.translatable("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.plain(teamStat.getName()), x, y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
         }
         
-        gui.drawCenteredString(matrices, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
+        gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
         if (end - start > TEAMS_PER_PAGE) {
-            gui.drawCenteredString(matrices, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
+            gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
         }
     }
     
@@ -73,14 +74,14 @@ public class TeamListGraphic extends Graphic {
         }
     }
     
-    private void drawArrow(PoseStack matrices, int mX, int mY, boolean left) {
+    private void drawArrow(GuiGraphics graphics, int mX, int mY, boolean left) {
         int x = left ? ARROW_X_LEFT : ARROW_X_RIGHT;
         int srcY = 0;
         
         if (isArrowEnabled(left)) {
             srcY = gui.inBounds(x, ARROW_Y, ARROW_W, ARROW_H, mX, mY) ? 2 : 1;
         }
-        gui.drawRect(matrices, x, ARROW_Y, ARROW_SRC_X, ARROW_SRC_Y + srcY * ARROW_W, ARROW_H, ARROW_W, left ? RenderRotation.ROTATE_90 : RenderRotation.ROTATE_270);
+        gui.drawRect(graphics, x, ARROW_Y, ARROW_SRC_X, ARROW_SRC_Y + srcY * ARROW_W, ARROW_H, ARROW_W, left ? RenderRotation.ROTATE_90 : RenderRotation.ROTATE_270);
     }
     
     private boolean isArrowEnabled(boolean left) {

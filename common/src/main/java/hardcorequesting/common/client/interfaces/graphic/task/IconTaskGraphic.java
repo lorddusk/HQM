@@ -9,6 +9,7 @@ import hardcorequesting.common.quests.task.icon.IconLayoutTask;
 import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
         this.task = task;
     }
     
-    protected abstract void drawElementText(PoseStack matrices, Part part, int id, int x, int y);
+    protected abstract void drawElementText(GuiGraphics graphics, Part part, int id, int x, int y);
     
     @Override
     protected List<Positioned<Part>> positionParts(List<Part> parts) {
@@ -44,13 +45,13 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
     }
     
     @Override
-    protected void drawPart(PoseStack matrices, Part part, int id, int x, int y, int mX, int mY) {
+    protected void drawPart(GuiGraphics graphics, Part part, int id, int x, int y, int mX, int mY) {
         int textX = x + X_TEXT_OFFSET, textY = y + Y_TEXT_OFFSET;
-        part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, x, y, mX, mY, false))
-                .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, x, y, mX, mY));
+        part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(graphics, itemStack, x, y, mX, mY, false))
+                .ifRight(fluidStack -> gui.drawFluid(fluidStack, graphics, x, y, mX, mY));
         
-        gui.drawString(matrices, part.getName(), textX, textY, 0x404040);
-        drawElementText(matrices, part, id, textX + X_TEXT_INDENT, textY + 9);
+        gui.drawString(graphics, part.getName(), textX, textY, 0x404040);
+        drawElementText(graphics, part, id, textX + X_TEXT_INDENT, textY + 9);
     }
     
     @Override

@@ -54,6 +54,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -89,7 +90,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         //As of writing, architectury has misnamed these player parameters, with the first one called oldPlayer, while it actually is the second one that is the old player
         PlayerEvent.PLAYER_CLONE.register((newPlayer, oldPlayer, wonGame) -> {
             if (HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
-            if (!wonGame && !oldPlayer.isSpectator() && !newPlayer.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+            if (!wonGame && !oldPlayer.isSpectator() && !newPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
                 int invSize = oldPlayer.getInventory().getContainerSize();
                 for (int i = 0; i < invSize; i++) {
                     ItemStack stack = oldPlayer.getInventory().getItem(i);
@@ -296,5 +297,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
         return () -> BuiltInRegistries.RECIPE_SERIALIZER.get(location);
+    }
+
+    @Override
+    public Supplier<CreativeModeTab> registerTab(String id, Supplier<CreativeModeTab> tab) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, location, tab.get());
+        return () -> BuiltInRegistries.CREATIVE_MODE_TAB.get(location);
     }
 }

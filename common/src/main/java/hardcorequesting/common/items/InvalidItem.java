@@ -8,7 +8,6 @@ import net.minecraft.world.item.Item;
 public class InvalidItem extends Item {
     public InvalidItem() {
         super(new Item.Properties()
-                .stacksTo(1)
-                .arch$tab(ModCreativeTabs.HQMTab));
+                .stacksTo(1));
     }
 }

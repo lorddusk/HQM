@@ -18,6 +18,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
@@ -45,33 +46,33 @@ public class QuestSetMapGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
+    public void draw(GuiGraphics graphics, int mX, int mY) {
         
-        super.draw(matrices, mX, mY);
+        super.draw(graphics, mX, mY);
         
         if (gui.isOpBook) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
         }
         
         Player player = gui.getPlayer();
         
         for (ReputationBar bar : set.getReputationBars()) {
-            bar.draw(matrices, gui, mX, mY, player.getUUID());
+            bar.draw(graphics, gui, mX, mY, player.getUUID());
         }
         
         HashMap<Quest, Boolean> isVisibleCache = new HashMap<>();
         HashMap<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         
-        drawConnectingLines(matrices, player, isVisibleCache, isLinkFreeCache);
+        drawConnectingLines(graphics, player, isVisibleCache, isLinkFreeCache);
         
         //gui.setBlitOffset(50);
         
-        drawQuestIcons(matrices, mX, mY, player, isVisibleCache, isLinkFreeCache);
+        drawQuestIcons(graphics, mX, mY, player, isVisibleCache, isLinkFreeCache);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        super.drawTooltip(matrices, mX, mY);
+    public void drawTooltip(GuiGraphics graphics, int mX, int mY) {
+        super.drawTooltip(graphics, mX, mY);
         
         Player player = gui.getPlayer();
     
@@ -146,7 +147,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 }
             
                 if (shouldDrawText && gui.getCurrentMode() != EditMode.MOVE) {
-                    gui.renderTooltipL(matrices, tooltip, mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(graphics, tooltip, mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
@@ -384,14 +385,14 @@ public class QuestSetMapGraphic extends EditableGraphic {
         return Translator.box(Translator.translatable("hqm.questBook." + (holding ? "holding" : "hold"), letter));
     }
     
-    private void drawConnectingLines(PoseStack matrices, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawConnectingLines(GuiGraphics graphics, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest child : set.getQuests().values()) {
             if (Quest.canQuestsBeEdited() || child.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                 for (Quest parent : child.getRequirements()) {
                     if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
                             int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
-                            gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                            gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
                                     color);
@@ -405,7 +406,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
                         int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
-                        gui.drawLine(matrices, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
+                        gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                 5,
                                 color);
@@ -415,7 +416,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         }
     }
     
-    private void drawQuestIcons(PoseStack matrices, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private void drawQuestIcons(GuiGraphics graphics, int x, int y, Player player, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         for (Quest quest : set.getQuests().values()) {
             if ((Quest.canQuestsBeEdited() || quest.isVisible(player, isVisibleCache, isLinkFreeCache))) {
                 
@@ -428,8 +429,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 else color = quest.getColorFilter(player, gui.getTick());
                 
                 gui.applyColor(color);
-                ResourceHelper.bindResource(GuiBase.MAP_TEXTURE);
-                gui.drawRect(matrices, quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
+                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
                 
                 int iconX = quest.getGuiCenterX() - 8;
                 int iconY = quest.getGuiCenterY() - 8;
@@ -440,8 +440,8 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 }
                 
                 final int iconX_ = iconX, iconY_ = iconY;
-                quest.getIconStack().ifLeft(itemStack -> gui.drawItemStack(matrices, itemStack, iconX_, iconY_, true))
-                        .ifRight(fluidStack -> gui.drawFluid(fluidStack, matrices, iconX_, iconY_));
+                quest.getIconStack().ifLeft(itemStack -> gui.drawItemStack(graphics, itemStack, iconX_, iconY_, true))
+                        .ifRight(fluidStack -> gui.drawFluid(fluidStack, graphics.pose(), iconX_, iconY_));
             }
         }
     }

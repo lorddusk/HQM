@@ -187,7 +187,7 @@ public class QuestingDataManager {
     }
     
     public void spawnBook(Player player) {
-        if (!player.level.isClientSide && HQMConfig.getInstance().SPAWN_BOOK && !getQuestingData(player).receivedBook && isQuestActive()) {
+        if (!player.level().isClientSide && HQMConfig.getInstance().SPAWN_BOOK && !getQuestingData(player).receivedBook && isQuestActive()) {
             getQuestingData(player).receivedBook = true;
             CompoundTag hqmTag = new CompoundTag();
             CompoundTag extraTag = HardcoreQuestingCore.platform.getPlayerExtraTag(player);
@@ -203,8 +203,8 @@ public class QuestingDataManager {
     }
     
     private static void spawnItemAtPlayer(Player player, ItemStack stack) {
-        ItemEntity item = new ItemEntity(player.level, player.getX() + 0.5D, player.getY() + 0.5D, player.getZ() + 0.5D, stack);
-        player.level.addFreshEntity(item);
+        ItemEntity item = new ItemEntity(player.level(), player.getX() + 0.5D, player.getY() + 0.5D, player.getZ() + 0.5D, stack);
+        player.level().addFreshEntity(item);
         item.playerTouch(player);
     }
     

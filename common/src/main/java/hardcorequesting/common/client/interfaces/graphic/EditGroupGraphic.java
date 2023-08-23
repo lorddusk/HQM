@@ -11,6 +11,7 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.ItemStack;
 
@@ -37,10 +38,10 @@ public class EditGroupGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
-        gui.drawString(matrices, group.getDisplayName(), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
+        gui.drawString(graphics, group.getDisplayName(), EditBagsGraphic.GROUPS_X, EditBagsGraphic.GROUPS_Y, group.getTier().getColor().getHexColor());
         List<ItemStack> items = new ArrayList<>(group.getItems());
         items.add(ItemStack.EMPTY);
         for (int i = 0; i < items.size(); i++) {
@@ -49,7 +50,7 @@ public class EditGroupGraphic extends EditableGraphic {
             int xPos = (i % ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_X;
             int yPos = (i / ITEMS_PER_LINE) * GROUP_ITEMS_SPACING + GROUP_ITEMS_Y;
             
-            gui.drawItemStack(matrices, stack, xPos, yPos, mX, mY, false);
+            gui.drawItemStack(graphics, stack, xPos, yPos, mX, mY, false);
         }
         
         for (int i = 0; i < items.size(); i++) {
@@ -61,7 +62,7 @@ public class EditGroupGraphic extends EditableGraphic {
             if (gui.inBounds(xPos, yPos, GuiQuestBook.ITEM_SIZE, GuiQuestBook.ITEM_SIZE, mX, mY)) {
                 if (!stack.isEmpty()) {
                     try {
-                        gui.renderTooltip(matrices, stack, mX + gui.getLeft(), mY + gui.getTop());
+                        graphics.renderTooltip(this.gui.getFont(), stack, mX + gui.getLeft(), mY + gui.getTop());
                     } catch (Exception ignored) {
                     }
                 }
@@ -69,8 +70,8 @@ public class EditGroupGraphic extends EditableGraphic {
             }
         }
         
-        gui.drawString(matrices, Translator.translatable("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translatable("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
     }
     
     @Override

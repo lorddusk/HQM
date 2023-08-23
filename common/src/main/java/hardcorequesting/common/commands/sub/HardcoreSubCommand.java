@@ -16,9 +16,9 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         Command<CommandSourceStack> enable = context -> {
             if (context.getSource().getLevel().getLevelData().isHardcore())
-                context.getSource().sendSuccess(Component.translatable("hqm.message.vanillaHardcoreOn"), true);
+                context.getSource().sendSuccess(() -> Component.translatable("hqm.message.vanillaHardcoreOn"), true);
             else
-                context.getSource().sendSuccess(Component.translatable(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
+                context.getSource().sendSuccess(() -> Component.translatable(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
             QuestingDataManager.getInstance().activateHardcore();
             if (context.getSource().getEntity() instanceof Player)
                 currentLives((Player) context.getSource().getEntity());
@@ -30,7 +30,7 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
                 .then(literal("disable")
                         .executes(context -> {
                             QuestingDataManager.getInstance().disableHardcore();
-                            context.getSource().sendSuccess(Component.translatable("hqm.message.hardcoreDisabled"), true);
+                            context.getSource().sendSuccess(() -> Component.translatable("hqm.message.hardcoreDisabled"), true);
                             return 1;
                         })
                 )

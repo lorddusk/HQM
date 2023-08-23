@@ -20,6 +20,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -109,8 +110,8 @@ public class QuestSetsGraphic extends EditableGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         Player player = gui.getPlayer();
         List<QuestSet> questSets = Quest.getQuestSets();
@@ -174,7 +175,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             } else {
                 color = HQMConfig.DISABLED_SET;
             }
-            gui.drawString(matrices, Translator.plain(name), LIST_X, setY, color);
+            gui.drawString(graphics, Translator.plain(name), LIST_X, setY, color);
             
             FormattedText info;
             if (enabled) {
@@ -184,31 +185,31 @@ public class QuestSetsGraphic extends EditableGraphic {
                     info = Translator.translatable("hqm.questBook.percentageQuests", ((completedCount * 100) / total));
             } else
                 info = Translator.translatable("hqm.questBook.locked");
-            gui.drawString(matrices, info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
+            gui.drawString(graphics, info, LIST_X + LINE_2_X, setY + LINE_2_Y, 0.7F, color);
             if (enabled && unclaimed != 0) {
                 FormattedText toClaim = Translator.translatable("hqm.questBook.unclaimedRewards", Translator.quest(unclaimed)).withStyle(ChatFormatting.DARK_PURPLE);
-                gui.drawString(matrices, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
+                gui.drawString(graphics, toClaim, LIST_X + LINE_2_X, setY + LINE_2_Y + 8, 0.7F, 0xFFFFFFFF);
             }
             setY += GuiQuestBook.TEXT_HEIGHT + TEXT_SPACING;
         }
         
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
         } else {
             if (selectedSet != null) {
                 List<FormattedText> description = descriptionScroll.getVisibleEntries(selectedSet.getDescription(gui), VISIBLE_DESCRIPTION_LINES);
-                gui.drawString(matrices, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(graphics, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
             }
             
-            drawQuestInfo(matrices, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
+            drawQuestInfo(graphics, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
         }
     }
     
-    public static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y) {
-        drawQuestInfo(matrices, gui, set, x, y, new HashMap<>(), new HashMap<>());
+    public static void drawQuestInfo(GuiGraphics graphics, GuiQuestBook gui, QuestSet set, int x, int y) {
+        drawQuestInfo(graphics, gui, set, x, y, new HashMap<>(), new HashMap<>());
     }
     
-    private static void drawQuestInfo(PoseStack matrices, GuiQuestBook gui, QuestSet set, int x, int y, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
+    private static void drawQuestInfo(GuiGraphics graphics, GuiQuestBook gui, QuestSet set, int x, int y, HashMap<Quest, Boolean> isVisibleCache, HashMap<Quest, Boolean> isLinkFreeCache) {
         int completed = 0;
         int reward = 0;
         int enabled = 0;
@@ -246,7 +247,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         if (Quest.canQuestsBeEdited() && !Screen.hasControlDown()) {
             info.add(Translator.translatable("hqm.questBook.inclInvisiQuests", Translator.quest(realTotal)).withStyle(ChatFormatting.GRAY));
         }
-        gui.drawString(matrices, info, x, y, 0.7F, 0x404040);
+        gui.drawString(graphics, info, x, y, 0.7F, 0x404040);
     }
     
     @Override

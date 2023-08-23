@@ -10,6 +10,7 @@ import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -114,31 +115,31 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         if (reputation != null) {
             
             
             
-            gui.drawString(matrices, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            FormattedText info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(lower.getLabel()), false);
+            FormattedText info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(lower.getLabel()), false);
             
-            gui.drawString(matrices, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(upper.getLabel()), false);
+            info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(upper.getLabel()), false);
             
-            gui.drawString(matrices, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            info = reputation.drawAndGetTooltip(matrices, gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);
+            info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);
             
             
             if (info != null) {
-                gui.renderTooltip(matrices, info, mX + gui.getLeft(), mY + gui.getTop());
+                gui.renderTooltip(graphics, info, mX + gui.getLeft(), mY + gui.getTop());
             }
         }
     }

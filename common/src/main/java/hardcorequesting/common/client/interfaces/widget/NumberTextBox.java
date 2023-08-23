@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.function.IntConsumer;
@@ -45,10 +46,10 @@ public class NumberTextBox extends TextBox {
     }
     
     @Override
-    protected void draw(PoseStack matrices, boolean selected, int mX, int mY) {
-        super.draw(matrices, selected, mX, mY);
+    protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
+        super.draw(graphics, selected, mX, mY);
         
-        this.gui.drawString(matrices, title, x, y + TEXT_OFFSET, 0x404040);
+        this.gui.drawString(graphics, title, x, y + TEXT_OFFSET, 0x404040);
     }
     
     @Override

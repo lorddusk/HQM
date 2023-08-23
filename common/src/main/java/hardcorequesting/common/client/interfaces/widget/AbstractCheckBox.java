@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public abstract class AbstractCheckBox implements Drawable, Clickable {
     }
     
     @Override
-    public void render(PoseStack matrices, int mX, int mY) {
+    public void render(GuiGraphics graphics, int mX, int mY) {
         if (!isVisible()) {
             return;
         }
@@ -39,11 +40,9 @@ public abstract class AbstractCheckBox implements Drawable, Clickable {
         boolean hover = gui.inBounds(x, y, CHECK_BOX_SIZE, CHECK_BOX_SIZE, mX, mY);
         
         gui.applyColor(0xFFFFFFFF);
-        
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-        
-        gui.drawRect(matrices, x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
-        gui.drawString(matrices, cached, x + 12, y + 2, 0.7F, 0x404040);
+
+        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
+        gui.drawString(graphics, cached, x + 12, y + 2, 0.7F, 0x404040);
     }
     
     @Override

@@ -11,6 +11,7 @@ import hardcorequesting.common.util.Translator;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -115,11 +116,11 @@ public class WrappedTextMenu extends AbstractTextMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         if (this.translatedLines != null) {
-            this.gui.drawString(matrices, this.translatedLines, 20, 100, 1F, MultilineTextBox.DEFAULT_TEXT_COLOR);
+            this.gui.drawString(graphics, this.translatedLines, 20, 100, 1F, MultilineTextBox.DEFAULT_TEXT_COLOR);
         }
     }
     

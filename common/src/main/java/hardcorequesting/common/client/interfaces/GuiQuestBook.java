@@ -17,6 +17,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
@@ -121,7 +122,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     @Override
-    public void render(PoseStack matrices, int x0, int y0, float f) {
+    public void render(GuiGraphics graphics, int x0, int y0, float f) {
         left = (width - TEXTURE_WIDTH) / 2;
         top = (height - TEXTURE_HEIGHT) / 2;
         
@@ -129,56 +130,54 @@ public class GuiQuestBook extends GuiBase {
         int y = y0 - top;
         
         applyColor(0xFFFFFFFF);
+
+        drawRect(graphics, BG_TEXTURE, 0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
         ResourceHelper.bindResource(BG_TEXTURE);
-        
-        drawRect(matrices, 0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
-        drawRect(matrices, PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
+        drawRect(graphics, PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
         
         if (Quest.canQuestsBeEdited()) {
             applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(MAP_TEXTURE);
-            SaveHelper.render(matrices, this, x, y);
+            SaveHelper.render(graphics, this, x, y);
         }
         
-        saveButton.render(matrices, x, y);
+        saveButton.render(graphics, x, y);
         
         applyColor(0xFFFFFFFF);
-        ResourceHelper.bindResource(MAP_TEXTURE);
-        
-        
+
         if (shouldDisplayBackArrow()) {
-            drawRect(matrices, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
+            drawRect(graphics, MAP_TEXTURE, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
         }
         if (shouldDisplayMenuArrow()) {
-            drawRect(matrices, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
+            drawRect(graphics, MAP_TEXTURE, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
         }
         
         if (editMenu == null) {
     
-            pageGraphic.drawFull(matrices, x, y);
+            pageGraphic.drawFull(graphics, x, y);
     
             if (currentMode == EditMode.DELETE) {
-                matrices.pushPose();
-                matrices.translate(0, 0, 200);
-                drawCenteredString(matrices, Translator.translatable("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                drawCenteredString(matrices, Translator.translatable("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                matrices.popPose();
+                graphics.pose().pushPose();
+                graphics.pose().translate(0, 0, 200);
+                drawCenteredString(graphics, Translator.translatable("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(graphics, Translator.translatable("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                graphics.pose().popPose();
             }
     
         } else {
-            editMenu.drawFull(matrices, x, y);
+            editMenu.drawFull(graphics, x, y);
         }
     
-        saveButton.renderTooltip(matrices, x, y);
+        saveButton.renderTooltip(graphics, x, y);
         
         if (shouldDisplayBackArrow() && inBackArrowBounds(x, y)) {
-            renderTooltip(matrices, FormattedText.composite(
+            renderTooltip(graphics, FormattedText.composite(
                     Translator.translatable("hqm.questBook.goBack"),
                     Translator.plain("\n"),
                     Translator.translatable("hqm.questBook.rightClick").withStyle(ChatFormatting.DARK_GRAY)
             ), x + left, y + top);
         } else if (shouldDisplayMenuArrow() && inMenuArrowBounds(x, y)) {
-            renderTooltip(matrices, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
+            renderTooltip(graphics, Translator.translatable("hqm.questBook.backToMenu"), x + left, y + top);
         }
     }
     

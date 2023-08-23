@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import org.jetbrains.annotations.Nullable;
@@ -66,27 +67,24 @@ public abstract class LargeButton implements Drawable, Clickable {
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void render(PoseStack matrices, int mX, int mY) {
+    public void render(GuiGraphics graphics, int mX, int mY) {
         if (isVisible()) {
-            
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             boolean enabled = isEnabled();
-            this.gui.drawRect(matrices, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
-            this.gui.drawCenteredString(matrices, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
+            this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+            this.gui.drawCenteredString(graphics, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
         }
     }
     
     @Override
     @Environment(EnvType.CLIENT)
-    public void renderTooltip(PoseStack matrices, int mX, int mY) {
+    public void renderTooltip(GuiGraphics graphics, int mX, int mY) {
         if (isVisible() && inButtonBounds(mX, mY)) {
             FormattedText description = getDescription();
             if (description != null) {
                 var lines = this.gui.getLinesFromText(getDescription(), 1, 200);
     
-                this.gui.renderTooltip(matrices, Language.getInstance().getVisualOrder(lines), mX + this.gui.getLeft(), mY + this.gui.getTop());
+                this.gui.renderTooltipL(graphics, lines, mX + this.gui.getLeft(), mY + this.gui.getTop());
             }
         }
     }

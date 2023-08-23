@@ -9,6 +9,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.UUID;
@@ -24,14 +25,14 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     }
     
     @Override
-    protected void drawElementText(PoseStack matrices, TameMobsTask.Part part, int index, int x, int y) {
+    protected void drawElementText(GuiGraphics graphics, TameMobsTask.Part part, int index, int x, int y) {
         int tamed = task.tamed(index, playerId);
         if (tamed == part.getCount()) {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.allTamed").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.tameTask.allTamed").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
         } else {
-            gui.drawString(matrices, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.getCount())), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.getCount())), x, y, 0.7F, 0x404040);
         }
-        gui.drawString(matrices, Translator.translatable("hqm.tameTask.totalTames", part.getCount()), x, y + 6, 0.7F, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.tameTask.totalTames", part.getCount()), x, y + 6, 0.7F, 0x404040);
     }
     
     @Override

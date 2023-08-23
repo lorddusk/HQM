@@ -10,6 +10,7 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.function.Consumer;
@@ -41,8 +42,8 @@ public class PickReputationMenu extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         int x = EditReputationGraphic.REPUTATION_LIST_X;
         int y = EditReputationGraphic.REPUTATION_LIST_Y;
@@ -53,11 +54,11 @@ public class PickReputationMenu extends GuiEditMenu {
             boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
             boolean selected = reputation.equals(selectedReputation);
             
-            gui.drawString(matrices, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+            gui.drawString(graphics, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
             
             y += EditReputationGraphic.REPUTATION_OFFSET;
         }
-        gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
+        gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
     }
     
     @Override

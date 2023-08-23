@@ -9,6 +9,7 @@ import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.UUID;
@@ -62,17 +63,17 @@ public class ReputationBar {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(PoseStack matrices, GuiQuestBook gui, int mX, int mY, UUID playerId) {
+    public void draw(GuiGraphics graphics, GuiQuestBook gui, int mX, int mY, UUID playerId) {
         Reputation reputation = ReputationManager.getInstance().getReputation(this.repId);
         if (reputation == null) return;
         
         gui.applyColor(0xFFFFFFFF);
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
     
-        FormattedText info = reputation.drawAndGetTooltip(matrices, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
+        FormattedText info = reputation.drawAndGetTooltip(graphics, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
         
         if (info != null) {
-            gui.renderTooltip(matrices, info, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltip(graphics, info, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     

@@ -49,15 +49,15 @@ public class CommandHandler {
         }
         
         default void currentLives(Player player) {
-            player.createCommandSourceStack().sendSuccess(Component.literal("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
+            player.createCommandSourceStack().sendSuccess(() -> Component.literal("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void currentLives(CommandSourceStack source, Player player) {
-            source.sendSuccess(Component.literal(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
+            source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
         
         default void sendChat(CommandSourceStack sender, Component text) {
-            sender.sendSuccess(text, false);
+            sender.sendSuccess(() -> text, false);
         }
     }
 }

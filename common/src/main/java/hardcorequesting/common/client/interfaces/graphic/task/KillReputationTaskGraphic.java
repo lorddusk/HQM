@@ -10,6 +10,7 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.UUID;
 
@@ -42,14 +43,14 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
     
         int killCount = task.getKills(playerId);
         if (Quest.canQuestsBeEdited()) {
-            gui.drawString(matrices, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         } else {
-            gui.drawString(matrices, gui.getLinesFromText(killCount == task.getKillsRequirement()
+            gui.drawString(graphics, gui.getLinesFromText(killCount == task.getKillsRequirement()
                     ? Translator.translatable("hqm.repKil.killCount", Translator.player(task.getKillsRequirement())).withStyle(ChatFormatting.DARK_GREEN)
                     : Translator.translatable("hqm.repKil.killCountOutOf", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
         }

@@ -52,7 +52,7 @@ public class BlockSyncMessage implements IMessage {
         private void handle(BlockSyncMessage message, PacketContext ctx) {
             Player player = HardcoreQuestingCore.proxy.getPlayer(ctx);
             if (player == null) return;
-            BlockEntity te = player.level.getBlockEntity(BlockPos.of(message.pos));
+            BlockEntity te = player.level().getBlockEntity(BlockPos.of(message.pos));
             JsonObject data = new JsonParser().parse(message.data).getAsJsonObject();
             if (te instanceof IBlockSync)
                 ((IBlockSync) te).readData(player, !ctx.isClient(), message.type, data);

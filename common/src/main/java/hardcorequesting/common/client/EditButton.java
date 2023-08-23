@@ -2,12 +2,14 @@ package hardcorequesting.common.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.ComponentCollector;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -33,7 +35,7 @@ public class EditButton {
     private final int x;
     private final int y;
     private final EditMode mode;
-    private List<FormattedCharSequence> text;
+    private List<FormattedText> text;
     
     public EditButton(EditMode mode, int id, Runnable onClick) {
         this.mode = mode;
@@ -56,44 +58,41 @@ public class EditButton {
     }
     
     @Environment(EnvType.CLIENT)
-    public void draw(GuiQuestBook gui, PoseStack matrices, int mX, int mY) {
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+    public void draw(GuiQuestBook gui, GuiGraphics graphics, int mX, int mY) {
         int srcY = gui.getCurrentMode() == mode ? 2 : gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
-        gui.drawRect(matrices, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
-        gui.drawRect(matrices, x + 2, y + 2,
+        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + 2, y + 2,
                 BUTTON_ICON_SRC_X + (mode.ordinal() % EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SRC_Y + (mode.ordinal() / EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SIZE, BUTTON_ICON_SIZE);
     }
     
     @Environment(EnvType.CLIENT)
-    public void drawInfo(GuiQuestBook gui, PoseStack matrices, int mX, int mY) {
+    public void drawInfo(GuiQuestBook gui, GuiGraphics graphics, int mX, int mY) {
         if (gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY)) {
-            if (text == null) {
-                List<FormattedText> text = new ArrayList<>();
+            if (this.text == null) {
+                this.text = new ArrayList<>();
                 if (KeyboardHandler.keyMap.containsValue(mode)) {
                     List<String> builder = new ArrayList<>();
                     for (Map.Entry<Integer, EditMode> entry : KeyboardHandler.keyMap.entries()) {
                         if (entry.getValue() == mode)
                             builder.add("§7" + StringUtils.capitalize(InputConstants.Type.KEYSYM.getOrCreate(entry.getKey()).getDisplayName().getString()));
                     }
-                    text.add(Translator.translatable("hqm.editMode.keybind", mode.getName(), String.join(", ", builder)));
+                    this.text.add(Translator.translatable("hqm.editMode.keybind", mode.getName(), String.join(", ", builder)));
                 } else {
-                    text.add(FormattedText.of(mode.getName()));
+                    this.text.add(FormattedText.of(mode.getName()));
                 }
-                text.addAll(gui.getLinesFromText(Translator.plain("\n" + mode.getDescription()), 1F, 150));
-                for (int i = 1; i < text.size(); i++) {
+                this.text.addAll(gui.getLinesFromText(Translator.plain("\n" + mode.getDescription()), 1F, 150));
+                for (int i = 1; i < this.text.size(); i++) {
                     ComponentCollector collector = new ComponentCollector();
-                    text.get(i).visit((style, string) -> {
+                    this.text.get(i).visit((style, string) -> {
                         collector.append(FormattedText.of(string, style));
                         return Optional.empty();
                     }, Style.EMPTY);
-                    text.set(i, collector.getResultOrEmpty());
+                    this.text.set(i, collector.getResultOrEmpty());
                 }
-                this.text = Language.getInstance().getVisualOrder(text);
             }
-    
-            gui.renderTooltip(matrices, text, mX + gui.getLeft(), mY + gui.getTop());
+            gui.renderTooltipL(graphics, this.text, mX + gui.getLeft(), mY + gui.getTop());
         }
     }
     

@@ -9,6 +9,7 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     
     protected abstract List<Positioned<Part>> positionParts(List<Part> parts);
     
-    protected abstract void drawPart(PoseStack matrices, Part part, int id, int x, int y, int mX, int mY);
+    protected abstract void drawPart(GuiGraphics graphics, Part part, int id, int x, int y, int mX, int mY);
     
     protected List<FormattedText> getPartTooltip(Positioned<Part> pos, int id, int mX, int mY) {return null;}
     
@@ -47,32 +48,32 @@ public abstract class ListTaskGraphic<Part> extends TaskGraphic {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
+    public void draw(GuiGraphics graphics, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
         
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             Part part = pos.getElement();
-            drawPart(matrices, part, i, pos.getX(), pos.getY(), mX, mY);
+            drawPart(graphics, part, i, pos.getX(), pos.getY(), mX, mY);
         }
         
-        super.draw(matrices, mX, mY);
+        super.draw(graphics, mX, mY);
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, int mX, int mY) {
+    public void drawTooltip(GuiGraphics graphics, int mX, int mY) {
         List<Positioned<Part>> renderElements = positionParts(parts.getShownElements());
     
         for (int i = 0; i < renderElements.size(); i++) {
             Positioned<Part> pos = renderElements.get(i);
             List<FormattedText> tooltip = getPartTooltip(pos, i, mX, mY);
             if (tooltip != null) {
-                gui.renderTooltipL(matrices, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
+                gui.renderTooltipL(graphics, tooltip, gui.getLeft() + mX, gui.getTop() + mY);
                 return;
             }
         }
         
-        super.drawTooltip(matrices, mX, mY);
+        super.drawTooltip(graphics, mX, mY);
     }
     
     @Override

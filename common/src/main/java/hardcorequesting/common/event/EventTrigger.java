@@ -99,7 +99,7 @@ public class EventTrigger {
     }
     
     public void onLivingDeath(LivingEntity entity, DamageSource source) {
-        if (entity.level.isClientSide)
+        if (entity.level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.DEATH)) {
             task.onLivingDeath(entity, source);
@@ -107,7 +107,7 @@ public class EventTrigger {
     }
     
     public void onCrafting(Player player, ItemStack stack) {
-        if (player.level.isClientSide)
+        if (player.level().isClientSide)
             return;
         for (QuestTask<?> task : getTasks(Type.CRAFTING)) {
             task.onCrafting(player, stack);
@@ -115,7 +115,7 @@ public class EventTrigger {
     }
     
     public void onItemPickUp(Player playerEntity, ItemStack stack) {
-        if (playerEntity.level.isClientSide)
+        if (playerEntity.level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.PICK_UP)) {
             task.onItemPickUp(playerEntity, stack);
@@ -123,7 +123,7 @@ public class EventTrigger {
     }
     
     public void onBookOpening(BookOpeningEvent event) {
-        if (event.getPlayer().level.isClientSide)
+        if (event.getPlayer().level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.OPEN_BOOK)) {
             task.onOpenBook(event);
@@ -131,7 +131,7 @@ public class EventTrigger {
     }
     
     public void onQuestComplete(QuestCompletedEvent event) {
-        if (event.player.level.isClientSide)
+        if (event.player.level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.QUEST_COMPLETED)) {
             task.onQuestCompleted(event);
@@ -139,7 +139,7 @@ public class EventTrigger {
     }
     
     public void onQuestSelected(QuestSelectedEvent event) {
-        if (event.getPlayer().level.isClientSide)
+        if (event.getPlayer().level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.QUEST_SELECTED)) {
             task.onQuestSelected(event);
@@ -147,7 +147,7 @@ public class EventTrigger {
     }
     
     public void onReputationChange(ReputationEvent event) {
-        if (event.getPlayer().level.isClientSide)
+        if (event.getPlayer().level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.REPUTATION_CHANGE)) {
             task.onReputationChange(event);
@@ -155,7 +155,7 @@ public class EventTrigger {
     }
     
     public void onAnimalTame(Player tamer, Entity entity) {
-        if (entity.level.isClientSide)
+        if (entity.level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.ANIMAL_TAME)) {
             task.onAnimalTame(tamer, entity);
@@ -169,7 +169,7 @@ public class EventTrigger {
     }
     
     public void onBlockBreak(LevelAccessor world, BlockPos pos, BlockState state, Player player) {
-        if (player.level.isClientSide)
+        if (player.level().isClientSide)
             return;
         for (QuestTask task : getTasks(Type.BLOCK_BROKEN)) {
             task.onBlockBroken(pos, state, player);

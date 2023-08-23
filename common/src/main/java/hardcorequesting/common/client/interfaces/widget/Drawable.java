@@ -1,9 +1,9 @@
 package hardcorequesting.common.client.interfaces.widget;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 public interface Drawable {
-    void render(PoseStack matrices, int mX, int mY);
+    void render(GuiGraphics graphics, int mX, int mY);
     
-    default void renderTooltip(PoseStack matrices, int mX, int mY) {}
+    default void renderTooltip(GuiGraphics graphics, int mX, int mY) {}
 }

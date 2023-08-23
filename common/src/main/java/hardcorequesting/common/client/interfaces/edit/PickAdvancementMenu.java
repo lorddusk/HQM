@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 import java.util.ArrayList;
@@ -98,8 +99,8 @@ public class PickAdvancementMenu extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -109,14 +110,14 @@ public class PickAdvancementMenu extends GuiEditMenu {
             boolean selected = name.equals(advancement);
             boolean inBounds = gui.inBounds(START_X, nameY, 130, 6, mX, mY);
             
-            gui.drawString(matrices, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(graphics, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
             nameY += OFFSET_Y;
         }
         
-        gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.plain(((advancement == null) ? "Nothing" : "Currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(graphics, Translator.plain("Search"), 180, 20, 0x404040);
+        gui.drawString(graphics, Translator.plain(((advancement == null) ? "Nothing" : "Currently") + "Selected"), 180, 40, 0x404040);
         if (advancement != null) {
-            gui.drawString(matrices, Translator.plain(advancement), 180, 50, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.plain(advancement), 180, 50, 0.7F, 0x404040);
         }
     }
     

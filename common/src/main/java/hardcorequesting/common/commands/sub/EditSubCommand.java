@@ -22,17 +22,17 @@ public class EditSubCommand implements CommandHandler.SubCommand {
                         boolean newEditModeState = !Quest.canQuestsBeEdited();
                         Quest.setEditMode(newEditModeState);
                         if (newEditModeState) {
-                            context.getSource().sendSuccess(Translator.translatable("hqm.command.editMode.enabled"), false);
+                            context.getSource().sendSuccess(() -> Translator.translatable("hqm.command.editMode.enabled"), false);
                         } else {
-                            context.getSource().sendSuccess(Translator.translatable("hqm.command.editMode.disabled"), false);
+                            context.getSource().sendSuccess(() -> Translator.translatable("hqm.command.editMode.disabled"), false);
                         }
                     } else {
-                        context.getSource().sendSuccess(Translator.translatable("hqm.command.editMode.server"), false);
+                        context.getSource().sendSuccess(() -> Translator.translatable("hqm.command.editMode.server"), false);
                         Quest.setEditMode(false);
                     }
                     
                     if (Arrays.stream(SaveHelper.list).anyMatch(element -> element.count > 0))
-                        context.getSource().sendSuccess(Translator.text("You still have unsaved changes! Caution!", ChatFormatting.RED), false);
+                        context.getSource().sendSuccess(() -> Translator.text("You still have unsaved changes! Caution!", ChatFormatting.RED), false);
                     return 1;
                 });
     }

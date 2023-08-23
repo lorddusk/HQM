@@ -15,6 +15,8 @@ import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
@@ -122,11 +124,11 @@ public class PickItemMenu<T> extends GuiEditMenu {
         return gui.inBounds(left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, ARROW_W, ARROW_H, mX, mY);
     }
     
-    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(GuiGraphics graphics, GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(matrices, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
     
     private boolean usePrecision() {
@@ -134,33 +136,31 @@ public class PickItemMenu<T> extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
-        gui.drawString(matrices, Translator.plain("Selected"), 20, 20, 0x404040);
-        type.draw(selected, matrices, gui, 70, 15, mX, mY);
-        gui.drawString(matrices, Translator.plain("Search"), 180, 20, 0x404040);
-        drawList(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
+        gui.drawString(graphics, Translator.plain("Selected"), 20, 20, 0x404040);
+        type.draw(selected, graphics, gui, 70, 15, mX, mY);
+        gui.drawString(graphics, Translator.plain("Search"), 180, 20, 0x404040);
+        drawList(graphics, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         
-        gui.drawString(matrices, Translator.plain("Player inventory"), 20, 70, 0x404040);
-        drawList(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+        gui.drawString(graphics, Translator.plain("Player inventory"), 20, 70, 0x404040);
+        drawList(graphics, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
         if (usePrecision()) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
-            
-            drawArrow(matrices, gui, mX, mY, true);
-            drawArrow(matrices, gui, mX, mY, false);
-            gui.drawCenteredString(matrices, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+
+            drawArrow(graphics, gui, mX, mY, true);
+            drawArrow(graphics, gui, mX, mY, false);
+            gui.drawCenteredString(graphics, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
         }
     }
     
     @Override
-    public void drawTooltip(PoseStack matrices, int mX, int mY) {
-        super.drawTooltip(matrices, mX, mY);
+    public void drawTooltip(GuiGraphics graphics, int mX, int mY) {
+        super.drawTooltip(graphics, mX, mY);
         
-        drawListMouseOver(matrices, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
-        drawListMouseOver(matrices, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
+        drawListMouseOver(graphics, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
+        drawListMouseOver(graphics, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
     }
     
     @Override
@@ -196,17 +196,17 @@ public class PickItemMenu<T> extends GuiEditMenu {
         }
     }
     
-    private void drawList(PoseStack matrices, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
+    private void drawList(GuiGraphics graphics, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             T element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
             int yI = i / ITEMS_PER_LINE;
     
-            type.draw(element, matrices, gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
+            type.draw(element, graphics, gui, x + xI * OFFSET, y + yI * OFFSET, mX, mY);
         }
     }
     
-    private void drawListMouseOver(PoseStack matrices, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
+    private void drawListMouseOver(GuiGraphics graphics, GuiBase gui, int x, int y, List<T> items, int mX, int mY) {
         for (int i = 0; i < items.size(); i++) {
             T element = items.get(i);
             int xI = i % ITEMS_PER_LINE;
@@ -214,7 +214,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
             
             if (gui.inBounds(x + xI * OFFSET, y + yI * OFFSET, SIZE, SIZE, mX, mY)) {
                 if (element != null) {
-                    gui.renderTooltipL(matrices, type.getName(element, gui), mX + gui.getLeft(), mY + gui.getTop());
+                    gui.renderTooltipL(graphics, type.getName(element, gui), mX + gui.getLeft(), mY + gui.getTop());
                 }
                 break;
             }
@@ -261,13 +261,13 @@ public class PickItemMenu<T> extends GuiEditMenu {
             }
     
             @Override
-            protected void draw(ItemStack item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-                gui.drawItemStack(matrices, item, x, y, mX, mY, false);
+            protected void draw(ItemStack item, GuiGraphics graphics, GuiBase gui, int x, int y, int mX, int mY) {
+                gui.drawItemStack(graphics, item, x, y, mX, mY, false);
             }
     
             @Override
             protected List<Component> getName(ItemStack item, GuiBase gui) {
-                return gui.getTooltipFromItem(item);
+                return Screen.getTooltipFromItem(Minecraft.getInstance(), item);
             }
     
             @Override
@@ -303,14 +303,14 @@ public class PickItemMenu<T> extends GuiEditMenu {
             }
     
             @Override
-            protected void draw(Either<ItemStack, FluidStack> item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY) {
-                item.ifLeft(stack -> gui.drawItemStack(matrices, stack, x, y, mX, mY, false))
-                        .ifRight(stack -> gui.drawFluid(stack, matrices, x, y, mX, mY));
+            protected void draw(Either<ItemStack, FluidStack> item, GuiGraphics graphics, GuiBase gui, int x, int y, int mX, int mY) {
+                item.ifLeft(stack -> gui.drawItemStack(graphics, stack, x, y, mX, mY, false))
+                        .ifRight(stack -> gui.drawFluid(stack, graphics, x, y, mX, mY));
             }
     
             @Override
             protected List<Component> getName(Either<ItemStack, FluidStack> item, GuiBase gui) {
-                return item.map(gui::getTooltipFromItem,
+                return item.map(stack -> Screen.getTooltipFromItem(Minecraft.getInstance(), stack),
                         stack -> Collections.singletonList(stack.getName()));
             }
     
@@ -338,7 +338,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
     
         protected abstract Stream<TextSearch.SearchEntry<T>> getSearchEntriesStream();
     
-        protected abstract void draw(T item, PoseStack matrices, GuiBase gui, int x, int y, int mX, int mY);
+        protected abstract void draw(T item, GuiGraphics graphics, GuiBase gui, int x, int y, int mX, int mY);
     
         protected abstract List<? extends FormattedText> getName(T item, GuiBase gui);
         

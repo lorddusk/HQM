@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
 public abstract class ArrowSelectionHelper implements Drawable, Clickable {
@@ -30,19 +31,18 @@ public abstract class ArrowSelectionHelper implements Drawable, Clickable {
     }
     
     @Override
-    public void render(PoseStack matrices, int mX, int mY) {
+    public void render(GuiGraphics graphics, int mX, int mY) {
         if (isArrowVisible()) {
             
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             
-            drawArrow(matrices, gui, mX, mY, true);
-            drawArrow(matrices, gui, mX, mY, false);
+            drawArrow(graphics, gui, mX, mY, true);
+            drawArrow(graphics, gui, mX, mY, false);
             
-            gui.drawCenteredString(matrices, getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(graphics, getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
             FormattedText description = getArrowDescription();
             if (description != null) {
-                gui.drawString(matrices, gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(graphics, gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
             }
         }
     }
@@ -76,11 +76,11 @@ public abstract class ArrowSelectionHelper implements Drawable, Clickable {
         return true;
     }
     
-    private void drawArrow(PoseStack matrices, GuiBase gui, int mX, int mY, boolean left) {
+    private void drawArrow(GuiGraphics graphics, GuiBase gui, int mX, int mY, boolean left) {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(matrices, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
     
     private boolean inArrowBounds(GuiBase gui, int mX, int mY, boolean left) {

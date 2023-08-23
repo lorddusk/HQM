@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.*;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.FormattedText;
@@ -123,8 +124,8 @@ public class PickMobMenu extends GuiEditMenu {
     }
     
     @Override
-    public void draw(PoseStack matrices, int mX, int mY) {
-        super.draw(matrices, mX, mY);
+    public void draw(GuiGraphics graphics, int mX, int mY) {
+        super.draw(graphics, mX, mY);
         
         ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -134,14 +135,14 @@ public class PickMobMenu extends GuiEditMenu {
             boolean selected = entry.equals(mob);
             boolean inBounds = gui.inBounds(START_X, mobY, 130, 6, mX, mY);
             
-            gui.drawString(matrices, entry.description, START_X, mobY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(graphics, entry.description, START_X, mobY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
             mobY += OFFSET_Y;
         }
         
-        gui.drawString(matrices, Translator.translatable("hqm." + textKey + ".search"), 180, 20, 0x404040);
-        gui.drawString(matrices, Translator.translatable("hqm." + textKey + "." + (mob == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm." + textKey + ".search"), 180, 20, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm." + textKey + "." + (mob == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
         if (mob != null) {
-            gui.drawString(matrices, mob.description, 180, 50, 0.7F, 0x404040);
+            gui.drawString(graphics, mob.description, 180, 50, 0.7F, 0x404040);
         }
     }
     

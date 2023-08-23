@@ -16,6 +16,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -79,6 +81,8 @@ import java.util.function.Supplier;
 public class HardcoreQuestingForge implements AbstractPlatform {
     private final NetworkManager networkManager = new NetworkingManager();
     private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HardcoreQuestingCore.ID);
+
+    private final DeferredRegister<CreativeModeTab> tab = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, HardcoreQuestingCore.ID);
     private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
     private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, HardcoreQuestingCore.ID);
@@ -90,6 +94,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         HardcoreQuestingCore.initialize(this);
     
         sounds.register(FMLJavaModLoadingContext.get().getModEventBus());
+        tab.register(FMLJavaModLoadingContext.get().getModEventBus());
         block.register(FMLJavaModLoadingContext.get().getModEventBus());
         item.register(FMLJavaModLoadingContext.get().getModEventBus());
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -98,7 +103,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
             if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
                     || event.isCanceled()
-                    || player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                    || player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
                     || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                     return;
                 }
@@ -117,7 +122,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         MinecraftForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
             if (event.getEntity() == null || event.getEntity() instanceof FakePlayer
                 || !event.isWasDeath() || event.isCanceled()
-                || event.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
+                || event.getEntity().level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
                 || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                 return;
             }
@@ -125,7 +130,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
             ItemStack bookStack = new ItemStack(ModItems.book.get());
             if (event.getOriginal().getInventory().contains(bookStack)) {
                 for (ItemStack stack : event.getOriginal().getInventory().items) {
-                    if (bookStack.sameItem(stack)) {
+                    if (ItemStack.isSameItem(bookStack, stack)) {
                         bookStack = stack.copy();
                         break;
                     }
@@ -343,5 +348,10 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
         return recipe.register(id, BookCatalystRecipeSerializer::new);
+    }
+
+    @Override
+    public Supplier<CreativeModeTab> registerTab(String id, Supplier<CreativeModeTab> supplier) {
+        return tab.register(id, supplier);
     }
 }
