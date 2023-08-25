@@ -29,6 +29,7 @@ public class CommandHandler {
         SUB_COMMANDS.put("quest", new QuestSubCommand());
         SUB_COMMANDS.put("enable", new EnableSubCommand());
         SUB_COMMANDS.put("version", new VersionSubCommand());
+        SUB_COMMANDS.put("reset", new ResetPlayerSubCommand());
     }
     
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
