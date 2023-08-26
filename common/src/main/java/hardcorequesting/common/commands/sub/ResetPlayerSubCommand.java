@@ -1,6 +1,5 @@
 package hardcorequesting.common.commands.sub;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -25,16 +24,23 @@ public class ResetPlayerSubCommand implements CommandHandler.SubCommand {
                                 .executes(context -> run(context, EntityArgument.getPlayers(context, "targets")))));
     }
 
-    private int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> players){
+    private int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> players) {
+        int successes = 0;
         for (Player player : players) {
             if (!QuestingDataManager.getInstance().hasData(player)) {
-                sendChat(context.getSource(), Component.literal("No data available for " + player.getDisplayName() + " (" + player.getName() + ")."));
+                context.getSource().sendFailure(Component.translatable("hqm.message.resetFail", player.getDisplayName()));
             } else {
                 QuestingDataManager.getInstance().remove(player);
+                logSuccess(context.getSource(), player);
+                successes++;
             }
         }
         WorldEventListener.onSave(context.getSource().getLevel());
-        sendChat(context.getSource(), Component.literal("Deletion done."));
-        return Command.SINGLE_SUCCESS;
+        return successes;
+    }
+    
+    private static void logSuccess(CommandSourceStack source, Player player) {
+        source.sendSuccess(() -> Component.translatable("hqm.message.resetPlayer", player.getDisplayName()), true);
+        player.sendSystemMessage(Component.translatable("hqm.message.reset"));
     }
 }
