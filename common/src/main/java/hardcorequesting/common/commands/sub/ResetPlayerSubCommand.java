@@ -5,6 +5,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.event.WorldEventListener;
+import hardcorequesting.common.network.NetworkManager;
+import hardcorequesting.common.network.message.PlayerDataSyncMessage;
+import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,11 +29,12 @@ public class ResetPlayerSubCommand implements CommandHandler.SubCommand {
 
     private int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> players) {
         int successes = 0;
-        for (Player player : players) {
+        for (ServerPlayer player : players) {
             if (!QuestingDataManager.getInstance().hasData(player)) {
                 context.getSource().sendFailure(Component.translatable("hqm.message.resetFail", player.getDisplayName()));
             } else {
                 QuestingDataManager.getInstance().remove(player);
+                NetworkManager.sendToPlayer(new PlayerDataSyncMessage(QuestLine.getActiveQuestLine(), player), player);
                 logSuccess(context.getSource(), player);
                 successes++;
             }
