@@ -10,11 +10,14 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.*;
 import net.minecraft.Util;
 import net.minecraft.util.GsonHelper;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
 
 public class TeamAdapter {
+    private static final Logger LOGGER = LogManager.getLogger("Hardcore Questing Mode");
     
     private static Map<Team, List<UUID>> invitesMap = new HashMap<>();
     public static final Adapter<Team> TEAM_ADAPTER = new Adapter<Team>() {
@@ -98,16 +101,18 @@ public class TeamAdapter {
                 JsonObject questDataObject = element.getAsJsonObject();
                 UUID questId = UUID.fromString(GsonHelper.getAsString(questDataObject, QUEST_ID));
                 Quest quest = Quest.getQuest(questId);
-                team.getQuestData().put(
-                        questId,
-                        QuestDataAdapter.deserialize(GsonHelper.getAsJsonObject(questDataObject, QUEST_DATA), quest)
-                );
+                if (quest != null) {
+                    QuestData questData = QuestDataAdapter.deserialize(GsonHelper.getAsJsonObject(questDataObject, QUEST_DATA), quest);
+                    team.getQuestData().put(questId, questData);
+                } else {
+                    LOGGER.error("Couldn't find quest with id {} while loading quest progress data. Discarding data.", questId);
+                }
             }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, INVITES)) {
                 if (element.getAsJsonPrimitive().isString())
                     invites.add(UUID.fromString(element.getAsString()));
             }
-            if (invites.size() > 0)
+            if (!invites.isEmpty())
                 invitesMap.put(team, invites);
             return team;
         }
