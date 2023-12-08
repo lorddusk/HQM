@@ -1,12 +1,11 @@
 pluginManagement {
     repositories {
-        jcenter()
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
         maven { url "https://maven.architectury.dev/" }
-        maven { url "https://maven.minecraftforge.net/" }
+        maven { url "https://maven.neoforged.net/" }
         gradlePluginPortal()
     }
 }
@@ -15,4 +14,4 @@ rootProject.name="HQM"
 
 include("common")
 include("fabric")
-include("forge")
+include("neoforge")

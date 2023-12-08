@@ -2,7 +2,6 @@ package hardcorequesting.common.items.crafting;
 
 import hardcorequesting.common.items.ModItems;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -12,8 +11,8 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class BookCatalystRecipe extends ShapedRecipe {
     
-    public BookCatalystRecipe(ResourceLocation id, String group, int width, int height, NonNullList<Ingredient> ingredients, ItemStack result) {
-        super(id, group, CraftingBookCategory.MISC, width, height, ingredients, result);
+    public BookCatalystRecipe(String group, int width, int height, NonNullList<Ingredient> ingredients, ItemStack result) {
+        super(group, CraftingBookCategory.MISC, width, height, ingredients, result);
     }
     
     @Override

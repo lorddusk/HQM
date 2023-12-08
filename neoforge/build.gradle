@@ -7,24 +7,27 @@ configurations {
     shadowCommon
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
-    developmentForge.extendsFrom common
+    developmentNeoForge.extendsFrom common
 }
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
+repositories {
+    maven { url "https://maven.neoforged.net/" }
+}
 dependencies {
-    forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+    neoForge "net.neoforged:neoforge:${project.neoforge_version}"
 
     compileOnly("org.jetbrains:annotations:${project.annotations_version}")
     forgeDependencies(implementation("blue.endless:jankson:${project.jankson_version}"))
     shadowCommon("blue.endless:jankson:${project.jankson_version}")
-    modImplementation "dev.architectury:architectury-forge:${project.architectury_version}"
+    modImplementation "dev.architectury:architectury-neoforge:${project.architectury_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) {
         transitive = false
     }
 }
@@ -48,7 +51,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    archiveClassifier = "forge"
+    archiveClassifier = "neoforge"
 }
 
 jar {

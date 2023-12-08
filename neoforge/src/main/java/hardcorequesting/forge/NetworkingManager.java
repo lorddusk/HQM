@@ -12,16 +12,12 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.event.EventNetworkChannel;
-import org.apache.commons.lang3.tuple.Pair;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.LogicalSide;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.*;
+import net.neoforged.neoforge.network.event.EventNetworkChannel;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -36,14 +32,16 @@ public class NetworkingManager implements NetworkManager {
     
     public static void init() {
         CHANNEL.addListener(createPacketHandler(NetworkEvent.ClientCustomPayloadEvent.class, C2S));
-        
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> ClientNetworkingManager::initClient);
+
+        if(FMLEnvironment.dist.isClient()){
+            ClientNetworkingManager.initClient();
+        }
     }
     
     static <T extends NetworkEvent> Consumer<T> createPacketHandler(Class<T> clazz, Map<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> map) {
         return event -> {
             if (event.getClass() != clazz) return;
-            NetworkEvent.Context context = event.getSource().get();
+            NetworkEvent.Context context = event.getSource();
             if (context.getPacketHandled()) return;
             FriendlyByteBuf buffer = new FriendlyByteBuf(event.getPayload().copy());
             ResourceLocation type = buffer.readResourceLocation();
@@ -53,7 +51,7 @@ public class NetworkingManager implements NetworkManager {
                 consumer.accept(new PacketContext() {
                     @Override
                     public Player getPlayer() {
-                        return isClient() ? getClientPlayer() : context.getSender();
+                        return this.isClient() ? this.getClientPlayer() : context.getSender();
                     }
                     
                     @Override
@@ -65,9 +63,10 @@ public class NetworkingManager implements NetworkManager {
                     public boolean isClient() {
                         return context.getDirection().getReceptionSide() == LogicalSide.CLIENT;
                     }
-                    
+
+                    @OnlyIn(Dist.CLIENT)
                     private Player getClientPlayer() {
-                        return DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> ClientNetworkingManager::getClientPlayer);
+                        return FMLEnvironment.dist.isClient() ? ClientNetworkingManager.getClientPlayer() : null;
                     }
                 }, buffer);
             }
@@ -94,7 +93,7 @@ public class NetworkingManager implements NetworkManager {
             FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
             packetBuffer.writeResourceLocation(id);
             packetBuffer.writeBytes(buffer);
-            connection.send(NetworkDirection.PLAY_TO_SERVER.buildPacket(Pair.of(packetBuffer, 0), CHANNEL_ID).getThis());
+            connection.send(PlayNetworkDirection.PLAY_TO_SERVER.buildPacket(new INetworkDirection.PacketData(packetBuffer, 0), CHANNEL_ID));
         }
     }
     
@@ -112,6 +111,6 @@ public class NetworkingManager implements NetworkManager {
         FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
         packetBuffer.writeResourceLocation(id);
         packetBuffer.writeBytes(buffer);
-        return NetworkDirection.PLAY_TO_CLIENT.buildPacket(Pair.of(packetBuffer, 0), CHANNEL_ID).getThis();
+        return PlayNetworkDirection.PLAY_TO_CLIENT.buildPacket(new INetworkDirection.PacketData(packetBuffer, 0), CHANNEL_ID);
     }
 }

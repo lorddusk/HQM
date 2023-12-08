@@ -2,7 +2,6 @@ package hardcorequesting.forge;
 
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.fluid.FluidStack;
-import dev.architectury.platform.forge.EventBuses;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
@@ -12,10 +11,11 @@ import hardcorequesting.common.recipe.BookCatalystRecipeSerializer;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -39,31 +39,30 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.player.AdvancementEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
+import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,16 +79,15 @@ import java.util.function.Supplier;
 @Mod("hardcorequesting")
 public class HardcoreQuestingForge implements AbstractPlatform {
     private final NetworkManager networkManager = new NetworkingManager();
-    private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, HardcoreQuestingCore.ID);
+    private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, HardcoreQuestingCore.ID);
 
     private final DeferredRegister<CreativeModeTab> tab = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, HardcoreQuestingCore.ID);
-    private final DeferredRegister<Block> block = DeferredRegister.create(ForgeRegistries.BLOCKS, HardcoreQuestingCore.ID);
-    private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
-    private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, HardcoreQuestingCore.ID);
-    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, HardcoreQuestingCore.ID);
+    private final DeferredRegister<Block> block = DeferredRegister.create(BuiltInRegistries.BLOCK, HardcoreQuestingCore.ID);
+    private final DeferredRegister<Item> item = DeferredRegister.create(BuiltInRegistries.ITEM, HardcoreQuestingCore.ID);
+    private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, HardcoreQuestingCore.ID);
+    private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
-        EventBuses.registerModEventBus(HardcoreQuestingCore.ID, FMLJavaModLoadingContext.get().getModEventBus());
         NetworkingManager.init();
         HardcoreQuestingCore.initialize(this);
     
@@ -99,7 +97,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         item.register(FMLJavaModLoadingContext.get().getModEventBus());
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
             if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
                     || event.isCanceled()
@@ -119,9 +117,9 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 }
             }
         });
-        MinecraftForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
+        NeoForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
             if (event.getEntity() == null || event.getEntity() instanceof FakePlayer
-                || !event.isWasDeath() || event.isCanceled()
+                || !event.isWasDeath()
                 || event.getEntity().level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
                 || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                 return;
@@ -167,12 +165,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnCommandRegistration(Consumer<CommandDispatcher<CommandSourceStack>> consumer) {
-        MinecraftForge.EVENT_BUS.<RegisterCommandsEvent>addListener(event -> consumer.accept(event.getDispatcher()));
+        NeoForge.EVENT_BUS.<RegisterCommandsEvent>addListener(event -> consumer.accept(event.getDispatcher()));
     }
     
     @Override
     public void registerOnWorldLoad(BiConsumer<ResourceKey<Level>, ServerLevel> biConsumer) {
-        MinecraftForge.EVENT_BUS.<LevelEvent.Load>addListener(load -> {
+        NeoForge.EVENT_BUS.<LevelEvent.Load>addListener(load -> {
             if (load.getLevel() instanceof ServerLevel)
                 biConsumer.accept(((Level) load.getLevel()).dimension(), (ServerLevel) load.getLevel());
         });
@@ -180,7 +178,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnWorldSave(Consumer<ServerLevel> consumer) {
-        MinecraftForge.EVENT_BUS.<LevelEvent.Save>addListener(save -> {
+        NeoForge.EVENT_BUS.<LevelEvent.Save>addListener(save -> {
             if (save.getLevel() instanceof ServerLevel)
                 consumer.accept((ServerLevel) save.getLevel());
         });
@@ -188,12 +186,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnPlayerJoin(Consumer<ServerPlayer> consumer) {
-        MinecraftForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> consumer.accept((ServerPlayer) event.getEntity()));
+        NeoForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> consumer.accept((ServerPlayer) event.getEntity()));
     }
     
     @Override
     public void registerOnServerTick(Consumer<MinecraftServer> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.ServerTickEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<TickEvent.ServerTickEvent>addListener(event -> {
             if(event.phase == TickEvent.Phase.END)
                 consumer.accept(getServer());
         });
@@ -201,7 +199,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnClientTick(Consumer<Minecraft> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.ClientTickEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<TickEvent.ClientTickEvent>addListener(event -> {
             if(event.phase == TickEvent.Phase.END)
                 consumer.accept(Minecraft.getInstance());
         });
@@ -209,7 +207,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnWorldTick(Consumer<Level> consumer) {
-        MinecraftForge.EVENT_BUS.<TickEvent.LevelTickEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<TickEvent.LevelTickEvent>addListener(event -> {
             if(event.phase == TickEvent.Phase.END)
                 consumer.accept(event.level);
         });
@@ -217,12 +215,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
 
     @Override
     public void registerOnUseItem(TriConsumer<Player, Level, InteractionHand> triConsumer) {
-        MinecraftForge.EVENT_BUS.<PlayerInteractEvent.RightClickItem>addListener(event -> triConsumer.accept(event.getEntity(), event.getLevel(), event.getHand()));
+        NeoForge.EVENT_BUS.<PlayerInteractEvent.RightClickItem>addListener(event -> triConsumer.accept(event.getEntity(), event.getLevel(), event.getHand()));
     }
     
     @Override
     public void registerOnBlockPlace(BlockPlaced blockPlaced) {
-        MinecraftForge.EVENT_BUS.<BlockEvent.EntityPlaceEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<BlockEvent.EntityPlaceEvent>addListener(event -> {
             if (event.getEntity() instanceof LivingEntity)
                 blockPlaced.onBlockPlaced(event.getEntity().getCommandSenderWorld(), event.getPos(), event.getPlacedBlock(), (LivingEntity) event.getEntity());
         });
@@ -230,56 +228,56 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnBlockUse(BlockUsed blockUsed) {
-        MinecraftForge.EVENT_BUS.<PlayerInteractEvent.RightClickBlock>addListener(event -> {
+        NeoForge.EVENT_BUS.<PlayerInteractEvent.RightClickBlock>addListener(event -> {
             blockUsed.onBlockUsed(event.getEntity(), event.getLevel(), event.getHand(), event.getPos(), event.getFace());
         });
     }
     
     @Override
     public void registerOnBlockBreak(BlockBroken blockBroken) {
-        MinecraftForge.EVENT_BUS.<BlockEvent.BreakEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<BlockEvent.BreakEvent>addListener(event -> {
             blockBroken.onBlockBroken(event.getLevel(), event.getPos(), event.getState(), event.getPlayer());
         });
     }
     
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> biConsumer) {
-        MinecraftForge.EVENT_BUS.<PlayerEvent.ItemPickupEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<PlayerEvent.ItemPickupEvent>addListener(event -> {
             biConsumer.accept(event.getEntity(), event.getStack());
         });
     }
     
     @Override
     public void registerOnLivingDeath(BiConsumer<LivingEntity, DamageSource> biConsumer) {
-        MinecraftForge.EVENT_BUS.<LivingDeathEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<LivingDeathEvent>addListener(event -> {
             biConsumer.accept(event.getEntity(), event.getSource());
         });
     }
     
     @Override
     public void registerOnCrafting(BiConsumer<Player, ItemStack> triConsumer) {
-        MinecraftForge.EVENT_BUS.<PlayerEvent.ItemCraftedEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<PlayerEvent.ItemCraftedEvent>addListener(event -> {
             triConsumer.accept(event.getEntity(), event.getCrafting());
         });
     }
     
     @Override
     public void registerOnAnvilCrafting(BiConsumer<Player, ItemStack> triConsumer) {
-        MinecraftForge.EVENT_BUS.<AnvilRepairEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<AnvilRepairEvent>addListener(event -> {
             triConsumer.accept(event.getEntity(), event.getOutput());
         });
     }
     
     @Override
     public void registerOnSmelting(BiConsumer<Player, ItemStack> triConsumer) {
-        MinecraftForge.EVENT_BUS.<PlayerEvent.ItemSmeltedEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<PlayerEvent.ItemSmeltedEvent>addListener(event -> {
             triConsumer.accept(event.getEntity(), event.getSmelting());
         });
     }
     
     @Override
-    public void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> biConsumer) {
-        MinecraftForge.EVENT_BUS.<AdvancementEvent>addListener(event -> {
+    public void registerOnAdvancement(BiConsumer<ServerPlayer, AdvancementHolder> biConsumer) {
+        NeoForge.EVENT_BUS.<AdvancementEvent.AdvancementEarnEvent>addListener(event -> {
             if (event.getEntity() instanceof ServerPlayer)
                 biConsumer.accept((ServerPlayer) event.getEntity(), event.getAdvancement());
         });
@@ -287,7 +285,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnAnimalTame(BiConsumer<Player, Entity> biConsumer) {
-        MinecraftForge.EVENT_BUS.<AnimalTameEvent>addListener(event -> {
+        NeoForge.EVENT_BUS.<AnimalTameEvent>addListener(event -> {
             biConsumer.accept(event.getTamer(), event.getAnimal());
         });
     }
@@ -304,7 +302,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
 
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        return stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM)
+        return stack.getCapability(Capabilities.FLUID_HANDLER_ITEM)
                 .map(HardcoreQuestingForge::getAllFluidsIn)
                 .orElse(Collections.emptyList());
     }
@@ -313,7 +311,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private static List<FluidStack> getAllFluidsIn(IFluidHandlerItem handler) {
         List<FluidStack> fluids = new ArrayList<>();
         for (int tank = 0; tank < handler.getTanks(); tank++) {
-            net.minecraftforge.fluids.FluidStack fluid = handler.getFluidInTank(tank);
+            net.neoforged.neoforge.fluids.FluidStack fluid = handler.getFluidInTank(tank);
             if (!fluid.isEmpty())
                 fluids.add(FluidStack.create(fluid.getFluid(), fluid.getAmount()));
         }

@@ -6,7 +6,7 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -98,7 +98,7 @@ public interface AbstractPlatform {
     
     void registerOnSmelting(BiConsumer<Player, ItemStack> consumer);
     
-    void registerOnAdvancement(BiConsumer<ServerPlayer, Advancement> consumer);
+    void registerOnAdvancement(BiConsumer<ServerPlayer, AdvancementHolder> consumer);
     
     void registerOnAnimalTame(BiConsumer<Player, Entity> consumer);
     

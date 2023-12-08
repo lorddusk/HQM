@@ -4,7 +4,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
@@ -162,7 +162,7 @@ public class EventTrigger {
         }
     }
     
-    public void onAdvancement(ServerPlayer playerEntity, Advancement advancement) {
+    public void onAdvancement(ServerPlayer playerEntity, AdvancementHolder advancement) {
         for (QuestTask task : getTasks(Type.ADVANCEMENT)) {
             task.onAdvancement(playerEntity);
         }

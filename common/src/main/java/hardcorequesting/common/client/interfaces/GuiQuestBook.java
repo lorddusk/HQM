@@ -1,6 +1,5 @@
 package hardcorequesting.common.client.interfaces;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
@@ -297,7 +296,7 @@ public class GuiQuestBook extends GuiBase {
     }
     
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll, double g) {
         double mX = mouseX - left;
         double mY = mouseY - top;
         

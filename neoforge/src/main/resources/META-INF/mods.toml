@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[45,)"
+loaderVersion = "[1,)"
 logoFile = "icon.png"
 authors = ["Vswe", "Lorddusk", "Newcastlegeek", "Way2muchnoise", "McJty", "canitzp", "ArclightTW", "shedaniel", "kirderf1", "CodexAdrian"]
 license = "GNU-3.0"
@@ -12,22 +12,22 @@ This mod will add Hardcore mode with extra lives. If you use up your lives, your
 '''
 
 [[dependencies.hardcorequesting]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "[45,)"
+versionRange = "[20.2.86,21)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.hardcorequesting]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.4,)"
+versionRange = "[1.20.2,1.21)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.hardcorequesting]]
 modId = "architectury"
 mandatory = true
-versionRange = "[8,)"
+versionRange = "[10,)"
 ordering = "NONE"
 side = "BOTH"

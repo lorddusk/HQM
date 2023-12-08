@@ -1,7 +1,6 @@
 package hardcorequesting.common.client.interfaces.edit;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
@@ -10,7 +9,7 @@ import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.FormattedText;
 
@@ -75,8 +74,8 @@ public class PickAdvancementMenu extends GuiEditMenu {
         advancementNames = new ArrayList<>();
         
         // Just using this to gain access to the advancement manager
-        for (Advancement a : HardcoreQuestingCore.getServer().getAdvancements().getAllAdvancements()) {
-            String adv = a.getId().toString();
+        for (AdvancementHolder a : HardcoreQuestingCore.getServer().getAdvancements().getAllAdvancements()) {
+            String adv = a.id().toString();
             rawAdvancemenNames.add(adv);
             advancementNames.add(adv);
         }

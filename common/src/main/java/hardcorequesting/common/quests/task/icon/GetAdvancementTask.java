@@ -10,7 +10,7 @@ import hardcorequesting.common.quests.data.AdvancementTaskData;
 import hardcorequesting.common.quests.task.TaskType;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.PlayerAdvancements;
@@ -84,7 +84,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
                 
                 ResourceLocation advResource = new ResourceLocation(part.getAdvancement());
                 
-                Advancement advAdvancement = manager.getAdvancement(advResource);
+                AdvancementHolder advAdvancement = manager.get(advResource);
                 
                 if (advAdvancement == null) {
                     completed = false;
