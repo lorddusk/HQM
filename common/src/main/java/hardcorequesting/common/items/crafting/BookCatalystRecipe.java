@@ -4,15 +4,12 @@ import hardcorequesting.common.items.ModItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 
 public class BookCatalystRecipe extends ShapedRecipe {
     
-    public BookCatalystRecipe(String group, int width, int height, NonNullList<Ingredient> ingredients, ItemStack result) {
-        super(group, CraftingBookCategory.MISC, width, height, ingredients, result);
+    public BookCatalystRecipe(String group, ShapedRecipePattern shapedRecipePattern, ItemStack result) {
+        super(group, CraftingBookCategory.MISC, shapedRecipePattern, result);
     }
     
     @Override

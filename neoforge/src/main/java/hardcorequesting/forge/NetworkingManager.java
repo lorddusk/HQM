@@ -5,76 +5,95 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.platform.NetworkManager;
 import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.*;
-import net.neoforged.neoforge.network.event.EventNetworkChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class NetworkingManager implements NetworkManager {
-    private static final ResourceLocation CHANNEL_ID = new ResourceLocation(HardcoreQuestingCore.ID, "network");
-    private static final ResourceLocation SYNC_IDS = new ResourceLocation(HardcoreQuestingCore.ID, "sync_ids");
-    static final EventNetworkChannel CHANNEL = NetworkRegistry.newEventChannel(CHANNEL_ID, () -> "1", version -> true, version -> true);
+public final class NetworkingManager implements NetworkManager {
     static final Map<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> S2C = Maps.newHashMap();
     static final Map<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> C2S = Maps.newHashMap();
-    
-    public static void init() {
-        CHANNEL.addListener(createPacketHandler(NetworkEvent.ClientCustomPayloadEvent.class, C2S));
 
-        if(FMLEnvironment.dist.isClient()){
-            ClientNetworkingManager.initClient();
+    static void register(RegisterPayloadHandlerEvent event) {
+        var registrar = event.registrar(HardcoreQuestingCore.ID)
+                .versioned("1");
+        for (Map.Entry<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> entry : S2C.entrySet()) {
+            var id = entry.getKey();
+            var handler = entry.getValue();
+            registrar.play(id, GenericPayload.reader(id), builder -> builder.client((payload, context) -> handler.accept(new PacketContext() {
+
+                @Override
+                public Player getPlayer() {
+                    return ClientNetworkingManager.getClientPlayer();
+                }
+
+                @Override
+                public Consumer<Runnable> getTaskQueue() {
+                    return context.workHandler()::execute;
+                }
+
+                @Override
+                public boolean isClient() {
+                    return true;
+                }
+            }, payload.buffer())));
+        }
+        for (Map.Entry<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> entry : C2S.entrySet()) {
+            var id = entry.getKey();
+            var handler = entry.getValue();
+            registrar.play(id, GenericPayload.reader(id), builder -> builder.server((payload, context) -> handler.accept(new PacketContext() {
+
+                @Override
+                public Player getPlayer() {
+
+                    return context.player().orElseThrow();
+                }
+
+                @Override
+                public Consumer<Runnable> getTaskQueue() {
+
+                    return context.workHandler()::execute;
+                }
+
+                @Override
+                public boolean isClient() {
+
+                    return false;
+                }
+            }, payload.buffer())));
         }
     }
-    
-    static <T extends NetworkEvent> Consumer<T> createPacketHandler(Class<T> clazz, Map<ResourceLocation, BiConsumer<PacketContext, FriendlyByteBuf>> map) {
-        return event -> {
-            if (event.getClass() != clazz) return;
-            NetworkEvent.Context context = event.getSource();
-            if (context.getPacketHandled()) return;
-            FriendlyByteBuf buffer = new FriendlyByteBuf(event.getPayload().copy());
-            ResourceLocation type = buffer.readResourceLocation();
-            BiConsumer<PacketContext, FriendlyByteBuf> consumer = map.get(type);
-            
-            if (consumer != null) {
-                consumer.accept(new PacketContext() {
-                    @Override
-                    public Player getPlayer() {
-                        return this.isClient() ? this.getClientPlayer() : context.getSender();
-                    }
-                    
-                    @Override
-                    public Consumer<Runnable> getTaskQueue() {
-                        return context::enqueueWork;
-                    }
-                    
-                    @Override
-                    public boolean isClient() {
-                        return context.getDirection().getReceptionSide() == LogicalSide.CLIENT;
-                    }
 
-                    @OnlyIn(Dist.CLIENT)
-                    private Player getClientPlayer() {
-                        return FMLEnvironment.dist.isClient() ? ClientNetworkingManager.getClientPlayer() : null;
-                    }
-                }, buffer);
-            }
-            context.setPacketHandled(true);
-        };
+    public record GenericPayload(ResourceLocation id, FriendlyByteBuf buffer) implements CustomPacketPayload {
+        @Override
+        public ResourceLocation id() {
+            return this.id;
+        }
+
+        public static FriendlyByteBuf.Reader<GenericPayload> reader(ResourceLocation id) {
+            return buffer -> {
+                FriendlyByteBuf storedBuffer = new FriendlyByteBuf(Unpooled.buffer());
+                storedBuffer.writeBytes(buffer);
+                return new GenericPayload(id, storedBuffer);
+            };
+        }
+
+        @Override
+        public void write(FriendlyByteBuf buffer) {
+            buffer.writeBytes(this.buffer);
+            this.buffer.resetReaderIndex();
+        }
     }
-    
-    @OnlyIn(Dist.CLIENT)
+
     @Override
     public void registerS2CHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer) {
         S2C.put(id, consumer);
@@ -84,33 +103,20 @@ public class NetworkingManager implements NetworkManager {
     public void registerC2SHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer) {
         C2S.put(id, consumer);
     }
-    
+
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void sendToServer(ResourceLocation id, FriendlyByteBuf buffer) {
-        ClientPacketListener connection = Minecraft.getInstance().getConnection();
-        if (connection != null) {
-            FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
-            packetBuffer.writeResourceLocation(id);
-            packetBuffer.writeBytes(buffer);
-            connection.send(PlayNetworkDirection.PLAY_TO_SERVER.buildPacket(new INetworkDirection.PacketData(packetBuffer, 0), CHANNEL_ID));
-        }
+        PacketDistributor.SERVER.noArg().send(new GenericPayload(id, buffer));
     }
-    
-    public void sendToClient(ResourceLocation id, PacketDistributor.PacketTarget target, FriendlyByteBuf buffer) {
-        target.send(createToPlayerPacket(id, buffer));
-    }
-    
+
     @Override
     public void sendToPlayer(ServerPlayer player, ResourceLocation id, FriendlyByteBuf buffer) {
-        sendToClient(id, PacketDistributor.PLAYER.with(() -> player), buffer);
+
+        PacketDistributor.PLAYER.with(player).send(new GenericPayload(id, buffer));
     }
     
     @Override
     public Packet<?> createToPlayerPacket(ResourceLocation id, FriendlyByteBuf buffer) {
-        FriendlyByteBuf packetBuffer = new FriendlyByteBuf(Unpooled.buffer());
-        packetBuffer.writeResourceLocation(id);
-        packetBuffer.writeBytes(buffer);
-        return PlayNetworkDirection.PLAY_TO_CLIENT.buildPacket(new INetworkDirection.PacketData(packetBuffer, 0), CHANNEL_ID);
+        return new ClientboundCustomPayloadPacket(new GenericPayload(id, buffer));
     }
 }

@@ -4,12 +4,10 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -138,15 +136,5 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                 sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName()));
         }
         currentLives(player);
-    }
-    
-    private void getPlayerLives(CommandSourceStack source, String playerName) throws CommandRuntimeException {
-        Player player = HardcoreQuestingCore.getServer().getPlayerList().getPlayerByName(playerName);
-        if (player != null) {
-            int lives = QuestingDataManager.getInstance().getQuestingData(player).getLives();
-            sendChat(source, Translator.translatable("hqm.message.hasLivesRemaining", playerName, Translator.lives(lives)));
-        } else {
-            throw new CommandRuntimeException(Component.translatable("hqm.message.noPlayer"));
-        }
     }
 }

@@ -7,7 +7,10 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import org.apache.commons.lang3.NotImplementedException;
+
+import java.util.Optional;
 
 /**
  * Same as the corresponding class in the forge module, but does not extend ForgeRegistryEntry
@@ -17,13 +20,15 @@ public class BookCatalystRecipeSerializer implements RecipeSerializer<BookCataly
     @Override
     public BookCatalystRecipe fromNetwork(FriendlyByteBuf friendlyByteBuf) {
         ShapedRecipe recipe = RecipeSerializer.SHAPED_RECIPE.fromNetwork(friendlyByteBuf);
-        return new BookCatalystRecipe(recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem(RegistryAccess.EMPTY));
+        ShapedRecipePattern pattern = new ShapedRecipePattern(recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), Optional.empty());
+        return new BookCatalystRecipe(recipe.getGroup(), pattern, recipe.getResultItem(RegistryAccess.EMPTY));
     }
 
     @Override
     public Codec<BookCatalystRecipe> codec() {
         return RecipeSerializer.SHAPED_RECIPE.codec().flatXmap(recipe -> {
-            BookCatalystRecipe bookCatalystRecipe = new BookCatalystRecipe(recipe.getGroup(), recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), recipe.getResultItem(RegistryAccess.EMPTY));
+            ShapedRecipePattern pattern = new ShapedRecipePattern(recipe.getWidth(), recipe.getHeight(), recipe.getIngredients(), Optional.empty());
+            BookCatalystRecipe bookCatalystRecipe = new BookCatalystRecipe(recipe.getGroup(), pattern, recipe.getResultItem(RegistryAccess.EMPTY));
             return DataResult.success(bookCatalystRecipe);
         }, bookCatalystRecipe -> {
             throw new NotImplementedException("Serializing ShapedRecipe is not implemented yet.");

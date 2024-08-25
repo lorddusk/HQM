@@ -3,6 +3,7 @@ package hardcorequesting.forge;
 import com.mojang.brigadier.CommandDispatcher;
 import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
@@ -40,13 +41,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.TickEvent;
@@ -60,6 +62,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -76,7 +79,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@Mod("hardcorequesting")
+@Mod(HardcoreQuestingCore.ID)
 public class HardcoreQuestingForge implements AbstractPlatform {
     private final NetworkManager networkManager = new NetworkingManager();
     private final DeferredRegister<SoundEvent> sounds = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, HardcoreQuestingCore.ID);
@@ -87,16 +90,19 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, HardcoreQuestingCore.ID);
     private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, HardcoreQuestingCore.ID);
     
-    public HardcoreQuestingForge() {
-        NetworkingManager.init();
+    public HardcoreQuestingForge(IEventBus eventBus) {
         HardcoreQuestingCore.initialize(this);
     
-        sounds.register(FMLJavaModLoadingContext.get().getModEventBus());
-        tab.register(FMLJavaModLoadingContext.get().getModEventBus());
-        block.register(FMLJavaModLoadingContext.get().getModEventBus());
-        item.register(FMLJavaModLoadingContext.get().getModEventBus());
-        recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
-        tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
+        sounds.register(eventBus);
+        tab.register(eventBus);
+        block.register(eventBus);
+        item.register(eventBus);
+        recipe.register(eventBus);
+        tileEntityType.register(eventBus);
+
+        eventBus.addListener(NetworkingManager::register);
+        eventBus.addListener(HardcoreQuestingForge::registerCapabilities);
+
         NeoForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
             if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
@@ -135,6 +141,14 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 }
                 event.getEntity().getInventory().add(bookStack);
             }
+        });
+    }
+
+    private static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModBlocks.typeBarrel.get(), (abstractBarrel, direction) -> {
+            if (abstractBarrel instanceof BarrelBlockEntity barrel)
+                return barrel.fluidHandler();
+            return null;
         });
     }
     
@@ -302,7 +316,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
 
     @Override
     public List<FluidStack> findFluidsIn(ItemStack stack) {
-        return stack.getCapability(Capabilities.FLUID_HANDLER_ITEM)
+        return FluidUtil.getFluidHandler(stack)
                 .map(HardcoreQuestingForge::getAllFluidsIn)
                 .orElse(Collections.emptyList());
     }

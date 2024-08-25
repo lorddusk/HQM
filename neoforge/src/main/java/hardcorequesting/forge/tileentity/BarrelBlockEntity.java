@@ -5,20 +5,15 @@ import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
-    private final LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
+    private final IFluidHandler fluidHandler = new IFluidHandler() {
         @Override
         public int getTanks() {
             return 1;
@@ -78,17 +73,13 @@ public class BarrelBlockEntity extends AbstractBarrelBlockEntity {
         public FluidStack drain(int maxDrain, FluidAction action) {
             return FluidStack.EMPTY;
         }
-    });
+    };
     
     public BarrelBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state);
     }
-    
-    @NotNull
-    @Override
-    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == Capabilities.FLUID_HANDLER)
-            return fluidHandler.cast();
-        return super.getCapability(cap, side);
+
+    public IFluidHandler fluidHandler() {
+        return this.fluidHandler;
     }
 }

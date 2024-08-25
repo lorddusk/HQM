@@ -57,7 +57,6 @@
   "hqm.massage.setLivesInstead": "Setting %s to %s lives instead.",
   "hqm.massage.setLivesBy": "You have got your lives set to %s by %s",
   "hqm.message.haveRemaining": "You have %s remaining",
-  "hqm.message.hasLivesRemaining": "%s has %s remaining",
   "hqm.message.version": "Hardcore Questing Mode - Version : %s",
   "hqm.message.addOne": "You have added 1 to your total life.",
   "hqm.message.eatRottenHearth": "Why did you eat a rotten heart?",

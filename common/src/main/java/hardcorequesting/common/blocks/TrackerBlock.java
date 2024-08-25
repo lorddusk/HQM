@@ -1,5 +1,6 @@
 package hardcorequesting.common.blocks;
 
+import com.mojang.serialization.MapCodec;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
@@ -27,14 +28,21 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class TrackerBlock extends BaseEntityBlock {
+public final class TrackerBlock extends BaseEntityBlock {
+    public static final MapCodec<TrackerBlock> CODEC = MapCodec.unit(TrackerBlock::new);
+
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
     
     public TrackerBlock() {
         super(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(10.0F));
         registerDefaultState(this.stateDefinition.any().setValue(POWER, 0));
     }
-    
+
+    @Override
+    protected MapCodec<TrackerBlock> codec() {
+        return CODEC;
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(POWER);

@@ -1,11 +1,11 @@
 package hardcorequesting.common.blocks;
 
+import com.mojang.serialization.MapCodec;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.items.QuestBookItem;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -23,15 +23,21 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class DeliveryBlock extends BaseEntityBlock {
-    
+public final class DeliveryBlock extends BaseEntityBlock {
+    public static final MapCodec<DeliveryBlock> CODEC = simpleCodec(DeliveryBlock::new);
+
     public static final BooleanProperty BOUND = BooleanProperty.create("bound");
     
     public DeliveryBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.getStateDefinition().any().setValue(BOUND, false));
     }
-    
+
+    @Override
+    protected MapCodec<DeliveryBlock> codec() {
+        return CODEC;
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
