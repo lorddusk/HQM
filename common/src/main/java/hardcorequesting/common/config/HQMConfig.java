@@ -164,15 +164,6 @@ public class HQMConfig {
         @Comment("How many lives players should start with.")
         public int DEFAULT_LIVES = 3;
         
-        //@Name("Heart Rot Timer in Seconds")
-        @Comment("Define in seconds how long the rot timer is.")
-        //@RangeInt(min = 1)
-        public int HEART_ROT_TIME = 120;
-        
-        //@Name("Enable rot timer")
-        @Comment("Set to true to enable the heart rot timer")
-        public boolean HEART_ROT_ENABLE = false;
-        
         //@Name("Maximum lives obtainable")
         @Comment("Use this to set the maximum lives obtainable")
         public int MAX_LIVES = 20;

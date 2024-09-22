@@ -8,23 +8,19 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
 
 public class ItemHeart extends Item {
-    private int value;
+    private final int value;
     
     public ItemHeart(int value) {
         super(new Item.Properties()
@@ -73,33 +69,6 @@ public class ItemHeart extends Item {
         return super.use(world, player, hand);
     }
     
-    @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player) {
-            Player entityPlayer = (Player) entity;
-            if (value == 3 && HQMConfig.getInstance().Hardcore.HEART_ROT_ENABLE) {
-                //TODO replace with our own data component
-                CompoundTag stackTag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-                if (!stackTag.contains("RotTime")) {
-                    int rot = (HQMConfig.getInstance().Hardcore.HEART_ROT_TIME * 20);
-                    stackTag.putInt("MaxRot", rot);
-                    stackTag.putInt("RotTime", rot);
-                    CustomData.set(DataComponents.CUSTOM_DATA, stack, stackTag);
-                } else {
-                    int newRot = stackTag.getInt("RotTime");
-                    if (newRot <= 0) {
-                        // TODO who wrote this code lmao -bikeshedaniel
-                        stack = new ItemStack(ModItems.rottenHeart.get());
-                        entityPlayer.sendSystemMessage(Translator.translatable("hqm.message.hearthDecay"));
-                    } else {
-                        stackTag.putInt("RotTime", newRot - 1);
-                        CustomData.set(DataComponents.CUSTOM_DATA, stack, stackTag);
-                    }
-                }
-            }
-        }
-    }
-    
     @Environment(EnvType.CLIENT)
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag tooltipFlag) {
@@ -107,15 +76,6 @@ public class ItemHeart extends Item {
         
         if (value == 3) {
             tooltip.add(Translator.translatable("item.hqm:hearts_heart.tooltip"));
-            if (HQMConfig.getInstance().Hardcore.HEART_ROT_ENABLE) {
-                CompoundTag tagCompound = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).getUnsafe();
-                if (tagCompound.contains("RotTime")) {
-                    int rot = tagCompound.getInt("RotTime");
-                    int maxRot = tagCompound.getInt("MaxRot");
-                    float percentage = (float) ((rot * 100) / maxRot);
-                    tooltip.add(Translator.translatable("item.hqm:hearts_heart.freshness", percentage));
-                }
-            }
         }
         if (value == 4) {
             tooltip.add(Translator.translatable("item.hqm:hearts_rottenheart.tooltip"));
