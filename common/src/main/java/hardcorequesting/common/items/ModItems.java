@@ -9,6 +9,7 @@ import hardcorequesting.common.util.RegisterHelper;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -23,11 +24,11 @@ public class ModItems {
     public static Supplier<BagItem> legendaryBag;
     public static Supplier<InvalidItem> invalidItem;
     
-    public static Supplier<ItemHeart> quarterHeart;
-    public static Supplier<ItemHeart> halfHeart;
-    public static Supplier<ItemHeart> threeQuartsHeart;
-    public static Supplier<ItemHeart> heart;
-    public static Supplier<ItemHeart> rottenHeart;
+    public static Supplier<Item> quarterHeart;
+    public static Supplier<Item> halfHeart;
+    public static Supplier<Item> threeQuartsHeart;
+    public static Supplier<Item> heart;
+    public static Supplier<Item> rottenHeart;
     
     public static void init() {
         book = RegisterHelper.registerItem("quest_book", () -> new QuestBookItem(false));
@@ -39,11 +40,11 @@ public class ModItems {
         legendaryBag = RegisterHelper.registerItem("legendary_bag", () -> new BagItem(BagTier.LEGENDARY));
         invalidItem = RegisterHelper.registerItem("hqm_invalid_item", InvalidItem::new);
         
-        quarterHeart = RegisterHelper.registerItem("quarterheart", () -> new ItemHeart(0));
-        halfHeart = RegisterHelper.registerItem("halfheart", () -> new ItemHeart(1));
-        threeQuartsHeart = RegisterHelper.registerItem("threequartsheart", () -> new ItemHeart(2));
-        heart = RegisterHelper.registerItem("heart", () -> new ItemHeart(3));
-        rottenHeart = RegisterHelper.registerItem("rottenheart", () -> new ItemHeart(4));
+        quarterHeart = RegisterHelper.registerItem("quarterheart", () -> new HeartItem(0));
+        halfHeart = RegisterHelper.registerItem("halfheart", () -> new HeartItem(1));
+        threeQuartsHeart = RegisterHelper.registerItem("threequartsheart", () -> new HeartItem(2));
+        heart = RegisterHelper.registerItem("heart", () -> new HeartItem(3));
+        rottenHeart = RegisterHelper.registerItem("rottenheart", () -> new RottenHeartItem(new Item.Properties()));
     }
 
     public static final class DataComponents {
