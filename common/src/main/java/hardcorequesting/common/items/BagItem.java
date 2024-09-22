@@ -27,7 +27,7 @@ public class BagItem extends Item {
     public int tierOrdinal;
     
     public BagItem(BagTier tier) {
-        super(new Item.Properties().durability(0).stacksTo(64));
+        super(new Item.Properties());
         this.tier = tier;
         this.tierOrdinal = tier.ordinal();
     }
