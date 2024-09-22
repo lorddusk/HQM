@@ -6,9 +6,11 @@ import hardcorequesting.common.items.QuestBookItem;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
+@MethodsReturnNonnullByDefault
 public final class DeliveryBlock extends BaseEntityBlock {
     public static final MapCodec<DeliveryBlock> CODEC = simpleCodec(DeliveryBlock::new);
 
@@ -43,39 +46,49 @@ public final class DeliveryBlock extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return HardcoreQuestingCore.platform.createBarrelBlockEntity(pos, state);
     }
-    
+
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!world.isClientSide) {
-            ItemStack hold = player.getItemInHand(hand);
-            BlockEntity tile = world.getBlockEntity(pos);
-            if (tile instanceof AbstractBarrelBlockEntity) {
-                if (!hold.isEmpty() && hold.getItem() instanceof QuestBookItem) {
-                    ((AbstractBarrelBlockEntity) tile).storeSettings(player);
-                    if (((AbstractBarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.bindTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()));
+    protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        if (itemStack.getItem() instanceof QuestBookItem) {
+            if (!level.isClientSide) {
+                BlockEntity tile = level.getBlockEntity(blockPos);
+                if (tile instanceof AbstractBarrelBlockEntity barrel) {
+                    barrel.storeSettings(player);
+                    if (barrel.getCurrentTask() != null) {
+                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.bindTo", Quest.getQuest(barrel.getQuestUUID()).getName()));
                     } else {
                         player.sendSystemMessage(Translator.translatable("hqm.message.noTaskSelected"));
                     }
+                }
+            }
+            return ItemInteractionResult.SUCCESS;
+        } else {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        if (!level.isClientSide) {
+            BlockEntity tile = level.getBlockEntity(blockPos);
+            if (tile instanceof AbstractBarrelBlockEntity barrel) {
+                if (barrel.getCurrentTask() != null) {
+                    player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.boundTo", Quest.getQuest(barrel.getQuestUUID()).getName()));
                 } else {
-                    if (((AbstractBarrelBlockEntity) tile).getCurrentTask() != null) {
-                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.boundTo", Quest.getQuest(((AbstractBarrelBlockEntity) tile).getQuestUUID()).getName()));
-                    } else {
-                        player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.nonBound"));
-                    }
+                    player.sendSystemMessage(Translator.translatable("tile.hqm:item_barrel.nonBound"));
                 }
             }
         }
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
-    public boolean hasAnalogOutputSignal(BlockState state) {
+    protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
     
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
         if (state.getValue(BOUND)) {
             return 15;
         } else {
@@ -84,7 +97,7 @@ public final class DeliveryBlock extends BaseEntityBlock {
     }
     
     @Override
-    public RenderShape getRenderShape(BlockState state) {
+    protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
     

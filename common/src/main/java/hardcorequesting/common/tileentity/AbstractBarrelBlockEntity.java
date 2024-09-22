@@ -8,6 +8,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.item.ConsumeItemTask;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -128,8 +129,8 @@ public abstract class AbstractBarrelBlockEntity extends BlockEntity implements C
     }
     
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        return saveWithoutMetadata(provider);
     }
     
     public void updateState() {
@@ -204,21 +205,19 @@ public abstract class AbstractBarrelBlockEntity extends BlockEntity implements C
 //        }
 //        return 0;
 //    }
-    
-    
+
+
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (this.getPlayerUUID() != null && selectedQuestId != null) {
             compoundTag.putUUID(NBT_PLAYER_UUID, this.getPlayerUUID());
             compoundTag.putUUID(NBT_QUEST, this.getQuestUUID());
             compoundTag.putByte(NBT_TASK, (byte) selectedTask);
         }
     }
-    
+
     @Override
-    public void load(CompoundTag compoundTag) {
-        super.load(compoundTag);
+    protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (compoundTag.contains(NBT_PLAYER_UUID + "Most")) {
             this.setPlayerUUID(compoundTag.getUUID(NBT_PLAYER_UUID));
             this.setQuestUUID(compoundTag.getUUID(NBT_QUEST));

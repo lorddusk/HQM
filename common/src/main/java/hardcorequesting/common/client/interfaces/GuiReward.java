@@ -17,6 +17,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -136,7 +137,8 @@ public class GuiReward extends GuiBase {
                     } else {
                         List<FormattedCharSequence> str = new ArrayList<>();
                         try {
-                            List<Component> info = reward.stack.getTooltipLines(Minecraft.getInstance().player, minecraft.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+                            List<Component> info = reward.stack.getTooltipLines(Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player,
+                                    minecraft.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
                             if (info.size() > 0) {
                                 str.add(Language.getInstance().getVisualOrder(info.get(0)));
                                 if (info.size() > 1) {

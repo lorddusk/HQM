@@ -48,19 +48,18 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.player.AdvancementEvent;
-import net.neoforged.neoforge.event.entity.player.AnvilRepairEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.*;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
@@ -205,26 +204,17 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnServerTick(Consumer<MinecraftServer> consumer) {
-        NeoForge.EVENT_BUS.<TickEvent.ServerTickEvent>addListener(event -> {
-            if(event.phase == TickEvent.Phase.END)
-                consumer.accept(getServer());
-        });
+        NeoForge.EVENT_BUS.<ServerTickEvent.Post>addListener(event -> consumer.accept(getServer()));
     }
     
     @Override
     public void registerOnClientTick(Consumer<Minecraft> consumer) {
-        NeoForge.EVENT_BUS.<TickEvent.ClientTickEvent>addListener(event -> {
-            if(event.phase == TickEvent.Phase.END)
-                consumer.accept(Minecraft.getInstance());
-        });
+        NeoForge.EVENT_BUS.<ClientTickEvent.Post>addListener(event -> consumer.accept(Minecraft.getInstance()));
     }
     
     @Override
     public void registerOnWorldTick(Consumer<Level> consumer) {
-        NeoForge.EVENT_BUS.<TickEvent.LevelTickEvent>addListener(event -> {
-            if(event.phase == TickEvent.Phase.END)
-                consumer.accept(event.level);
-        });
+        NeoForge.EVENT_BUS.<LevelTickEvent.Post>addListener(event -> consumer.accept(event.getLevel()));
     }
 
     @Override
@@ -256,9 +246,8 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     
     @Override
     public void registerOnItemPickup(BiConsumer<Player, ItemStack> biConsumer) {
-        NeoForge.EVENT_BUS.<PlayerEvent.ItemPickupEvent>addListener(event -> {
-            biConsumer.accept(event.getEntity(), event.getStack());
-        });
+        NeoForge.EVENT_BUS.<ItemEntityPickupEvent.Post>addListener(event ->
+                biConsumer.accept(event.getPlayer(), event.getCurrentStack()));
     }
     
     @Override

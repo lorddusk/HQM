@@ -7,7 +7,7 @@ repositories {
         name = 'Ladysnake Mods'
         url = 'https://maven.ladysnake.org/releases'
         content {
-            includeGroup "dev.onyxstudios.cardinal-components-api"
+            includeGroup "org.ladysnake.cardinal-components-api"
         }
     }
     maven { url = "https://nexus.resourcefulbees.com/repository/maven-public/"}
@@ -42,11 +42,12 @@ dependencies {
     depend("org.jetbrains:annotations:${project.annotations_version}")
 
     // Used for storing player-attached data
-    depend("dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.fabric_cardinal_components}")
-    depend("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.fabric_cardinal_components}")
+    depend("org.ladysnake.cardinal-components-api:cardinal-components-base:${project.fabric_cardinal_components}")
+    depend("org.ladysnake.cardinal-components-api:cardinal-components-entity:${project.fabric_cardinal_components}")
     // Used for testing the fluid system
-    modRuntimeOnly "RebornCore:RebornCore-${project.fabric_reborncore_version}"
-    modRuntimeOnly "TechReborn:TechReborn-${project.fabric_techreborn_version}"
+    // Reenable this when moving to a minecraft version that has a TechReborn release
+    //modRuntimeOnly "RebornCore:RebornCore-${project.fabric_reborncore_version}"
+    //modRuntimeOnly "TechReborn:TechReborn-${project.fabric_techreborn_version}"
     // Used for parsing the config file
     depend("blue.endless:jankson:${project.jankson_version}")
 

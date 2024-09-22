@@ -1,11 +1,8 @@
 package hardcorequesting.common.client;
 
 import dev.architectury.fluid.FluidStack;
-import dev.architectury.registry.CreativeTabRegistry;
 import hardcorequesting.common.HardcoreQuestingCore;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -13,7 +10,6 @@ import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -63,9 +59,10 @@ public class TextSearch<T> {
         if (ITEMS.isEmpty() || FLUIDS.isEmpty()) {
             clear();
             Player player = Minecraft.getInstance().player;
+            Item.TooltipContext tooltipContext = Item.TooltipContext.of(Minecraft.getInstance().level);
             for (ItemStack stack : CreativeModeTabs.searchTab().getDisplayItems()) {
-                List tooltipList = stack.getTooltipLines(player, TooltipFlag.Default.NORMAL);
-                List advTooltipList = stack.getTooltipLines(player, TooltipFlag.Default.ADVANCED);
+                List tooltipList = stack.getTooltipLines(tooltipContext, player, TooltipFlag.Default.NORMAL);
+                List advTooltipList = stack.getTooltipLines(tooltipContext, player, TooltipFlag.Default.ADVANCED);
                 StringBuilder searchString = new StringBuilder();
                 for (Object string : tooltipList) {
                     if (string != null)

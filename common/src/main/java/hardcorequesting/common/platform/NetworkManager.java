@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.function.BiConsumer;
 
 public interface NetworkManager {
-    @Environment(EnvType.CLIENT)
     void registerS2CHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer);
     
     void registerC2SHandler(ResourceLocation id, BiConsumer<PacketContext, FriendlyByteBuf> consumer);

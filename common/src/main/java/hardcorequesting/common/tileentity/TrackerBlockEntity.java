@@ -12,6 +12,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -64,19 +65,15 @@ public class TrackerBlockEntity extends BlockEntity {
     }
     
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        
-        questId = compound.getUUID(NBT_QUEST);
-        
-        radius = compound.getInt(NBT_RADIUS);
-        type = TrackerType.values()[compound.getByte(NBT_TYPE)];
+    protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        questId = compoundTag.getUUID(NBT_QUEST);
+
+        radius = compoundTag.getInt(NBT_RADIUS);
+        type = TrackerType.values()[compoundTag.getByte(NBT_TYPE)];
     }
-    
+
     @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
-        
+    protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (quest != null) {
             compoundTag.putUUID(NBT_QUEST, quest.getQuestId());
         }

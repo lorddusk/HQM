@@ -71,8 +71,8 @@ public class BagItem extends Item {
     
     @Environment(EnvType.CLIENT)
     @Override
-    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag context) {
-        super.appendHoverText(stack, world, tooltip, context);
+    public void appendHoverText(ItemStack stack, TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, tooltipContext, tooltip, tooltipFlag);
         
         tooltip.add(tier.getColoredName());
     }

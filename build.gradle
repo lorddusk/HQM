@@ -1,5 +1,6 @@
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
+    // version is fixed while waiting for a fix to https://github.com/architectury/architectury-transformer/issues/24
+    id "architectury-plugin" version "3.4.155"
     id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
 }
 
@@ -30,7 +31,7 @@ allprojects {
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.release = 17
+        options.release = 21
     }
 
     java {

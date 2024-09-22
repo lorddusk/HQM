@@ -1,16 +1,15 @@
 package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -56,7 +55,7 @@ public class TextBox {
         this.scale = scale;
         this.offsetY = (int) (TEXT_BOX_HEIGHT - scale * GuiBase.TEXT_HEIGHT);
     
-        this.text = SharedConstants.filterText(Objects.requireNonNullElse(str, ""));
+        this.text = StringUtil.filterText(Objects.requireNonNullElse(str, ""));
         helper = new TextFieldHelper(this::getText, this::setText, this::getStrippedClipboard,
                 TextFieldHelper.createClipboardSetter(Minecraft.getInstance()), this::isTextValid);
         updateVisible();
@@ -76,7 +75,7 @@ public class TextBox {
     }
     
     protected String getStrippedClipboard() {
-        return SharedConstants.filterText(TextFieldHelper.getClipboardContents(Minecraft.getInstance()));
+        return StringUtil.filterText(TextFieldHelper.getClipboardContents(Minecraft.getInstance()));
     }
     
     public boolean onKeyStroke(int k) {

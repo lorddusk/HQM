@@ -8,10 +8,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import dev.architectury.fluid.FluidStack;
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Fraction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -20,6 +19,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +28,8 @@ import org.jetbrains.annotations.Nullable;
  * Created by lang2 on 10/12/2015.
  */
 public class MinecraftAdapter {
+    private static final Logger LOGGER = LogManager.getLogger("Hardcore Questing Mode");
+
     public static final Adapter<ItemStack> ITEM_STACK = new Adapter<>() {
         
         @Override
@@ -37,12 +40,11 @@ public class MinecraftAdapter {
             JsonObject jsonObj = new JsonObject();
             jsonObj.addProperty("id", BuiltInRegistries.ITEM.getKey(src.getItem()).toString());
             jsonObj.addProperty("Count", src.getCount());
-            
-            CompoundTag tag = src.getTag();
-            if (tag != null) {
-                jsonObj.add("tag", COMPOUND_TAG.serialize(tag));
-            }
-            
+
+            DataComponentPatch.CODEC.encodeStart(JsonOps.INSTANCE, src.getComponentsPatch())
+                    .resultOrPartial(error -> LOGGER.error("Error while serializing item stack components: {}", error))
+                    .ifPresent(jsonElement -> jsonObj.add("components", jsonElement));
+
             return jsonObj;
         }
         
@@ -55,13 +57,15 @@ public class MinecraftAdapter {
                 JsonObject jsonObj = json.getAsJsonObject();
                 Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(jsonObj, "id")));
                 int count = GsonHelper.getAsByte(jsonObj, "Count");
-                ItemStack stack = new ItemStack(item, count);
-                
-                if (jsonObj.has("tag")) {
-                    stack.setTag(COMPOUND_TAG.deserialize(jsonObj.get("tag")));
+
+                DataComponentPatch dataComponentPatch = DataComponentPatch.EMPTY;
+                if (jsonObj.has("components")) {
+                    dataComponentPatch = DataComponentPatch.CODEC.parse(JsonOps.INSTANCE, jsonObj.get("components"))
+                            .resultOrPartial(error -> LOGGER.error("Error while deserializing item stack components: {}", error))
+                            .orElse(DataComponentPatch.EMPTY);
                 }
                 
-                return stack;
+                return new ItemStack(item.builtInRegistryHolder(), count, dataComponentPatch);
             }
         }
     };

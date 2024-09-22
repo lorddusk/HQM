@@ -50,26 +50,24 @@ public class NetworkManager {
         registerMessage(SyncableTileMessage.class, SyncableTileMessage.class, id++, EnvType.CLIENT);
         registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, EnvType.CLIENT);
         registerMessage(GeneralUpdateMessage.class, GeneralUpdateMessage.class, id++, EnvType.SERVER);
-        
-        if (HardcoreQuestingCore.platform.isClient()) {
-            HardcoreQuestingCore.platform.getNetworkManager().registerS2CHandler(S2C, (packetContext, packetByteBuf) -> {
-                int id = packetByteBuf.readInt();
-                for (Map.Entry<Class<? extends IMessage>, Tuple<Class<? extends IMessageHandler>, Integer>> entry : PACKET_HANDLERS.entrySet()) {
-                    if (entry.getValue().getB() == id) {
-                        try {
-                            IMessage message = entry.getKey().newInstance();
-                            message.fromBytes(packetByteBuf, packetContext);
-                            IMessageHandler<IMessage, ?> handler = entry.getKey() != entry.getValue().getA() ? entry.getValue().getA().newInstance() : (IMessageHandler<IMessage, ?>) message;
-                            handler.onMessage(message, packetContext);
-                        } catch (InstantiationException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                        return;
+
+        HardcoreQuestingCore.platform.getNetworkManager().registerS2CHandler(S2C, (packetContext, packetByteBuf) -> {
+            int id = packetByteBuf.readInt();
+            for (Map.Entry<Class<? extends IMessage>, Tuple<Class<? extends IMessageHandler>, Integer>> entry : PACKET_HANDLERS.entrySet()) {
+                if (entry.getValue().getB() == id) {
+                    try {
+                        IMessage message = entry.getKey().newInstance();
+                        message.fromBytes(packetByteBuf, packetContext);
+                        IMessageHandler<IMessage, ?> handler = entry.getKey() != entry.getValue().getA() ? entry.getValue().getA().newInstance() : (IMessageHandler<IMessage, ?>) message;
+                        handler.onMessage(message, packetContext);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
                     }
+                    return;
                 }
-                HardcoreQuestingCore.LOGGER.error("Invalid Packet ID: " + id);
-            });
-        }
+            }
+            HardcoreQuestingCore.LOGGER.error("Invalid Packet ID: " + id);
+        });
         HardcoreQuestingCore.platform.getNetworkManager().registerC2SHandler(C2S, (packetContext, packetByteBuf) -> {
             int id = packetByteBuf.readInt();
             for (Map.Entry<Class<? extends IMessage>, Tuple<Class<? extends IMessageHandler>, Integer>> entry : PACKET_HANDLERS.entrySet()) {

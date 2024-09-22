@@ -1,14 +1,15 @@
 package hardcorequesting.fabric.capabilities;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
-import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
-import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import hardcorequesting.common.HardcoreQuestingCore;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import org.ladysnake.cca.api.v3.component.Component;
+import org.ladysnake.cca.api.v3.component.ComponentKey;
+import org.ladysnake.cca.api.v3.component.ComponentRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import org.ladysnake.cca.api.v3.entity.EntityComponentInitializer;
+import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
 public final class ModCapabilities implements EntityComponentInitializer {
     public static final ComponentKey<CompoundTagComponent> PLAYER_EXTRA_DATA =
@@ -23,12 +24,12 @@ public final class ModCapabilities implements EntityComponentInitializer {
         public CompoundTag tag = new CompoundTag();
         
         @Override
-        public void readFromNbt(CompoundTag tag) {
+        public void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {
             this.tag = tag.getCompound("Tag");
         }
         
         @Override
-        public void writeToNbt(CompoundTag tag) {
+        public void writeToNbt(CompoundTag tag, HolderLookup.Provider provider) {
             this.tag.put("Tag", this.tag);
         }
     }
