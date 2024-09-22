@@ -40,10 +40,10 @@ public class ModItems {
         legendaryBag = RegisterHelper.registerItem("legendary_bag", () -> new BagItem(BagTier.LEGENDARY));
         invalidItem = RegisterHelper.registerItem("hqm_invalid_item", InvalidItem::new);
         
-        quarterHeart = RegisterHelper.registerItem("quarterheart", () -> new HeartItem(0));
-        halfHeart = RegisterHelper.registerItem("halfheart", () -> new HeartItem(1));
-        threeQuartsHeart = RegisterHelper.registerItem("threequartsheart", () -> new HeartItem(2));
-        heart = RegisterHelper.registerItem("heart", () -> new HeartItem(3));
+        quarterHeart = RegisterHelper.registerItem("quarterheart", () -> new Item(new Item.Properties()));
+        halfHeart = RegisterHelper.registerItem("halfheart", () -> new Item(new Item.Properties()));
+        threeQuartsHeart = RegisterHelper.registerItem("threequartsheart", () -> new Item(new Item.Properties()));
+        heart = RegisterHelper.registerItem("heart", () -> new HeartItem(new Item.Properties()));
         rottenHeart = RegisterHelper.registerItem("rottenheart", () -> new RottenHeartItem(new Item.Properties()));
     }
 
