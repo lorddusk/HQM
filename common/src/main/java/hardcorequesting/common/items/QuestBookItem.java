@@ -1,5 +1,7 @@
 package hardcorequesting.common.items;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
@@ -9,9 +11,14 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class QuestBookItem extends Item {
+public final class QuestBookItem extends Item {
     private final boolean enabled;
     
     public QuestBookItem(boolean enabled) {
@@ -34,7 +41,7 @@ public class QuestBookItem extends Item {
     
     public static ItemStack getOPBook(Player player) {
         ItemStack stack = new ItemStack(ModItems.enabledBook.get());
-        stack.set(ModItems.DataComponents.USE_AS_PLAYER.get(), player.getUUID());
+        stack.set(ModItems.DataComponents.USE_AS_PLAYER.get(), new UseAsPlayer(player.getUUID(), player.getGameProfile().getName()));
         return stack;
     }
     
@@ -53,11 +60,11 @@ public class QuestBookItem extends Item {
                 player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
             } else {
                 if (enabled) {
-                    UUID uuid = stack.get(ModItems.DataComponents.USE_AS_PLAYER.get());
-                    if (uuid != null) {
-                        if (questingData.hasData(uuid)) {
+                    UseAsPlayer useAsPlayer = stack.get(ModItems.DataComponents.USE_AS_PLAYER.get());
+                    if (useAsPlayer != null) {
+                        if (questingData.hasData(useAsPlayer.uuid())) {
                             if (HardcoreQuestingCore.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
-                                Player subject = QuestingData.getPlayer(uuid);
+                                Player subject = QuestingData.getPlayer(useAsPlayer.uuid());
                                 if (subject instanceof ServerPlayer) {
                                     EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
                                     PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
@@ -92,11 +99,9 @@ public class QuestBookItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag tooltipFlag) {
         if (enabled) {
-            UUID uuid = stack.get(ModItems.DataComponents.USE_AS_PLAYER.get());
-            if (uuid != null) {
-                //FIXME QuestingData.getPlayer() will try and get the player from the mc server, but this is called from client-side!
-                Player useAsPlayer = QuestingData.getPlayer(uuid);
-                tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer == null ? "INVALID" : useAsPlayer.getScoreboardName()));
+            UseAsPlayer useAsPlayer = stack.get(ModItems.DataComponents.USE_AS_PLAYER.get());
+            if (useAsPlayer != null) {
+                tooltip.add(Translator.translatable("item.hqm:quest_book_1.useAs", useAsPlayer.name()));
             } else
                 tooltip.add(Translator.translatable("item.hqm:quest_book_1.invalid").withStyle(ChatFormatting.RED));
         }
@@ -105,5 +110,22 @@ public class QuestBookItem extends Item {
     @Override
     public boolean isFoil(ItemStack stack) {
         return enabled;
+    }
+
+    public record UseAsPlayer(UUID uuid, String name) {
+
+        public static final Codec<UseAsPlayer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                UUIDUtil.STRING_CODEC.fieldOf("uuid").forGetter(UseAsPlayer::uuid),
+                ExtraCodecs.PLAYER_NAME.fieldOf("name").forGetter(UseAsPlayer::name)
+        ).apply(instance, UseAsPlayer::new));
+
+        public static final StreamCodec<ByteBuf, UseAsPlayer> STREAM_CODEC = StreamCodec.composite(
+                UUIDUtil.STREAM_CODEC,
+                UseAsPlayer::uuid,
+                ByteBufCodecs.stringUtf8(16),
+                UseAsPlayer::name,
+                UseAsPlayer::new
+        );
+
     }
 }
