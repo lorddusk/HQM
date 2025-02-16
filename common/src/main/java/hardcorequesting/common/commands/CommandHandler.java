@@ -32,9 +32,7 @@ public class CommandHandler {
         for (SubCommand command : SUB_COMMANDS) {
             builder = builder.then(command.build(literal(command.name())));
         }
-        dispatcher.register(builder.executes(context -> {
-            return 1;
-        }));
+        dispatcher.register(builder);
     }
     
     public interface SubCommand {
