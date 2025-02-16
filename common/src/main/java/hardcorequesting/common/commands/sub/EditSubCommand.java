@@ -13,7 +13,7 @@ import net.minecraft.commands.Commands;
 
 import java.util.Arrays;
 
-public class EditSubCommand implements CommandHandler.SubCommand {
+public record EditSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "edit";

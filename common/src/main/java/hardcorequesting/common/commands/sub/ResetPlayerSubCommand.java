@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.Collection;
 
-public class ResetPlayerSubCommand implements CommandHandler.SubCommand {
+public record ResetPlayerSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "reset";

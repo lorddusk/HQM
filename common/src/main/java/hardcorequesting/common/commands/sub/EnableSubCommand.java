@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 
 import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
-public class EnableSubCommand implements CommandHandler.SubCommand {
+public record EnableSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "enable";

@@ -10,7 +10,7 @@ import net.minecraft.commands.Commands;
 
 import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
-public class QuestSubCommand implements CommandHandler.SubCommand {
+public record QuestSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "quest";

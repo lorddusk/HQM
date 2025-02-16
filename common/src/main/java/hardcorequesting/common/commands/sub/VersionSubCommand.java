@@ -10,7 +10,7 @@ import net.minecraft.commands.CommandSourceStack;
 
 import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
-public class VersionSubCommand implements CommandHandler.SubCommand {
+public record VersionSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "version";

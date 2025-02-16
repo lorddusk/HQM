@@ -16,7 +16,7 @@ import java.util.Set;
 import static net.minecraft.commands.Commands.literal;
 
 
-public class CommandHandler {
+public final class CommandHandler {
     public static final Set<SubCommand> SUB_COMMANDS = Set.of(
             new HelpSubCommand(),
             new HardcoreSubCommand(),

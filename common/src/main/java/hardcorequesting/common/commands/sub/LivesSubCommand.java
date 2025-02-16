@@ -19,7 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 import static net.minecraft.commands.Commands.literal;
 
-public final class LivesSubCommand implements CommandHandler.SubCommand {
+public record LivesSubCommand() implements CommandHandler.SubCommand {
     public static final SimpleCommandExceptionType ERROR_NOT_HARDCORE = new SimpleCommandExceptionType(Component.translatable("hqm.message.noHardcoreYet"));
 
     private static void requireHardmodeIsActive() throws CommandSyntaxException {

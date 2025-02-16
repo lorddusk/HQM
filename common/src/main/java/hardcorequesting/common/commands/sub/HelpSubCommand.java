@@ -15,7 +15,7 @@ import java.util.List;
 
 import static net.minecraft.commands.Commands.literal;
 
-public class HelpSubCommand implements CommandHandler.SubCommand {
+public record HelpSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "help";

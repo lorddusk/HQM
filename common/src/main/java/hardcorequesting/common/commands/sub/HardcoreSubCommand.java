@@ -13,7 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 import static net.minecraft.commands.Commands.literal;
 
-public class HardcoreSubCommand implements CommandHandler.SubCommand {
+public record HardcoreSubCommand() implements CommandHandler.SubCommand {
     @Override
     public String name() {
         return "hardcore";
