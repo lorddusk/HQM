@@ -16,16 +16,16 @@ public class OpSubCommand implements CommandHandler.SubCommand {
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS) && source.getEntity() instanceof Player)
-                .then(Commands.argument("targets", EntityArgument.player())
+                .then(Commands.argument("target", EntityArgument.player())
                         .executes(context -> {
-                            Player player = EntityArgument.getPlayer(context, "targets");
+                            Player player = EntityArgument.getPlayer(context, "target");
                             if (QuestingDataManager.getInstance().hasData(player)) {
                                 player.getInventory().add(QuestBookItem.getOPBook(player));
                             } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
-                    Player player = (Player) context.getSource().getEntity();
+                    Player player = context.getSource().getPlayerOrException();
                     if (QuestingDataManager.getInstance().hasData(player)) {
                         player.getInventory().add(QuestBookItem.getOPBook(player));
                     } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));

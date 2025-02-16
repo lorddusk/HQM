@@ -8,6 +8,7 @@ import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import static net.minecraft.commands.Commands.literal;
@@ -21,8 +22,10 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
             else
                 context.getSource().sendSuccess(() -> Component.translatable(QuestingDataManager.getInstance().isHardcoreActive() ? "hqm.message.hardcoreAlreadyActivated" : "hqm.message.questHardcore"), true);
             QuestingDataManager.getInstance().activateHardcore();
-            if (context.getSource().getEntity() instanceof Player)
-                currentLives((Player) context.getSource().getEntity());
+
+            ServerPlayer player = context.getSource().getPlayer();
+            if (player != null)
+                currentLives(player);
             return 1;
         };
         return builder

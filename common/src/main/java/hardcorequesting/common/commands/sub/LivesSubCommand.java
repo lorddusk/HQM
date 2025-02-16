@@ -50,8 +50,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            if (context.getSource().getEntity() instanceof Player)
-                                addLivesTo(context.getSource(), (Player) context.getSource().getEntity(), 1);
+                            addLivesTo(context.getSource(), context.getSource().getPlayerOrException(), 1);
                             return 1;
                         })
                 )
@@ -83,8 +82,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            if (context.getSource().getEntity() instanceof Player)
-                                removeLivesFrom(context.getSource(), (Player) context.getSource().getEntity(), 1);
+                            removeLivesFrom(context.getSource(), context.getSource().getPlayerOrException(), 1);
                             return 1;
                         })
                 )
@@ -94,7 +92,8 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                                 context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                                 return 1;
                             }
-                            currentLives(context.getSource(), EntityArgument.getPlayer(context, "targets"));
+                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets"))
+                                currentLives(context.getSource(), player);
                             return 1;
                         }))
                 .executes(context -> {
@@ -102,8 +101,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
                         context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
                         return 1;
                     }
-                    if (context.getSource().getEntity() instanceof Player)
-                        currentLives((Player) context.getSource().getEntity());
+                    currentLives(context.getSource().getPlayerOrException());
                     return 1;
                 });
     }
