@@ -17,13 +17,17 @@ import static net.minecraft.commands.Commands.literal;
 
 public class HelpSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "help";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
-        for (String s : CommandHandler.SUB_COMMANDS.keySet()) {
-            CommandHandler.SubCommand command = CommandHandler.SUB_COMMANDS.get(s);
-            builder = builder.then(literal(s).executes(context -> {
+        for (CommandHandler.SubCommand command : CommandHandler.SUB_COMMANDS) {
+            builder = builder.then(literal(command.name()).executes(context -> {
                 for (int i : command.getSyntaxOptions(context))
-                    context.getSource().sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
-                            .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + s + CommandStrings.INFO_SUFFIX + i)), false);
+                    context.getSource().sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + command.name() + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
+                            .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + command.name() + CommandStrings.INFO_SUFFIX + i)), false);
                 return 1;
             }));
         }
@@ -31,15 +35,15 @@ public class HelpSubCommand implements CommandHandler.SubCommand {
             MutableComponent output = Component.literal("");
             output = output.append(Translator.translatable(CommandStrings.HELP_START));
             output = output.append(" ");
-            List<String> commands = new ArrayList<>(CommandHandler.SUB_COMMANDS.keySet());
+            List<CommandHandler.SubCommand> commands = new ArrayList<>(CommandHandler.SUB_COMMANDS);
             
             for (int i = 0; i < commands.size() - 1; i++) {
-                output = output.append("/").append("hqm").append(" ").append(Component.literal(commands.get(i)).withStyle(ChatFormatting.YELLOW));
+                output = output.append("/").append("hqm").append(" ").append(Component.literal(commands.get(i).name()).withStyle(ChatFormatting.YELLOW));
                 if (i != commands.size() - 2) {
                     output = output.append(", ");
                 }
             }
-            output = output.append(" and /").append("hqm").append(" ").append(Component.literal(commands.get(commands.size() - 1)).withStyle(ChatFormatting.YELLOW)).append(".");
+            output = output.append(" and /").append("hqm").append(" ").append(Component.literal(commands.getLast().name()).withStyle(ChatFormatting.YELLOW)).append(".");
             MutableComponent finalOutput = output;
             context.getSource().sendSuccess(() -> finalOutput, false);
             return 1;

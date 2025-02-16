@@ -12,6 +12,11 @@ import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
 public class QuestSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "quest";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))

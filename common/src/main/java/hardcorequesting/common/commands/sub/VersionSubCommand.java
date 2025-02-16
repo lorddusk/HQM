@@ -12,6 +12,11 @@ import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
 public class VersionSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "version";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .executes(context -> {

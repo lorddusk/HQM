@@ -30,6 +30,11 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
     }
 
     @Override
+    public String name() {
+        return "lives";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))

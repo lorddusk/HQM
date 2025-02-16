@@ -15,6 +15,11 @@ import static net.minecraft.commands.Commands.literal;
 
 public class HardcoreSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "hardcore";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         Command<CommandSourceStack> enable = context -> {
             if (context.getSource().getLevel().getLevelData().isHardcore())

@@ -20,6 +20,11 @@ import java.util.Collection;
 
 public class ResetPlayerSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "reset";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder.requires(sourceStack -> sourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("targets", EntityArgument.players())

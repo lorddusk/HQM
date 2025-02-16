@@ -10,32 +10,27 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.commands.Commands.literal;
 
 
 public class CommandHandler {
-    public static final Map<String, SubCommand> SUB_COMMANDS;
-    
-    static {
-        SUB_COMMANDS = new HashMap<>();
-        SUB_COMMANDS.put("help", new HelpSubCommand());
-        SUB_COMMANDS.put("hardcore", new HardcoreSubCommand());
-        SUB_COMMANDS.put("lives", new LivesSubCommand());
-        SUB_COMMANDS.put("op", new OpSubCommand());
-        SUB_COMMANDS.put("edit", new EditSubCommand());
-        SUB_COMMANDS.put("quest", new QuestSubCommand());
-        SUB_COMMANDS.put("enable", new EnableSubCommand());
-        SUB_COMMANDS.put("version", new VersionSubCommand());
-        SUB_COMMANDS.put("reset", new ResetPlayerSubCommand());
-    }
-    
+    public static final Set<SubCommand> SUB_COMMANDS = Set.of(
+            new HelpSubCommand(),
+            new HardcoreSubCommand(),
+            new LivesSubCommand(),
+            new OpSubCommand(),
+            new EditSubCommand(),
+            new QuestSubCommand(),
+            new EnableSubCommand(),
+            new VersionSubCommand(),
+            new ResetPlayerSubCommand());
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> builder = literal("hqm");
-        for (String s : SUB_COMMANDS.keySet()) {
-            builder = builder.then(SUB_COMMANDS.get(s).build(literal(s)));
+        for (SubCommand command : SUB_COMMANDS) {
+            builder = builder.then(command.build(literal(command.name())));
         }
         dispatcher.register(builder.executes(context -> {
             return 1;
@@ -43,6 +38,8 @@ public class CommandHandler {
     }
     
     public interface SubCommand {
+        String name();
+
         ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder);
         
         default int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {

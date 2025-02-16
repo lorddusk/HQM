@@ -13,6 +13,11 @@ import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 
 public class EnableSubCommand implements CommandHandler.SubCommand {
     @Override
+    public String name() {
+        return "enable";
+    }
+
+    @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
