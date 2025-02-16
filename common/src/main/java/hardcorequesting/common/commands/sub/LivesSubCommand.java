@@ -21,7 +21,7 @@ public class LivesSubCommand implements CommandHandler.SubCommand {
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermission(4))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(literal("add")
                         .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer(1))

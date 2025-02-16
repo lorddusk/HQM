@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -25,7 +26,7 @@ public class HardcoreSubCommand implements CommandHandler.SubCommand {
             return 1;
         };
         return builder
-                .requires(source -> source.hasPermission(4))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(literal("enable").executes(enable))
                 .then(literal("disable")
                         .executes(context -> {

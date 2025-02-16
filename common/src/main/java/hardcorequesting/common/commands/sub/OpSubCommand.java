@@ -15,7 +15,7 @@ public class OpSubCommand implements CommandHandler.SubCommand {
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermission(4) && source.getEntity() instanceof Player)
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS) && source.getEntity() instanceof Player)
                 .then(Commands.argument("targets", EntityArgument.player())
                         .executes(context -> {
                             Player player = EntityArgument.getPlayer(context, "targets");
