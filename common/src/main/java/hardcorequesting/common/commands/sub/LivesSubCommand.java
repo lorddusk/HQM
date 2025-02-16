@@ -3,7 +3,6 @@ package hardcorequesting.common.commands.sub;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import hardcorequesting.common.commands.CommandHandler;
@@ -105,10 +104,10 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
     }
 
     @Override
-    public int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
-        return new int[]{0, 1, 2, 3};
+    public void sendHelpMessages(CommandSourceStack source) {
+        sendHelpMessagesForCommand(source, this.name(), 0, 1, 2, 3);
     }
-    
+
     private static void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
         QuestingDataManager.getInstance().getQuestingData(player).removeLives(player, amount);
         sendChat(source, Translator.translatable("hqm.message.removeLivesFrom", Translator.lives(amount), player.getScoreboardName()));

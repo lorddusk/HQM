@@ -25,9 +25,7 @@ public class HelpSubCommand implements CommandHandler.SubCommand {
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         for (CommandHandler.SubCommand command : CommandHandler.SUB_COMMANDS) {
             builder = builder.then(literal(command.name()).executes(context -> {
-                for (int i : command.getSyntaxOptions(context))
-                    context.getSource().sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + command.name() + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
-                            .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + command.name() + CommandStrings.INFO_SUFFIX + i)), false);
+                command.sendHelpMessages(context.getSource());
                 return 1;
             }));
         }

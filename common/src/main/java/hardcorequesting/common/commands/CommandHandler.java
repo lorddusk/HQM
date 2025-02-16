@@ -3,9 +3,10 @@ package hardcorequesting.common.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.common.commands.sub.*;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -39,9 +40,9 @@ public class CommandHandler {
         String name();
 
         ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder);
-        
-        default int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
-            return new int[0];
+
+        default void sendHelpMessages(CommandSourceStack source) {
+            Utils.sendHelpMessagesForCommand(source, this.name(), 0);
         }
     }
 
@@ -56,6 +57,12 @@ public class CommandHandler {
 
         public static void sendChat(CommandSourceStack sender, Component text) {
             sender.sendSuccess(() -> text, false);
+        }
+
+        public static void sendHelpMessagesForCommand(CommandSourceStack source, String command, int... syntaxOptions) {
+            for (int i : syntaxOptions)
+                source.sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + command + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
+                        .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + command + CommandStrings.INFO_SUFFIX + i)), false);
         }
     }
 }
