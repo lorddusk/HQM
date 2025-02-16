@@ -9,6 +9,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
+import static hardcorequesting.common.commands.CommandHandler.Utils.*;
+
 public class EnableSubCommand implements CommandHandler.SubCommand {
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {

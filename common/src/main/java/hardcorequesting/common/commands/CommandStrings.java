@@ -21,4 +21,6 @@ public class CommandStrings {
     
     public static final String INFO_SUFFIX = ".info";
     public static final String SYNTAX_SUFFIX = ".syntax";
+
+
 }

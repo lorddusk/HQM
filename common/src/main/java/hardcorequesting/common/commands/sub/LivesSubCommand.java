@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
+import static hardcorequesting.common.commands.CommandHandler.Utils.*;
 import static net.minecraft.commands.Commands.literal;
 
 public final class LivesSubCommand implements CommandHandler.SubCommand {
@@ -48,7 +49,7 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
                 });
     }
 
-    private LiteralArgumentBuilder<CommandSourceStack> makeAddBuilder() {
+    private static LiteralArgumentBuilder<CommandSourceStack> makeAddBuilder() {
         return literal("add")
                 .then(Commands.argument("targets", EntityArgument.players())
                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
@@ -73,7 +74,7 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
                 });
     }
 
-    private LiteralArgumentBuilder<CommandSourceStack> makeRemoveBuilder() {
+    private static LiteralArgumentBuilder<CommandSourceStack> makeRemoveBuilder() {
         return literal("remove")
                 .then(Commands.argument("targets", EntityArgument.players())
                         .then(Commands.argument("amount", IntegerArgumentType.integer(1))
@@ -103,7 +104,7 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
         return new int[]{0, 1, 2, 3};
     }
     
-    private void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
+    private static void removeLivesFrom(CommandSourceStack source, Player player, int amount) {
         QuestingDataManager.getInstance().getQuestingData(player).removeLives(player, amount);
         sendChat(source, Translator.translatable("hqm.message.removeLivesFrom", Translator.lives(amount), player.getScoreboardName()));
         if (source.getEntity() != player)
@@ -111,7 +112,7 @@ public final class LivesSubCommand implements CommandHandler.SubCommand {
         currentLives(player);
     }
     
-    private void addLivesTo(CommandSourceStack source, Player player, int amount) {
+    private static void addLivesTo(CommandSourceStack source, Player player, int amount) {
         QuestingDataManager questingDataManager = QuestingDataManager.getInstance();
         if (questingDataManager.getQuestingData(player).getRawLives() + amount <= HQMConfig.getInstance().Hardcore.MAX_LIVES) {
             questingDataManager.getQuestingData(player).addLives(player, amount);

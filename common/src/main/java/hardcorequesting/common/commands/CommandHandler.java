@@ -48,16 +48,18 @@ public class CommandHandler {
         default int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
             return new int[0];
         }
-        
-        default void currentLives(Player player) {
+    }
+
+    public static final class Utils {
+        public static void currentLives(Player player) {
             player.createCommandSourceStack().sendSuccess(() -> Component.literal("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        
-        default void currentLives(CommandSourceStack source, Player player) {
+
+        public static void currentLives(CommandSourceStack source, Player player) {
             source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        
-        default void sendChat(CommandSourceStack sender, Component text) {
+
+        public static void sendChat(CommandSourceStack sender, Component text) {
             sender.sendSuccess(() -> text, false);
         }
     }

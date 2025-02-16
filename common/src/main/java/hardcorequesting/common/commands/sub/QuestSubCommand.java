@@ -8,6 +8,8 @@ import hardcorequesting.common.util.Translator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
+import static hardcorequesting.common.commands.CommandHandler.Utils.*;
+
 public class QuestSubCommand implements CommandHandler.SubCommand {
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
