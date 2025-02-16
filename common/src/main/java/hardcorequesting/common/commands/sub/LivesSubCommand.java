@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -17,95 +19,85 @@ import net.minecraft.world.entity.player.Player;
 
 import static net.minecraft.commands.Commands.literal;
 
-public class LivesSubCommand implements CommandHandler.SubCommand {
+public final class LivesSubCommand implements CommandHandler.SubCommand {
+    public static final SimpleCommandExceptionType ERROR_NOT_HARDCORE = new SimpleCommandExceptionType(Component.translatable("hqm.message.noHardcoreYet"));
+
+    private static void requireHardmodeIsActive() throws CommandSyntaxException {
+        if (!QuestingDataManager.getInstance().isHardcoreActive()) {
+            throw ERROR_NOT_HARDCORE.create();
+        }
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(literal("add")
-                        .then(Commands.argument("targets", EntityArgument.players())
-                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                                return 1;
-                                            }
-                                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
-                                                addLivesTo(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
-                                            }
-                                            return 1;
-                                        }))
-                                .executes(context -> {
-                                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                        return 1;
-                                    }
-                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
-                                        addLivesTo(context.getSource(), player, 1);
-                                    }
-                                    return 1;
-                                }))
-                        .executes(context -> {
-                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                return 1;
-                            }
-                            addLivesTo(context.getSource(), context.getSource().getPlayerOrException(), 1);
-                            return 1;
-                        })
-                )
-                .then(literal("remove")
-                        .then(Commands.argument("targets", EntityArgument.players())
-                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
-                                        .executes(context -> {
-                                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                                return 1;
-                                            }
-                                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
-                                                removeLivesFrom(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
-                                            }
-                                            return 1;
-                                        }))
-                                .executes(context -> {
-                                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                        return 1;
-                                    }
-                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
-                                        removeLivesFrom(context.getSource(), player, 1);
-                                    }
-                                    return 1;
-                                }))
-                        .executes(context -> {
-                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                return 1;
-                            }
-                            removeLivesFrom(context.getSource(), context.getSource().getPlayerOrException(), 1);
-                            return 1;
-                        })
-                )
+                .then(makeAddBuilder())
+                .then(makeRemoveBuilder())
                 .then(Commands.argument("targets", EntityArgument.players())
                         .executes(context -> {
-                            if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                                context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                                return 1;
-                            }
+                            requireHardmodeIsActive();
                             for (ServerPlayer player : EntityArgument.getPlayers(context, "targets"))
                                 currentLives(context.getSource(), player);
                             return 1;
                         }))
                 .executes(context -> {
-                    if (!QuestingDataManager.getInstance().isHardcoreActive()) {
-                        context.getSource().sendFailure(Component.translatable("hqm.message.noHardcoreYet"));
-                        return 1;
-                    }
+                    requireHardmodeIsActive();
                     currentLives(context.getSource().getPlayerOrException());
                     return 1;
                 });
     }
-    
+
+    private LiteralArgumentBuilder<CommandSourceStack> makeAddBuilder() {
+        return literal("add")
+                .then(Commands.argument("targets", EntityArgument.players())
+                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                .executes(context -> {
+                                    requireHardmodeIsActive();
+                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
+                                        addLivesTo(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
+                                    }
+                                    return 1;
+                                }))
+                        .executes(context -> {
+                            requireHardmodeIsActive();
+                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
+                                addLivesTo(context.getSource(), player, 1);
+                            }
+                            return 1;
+                        }))
+                .executes(context -> {
+                    requireHardmodeIsActive();
+                    addLivesTo(context.getSource(), context.getSource().getPlayerOrException(), 1);
+                    return 1;
+                });
+    }
+
+    private LiteralArgumentBuilder<CommandSourceStack> makeRemoveBuilder() {
+        return literal("remove")
+                .then(Commands.argument("targets", EntityArgument.players())
+                        .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                .executes(context -> {
+                                    requireHardmodeIsActive();
+                                    for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
+                                        removeLivesFrom(context.getSource(), player, IntegerArgumentType.getInteger(context, "amount"));
+                                    }
+                                    return 1;
+                                }))
+                        .executes(context -> {
+                            requireHardmodeIsActive();
+                            for (ServerPlayer player : EntityArgument.getPlayers(context, "targets")) {
+                                removeLivesFrom(context.getSource(), player, 1);
+                            }
+                            return 1;
+                        }))
+                .executes(context -> {
+                    requireHardmodeIsActive();
+                    removeLivesFrom(context.getSource(), context.getSource().getPlayerOrException(), 1);
+                    return 1;
+                });
+    }
+
     @Override
     public int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
         return new int[]{0, 1, 2, 3};
