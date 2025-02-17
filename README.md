@@ -10,6 +10,7 @@ HQM has a couple supporting features to complement the questing system:
 - Loot bags: Openable reward items with loot tables that work slightly differently to vanilla loot tables 
 - Reputations: Support for creating stats that can be used with quest rewards and quest conditions
 
-The latest versions of the mod support both fabric and forge,
-and can be downloaded from [curseforge](https://www.curseforge.com/minecraft/mc-mods/hardcore-questing-mode).
+The latest versions of the mod support both fabric and neoforge,
+and is available at [curseforge](https://www.curseforge.com/minecraft/mc-mods/hardcore-questing-mode) and [modrinth](https://modrinth.com/mod/hqm).
 
+HQM has a [discord server](https://discord.gg/7QRxJMn).
