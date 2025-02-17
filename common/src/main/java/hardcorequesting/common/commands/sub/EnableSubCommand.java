@@ -5,14 +5,22 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
-public class EnableSubCommand implements CommandHandler.SubCommand {
+import static hardcorequesting.common.commands.CommandHandler.Utils.*;
+
+public record EnableSubCommand() implements CommandHandler.SubCommand {
+    @Override
+    public String name() {
+        return "enable";
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermission(4))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .executes(context -> {
                     if (context.getSource().getLevel().getLevelData().isHardcore())
                         context.getSource().sendSuccess(() -> Component.translatable("hqm.message.vanillaHardcoreOn"), true);

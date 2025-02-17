@@ -8,7 +8,14 @@ import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 
-public class VersionSubCommand implements CommandHandler.SubCommand {
+import static hardcorequesting.common.commands.CommandHandler.Utils.*;
+
+public record VersionSubCommand() implements CommandHandler.SubCommand {
+    @Override
+    public String name() {
+        return "version";
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder

@@ -18,10 +18,15 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.Collection;
 
-public class ResetPlayerSubCommand implements CommandHandler.SubCommand {
+public record ResetPlayerSubCommand() implements CommandHandler.SubCommand {
+    @Override
+    public String name() {
+        return "reset";
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
-        return builder.requires(sourceStack -> sourceStack.hasPermission(Commands.LEVEL_ADMINS))
+        return builder.requires(sourceStack -> sourceStack.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("targets", EntityArgument.players())
                         .then(Commands.literal("yes-this-is-really-what-i-want")
                                 .executes(context -> run(context, EntityArgument.getPlayers(context, "targets")))));

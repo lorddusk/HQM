@@ -9,14 +9,20 @@ import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 import java.util.Arrays;
 
-public class EditSubCommand implements CommandHandler.SubCommand {
+public record EditSubCommand() implements CommandHandler.SubCommand {
+    @Override
+    public String name() {
+        return "edit";
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermission(4))
+                .requires(source -> source.hasPermission(Commands.LEVEL_OWNERS))
                 .executes(context -> {
                     if (HQMUtil.isSinglePlayerOnly()) {
                         boolean newEditModeState = !Quest.canQuestsBeEdited();

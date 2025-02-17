@@ -11,21 +11,26 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
-public class OpSubCommand implements CommandHandler.SubCommand {
+public record OpSubCommand() implements CommandHandler.SubCommand {
+    @Override
+    public String name() {
+        return "op";
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder
-                .requires(source -> source.hasPermission(4) && source.getEntity() instanceof Player)
-                .then(Commands.argument("targets", EntityArgument.player())
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS) && source.getEntity() instanceof Player)
+                .then(Commands.argument("target", EntityArgument.player())
                         .executes(context -> {
-                            Player player = EntityArgument.getPlayer(context, "targets");
+                            Player player = EntityArgument.getPlayer(context, "target");
                             if (QuestingDataManager.getInstance().hasData(player)) {
                                 player.getInventory().add(QuestBookItem.getOPBook(player));
                             } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));
                             return 1;
                         }))
                 .executes(context -> {
-                    Player player = (Player) context.getSource().getEntity();
+                    Player player = context.getSource().getPlayerOrException();
                     if (QuestingDataManager.getInstance().hasData(player)) {
                         player.getInventory().add(QuestBookItem.getOPBook(player));
                     } else context.getSource().sendFailure(Component.translatable("hqm.message.noPlayer"));

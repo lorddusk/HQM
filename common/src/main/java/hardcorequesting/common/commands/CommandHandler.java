@@ -3,62 +3,66 @@ package hardcorequesting.common.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import hardcorequesting.common.commands.sub.*;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.util.Translator;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import static net.minecraft.commands.Commands.literal;
 
 
-public class CommandHandler {
-    public static final Map<String, SubCommand> SUB_COMMANDS;
-    
-    static {
-        SUB_COMMANDS = new HashMap<>();
-        SUB_COMMANDS.put("help", new HelpSubCommand());
-        SUB_COMMANDS.put("hardcore", new HardcoreSubCommand());
-        SUB_COMMANDS.put("lives", new LivesSubCommand());
-        SUB_COMMANDS.put("op", new OpSubCommand());
-        SUB_COMMANDS.put("edit", new EditSubCommand());
-        SUB_COMMANDS.put("quest", new QuestSubCommand());
-        SUB_COMMANDS.put("enable", new EnableSubCommand());
-        SUB_COMMANDS.put("version", new VersionSubCommand());
-        SUB_COMMANDS.put("reset", new ResetPlayerSubCommand());
-    }
-    
+public final class CommandHandler {
+    public static final Set<SubCommand> SUB_COMMANDS = Set.of(
+            new HelpSubCommand(),
+            new HardcoreSubCommand(),
+            new LivesSubCommand(),
+            new OpSubCommand(),
+            new EditSubCommand(),
+            new QuestSubCommand(),
+            new EnableSubCommand(),
+            new VersionSubCommand(),
+            new ResetPlayerSubCommand());
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralArgumentBuilder<CommandSourceStack> builder = literal("hqm");
-        for (String s : SUB_COMMANDS.keySet()) {
-            builder = builder.then(SUB_COMMANDS.get(s).build(literal(s)));
+        for (SubCommand command : SUB_COMMANDS) {
+            builder = builder.then(command.build(literal(command.name())));
         }
-        dispatcher.register(builder.executes(context -> {
-            return 1;
-        }));
+        dispatcher.register(builder);
     }
     
     public interface SubCommand {
+        String name();
+
         ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder);
-        
-        default int[] getSyntaxOptions(CommandContext<CommandSourceStack> context) {
-            return new int[0];
+
+        default void sendHelpMessages(CommandSourceStack source) {
+            Utils.sendHelpMessagesForCommand(source, this.name(), 0);
         }
-        
-        default void currentLives(Player player) {
+    }
+
+    public static final class Utils {
+        public static void currentLives(Player player) {
             player.createCommandSourceStack().sendSuccess(() -> Component.literal("You currently have " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        
-        default void currentLives(CommandSourceStack source, Player player) {
+
+        public static void currentLives(CommandSourceStack source, Player player) {
             source.sendSuccess(() -> Component.literal(player.getScoreboardName() + " currently has " + QuestingDataManager.getInstance().getQuestingData(player).getLives() + " live(s) left."), false);
         }
-        
-        default void sendChat(CommandSourceStack sender, Component text) {
+
+        public static void sendChat(CommandSourceStack sender, Component text) {
             sender.sendSuccess(() -> text, false);
+        }
+
+        public static void sendHelpMessagesForCommand(CommandSourceStack source, String command, int... syntaxOptions) {
+            for (int i : syntaxOptions)
+                source.sendSuccess(() -> Translator.translatable(CommandStrings.COMMAND_PREFIX + command + CommandStrings.SYNTAX_SUFFIX + i).withStyle(ChatFormatting.YELLOW)
+                        .append(Component.literal(" - ")).append(Translator.translatable(CommandStrings.COMMAND_PREFIX + command + CommandStrings.INFO_SUFFIX + i)), false);
         }
     }
 }
