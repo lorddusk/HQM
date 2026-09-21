@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class TaskType<T extends QuestTask<?>> {
-    public static final ResourceKey<Registry<TaskType<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(new ResourceLocation(HardcoreQuestingCore.ID, "task_type"));
+    public static final ResourceKey<Registry<TaskType<?>>> REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, "task_type"));
     public static final DeferredRegister<TaskType<?>> REGISTER = DeferredRegister.create(HardcoreQuestingCore.ID, REGISTRY_KEY);
     
     public static final RegistrySupplier<TaskType<CheckBoxTask>> CHECKBOX = REGISTER.register("checkbox", () -> new TaskType<>("checkbox", CheckBoxTask::new));

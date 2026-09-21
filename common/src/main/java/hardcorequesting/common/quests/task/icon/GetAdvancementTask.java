@@ -82,7 +82,7 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
                 Part part = this.parts.get(i);
                 if (part == null || part.getAdvancement() == null) continue;
                 
-                ResourceLocation advResource = new ResourceLocation(part.getAdvancement());
+                ResourceLocation advResource = ResourceLocation.parse(part.getAdvancement());
                 
                 AdvancementHolder advAdvancement = manager.get(advResource);
                 
@@ -161,4 +161,3 @@ public class GetAdvancementTask extends IconLayoutTask<GetAdvancementTask.Part, 
         }
     }
 }
-

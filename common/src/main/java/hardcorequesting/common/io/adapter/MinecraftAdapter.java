@@ -55,7 +55,7 @@ public class MinecraftAdapter {
                 return ItemStack.EMPTY;
             else {
                 JsonObject jsonObj = json.getAsJsonObject();
-                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(jsonObj, "id")));
+                Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(jsonObj, "id")));
                 int count = GsonHelper.getAsByte(jsonObj, "Count");
 
                 DataComponentPatch dataComponentPatch = DataComponentPatch.EMPTY;
@@ -105,7 +105,7 @@ public class MinecraftAdapter {
         public FluidStack deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             
-            Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
+            Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(GsonHelper.getAsString(object, FLUID)));
             Fraction amount = Fraction.CODEC.parse(JsonOps.INSTANCE, object.get(VOLUME)).result().orElseThrow();
             return FluidStack.create(fluid, amount.intValue());
         }

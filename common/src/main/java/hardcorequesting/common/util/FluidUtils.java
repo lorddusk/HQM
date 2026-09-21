@@ -50,9 +50,9 @@ public class FluidUtils {
         public static RenderType createFluid(ResourceLocation location) {
             return RenderType.create(
                     HardcoreQuestingCore.ID + ":fluid_type",
-                    DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, true, false,
+                    DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 256, true, false,
                     RenderType.CompositeState.builder()
-                            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_SHADER)
+                            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_LIGHTMAP_SHADER)
                             .setLightmapState(RenderStateShard.LIGHTMAP)
                             .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
                             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
