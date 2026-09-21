@@ -11,13 +11,16 @@ cross-loader support prematurely.
 ## Verified
 
 - `:common:compileJava` passes with Java 21.
-- `:neoforge:build` produces `HQM-1.21.1-5.19.0-neoforge.jar`.
-- `:neoforge:runClient` reaches the Minecraft main menu with HQM in the mod list.
+- `:neoforge:build` produces `HQM-1.21.1-5.19.0-oast.1-neoforge.jar`.
+- `:neoforge:runClient` enters a singleplayer world and loads nine sample quests
+  from two quest sets. The chapter map, icons and dependency lines render.
+- Minecraft starts in Simplified Chinese in the test instance. An initial
+  `zh_cn.json` covers the main quest-book controls; untranslated HQM strings
+  still fall back to English.
 
 ## Not yet verified
 
-- Joining a world, opening the quest book, selecting a chapter, completing tasks,
-  and reward claims.
+- Completing tasks, reward claims and a full pass through the quest-book pages.
 - Dedicated server startup and client/server synchronization.
 - Rendering fidelity for custom rotations, selection highlights and fluid icons.
 
@@ -29,3 +32,6 @@ builder API. These changes compile but the rendering paths need in-game testing.
 Use Java 21 and run `./gradlew :neoforge:build`. The generated JAR is under
 `neoforge/build/libs/`. Do not publish it as a release until the unverified
 paths above have been tested.
+
+The `-oast.1` suffix denotes this test build, not an upstream HQM release.
+Both upstream license documents are included in the remapped JAR.

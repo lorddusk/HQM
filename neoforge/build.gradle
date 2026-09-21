@@ -41,6 +41,8 @@ processResources {
 }
 
 shadowJar {
+    from(rootProject.file("LICENSE.md"))
+    from(rootProject.file("LICENSE_ART.md"))
     relocate "hardcorequesting.common", "hardcorequesting.common.forge"
     relocate "blue.endless.jankson", "hardcorequesting.common.forge.blue.endless.jankson"
 
@@ -55,6 +57,8 @@ remapJar {
 }
 
 jar {
+    from(rootProject.file("LICENSE.md"))
+    from(rootProject.file("LICENSE_ART.md"))
     archiveClassifier = "dev"
 }
 
