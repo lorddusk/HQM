@@ -344,7 +344,7 @@ public class QuestTaskAdapter {
             KillMobsTask.Part result = new KillMobsTask.Part();
             if (object.has(NAME))
                 result.setName(WrappedText.fromJson(object.get(NAME), false));
-            result.setMob(new ResourceLocation(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
+            result.setMob(ResourceLocation.parse(GsonHelper.getAsString(object, MOB, result.getMob().toString())));
             result.setCount(GsonHelper.getAsInt(object, KILLS, result.getCount()));
             if (object.has(ICON)) {
                 ItemStack icon = MinecraftAdapter.ICON_ITEM_STACK.deserialize(GsonHelper.getAsJsonObject(object, ICON));

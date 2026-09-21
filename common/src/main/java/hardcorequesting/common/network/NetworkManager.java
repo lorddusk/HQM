@@ -22,8 +22,8 @@ import java.util.Map;
 
 public class NetworkManager {
     
-    private static final ResourceLocation S2C = new ResourceLocation(HardcoreQuestingCore.ID, "s2c");
-    private static final ResourceLocation C2S = new ResourceLocation(HardcoreQuestingCore.ID, "c2s");
+    private static final ResourceLocation S2C = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, "s2c");
+    private static final ResourceLocation C2S = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, "c2s");
     private static int id = 0;
     private static final Map<Class<? extends IMessage>, Tuple<Class<? extends IMessageHandler>, Integer>> PACKET_HANDLERS = new HashMap<>();
     
