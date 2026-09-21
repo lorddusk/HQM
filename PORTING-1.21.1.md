@@ -11,7 +11,7 @@ cross-loader support prematurely.
 ## Verified
 
 - `:common:compileJava` passes with Java 21.
-- `:neoforge:build` produces `HQM-1.21.1-5.19.0-oast.1-neoforge.jar`.
+- `:neoforge:build` produces `HQM-1.21.1-5.19.0-1.21.1-alpha.1-neoforge.jar`.
 - `:neoforge:runClient` enters a singleplayer world and loads nine sample quests
   from two quest sets. The chapter map, icons and dependency lines render.
 - Minecraft starts in Simplified Chinese in the test instance. An initial
@@ -33,5 +33,5 @@ Use Java 21 and run `./gradlew :neoforge:build`. The generated JAR is under
 `neoforge/build/libs/`. Do not publish it as a release until the unverified
 paths above have been tested.
 
-The `-oast.1` suffix denotes this test build, not an upstream HQM release.
+The `-1.21.1-alpha.1` suffix denotes this test build, not an upstream HQM release.
 Both upstream license documents are included in the remapped JAR.
