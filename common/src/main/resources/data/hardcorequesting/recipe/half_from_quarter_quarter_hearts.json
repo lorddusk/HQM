@@ -5,10 +5,10 @@
       "item": "hardcorequesting:quarterheart"
     },
     {
-      "item": "hardcorequesting:halfheart"
+      "item": "hardcorequesting:quarterheart"
     }
   ],
   "result": {
-    "item": "hardcorequesting:threequartsheart"
+    "id": "hardcorequesting:halfheart"
   }
 }

@@ -33,7 +33,7 @@ import java.util.UUID;
 public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData> {
     private static final String TAME = "part";
     
-    public static final ResourceLocation ABSTRACT_HORSE = new ResourceLocation("abstracthorse");
+    public static final ResourceLocation ABSTRACT_HORSE = ResourceLocation.parse("abstracthorse");
     
     public TameMobsTask(Quest parent) {
         super(TaskType.TAME.get(), TameTaskData.class, EditType.Type.MONSTER, parent);
@@ -53,7 +53,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
         part.setCount(amount);
         
         if(entityId != null && (part.hasNoIcon() || part.getIconStack().left().orElse(ItemStack.EMPTY).getItem() instanceof SpawnEggItem)) {
-            EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(entityId));
+            EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(entityId));
             if(entityType != null) {
                 Item egg = SpawnEggItem.byId(entityType);
                 if(egg != null) {
@@ -143,7 +143,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
                             updated = true;
                         }
                     } else {
-                        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(part.mobId));
+                        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(part.mobId));
                         if (type != null) {
                             if (type.equals(entity.getType())) {
                                 data.setValue(i, data.getValue(i) + 1);

@@ -6,12 +6,13 @@ import dev.architectury.fluid.FluidStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class FluidUtils {
     public static FluidStack split(FluidStack fluid, Fraction toRemove) {
@@ -36,10 +37,6 @@ public class FluidUtils {
         return Fraction.ofWhole(stack.getAmount());
     }
 
-    public static Material getBlockMaterial(ResourceLocation loc) {
-        return new Material(TextureAtlas.LOCATION_BLOCKS, loc);
-    }
-
     @Environment(EnvType.CLIENT)
     public static class CustomRenderTypes extends RenderType {
         private CustomRenderTypes(String string, VertexFormat arg, VertexFormat.Mode arg2, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {
@@ -47,12 +44,21 @@ public class FluidUtils {
             throw new IllegalStateException("This class is not meant to be constructed!");
         }
 
+        private static final Map<ResourceLocation, RenderType> FLUID_TYPES = new HashMap<>();
+        
+        /**
+         * @param location the location of the texture (atlas) that the vertices' uv coordinates refer to
+         */
         public static RenderType createFluid(ResourceLocation location) {
+            return FLUID_TYPES.computeIfAbsent(location, CustomRenderTypes::create);
+        }
+        
+        private static RenderType create(ResourceLocation location) {
             return RenderType.create(
                     HardcoreQuestingCore.ID + ":fluid_type",
-                    DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, true, false,
+                    DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.QUADS, 256, true, false,
                     RenderType.CompositeState.builder()
-                            .setShaderState(RenderStateShard.POSITION_COLOR_TEX_SHADER)
+                            .setShaderState(new RenderStateShard.ShaderStateShard(GameRenderer::getPositionTexColorShader))
                             .setLightmapState(RenderStateShard.LIGHTMAP)
                             .setTextureState(new RenderStateShard.TextureStateShard(location, false, false))
                             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)

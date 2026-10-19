@@ -1,7 +1,7 @@
 plugins {
     // version is fixed while waiting for a fix to https://github.com/architectury/architectury-transformer/issues/24
-    id "architectury-plugin" version "3.4.155"
-    id "dev.architectury.loom" version "1.7-SNAPSHOT" apply false
+    id "architectury-plugin" version "3.4.162"
+    id "dev.architectury.loom" version "1.7.435" apply false
 }
 
 architectury {

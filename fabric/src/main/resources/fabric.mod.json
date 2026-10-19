@@ -39,10 +39,10 @@
   "accessWidener": "hqm.accesswidener",
   "depends": {
     "fabricloader": ">=0.16",
-    "fabric": ">=0.100",
-    "minecraft": ">=1.20.6",
+    "fabric": ">=0.116",
+    "minecraft": "~1.21.1",
     "java": ">=21",
-    "architectury": ">=12",
+    "architectury": ">=13",
     "cardinal-components-base": ">=6",
     "cardinal-components-entity": ">=6"
   },

@@ -127,13 +127,12 @@ public class GuiBase extends Screen {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(graphics.pose().last().pose(), x, y + targetH, 0).uv((float) pt1[0], (float) pt1[1]).endVertex();
-        bufferBuilder.vertex(graphics.pose().last().pose(), x + targetW, y + targetH, 0).uv((float) pt2[0], (float) pt2[1]).endVertex();
-        bufferBuilder.vertex(graphics.pose().last().pose(), x + targetW, y, 0).uv((float) pt3[0], (float) pt3[1]).endVertex();
-        bufferBuilder.vertex(graphics.pose().last().pose(), x, y, 0).uv((float) pt4[0], (float) pt4[1]).endVertex();
-        tesselator.end();
+        BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.addVertex(graphics.pose().last().pose(), x, y + targetH, 0).setUv((float) pt1[0], (float) pt1[1]);
+        bufferBuilder.addVertex(graphics.pose().last().pose(), x + targetW, y + targetH, 0).setUv((float) pt2[0], (float) pt2[1]);
+        bufferBuilder.addVertex(graphics.pose().last().pose(), x + targetW, y, 0).setUv((float) pt3[0], (float) pt3[1]);
+        bufferBuilder.addVertex(graphics.pose().last().pose(), x, y, 0).setUv((float) pt4[0], (float) pt4[1]);
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
     }
     
     public void renderTooltip(GuiGraphics graphics, FormattedText stringRenderable, int x, int y) {
@@ -160,11 +159,10 @@ public class GuiBase extends Screen {
         RenderSystem.lineWidth(1 + thickness * scale / 2F);
     
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-        builder.vertex(graphics.pose().last().pose(), x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        builder.vertex(graphics.pose().last().pose(), x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        tesselator.end();
+        BufferBuilder builder = tesselator.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+        builder.addVertex(graphics.pose().last().pose(), x1, y1, 0).setColor(255, 255, 255, 255).setNormal(dx, dy, 0.0F);
+        builder.addVertex(graphics.pose().last().pose(), x2, y2, 0).setColor(255, 255, 255, 255).setNormal(dx, dy, 0.0F);
+        BufferUploader.drawWithShader(builder.buildOrThrow());
     }
     
     public void drawFluid(FluidStack fluid, GuiGraphics graphics, int x, int y, int mX, int mY) {
@@ -188,12 +186,12 @@ public class GuiBase extends Screen {
         int g = (color >> 8 & 255);
         int b = (color & 255);
         MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-        VertexConsumer builder = FluidUtils.getBlockMaterial(sprite.atlasLocation()).buffer(source, FluidUtils.CustomRenderTypes::createFluid);
+        VertexConsumer builder = source.getBuffer(FluidUtils.CustomRenderTypes.createFluid(sprite.atlasLocation()));
         Matrix4f matrix = stack.last().pose();
-        builder.vertex(matrix, x2, y1, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV0()).endVertex();
-        builder.vertex(matrix, x1, y1, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV0()).endVertex();
-        builder.vertex(matrix, x1, y2, 0).color(r, g, b, a).uv(sprite.getU0(), sprite.getV1()).endVertex();
-        builder.vertex(matrix, x2, y2, 0).color(r, g, b, a).uv(sprite.getU1(), sprite.getV1()).endVertex();
+        builder.addVertex(matrix, x2, y1, 0).setColor(r, g, b, a).setUv(sprite.getU1(), sprite.getV0());
+        builder.addVertex(matrix, x1, y1, 0).setColor(r, g, b, a).setUv(sprite.getU0(), sprite.getV0());
+        builder.addVertex(matrix, x1, y2, 0).setColor(r, g, b, a).setUv(sprite.getU0(), sprite.getV1());
+        builder.addVertex(matrix, x2, y2, 0).setColor(r, g, b, a).setUv(sprite.getU1(), sprite.getV1());
         source.endBatch();
         stack.popPose();
     }
@@ -275,7 +273,7 @@ public class GuiBase extends Screen {
         FormattedCharSequence text = str.getString().isEmpty() ? FormattedCharSequence.EMPTY : Language.getInstance().getVisualOrder(str);
         float drawX = (x + this.left) / mult;
         float drawY = (y + this.top) / mult;
-        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         this.font.drawInBatch(text, drawX, drawY, color, shadow, graphics.pose().last().pose(), bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
         bufferSource.endBatch();
 
@@ -318,25 +316,24 @@ public class GuiBase extends Screen {
     public void drawSelection(GuiGraphics graphics, Collection<Rect2i> areas) {
         PoseStack matrices = graphics.pose();
         Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionShader);
         RenderSystem.setShaderColor(0.0F, 0.0F, 255.0F, 255.0F);
         RenderSystem.enableColorLogicOp();
         RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+        BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
         
         for (Rect2i area : areas) {
             int x0 = area.getX() + left;
             int y0 = area.getY() + top;
             int x1 = x0 + area.getWidth();
             int y1 = y0 + area.getHeight();
-            bufferBuilder.vertex(matrices.last().pose(), x0, y1, 0F).endVertex();
-            bufferBuilder.vertex(matrices.last().pose(), x1, y1, 0F).endVertex();
-            bufferBuilder.vertex(matrices.last().pose(), x1, y0, 0F).endVertex();
-            bufferBuilder.vertex(matrices.last().pose(), x0, y0, 0F).endVertex();
+            bufferBuilder.addVertex(matrices.last().pose(), x0, y1, 0F);
+            bufferBuilder.addVertex(matrices.last().pose(), x1, y1, 0F);
+            bufferBuilder.addVertex(matrices.last().pose(), x1, y0, 0F);
+            bufferBuilder.addVertex(matrices.last().pose(), x0, y0, 0F);
         }
         
-        tesselator.end();
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
         RenderSystem.disableColorLogicOp();
     }
     

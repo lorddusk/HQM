@@ -6,14 +6,18 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import dev.architectury.fluid.FluidStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Fraction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -29,6 +33,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MinecraftAdapter {
     private static final Logger LOGGER = LogManager.getLogger("Hardcore Questing Mode");
+    
+    // Some components (e.g. enchantments and banner patterns) refer to data-driven registries, which can only be resolved with access to them
+    private static DynamicOps<JsonElement> registryOps() {
+        RegistryAccess registries = HardcoreQuestingCore.proxy.registryAccess();
+        return registries != null ? RegistryOps.create(JsonOps.INSTANCE, registries) : JsonOps.INSTANCE;
+    }
 
     public static final Adapter<ItemStack> ITEM_STACK = new Adapter<>() {
         
@@ -41,7 +51,7 @@ public class MinecraftAdapter {
             jsonObj.addProperty("id", BuiltInRegistries.ITEM.getKey(src.getItem()).toString());
             jsonObj.addProperty("Count", src.getCount());
 
-            DataComponentPatch.CODEC.encodeStart(JsonOps.INSTANCE, src.getComponentsPatch())
+            DataComponentPatch.CODEC.encodeStart(registryOps(), src.getComponentsPatch())
                     .resultOrPartial(error -> LOGGER.error("Error while serializing item stack components: {}", error))
                     .ifPresent(jsonElement -> jsonObj.add("components", jsonElement));
 
@@ -55,12 +65,12 @@ public class MinecraftAdapter {
                 return ItemStack.EMPTY;
             else {
                 JsonObject jsonObj = json.getAsJsonObject();
-                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(jsonObj, "id")));
+                Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(GsonHelper.getAsString(jsonObj, "id")));
                 int count = GsonHelper.getAsByte(jsonObj, "Count");
 
                 DataComponentPatch dataComponentPatch = DataComponentPatch.EMPTY;
                 if (jsonObj.has("components")) {
-                    dataComponentPatch = DataComponentPatch.CODEC.parse(JsonOps.INSTANCE, jsonObj.get("components"))
+                    dataComponentPatch = DataComponentPatch.CODEC.parse(registryOps(), jsonObj.get("components"))
                             .resultOrPartial(error -> LOGGER.error("Error while deserializing item stack components: {}", error))
                             .orElse(DataComponentPatch.EMPTY);
                 }
@@ -105,7 +115,7 @@ public class MinecraftAdapter {
         public FluidStack deserialize(JsonElement json) {
             JsonObject object = json.getAsJsonObject();
             
-            Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(GsonHelper.getAsString(object, FLUID)));
+            Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(GsonHelper.getAsString(object, FLUID)));
             Fraction amount = Fraction.CODEC.parse(JsonOps.INSTANCE, object.get(VOLUME)).result().orElseThrow();
             return FluidStack.create(fluid, amount.intValue());
         }

@@ -2,7 +2,6 @@ package hardcorequesting.common.items.crafting;
 
 import hardcorequesting.common.items.ModItems;
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
@@ -13,11 +12,11 @@ public class BookCatalystRecipe extends ShapedRecipe {
     }
     
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingContainer container) {
-        NonNullList<ItemStack> remaining = super.getRemainingItems(container);
+    public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+        NonNullList<ItemStack> remaining = super.getRemainingItems(input);
         
         for (int i = 0; i < remaining.size(); i++) {
-            ItemStack stack = container.getItem(i);
+            ItemStack stack = input.getItem(i);
             if (stack.is(ModItems.book.get()) || stack.is(ModItems.enabledBook.get())) {
                 remaining.set(i, stack.copy());
             }

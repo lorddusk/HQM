@@ -10,13 +10,13 @@
       "tag": "minecraft:planks"
     },
     "q": {
-      "item": "hardcorequesting:enabled_quest_book"
+      "item": "hardcorequesting:quest_book"
     },
     "g": {
       "item": "minecraft:glass"
     }
   },
   "result": {
-    "item": "hardcorequesting:item_barrel"
+    "id": "hardcorequesting:item_barrel"
   }
 }

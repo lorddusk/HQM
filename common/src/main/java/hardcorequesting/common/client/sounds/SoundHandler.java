@@ -97,7 +97,7 @@ public class SoundHandler {
     
     @Environment(EnvType.CLIENT)
     private static SoundInstance play(String sound, float volume, float pitch) {
-        return play(new ResourceLocation(HardcoreQuestingCore.ID, sound), volume, pitch);
+        return play(ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, sound), volume, pitch);
     }
     
     @Environment(EnvType.CLIENT)

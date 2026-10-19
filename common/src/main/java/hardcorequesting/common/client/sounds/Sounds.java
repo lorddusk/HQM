@@ -18,7 +18,7 @@ public enum Sounds {
     private Supplier<SoundEvent> supplier;
     
     Sounds(String soundName) {
-        this.soundId = new ResourceLocation(HardcoreQuestingCore.ID, soundName);
+        this.soundId = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, soundName);
     }
     
     public ResourceLocation getSoundId() {

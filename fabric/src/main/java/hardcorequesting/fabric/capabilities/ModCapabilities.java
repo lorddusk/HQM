@@ -13,7 +13,7 @@ import org.ladysnake.cca.api.v3.entity.RespawnCopyStrategy;
 
 public final class ModCapabilities implements EntityComponentInitializer {
     public static final ComponentKey<CompoundTagComponent> PLAYER_EXTRA_DATA =
-            ComponentRegistry.getOrCreate(new ResourceLocation(HardcoreQuestingCore.ID, "player_extra_data"), CompoundTagComponent.class);
+            ComponentRegistry.getOrCreate(ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, "player_extra_data"), CompoundTagComponent.class);
     
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

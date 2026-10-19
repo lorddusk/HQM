@@ -265,14 +265,14 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Block> Supplier<T> registerBlock(String id, Supplier<T> block) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.BLOCK, location, block.get());
         return () -> (T) BuiltInRegistries.BLOCK.get(location);
     }
     
     @Override
     public Supplier<SoundEvent> registerSound(String id, Supplier<SoundEvent> sound) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.SOUND_EVENT, location, sound.get());
         return () -> BuiltInRegistries.SOUND_EVENT.get(location);
     }
@@ -280,7 +280,7 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Item> Supplier<T> registerItem(String id, Supplier<T> item) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.ITEM, location, item.get());
         return () -> (T) BuiltInRegistries.ITEM.get(location);
     }
@@ -288,21 +288,21 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends BlockEntity> Supplier<BlockEntityType<T>> registerBlockEntity(String id, BiFunction<BlockPos, BlockState, T> constructor, Supplier<Block> validBlock) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, location, FabricBlockEntityTypeBuilder.create(constructor::apply, validBlock.get()).build(null));
         return () -> (BlockEntityType<T>) BuiltInRegistries.BLOCK_ENTITY_TYPE.get(location);
     }
     
     @Override
     public Supplier<RecipeSerializer<?>> registerBookRecipeSerializer(String id) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, location, new BookCatalystRecipeSerializer());
         return () -> BuiltInRegistries.RECIPE_SERIALIZER.get(location);
     }
 
     @Override
     public Supplier<CreativeModeTab> registerTab(String id, Supplier<CreativeModeTab> tab) {
-        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, location, tab.get());
         return () -> BuiltInRegistries.CREATIVE_MODE_TAB.get(location);
     }

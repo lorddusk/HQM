@@ -8,7 +8,10 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestTicker;
 import hardcorequesting.common.quests.task.TaskType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class ClientProxy extends CommonProxy {
     
@@ -52,5 +55,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Player getPlayer(PacketContext ctx) {
         return ctx.isClient() ? Minecraft.getInstance().player : super.getPlayer(ctx);
+    }
+    
+    @Override
+    @Nullable
+    public RegistryAccess registryAccess() {
+        RegistryAccess access = super.registryAccess();
+        if (access != null)
+            return access;
+        // Not hosting a server, so we are connected to a remote one
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        return connection != null ? connection.registryAccess() : null;
     }
 }
