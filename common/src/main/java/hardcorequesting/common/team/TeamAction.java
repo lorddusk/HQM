@@ -202,6 +202,15 @@ public enum TeamAction {
             }
         }
     };
+
+    private static final TeamAction[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static TeamAction byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     private static Team getTeam(Player player) {
         return QuestingDataManager.getInstance().getQuestingData(player).getTeam();

@@ -20,9 +20,8 @@ public class TeamErrorMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        int ordinal = buf.readInt();
-        // An error that does not exist is left out, the handler ignores the message
-        this.error = ordinal >= 0 && ordinal < TeamError.values().length ? TeamError.values()[ordinal] : null;
+        // Null for a value that does not exist, the handler ignores the message
+        this.error = TeamError.byOrdinal(buf.readInt());
     }
     
     @Override

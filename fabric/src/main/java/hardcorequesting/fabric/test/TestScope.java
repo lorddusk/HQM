@@ -3,6 +3,7 @@ package hardcorequesting.fabric.test;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import hardcorequesting.common.bag.LootGroup;
+import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.io.adapter.QuestAdapter;
 import hardcorequesting.common.io.adapter.QuestTaskAdapter;
 import hardcorequesting.common.quests.Quest;
@@ -180,6 +181,22 @@ public final class TestScope {
                 contains(expected.getAsJsonArray().get(i), actual.getAsJsonArray().get(i), path + "[" + i + "]");
         } else if (!expected.equals(actual)) {
             throw new AssertionError(path + ": expected " + expected + " but was " + actual);
+        }
+    }
+
+    /**
+     * @return how many tasks are registered for events, counted over all event types
+     */
+    public static int registeredTaskCount() {
+        try {
+            Field field = EventTrigger.class.getDeclaredField("registeredTasks");
+            field.setAccessible(true);
+            int count = 0;
+            for (List<?> tasks : (List<?>[]) field.get(EventTrigger.instance()))
+                count += tasks.size();
+            return count;
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
         }
     }
 }

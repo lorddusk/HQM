@@ -24,9 +24,8 @@ public class TeamUpdateMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        int ordinal = buf.readInt();
-        // A type that does not exist is left out, the handler ignores the message
-        this.type = ordinal >= 0 && ordinal < TeamUpdateType.values().length ? TeamUpdateType.values()[ordinal] : null;
+        // Null for a value that does not exist, the handler ignores the message
+        this.type = TeamUpdateType.byOrdinal(buf.readInt());
         this.data = SyncUtil.readLargeString(buf);
     }
     

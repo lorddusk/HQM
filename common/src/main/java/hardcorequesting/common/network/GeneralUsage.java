@@ -52,6 +52,15 @@ public enum GeneralUsage {
             GuiReward.open(player, groupId, bag, limits);
         }
     };
+
+    private static final GeneralUsage[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static GeneralUsage byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     private final boolean serverBound;
     

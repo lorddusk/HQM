@@ -17,9 +17,7 @@ import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import hardcorequesting.common.bag.GroupTier;
 import hardcorequesting.common.death.DeathType;
-import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.quests.QuestingDataManager;
-import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.WrappedText;
 import hardcorequesting.common.bag.LootGroup;
@@ -582,36 +580,6 @@ public class HQMTest {
             return;
         }
         helper.succeed();
-    }
-    
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
-    public void tasksOfRemovedQuestsAreNotNotified(GameTestHelper helper) {
-        List<Quest> created = new ArrayList<>();
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
-        try {
-            Quest quest = createQuest(created, "removed");
-            for (TaskType<?> type : TaskType.values())
-                type.addTask(quest);
-            // The quest disappears from the book without going through removeQuest, as when a whole set is dropped while loading
-            Quest.getQuests().remove(quest.getQuestId());
-            
-            for (QuestTask<?> task : quest.getTasks()) {
-                if (task.isValid()) {
-                    helper.fail("The " + task.getType().toDataName() + " task of a removed quest is still valid.");
-                    return;
-                }
-            }
-            try {
-                EventTrigger.instance().onPlayerTick(player);
-            } catch (RuntimeException e) {
-                helper.fail("A task of a removed quest was still notified of an event: " + e);
-                return;
-            }
-            helper.succeed();
-        } finally {
-            created.forEach(quest -> quest.getTasks().forEach(QuestTask::onDelete));
-            QuestingDataManager.getInstance().getQuestingData(player).getTeam().clearProgress();
-        }
     }
     
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)

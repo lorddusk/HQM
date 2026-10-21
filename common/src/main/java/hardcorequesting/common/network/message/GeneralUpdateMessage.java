@@ -43,8 +43,8 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
     @Override
     public IMessage onMessage(GeneralUpdateMessage message, PacketContext ctx) {
         ctx.getTaskQueue().accept(() -> {
-            if (message.data != null && message.usage >= 0 && message.usage < GeneralUsage.values().length) {
-                GeneralUsage usage = GeneralUsage.values()[message.usage];
+            GeneralUsage usage = GeneralUsage.byOrdinal(message.usage);
+            if (message.data != null && usage != null) {
                 // Only the side the usage is meant for handles it, a client must not be able to make the server run client code, or the other way around
                 if (message.player != null && usage.isServerBound() != ctx.isClient()) {
                     usage.receiveData(message.player, message.data);

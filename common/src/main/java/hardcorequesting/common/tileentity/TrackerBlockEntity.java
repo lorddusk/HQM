@@ -72,8 +72,9 @@ public class TrackerBlockEntity extends BlockEntity {
 
         radius = compoundTag.getInt(NBT_RADIUS);
         int typeOrdinal = compoundTag.getByte(NBT_TYPE);
-        if (typeOrdinal >= 0 && typeOrdinal < TrackerType.values().length) {
-            type = TrackerType.values()[typeOrdinal];
+        TrackerType loadedType = TrackerType.byOrdinal(typeOrdinal);
+        if (loadedType != null) {
+            type = loadedType;
         } else {
             // For example data of a version with more tracker types. The tracker keeps the type it had.
             HardcoreQuestingCore.LOGGER.warn("The tracker at %s has the unknown tracker type %d, keeping %s", getBlockPos(), typeOrdinal, type);

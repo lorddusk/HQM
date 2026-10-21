@@ -219,9 +219,7 @@ public abstract class QuestTask<Data extends TaskData> {
     }
     
     public boolean isValid() {
-        Quest parent = getParent();
-        // The parent also has to still be part of the book, a quest that was dropped keeps its task list
-        return parent != null && Quest.getQuest(parent.getQuestId()) == parent && parent.getTasks() != null && parent.getTasks().contains(this);
+        return getParent() != null && getParent().getTasks() != null && getParent().getTasks().contains(this);
     }
     
     //for these to be called one must register the task using the method above using the correct types

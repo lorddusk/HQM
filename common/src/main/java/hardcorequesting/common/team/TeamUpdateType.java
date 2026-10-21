@@ -172,6 +172,15 @@ public enum TeamUpdateType {
             return new TeamUpdateMessage(this, TeamAdapter.TEAM_ADAPTER.toJson(team));
         }
     };
+
+    private static final TeamUpdateType[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static TeamUpdateType byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     public abstract void update(Team team, String data);
     

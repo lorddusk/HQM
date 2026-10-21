@@ -22,9 +22,8 @@ public class TeamMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        int ordinal = buf.readInt();
-        // An action that does not exist is left out, the handler ignores the message
-        this.action = ordinal >= 0 && ordinal < TeamAction.values().length ? TeamAction.values()[ordinal] : null;
+        // Null for a value that does not exist, the handler ignores the message
+        this.action = TeamAction.byOrdinal(buf.readInt());
         this.data = buf.readUtf(32767);
     }
     

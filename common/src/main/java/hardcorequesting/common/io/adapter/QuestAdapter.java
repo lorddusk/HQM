@@ -87,6 +87,15 @@ public class QuestAdapter {
     private static final Type STRING_LIST_TYPE = new TypeToken<List<String>>() {}.getType();
     private static final Pattern OTHER_QUEST_SET = Pattern.compile("^\\{(.*?)\\}\\[(.*)\\]$");
     public static Quest QUEST;
+    
+    /**
+     * Removes a quest that was created while loading but is not kept, with the listeners of its tasks, so they are not notified of events anymore.
+     */
+    private static void dropQuest(Quest quest) {
+        quest.getTasks().forEach(QuestTask::onDelete);
+        QuestSetsManager.getInstance().quests.remove(quest.getQuestId());
+    }
+    
     private static final Map<Quest, List<UUID>> requirementMapping = new HashMap<>();
     private static final Map<Quest, List<UUID>> prerequisiteMapping = new HashMap<>();
     private static final Map<Quest, List<UUID>> optionMapping = new HashMap<>();
@@ -250,8 +259,7 @@ public class QuestAdapter {
                     // For example a task type of a mod that is gone. Progress is kept by the position of the tasks,
                     // so the quest is left out as a whole, instead of loading it with different tasks.
                     HardcoreQuestingCore.LOGGER.warn("Skipped the quest '%s', as one of its tasks can not be read: %s", QUEST.getRawName().getRawText(), e.getMessage());
-                    QUEST.getTasks().forEach(QuestTask::onDelete);
-                    QuestSetsManager.getInstance().quests.remove(QUEST.getQuestId());
+                    dropQuest(QUEST);
                     return null;
                 }
             }
@@ -276,7 +284,7 @@ public class QuestAdapter {
                 optionalAdd(optionLinkMapping, optionLinks.stream().map(java.util.UUID::fromString).collect(Collectors.toList()));
                 return QUEST;
             }
-            QuestSetsManager.getInstance().quests.remove(QUEST.getQuestId());
+            dropQuest(QUEST);
             return null;
         }
         
@@ -304,7 +312,7 @@ public class QuestAdapter {
         
         private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
-                QuestSetsManager.getInstance().quests.remove(quest.getQuestId());
+                dropQuest(quest);
             }
             return null;
         }

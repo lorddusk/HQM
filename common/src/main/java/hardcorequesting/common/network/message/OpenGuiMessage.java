@@ -22,9 +22,8 @@ public class OpenGuiMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        int ordinal = buf.readInt();
-        // A gui that does not exist is left out, the handler ignores the message
-        this.gui = ordinal >= 0 && ordinal < GuiType.values().length ? GuiType.values()[ordinal] : null;
+        // Null for a value that does not exist, the handler ignores the message
+        this.gui = GuiType.byOrdinal(buf.readInt());
         if (this.gui == GuiType.NONE) return;
         data = buf.readUtf(32767);
     }

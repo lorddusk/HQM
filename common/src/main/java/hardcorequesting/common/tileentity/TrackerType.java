@@ -98,6 +98,15 @@ public enum TrackerType {
             }
         }
     };
+
+    private static final TrackerType[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static TrackerType byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     
     private String id;

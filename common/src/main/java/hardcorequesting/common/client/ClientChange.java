@@ -125,12 +125,12 @@ public enum ClientChange {
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.of(root.get(BLOCK_POS).getAsLong());
             int radius = root.get(RADIUS).getAsInt();
-            int type = root.get(TYPE).getAsInt();
-            if (type < 0 || type >= TrackerType.values().length) {
+            TrackerType type = TrackerType.byOrdinal(root.get(TYPE).getAsInt());
+            if (type == null) {
                 HardcoreQuestingCore.LOGGER.warn("Ignored a TRACKER_UPDATE with an unknown tracker type from %s", player.getScoreboardName());
                 return;
             }
-            TrackerBlockEntity.saveToServer(player, pos, radius, TrackerType.values()[type]);
+            TrackerBlockEntity.saveToServer(player, pos, radius, type);
         }
     }),
     SOUND(new ClientUpdater<Sounds>() {
@@ -141,12 +141,12 @@ public enum ClientChange {
         
         @Override
         public void parse(Player player, String data) {
-            int sound = Integer.parseInt(data);
-            if (sound < 0 || sound >= Sounds.values().length) {
+            Sounds sound = Sounds.byOrdinal(Integer.parseInt(data));
+            if (sound == null) {
                 HardcoreQuestingCore.LOGGER.warn("Ignored a SOUND update with an unknown sound");
                 return;
             }
-            SoundHandler.handleSoundPacket(Sounds.values()[sound]);
+            SoundHandler.handleSoundPacket(sound);
         }
     }),
     LORE(new ClientUpdater() {
@@ -193,6 +193,15 @@ public enum ClientChange {
             }
         }
     });
+
+    private static final ClientChange[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static ClientChange byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     private ClientUpdater updater;
     

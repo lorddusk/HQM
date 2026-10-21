@@ -22,9 +22,8 @@ public class ClientUpdateMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        int ordinal = buf.readInt();
-        // An action that does not exist is left out, the handler ignores the message
-        this.update = ordinal >= 0 && ordinal < ClientChange.values().length ? ClientChange.values()[ordinal] : null;
+        // Null for a value that does not exist, the handler ignores the message
+        this.update = ClientChange.byOrdinal(buf.readInt());
         data = buf.readUtf(32767);
     }
     

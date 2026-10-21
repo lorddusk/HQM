@@ -59,12 +59,13 @@ public enum GuiType {
             JsonElement quest = root.get(QUEST);
             UUID questId = quest.isJsonNull() ? null : UUID.fromString(quest.getAsString());
             int radius = root.get(RADIUS).getAsInt();
-            int type = root.get(TYPE).getAsInt();
-            if (type < 0 || type >= TrackerType.values().length) {
-                HardcoreQuestingCore.LOGGER.warn("Did not open the tracker screen, as the tracker type %d is unknown", type);
+            int typeOrdinal = root.get(TYPE).getAsInt();
+            TrackerType type = TrackerType.byOrdinal(typeOrdinal);
+            if (type == null) {
+                HardcoreQuestingCore.LOGGER.warn("Did not open the tracker screen, as the tracker type %d is unknown", typeOrdinal);
                 return;
             }
-            TrackerBlockEntity.openInterface(player, pos, questId, radius, TrackerType.values()[type]);
+            TrackerBlockEntity.openInterface(player, pos, questId, radius, type);
         }
     },
     BOOK {
@@ -78,6 +79,15 @@ public enum GuiType {
             GuiQuestBook.displayGui(player, Boolean.parseBoolean(data));
         }
     };
+
+    private static final GuiType[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static GuiType byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     public abstract IMessage build(String... data);
     

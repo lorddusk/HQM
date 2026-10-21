@@ -384,6 +384,23 @@ public class PersistenceTests {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void droppedQuestsDoNotLeaveTaskListeners(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            JsonObject blockBreak = taskSamples().get("block_break");
+            JsonObject noId = questWithTask("no_id", 0, 0, blockBreak.deepCopy());
+            noId.remove("uuid");
+            JsonObject unknownTask = quest("unknown_task", 45, 0);
+            JsonArray tasks = new JsonArray();
+            tasks.add(blockBreak.deepCopy());
+            tasks.add(json("{\"type\": \"somemod:nothing\"}"));
+            unknownTask.add("tasks", tasks);
+            t.loadBook(bookWith(setOf("Set", noId, unknownTask, questWithTask("fine", 90, 0, blockBreak.deepCopy()))));
+
+            equal(1, TestScope.registeredTaskCount(), "Only the task of the quest that was kept should be notified of events");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void linksToMissingQuestsAreIgnored(GameTestHelper helper) {
         TestScope.run(helper, t -> {
             JsonObject linked = quest("linked", 0, 0);

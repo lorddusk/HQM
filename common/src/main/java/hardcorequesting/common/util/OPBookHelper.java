@@ -90,6 +90,15 @@ public final class OPBookHelper {
                 }
             }
         };
+
+        private static final OpAction[] VALUES = values();
+
+        /**
+         * @return the constant with this number, or null if there is none
+         */
+        public static OpAction byOrdinal(int ordinal) {
+            return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+        }
         
         private static final String QUEST = "quest";
         private static final String SUBJECT = "subject";

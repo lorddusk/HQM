@@ -14,6 +14,15 @@ public enum TeamError {
     INVALID_PLAYER("hqm.team.invalidPlayer.title", "hqm.team.invalidPlayer.desc"),
     IN_PARTY("hqm.team.playerInParty.title", "hqm.team.playerInParty.desc"),
     USED_NAME("hqm.team.usedTeamName.title", "hqm.team.usedTeamName.desc");
+
+    private static final TeamError[] VALUES = values();
+
+    /**
+     * @return the constant with this number, or null if there is none
+     */
+    public static TeamError byOrdinal(int ordinal) {
+        return ordinal >= 0 && ordinal < VALUES.length ? VALUES[ordinal] : null;
+    }
     
     //slightly ugly but there's no real way of getting hold of the interface, this works perfectly fine
     public static TeamError latestError;
