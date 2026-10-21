@@ -149,7 +149,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             total += req;
         }
         
-        return Math.max(0, Math.min(1, done / (float) total));
+        return total == 0 ? 0 : Math.clamp(done / (float) total, 0, 1);
     }
     
     @Override

@@ -53,7 +53,7 @@ public class CompleteQuestTaskData extends TaskData {
     }
     
     public float getCompletedRatio(int size) {
-        return (float) quests.stream().limit(size).filter(Boolean::booleanValue).count() / size;
+        return size == 0 ? 0 : (float) quests.stream().limit(size).filter(Boolean::booleanValue).count() / size;
     }
     
     public boolean areAllCompleted(int size) {

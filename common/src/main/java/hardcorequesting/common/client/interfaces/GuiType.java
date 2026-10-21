@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.message.OpenGuiMessage;
 import hardcorequesting.common.tileentity.TrackerBlockEntity;
@@ -58,8 +59,12 @@ public enum GuiType {
             JsonElement quest = root.get(QUEST);
             UUID questId = quest.isJsonNull() ? null : UUID.fromString(quest.getAsString());
             int radius = root.get(RADIUS).getAsInt();
-            TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
-            TrackerBlockEntity.openInterface(player, pos, questId, radius, type);
+            int type = root.get(TYPE).getAsInt();
+            if (type < 0 || type >= TrackerType.values().length) {
+                HardcoreQuestingCore.LOGGER.warn("Did not open the tracker screen, as the tracker type %d is unknown", type);
+                return;
+            }
+            TrackerBlockEntity.openInterface(player, pos, questId, radius, TrackerType.values()[type]);
         }
     },
     BOOK {

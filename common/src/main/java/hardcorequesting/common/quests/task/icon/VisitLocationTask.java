@@ -69,6 +69,9 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
                                 data.complete(i);
                             }
                         }
+                    } else if (!data.getValue(i)) {
+                        // A location in another dimension can not be visited from here, so the task is not done yet
+                        all = false;
                     }
                 }
                 

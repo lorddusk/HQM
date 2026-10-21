@@ -28,13 +28,13 @@ import java.util.UUID;
  */
 public enum GeneralUsage {
     
-    BOOK_OPEN {
+    BOOK_OPEN(false) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             GuiQuestBook.displayGui(player, nbt.getBoolean("OP"));
         }
     },
-    BOOK_SELECT_TASK {
+    BOOK_SELECT_TASK(true) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
@@ -42,7 +42,7 @@ public enum GeneralUsage {
             data.selectedTask = nbt.getInt("TaskId");
         }
     },
-    BAG_OPENED {
+    BAG_OPENED(false) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             UUID groupId = nbt.getUUID("GroupId");
@@ -52,6 +52,19 @@ public enum GeneralUsage {
             GuiReward.open(player, groupId, bag, limits);
         }
     };
+    
+    private final boolean serverBound;
+    
+    /**
+     * @param serverBound whether the usage is sent by clients and handled by the server, otherwise it is sent by the server and handled by clients
+     */
+    GeneralUsage(boolean serverBound) {
+        this.serverBound = serverBound;
+    }
+    
+    public boolean isServerBound() {
+        return serverBound;
+    }
     
     // server -> client
     public static void sendOpenBook(Player player, boolean op) {

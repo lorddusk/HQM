@@ -29,7 +29,7 @@ public class KillReputationTask extends ReputationTask<ReputationKillTaskData> {
     
     @Override
     public float getCompletedRatio(Team team) {
-        return (float) getData(team).kills / kills;
+        return kills == 0 ? 0 : (float) getData(team).kills / kills;
     }
     
     @Override

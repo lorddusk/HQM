@@ -22,7 +22,9 @@ public class SoundMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.update = ClientChange.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // A change that does not exist is left out, the handler ignores the message
+        this.update = ordinal >= 0 && ordinal < ClientChange.values().length ? ClientChange.values()[ordinal] : null;
         this.data = buf.readUtf(32767);
     }
     
@@ -40,6 +42,10 @@ public class SoundMessage implements IMessage {
         }
         
         private void handle(SoundMessage message, PacketContext ctx) {
+            if (message.update == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a SoundMessage with an unknown update");
+                return;
+            }
             message.update.parse(HardcoreQuestingCore.proxy.getPlayer(ctx), message.data);
         }
     }

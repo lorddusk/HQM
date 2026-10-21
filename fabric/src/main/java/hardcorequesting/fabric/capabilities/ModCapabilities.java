@@ -30,7 +30,7 @@ public final class ModCapabilities implements EntityComponentInitializer {
         
         @Override
         public void writeToNbt(CompoundTag tag, HolderLookup.Provider provider) {
-            this.tag.put("Tag", this.tag);
+            tag.put("Tag", this.tag);
         }
     }
 }

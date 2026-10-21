@@ -24,7 +24,9 @@ public class TeamUpdateMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.type = TeamUpdateType.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // A type that does not exist is left out, the handler ignores the message
+        this.type = ordinal >= 0 && ordinal < TeamUpdateType.values().length ? TeamUpdateType.values()[ordinal] : null;
         this.data = SyncUtil.readLargeString(buf);
     }
     
@@ -44,6 +46,10 @@ public class TeamUpdateMessage implements IMessage {
         }
         
         private void handle(TeamUpdateMessage message, PacketContext ctx) {
+            if (message.type == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a TeamUpdateMessage with an unknown type");
+                return;
+            }
             message.type.update(QuestingDataManager.getInstance().getQuestingData(HardcoreQuestingCore.proxy.getPlayer(ctx)).getTeam(), message.data);
         }
     }

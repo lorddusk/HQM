@@ -35,6 +35,7 @@ public class BagItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         if (!world.isClientSide) {
+            boolean opened = false;
             int totalWeight = 0;
             for (LootGroup group : LootGroup.getGroups().values()) {
                 if (group.isValid(player)) {
@@ -51,6 +52,7 @@ public class BagItem extends Item {
                             player.getInventory().setChanged();
                             openClientInterface(player, group.getId(), tierOrdinal);
                             world.playSound(null, player.blockPosition(), Sounds.BAG.getSound(), SoundSource.MASTER, 1, 1);
+                            opened = true;
                             break;
                         } else {
                             rng -= weight;
@@ -58,6 +60,9 @@ public class BagItem extends Item {
                     }
                 }
             }
+            
+            if (!opened)
+                return InteractionResultHolder.fail(player.getItemInHand(hand));
             
             ItemStack stack = player.getItemInHand(hand).copy();
             stack.shrink(1);

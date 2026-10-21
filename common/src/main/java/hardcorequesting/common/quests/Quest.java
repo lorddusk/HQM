@@ -117,10 +117,14 @@ public class Quest {
     
     public static void removeQuest(Quest quest) {
         for (UUID requirementId : quest.requirement) {
-            Quest.getQuest(requirementId).reversedRequirement.remove(quest.getQuestId());
+            Quest requirement = Quest.getQuest(requirementId);
+            if (requirement != null)
+                requirement.reversedRequirement.remove(quest.getQuestId());
         }
         for (UUID optionLinkId : quest.optionLinks) {
-            Quest.getQuest(optionLinkId).reversedOptionLinks.remove(quest.getQuestId());
+            Quest optionLink = Quest.getQuest(optionLinkId);
+            if (optionLink != null)
+                optionLink.reversedOptionLinks.remove(quest.getQuestId());
         }
         
         quest.tasks.forEach(QuestTask::onDelete);
@@ -191,9 +195,11 @@ public class Quest {
     private boolean lookForId(UUID questId, Set<UUID> visited, boolean reversed) {
         if (visited.add(this.getQuestId())) {
             List<UUID> currentRequirements = reversed ? reversedRequirement : requirement;
-            for (UUID id : currentRequirements)
-                if (id.equals(questId) || QuestSetsManager.getInstance().quests.get(id).lookForId(questId, visited, reversed))
+            for (UUID id : currentRequirements) {
+                Quest other = QuestSetsManager.getInstance().quests.get(id);   // missing when the quest was removed without this one being updated
+                if (id.equals(questId) || (other != null && other.lookForId(questId, visited, reversed)))
                     return true;
+            }
         }
         return false;
     }
@@ -236,7 +242,7 @@ public class Quest {
         for (UUID questId : optionLinks) {
             QuestSetsManager.getInstance().quests.get(questId).reversedOptionLinks.remove(getQuestId());
         }
-        reversedRequirement.clear();
+        reversedOptionLinks.clear();
         optionLinks.clear();
     }
     
@@ -339,7 +345,8 @@ public class Quest {
         
         boolean result = true;
         for (UUID optionLinkId : optionLinks) {
-            if (QuestSetsManager.getInstance().quests.get(optionLinkId).isCompleted(playerId)) {
+            Quest linked = QuestSetsManager.getInstance().quests.get(optionLinkId);
+            if (linked != null && linked.isCompleted(playerId)) {
                 result = false;
                 break;
             }
@@ -347,7 +354,8 @@ public class Quest {
         
         if (result) {
             for (UUID optionLinkId : reversedOptionLinks) {
-                if (QuestSetsManager.getInstance().quests.get(optionLinkId).isCompleted(playerId)) {
+                Quest linked = QuestSetsManager.getInstance().quests.get(optionLinkId);
+                if (linked != null && linked.isCompleted(playerId)) {
                     result = false;
                     break;
                 }
@@ -673,6 +681,8 @@ public class Quest {
     }
     
     public float getProgress(Team team) {
+        if (this.tasks.isEmpty()) return 0;
+        
         float data = 0;
         for (QuestTask<?> task : this.tasks) {
             data += task.getCompletedRatio(team);

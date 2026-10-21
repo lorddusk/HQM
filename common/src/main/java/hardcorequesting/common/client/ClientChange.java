@@ -3,6 +3,7 @@ package hardcorequesting.common.client;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.network.IMessage;
@@ -124,8 +125,12 @@ public enum ClientChange {
             JsonObject root = parser.parse(data).getAsJsonObject();
             BlockPos pos = BlockPos.of(root.get(BLOCK_POS).getAsLong());
             int radius = root.get(RADIUS).getAsInt();
-            TrackerType type = TrackerType.values()[root.get(TYPE).getAsInt()];
-            TrackerBlockEntity.saveToServer(player, pos, radius, type);
+            int type = root.get(TYPE).getAsInt();
+            if (type < 0 || type >= TrackerType.values().length) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a TRACKER_UPDATE with an unknown tracker type from %s", player.getScoreboardName());
+                return;
+            }
+            TrackerBlockEntity.saveToServer(player, pos, radius, TrackerType.values()[type]);
         }
     }),
     SOUND(new ClientUpdater<Sounds>() {
@@ -136,7 +141,12 @@ public enum ClientChange {
         
         @Override
         public void parse(Player player, String data) {
-            SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
+            int sound = Integer.parseInt(data);
+            if (sound < 0 || sound >= Sounds.values().length) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a SOUND update with an unknown sound");
+                return;
+            }
+            SoundHandler.handleSoundPacket(Sounds.values()[sound]);
         }
     }),
     LORE(new ClientUpdater() {
@@ -174,7 +184,9 @@ public enum ClientChange {
             int task = root.get(TASK).getAsInt();
             if (quest != null && task > -1 && task < quest.getTasks().size()) {
                 QuestTask<?> taskObj = quest.getTasks().get(task);
-                if (taskObj.getType() == TaskType.CHECKBOX.get()) {
+                // The same conditions as for the tasks that are completed by events: the client can only ask for what the screen offers
+                if (taskObj.getType() == TaskType.CHECKBOX.get() && quest.isEnabled(player) && quest.isAvailable(player)
+                    && taskObj.isVisible(player.getUUID()) && !taskObj.isCompleted(player)) {
                     taskObj.completeTask(player.getUUID());
                     quest.sendUpdatedDataToTeam(player);
                 }
@@ -189,7 +201,13 @@ public enum ClientChange {
     }
     
     public void parse(Player player, String data) {
-        updater.parse(player, data);
+        try {
+            updater.parse(player, data);
+        } catch (RuntimeException e) {
+            // The data comes from a client, and can be anything. It is dropped and the exception is kept in the log.
+            HardcoreQuestingCore.LOGGER.warn("Ignored a malformed %s update from %s: %s", name(), player.getScoreboardName(),
+                    data.length() > 200 ? data.substring(0, 200) + "..." : data, e);
+        }
     }
     
     @SuppressWarnings("unchecked")

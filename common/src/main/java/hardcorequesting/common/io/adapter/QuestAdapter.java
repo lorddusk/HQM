@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.datafixers.util.Either;
 import dev.architectury.fluid.FluidStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.quests.reward.QuestRewards;
@@ -217,8 +218,15 @@ public class QuestAdapter {
                     GsonHelper.getAsBoolean(object, BIG_ICON, false)
             );
             boolean hasUuid = object.has(UUID);
-            if (hasUuid)
-                QUEST.setId(java.util.UUID.fromString(GsonHelper.getAsString(object, UUID)));
+            if (hasUuid) {
+                java.util.UUID id = java.util.UUID.fromString(GsonHelper.getAsString(object, UUID));
+                if (QuestSetsManager.getInstance().quests.containsKey(id)) {
+                    // For example a set that was exported, renamed and imported again. The quest keeps the random id it was created with.
+                    HardcoreQuestingCore.LOGGER.warn("The quest '%s' has the id %s, which another quest has already. It gets a new id.", QUEST.getRawName().getRawText(), id);
+                } else {
+                    QUEST.setId(id);
+                }
+            }
             QUEST.setTriggerTasks(GsonHelper.getAsInt(object, TRIGGER_TASKS, QUEST.getTriggerTasks()));
             QUEST.setParentRequirementCount(GsonHelper.getAsInt(object, PARENT_REQUIREMENT, QUEST._getParentRequirementCount()));
             if (object.has(ICON)) {
@@ -236,7 +244,16 @@ public class QuestAdapter {
             if (object.has(REPEAT)) QUEST.setRepeatInfo(REPEAT_INFO_ADAPTER.deserialize(object.get(REPEAT)));
             if (object.has(TRIGGER)) QUEST.setTriggerType(TriggerType.valueOf(GsonHelper.getAsString(object, TRIGGER)));
             for (JsonElement element : GsonHelper.getAsJsonArray(object, TASKS, EMPTY_ARRAY)) {
-                QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
+                try {
+                    QuestTaskAdapter.TASK_ADAPTER.deserialize(element);
+                } catch (RuntimeException e) {
+                    // For example a task type of a mod that is gone. Progress is kept by the position of the tasks,
+                    // so the quest is left out as a whole, instead of loading it with different tasks.
+                    HardcoreQuestingCore.LOGGER.warn("Skipped the quest '%s', as one of its tasks can not be read: %s", QUEST.getRawName().getRawText(), e.getMessage());
+                    QUEST.getTasks().forEach(QuestTask::onDelete);
+                    QuestSetsManager.getInstance().quests.remove(QUEST.getQuestId());
+                    return null;
+                }
             }
             QuestRewards rewards = QUEST.getRewards();
             rewards.setReward(readItemStackList(GsonHelper.getAsJsonArray(object, REWARDS, EMPTY_ARRAY)));
@@ -395,8 +412,16 @@ public class QuestAdapter {
         for (Map.Entry<ReputationReward, String> entry : reputationRewardMapping.entrySet()) {
             String rep = entry.getValue();
             Reputation reputation = ReputationManager.getInstance().getReputations().get(rep);
-            if (reputation == null)
-                throw new IOException("Failed to load reputation " + rep);
+            if (reputation == null) {
+                // Left in place, saving or claiming it would fail on the missing reputation
+                HardcoreQuestingCore.LOGGER.warn("Removed a reward of the reputation '%s' from its quest, as the reputation does not exist", rep);
+                for (Quest quest : QuestSetsManager.getInstance().quests.values()) {
+                    List<ReputationReward> rewards = quest.getRewards().getReputationRewards();
+                    if (rewards != null)
+                        rewards.remove(entry.getKey());
+                }
+                continue;
+            }
             entry.getKey().setReward(reputation);
         }
         reputationRewardMapping.clear();

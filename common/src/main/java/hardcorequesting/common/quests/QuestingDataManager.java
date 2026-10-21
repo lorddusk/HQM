@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -97,7 +96,7 @@ public class QuestingDataManager {
         if (hardcoreActive || questActive) {
             hardcoreActive = false;
             questActive = false;
-            questingData = new HashMap<>();
+            questingData = new ConcurrentHashMap<>();
         }
     }
     

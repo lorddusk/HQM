@@ -126,9 +126,9 @@ public record LivesSubCommand() implements CommandHandler.SubCommand {
         } else {
             questingDataManager.getQuestingData(player).addLives(player, amount);
             sendChat(source, Translator.translatable("hqm.message.cantGiveMoreLives", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES));
-            sendChat(source, Translator.translatable("hqm.massage.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES));
+            sendChat(source, Translator.translatable("hqm.message.setLivesInstead", player.getScoreboardName(), HQMConfig.getInstance().Hardcore.MAX_LIVES));
             if (source.getEntity() != player)
-                sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.massage.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName()));
+                sendChat(player.createCommandSourceStack(), Translator.translatable("hqm.message.setLivesBy", HQMConfig.getInstance().Hardcore.MAX_LIVES, source.getTextName()));
         }
         currentLives(player);
     }

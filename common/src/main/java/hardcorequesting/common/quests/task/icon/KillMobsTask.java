@@ -85,7 +85,7 @@ public class KillMobsTask extends IconLayoutTask<KillMobsTask.Part, MobTaskData>
             total += req;
         }
         
-        return (float) killed / total;
+        return total == 0 ? 0 : (float) killed / total;
     }
     
     @Override

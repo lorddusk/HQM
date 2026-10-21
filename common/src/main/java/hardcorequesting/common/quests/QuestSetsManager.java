@@ -76,15 +76,23 @@ public class QuestSetsManager implements Serializable {
         questSets.clear();
         EventTrigger.instance().clear();
         
-        reader.read("sets.json")
-                .map(SaveHandler.JSON_PARSER::parse)
-                .ifPresent(jsonElement -> {
-                    if (jsonElement.isJsonArray()) {
-                        loadSetsFromJsonOld(reader, jsonElement.getAsJsonArray());
-                    } else {
-                        loadSetsFromJson(reader, jsonElement);
-                    }
-                });
+        reader.read("sets.json").ifPresent(text -> {
+            try {
+                JsonElement jsonElement = SaveHandler.JSON_PARSER.parse(text);
+                if (jsonElement.isJsonArray()) {
+                    loadSetsFromJsonOld(reader, jsonElement.getAsJsonArray());
+                } else {
+                    loadSetsFromJson(reader, jsonElement);
+                }
+            } catch (RuntimeException e) {
+                // The rest has to load without it. The set files are left alone, only the list that names them is lost.
+                HardcoreQuestingCore.LOGGER.error("Could not read sets.json, continuing without quest sets", e);
+                quests.clear();
+                questSets.clear();
+                EventTrigger.instance().clear();
+                SimpleSerializable.keepUnreadable(reader, "sets.json", text);
+            }
+        });
         try {
             QuestAdapter.postLoad();
         } catch (IOException e) {

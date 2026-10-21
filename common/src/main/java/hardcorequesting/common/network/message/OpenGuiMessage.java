@@ -22,7 +22,9 @@ public class OpenGuiMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.gui = GuiType.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // A gui that does not exist is left out, the handler ignores the message
+        this.gui = ordinal >= 0 && ordinal < GuiType.values().length ? GuiType.values()[ordinal] : null;
         if (this.gui == GuiType.NONE) return;
         data = buf.readUtf(32767);
     }
@@ -42,6 +44,10 @@ public class OpenGuiMessage implements IMessage {
         }
         
         private void handle(OpenGuiMessage message, PacketContext ctx) {
+            if (message.gui == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored an OpenGuiMessage with an unknown gui");
+                return;
+            }
             message.gui.open(HardcoreQuestingCore.proxy.getPlayer(ctx), message.data);
         }
     }

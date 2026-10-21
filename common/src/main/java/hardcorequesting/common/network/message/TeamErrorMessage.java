@@ -1,5 +1,6 @@
 package hardcorequesting.common.network.message;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
@@ -19,7 +20,9 @@ public class TeamErrorMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.error = TeamError.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // An error that does not exist is left out, the handler ignores the message
+        this.error = ordinal >= 0 && ordinal < TeamError.values().length ? TeamError.values()[ordinal] : null;
     }
     
     @Override
@@ -36,6 +39,10 @@ public class TeamErrorMessage implements IMessage {
         }
         
         private void handle(TeamErrorMessage message, PacketContext ctx) {
+            if (message.error == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a TeamErrorMessage with an unknown error");
+                return;
+            }
             TeamError.latestError = message.error;
         }
     }
