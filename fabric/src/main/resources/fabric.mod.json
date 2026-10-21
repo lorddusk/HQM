@@ -27,7 +27,15 @@
       "hardcorequesting.fabric.HardcoreQuestingFabric"
     ],
     "fabric-gametest": [
-      "hardcorequesting.fabric.HQMTest"
+      "hardcorequesting.fabric.HQMTest",
+      "hardcorequesting.fabric.test.PersistenceTests",
+      "hardcorequesting.fabric.test.QuestLogicTests",
+      "hardcorequesting.fabric.test.TaskCompletionTests",
+      "hardcorequesting.fabric.test.TeamTests",
+      "hardcorequesting.fabric.test.LivesTests",
+      "hardcorequesting.fabric.test.RewardTests",
+      "hardcorequesting.fabric.test.CommandTests",
+      "hardcorequesting.fabric.test.NetworkTests"
     ],
     "cardinal-components": [
       "hardcorequesting.fabric.capabilities.ModCapabilities"
