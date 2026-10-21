@@ -195,7 +195,7 @@ public class EventTrigger {
     private void onBlockUsed(Player playerEntity, Level world, InteractionHand hand, BlockPos pos, Direction face) {
         if (world.isClientSide)
             return;
-        for (QuestTask task : getTasks(Type.ITEM_USED)) {
+        for (QuestTask task : getTasks(Type.BLOCK_USED)) {
             task.onBlockUsed(playerEntity, world, hand);
         }
     }
@@ -219,7 +219,8 @@ public class EventTrigger {
         QUEST_SELECTED,
         BLOCK_PLACED,
         BLOCK_BROKEN,
-        ITEM_USED
+        ITEM_USED,
+        BLOCK_USED
     }
     
     public static class BookOpeningEvent {

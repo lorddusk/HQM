@@ -19,6 +19,8 @@ import java.util.List;
 public class SoundHandler {
     
     private static final String LABEL = "lore";
+    private static final int MAX_STOP_ATTEMPTS = 100;
+    private static final long STOP_ATTEMPT_DELAY_MS = 50;
     private static List<String> paths = new ArrayList<>();
     private static int loreNumber;
     private static boolean loreMusic = false;
@@ -110,13 +112,22 @@ public class SoundHandler {
     @Environment(EnvType.CLIENT)
     public static void stopLoreMusic() {
         if (isLorePlaying()) {
-            new Thread(() ->
+            Thread thread = new Thread(() ->
             {
-                while (isLorePlaying()) {    // Somehow it doesn't stop the sound on closing the book with escape
+                // Somehow it doesn't stop the sound on closing the book with escape, so it is tried again for a while
+                for (int attempt = 0; attempt < MAX_STOP_ATTEMPTS && isLorePlaying(); attempt++) {
                     Minecraft.getInstance().getSoundManager().stop(loreSound);
+                    try {
+                        Thread.sleep(STOP_ATTEMPT_DELAY_MS);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
                 }
                 loreSound = null;
-            }).start();
+            }, "HQM lore music stop");
+            thread.setDaemon(true);
+            thread.start();
         }
     }
     

@@ -60,7 +60,7 @@ public class CommandReward extends QuestReward<CommandReward.Command> {
     
         @Override
         public boolean shouldInformAdmins() {
-            return true;
+            return false;
         }
     }
 }

@@ -85,10 +85,10 @@ public class KeyboardHandler {
         for (String entry : config) {
             String[] split = entry.split(":");
             if (split.length != 2) continue;
-            int key = Integer.parseInt(split[0]);
-            EditMode mode = EditMode.valueOf(split[1].toUpperCase());
-            if (mode == null) continue;
-            addKeymap(key, mode);
+            try {
+                addKeymap(Integer.parseInt(split[0]), EditMode.valueOf(split[1].toUpperCase()));
+            } catch (IllegalArgumentException ignored) {   // Not a number or not an edit mode
+            }
         }
     }
     

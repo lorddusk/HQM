@@ -96,7 +96,7 @@ public class TameMobsTask extends IconLayoutTask<TameMobsTask.Part, TameTaskData
             total += req;
         }
         
-        return (float) tamed / total;
+        return total == 0 ? 0 : (float) tamed / total;
     }
     
     @Override

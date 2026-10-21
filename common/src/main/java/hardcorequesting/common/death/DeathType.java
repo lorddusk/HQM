@@ -134,7 +134,7 @@ public enum DeathType {
     }
 
     public static DeathType getClamped(int i) {
-        return DeathType.values()[Mth.clamp(i, 0, DeathType.values().length)];
+        return DeathType.values()[Mth.clamp(i, 0, DeathType.values().length - 1)];
     }
     
     /*Fire: inFire, onFire, fireball

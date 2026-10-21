@@ -22,7 +22,9 @@ public class OpActionMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.action = OPBookHelper.OpAction.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // An action that does not exist is left out, the handler ignores the message
+        this.action = ordinal >= 0 && ordinal < OPBookHelper.OpAction.values().length ? OPBookHelper.OpAction.values()[ordinal] : null;
         this.data = buf.readUtf(32767);
     }
     
@@ -41,6 +43,10 @@ public class OpActionMessage implements IMessage {
         }
         
         private void handle(OpActionMessage message, PacketContext ctx) {
+            if (message.action == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a OpActionMessage with an unknown action from %s", ctx.getPlayer().getScoreboardName());
+                return;
+            }
             message.action.process(HardcoreQuestingCore.proxy.getPlayer(ctx), message.data);
         }
     }

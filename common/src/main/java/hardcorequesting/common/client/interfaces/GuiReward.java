@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces;
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.BagItem;
@@ -44,6 +45,7 @@ public class GuiReward extends GuiBase {
     private int lines;
     private List<Reward> rewards;
     private FormattedText statisticsText;
+    private boolean renderFailureLogged;
     
     public GuiReward(LootGroup group, int bagTier, Player player) {
         super(CommonComponents.EMPTY);
@@ -125,7 +127,8 @@ public class GuiReward extends GuiBase {
         for (Reward reward : rewards) {
             try {
                 drawItemStack(graphics, reward.stack, reward.x, reward.y, true);
-            } catch (Throwable ignored) {
+            } catch (RuntimeException e) {
+                logRenderFailure(e);
             }
         }
         
@@ -146,12 +149,22 @@ public class GuiReward extends GuiBase {
                                 }
                             }
                             graphics.renderTooltip(font, str, mX0, mY0);
-                        } catch (Throwable ignored) {
+                        } catch (RuntimeException e) {
+                            logRenderFailure(e);
                         }
                     }
-                } catch (Throwable ignored) {
+                } catch (RuntimeException e) {
+                    logRenderFailure(e);
                 }
             }
+        }
+    }
+    
+    private void logRenderFailure(RuntimeException e) {
+        // Rendering happens every frame, so it is only logged once. A broken item of another mod should not close the screen.
+        if (!renderFailureLogged) {
+            renderFailureLogged = true;
+            HardcoreQuestingCore.LOGGER.warn("Could not render a reward of the reward screen", e);
         }
     }
     

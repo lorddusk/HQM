@@ -162,6 +162,11 @@ public class LootGroup {
     }
     
     @Override
+    public int hashCode() {
+        return Objects.hash(name, limit, items.size());
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof LootGroup) {
             if (Objects.equals(name, ((LootGroup) obj).name) && limit == ((LootGroup) obj).limit && items.size() == ((LootGroup) obj).items.size()) {

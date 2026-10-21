@@ -55,7 +55,7 @@ public class LocationTaskData extends TaskData {
     }
     
     public float getCompletedRatio(int size) {
-        return (float) visited.stream().limit(size).filter(Boolean::booleanValue).count() / size;
+        return size == 0 ? 0 : (float) visited.stream().limit(size).filter(Boolean::booleanValue).count() / size;
     }
     
     public boolean areAllCompleted(int size) {

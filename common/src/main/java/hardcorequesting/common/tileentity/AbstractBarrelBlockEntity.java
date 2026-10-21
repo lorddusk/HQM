@@ -218,7 +218,7 @@ public abstract class AbstractBarrelBlockEntity extends BlockEntity implements C
 
     @Override
     protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        if (compoundTag.contains(NBT_PLAYER_UUID + "Most")) {
+        if (compoundTag.hasUUID(NBT_PLAYER_UUID) && compoundTag.hasUUID(NBT_QUEST)) {
             this.setPlayerUUID(compoundTag.getUUID(NBT_PLAYER_UUID));
             this.setQuestUUID(compoundTag.getUUID(NBT_QUEST));
             selectedTask = compoundTag.getByte(NBT_TASK);

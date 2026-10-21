@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
@@ -507,7 +508,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                             try {
                                                 quest.setIconStack(result.get());
                                             } catch (Exception e) {
-                                                System.out.println("Tell LordDusk that he found the issue.");
+                                                HardcoreQuestingCore.LOGGER.warn("Failed to set the icon of a quest", e);
                                             }
                                             SaveHelper.add(EditType.ICON_CHANGE);
                                         });
@@ -535,7 +536,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                                 });
                                 break;
                             case QUEST_SELECTION:
-                                if (Quest.speciallySelectedQuestId == quest.getQuestId()) Quest.speciallySelectedQuestId = null;
+                                if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) Quest.speciallySelectedQuestId = null;
                                 else Quest.speciallySelectedQuestId = quest.getQuestId();
                                 break;
                             case QUEST_OPTION:

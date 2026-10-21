@@ -1,5 +1,6 @@
 package hardcorequesting.common.network.message;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
@@ -21,7 +22,9 @@ public class TeamMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.action = TeamAction.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // An action that does not exist is left out, the handler ignores the message
+        this.action = ordinal >= 0 && ordinal < TeamAction.values().length ? TeamAction.values()[ordinal] : null;
         this.data = buf.readUtf(32767);
     }
     
@@ -40,6 +43,10 @@ public class TeamMessage implements IMessage {
         }
         
         private void handle(TeamMessage message, PacketContext ctx) {
+            if (message.action == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a TeamMessage with an unknown action from %s", ctx.getPlayer().getScoreboardName());
+                return;
+            }
             message.action.process(ctx.getPlayer(), message.data);
         }
     }

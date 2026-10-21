@@ -1,5 +1,6 @@
 package hardcorequesting.common.network.message;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.ClientChange;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
@@ -21,7 +22,9 @@ public class ClientUpdateMessage implements IMessage {
     
     @Override
     public void fromBytes(FriendlyByteBuf buf, PacketContext context) {
-        this.update = ClientChange.values()[buf.readInt()];
+        int ordinal = buf.readInt();
+        // An action that does not exist is left out, the handler ignores the message
+        this.update = ordinal >= 0 && ordinal < ClientChange.values().length ? ClientChange.values()[ordinal] : null;
         data = buf.readUtf(32767);
     }
     
@@ -40,6 +43,10 @@ public class ClientUpdateMessage implements IMessage {
         }
         
         private void handle(ClientUpdateMessage message, PacketContext ctx) {
+            if (message.update == null) {
+                HardcoreQuestingCore.LOGGER.warn("Ignored a ClientUpdateMessage with an unknown action from %s", ctx.getPlayer().getScoreboardName());
+                return;
+            }
             message.update.parse(ctx.getPlayer(), message.data);
         }
     }

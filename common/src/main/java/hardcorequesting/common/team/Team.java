@@ -103,7 +103,7 @@ public class Team {
                 if (data.completed) completed++;
             }
         }
-        return (float) completed / total;
+        return total == 0 ? 0 : (float) completed / total;
     }
     
     public void receiveAndSyncReputation(Quest quest, List<ReputationReward> reputationList) {
@@ -166,13 +166,20 @@ public class Team {
     }
     
     public void removePlayer(Player toBeRemoved) {
+        removePlayer(toBeRemoved.getUUID());
+    }
+    
+    /**
+     * Removes the player from the team, who gets a new team of their own. The player does not have to be online.
+     */
+    public void removePlayer(UUID toBeRemoved) {
         int id = 0;
         Iterator<PlayerEntry> iterator = players.iterator();
         while (iterator.hasNext()) {
             PlayerEntry player = iterator.next();
             
-            if (player.getUUID().equals(toBeRemoved.getUUID())) {
-                Team newSingleTeam = Team.single(toBeRemoved.getUUID());
+            if (player.getUUID().equals(toBeRemoved)) {
+                Team newSingleTeam = Team.single(toBeRemoved);
                 for (UUID i : questData.keySet()) {
                     QuestData leaveData = newSingleTeam.questData.get(i);
                     QuestData data = questData.get(i);
@@ -267,7 +274,7 @@ public class Team {
         for (int i = players.size() - 1; i >= 0; i--) {
             PlayerEntry player = players.get(i);
             if (player.isInTeam()) {
-                removePlayer(player.getPlayerMP());
+                removePlayer(player.getUUID());
             } else {
                 players.remove(i);
             }
@@ -392,14 +399,18 @@ public class Team {
     }
     
     private void createQuestData(UUID questId) {
-        this.questData.put(questId, Quest.getQuest(questId).createData(1));
+        Quest quest = Quest.getQuest(questId);
+        if (quest != null)
+            this.questData.put(questId, quest.createData(1));
     }
     
     public QuestData getQuestData(UUID questId) {
         if (!this.questData.containsKey(questId)) {
             createQuestData(questId);
         }
-        return this.questData.get(questId);
+        QuestData data = this.questData.get(questId);
+        // The quest does not exist (anymore), so there is nothing to store. Callers get empty data that is not kept.
+        return data != null ? data : new QuestData(getPlayerCount());
     }
     
     public void setQuestData(UUID questId, QuestData data) {

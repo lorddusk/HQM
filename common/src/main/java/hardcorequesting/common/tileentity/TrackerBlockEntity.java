@@ -1,5 +1,6 @@
 package hardcorequesting.common.tileentity;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
 import hardcorequesting.common.blocks.TrackerBlock;
 import hardcorequesting.common.client.ClientChange;
@@ -61,21 +62,31 @@ public class TrackerBlockEntity extends BlockEntity {
         if (Quest.canQuestsBeEdited() && tracker != null) {
             tracker.radius = radius;
             tracker.type = type;
+            tracker.setChanged();
         }
     }
     
     @Override
     protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        questId = compoundTag.getUUID(NBT_QUEST);
+        questId = compoundTag.hasUUID(NBT_QUEST) ? compoundTag.getUUID(NBT_QUEST) : null;
 
         radius = compoundTag.getInt(NBT_RADIUS);
-        type = TrackerType.values()[compoundTag.getByte(NBT_TYPE)];
+        int typeOrdinal = compoundTag.getByte(NBT_TYPE);
+        if (typeOrdinal >= 0 && typeOrdinal < TrackerType.values().length) {
+            type = TrackerType.values()[typeOrdinal];
+        } else {
+            // For example data of a version with more tracker types. The tracker keeps the type it had.
+            HardcoreQuestingCore.LOGGER.warn("The tracker at %s has the unknown tracker type %d, keeping %s", getBlockPos(), typeOrdinal, type);
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
         if (quest != null) {
             compoundTag.putUUID(NBT_QUEST, quest.getQuestId());
+        } else if (questId != null) {
+            // Not resolved yet, which happens on the first tick
+            compoundTag.putUUID(NBT_QUEST, questId);
         }
         compoundTag.putInt(NBT_RADIUS, radius);
         compoundTag.putByte(NBT_TYPE, (byte) type.ordinal());

@@ -44,7 +44,7 @@ public class DeathTask extends QuestTask<DeathTaskData> {
     
     @Override
     public float getCompletedRatio(Team team) {
-        return (float) getData(team).getDeaths() / deaths;
+        return deaths == 0 ? 0 : (float) getData(team).getDeaths() / deaths;
     }
     
     @Override
