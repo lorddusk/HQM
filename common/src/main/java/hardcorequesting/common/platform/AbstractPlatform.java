@@ -29,6 +29,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -111,6 +112,16 @@ public interface AbstractPlatform {
      * If there is no fluid in the item stack, an empty list will be returned.
      */
     List<FluidStack> findFluidsIn(ItemStack stack);
+
+    /**
+     * Drains fluid out of the item in a slot of the player's inventory, for example a bucket.
+     * The emptied container (an empty bucket) replaces the item, or goes back into the inventory if the slot holds several items.
+     * A container that cannot give the fluid in the requested portion (a bucket gives all or nothing) drains nothing.
+     *
+     * @param slot the slot in the player's inventory
+     * @return the amount that was drained, 0 if the item holds none of this fluid
+     */
+    int drainFluidFrom(Player player, int slot, Fluid fluid, int maxAmount);
 
     Fraction getBucketAmount();
     

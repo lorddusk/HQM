@@ -46,6 +46,7 @@ public final class QuestGraphic extends EditableGraphic {
     private static final int TASK_LABEL_START_Y = 100;
     private static final int TASK_MARGIN = 2;
     private static final int TITLE_START_Y = 15;
+    private static final int MAX_NAME_WIDTH = 130;   // as for the description lines, up to the scroll bars
     private static final int DESCRIPTION_START_Y = 30;
     private static final int TASK_SELECTION_ROWS = 8;
     private static final int TASK_SELECTION_COLUMNS = 2;
@@ -141,7 +142,7 @@ public final class QuestGraphic extends EditableGraphic {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
-        gui.drawString(graphics, quest.getName(), START_X, TITLE_START_Y, 0x404040);
+        gui.drawString(graphics, gui.fitToWidth(quest.getName(), MAX_NAME_WIDTH), START_X, TITLE_START_Y, 0x404040);
         
         List<FormattedText> description = descriptionScroll.getVisibleEntries();
         gui.drawString(graphics, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
@@ -152,9 +153,10 @@ public final class QuestGraphic extends EditableGraphic {
             if (isVisible || Quest.canQuestsBeEdited()) {
                 boolean completed = task.isCompleted(playerId);
                 int yPos = getTaskY(id);
-                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getName()), GuiBase.TEXT_HEIGHT, mX, mY);
+                FormattedText name = gui.fitToWidth(task.getName(), MAX_NAME_WIDTH);
+                boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(name), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(graphics, task.getName(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(graphics, name, START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
                 
                 id++;
             }

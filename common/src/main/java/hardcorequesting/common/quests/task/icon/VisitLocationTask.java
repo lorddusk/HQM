@@ -214,6 +214,13 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
             return radius;
         }
         
+        /**
+         * @return the distance in blocks from the player to the middle of the location block
+         */
+        public int distanceTo(Player player) {
+            return (int) Math.sqrt(player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D));
+        }
+        
         public void setRadius(int radius) {
             this.radius = radius;
         }

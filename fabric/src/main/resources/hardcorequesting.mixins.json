@@ -3,7 +3,7 @@
   "package": "hardcorequesting.fabric.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "MixinAnvilMenu", "MixinPlayerInventory"
+    "MixinAbstractHorse", "MixinAnvilMenu", "MixinPlayerInventory"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -41,8 +41,7 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
             if (Objects.equals(mc.level.dimension().location().toString(), part.getDimension())) {
                 if (part.getRadius() >= 0) {
                     FormattedText str;
-                    int distance = (int) mc.player.distanceToSqr(part.getPosition().getX() + 0.5, part.getPosition().getY() + 0.5, part.getPosition().getZ() + 0.5);
-                    str = Translator.translatable("hqm.locationMenu.mAway", distance);
+                    str = Translator.translatable("hqm.locationMenu.mAway", part.distanceTo(mc.player));
                     if (part.getVisibility().doShowRadius()) {
                         str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.getRadius()), Translator.plain("]"));
                     }

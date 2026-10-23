@@ -11,9 +11,11 @@ import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.quests.task.TaskType;
+import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -25,9 +27,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -94,6 +98,10 @@ public class TaskCompletionTests {
         return "{\"item\": {\"id\": \"" + item + "\", \"Count\": 1}, \"required\": " + required + "}";
     }
 
+    private static String fluidPart(String fluid, long required) {
+        return "{\"fluid\": {\"fluid\": \"" + fluid + "\", \"volume\": {\"n\": 1, \"d\": 1}}, \"required\": " + required + "}";
+    }
+
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void everyTaskTypeHasACompletionTest(GameTestHelper helper) {
         TestScope.run(helper, t -> {
@@ -133,6 +141,42 @@ public class TaskCompletionTests {
             play.task().onUpdate(play.player());
             check(play.task().isCompleted(play.id()), "Completed with 7 of 5");
             equal(2, play.player().getInventory().countItem(Items.BREAD), "The bread that was not needed stays in the inventory");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void consumeTakesFluidFromBuckets(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            Play play = play(t, items("consume", fluidPart("minecraft:water", 3 * FluidConstants.BUCKET), "items"));
+            Inventory inventory = play.player().getInventory();
+
+            inventory.add(new ItemStack(Items.WATER_BUCKET));
+            inventory.add(new ItemStack(Items.LAVA_BUCKET));
+            inventory.add(new ItemStack(Items.WATER_BUCKET));
+            play.task().onUpdate(play.player());
+            play.expectRatio(2 / 3F, "After 2 of 3 water buckets");
+            equal(2, inventory.countItem(Items.BUCKET), "Empty buckets after handing in");
+            equal(0, inventory.countItem(Items.WATER_BUCKET), "Water buckets left");
+            equal(1, inventory.countItem(Items.LAVA_BUCKET), "The lava bucket is not taken");
+
+            inventory.add(new ItemStack(Items.WATER_BUCKET));
+            play.task().onUpdate(play.player());
+            check(play.task().isCompleted(play.id()), "Completed with 3 of 3 water buckets");
+            equal(3, inventory.countItem(Items.BUCKET), "Empty buckets after completing");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void consumeEmptiesABucketForLessThanABucket(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            Play play = play(t, items("consume", fluidPart("minecraft:water", FluidConstants.BUCKET / 2), "items"));
+            Inventory inventory = play.player().getInventory();
+
+            inventory.add(new ItemStack(Items.WATER_BUCKET));
+            play.task().onUpdate(play.player());
+
+            check(play.task().isCompleted(play.id()), "Completed with half a bucket required");
+            equal(1, inventory.countItem(Items.BUCKET), "The bucket is emptied");
         });
     }
 
@@ -304,6 +348,26 @@ public class TaskCompletionTests {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void tamingAnyHorseIsCounted(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            // "minecraft:abstracthorse" is what the editor stores for the "any horse-like entity" entry
+            Play play = play(t, json("{\"type\": \"hardcorequesting:tame\", \"part\": [{\"tame\": \"minecraft:abstracthorse\", \"tames\": 2}]}"));
+
+            Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, new BlockPos(3, 1, 3));
+            wolf.tame(play.player());
+            play.expectRatio(0, "After taming a wolf");
+
+            AbstractHorse horse = helper.spawnWithNoFreeWill(EntityType.HORSE, new BlockPos(3, 1, 4));
+            horse.tameWithName(play.player());
+            play.expectRatio(0.5F, "After taming a horse");
+
+            AbstractHorse donkey = helper.spawnWithNoFreeWill(EntityType.DONKEY, new BlockPos(4, 1, 3));
+            donkey.tameWithName(play.player());
+            check(play.task().isCompleted(play.id()), "Completed after taming a horse and a donkey");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void deathsAreCounted(GameTestHelper helper) {
         TestScope.run(helper, t -> {
             Play play = play(t, json("{\"type\": \"hardcorequesting:death\", \"deaths\": 2}"));
@@ -333,6 +397,20 @@ public class TaskCompletionTests {
             EventTrigger.instance().onPlayerTick(play.player());
             play.expectRatio(2 / 3F, "At the second location");
             check(!play.task().isCompleted(play.id()), "The location in the other dimension was not visited");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void locationDistanceIsInBlocks(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            BlockPos here = BlockPos.containing(helper.absoluteVec(new Vec3(1.5, 1, 1.5)));
+            Play play = play(t, json("{\"type\": \"hardcorequesting:location\", \"locations\": [" + location(here, 5, "\"minecraft:overworld\"") + "]}"));
+            VisitLocationTask.Part part = ((VisitLocationTask) play.task()).getParts().getElements().get(0);
+
+            play.player().setPos(Vec3.atCenterOf(here.offset(10, 0, 0)));
+            equal(10, part.distanceTo(play.player()), "Distance at 10 blocks");
+            play.player().setPos(Vec3.atCenterOf(here.offset(9, 0, 0)));
+            equal(9, part.distanceTo(play.player()), "Distance at 9 blocks");
         });
     }
 

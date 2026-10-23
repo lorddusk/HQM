@@ -33,6 +33,8 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.item.PlayerInventoryStorage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.client.Minecraft;
@@ -64,6 +66,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.nio.file.Path;
@@ -255,6 +258,22 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
             return fluids;
         }
         return List.of();
+    }
+
+    @Override
+    public int drainFluidFrom(Player player, int slot, Fluid fluid, int maxAmount) {
+        ContainerItemContext context = ContainerItemContext.ofPlayerSlot(player, PlayerInventoryStorage.of(player).getSlot(slot));
+        Storage<FluidVariant> storage = context.find(FluidStorage.ITEM);
+        if (storage == null) {
+            return 0;
+        }
+        try (Transaction transaction = Transaction.openOuter()) {
+            long drained = storage.extract(FluidVariant.of(fluid), maxAmount, transaction);
+            if (drained > 0) {
+                transaction.commit();
+            }
+            return (int) drained;
+        }
     }
 
     @Override

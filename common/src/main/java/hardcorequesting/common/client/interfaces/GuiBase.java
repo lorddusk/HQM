@@ -256,6 +256,17 @@ public class GuiBase extends Screen {
         return font.width(txt);
     }
     
+    /**
+     * @return the text, or the start of it followed by "..." if it is wider than the given width
+     */
+    public FormattedText fitToWidth(FormattedText text, int width) {
+        if (font.width(text) <= width) {
+            return text;
+        }
+        FormattedText ellipsis = FormattedText.of("...");
+        return FormattedText.composite(font.getSplitter().headByWidth(text, width - font.width(ellipsis), Style.EMPTY), ellipsis);
+    }
+    
     public void drawString(GuiGraphics graphics, FormattedText str, int x, int y, int color) {
         drawString(graphics, str, x, y, 1F, color);
     }

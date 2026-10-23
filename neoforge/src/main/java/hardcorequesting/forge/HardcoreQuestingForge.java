@@ -29,6 +29,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -40,6 +41,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
@@ -62,6 +64,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -319,6 +322,27 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                 fluids.add(FluidStack.create(fluid.getFluid(), fluid.getAmount()));
         }
         return fluids;
+    }
+    
+    @Override
+    public int drainFluidFrom(Player player, int slot, Fluid fluid, int maxAmount) {
+        Inventory inventory = player.getInventory();
+        ItemStack stack = inventory.getItem(slot);
+        // the handler changes its container, so it works on a single item and the stack is updated afterwards
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(stack.copyWithCount(1)).orElse(null);
+        if (handler == null) {
+            return 0;
+        }
+        int drained = handler.drain(new net.neoforged.neoforge.fluids.FluidStack(fluid, maxAmount), IFluidHandler.FluidAction.EXECUTE).getAmount();
+        if (drained > 0) {
+            if (stack.getCount() == 1) {
+                inventory.setItem(slot, handler.getContainer());
+            } else {
+                stack.shrink(1);
+                inventory.placeItemBackInInventory(handler.getContainer());
+            }
+        }
+        return drained;
     }
     
     @Override
