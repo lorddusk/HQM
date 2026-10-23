@@ -128,6 +128,9 @@ public class MenuPageGraphic extends EditableGraphic {
         gui.drawString(graphics, Translator.translatable("hqm.questBook.deaths", Translator.plural("hqm.times", deaths)), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
         gui.drawString(graphics, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
         
+        // Before the team part, which is skipped when teams are disabled
+        drawReputations(graphics, gui, mX, mY, player.getUUID());
+        
         if (!HQMConfig.getInstance().ENABLE_TEAMS) return;
         
         FormattedText str;
@@ -156,8 +159,6 @@ public class MenuPageGraphic extends EditableGraphic {
             gui.drawString(graphics, Translator.translatable("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
             gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, 0xff5555);
         }
-        
-        drawReputations(graphics, gui, mX, mY, player.getUUID());
     }
     
     private void drawReputations(GuiGraphics graphics, GuiQuestBook gui, int mX, int mY, final UUID playerId) {

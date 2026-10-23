@@ -46,8 +46,8 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
         if (setting.getReputation() == null) {
             setReputation(0);
         } else {
-            int id = reputationManager.getReputationList().indexOf(reputation);
-            if (reputationId != -1) {
+            int id = reputationManager.getReputationList().indexOf(setting.getReputation());
+            if (id != -1) {
                 setReputation(id);
                 lower = setting.getLower();
                 upper = setting.getUpper();

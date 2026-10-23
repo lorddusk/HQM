@@ -40,7 +40,7 @@ public final class RottenHeartItem extends Item {
                 DeathType.HQM.onDeath(player);
 
                 if (!player.getAbilities().instabuild)
-                    stack.grow(1);
+                    stack.shrink(1);
             }
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);

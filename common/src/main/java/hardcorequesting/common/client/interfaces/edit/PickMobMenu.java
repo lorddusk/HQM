@@ -166,6 +166,7 @@ public class PickMobMenu extends GuiEditMenu {
     
     @Override
     public void save() {
+        if (mob == null) return;   // nothing was selected
         resultConsumer.accept(new Result(mob.id, Math.max(1, amount)));
     }
     

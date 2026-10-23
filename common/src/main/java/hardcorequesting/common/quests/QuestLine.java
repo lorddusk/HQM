@@ -157,5 +157,8 @@ public class QuestLine {
         for (Serializable serializable : dataSerializables) {
             serializable.load(dataReader);
         }
+        
+        // Everything that was created while loading is counted as an edit, but it is not an unsaved change
+        SaveHelper.onLoad();
     }
 }

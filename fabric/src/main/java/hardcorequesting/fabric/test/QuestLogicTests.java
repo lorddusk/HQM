@@ -208,6 +208,27 @@ public class QuestLogicTests {
         });
     }
 
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void clearingLinksToMissingQuestsDoesNotThrow(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            QuestLine line = t.loadBook(bookOf(checkboxQuest("a"), requiring(checkboxQuest("b"), "a"),
+                    linking(checkboxQuest("c"), "d"), checkboxQuest("d"),
+                    linking(checkboxQuest("e"), "f"), checkboxQuest("f")));
+            Quest b = loaded(line, "b"), c = loaded(line, "c"), f = loaded(line, "f");
+            // Gone without the quests that link to them being updated
+            line.questSetsManager.quests.remove(id("a"));
+            line.questSetsManager.quests.remove(id("d"));
+            line.questSetsManager.quests.remove(id("e"));
+
+            b.clearRequirements();
+            c.clearOptionLinks();
+            f.clearOptionLinks();
+
+            equal(0, b.getRequirements().size(), "Requirements of the quest after clearing");
+            equal(0, c.getOptionLinks().size(), "Option links of the quest after clearing");
+        });
+    }
+
     // Completing
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)

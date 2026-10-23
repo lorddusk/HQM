@@ -206,8 +206,11 @@ public class Quest {
     
     public void clearRequirements() {
         SaveHelper.add(EditType.REQUIREMENT_REMOVE, requirement.size());
-        for (UUID questId : requirement)
-            QuestSetsManager.getInstance().quests.get(questId).reversedRequirement.remove(getQuestId());
+        for (UUID questId : requirement) {
+            Quest required = Quest.getQuest(questId);
+            if (required != null)
+                required.reversedRequirement.remove(getQuestId());
+        }
         requirement.clear();
     }
     
@@ -236,11 +239,15 @@ public class Quest {
     public void clearOptionLinks() {
         SaveHelper.add(EditType.OPTION_REMOVE, optionLinks.size());
         for (UUID questId : reversedOptionLinks) {
-            QuestSetsManager.getInstance().quests.get(questId).optionLinks.remove(getQuestId());
+            Quest linking = Quest.getQuest(questId);
+            if (linking != null)
+                linking.optionLinks.remove(getQuestId());
         }
         
         for (UUID questId : optionLinks) {
-            QuestSetsManager.getInstance().quests.get(questId).reversedOptionLinks.remove(getQuestId());
+            Quest linked = Quest.getQuest(questId);
+            if (linked != null)
+                linked.reversedOptionLinks.remove(getQuestId());
         }
         reversedOptionLinks.clear();
         optionLinks.clear();

@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
@@ -29,6 +30,7 @@ public class EditGroupGraphic extends EditableGraphic {
     private static final int ITEMS_PER_LINE = 7;
     
     private final LootGroup group;
+    private boolean tooltipFailureLogged;
     
     public EditGroupGraphic(GuiQuestBook gui, LootGroup group) {
         super(gui, EditMode.NORMAL, EditMode.ITEM, EditMode.DELETE);
@@ -63,7 +65,12 @@ public class EditGroupGraphic extends EditableGraphic {
                 if (!stack.isEmpty()) {
                     try {
                         graphics.renderTooltip(this.gui.getFont(), stack, mX + gui.getLeft(), mY + gui.getTop());
-                    } catch (Exception ignored) {
+                    } catch (RuntimeException e) {
+                        // Drawn every frame, so only the first failure is logged. An item of another mod may fail to render its tooltip.
+                        if (!tooltipFailureLogged) {
+                            tooltipFailureLogged = true;
+                            HardcoreQuestingCore.LOGGER.warn("Could not render the tooltip of an item of a loot group", e);
+                        }
                     }
                 }
                 break;

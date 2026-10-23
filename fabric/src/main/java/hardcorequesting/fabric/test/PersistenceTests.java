@@ -17,6 +17,7 @@ import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.RewardSetting;
 import hardcorequesting.common.team.Team;
 import hardcorequesting.common.team.TeamManager;
+import hardcorequesting.common.util.SaveHelper;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -529,6 +530,18 @@ public class PersistenceTests {
             
             MemoryData saved = TestScope.saveBook(line);
             check(saved.files().containsKey("sets/Set.json"), "The set could not be saved");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void loadingABookIsNotAnUnsavedChange(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            t.loadBook(fullBook());
+
+            int unsaved = 0;
+            for (SaveHelper.ListElement element : SaveHelper.list)
+                unsaved += element.count;
+            equal(0, unsaved, "Unsaved changes right after loading a book");
         });
     }
 }

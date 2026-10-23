@@ -11,6 +11,7 @@ import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.SyncUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -119,6 +120,9 @@ public class PlayerDataSyncMessage implements IMessage {
             questLine.questingDataManager.data.loadFromString(message.data);
             questLine.questingDataManager.state.loadFromString(QuestingDataManager.saveQuestingState(message.questing, message.hardcore));
             questLine.deathStatsManager.loadFromString(message.deaths);
+            
+            // Everything that was created while loading is counted as an edit, but it is not an unsaved change
+            SaveHelper.onLoad();
         }
     }
 }

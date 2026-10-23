@@ -1,34 +1,42 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Build and test
 
 on:
   push:
-    branches: [ "1.19.4" ]
+    branches: [ "1.21.1" ]
+    paths-ignore: [ "**.md", "docs/**" ]
   pull_request:
-    branches: [ "1.19.4" ]
+    branches: [ "1.21.1" ]
+    paths-ignore: [ "**.md", "docs/**" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   build:
+    name: ${{ matrix.loader }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [ fabric, neoforge ]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'zulu'
-        java-version: 17
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@v1
-#    - name: Cache Gradle packages
-#      uses: actions/cache@v2
-#      with:
-#        path: ~/.gradle/caches
-#        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-#        restore-keys: ${{ runner.os }}-gradle
-    - name: Build with Gradle
-      timeout-minutes: 20
-      run: ./gradlew build --stacktrace
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      # Validates the wrapper jar and caches Gradle and Loom downloads
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/1.21.1' }}
+
+      # Fabric: compiles, builds the jar and runs the gametests. NeoForge: compiles and builds the jar
+      - name: Build ${{ matrix.loader }}
+        run: ./gradlew :${{ matrix.loader }}:build --stacktrace --console=plain

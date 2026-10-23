@@ -200,6 +200,24 @@ public class LivesTests {
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void rottenHeartIsUsedUpAndCostsALife(GameTestHelper helper) {
+        TestScope.run(helper, t -> {
+            t.loadBook(bookOf(checkboxQuest("a")));
+            ServerPlayer player = player(helper);
+            QuestingData data = lives(player, 3);
+
+            ItemStack left = useHeart(helper, player, ModItems.rottenHeart, 3);
+            equal(3, data.getRawLives(), "Lives after using a rotten heart outside of hardcore mode");
+            equal(3, left.getCount(), "Rotten hearts left outside of hardcore mode");
+
+            hardcore();
+            left = useHeart(helper, player, ModItems.rottenHeart, 3);
+            equal(2, data.getRawLives(), "Lives after using a rotten heart");
+            equal(2, left.getCount(), "Rotten hearts left, the stack must shrink and not grow");
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
     public void partialHeartsCombineIntoHearts(GameTestHelper helper) {
         TestScope.run(helper, t -> {
             Item quarter = ModItems.quarterHeart.get(), half = ModItems.halfHeart.get(), threeQuarters = ModItems.threeQuartsHeart.get(), full = ModItems.heart.get();
